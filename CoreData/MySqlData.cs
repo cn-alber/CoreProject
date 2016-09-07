@@ -17,6 +17,10 @@ namespace CoreData
         public static string GetRedisData()
         {
             var s = CacheBase.Get<string>("user1");
+            if(s == null)
+            {
+                return null;
+            }
             return s;
         }
     }
