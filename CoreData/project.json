@@ -6,7 +6,8 @@
   "dependencies": {
     "CoreModels":"1.0.0-*",
     "Dapper":"1.50.2",
-    "MySql.Data.Core":"7.0.4-ir-191"
+    "MySql.Data.Core":"7.0.4-ir-191",
+    "StackExchange.Redis":"1.1.605"
   },
   "frameworks": {
     "netstandard1.6": {
