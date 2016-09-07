@@ -11,6 +11,7 @@ namespace CoreData
         {    
             MySqlConnection con = new MySqlConnection("server=xieyuntestout.mysql.rds.aliyuncs.com;database=xyuser;uid=xieyun;pwd=xieyun123;Port=3306;SslMode=None");
             return con.Query<User>("select * from user limit 10").AsList();
+            
         }
     }
 }
