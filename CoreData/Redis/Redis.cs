@@ -30,7 +30,7 @@ namespace CoreData.Redis
         /// <summary>
         /// 
         /// </summary>
-        public Redis(string host,string port,string pwd)
+        public Redis(string host, string port, string pwd)
         {
             Conf = new RedisConfig()
             {
@@ -90,6 +90,7 @@ namespace CoreData.Redis
         public T Get<T>(string key)
         {
             var result = Cache.StringGet(key);
+
             if (result != RedisValue.Null)
             {
                 return JsonConvert.DeserializeObject<T>(result);

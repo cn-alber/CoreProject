@@ -2,6 +2,7 @@
 using MySql.Data.MySqlClient;
 using Dapper;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace CoreData
 {
@@ -16,12 +17,18 @@ namespace CoreData
 
         public static string GetRedisData()
         {
-            var s = CacheBase.Get<string>("user1");
-            if(s == null)
+            MySqlConnection con = new MySqlConnection("server=xieyuntestout.mysql.rds.aliyuncs.com;database=xyuser;uid=xieyun;pwd=xieyun123;Port=3306;SslMode=None");
+            User user = con.Query<User>("select * from user limit 1").AsList()[0];
+            if (!CacheBase.Set<User>("user1", user))
             {
                 return null;
             }
-            return s;
+
+            CacheBase.Set<string>("user2", "test");
+
+            var cuser = CacheBase.Get<string>("user2");
+
+            return JsonConvert.SerializeObject(cuser);
         }
     }
 }
