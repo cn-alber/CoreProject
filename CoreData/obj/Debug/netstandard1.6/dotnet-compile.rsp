@@ -100,6 +100,7 @@
 --reference:C:\Users\ZongQ\.nuget\packages\System.Xml.XDocument\4.0.11\ref\netstandard1.3\System.Xml.XDocument.dll
 --reference:C:\Users\ZongQ\.nuget\packages\System.Xml.XmlDocument\4.0.1\ref\netstandard1.3\System.Xml.XmlDocument.dll
 --reference:c:\xyProjectList\CoreProject\CoreModels\bin\Debug\netstandard1.6\CoreModels.dll
+c:\xyProjectList\CoreProject\CoreData\CacheBase.cs
 c:\xyProjectList\CoreProject\CoreData\MySqlData.cs
 c:\xyProjectList\CoreProject\CoreData\Redis\ICache.cs
 c:\xyProjectList\CoreProject\CoreData\Redis\Redis.cs

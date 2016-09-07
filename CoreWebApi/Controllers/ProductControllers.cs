@@ -16,7 +16,7 @@ namespace CoreWebApi
 
         public IActionResult Get()
         {
-            return new OkObjectResult(MySqlData.GetData());
+            return new OkObjectResult(MySqlData.GetRedisData());
         }
 
         [HttpGet("{id}")]

@@ -13,5 +13,11 @@ namespace CoreData
             return con.Query<User>("select * from user limit 10").AsList();
             
         }
+
+        public static string GetRedisData()
+        {
+            var s = CacheBase.Get<string>("user1");
+            return s;
+        }
     }
 }

@@ -54,6 +54,7 @@
 -r:"C:\Users\ZongQ\.nuget\packages\Microsoft.Win32.Primitives\4.0.1\ref\netstandard1.3\Microsoft.Win32.Primitives.dll"
 -r:"C:\Users\ZongQ\.nuget\packages\MySql.Data.Core\7.0.4-ir-191\lib\netstandard1.6\MySql.Data.Core.dll"
 -r:"C:\Users\ZongQ\.nuget\packages\Newtonsoft.Json\9.0.1\lib\netstandard1.0\Newtonsoft.Json.dll"
+-r:"C:\Users\ZongQ\.nuget\packages\StackExchange.Redis\1.1.605\lib\netstandard1.5\StackExchange.Redis.dll"
 -r:"C:\Users\ZongQ\.nuget\packages\System.AppContext\4.1.0\ref\netstandard1.6\System.AppContext.dll"
 -r:"C:\Users\ZongQ\.nuget\packages\System.Buffers\4.0.0\lib\netstandard1.1\System.Buffers.dll"
 -r:"C:\Users\ZongQ\.nuget\packages\System.Collections\4.0.11\ref\netstandard1.3\System.Collections.dll"

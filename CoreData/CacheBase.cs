@@ -5,9 +5,9 @@ namespace CoreData
     /// <summary>
     /// 可以根据情况使用不同的缓存机制。这里也可以做成反射+缓存机制来动态配置使用哪种缓存机制。
     /// </summary>
-    public class CacheBase
+    public static class CacheBase
     {
-        public static Redis.RedisSession noSql = new Redis.RedisSession();
+        public static Redis.RedisSession noSql = new Redis.RedisSession("114.55.95.140","6379","xieyukeji");
         public static bool Remove(string key)
         {
             return noSql.Remove(key);
