@@ -17,8 +17,7 @@ namespace CoreData
 
         public static string GetRedisData()
         {
-            MySqlConnection con = new MySqlConnection("server=xieyuntestout.mysql.rds.aliyuncs.com;database=xyuser;uid=xieyun;pwd=xieyun123;Port=3306;SslMode=None");
-            User user = con.Query<User>("select * from user limit 1").AsList()[0];
+            User user = DbBase.UserDB.Query<User>("select * from user limit 1").AsList()[0];
             if (!CacheBase.Set<User>("user1", user))
             {
                 return null;
