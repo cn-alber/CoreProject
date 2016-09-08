@@ -8,11 +8,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System;
 using Microsoft.AspNetCore.Http.Authentication;
+using Newtonsoft.Json;
 
 namespace CoreWebApi
 {
     [Route("/api/products/RouteTest")]
-    public class ProductsController
+    public class ProductsController:Controller
     {
         public SignInManager<Models.Login> signInManager{get;}
         private static List<Product> _products = new List<Product>(new[] {
@@ -23,7 +24,13 @@ namespace CoreWebApi
 
         public IActionResult Get()
         {
-            return new OkObjectResult(MySqlData.GetRedisData());
+            var test = new Models.Login();
+            test.account = "admin";
+            test.password = "admin";
+            test.vcode = "123123";
+
+            var ss = JsonConvert.SerializeObject(test);
+            return new OkObjectResult(ss);
         }
 
         [HttpGet("{id}")]
@@ -47,8 +54,8 @@ namespace CoreWebApi
 
         [HttpPost]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> login(Models.Login lo)
+        [Route("/sign/in")]
+        public async Task<ResponseResult> login(Models.Login lo)
         {
             var user = new ClaimsPrincipal(
                 new ClaimsIdentity(
@@ -56,21 +63,8 @@ namespace CoreWebApi
                         new Claim(ClaimTypes.Name, "xishuai")
                          },
                          "CoreInstance"));
-           await signInManager.SignInAsync(lo, new AuthenticationProperties
-             {
-                 ExpiresUtc = DateTime.UtcNow.AddMinutes(200),
-                 IsPersistent = true,
-                 AllowRefresh = false
-             });
-            // await AuthenticationManager.SignInAsync("CookieInstance", user,
-            //  new AuthenticationProperties
-            //  {
-            //      ExpiresUtc = DateTime.UtcNow.AddMinutes(200),
-            //      IsPersistent = true,
-            //      AllowRefresh = false
-            //  });             
-            // await SignInAsync("CoreInstance", user, new AuthenticationProperties() { IsPersistent = true });
-            return new OkObjectResult("123");
+           await HttpContext.Authentication.SignInAsync("CoreInstance", new ClaimsPrincipal());
+            return new ResponseResult(100, lo, "");
         }
 
 

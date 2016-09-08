@@ -188,6 +188,7 @@
 --reference:c:\xyProjectList\CoreProject\CoreModels\bin\Debug\netstandard1.6\CoreModels.dll
 c:\xyProjectList\CoreProject\CoreWebApi\Program.cs
 c:\xyProjectList\CoreProject\CoreWebApi\Startup.cs
+c:\xyProjectList\CoreProject\CoreWebApi\Business\ResponseResult.cs
 c:\xyProjectList\CoreProject\CoreWebApi\Controllers\ProductControllers.cs
 c:\xyProjectList\CoreProject\CoreWebApi\Models\Login.cs
 c:\xyProjectList\CoreProject\CoreWebApi\Models\Product.cs
