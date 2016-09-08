@@ -14,7 +14,7 @@ namespace CoreWebApi
     [Route("/api/products/RouteTest")]
     public class ProductsController
     {
-        public SignInManager<Product> signInManager{get;}
+        public SignInManager<Models.Login> signInManager{get;}
         private static List<Product> _products = new List<Product>(new[] {
             new Product() { Id = 1, Name = "Computer" },
             new Product() { Id = 2, Name = "Radio" },
@@ -48,7 +48,7 @@ namespace CoreWebApi
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> login()
+        public async Task<IActionResult> login(Models.Login lo)
         {
             var user = new ClaimsPrincipal(
                 new ClaimsIdentity(
@@ -56,7 +56,7 @@ namespace CoreWebApi
                         new Claim(ClaimTypes.Name, "xishuai")
                          },
                          "CoreInstance"));
-           await signInManager.SignInAsync(new Product(), new AuthenticationProperties
+           await signInManager.SignInAsync(lo, new AuthenticationProperties
              {
                  ExpiresUtc = DateTime.UtcNow.AddMinutes(200),
                  IsPersistent = true,
