@@ -64,7 +64,7 @@ namespace CoreWebApi
                         new Claim(ClaimTypes.Name, "xishuai")
                          },
                          "CoreInstance"));
-           await HttpContext.Authentication.SignInAsync("CoreInstance", new ClaimsPrincipal());
+           await HttpContext.Authentication.SignInAsync("CoreInstance",new ClaimsPrincipal());
             return new ResponseResult(100, lo, "");
         }
 
