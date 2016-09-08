@@ -24,19 +24,22 @@ namespace CoreWebApi
             });
 
             services.AddAuthentication();
+            
         }
 
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(LogLevel.Debug);
             app.UseCors("AllowAnyCors");
+            
             app.UseCookieAuthentication(new CookieAuthenticationOptions()
             {
                 AuthenticationScheme = "CoreInstance",
-                // LoginPath = new PathString("/Account/Unauthorized/"),
+                
+                // LoginPath = "/Account/Unauthorized/",
                 // AccessDeniedPath = new PathString("/Account/Forbidden/"),
-                AutomaticAuthenticate = true
-                // AutomaticChallenge = true
+                AutomaticAuthenticate = true,
+                AutomaticChallenge = true
             });
             app.UseMvc();
         }

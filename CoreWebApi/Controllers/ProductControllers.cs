@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 
 namespace CoreWebApi
 {
+     [Authorize] 
     [Route("/api/products/RouteTest")]
     public class ProductsController:Controller
     {
@@ -33,7 +34,7 @@ namespace CoreWebApi
             return new OkObjectResult(ss);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("/api/products/RouteTest/{id}")]
         public IActionResult Get(int id)
         {
             var product = _products.FirstOrDefault(p => p.Id == id);
@@ -67,6 +68,11 @@ namespace CoreWebApi
             return new ResponseResult(100, lo, "");
         }
 
-
+        [HttpPost]
+        [Route("/sign/out")]
+        public async Task login()
+        {
+           await HttpContext.Authentication.SignOutAsync("CoreInstance");
+        }
     }
 }
