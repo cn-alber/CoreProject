@@ -2,12 +2,19 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using CoreData;
+using System.Threading.Tasks;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System;
+using Microsoft.AspNetCore.Http.Authentication;
 
 namespace CoreWebApi
 {
     [Route("/api/products/RouteTest")]
     public class ProductsController
     {
+        public SignInManager<Product> signInManager{get;}
         private static List<Product> _products = new List<Product>(new[] {
             new Product() { Id = 1, Name = "Computer" },
             new Product() { Id = 2, Name = "Radio" },
@@ -37,5 +44,35 @@ namespace CoreWebApi
         {
             _products.Add(product);
         }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> login()
+        {
+            var user = new ClaimsPrincipal(
+                new ClaimsIdentity(
+                    new[] {
+                        new Claim(ClaimTypes.Name, "xishuai")
+                         },
+                         "CoreInstance"));
+           await signInManager.SignInAsync(new Product(), new AuthenticationProperties
+             {
+                 ExpiresUtc = DateTime.UtcNow.AddMinutes(200),
+                 IsPersistent = true,
+                 AllowRefresh = false
+             });
+            // await AuthenticationManager.SignInAsync("CookieInstance", user,
+            //  new AuthenticationProperties
+            //  {
+            //      ExpiresUtc = DateTime.UtcNow.AddMinutes(200),
+            //      IsPersistent = true,
+            //      AllowRefresh = false
+            //  });             
+            // await SignInAsync("CoreInstance", user, new AuthenticationProperties() { IsPersistent = true });
+            return new OkObjectResult("123");
+        }
+
+
     }
 }
