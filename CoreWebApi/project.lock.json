@@ -9880,7 +9880,6 @@
   "projectFileDependencyGroups": {
     "": [
       "CoreData >= 1.0.0-*",
-      "Microsoft.AspNetCore.Authentication.Cookies >= 1.0.0",
       "Microsoft.AspNetCore.Cors >= 1.0.0",
       "Microsoft.AspNetCore.Diagnostics >= 1.0.0",
       "Microsoft.AspNetCore.Identity >= 1.0.0",

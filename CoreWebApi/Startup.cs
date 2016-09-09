@@ -1,10 +1,7 @@
-
-using CoreWebApi.Components;
 using CoreWebApi.Middleware;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,20 +41,17 @@ namespace CoreWebApi
             // Add session related services.
             services.AddSession();
 
-            // Add the system clock service
-            services.AddSingleton<ISystemClock, SystemClock>();
-
             // services.AddAuthentication();
             services.AddAuthorization();
 
-            services.AddMvc(config => 
-            {
-                var policy = new AuthorizationPolicyBuilder()
-                                 .RequireAuthenticatedUser()
-                                 .Build();
-                config.Filters.Add(new AuthorizeFilter(policy));
-            })
-                     ;
+            // services.AddMvc(config => 
+            // {
+            //     var policy = new AuthorizationPolicyBuilder("CoreInstance")
+            //                      .RequireAuthenticatedUser()
+            //                      .Build();
+            //     config.Filters.Add(new AuthorizeFilter(policy));
+            // });
+            services.AddMvc();
             // services.add();
         }
 
@@ -65,24 +59,24 @@ namespace CoreWebApi
         {
             loggerFactory.AddConsole(LogLevel.Debug);
 
-            app.Use(async (context, next) =>
-            {
-                try
-                {
-                    await next();
-                }
-                catch
-                {
-                     if (context.Response.HasStarted)
-                     {
-                         throw;
-                     }
-                     context.Response.StatusCode = 200;
-                     await context.Response.WriteAsync(Newtonsoft.Json.JsonConvert.SerializeObject(new ResponseResult(100,null,"接口请求异常")));
-                }
-            }
+            // app.Use(async (context, next) =>
+            // {
+            //     try
+            //     {
+            //         await next();
+            //     }
+            //     catch
+            //     {
+            //          if (context.Response.HasStarted)
+            //          {
+            //              throw;
+            //          }
+            //          context.Response.StatusCode = 200;
+            //          await context.Response.WriteAsync(Newtonsoft.Json.JsonConvert.SerializeObject(new ResponseResult(100,null,"参数不符")));
+            //     }
+            // }
 
-            );
+            // );
 
             // Configure Session.
             app.UseSession();
@@ -95,14 +89,10 @@ namespace CoreWebApi
             // var ss = new CookieAuthenticationOptions();
             // ss.
 
-            app.UseCookieAuthentication(new CookieAuthenticationOptions()
+            app.UseCoreCookieAuthentication(new CoreWebApi.Middleware.CookieAuthenticationOptions()
             {
                 AuthenticationScheme = "CoreInstance",
-
-                // LoginPath = new PathString("/sign/false/"),
-                // AccessDeniedPath = new PathString("/sign/false"),
-                AutomaticAuthenticate = true,
-                AutomaticChallenge = false
+                AutomaticAuthenticate = false
             });
             
             app.UseSimpleBearerAuthentication(new SimpleBearerOptions

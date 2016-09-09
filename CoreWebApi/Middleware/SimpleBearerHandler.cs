@@ -16,29 +16,42 @@ namespace CoreWebApi.Middleware
 
         protected override Task<bool> HandleUnauthorizedAsync(ChallengeContext context)
         {
-            Response.StatusCode = 401;
+            Response.StatusCode = 200;
             Response.Headers["WWW-Authenticate"] = "Bearer";
-            return Task.FromResult(false);
+            var msg = Newtonsoft.Json.JsonConvert.SerializeObject(new ResponseResult(100,null,"未授权"));
+            var b = System.Text.Encoding.UTF8.GetBytes(msg);
+            Response.Body.Write(b,0, b.Length);
+            return Task.FromResult(true);
         }
 
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            var header = Request.Headers["Authorization"].ToString();
-            if (string.IsNullOrEmpty(header) || !header.StartsWith("Bearer "))
+            if (Request.Headers.ContainsKey("Authorization"))
             {
-                return Task.FromResult(AuthenticateResult.Skip()); 
+                var header = Request.Headers["Authorization"].ToString();
+                if (string.IsNullOrEmpty(header) || !header.StartsWith("Bearer "))
+                {
+                    var msg = Newtonsoft.Json.JsonConvert.SerializeObject(new ResponseResult(100, null, "接口请求异常"));
+                    return Task.FromResult(AuthenticateResult.Fail(msg));
+                }
+
+                var user = header.Substring(7);
+                var principal = new ClaimsPrincipal();
+
+                if (principal == null)
+                {
+                    return Task.FromResult(AuthenticateResult.Fail("No such user"));
+                }
+
+                var ticket = new AuthenticationTicket(principal, new AuthenticationProperties(), Options.AuthenticationScheme);
+                return Task.FromResult(AuthenticateResult.Success(ticket));
+            }
+            else
+            {
+                var msg = Newtonsoft.Json.JsonConvert.SerializeObject(new ResponseResult(100, null, "接口请求异常"));
+                return Task.FromResult(AuthenticateResult.Fail(msg));
             }
 
-            var user = header.Substring(7);
-            var principal = new ClaimsPrincipal();
-
-            if (principal == null)
-            {
-                return Task.FromResult(AuthenticateResult.Fail("No such user"));
-            }
-
-            var ticket = new AuthenticationTicket(principal, new AuthenticationProperties(), Options.AuthenticationScheme);
-            return Task.FromResult(AuthenticateResult.Success(ticket));
         }
     }
 }

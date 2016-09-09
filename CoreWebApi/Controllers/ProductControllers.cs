@@ -7,12 +7,10 @@ using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Http.Authentication;
 using System;
+using Microsoft.AspNetCore.Http;
 
 namespace CoreWebApi
 {
-    // [Authorize]
-    
-    [Route("/api/products/RouteTest")]
     public class ProductsController : Controller
     {
         private static List<Product> _products = new List<Product>(new[] {
@@ -20,8 +18,10 @@ namespace CoreWebApi
             new Product() { Id = 2, Name = "Radio" },
             new Product() { Id = 3, Name = "Apple" },
         });
-        
-         [HttpGet("/api/products/RouteTest")]
+
+        [Authorize(ActiveAuthenticationSchemes = "CoreInstance")]
+        // [AllowAnonymous]
+        [HttpGet("/api/products/RouteTest")]
         public IActionResult Get()
         {
             var test = new Models.Login();
@@ -33,6 +33,7 @@ namespace CoreWebApi
             return new OkObjectResult(ss);
         }
 
+        [Authorize(ActiveAuthenticationSchemes = "Bearer")]
         [HttpGet("/api/products/RouteTest/{id}")]
         public IActionResult Get(int id)
         {
@@ -52,10 +53,14 @@ namespace CoreWebApi
             _products.Add(product);
         }
 
+        [AllowAnonymous]
         [RouteAttribute("/sign/false")]
         public ResponseResult LoginFalse()
         {
-            return new ResponseResult(100,null, "登陆失败");
+            var cc = new CookieOptions();
+            // HttpContext.Response.Cookies.Append("aaa", "1111", cc);
+            
+            return new ResponseResult(100, null, HttpContext.Session.Keys.Count().ToString());
         }
 
         [HttpPost]
@@ -69,12 +74,21 @@ namespace CoreWebApi
                         new Claim(ClaimTypes.Name, "xishuai")
                          },
                          "CoreInstance"));
+            string Issuer = "urn:microsoft.example";
+            List<Claim> claims = new List<Claim>();
+            claims.Add(new Claim(ClaimTypes.DateOfBirth, new DateTime(2000, 01, 01).ToString("u"), ClaimValueTypes.DateTime, Issuer));
+            claims.Add(new Claim(ClaimTypes.Role, "User", ClaimValueTypes.String, Issuer));
+            claims.Add(new Claim("Documents", "CRUD", ClaimValueTypes.String, "urn:microsoft.com"));
+            claims.Add(new Claim("CanWeFixIt", "YesWeCan", ClaimValueTypes.String, "urn:bobthebuilder.com"));
+            claims.Add(new Claim("CanWeFixIt", "NoWeCant", ClaimValueTypes.String, "urn:bobthebuilder.com"));
+            var identity = new ClaimsIdentity(claims, "sampleAuth");
+            var principal = new ClaimsPrincipal(identity);
+
             await HttpContext.Authentication.SignInAsync("CoreInstance", new ClaimsPrincipal(),
                 new AuthenticationProperties
                 {
                     ExpiresUtc = DateTime.UtcNow.AddMinutes(20),
-                    IsPersistent = false,
-                    AllowRefresh = false
+                    IsPersistent = false
                 });
             return new ResponseResult(100, lo, "");
         }

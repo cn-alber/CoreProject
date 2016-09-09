@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v1.0",
-    "signature": "bf85d0b4767c8ef0114785a21353e9848d72adec"
+    "signature": "83a8085c93897ee1ca4b1499ae63ef31272c84bc"
   },
   "compilationOptions": {},
   "targets": {
@@ -9,16 +9,19 @@
       "CoreWebApi/1.0.0": {
         "dependencies": {
           "CoreData": "1.0.0",
+          "Microsoft.AspNetCore.Cors": "1.0.0",
+          "Microsoft.AspNetCore.Diagnostics": "1.0.0",
+          "Microsoft.AspNetCore.Identity": "1.0.0",
           "Microsoft.AspNetCore.Mvc": "1.0.0",
           "Microsoft.AspNetCore.Mvc.Core": "1.0.0",
-          "Microsoft.AspNetCore.Cors": "1.0.0",
-          "Microsoft.AspNetCore.Authentication.Cookies": "1.0.0",
-          "Microsoft.AspNetCore.Identity": "1.0.0",
           "Microsoft.AspNetCore.Server.Kestrel": "1.0.0",
           "Microsoft.Aspnetcore.Session": "1.0.0",
           "Microsoft.AspNetCore.StaticFiles": "1.0.0",
           "Microsoft.Extensions.DependencyInjection": "1.0.0",
-          "Microsoft.Extensions.Logging.Console": "1.0.0"
+          "Microsoft.Extensions.Logging.Console": "1.0.0",
+          "Microsoft.Extensions.Configuration.Json": "1.0.0",
+          "Microsoft.Extensions.Configuration.EnvironmentVariables": "1.0.0",
+          "Microsoft.Extensions.Configuration.FileExtensions": "1.0.0"
         },
         "runtime": {
           "CoreWebApi.dll": {}
@@ -121,6 +124,20 @@
       "Microsoft.AspNetCore.DataProtection.Abstractions/1.0.0": {
         "runtime": {
           "lib/netstandard1.3/Microsoft.AspNetCore.DataProtection.Abstractions.dll": {}
+        }
+      },
+      "Microsoft.AspNetCore.Diagnostics/1.0.0": {
+        "dependencies": {
+          "Microsoft.AspNetCore.Diagnostics.Abstractions": "1.0.0",
+          "Microsoft.AspNetCore.Hosting.Abstractions": "1.0.0",
+          "Microsoft.AspNetCore.Http.Extensions": "1.0.0",
+          "Microsoft.AspNetCore.WebUtilities": "1.0.0",
+          "Microsoft.Extensions.FileProviders.Physical": "1.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
+          "Microsoft.Extensions.Options": "1.0.0"
+        },
+        "runtime": {
+          "lib/netstandard1.3/Microsoft.AspNetCore.Diagnostics.dll": {}
         }
       },
       "Microsoft.AspNetCore.Diagnostics.Abstractions/1.0.0": {
@@ -899,6 +916,11 @@
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-h5ycDgkqmRdManmYMQVJgzNI7YtVp2X2/os1cKmdfrpfq+m9L8bMKhbd7PCksoLci+aYTOSn45khPl+hpPb9ug=="
+    },
+    "Microsoft.AspNetCore.Diagnostics/1.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-nGmsbmax1PsMyOzeE+4UyA7dZZ4SlRa5j4eMbt1HArvUaec3Z7ldb7fASyCrC/tlpfKf9Jeruv1qy+yGyjUeQw=="
     },
     "Microsoft.AspNetCore.Diagnostics.Abstractions/1.0.0": {
       "type": "package",
