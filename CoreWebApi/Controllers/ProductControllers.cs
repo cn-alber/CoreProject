@@ -5,10 +5,13 @@ using System.Threading.Tasks;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Http.Authentication;
+using System;
 
 namespace CoreWebApi
 {
-    [Authorize]
+    // [Authorize]
+    
     [Route("/api/products/RouteTest")]
     public class ProductsController : Controller
     {
@@ -17,7 +20,8 @@ namespace CoreWebApi
             new Product() { Id = 2, Name = "Radio" },
             new Product() { Id = 3, Name = "Apple" },
         });
-
+        
+         [HttpGet("/api/products/RouteTest")]
         public IActionResult Get()
         {
             var test = new Models.Login();
@@ -65,7 +69,13 @@ namespace CoreWebApi
                         new Claim(ClaimTypes.Name, "xishuai")
                          },
                          "CoreInstance"));
-            await HttpContext.Authentication.SignInAsync("CoreInstance", new ClaimsPrincipal());
+            await HttpContext.Authentication.SignInAsync("CoreInstance", new ClaimsPrincipal(),
+                new AuthenticationProperties
+                {
+                    ExpiresUtc = DateTime.UtcNow.AddMinutes(20),
+                    IsPersistent = false,
+                    AllowRefresh = false
+                });
             return new ResponseResult(100, lo, "");
         }
 

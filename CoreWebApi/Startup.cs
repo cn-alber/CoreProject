@@ -1,9 +1,12 @@
 
 using CoreWebApi.Components;
+using CoreWebApi.Middleware;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -12,6 +15,14 @@ namespace CoreWebApi
     
     public class Startup
     {
+
+        public Startup(IHostingEnvironment env)
+        {
+            var builder = new ConfigurationBuilder();
+            builder.AddEnvironmentVariables();
+            Configuration = builder.Build();
+        }
+        public IConfiguration Configuration { get; set; }
         public void ConfigureServices(IServiceCollection services)
         {
             //Cors设置 AllowAny 允许全部CorsOptions
@@ -39,20 +50,40 @@ namespace CoreWebApi
             // services.AddAuthentication();
             services.AddAuthorization();
 
-            services.AddMvcCore(config => 
+            services.AddMvc(config => 
             {
                 var policy = new AuthorizationPolicyBuilder()
                                  .RequireAuthenticatedUser()
                                  .Build();
                 config.Filters.Add(new AuthorizeFilter(policy));
             })
-                     .AddJsonFormatters();
-
+                     ;
+            // services.add();
         }
 
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(LogLevel.Debug);
+
+            app.Use(async (context, next) =>
+            {
+                try
+                {
+                    await next();
+                }
+                catch
+                {
+                     if (context.Response.HasStarted)
+                     {
+                         throw;
+                     }
+                     context.Response.StatusCode = 200;
+                     await context.Response.WriteAsync(Newtonsoft.Json.JsonConvert.SerializeObject(new ResponseResult(100,null,"接口请求异常")));
+                }
+            }
+
+            );
+
             // Configure Session.
             app.UseSession();
 
@@ -61,14 +92,23 @@ namespace CoreWebApi
 
             app.UseCors("AllowAnyCors");
 
+            // var ss = new CookieAuthenticationOptions();
+            // ss.
+
             app.UseCookieAuthentication(new CookieAuthenticationOptions()
             {
                 AuthenticationScheme = "CoreInstance",
 
-                LoginPath = "/Account/Unauthorized/",
-                AccessDeniedPath = new PathString("/sign/false/"),
-                AutomaticAuthenticate = false,
-                AutomaticChallenge = true
+                // LoginPath = new PathString("/sign/false/"),
+                // AccessDeniedPath = new PathString("/sign/false"),
+                AutomaticAuthenticate = true,
+                AutomaticChallenge = false
+            });
+            
+            app.UseSimpleBearerAuthentication(new SimpleBearerOptions
+            {
+                AuthenticationScheme = "Bearer",
+                AutomaticAuthenticate = false
             });
 
             app.UseMvc();
