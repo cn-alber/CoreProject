@@ -1,22 +1,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using CoreData;
 using System.Threading.Tasks;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using System;
-using Microsoft.AspNetCore.Http.Authentication;
 using Newtonsoft.Json;
 
 namespace CoreWebApi
 {
-     [Authorize] 
+    [Authorize]
     [Route("/api/products/RouteTest")]
-    public class ProductsController:Controller
+    public class ProductsController : Controller
     {
-        public SignInManager<Models.Login> signInManager{get;}
         private static List<Product> _products = new List<Product>(new[] {
             new Product() { Id = 1, Name = "Computer" },
             new Product() { Id = 2, Name = "Radio" },
@@ -53,6 +48,12 @@ namespace CoreWebApi
             _products.Add(product);
         }
 
+        [RouteAttribute("/sign/false")]
+        public ResponseResult LoginFalse()
+        {
+            return new ResponseResult(100,null, "登陆失败");
+        }
+
         [HttpPost]
         [AllowAnonymous]
         [Route("/sign/in")]
@@ -64,15 +65,15 @@ namespace CoreWebApi
                         new Claim(ClaimTypes.Name, "xishuai")
                          },
                          "CoreInstance"));
-           await HttpContext.Authentication.SignInAsync("CoreInstance",new ClaimsPrincipal());
+            await HttpContext.Authentication.SignInAsync("CoreInstance", new ClaimsPrincipal());
             return new ResponseResult(100, lo, "");
         }
 
-        [HttpPost]
+        [HttpGetAttribute]
         [Route("/sign/out")]
         public async Task login()
         {
-           await HttpContext.Authentication.SignOutAsync("CoreInstance");
+            await HttpContext.Authentication.SignOutAsync("CoreInstance");
         }
     }
 }
