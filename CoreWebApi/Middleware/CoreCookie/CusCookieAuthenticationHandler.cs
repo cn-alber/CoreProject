@@ -11,20 +11,21 @@ using Microsoft.Net.Http.Headers;
 
 namespace CoreWebApi.Middleware
 {
-    
+
     public class CusCookieAuthenticationHandler : AuthenticationHandler<CusCookieAuthenticationOptions>
     {
         private const string HeaderValueNoCache = "no-cache";
         private const string HeaderValueMinusOne = "-1";
-        private const string SessionIdClaim = "Microsoft.AspNetCore.Authentication.Cookies-SessionId";
+        private const string SessionIdClaim = "Cookies-SessionId";
 
         private bool _shouldRefresh;
         private DateTimeOffset? _refreshIssuedUtc;
         private DateTimeOffset? _refreshExpiresUtc;
         private string _sessionKey;
         private Task<AuthenticateResult> _readCookieTask;
+        private string _exceptionMessage;
 
-        public CusCookieAuthenticationHandler(){}
+        public CusCookieAuthenticationHandler() { }
 
         private Task<AuthenticateResult> EnsureCookieTicket()
         {
@@ -36,6 +37,9 @@ namespace CoreWebApi.Middleware
             return _readCookieTask;
         }
 
+        ///<summary>
+        ///检查是否需要刷新session
+        ///</summary>
         private void CheckForRefresh(AuthenticationTicket ticket)
         {
             var currentUtc = Options.SystemClock.UtcNow;
@@ -74,7 +78,8 @@ namespace CoreWebApi.Middleware
             var cookie = Options.CookieManager.GetRequestCookie(Context, Options.CookieName);
             if (string.IsNullOrEmpty(cookie))
             {
-                return AuthenticateResult.Skip();
+                _exceptionMessage = CoreResult.NewData(1001,null);
+                return AuthenticateResult.Fail(_exceptionMessage);
             }
 
             var ticket = Options.TicketDataFormat.Unprotect(cookie, GetTlsTokenBinding());
@@ -204,7 +209,7 @@ namespace CoreWebApi.Middleware
                     cookieValue,
                     cookieOptions);
 
-                await ApplyHeaders( properties: ticket.Properties);
+                ApplyHeaders(properties: ticket.Properties);
             }
         }
 
@@ -279,7 +284,7 @@ namespace CoreWebApi.Middleware
 
             // Only redirect on the login path
             // var shouldRedirect = Options.LoginPath.HasValue && OriginalPath == Options.LoginPath;
-            await ApplyHeaders(signedInContext.Properties);
+            ApplyHeaders(signedInContext.Properties);
         }
 
         protected override async Task HandleSignOutAsync(SignOutContext signOutContext)
@@ -307,14 +312,15 @@ namespace CoreWebApi.Middleware
 
             // Only redirect on the logout path
             // var shouldRedirect = Options.LogoutPath.HasValue && OriginalPath == Options.LogoutPath;
-            await ApplyHeaders( context.Properties);
+            ApplyHeaders(context.Properties);
         }
 
-        private async Task ApplyHeaders(AuthenticationProperties properties)
+        private void ApplyHeaders(AuthenticationProperties properties)
         {
             Response.Headers[HeaderNames.CacheControl] = HeaderValueNoCache;
             Response.Headers[HeaderNames.Pragma] = HeaderValueNoCache;
             Response.Headers[HeaderNames.Expires] = HeaderValueMinusOne;
+            // await Options.Events.SigningIn();
 
             // if (shouldRedirectToReturnUrl && Response.StatusCode == 200)
             // {
@@ -355,38 +361,45 @@ namespace CoreWebApi.Middleware
             return path[0] == '/' && path[1] != '/' && path[1] != '\\';
         }
 
-        protected override async Task<bool> HandleForbiddenAsync(ChallengeContext context)
+        protected override Task<bool> HandleForbiddenAsync(ChallengeContext context)
         {
-            var properties = new AuthenticationProperties(context.Properties);
-            var returnUrl = properties.RedirectUri;
-            if (string.IsNullOrEmpty(returnUrl))
-            {
-                returnUrl = OriginalPathBase + Request.Path + Request.QueryString;
-            }
+            // var properties = new AuthenticationProperties(context.Properties);
+            // var returnUrl = properties.RedirectUri;
+            // if (string.IsNullOrEmpty(returnUrl))
+            // {
+            //     returnUrl = OriginalPathBase + Request.Path + Request.QueryString;
+            // }
             // var accessDeniedUri = Options.AccessDeniedPath + QueryString.Create(Options.ReturnUrlParameter, returnUrl);
             // var redirectContext = new CookieRedirectContext(Context, Options, BuildRedirectUri(accessDeniedUri), properties);
             // await Options.Events.RedirectToAccessDenied(redirectContext);
-            return true;
+            return Task.FromResult(true);
         }
 
-        protected override async Task<bool> HandleUnauthorizedAsync(ChallengeContext context)
+        protected override Task<bool> HandleUnauthorizedAsync(ChallengeContext context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
+            // if (context == null)
+            // {
+            //     throw new ArgumentNullException(nameof(context));
+            // }
 
-            var properties = new AuthenticationProperties(context.Properties);
-            var redirectUri = properties.RedirectUri;
-            if (string.IsNullOrEmpty(redirectUri))
-            {
-                redirectUri = OriginalPathBase + Request.Path + Request.QueryString;
-            }
+            // var properties = new AuthenticationProperties(context.Properties);
+            // var redirectUri = properties.RedirectUri;
+            // if (string.IsNullOrEmpty(redirectUri))
+            // {
+            //     redirectUri = OriginalPathBase + Request.Path + Request.QueryString;
+            // }
 
             // var loginUri = Options.LoginPath + QueryString.Create(Options.ReturnUrlParameter, redirectUri);
             // var redirectContext = new CookieRedirectContext(Context, Options, BuildRedirectUri(loginUri), properties);
             // await Options.Events.RedirectToLogin(redirectContext);
-            return true;
+            // Response.StatusCode = 200;
+            // Response.Headers["WWW-Authenticate"] = Options.AuthenticationScheme;
+
+            Response.Headers["WWW-Authenticate"] = Options.AuthenticationScheme;
+            var ex = System.Text.Encoding.UTF8.GetBytes(_exceptionMessage);
+            Response.Body.Write(ex,0,ex.Length);
+            
+            return Task.FromResult(false);
 
         }
 

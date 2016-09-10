@@ -1,12 +1,11 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace CoreWebApi
+namespace CoreWebApi.Middleware
 {
-    public class MemoryCacheTicketStore : ITicketStore
+    public class MemoryCacheTicketStore : IMemoryCacheTicketStore
     {
         private const string KeyPrefix = "AuthSessionStore-";
         private IMemoryCache _cache;

@@ -8,7 +8,7 @@ using Microsoft.Net.Http.Headers;
 
 namespace CoreWebApi.Middleware
 {
-    public class ChunkingCookieManager : ICookieManager
+    public class ChunkingCookieManager : ICusCookieManager
     {
         private const string ChunkKeySuffix = "C";
         private const string ChunkCountPrefix = "chunks-";

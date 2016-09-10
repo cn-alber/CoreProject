@@ -8,7 +8,7 @@ namespace CoreWebApi.Middleware
     /// while only sending a simple identifier key to the client. This is most commonly used to mitigate
     /// issues with serializing large identities into cookies.
     /// </summary>
-    public interface ICoreTicketStore
+    public interface IMemoryCacheTicketStore
     {
         /// <summary>
         /// Store the identity ticket and return the associated key.

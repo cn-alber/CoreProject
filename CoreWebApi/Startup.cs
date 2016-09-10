@@ -16,7 +16,12 @@ namespace CoreWebApi
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder();
+            // builder.AddJsonFile("appsettings.json");
             builder.AddEnvironmentVariables();
+            // if(env.IsDevelopment())
+            // {
+            //     builder.()
+            // }
             Configuration = builder.Build();
         }
         public IConfiguration Configuration { get; set; }
@@ -43,6 +48,11 @@ namespace CoreWebApi
 
             // services.AddAuthentication();
             services.AddAuthorization();
+
+            // Configuration.GetSection("AppSettings");
+            // services.AddOptions();
+            // services.Configure<BasicCode>(Configuration);
+            // services.Configure<BasicCode>(Configuration.GetSection("BasicCode"));
 
             // services.AddMvc(config => 
             // {

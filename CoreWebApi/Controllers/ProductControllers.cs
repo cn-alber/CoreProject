@@ -20,7 +20,7 @@ namespace CoreWebApi
         });
 
         [Authorize(ActiveAuthenticationSchemes = "CoreInstance")]
-        [HttpGet("/api/products/RouteTest")]
+        [HttpGet("/api")]
         public IActionResult Get()
         {
             var test = new Models.Login();

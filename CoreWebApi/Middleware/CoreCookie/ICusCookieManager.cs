@@ -6,7 +6,7 @@ namespace CoreWebApi.Middleware
     /// This is used by the CookieAuthenticationMiddleware to process request and response cookies.
     /// It is abstracted from the normal cookie APIs to allow for complex operations like chunking.
     /// </summary>
-    public interface ICookieManager
+    public interface ICusCookieManager
     {
         /// <summary>
         /// Retrieve a cookie of the given name from the request.
