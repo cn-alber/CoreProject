@@ -1,8 +1,8 @@
 using CoreWebApi.Middleware;
-using Microsoft.AspNetCore.Authorization;
+// using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Authorization;
+// using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -89,17 +89,17 @@ namespace CoreWebApi
             // var ss = new CookieAuthenticationOptions();
             // ss.
 
-            app.UseCoreCookieAuthentication(new CoreWebApi.Middleware.CookieAuthenticationOptions()
+            app.UseCusCookieAuthentication(new CusCookieAuthenticationOptions()
             {
                 AuthenticationScheme = "CoreInstance",
                 AutomaticAuthenticate = false
             });
             
-            app.UseSimpleBearerAuthentication(new SimpleBearerOptions
-            {
-                AuthenticationScheme = "Bearer",
-                AutomaticAuthenticate = false
-            });
+            // app.UseSimpleBearerAuthentication(new SimpleBearerOptions
+            // {
+            //     AuthenticationScheme = "Bearer",
+            //     AutomaticAuthenticate = false
+            // });
 
             app.UseMvc();
         }

@@ -11,14 +11,14 @@ namespace CoreWebApi.Middleware
     /// <summary>
     /// Configuration options for <see cref="CookieAuthenticationMiddleware"/>.
     /// </summary>
-    public class CookieAuthenticationOptions : AuthenticationOptions, IOptions<CookieAuthenticationOptions>
+    public class CusCookieAuthenticationOptions : AuthenticationOptions, IOptions<CusCookieAuthenticationOptions>
     {
         private string _cookieName;
 
         /// <summary>
         /// Create an instance of the options initialized with the default values
         /// </summary>
-        public CookieAuthenticationOptions()
+        public CusCookieAuthenticationOptions()
         {
             AuthenticationScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             AutomaticAuthenticate = true;
@@ -28,7 +28,7 @@ namespace CoreWebApi.Middleware
             CookieHttpOnly = false;
             CookieSecure = CookieSecurePolicy.SameAsRequest;
             SystemClock = new SystemClock();
-            Events = new CookieAuthenticationEvents();
+            Events = new CusCookieAuthenticationEvents();
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace CoreWebApi.Middleware
         /// calls methods on the provider which give the application control at certain points where processing is occurring. 
         /// If it is not provided a default instance is supplied which does nothing when the methods are called.
         /// </summary>
-        public ICookieAuthenticationEvents Events { get; set; }
+        public ICusCookieAuthenticationEvents Events { get; set; }
 
         /// <summary>
         /// The TicketDataFormat is used to protect and unprotect the identity and other properties which are stored in the
@@ -150,7 +150,7 @@ namespace CoreWebApi.Middleware
         /// </summary>
         public ITicketStore SessionStore { get; set; }
 
-        CookieAuthenticationOptions IOptions<CookieAuthenticationOptions>.Value
+        public CusCookieAuthenticationOptions Value
         {
             get
             {

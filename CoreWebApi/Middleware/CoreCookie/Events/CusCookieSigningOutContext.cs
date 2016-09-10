@@ -9,7 +9,7 @@ namespace CoreWebApi.Middleware
     /// <summary>
     /// Context object passed to the ICookieAuthenticationEvents method SigningOut    
     /// </summary>
-    public class CookieSigningOutContext : BaseCookieContext
+    public class CusCookieSigningOutContext : CusBaseCookieContext
     {
         /// <summary>
         /// 
@@ -18,9 +18,9 @@ namespace CoreWebApi.Middleware
         /// <param name="options"></param>
         /// <param name="properties"></param>
         /// <param name="cookieOptions"></param>
-        public CookieSigningOutContext(
+        public CusCookieSigningOutContext(
             HttpContext context, 
-            CookieAuthenticationOptions options, 
+            CusCookieAuthenticationOptions options, 
             AuthenticationProperties properties, 
             CookieOptions cookieOptions)
             : base(context, options)

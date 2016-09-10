@@ -8,14 +8,14 @@ using Microsoft.Extensions.Options;
 
 namespace CoreWebApi.Middleware
 {
-    public class CookieAuthenticationMiddleware : AuthenticationMiddleware<CookieAuthenticationOptions>
+    public class CusCookieAuthenticationMiddleware : AuthenticationMiddleware<CusCookieAuthenticationOptions>
     {
-        public CookieAuthenticationMiddleware(
+        public CusCookieAuthenticationMiddleware(
             RequestDelegate next,
             IDataProtectionProvider dataProtectionProvider,
             ILoggerFactory loggerFactory,
             UrlEncoder urlEncoder,
-            IOptions<CookieAuthenticationOptions> options)
+            IOptions<CusCookieAuthenticationOptions> options)
             : base(next, options, loggerFactory, urlEncoder)
         {
             if (dataProtectionProvider == null)
@@ -25,16 +25,16 @@ namespace CoreWebApi.Middleware
 
             if (Options.Events == null)
             {
-                Options.Events = new CookieAuthenticationEvents();
+                Options.Events = new CusCookieAuthenticationEvents();
             }
             if (String.IsNullOrEmpty(Options.CookieName))
             {
-                Options.CookieName = CookieAuthenticationDefaults.CookiePrefix + Options.AuthenticationScheme;
+                Options.CookieName = CusCookieAuthenticationDefaults.CookiePrefix + Options.AuthenticationScheme;
             }
             if (Options.TicketDataFormat == null)
             {
                 var provider = Options.DataProtectionProvider ?? dataProtectionProvider;
-                var dataProtector = provider.CreateProtector(typeof(CookieAuthenticationMiddleware).FullName, Options.AuthenticationScheme, "v2");
+                var dataProtector = provider.CreateProtector(typeof(CusCookieAuthenticationMiddleware).FullName, Options.AuthenticationScheme, "v2");
                 Options.TicketDataFormat = new TicketDataFormat(dataProtector);
             }
             if (Options.CookieManager == null)
@@ -55,9 +55,9 @@ namespace CoreWebApi.Middleware
             // }
         }
 
-        protected override AuthenticationHandler<CookieAuthenticationOptions> CreateHandler()
+        protected override AuthenticationHandler<CusCookieAuthenticationOptions> CreateHandler()
         {
-            return new CookieAuthenticationHandler();
+            return new CusCookieAuthenticationHandler();
         }
     }
 }

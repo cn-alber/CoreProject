@@ -10,7 +10,7 @@ namespace CoreWebApi.Middleware
     /// <summary>
     /// Context object passed to the ICookieAuthenticationEvents method SignedIn.
     /// </summary>    
-    public class CookieSignedInContext : BaseCookieContext
+    public class CusCookieSignedInContext : CusBaseCookieContext
     {
         /// <summary>
         /// Creates a new instance of the context object.
@@ -20,9 +20,9 @@ namespace CoreWebApi.Middleware
         /// <param name="authenticationScheme">Initializes AuthenticationScheme property</param>
         /// <param name="principal">Initializes Principal property</param>
         /// <param name="properties">Initializes Properties property</param>
-        public CookieSignedInContext(
+        public CusCookieSignedInContext(
             HttpContext context,
-            CookieAuthenticationOptions options,
+            CusCookieAuthenticationOptions options,
             string authenticationScheme,
             ClaimsPrincipal principal,
             AuthenticationProperties properties)

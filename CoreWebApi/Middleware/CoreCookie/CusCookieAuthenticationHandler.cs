@@ -12,7 +12,7 @@ using Microsoft.Net.Http.Headers;
 namespace CoreWebApi.Middleware
 {
     
-    internal class CookieAuthenticationHandler : AuthenticationHandler<CookieAuthenticationOptions>
+    public class CusCookieAuthenticationHandler : AuthenticationHandler<CusCookieAuthenticationOptions>
     {
         private const string HeaderValueNoCache = "no-cache";
         private const string HeaderValueMinusOne = "-1";
@@ -23,6 +23,8 @@ namespace CoreWebApi.Middleware
         private DateTimeOffset? _refreshExpiresUtc;
         private string _sessionKey;
         private Task<AuthenticateResult> _readCookieTask;
+
+        public CusCookieAuthenticationHandler(){}
 
         private Task<AuthenticateResult> EnsureCookieTicket()
         {
@@ -123,7 +125,7 @@ namespace CoreWebApi.Middleware
                 return result;
             }
 
-            var context = new CookieValidatePrincipalContext(Context, result.Ticket, Options);
+            var context = new CusCookieValidatePrincipalContext(Context, result.Ticket, Options);
             await Options.Events.ValidatePrincipal(context);
 
             if (context.Principal == null)
@@ -212,7 +214,7 @@ namespace CoreWebApi.Middleware
             var result = await EnsureCookieTicket();
             var cookieOptions = BuildCookieOptions();
 
-            var signInContext = new CookieSigningInContext(
+            var signInContext = new CusCookieSigningInContext(
                 Context,
                 Options,
                 Options.AuthenticationScheme,
@@ -266,7 +268,7 @@ namespace CoreWebApi.Middleware
                 cookieValue,
                 signInContext.CookieOptions);
 
-            var signedInContext = new CookieSignedInContext(
+            var signedInContext = new CusCookieSignedInContext(
                 Context,
                 Options,
                 Options.AuthenticationScheme,
@@ -290,7 +292,7 @@ namespace CoreWebApi.Middleware
                 await Options.SessionStore.RemoveAsync(_sessionKey);
             }
 
-            var context = new CookieSigningOutContext(
+            var context = new CusCookieSigningOutContext(
                 Context,
                 Options,
                 new AuthenticationProperties(signOutContext.Properties),

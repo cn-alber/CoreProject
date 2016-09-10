@@ -20,7 +20,6 @@ namespace CoreWebApi
         });
 
         [Authorize(ActiveAuthenticationSchemes = "CoreInstance")]
-        // [AllowAnonymous]
         [HttpGet("/api/products/RouteTest")]
         public IActionResult Get()
         {
@@ -33,7 +32,7 @@ namespace CoreWebApi
             return new OkObjectResult(ss);
         }
 
-        [Authorize(ActiveAuthenticationSchemes = "Bearer")]
+        [AllowAnonymous]
         [HttpGet("/api/products/RouteTest/{id}")]
         public IActionResult Get(int id)
         {
@@ -53,13 +52,13 @@ namespace CoreWebApi
             _products.Add(product);
         }
 
-        [AllowAnonymous]
+        [Authorize(ActiveAuthenticationSchemes = "CoreInstance")]
         [RouteAttribute("/sign/false")]
         public ResponseResult LoginFalse()
         {
             var cc = new CookieOptions();
             // HttpContext.Response.Cookies.Append("aaa", "1111", cc);
-            
+
             return new ResponseResult(100, null, HttpContext.Session.Keys.Count().ToString());
         }
 

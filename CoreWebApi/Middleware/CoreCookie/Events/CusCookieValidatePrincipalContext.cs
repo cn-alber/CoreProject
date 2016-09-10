@@ -12,7 +12,7 @@ namespace CoreWebApi.Middleware
     /// <summary>
     /// Context object passed to the ICookieAuthenticationProvider method ValidatePrincipal.
     /// </summary>
-    public class CookieValidatePrincipalContext : BaseCookieContext
+    public class CusCookieValidatePrincipalContext : CusBaseCookieContext
     {
         /// <summary>
         /// Creates a new instance of the context object.
@@ -20,7 +20,7 @@ namespace CoreWebApi.Middleware
         /// <param name="context"></param>
         /// <param name="ticket">Contains the initial values for identity and extra data</param>
         /// <param name="options"></param>
-        public CookieValidatePrincipalContext(HttpContext context, AuthenticationTicket ticket, CookieAuthenticationOptions options)
+        public CusCookieValidatePrincipalContext(HttpContext context, AuthenticationTicket ticket, CusCookieAuthenticationOptions options)
             : base(context, options)
         {
             if (context == null)

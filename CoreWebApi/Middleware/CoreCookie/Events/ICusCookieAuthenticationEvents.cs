@@ -8,7 +8,7 @@ namespace CoreWebApi.Middleware
     /// <summary>
     /// Specifies callback methods which the <see cref="CookieAuthenticationMiddleware"></see> invokes to enable developer control over the authentication process. />
     /// </summary>
-    public interface ICookieAuthenticationEvents
+    public interface ICusCookieAuthenticationEvents
     {
         /// <summary>
         /// Called each time a request principal has been validated by the middleware. By implementing this method the
@@ -16,20 +16,20 @@ namespace CoreWebApi.Middleware
         /// </summary>
         /// <param name="context">Contains information about the login session as well as the user <see cref="System.Security.Claims.ClaimsIdentity"/>.</param>
         /// <returns>A <see cref="Task"/> representing the completed operation.</returns>
-        Task ValidatePrincipal(CookieValidatePrincipalContext context);
+        Task ValidatePrincipal(CusCookieValidatePrincipalContext context);
 
         /// <summary>
         /// Called when an endpoint has provided sign in information before it is converted into a cookie. By
         /// implementing this method the claims and extra information that go into the ticket may be altered.
         /// </summary>
         /// <param name="context">Contains information about the login session as well as the user <see cref="System.Security.Claims.ClaimsIdentity"/>.</param>
-        Task SigningIn(CookieSigningInContext context);
+        Task SigningIn(CusCookieSigningInContext context);
 
         /// <summary>
         /// Called when an endpoint has provided sign in information after it is converted into a cookie.
         /// </summary>
         /// <param name="context">Contains information about the login session as well as the user <see cref="System.Security.Claims.ClaimsIdentity"/>.</param>
-        Task SignedIn(CookieSignedInContext context);
+        Task SignedIn(CusCookieSignedInContext context);
 
         /// <summary>
         /// Called when a SignOut causes a redirect in the cookie middleware.
@@ -59,6 +59,6 @@ namespace CoreWebApi.Middleware
         /// Called during the sign-out flow to augment the cookie cleanup process.
         /// </summary>
         /// <param name="context">Contains information about the login session as well as information about the authentication cookie.</param>
-        Task SigningOut(CookieSigningOutContext context);
+        Task SigningOut(CusCookieSigningOutContext context);
     }
 }

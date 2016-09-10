@@ -2,15 +2,15 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using Microsoft.AspNetCore.Builder;
+using CoreWebApi.Middleware;
 using Microsoft.Extensions.Options;
 
-namespace CoreWebApi.Middleware
+namespace Microsoft.AspNetCore.Builder
 {
     /// <summary>
     /// Extension methods to add cookie authentication capabilities to an HTTP application pipeline.
     /// </summary>
-    public static class CookieAppBuilderExtensions
+    public static class CusCookieAppBuilderExtensions
     {
         /// <summary>
         /// Adds the <see cref="CookieAuthenticationMiddleware"/> middleware to the specified <see cref="IApplicationBuilder"/>, which enables cookie authentication capabilities.
@@ -33,7 +33,7 @@ namespace CoreWebApi.Middleware
         /// <param name="app">The <see cref="IApplicationBuilder"/> to add the middleware to.</param>
         /// <param name="options">A <see cref="CookieAuthenticationOptions"/> that specifies options for the middleware.</param>
         /// <returns>A reference to this instance after the operation has completed.</returns>
-        public static IApplicationBuilder UseCoreCookieAuthentication(this IApplicationBuilder app, CookieAuthenticationOptions options)
+        public static IApplicationBuilder UseCusCookieAuthentication(this IApplicationBuilder app, CusCookieAuthenticationOptions options)
         {
             if (app == null)
             {
@@ -44,7 +44,7 @@ namespace CoreWebApi.Middleware
                 throw new ArgumentNullException(nameof(options));
             }
 
-            return app.UseMiddleware<CookieAuthenticationMiddleware>(Options.Create(options));
+            return app.UseMiddleware<CusCookieAuthenticationMiddleware>(Options.Create(options));
         }
     }
 }

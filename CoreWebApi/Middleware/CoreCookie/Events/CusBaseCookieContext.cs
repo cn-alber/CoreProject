@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Http;
 
 namespace CoreWebApi.Middleware
 {
-    public class BaseCookieContext : BaseContext
+    public class CusBaseCookieContext : BaseContext
     {
-        public BaseCookieContext(
+        public CusBaseCookieContext(
             HttpContext context,
-            CookieAuthenticationOptions options)
+            CusCookieAuthenticationOptions options)
             : base(context)
         {
             if (options == null)
@@ -22,6 +22,6 @@ namespace CoreWebApi.Middleware
             Options = options;
         }
 
-        public CookieAuthenticationOptions Options { get; }
+        public CusCookieAuthenticationOptions Options { get; }
     }
 }

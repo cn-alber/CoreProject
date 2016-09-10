@@ -13,93 +13,93 @@ namespace CoreWebApi.Middleware
     /// application only needs to override a few of the interface methods. This may be used as a base class
     /// or may be instantiated directly.
     /// </summary>
-    public class CookieAuthenticationEvents : ICookieAuthenticationEvents
+    public class CusCookieAuthenticationEvents : ICusCookieAuthenticationEvents
     {
         /// <summary>
         /// A delegate assigned to this property will be invoked when the related method is called.
         /// </summary>
-        public Func<CookieValidatePrincipalContext, Task> OnValidatePrincipal { get; set; } = context => TaskCache.CompletedTask;
+        public Func<CusCookieValidatePrincipalContext, Task> OnValidatePrincipal { get; set; } = context => TaskCache.CompletedTask;
 
         /// <summary>
         /// A delegate assigned to this property will be invoked when the related method is called.
         /// </summary>
-        public Func<CookieSigningInContext, Task> OnSigningIn { get; set; } = context => TaskCache.CompletedTask;
+        public Func<CusCookieSigningInContext, Task> OnSigningIn { get; set; } = context => TaskCache.CompletedTask;
 
         /// <summary>
         /// A delegate assigned to this property will be invoked when the related method is called.
         /// </summary>
-        public Func<CookieSignedInContext, Task> OnSignedIn { get; set; } = context => TaskCache.CompletedTask;
+        public Func<CusCookieSignedInContext, Task> OnSignedIn { get; set; } = context => TaskCache.CompletedTask;
 
         /// <summary>
         /// A delegate assigned to this property will be invoked when the related method is called.
         /// </summary>
-        public Func<CookieSigningOutContext, Task> OnSigningOut { get; set; } = context => TaskCache.CompletedTask;
+        public Func<CusCookieSigningOutContext, Task> OnSigningOut { get; set; } = context => TaskCache.CompletedTask;
 
         /// <summary>
         /// A delegate assigned to this property will be invoked when the related method is called.
         /// </summary>
-        public Func<CookieRedirectContext, Task> OnRedirectToLogin { get; set; } = context =>
-        {
-            if (IsAjaxRequest(context.Request))
-            {
-                context.Response.Headers["Location"] = context.RedirectUri;
-                context.Response.StatusCode = 401;
-            }
-            else
-            {
-                context.Response.Redirect(context.RedirectUri);
-            }
-            return TaskCache.CompletedTask;
-        };
+        // public Func<CookieRedirectContext, Task> OnRedirectToLogin { get; set; } = context =>
+        // {
+        //     if (IsAjaxRequest(context.Request))
+        //     {
+        //         context.Response.Headers["Location"] = context.RedirectUri;
+        //         context.Response.StatusCode = 401;
+        //     }
+        //     else
+        //     {
+        //         context.Response.Redirect(context.RedirectUri);
+        //     }
+        //     return TaskCache.CompletedTask;
+        // };
 
         /// <summary>
         /// A delegate assigned to this property will be invoked when the related method is called.
         /// </summary>
-        public Func<CookieRedirectContext, Task> OnRedirectToAccessDenied { get; set; } = context =>
-        {
-            if (IsAjaxRequest(context.Request))
-            {
-                context.Response.Headers["Location"] = context.RedirectUri;
-                context.Response.StatusCode = 403;
-            }
-            else
-            {
-                context.Response.Redirect(context.RedirectUri);
-            }
-            return TaskCache.CompletedTask;
-        };
+        // public Func<CookieRedirectContext, Task> OnRedirectToAccessDenied { get; set; } = context =>
+        // {
+        //     if (IsAjaxRequest(context.Request))
+        //     {
+        //         context.Response.Headers["Location"] = context.RedirectUri;
+        //         context.Response.StatusCode = 403;
+        //     }
+        //     else
+        //     {
+        //         context.Response.Redirect(context.RedirectUri);
+        //     }
+        //     return TaskCache.CompletedTask;
+        // };
 
         /// <summary>
         /// A delegate assigned to this property will be invoked when the related method is called.
         /// </summary>
-        public Func<CookieRedirectContext, Task> OnRedirectToLogout { get; set; } = context =>
-        {
-            if (IsAjaxRequest(context.Request))
-            {
-                context.Response.Headers["Location"] = context.RedirectUri;
-            }
-            else
-            {
-                context.Response.Redirect(context.RedirectUri);
-            }
-            return TaskCache.CompletedTask;
-        };
+        // public Func<CookieRedirectContext, Task> OnRedirectToLogout { get; set; } = context =>
+        // {
+        //     if (IsAjaxRequest(context.Request))
+        //     {
+        //         context.Response.Headers["Location"] = context.RedirectUri;
+        //     }
+        //     else
+        //     {
+        //         context.Response.Redirect(context.RedirectUri);
+        //     }
+        //     return TaskCache.CompletedTask;
+        // };
 
         /// <summary>
         /// A delegate assigned to this property will be invoked when the related method is called.
         /// </summary>
-        public Func<CookieRedirectContext, Task> OnRedirectToReturnUrl { get; set; } = context =>
-        {
-            if (IsAjaxRequest(context.Request))
-            {
-                context.Response.Headers["Location"] = context.RedirectUri;
-            }
-            else
-            {
-                context.Response.Redirect(context.RedirectUri);
-            }
-            return TaskCache.CompletedTask;
-        };
+        // public Func<CookieRedirectContext, Task> OnRedirectToReturnUrl { get; set; } = context =>
+        // {
+        //     if (IsAjaxRequest(context.Request))
+        //     {
+        //         context.Response.Headers["Location"] = context.RedirectUri;
+        //     }
+        //     else
+        //     {
+        //         context.Response.Redirect(context.RedirectUri);
+        //     }
+        //     return TaskCache.CompletedTask;
+        // };
 
         private static bool IsAjaxRequest(HttpRequest request)
         {
@@ -112,48 +112,48 @@ namespace CoreWebApi.Middleware
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public virtual Task ValidatePrincipal(CookieValidatePrincipalContext context) => OnValidatePrincipal(context);
+        public virtual Task ValidatePrincipal(CusCookieValidatePrincipalContext context) => OnValidatePrincipal(context);
 
         /// <summary>
         /// Implements the interface method by invoking the related delegate method.
         /// </summary>
         /// <param name="context"></param>
-        public virtual Task SigningIn(CookieSigningInContext context) => OnSigningIn(context);
+        public virtual Task SigningIn(CusCookieSigningInContext context) => OnSigningIn(context);
 
         /// <summary>
         /// Implements the interface method by invoking the related delegate method.
         /// </summary>
         /// <param name="context"></param>
-        public virtual Task SignedIn(CookieSignedInContext context) => OnSignedIn(context);
+        public virtual Task SignedIn(CusCookieSignedInContext context) => OnSignedIn(context);
 
         /// <summary>
         /// Implements the interface method by invoking the related delegate method.
         /// </summary>
         /// <param name="context"></param>
-        public virtual Task SigningOut(CookieSigningOutContext context) => OnSigningOut(context);
+        public virtual Task SigningOut(CusCookieSigningOutContext context) => OnSigningOut(context);
 
         /// <summary>
         /// Implements the interface method by invoking the related delegate method.
         /// </summary>
         /// <param name="context">Contains information about the event</param>
-        public virtual Task RedirectToLogout(CookieRedirectContext context) => OnRedirectToLogout(context);
+        // public virtual Task RedirectToLogout(CookieRedirectContext context) => OnRedirectToLogout(context);
 
         /// <summary>
         /// Implements the interface method by invoking the related delegate method.
         /// </summary>
         /// <param name="context">Contains information about the event</param>
-        public virtual Task RedirectToLogin(CookieRedirectContext context) => OnRedirectToLogin(context);
+        // public virtual Task RedirectToLogin(CookieRedirectContext context) => OnRedirectToLogin(context);
 
         /// <summary>
         /// Implements the interface method by invoking the related delegate method.
         /// </summary>
         /// <param name="context">Contains information about the event</param>
-        public virtual Task RedirectToReturnUrl(CookieRedirectContext context) => OnRedirectToReturnUrl(context);
+        // public virtual Task RedirectToReturnUrl(CookieRedirectContext context) => OnRedirectToReturnUrl(context);
 
         /// <summary>
         /// Implements the interface method by invoking the related delegate method.
         /// </summary>
         /// <param name="context">Contains information about the event</param>
-        public virtual Task RedirectToAccessDenied(CookieRedirectContext context) => OnRedirectToAccessDenied(context);
+        // public virtual Task RedirectToAccessDenied(CookieRedirectContext context) => OnRedirectToAccessDenied(context);
     }
 }

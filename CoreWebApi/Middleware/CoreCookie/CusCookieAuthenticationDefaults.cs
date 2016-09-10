@@ -1,6 +1,6 @@
 namespace CoreWebApi.Middleware
 {
-      public static class CookieAuthenticationDefaults
+      public static class CusCookieAuthenticationDefaults
     {
         /// <summary>
         /// The default value used for CookieAuthenticationOptions.AuthenticationScheme
