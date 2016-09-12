@@ -100,6 +100,7 @@
 "c:\xyProjectList\CoreProject\CoreData\CacheBase.cs"
 "c:\xyProjectList\CoreProject\CoreData\DbBase.cs"
 "c:\xyProjectList\CoreProject\CoreData\MySqlData.cs"
+"c:\xyProjectList\CoreProject\CoreData\CoreUser\UserHaddle.cs"
 "c:\xyProjectList\CoreProject\CoreData\Redis\ICache.cs"
 "c:\xyProjectList\CoreProject\CoreData\Redis\Redis.cs"
 "c:\xyProjectList\CoreProject\CoreData\Redis\RedisConfig.cs"

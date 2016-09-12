@@ -78,14 +78,15 @@ namespace CoreWebApi.Middleware
             var cookie = Options.CookieManager.GetRequestCookie(Context, Options.CookieName);
             if (string.IsNullOrEmpty(cookie))
             {
-                _exceptionMessage = CoreResult.NewData(1001,null);
+                _exceptionMessage = CoreResult.NewData(1002,null);
                 return AuthenticateResult.Fail(_exceptionMessage);
             }
 
             var ticket = Options.TicketDataFormat.Unprotect(cookie, GetTlsTokenBinding());
             if (ticket == null)
             {
-                return AuthenticateResult.Fail("Unprotect ticket failed");
+                _exceptionMessage = CoreResult.NewData(1003,null);
+                return AuthenticateResult.Fail(_exceptionMessage);
             }
 
             if (Options.SessionStore != null)
@@ -93,13 +94,15 @@ namespace CoreWebApi.Middleware
                 var claim = ticket.Principal.Claims.FirstOrDefault(c => c.Type.Equals(SessionIdClaim));
                 if (claim == null)
                 {
-                    return AuthenticateResult.Fail("SessionId missing");
+                    _exceptionMessage = CoreResult.NewData(1007,null);
+                    return AuthenticateResult.Fail(_exceptionMessage);
                 }
                 _sessionKey = claim.Value;
                 ticket = await Options.SessionStore.RetrieveAsync(_sessionKey);
                 if (ticket == null)
                 {
-                    return AuthenticateResult.Fail("Identity missing in session store");
+                    _exceptionMessage = CoreResult.NewData(1006,null);
+                    return AuthenticateResult.Fail(_exceptionMessage);
                 }
             }
 
@@ -113,7 +116,8 @@ namespace CoreWebApi.Middleware
                 {
                     await Options.SessionStore.RemoveAsync(_sessionKey);
                 }
-                return AuthenticateResult.Fail("Ticket expired");
+                _exceptionMessage = CoreResult.NewData(1004,null);
+                return AuthenticateResult.Fail(_exceptionMessage);
             }
 
             CheckForRefresh(ticket);
@@ -135,7 +139,8 @@ namespace CoreWebApi.Middleware
 
             if (context.Principal == null)
             {
-                return AuthenticateResult.Fail("No principal.");
+                _exceptionMessage = CoreResult.NewData(1005,null);
+                return AuthenticateResult.Fail(_exceptionMessage);
             }
 
             if (context.ShouldRenew)
@@ -320,32 +325,6 @@ namespace CoreWebApi.Middleware
             Response.Headers[HeaderNames.CacheControl] = HeaderValueNoCache;
             Response.Headers[HeaderNames.Pragma] = HeaderValueNoCache;
             Response.Headers[HeaderNames.Expires] = HeaderValueMinusOne;
-            // await Options.Events.SigningIn();
-
-            // if (shouldRedirectToReturnUrl && Response.StatusCode == 200)
-            // {
-            //     // set redirect uri in order:
-            //     // 1. properties.RedirectUri
-            //     // 2. query parameter ReturnUrlParameter
-            //     //
-            //     // Absolute uri is not allowed if it is from query string as query string is not
-            //     // a trusted source.
-            //     var redirectUri = properties.RedirectUri;
-            //     if (string.IsNullOrEmpty(redirectUri))
-            //     {
-            //         redirectUri = Request.Query[Options.ReturnUrlParameter];
-            //         if (string.IsNullOrEmpty(redirectUri) || !IsHostRelative(redirectUri))
-            //         {
-            //             redirectUri = null;
-            //         }
-            //     }
-
-            //     if (redirectUri != null)
-            //     {
-            //         await Options.Events.RedirectToReturnUrl(
-            //             new CookieRedirectContext(Context, Options, redirectUri, properties));
-            //     }
-            // }
         }
 
         private static bool IsHostRelative(string path)
@@ -363,38 +342,14 @@ namespace CoreWebApi.Middleware
 
         protected override Task<bool> HandleForbiddenAsync(ChallengeContext context)
         {
-            // var properties = new AuthenticationProperties(context.Properties);
-            // var returnUrl = properties.RedirectUri;
-            // if (string.IsNullOrEmpty(returnUrl))
-            // {
-            //     returnUrl = OriginalPathBase + Request.Path + Request.QueryString;
-            // }
-            // var accessDeniedUri = Options.AccessDeniedPath + QueryString.Create(Options.ReturnUrlParameter, returnUrl);
-            // var redirectContext = new CookieRedirectContext(Context, Options, BuildRedirectUri(accessDeniedUri), properties);
-            // await Options.Events.RedirectToAccessDenied(redirectContext);
+            Response.Headers["WWW-Authenticate"] = Options.AuthenticationScheme;
+            var ex = System.Text.Encoding.UTF8.GetBytes(CoreResult.NewData(1001,null));
+            Response.Body.Write(ex,0,ex.Length);
             return Task.FromResult(true);
         }
 
         protected override Task<bool> HandleUnauthorizedAsync(ChallengeContext context)
         {
-            // if (context == null)
-            // {
-            //     throw new ArgumentNullException(nameof(context));
-            // }
-
-            // var properties = new AuthenticationProperties(context.Properties);
-            // var redirectUri = properties.RedirectUri;
-            // if (string.IsNullOrEmpty(redirectUri))
-            // {
-            //     redirectUri = OriginalPathBase + Request.Path + Request.QueryString;
-            // }
-
-            // var loginUri = Options.LoginPath + QueryString.Create(Options.ReturnUrlParameter, redirectUri);
-            // var redirectContext = new CookieRedirectContext(Context, Options, BuildRedirectUri(loginUri), properties);
-            // await Options.Events.RedirectToLogin(redirectContext);
-            // Response.StatusCode = 200;
-            // Response.Headers["WWW-Authenticate"] = Options.AuthenticationScheme;
-
             Response.Headers["WWW-Authenticate"] = Options.AuthenticationScheme;
             var ex = System.Text.Encoding.UTF8.GetBytes(_exceptionMessage);
             Response.Body.Write(ex,0,ex.Length);

@@ -1,5 +1,5 @@
 
-namespace CoreWebApi.Models
+namespace CoreModels.Basic
 {
     public class BasicCode
     {

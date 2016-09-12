@@ -1,7 +1,9 @@
 using CoreWebApi.Middleware;
+using Microsoft.AspNetCore.Authorization;
 // using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Authorization;
 // using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -54,14 +56,14 @@ namespace CoreWebApi
             // services.Configure<BasicCode>(Configuration);
             // services.Configure<BasicCode>(Configuration.GetSection("BasicCode"));
 
-            // services.AddMvc(config => 
-            // {
-            //     var policy = new AuthorizationPolicyBuilder("CoreInstance")
-            //                      .RequireAuthenticatedUser()
-            //                      .Build();
-            //     config.Filters.Add(new AuthorizeFilter(policy));
-            // });
-            services.AddMvc();
+            services.AddMvc(config => 
+            {
+                var policy = new AuthorizationPolicyBuilder("CoreInstance")
+                                 .RequireAuthenticatedUser()
+                                 .Build();
+                config.Filters.Add(new AuthorizeFilter(policy));
+            });
+            // services.AddMvc();
             // services.add();
         }
 
@@ -102,14 +104,16 @@ namespace CoreWebApi
             app.UseCusCookieAuthentication(new CusCookieAuthenticationOptions()
             {
                 AuthenticationScheme = "CoreInstance",
-                AutomaticAuthenticate = false
+                AutomaticAuthenticate = false,
+                AutomaticChallenge = false,
+                SessionStore = new MemoryCacheTicketStore()
             });
             
-            // app.UseSimpleBearerAuthentication(new SimpleBearerOptions
-            // {
-            //     AuthenticationScheme = "Bearer",
-            //     AutomaticAuthenticate = false
-            // });
+            app.UseSimpleBearerAuthentication(new SimpleBearerOptions
+            {
+                AuthenticationScheme = "Bearer",
+                AutomaticAuthenticate = false
+            });
 
             app.UseMvc();
         }
