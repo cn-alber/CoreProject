@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using CoreData.CoreUser;
 using CoreModels.XyUser;
 using System.Linq;
+using CoreWebApi.Models;
 
 namespace CoreWebApi
 {
@@ -44,7 +45,7 @@ namespace CoreWebApi
                     IsPersistent = false
                 });
             var ss = JsonConvert.SerializeObject(test);
-            return CoreResult.NewResponse(0, user);
+            return CoreResult.NewResponse(0, user, "Basic");
         }
 
         [HttpGet("/api/{id}")]
@@ -64,11 +65,17 @@ namespace CoreWebApi
         }
 
         [AllowAnonymous]
-        [HttpPostAttribute("/Core/loginin")]
-        public async Task<ResponseResult> login(dynamic lo)
+        [HttpPostAttribute("/sign/in")]
+        public async Task<ResponseResult> login([FromBodyAttribute]Newtonsoft.Json.Linq.JObject lo)
         {
-            var data = UserHaddle.GetUserInfo(lo.account,lo.password);
+            var password = GetMD5(lo["password"].ToString(), "Xy@.");
+            var data = UserHaddle.GetUserInfo(lo["account"].ToString(),password);
             var user = data.d as User;
+
+            if(data.s>0)
+            {
+                return CoreResult.NewResponse(data.s, lo, "Indentity");
+            }
 
              var userc = new ClaimsPrincipal(
                 new ClaimsIdentity(
@@ -86,7 +93,7 @@ namespace CoreWebApi
                     ExpiresUtc = DateTime.UtcNow.AddMinutes(20),
                     IsPersistent = false
                 });
-            return CoreResult.NewResponse(0, user);
+            return CoreResult.NewResponse(0, user, "Basic");
         }
 
         [HttpGetAttribute("/Core/loginout")]    

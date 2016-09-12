@@ -6,9 +6,9 @@ namespace CoreWebApi
 {
     public static class JsonFile
     {
-        public static string GetBasicMessage(int Code)
+        public static string GetMessage(int Code, string Section)
         {
-            var section = Configuration().GetSection("BasicCode");
+            var section = Configuration().GetSection(Section);
             return section.GetValue<string>(Code.ToString());
         }
         public static string GetJson(string FileName, string Section)

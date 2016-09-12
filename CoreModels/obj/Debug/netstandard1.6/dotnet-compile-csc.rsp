@@ -55,4 +55,5 @@
 -r:"C:\Users\ZongQ\.nuget\packages\System.Xml.XDocument\4.0.11\ref\netstandard1.3\System.Xml.XDocument.dll"
 "c:\xyProjectList\CoreProject\CoreModels\DataResult.cs"
 "c:\xyProjectList\CoreProject\CoreModels\Basic\BasicCode.cs"
+"c:\xyProjectList\CoreProject\CoreModels\Enum\CodeType.cs"
 "c:\xyProjectList\CoreProject\CoreModels\XyUser\User.cs"

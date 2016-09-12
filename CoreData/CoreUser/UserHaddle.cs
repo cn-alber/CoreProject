@@ -6,28 +6,27 @@ namespace CoreData.CoreUser
 {
     public static class UserHaddle
     {
+        
+        ///<summary>
+        ///获取登陆信息
+        ///</summary>
         public static DataResult GetUserInfo(string account, string password)
         {
             var m = string.Empty;
-            var s = false;
+            var s = 0;
             var d = new User();
 
             var u = DbBase.UserDB.Query<User>("select id, password, name, companyid, roleid from user where account = @acc",new {acc = account}).AsList();
-            if(u == null)
+            if(u.Count == 0)
             {
-                m = "账号不存在";
+                s = 2001;
             }
-            else if(u[0].PassWord.Equals(password))
+            else if(!u[0].PassWord.Equals(password))
             {
-                m = "密码错误";
-            }
-            else
-            {
-                s = true;
-
+                s = 2002;
             }
             
-            return new DataResult(s, u[0], m);
+            return new DataResult(s, s == 0 ? u[0] : null);
         }
     }
 }
