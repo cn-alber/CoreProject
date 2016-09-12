@@ -44,7 +44,7 @@ namespace CoreWebApi
                     IsPersistent = false
                 });
             var ss = JsonConvert.SerializeObject(test);
-            return new ResponseResult(100, data, "");
+            return CoreResult.NewResponse(0, user);
         }
 
         [HttpGet("/api/{id}")]
@@ -67,20 +67,26 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/loginin")]
         public async Task<ResponseResult> login(dynamic lo)
         {
-            var user = new ClaimsPrincipal(
+            var data = UserHaddle.GetUserInfo(lo.account,lo.password);
+            var user = data.d as User;
+
+             var userc = new ClaimsPrincipal(
                 new ClaimsIdentity(
                     new[] {
-                        new Claim(ClaimTypes.Name, "xishuai")
+                        new Claim("uid", user.ID.ToString()),
+                        new Claim("uname",user.Name.ToString()),
+                        new Claim("coid",user.CompanyID.ToString()),
+                        new Claim("roleid", user.RoleID.ToString())
                          },
-                         "CoreInstance"));
+                         "CoreInstance"));   
 
-            await HttpContext.Authentication.SignInAsync("CoreInstance", user,
+            await HttpContext.Authentication.SignInAsync("CoreInstance", userc,
                 new AuthenticationProperties
                 {
                     ExpiresUtc = DateTime.UtcNow.AddMinutes(20),
                     IsPersistent = false
                 });
-            return new ResponseResult(100, lo, "");
+            return CoreResult.NewResponse(0, user);
         }
 
         [HttpGetAttribute("/Core/loginout")]    
