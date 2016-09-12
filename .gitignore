@@ -1,4 +1,31 @@
+### common #
+/.idea
+.project
+.classpath
+*.launch
+.settings/
+/.vscode
+
+# OS #
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# LOGS #
+*.log
+
+composer.phar
+
+# NODE #
+node_modules
+bower_components
 
 
 
-*.dll
+# Visual Studio
+[Dd]ebug/
+[Rr]elease/
+
+bin
+obj
+*.lock.json
