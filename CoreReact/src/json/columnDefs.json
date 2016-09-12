@@ -1,0 +1,76 @@
+[
+  {
+    "headerName": "#",
+    "width": 30,
+    "checkboxSelection": true,
+    "suppressSorting": true,
+    "suppressMenu": true,
+    "pinned": true
+  },
+  {
+    "headerName": "Employee",
+    "children": [
+      {
+        "headerName": "Name",
+        "field": "name",
+        "enableRowGroup": true,
+        "enablePivot": true,
+        "width": 150,
+        "pinned": true
+      },
+      {
+        "headerName": "Country",
+        "field": "country",
+        "width": 150,
+        "enableRowGroup": true,
+        "enablePivot": true,
+        "pinned": true,
+        "filterParams": {
+          "cellHeight": 20
+        }
+      }
+    ]
+  },
+  {
+    "headerName": "IT Skills",
+    "children": [
+      {
+        "headerName": "Skills",
+        "width": 125,
+        "suppressSorting": true,
+        "field": "skills",
+        "enableRowGroup": true,
+        "enablePivot": true
+      },
+      {
+        "headerName": "Proficiency",
+        "field": "proficiency",
+        "width": 120,
+        "enableValue": true
+      }
+    ]
+  },
+  {
+    "headerName": "Contact",
+    "children": [
+      {
+        "headerName": "Mobile",
+        "field": "mobile",
+        "width": 150,
+        "filter": "text"
+      },
+      {
+        "headerName": "Land-line",
+        "field": "landline",
+        "width": 150,
+        "filter": "text"
+      },
+      {
+        "headerName": "Address",
+        "field": "address",
+        "width": 500,
+        "filter": "text"
+      }
+    ]
+  }
+]

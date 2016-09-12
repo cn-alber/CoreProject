@@ -1,0 +1,43 @@
+:global{
+  .ant-modal-close-x {
+    transition: transform 350ms ease;
+    &:hover {
+      transform: rotate(360deg);
+    }
+  }
+  .ant-message-notice-content {
+    transition: background-color 100ms ease;
+    border-color:rgba(0, 0, 0, 0.9);
+    box-shadow: 0 1px 8px hsla(0, 0%, 0%, 0.2);
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fdfdfd;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.68);
+    // &:hover {
+    //   background-color: rgba(255,255,255,0.85);
+    //   color: #444;
+    //   text-shadow: none;
+    // }
+  }
+  .ant-modal-title {
+    font-family: '华文细黑', Arial;
+  }
+
+  .ant-menu-item .fa,
+  .ant-menu-submenu-title .fa {
+    min-width: 14px;
+    margin-right: 6px;
+  }
+
+  .modalTop {
+    .ant-modal {
+      top: 0;
+    }
+    .ant-modal-header {
+      border-radius: 0;
+      padding: 8px 16px;
+    }
+    .ant-modal-close {
+      top:10px;
+    }
+  }
+}

@@ -1,0 +1,35 @@
+:global {
+  
+}
+
+.wrapper,
+.inner {
+  height:100%;
+}
+.inner {
+      display: flex;
+}
+.zhang {
+  margin: auto;
+  color: #969696;
+  width: auto;
+  padding: 10px;
+  position: relative;
+  background: rgba(249, 255, 0, 0.41);
+  border-radius: 6px;
+  z-index: 10;
+  border: 1px solid #ecf100;
+}
+.btn {
+  margin-bottom:5px;
+}
+.btn :global(.ant-btn-primary) {
+  width: 100%;
+  letter-spacing: 1px;
+  line-height: 35px;
+  font-size: 14px;
+}
+.wrapper {
+    overflow:hidden;
+    background-color: #f5f5f5;
+}

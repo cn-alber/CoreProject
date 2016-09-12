@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Http.Authentication;
 using System;
 using Microsoft.AspNetCore.Http;
 using CoreData.CoreUser;
 using CoreModels.XyUser;
 using System.Linq;
-using CoreWebApi.Models;
 
 namespace CoreWebApi
 {
@@ -66,7 +66,7 @@ namespace CoreWebApi
 
         [AllowAnonymous]
         [HttpPostAttribute("/sign/in")]
-        public async Task<ResponseResult> login([FromBodyAttribute]Newtonsoft.Json.Linq.JObject lo)
+        public async Task<ResponseResult> login([FromBodyAttribute]JObject lo)
         {
             var password = GetMD5(lo["password"].ToString(), "Xy@.");
             var data = UserHaddle.GetUserInfo(lo["account"].ToString(),password);

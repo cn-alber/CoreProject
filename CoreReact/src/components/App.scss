@@ -1,0 +1,163 @@
+:global {
+	.ant-select-tree-dropdown {
+		max-height:100%;
+		overflow-y: auto;
+	}
+	.ant-select-tree-dropdown::-webkit-scrollbar
+	{
+		width: 6px;
+	  height: 6px;
+	}
+	.ant-select-tree-dropdown::-webkit-scrollbar-thumb
+	{
+		background-color: rgba(0,0,0,0.13);
+	  border-radius: 10px;
+	}
+	.ant-select-tree-dropdown:hover::-webkit-scrollbar-thumb
+	{
+		background-color: rgba(0,0,0,0.3);
+	}
+	.rag-red {
+	    background-color: lightcoral;
+	}
+	.rag-green {
+	    background-color: lightgreen;
+	}
+	.rag-amber {
+	    background-color: lightsalmon;
+	}
+
+	.myCollapse .ant-collapse {
+		border:0;
+		background-color:transparent;
+	}
+	.myCollapse .ant-collapse-content {
+		padding:0;
+	}
+	.myCollapse .ant-collapse-content > .ant-collapse-content-box {
+		padding-top:0;
+	}
+	.myCollapse .ant-collapse > .ant-collapse-item {
+		border-top:0;
+	}
+
+	.myCollapse .CBGLine label {
+		display:block;
+		margin: 6px 10px;
+	}
+
+	// .ant-time-picker-panel-select li:last-child:after {
+  //   height: auto;
+	// }
+	.mt5 {
+		margin-top:5px;
+	}
+}
+.side::-webkit-scrollbar,
+.main::-webkit-scrollbar,
+{
+	width: 6px;
+  height: 6px;
+}
+.side::-webkit-scrollbar-thumb,
+.main::-webkit-scrollbar-thumb
+{
+	background-color: rgba(0,0,0,0.13);
+  border-radius: 10px;
+}
+.side:hover::-webkit-scrollbar-thumb,
+.main:hover::-webkit-scrollbar-thumb
+{
+	background-color: rgba(0,0,0,0.3);
+}
+.content {
+  position: relative;
+  height: 100%;
+	padding: 10px 10px 0;
+}
+
+.side {
+  padding:8px;
+  width: 220px;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+	position: absolute;
+	left:0;top:0;
+	height:100%;
+}
+.main {
+  padding: 8px;
+  overflow-y: auto;
+  transition: width 0.3s ease;
+	position: relative;
+  overflow-x: hidden;
+	margin-left:220px;
+	height: 100%;
+	transition: all 0.3s ease;
+}
+
+.side > .inner {
+	width:204px;
+	padding-bottom:45px;
+}
+.main > .inner {
+	margin-top:18px;
+	padding-bottom:45px;
+}
+.sideTop {
+	text-align: right;
+	height: 28px;
+	overflow: hidden;
+}
+.side .box {
+	margin-top:5px;
+	margin-bottom:10px;
+}
+.side .box:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+
+.content.collapse .side {
+  transition: all 0.3s ease;
+  width: 0;
+  overflow: hidden;
+  padding-left:0;
+  padding-right:0;
+}
+.content.collapse .main {
+  transition: all 0.3s ease;
+	margin-left:0;
+}
+
+
+.ecBox {
+	overflow: hidden;
+	width:100%;
+}
+.ecBox .head {
+	text-align: right;
+	padding-right:12px;
+	display: none;
+}
+.ecDiv {
+	max-width:100%;
+	margin:0 auto;
+	height:380px;
+}
+
+.dateSel {
+	margin-top: 5px;
+	position: relative;
+	min-height: 60px;
+}
+.tr {
+	text-align: right;
+}
+
+tr.tableRow > td {
+ padding:8px !important;
+}
+
+.tableCSV {
+	text-align:right;
+	margin-top:30px;
+	margin-bottom:10px;
+}
