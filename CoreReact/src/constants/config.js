@@ -12,5 +12,5 @@ module.exports = {
   SERVICE_CALL: ['400800820'],
   SERVICE_EMAIL: [],
   API_HOST_DEV: 'http://192.168.30.101/api.php?service=new/',
-  API_HOST_PRO: 'http://localhost:5000/'
+  API_HOST_PRO: 'http://localhost:5000/core/'
 }
