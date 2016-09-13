@@ -24,7 +24,7 @@ namespace CoreWebApi
             test.password = "admin";
             test.vcode = "123123";
 
-            var data = UserHaddle.GetUserInfo("admin","admin");
+            var data = UserHaddle.GetUserInfo("admin",GetMD5("admin","Xy@."));
             var user = data.d as User;
 
              var userc = new ClaimsPrincipal(
@@ -65,7 +65,7 @@ namespace CoreWebApi
         }
 
         [AllowAnonymous]
-        [HttpPostAttribute("/sign/in")]
+        [HttpPostAttribute("/Core/sign/in")]
         public async Task<ResponseResult> login([FromBodyAttribute]JObject lo)
         {
             var password = GetMD5(lo["password"].ToString(), "Xy@.");
@@ -93,10 +93,21 @@ namespace CoreWebApi
                     ExpiresUtc = DateTime.UtcNow.AddMinutes(20),
                     IsPersistent = false
                 });
-            return CoreResult.NewResponse(0, user, "Basic");
+            return CoreResult.NewResponse(0, null, "Basic");
         }
 
-        [HttpGetAttribute("/Core/loginout")]    
+        [HttpGetAttribute("/core/sign/mune")]
+        public ResponseResult MenuList()
+        {
+            var roleid = GetRoleid();
+            var coid = GetCoid();
+            // var roleid = "1";
+            // var coid = "1";
+            var m = UserHaddle.GetMenuList(roleid, coid);
+            return CoreResult.NewResponse(m.s, m.d, "Basic");
+        }
+
+        [HttpGetAttribute("/Core/sign/out")]    
         public async Task loginout()
         {
             await HttpContext.Authentication.SignOutAsync("CoreInstance");
