@@ -58,8 +58,6 @@ namespace CoreWebApi
             test.password = "admin";
             test.vcode = cc.FirstOrDefault(q => q.Type.Equals("uid")).Value;
 
-            
-            
             // cc.FirstOrDefault(q => q.Type.Equals("uid"));
 
             return new OkObjectResult(test);
