@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 --temp-output:e:\VSCode\CoreProject\CoreModels\obj\Debug\netstandard1.6\
 --out:e:\VSCode\CoreProject\CoreModels\bin\Debug\netstandard1.6\CoreModels.dll
+=======
+--temp-output:D:\CoreProject\CoreModels\obj\Debug\netstandard1.6\
+--out:D:\CoreProject\CoreModels\bin\Debug\netstandard1.6\CoreModels.dll
+>>>>>>> ead6e05160da96bc77f7a7f0da55215c93994995
 --define:DEBUG
 --define:TRACE
 --define:NETSTANDARD1_6
@@ -56,6 +61,7 @@
 --reference:C:\Users\Administrator\.nuget\packages\System.Threading.Timer\4.0.1\ref\netstandard1.2\System.Threading.Timer.dll
 --reference:C:\Users\Administrator\.nuget\packages\System.Xml.ReaderWriter\4.0.11\ref\netstandard1.3\System.Xml.ReaderWriter.dll
 --reference:C:\Users\Administrator\.nuget\packages\System.Xml.XDocument\4.0.11\ref\netstandard1.3\System.Xml.XDocument.dll
+<<<<<<< HEAD
 e:\VSCode\CoreProject\CoreModels\DataResult.cs
 e:\VSCode\CoreProject\CoreModels\Basic\BasicCode.cs
 e:\VSCode\CoreProject\CoreModels\Enum\CodeType.cs
@@ -66,3 +72,13 @@ e:\VSCode\CoreProject\CoreModels\XyUser\Menu.cs
 e:\VSCode\CoreProject\CoreModels\XyUser\MenuList.cs
 e:\VSCode\CoreProject\CoreModels\XyUser\Role.cs
 e:\VSCode\CoreProject\CoreModels\XyUser\User.cs
+=======
+D:\CoreProject\CoreModels\DataResult.cs
+D:\CoreProject\CoreModels\Basic\BasicCode.cs
+D:\CoreProject\CoreModels\Enum\CodeType.cs
+D:\CoreProject\CoreModels\XyUser\Company.cs
+D:\CoreProject\CoreModels\XyUser\Menu.cs
+D:\CoreProject\CoreModels\XyUser\MenuList.cs
+D:\CoreProject\CoreModels\XyUser\Role.cs
+D:\CoreProject\CoreModels\XyUser\User.cs
+>>>>>>> ead6e05160da96bc77f7a7f0da55215c93994995
