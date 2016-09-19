@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Serialization;
 
 namespace CoreWebApi
 {
@@ -62,7 +63,7 @@ namespace CoreWebApi
                                  .RequireAuthenticatedUser()
                                  .Build();
                 config.Filters.Add(new AuthorizeFilter(policy));
-            });
+            }).AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver()); //json返回默认使用model字段，避免小写：Result -> result
             // services.AddMvc();
             // services.add();
         }

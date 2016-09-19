@@ -127,6 +127,7 @@ namespace CoreModels.XyUser
 
     public class Menu
     {
+     
         public int ID { get; set; }
         public string Name { get; set; }
         public string NewIcon { get; set; }
@@ -135,6 +136,23 @@ namespace CoreModels.XyUser
         public int ParentID { get; set; }
         public List<Menu> Data { get; set; }
     }
+
+
+    public class Refresh
+    {
+        
+        public int type{get;set;}
+        public int id { get; set; }
+        public string name { get; set; }
+        public string icons { get; set; }
+        public string[] icon {get;set;}
+        public string path { get; set; }
+        public int parentID { get; set; }
+        public List<Refresh> data { get; set; }
+    }
+
+
+
 }
 //     public class MenuList
 //     {

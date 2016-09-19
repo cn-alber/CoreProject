@@ -1277,7 +1277,7 @@
     "StackExchange.Redis/1.1.605": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-W+bVyzYtLBTGqU4v1+ByKeUGadXyPCq9R+IwgVqvIs/a+UsSSt9ZOaRowvk4oEGQZIt7aNC/d9KlrYVDEGyCKg=="
+      "sha512": "sha512-3yGtfr2ihBESynl8A1Ynydk+/TEpZZsaXEPf47x48t7mwX5c+1rqtndLEnRIWDcENJKFixaWn03h1amVJcnl1Q=="
     },
     "System.Collections.NonGeneric/4.0.1": {
       "type": "package",

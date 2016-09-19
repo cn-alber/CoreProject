@@ -101,16 +101,38 @@ namespace CoreWebApi
         {
             var roleid = GetRoleid();
             var coid = GetCoid();
-            // var roleid = "1";
-            // var coid = "1";
+
             var m = UserHaddle.GetMenuList(roleid, coid);
             return CoreResult.NewResponse(m.s, m.d, "Basic");
         }
 
-        [HttpGetAttribute("/Core/sign/out")]    
-        public async Task loginout()
+        // [HttpPostAttribute("/Core/sign/out")]    
+        // public async Task loginout()
+        // {
+        //     await HttpContext.Authentication.SignOutAsync("CoreInstance");
+        // }
+
+        [HttpPostAttribute("/Core/sign/out")]    
+        public ResponseResult  loginout()
         {
-            await HttpContext.Authentication.SignOutAsync("CoreInstance");
+            var a =  HttpContext.Authentication.SignOutAsync("CoreInstance");
+            return CoreResult.NewResponse(0,null, "Basic");
         }
+
+        [HttpPostAttribute("/Core/account/password")]    
+        public ResponseResult  editpassword([FromBodyAttribute]JObject lo   )
+        {
+            string oldPwd = lo["oldPwd"].ToString();
+            string newPwd = lo["newPwd"].ToString();
+            string reNewPwd = lo["reNewPwd"].ToString();
+            var m = UserHaddle.editPwd(GetUid(),oldPwd,newPwd,reNewPwd);
+            return CoreResult.NewResponse(m.s,m.d, "Basic");
+        }
+
+
+
+        
+
+
     }
 }
