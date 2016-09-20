@@ -64,6 +64,31 @@ namespace CoreData.CoreUser
             cp.com = u;
             return new DataResult(s,cp);
         }
+        ///<summary>
+        ///查询单笔公司资料
+        ///</summary>
+        public static DataResult GetCompanyEdit(int ID)
+        {
+            var s = 0;            
+            string wheresql = "select name,enable,address,email,typelist,contacts,telphone,mobile,remark from company where id ='" + ID.ToString() + "'" ;//+ " limit 0,10";
+            var u = DbBase.UserDB.Query<Company>(wheresql).AsList();
+            return new DataResult(s,u);
+        }
+        ///<summary>
+        ///检查公司资料是否已经存在
+        ///</summary>
+        public static DataResult IsComExist(string name)
+        {
+            var s = 0;            
+            string wheresql = "select name,enable,address,email,typelist,contacts,telphone,mobile,remark from company where name ='" + name + "'" ;//+ " limit 0,10";
+            var u = DbBase.UserDB.Query<Company>(wheresql).AsList();
+            bool flag = false;
+            if(u.Count > 0)
+            {
+                flag = true;
+            }
+            return new DataResult(s,flag);
+        }
     }
 
     public class CompanyParm

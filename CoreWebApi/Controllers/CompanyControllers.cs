@@ -34,5 +34,13 @@ namespace CoreWebApi
             var data = CompanyHaddle.GetCompanyAll(id,nameFilter,enable,pageIndex,numPerPage);
             return CoreResult.NewResponse(data.s, data.d, "Basic"); 
         }
+        [AllowAnonymous]
+        [HttpPostAttribute("/Core/Company/GetCompanySingle")]
+        public ResponseResult CompanySingle([FromBodyAttribute]JObject co)
+        {   
+            int id = int.Parse(co["Id"].ToString());
+            var data = CompanyHaddle.GetCompanyEdit(id);
+            return CoreResult.NewResponse(data.s, data.d, "Basic"); 
+        }
     }
 }

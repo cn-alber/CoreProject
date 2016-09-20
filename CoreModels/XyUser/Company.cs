@@ -7,11 +7,11 @@ namespace CoreModels.XyUser
         //private int _id;
         private string _name;
         private bool _enable = false;
-       // private string _contacts;
+        private string _contacts;
         private string _address;
-       // private string _email;
-        //private string _telphone;
-        //private string _mobile;
+        private string _email;
+        private string _telphone;
+        private string _mobile;
         private string _remark;
         private string _typelist;
         //private string _warehouselist;
@@ -51,11 +51,11 @@ namespace CoreModels.XyUser
 		/// <summary>
 		/// 联系人
         /// </summary>				
-        // public string Contacts
-        // {
-        //     get{ return _contacts; }
-        //     set{ _contacts = value; }
-        // }        
+        public string Contacts
+        {
+            get{ return _contacts; }
+            set{ _contacts = value; }
+        }        
 		/// <summary>
 		/// 公司地址
         /// </summary>				
@@ -67,27 +67,27 @@ namespace CoreModels.XyUser
 		/// <summary>
 		/// 邮箱
         /// </summary>				
-        // public string Email
-        // {
-        //     get{ return _email; }
-        //     set{ _email = value; }
-        // }        
-		// /// <summary>
-		// /// 固定电话
-        // /// </summary>				
-        // public string TelPhone
-        // {
-        //     get{ return _telphone; }
-        //     set{ _telphone = value; }
-        // }        
-		// /// <summary>
-		// /// 移动电话
-        // /// </summary>		
-        // public string Mobile
-        // {
-        //     get{ return _mobile; }
-        //     set{ _mobile = value; }
-        // }        
+        public string Email
+        {
+            get{ return _email; }
+            set{ _email = value; }
+        }        
+		/// <summary>
+		/// 固定电话
+        /// </summary>				
+        public string TelPhone
+        {
+            get{ return _telphone; }
+            set{ _telphone = value; }
+        }        
+		/// <summary>
+		/// 移动电话
+        /// </summary>		
+        public string Mobile
+        {
+            get{ return _mobile; }
+            set{ _mobile = value; }
+        }        
 		/// <summary>
 		/// 备注
         /// </summary>		
