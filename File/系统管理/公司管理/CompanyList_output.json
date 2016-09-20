@@ -1,0 +1,37 @@
+{
+    "s": 0,
+    "d": {
+        "datacnt": 100,
+        "pagecnt": 34.0,
+        "com": [
+            {
+                "Name": "公司测试test8",
+                "Enable": true,
+                "Address": "",
+                "Remark": "",
+                "TypeList": "0,1",
+                "Creator": "系统管理员",
+                "CreateDate": "2016-04-28T17:50:17"
+            },
+            {
+                "Name": "公司测试test9",
+                "Enable": true,
+                "Address": "",
+                "Remark": "",
+                "TypeList": "0,1",
+                "Creator": "系统管理员",
+                "CreateDate": "2016-04-28T17:50:25"
+            },
+            {
+                "Name": "公司测试test10",
+                "Enable": true,
+                "Address": "",
+                "Remark": "",
+                "TypeList": "0",
+                "Creator": "系统管理员",
+                "CreateDate": "2016-04-28T17:50:30"
+            }
+        ]
+    },
+    "m": "请求成功"
+}

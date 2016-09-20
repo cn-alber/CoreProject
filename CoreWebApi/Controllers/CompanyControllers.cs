@@ -1,26 +1,38 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
-using Newtonsoft.Json;
+//using System.Threading.Tasks;
+//using System.Security.Claims;
+//using Microsoft.AspNetCore.Authorization;
+//using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Microsoft.AspNetCore.Http.Authentication;
-using System;
-using Microsoft.AspNetCore.Http;
+//using Microsoft.AspNetCore.Http.Authentication;
+//using System;
+//using Microsoft.AspNetCore.Http;
 using CoreData.CoreUser;
-using CoreModels.XyUser;
-using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+//using CoreModels.XyUser;
+//using System.Linq;
 
 namespace CoreWebApi
 {
-    [Route("api/[controller]")]
     public class CompanyController : ControllBase
     {
-        [HttpGet("id={id}&filter={nameFilter}&enable={enable}")]
-        public ResponseResult Get(int id,string nameFilter,string enable)
+        [HttpGet("api/Company")]
+        public ResponseResult Get()
         {
-            var data = CompanyHaddle.GetCompanyAll(id,nameFilter,enable);
-            return CoreResult.NewResponse(data.s, data.d, "Basic");
+            var data = CompanyHaddle.GetCompanyAll(1,"","all",33,3);
+            return CoreResult.NewResponse(data.s, data.d, "Basic"); 
+        }
+        [AllowAnonymous]
+        [HttpPostAttribute("/Core/Company/GetCompany")]
+        public ResponseResult CompanyList([FromBodyAttribute]JObject co)
+        {   
+            int id = int.Parse(co["Id"].ToString());
+            string nameFilter = co["Filter"].ToString();
+            string enable = co["Enable"].ToString();
+            int pageIndex = int.Parse(co["PageIndex"].ToString());
+            int numPerPage = int.Parse(co["NumPerPage"].ToString());
+            var data = CompanyHaddle.GetCompanyAll(id,nameFilter,enable,pageIndex,numPerPage);
+            return CoreResult.NewResponse(data.s, data.d, "Basic"); 
         }
     }
 }
