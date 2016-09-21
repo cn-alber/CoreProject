@@ -1,0 +1,19 @@
+{
+    "s": 0,
+    "d": [
+        {
+            "Name": "携云科技",
+            "Enable": true,
+            "Contacts": "联系人c1",
+            "Address": "携云科技有限公司",
+            "Email": "346517865@qq.com",
+            "TelPhone": "52777879-5001",
+            "Mobile": "13814987627",
+            "Remark": "系统主账号",
+            "TypeList": "0,1",
+            "Creator": null,
+            "CreateDate": "2016-09-20T06:05:24.7196563Z"
+        }
+    ],
+    "m": "请求成功"
+}
