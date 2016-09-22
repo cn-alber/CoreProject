@@ -130,6 +130,8 @@ namespace CoreData.CoreUser
             // return new DataResult(s,"公司:[" + name + "]被" + (enable ? "启用" : "禁用"));
             return new DataResult(0,"");
         }
+
+        
     }
 
     public class CompanyParm
