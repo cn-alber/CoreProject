@@ -8,8 +8,13 @@
 -debug:portable
 -nostdlib
 -nologo
+<<<<<<< HEAD
 "e:\VSCode\CoreProject\CoreData\obj\Debug\netstandard1.6\dotnet-compile.assemblyinfo.cs"
 -out:"e:\VSCode\CoreProject\CoreData\bin\Debug\netstandard1.6\CoreData.dll"
+=======
+"d:\CoreProject\CoreData\obj\Debug\netstandard1.6\dotnet-compile.assemblyinfo.cs"
+-out:"d:\CoreProject\CoreData\bin\Debug\netstandard1.6\CoreData.dll"
+>>>>>>> d9406ba01bac4db0ac9f0f82b0a4c42913a75451
 -r:"C:\Users\Administrator\.nuget\packages\Dapper\1.50.2\lib\netstandard1.3\Dapper.dll"
 -r:"C:\Users\Administrator\.nuget\packages\Google.Protobuf\3.0.0-beta4\lib\netstandard1.0\Google.Protobuf.dll"
 -r:"C:\Users\Administrator\.nuget\packages\Microsoft.CSharp\4.0.1\ref\netstandard1.0\Microsoft.CSharp.dll"
@@ -96,6 +101,7 @@
 -r:"C:\Users\Administrator\.nuget\packages\System.Xml.ReaderWriter\4.0.11\ref\netstandard1.3\System.Xml.ReaderWriter.dll"
 -r:"C:\Users\Administrator\.nuget\packages\System.Xml.XDocument\4.0.11\ref\netstandard1.3\System.Xml.XDocument.dll"
 -r:"C:\Users\Administrator\.nuget\packages\System.Xml.XmlDocument\4.0.1\ref\netstandard1.3\System.Xml.XmlDocument.dll"
+<<<<<<< HEAD
 -r:"e:\VSCode\CoreProject\CoreModels\bin\Debug\netstandard1.6\CoreModels.dll"
 "e:\VSCode\CoreProject\CoreData\CacheBase.cs"
 "e:\VSCode\CoreProject\CoreData\DbBase.cs"
@@ -107,3 +113,16 @@
 "e:\VSCode\CoreProject\CoreData\Redis\Redis.cs"
 "e:\VSCode\CoreProject\CoreData\Redis\RedisConfig.cs"
 "e:\VSCode\CoreProject\CoreData\Redis\RedisSession.cs"
+=======
+-r:"d:\CoreProject\CoreModels\bin\Debug\netstandard1.6\CoreModels.dll"
+"d:\CoreProject\CoreData\CacheBase.cs"
+"d:\CoreProject\CoreData\DbBase.cs"
+"d:\CoreProject\CoreData\MySqlData.cs"
+"d:\CoreProject\CoreData\CoreCore\NotifyHaddle.cs"
+"d:\CoreProject\CoreData\CoreUser\CompanyHaddle.cs"
+"d:\CoreProject\CoreData\CoreUser\UserHaddle.cs"
+"d:\CoreProject\CoreData\Redis\ICache.cs"
+"d:\CoreProject\CoreData\Redis\Redis.cs"
+"d:\CoreProject\CoreData\Redis\RedisConfig.cs"
+"d:\CoreProject\CoreData\Redis\RedisSession.cs"
+>>>>>>> d9406ba01bac4db0ac9f0f82b0a4c42913a75451
