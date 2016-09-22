@@ -2,16 +2,17 @@
 using CoreModels;
 using Dapper;
 using System;
-namespace CoreDate.CoreComm
+namespace CoreData.CoreComm
 {
     public static class ShopHaddle
     {
+       
         ///<summary>
         ///查询店铺资料
         ///<summary>
         public static DataResult GetShopAll(ShopParam IParam)
         {
-            var s = 0;
+            var s = 1;
             string wheresql = "where 1=1";
             if(IParam.CoID!=1)
             {
@@ -41,6 +42,31 @@ namespace CoreDate.CoreComm
             wheresql = wheresql + " limit " + dataindex.ToString() + " ," + IParam.PageSize;//分页
             IParam.ShopLst = CoreData.DbBase.CommDB.Query<Shop>(wheresql).AsList();
             return new DataResult(s,IParam);
+        }
+        ///<summary>
+        ///查询单笔店铺资料
+        ///<summary>
+        public static DataResult GetShopSingle(string shopid,string coid)
+        {
+            var s = 1;
+            var sname = "shop"+coid+shopid;
+            var su = CacheBase.Get<Shop>(sname);
+            if(su==null)
+            {
+                var u = DbBase.CommDB.Query<Shop>("select * from Shop where id = @sid and CoID = @coid",new{sid = shopid,coid=coid}).AsList();
+                if(u.Count==0)
+                {
+
+                }
+                else
+                {
+                    su = u[0];
+                    CacheBase.Set<Shop>(sname,su);
+                }
+            }
+            return new DataResult(s,su);
+
+
         }
 
     }

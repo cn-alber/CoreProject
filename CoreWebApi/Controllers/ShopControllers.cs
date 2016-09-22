@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Authorization;
-using CoreDate.CoreComm;
+using CoreData.CoreComm;
 using CoreModels;
 
 namespace CoreWebApi
@@ -22,7 +22,7 @@ namespace CoreWebApi
             cp.SortDirection = obj["SortDirection"].ToString();
             var res = ShopHaddle.GetShopAll(cp);
             var Result = CoreResult.NewResponse(res.s,res,"Basic");
-            return Result;            
+            return Result;             
         }
 
     }
