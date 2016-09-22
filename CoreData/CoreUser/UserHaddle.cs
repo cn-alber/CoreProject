@@ -183,7 +183,7 @@ namespace CoreData.CoreUser
                 if (role.s > 1) return null;
                 var r = role.d as Role;
 
-                var child = DbBase.UserDB.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NavigateUrl as path,ParentID from menus where viewpowerid in (" + r.ViewList + ") order by ParentID,sortindex").AsList();
+                var child = DbBase.UserDB.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where viewpowerid in (" + r.ViewList + ") order by ParentID,sortindex").AsList();
                 foreach(var c in child){
                     c.icon = c.icons.Split(',');
                 }
@@ -194,7 +194,7 @@ namespace CoreData.CoreUser
                 }
                 var pidarray = (from c in child select c.parentID).Distinct().ToArray();
                 var pid = string.Join(",", pidarray);
-                parent = DbBase.UserDB.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NavigateUrl as path,ParentID from menus where id in (" + pid + ") order by sortindex").AsList();
+                parent = DbBase.UserDB.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where id in (" + pid + ") order by sortindex").AsList();
                 
                 foreach (var p in parent)
                 {

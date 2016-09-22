@@ -38,17 +38,23 @@ namespace CoreWebApi
             }else{return CoreResult.NewResponse(m.s, m.d, "Indentity");}                              
         }
 
-        //消息提醒
+        /// <summary>
+		/// 消息列表
+		/// </summary>
         [HttpPostAttribute("/core/profile/msg")]
         public ResponseResult msg([FromBodyAttribute]JObject lo)
         {
             var msgparam = new MsgParam();
-            msgparam.IsRead = lo["readed"].ToString();             
-            foreach (string  i in lo["levels"])
-            {
-                msgparam.LevelList += i+",";
-            }
-            msgparam.LevelList = msgparam.LevelList.Substring(0,msgparam.LevelList.Length - 1);
+            msgparam.IsRead = lo["readed"].ToString();
+            if(string.IsNullOrEmpty(lo["levels"].ToString())){
+                msgparam.LevelList = "";
+            }else{
+                foreach (string  i in lo["levels"])
+                {
+                    msgparam.LevelList += i+",";
+                }
+                msgparam.LevelList = msgparam.LevelList.Substring(0,msgparam.LevelList.Length - 1);
+            }             
 
             msgparam.PageIndex = lo["page"] !=null? int.Parse(lo["page"].ToString()):1;
             msgparam.PageSize = 20;
@@ -59,6 +65,9 @@ namespace CoreWebApi
             return CoreResult.NewResponse(m.s, m.d, "Basic");
         }
 
+        /// <summary>
+		/// 消息提醒数
+		/// </summary>
         [HttpGetAttribute("/core/profile/msgCount")]
         public ResponseResult msgCount()
         {
@@ -68,6 +77,29 @@ namespace CoreWebApi
             var m = NotifyHaddle.GetMsgCount(uid,roleid);
             return CoreResult.NewResponse(m.s, m.d, "Basic");
         }
+
+        /// <summary>
+		/// 消息新增
+		/// </summary>
+        [HttpPostAttribute("/core/profile/msgadd")]
+        public ResponseResult msgadd([FromBodyAttribute]JObject lo)
+        {
+            var content =  lo["content"].ToString();
+            var level =  lo["level"].ToString();
+            var roletype =  "";
+            if(!string.IsNullOrEmpty(lo["roletype"].ToString())){               
+                foreach (string  i in lo["roletype"])
+                {
+                    roletype += i+",";
+                }
+                roletype = roletype.Substring(0,roletype.Length - 1);
+            }        
+            var cid = GetCoid();
+            var uid = GetUid();
+            var m =  NotifyHaddle.MsgAdd(content,level,roletype,cid,uid);
+            return CoreResult.NewResponse(m.s, m.d, "Basic");    
+        }
+
 
 
 

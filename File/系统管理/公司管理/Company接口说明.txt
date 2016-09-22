@@ -21,4 +21,11 @@ OutPut: 单笔company 资料
 参考:input jason 文件:CompanySingle_input.json
 参考:output jason 文件:CompanySingle_output.json
 
-3.
+3.UpdateEnable()//批次更新公司资料的状态
+路由:http://localhost:5000/Core/Company/UpdateEnable
+input 参数： Id        公司ID list,用逗号隔开
+            NameList  公司名称list,用逗号隔开
+            Enable    状态 true/false
+OutPut: 成功 or 失败讯息
+参考:input jason 文件:UpdateEnable_input.json
+参考:output jason 文件:UpdateEnable_output.json
