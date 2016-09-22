@@ -1,0 +1,9 @@
+{
+"CoID":"1",
+"Filter":"京东",
+"Enable":"true",
+"PageIndex":"1",
+"PageSize":"3",
+"SortField":"ShopName",
+"SortDirection":"ASC"
+}
