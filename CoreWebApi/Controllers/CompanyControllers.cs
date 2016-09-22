@@ -54,6 +54,8 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "Basic"); 
         }
 
+
+
         // [AllowAnonymous]
         // [HttpPostAttribute("/Core/Company/UpdateCompany")]
         // public ResponseResult UpdateCompamy([FromBodyAttribute]JObject co)
