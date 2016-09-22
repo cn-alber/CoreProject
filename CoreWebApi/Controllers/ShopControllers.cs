@@ -21,9 +21,19 @@ namespace CoreWebApi
             cp.SortField = obj["SortField"].ToString();
             cp.SortDirection = obj["SortDirection"].ToString();
             var res = ShopHaddle.GetShopAll(cp);
-            var Result = CoreResult.NewResponse(res.s,res,"Basic");
+            var Result = CoreResult.NewResponse(res.s,res.d,"Basic");
             return Result;             
         }
 
+        [AllowAnonymous]
+        [HttpPostAttribute("/Core/Shop/ShopEdit")]
+        public ResponseResult ShopEdit([FromBodyAttribute]JObject obj)
+        {
+            var CoID = obj["CoID"].ToString(); 
+            //CoID = GetCoid();
+            string shopid = obj["ShopID"].ToString();
+            var res = ShopHaddle.GetShopEdit(CoID,shopid);
+            return CoreResult.NewResponse(res.s,res.d,"General");
+        }
     }
 }

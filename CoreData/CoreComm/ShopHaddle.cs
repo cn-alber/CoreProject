@@ -46,29 +46,26 @@ namespace CoreData.CoreComm
         ///<summary>
         ///查询单笔店铺资料
         ///<summary>
-        public static DataResult GetShopSingle(string shopid,string coid)
+        public static DataResult GetShopEdit(string coid,string shopid)
         {
             var s = 1;
             var sname = "shop"+coid+shopid;
-            var su = CacheBase.Get<Shop>(sname);
-            if(su==null)
-            {
+            Shop su = null;
+           // var su = CacheBase.Get<Shop>(sname);
+            // if(su==null)
+            // {
                 var u = DbBase.CommDB.Query<Shop>("select * from Shop where id = @sid and CoID = @coid",new{sid = shopid,coid=coid}).AsList();
                 if(u.Count==0)
                 {
-
+                    s=3001;
                 }
                 else
                 {
                     su = u[0];
-                    CacheBase.Set<Shop>(sname,su);
+                    //CacheBase.Set<Shop>(sname,su);
                 }
-            }
+            // }
             return new DataResult(s,su);
-
-
         }
-
-    }
-   
+    }   
 }
