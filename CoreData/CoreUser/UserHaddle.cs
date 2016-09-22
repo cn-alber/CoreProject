@@ -136,7 +136,7 @@ namespace CoreData.CoreUser
             var cname = "menus" + coid + roleid;
 
             //获取菜单缓存
-            CacheBase.Remove(cname);
+            //CacheBase.Remove(cname);
             var parent = CacheBase.Get<List<Refresh>>(cname);
             var parentRefresh = new List<Refresh>();
         
@@ -164,7 +164,7 @@ namespace CoreData.CoreUser
                     return new DataResult(s, reslut);
 
                     //无缓存，添加缓存
-                    //CacheBase.Set<List<Menu>>(cname, parent);
+                    CacheBase.Set<List<Refresh>>(cname, parent);
                 }
             }
             return new DataResult(s, s == 1 ? parent : null);
