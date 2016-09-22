@@ -91,7 +91,7 @@ namespace CoreModels.XyCore{
     }
 
     public class NotifyMsg{
-        public int MsgLevel{get;set;}
+        public string  MsgLevel{get;set;}
         public string Msg{get;set;}
         public string CreateDate{get;set;}
         public bool Isreaded{get;set;}

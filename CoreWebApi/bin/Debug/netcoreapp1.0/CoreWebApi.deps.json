@@ -1252,7 +1252,7 @@
     "MySql.Data.Core/7.0.4-ir-191": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-pVCkGOAqfUXl8Spf96vOSN8N+lweEyj0S4+YJJGj/8YCF8QocwmgeSdYRXG35rO7Pz1qQZlO0dlRYoTWwU5K0g=="
+      "sha512": "sha512-+motbJL/HNhErU6x9MGVpMfBUClc/XYIGrbxIfMhP6oqCq3sud9A4n2HunvJQIuv9eM9852v83m2H1EUr9RLdw=="
     },
     "Newtonsoft.Json/9.0.1": {
       "type": "package",
