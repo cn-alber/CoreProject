@@ -195,6 +195,7 @@
 "d:\CoreProject\CoreWebApi\Controllers\ExpressControllers.cs"
 "d:\CoreProject\CoreWebApi\Controllers\LoginControllers.cs"
 "d:\CoreProject\CoreWebApi\Controllers\ProfileController.cs"
+"d:\CoreProject\CoreWebApi\Controllers\ShopControllers.cs"
 "d:\CoreProject\CoreWebApi\Middleware\SimpleBearerAppBuilderExtensions.cs"
 "d:\CoreProject\CoreWebApi\Middleware\SimpleBearerHandler.cs"
 "d:\CoreProject\CoreWebApi\Middleware\SimpleBearerMiddleware.cs"

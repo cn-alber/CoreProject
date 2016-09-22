@@ -1,0 +1,27 @@
+接口名称：ShopControllers
+
+function说明
+1.GetShopAll()//查询table Shop 资料
+    路由：http://localhost:5000/Core/Shop/CallShop
+    参数: CoreModels.ShopParam
+    InPut:
+        CoID            int         公司编号CoID
+        Filter          string      模糊查询匹配(店铺名称,店铺平台归属,创建人)
+        Enable          string      启用状态(all/false/true)
+        PageIndex       int         当前页码(ex.第一页就给1)
+        PageSize        int         每页显示资料笔数
+        SortField       string      排序字段
+        SortDirection   string      排序方向(DESC|ASC)
+    OutPut:
+        CoID            int         公司编号CoID
+        Filter          string      模糊查询匹配(店铺名称,店铺平台归属,创建人)
+        Enable          string      启用状态(all/false/true)
+        PageIndex       int         当前页码(ex.第一页就给1)
+        PageSize        int         每页显示资料笔数
+        PageCount       int         总页数
+        DataCount       int         资料总笔数
+        SortField       string      排序字段
+        SortDirection   string      排序方向(DESC|ASC)  
+        ShopLst         List<Shop>  店铺资料(Shop)
+    参考:input json 文件:ShopListQuery_input.json
+    参考:output json 文件:ShopListQuery_output.json
