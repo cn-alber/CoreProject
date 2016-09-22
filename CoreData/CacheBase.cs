@@ -7,7 +7,7 @@ namespace CoreData
     /// </summary>
     public static class CacheBase
     {
-        public static Redis.RedisSession noSql = new Redis.RedisSession("114.55.95.140","6379","xieyukeji");
+        public static Redis.RedisSession noSql = new Redis.RedisSession("2fabab704b8e46c1.redis.rds.aliyuncs.com","6379","S13814987627s");
         public static bool Remove(string key)
         {
             return noSql.Remove(key);

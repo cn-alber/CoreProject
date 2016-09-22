@@ -45,7 +45,7 @@ namespace CoreWebApi
                     IsPersistent = false
                 });
             var ss = JsonConvert.SerializeObject(test);
-            return CoreResult.NewResponse(0, user, "Basic");
+            return CoreResult.NewResponse(1, user, "Basic");
         }
 
         [HttpGet("/api/{id}")]
@@ -71,7 +71,7 @@ namespace CoreWebApi
             var data = UserHaddle.GetUserInfo(lo["account"].ToString(),password);
             var user = data.d as User;
 
-            if(data.s>0)
+            if(data.s>1)
             {
                 return CoreResult.NewResponse(data.s, lo, "Indentity");
             }
@@ -92,7 +92,7 @@ namespace CoreWebApi
                     ExpiresUtc = DateTime.UtcNow.AddMinutes(20),
                     IsPersistent = false
                 });
-            return CoreResult.NewResponse(0, null, "Basic");
+            return CoreResult.NewResponse(1, null, "Basic");
         }
 
         [HttpGetAttribute("/core/sign/mune")]
@@ -115,7 +115,7 @@ namespace CoreWebApi
         public ResponseResult  loginout()
         {
             var a =  HttpContext.Authentication.SignOutAsync("CoreInstance");
-            return CoreResult.NewResponse(0,null, "Basic");
+            return CoreResult.NewResponse(1,null, "Basic");
         }
 
         [HttpPostAttribute("/Core/account/password")]    
@@ -127,11 +127,5 @@ namespace CoreWebApi
             var m = UserHaddle.editPwd(GetUid(),oldPwd,newPwd,reNewPwd);
             return CoreResult.NewResponse(m.s,m.d, "Basic");
         }
-
-
-
-        
-
-
     }
 }

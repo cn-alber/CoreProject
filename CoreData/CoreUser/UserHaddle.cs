@@ -15,7 +15,7 @@ namespace CoreData.CoreUser
         ///</summary>
         public static DataResult GetUserInfo(string account, string password)
         {
-            var s = 0;
+            var s = 1;
 
             var u = DbBase.UserDB.Query<User>("select id, password, name, companyid, roleid, enable, islocked from user where account = @acc", new { acc = account }).AsList();
             if (u.Count == 0)
@@ -31,7 +31,7 @@ namespace CoreData.CoreUser
                 s = 2002;
             }
 
-            return new DataResult(s, s == 0 ? u[0] : null);
+            return new DataResult(s, s == 1 ? u[0] : null);
         }
 
         ///<summary>
@@ -39,7 +39,7 @@ namespace CoreData.CoreUser
         ///</summary>
         public static DataResult GetRole(string roleid, string coid)
         {
-            var s = 0;
+            var s = 1;
             var cname = "role" + coid + roleid;
             var cu = CacheBase.Get<Role>(cname);
             if (cu == null)
@@ -71,7 +71,7 @@ namespace CoreData.CoreUser
         ///</summary>
         public static DataResult GetMenuList(string roleid, string coid)
         {
-            var s = 0;
+            var s = 1;
             var cname = "menus" + coid + roleid;
 
             //获取菜单缓存
@@ -89,7 +89,7 @@ namespace CoreData.CoreUser
                     CacheBase.Set<List<Menu>>(cname, parent);
                 }
             }
-            return new DataResult(s, s == 0 ? parent : null);
+            return new DataResult(s, s == 1 ? parent : null);
         }
 
         ///<summary>
@@ -102,7 +102,7 @@ namespace CoreData.CoreUser
             {
                 //获取权限列表
                 var role = GetRole(roleid, coid);
-                if (role.s > 0) return null;
+                if (role.s > 1) return null;
                 var r = role.d as Role;
 
                 var child = DbBase.UserDB.Query<Menu>("select name,NewIcon,NewIconPre,NavigateUrl,ParentID from menus where viewpowerid in (" + r.ViewList + ") order by ParentID,sortindex").AsList();
@@ -132,7 +132,7 @@ namespace CoreData.CoreUser
         ///</summary>
         public static DataResult GetRefreshList(string roleid, string coid,string uname,string uid)
         {
-            var s = 0;
+            var s = 1;
             var cname = "menus" + coid + roleid;
 
             //获取菜单缓存
@@ -167,7 +167,7 @@ namespace CoreData.CoreUser
                     //CacheBase.Set<List<Menu>>(cname, parent);
                 }
             }
-            return new DataResult(s, s == 0 ? parent : null);
+            return new DataResult(s, s == 1 ? parent : null);
         }
 
         ///<summary>
@@ -180,7 +180,7 @@ namespace CoreData.CoreUser
             {
                 //获取权限列表
                 var role = GetRole(roleid, coid);
-                if (role.s > 0) return null;
+                if (role.s > 1) return null;
                 var r = role.d as Role;
 
                 var child = DbBase.UserDB.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NavigateUrl as path,ParentID from menus where viewpowerid in (" + r.ViewList + ") order by ParentID,sortindex").AsList();
@@ -211,7 +211,7 @@ namespace CoreData.CoreUser
         }
 
         public static DataResult lockuser(string uid){
-            int s = 0;
+            int s = 1;
             try{
               int rnt =  DbBase.UserDB.Execute("UPDATE `user` SET `user`.IsLocked = 1 WHERE `user`.ID = "+uid);    
               if(rnt<1)  s = -1;
@@ -222,7 +222,7 @@ namespace CoreData.CoreUser
         }
 
         public static DataResult unlockuser(string uid,string password){
-            int s = 0;
+            int s = 1;
             try{
                 int rnt = DbBase.UserDB.Execute("UPDATE `user` SET `user`.IsLocked = 0 WHERE `user`.ID = @uid AND `user`.`PassWord` = @p ",new { uid = int.Parse(uid) ,p = password }); 
                 if(rnt == 0) s = 2002;
@@ -231,13 +231,13 @@ namespace CoreData.CoreUser
         }
 
         public static DataResult editPwd(string uid,string oldp,string newp,string reNewPwd){
-            int s = 0;
+            int s = 1;
             string regexstr = @".{6,18}";
             if (string.IsNullOrEmpty(oldp)) {  s = 2006; }
             if (string.IsNullOrEmpty(newp)) {  s = 2012; }
             if (!Regex.IsMatch(newp, regexstr)){ s=2007; }
             if (newp != reNewPwd) {  s=2010; }
-            if(s == 0){
+            if(s == 1){
                 try{
                     int rnt = DbBase.UserDB.Execute("UPDATE `user` SET `user`.`PassWord`= @newp WHERE `user`.ID = @uid AND `user`.`PassWord` = @p ",
                                                 new { newp = newp ,uid = int.Parse(uid) ,p = oldp }); 
