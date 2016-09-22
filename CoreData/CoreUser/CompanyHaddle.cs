@@ -14,7 +14,7 @@ namespace CoreData.CoreUser
         ///</summary>
         public static DataResult GetCompanyAll(int CoID,string nameFilter, string enable,int pageIndex,int numPerPage)
         {
-            var s = 0;
+            var s = 1;
             string wheresql = "";
             bool flag = false;
             if(CoID != 1)
@@ -70,7 +70,7 @@ namespace CoreData.CoreUser
         ///</summary>
         public static DataResult GetCompanyEdit(int ID)
         {
-            var s = 0;            
+            var s = 1;            
             string wheresql = "select name,enable,address,email,typelist,contacts,telphone,mobile,remark from company where id ='" + ID.ToString() + "'" ;//+ " limit 0,10";
             var u = DbBase.UserDB.Query<Company>(wheresql).AsList();
             return new DataResult(s,u);
@@ -80,7 +80,7 @@ namespace CoreData.CoreUser
         ///</summary>
         public static DataResult IsComExist(string name)
         {
-            var s = 0;            
+            var s = 1;            
             string wheresql = "select name,enable,address,email,typelist,contacts,telphone,mobile,remark from company where name ='" + name + "'" ;//+ " limit 0,10";
             var u = DbBase.UserDB.Query<Company>(wheresql).AsList();
             bool flag = false;
@@ -95,7 +95,7 @@ namespace CoreData.CoreUser
         ///</summary>
         public static DataResult UpdateEnable(string id,string name,bool enable)
         {
-            var s = 0;            
+            var s = 1;            
             string wheresql = "update company set enable = " + enable + " where id in (" + id + ")" ;//+ " limit 0,10";
             var u = DbBase.UserDB.Query<Company>(wheresql).AsList();
             
