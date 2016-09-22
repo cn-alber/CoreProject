@@ -47,6 +47,16 @@ namespace CoreData.CoreUser
             return new DataResult(s,msgcount);
         }
 
+        public static DataResult MsgAdd(string content,string level,string roletype,string cid,string uid){
+            int s = 0;
+            try{
+              int rnt =  DbBase.CoreDB.Execute("INSERT INTO userwebmsg(userwebmsg.CoId,userwebmsg.Content,userwebmsg.`Create`,userwebmsg.Creater,userwebmsg.`Level`,userwebmsg.RoleType)"+ 
+                                  "VALUES("+cid+",'"+content+"',NOW(),"+uid+","+level+",'"+roletype+"');");
+              if(rnt == 0) s = -1;
+            }catch{}        
+            return new DataResult(s,null);
+        }
+
 
 
 

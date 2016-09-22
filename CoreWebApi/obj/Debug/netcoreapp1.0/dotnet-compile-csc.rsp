@@ -7,8 +7,13 @@
 -debug:portable
 -nostdlib
 -nologo
+<<<<<<< HEAD
+"e:\VSCode\CoreProject\CoreWebApi\obj\Debug\netcoreapp1.0\dotnet-compile.assemblyinfo.cs"
+-out:"e:\VSCode\CoreProject\CoreWebApi\bin\Debug\netcoreapp1.0\CoreWebApi.dll"
+=======
 "d:\CoreProject\CoreWebApi\obj\Debug\netcoreapp1.0\dotnet-compile.assemblyinfo.cs"
 -out:"d:\CoreProject\CoreWebApi\bin\Debug\netcoreapp1.0\CoreWebApi.dll"
+>>>>>>> d9406ba01bac4db0ac9f0f82b0a4c42913a75451
 -r:"C:\Users\Administrator\.nuget\packages\Dapper\1.50.2\lib\netstandard1.3\Dapper.dll"
 -r:"C:\Users\Administrator\.nuget\packages\Google.Protobuf\3.0.0-beta4\lib\netstandard1.0\Google.Protobuf.dll"
 -r:"C:\Users\Administrator\.nuget\packages\Microsoft.AspNetCore.Antiforgery\1.0.0\lib\netstandard1.3\Microsoft.AspNetCore.Antiforgery.dll"
@@ -182,6 +187,42 @@
 -r:"C:\Users\Administrator\.nuget\packages\System.Xml.ReaderWriter\4.0.11\ref\netstandard1.3\System.Xml.ReaderWriter.dll"
 -r:"C:\Users\Administrator\.nuget\packages\System.Xml.XDocument\4.0.11\ref\netstandard1.3\System.Xml.XDocument.dll"
 -r:"C:\Users\Administrator\.nuget\packages\System.Xml.XmlDocument\4.0.1\ref\netstandard1.3\System.Xml.XmlDocument.dll"
+<<<<<<< HEAD
+-r:"e:\VSCode\CoreProject\CoreData\bin\Debug\netstandard1.6\CoreData.dll"
+-r:"e:\VSCode\CoreProject\CoreModels\bin\Debug\netstandard1.6\CoreModels.dll"
+"e:\VSCode\CoreProject\CoreWebApi\Program.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Startup.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Components\ControllBase.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Components\ISystemClock.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Components\JsonFile.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Components\ResponseResult.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Components\SystemClock.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Controllers\CompanyControllers.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Controllers\LoginControllers.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Controllers\ProfileController.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\SimpleBearerAppBuilderExtensions.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\SimpleBearerHandler.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\SimpleBearerMiddleware.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\SimpleBearerOptions.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\CoreCookie\ChunkingCookieManager.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\CoreCookie\Constants.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\CoreCookie\CusCookieAppBuilderExtensions.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\CoreCookie\CusCookieAuthenticationDefaults.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\CoreCookie\CusCookieAuthenticationHandler.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\CoreCookie\CusCookieAuthenticationMiddleware.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\CoreCookie\CusCookieAuthenticationOptions.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\CoreCookie\ICusCookieManager.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\CoreCookie\IMemoryCacheTicketStore.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\CoreCookie\MemoryCacheTicketStore.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\CoreCookie\Events\CusBaseCookieContext.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\CoreCookie\Events\CusCookieAuthenticationEvents.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\CoreCookie\Events\CusCookieSignedInContext.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\CoreCookie\Events\CusCookieSigningInContext.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\CoreCookie\Events\CusCookieSigningOutContext.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\CoreCookie\Events\CusCookieValidatePrincipalContext.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Middleware\CoreCookie\Events\ICusCookieAuthenticationEvents.cs"
+"e:\VSCode\CoreProject\CoreWebApi\Models\Login.cs"
+=======
 -r:"d:\CoreProject\CoreData\bin\Debug\netstandard1.6\CoreData.dll"
 -r:"d:\CoreProject\CoreModels\bin\Debug\netstandard1.6\CoreModels.dll"
 "d:\CoreProject\CoreWebApi\Program.cs"
@@ -216,3 +257,4 @@
 "d:\CoreProject\CoreWebApi\Middleware\CoreCookie\Events\CusCookieValidatePrincipalContext.cs"
 "d:\CoreProject\CoreWebApi\Middleware\CoreCookie\Events\ICusCookieAuthenticationEvents.cs"
 "d:\CoreProject\CoreWebApi\Models\Login.cs"
+>>>>>>> d9406ba01bac4db0ac9f0f82b0a4c42913a75451
