@@ -2,6 +2,8 @@
 using CoreModels;
 using Dapper;
 using System;
+using System.Collections.Generic;
+using CoreModels.XyComm;
 namespace CoreData.CoreComm
 {
     public static class ShopHaddle
@@ -66,6 +68,38 @@ namespace CoreData.CoreComm
                 }
             // }
             return new DataResult(s,su);
+        }
+
+        ///<summary>
+        ///启用、停用店铺
+        ///<summary>
+        public static DataResult UptShopEnable(Dictionary<int,string> IDsDic,string Company,string UserName,bool Enable)
+        {
+            var s = 1;
+            string contents = string.Empty;            
+            string uptsql = @"update Shop set Enable = @Enable where ID in @ID";
+            var args = new {ID = IDsDic.Keys.AsList(),Enable = Enable};          
+
+            int count = DbBase.CommDB.Execute(uptsql,args);
+            if(count<=0)
+            {
+                s=3003;
+            }
+            else
+            {
+                if(Enable)
+               {
+                   contents = "店铺状态启用：";
+               }
+               else
+               {
+                   contents = "店铺状态停用：";
+               }
+               contents+= string.Join(",", IDsDic.Values.AsList().ToArray());
+               CoreUser.LogComm.InsertUserLog("修改店铺资料", "Shop", contents, UserName, Company, DateTime.Now);
+            }
+            
+            return new DataResult(s,contents);
         }
     }   
 }

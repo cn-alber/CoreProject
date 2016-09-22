@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-namespace CoreModels
+namespace CoreModels.XyComm
 {
     public class Shop
     {

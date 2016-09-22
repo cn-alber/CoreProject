@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Authorization;
 using CoreData.CoreComm;
-using CoreModels;
+using CoreModels.XyComm;
+using System.Collections.Generic;
 
 namespace CoreWebApi
 {
@@ -35,5 +36,19 @@ namespace CoreWebApi
             var res = ShopHaddle.GetShopEdit(CoID,shopid);
             return CoreResult.NewResponse(res.s,res.d,"General");
         }
+
+        [AllowAnonymous]
+        [HttpPostAttribute("/Core/Shop/ShopEnable")]
+        public ResponseResult ShopEnable([FromBodyAttribute]JObject obj)
+        {    
+            Dictionary<int,string> IDsDic = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<int,string>>(obj["IDsDic"].ToString());
+            string Company = obj["Company"].ToString(); 
+            string UserName = obj["UserName"].ToString(); 
+            bool Enable = obj["Enable"].ToString().ToUpper()=="TRUE"?true:false;
+
+            var res = ShopHaddle.UptShopEnable(IDsDic,Company,UserName,Enable);
+            return CoreResult.NewResponse(res.s,res.d,"General");
+        }
+
     }
 }
