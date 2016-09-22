@@ -4,6 +4,7 @@ using CoreModels;
 using CoreModels.XyUser;
 using Dapper;
 using System;
+
 namespace CoreData.CoreUser
 {
     public static class CompanyHaddle
@@ -89,6 +90,48 @@ namespace CoreData.CoreUser
             }
             return new DataResult(s,flag);
         }
+        ///<summary>
+        ///公司启用停用设置
+        ///</summary>
+        public static DataResult UpdateEnable(string id,string name,bool enable)
+        {
+            var s = 0;            
+            string wheresql = "update company set enable = " + enable + " where id in (" + id + ")" ;//+ " limit 0,10";
+            var u = DbBase.UserDB.Query<Company>(wheresql).AsList();
+            
+            return new DataResult(s,"公司:[" + name + "]被" + (enable ? "启用" : "禁用"));
+        }
+
+        ///<summary>
+        ///公司基本资料保存
+        ///</summary>
+        public static DataResult UpdateCompany(string modifyFlag,string name)
+        {
+            // var s = 0;     
+            // if (modifyFlag == "new")
+            // {
+            //     var result = IsComExist(name);
+            //     if (bool.Parse(result.d.ToString()) == true)
+            //     {
+            //         return new DataResult(s,"该公司名称的资料已经存在，不允许新增");
+            //     }
+            //     //DBTrans a = DbBase.UserDB.BeginTransaction(IsolationLevel)
+            //     //DbBase.UserDB.QuerySingle IsolationLevel.ReadUncommitted
+            //     //DbTransaction a = 
+            // }
+            // else
+            // {
+
+            // }
+            // var s = 0;            
+            // string wheresql = "update company set enable = " + enable + " where id in (" + id + ")" ;//+ " limit 0,10";
+            // var u = DbBase.UserDB.Query<Company>(wheresql).AsList();
+            
+            // return new DataResult(s,"公司:[" + name + "]被" + (enable ? "启用" : "禁用"));
+            return new DataResult(0,"");
+        }
+
+        
     }
 
     public class CompanyParm
