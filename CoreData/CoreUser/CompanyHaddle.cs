@@ -50,16 +50,20 @@ namespace CoreData.CoreUser
             }
             return new DataResult(s,cp);
         }
-        // ///<summary>
-        // ///查询单笔公司资料
-        // ///</summary>
-        // public static DataResult GetCompanyEdit(int ID)
-        // {
-        //     var s = 1;            
-        //     string wheresql = "select name,enable,address,email,typelist,contacts,telphone,mobile,remark from company where id ='" + ID.ToString() + "'" ;//+ " limit 0,10";
-        //     var u = DbBase.UserDB.Query<Company>(wheresql).AsList();
-        //     return new DataResult(s,u);
-        // }
+        ///<summary>
+        ///查询单笔公司资料
+        ///</summary>
+        public static DataResult GetCompanyEdit(int ID)
+        {
+            var s = 1;            
+            string wheresql = "select id,name,enable,address,email,typelist,contacts,telphone,mobile,remark from company where id ='" + ID.ToString() + "'" ;//+ " limit 0,10";
+            var u = DbBase.UserDB.Query<CompanySingle>(wheresql).AsList();
+            if (u.Count == 0)
+            {
+                s = 3001;
+            }
+            return new DataResult(s,u);
+        }
         // ///<summary>
         // ///检查公司资料是否已经存在
         // ///</summary>
