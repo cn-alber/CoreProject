@@ -84,7 +84,7 @@ namespace CoreWebApi
             var data = UserHaddle.GetUserInfo(lo["account"].ToString(),password);
             var user = data.d as User;
 
-            if(data.s>1)
+            if(data.s<0)
             {
                 return CoreResult.NewResponse(data.s, lo, "Indentity");
             }

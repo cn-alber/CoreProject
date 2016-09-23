@@ -22,7 +22,7 @@ namespace CoreDate.CoreComm
                 {                   
                     result.d = new{ emu_data = JsonConvert.DeserializeObject<dynamic>(list.emu_data) };                                  
                 }else {
-                    result.s = 3001;                   
+                    result.s = -4001;                   
                 }               
             }
             catch (Exception e){                
@@ -40,7 +40,7 @@ namespace CoreDate.CoreComm
             try
             {
                 var my = DbBase.CommDB.Query<print_uses>("SELECT * FROM print_uses as a WHERE a.id = "+my_id+" AND a.admin_id ="+admin_id).AsList()[0];
-                if (my == null) { result.s = 3002; }               
+                if (my == null) { result.s = -4002; }               
                 result.d = new{
                     currentTplID = int.Parse(my_id),
                     tpl_name = my.name,
@@ -74,14 +74,14 @@ namespace CoreDate.CoreComm
                     if (rnt > 0){
                        result.s = 1;
                     }else{
-                        result.s = 3003;
+                        result.s = -4003;
                     }
                 }else {
                     rnt = DbBase.CommDB.Execute("INSERT INTO print_use_setting(print_use_setting.admin_id,print_use_setting.defed_id) VALUES("+admin_id+","+my_tpl_id+")");
                     if (rnt > 0){
                         result.s = 1;
                     }else{
-                        result.s = 3004;
+                        result.s = -4004;
                     }
                 }                
             }catch (Exception e){
@@ -100,14 +100,14 @@ namespace CoreDate.CoreComm
             {
                 var oldmoder = DbBase.CommDB.Query<print_use_setting>("SELECT a.id FROM print_use_setting as a WHERE a.defed_id = "+my_tpl_id).AsList();
                 if (oldmoder!=null) {
-                    result.s = 3005;
+                    result.s = -4005;
                 }
                 int rnt = DbBase.CommDB.Execute("DELETE FROM print_uses WHERE print_uses.id = "+my_tpl_id);
                 if (rnt > 0)
                 {
                    result.s = 1;
                 }else{
-                    result.s = 3006;
+                    result.s = -4006;
                 }                
             }catch (Exception e)
             {
@@ -128,7 +128,7 @@ namespace CoreDate.CoreComm
                 {
                    result.d = list;                 
                 }else{
-                    result.s=4007;
+                    result.s=-4007;
                 }               
             }catch (Exception e){
                 result.s = -1;

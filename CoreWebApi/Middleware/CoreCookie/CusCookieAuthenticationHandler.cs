@@ -78,14 +78,14 @@ namespace CoreWebApi.Middleware
             var cookie = Options.CookieManager.GetRequestCookie(Context, Options.CookieName);
             if (string.IsNullOrEmpty(cookie))
             {
-                _exceptionMessage = CoreResult.NewData(1002,null,"Basic");
+                _exceptionMessage = CoreResult.NewData(-1002,null,"Basic");
                 return AuthenticateResult.Fail(_exceptionMessage);
             }
 
             var ticket = Options.TicketDataFormat.Unprotect(cookie, GetTlsTokenBinding());
             if (ticket == null)
             {
-                _exceptionMessage = CoreResult.NewData(1003,null,"Basic");
+                _exceptionMessage = CoreResult.NewData(-1003,null,"Basic");
                 return AuthenticateResult.Fail(_exceptionMessage);
             }
 
@@ -94,14 +94,14 @@ namespace CoreWebApi.Middleware
                 var claim = ticket.Principal.Claims.FirstOrDefault(c => c.Type.Equals(SessionIdClaim));
                 if (claim == null)
                 {
-                    _exceptionMessage = CoreResult.NewData(1007,null,"Basic");
+                    _exceptionMessage = CoreResult.NewData(-1007,null,"Basic");
                     return AuthenticateResult.Fail(_exceptionMessage);
                 }
                 _sessionKey = claim.Value;
                 ticket = await Options.SessionStore.RetrieveAsync(_sessionKey);
                 if (ticket == null)
                 {
-                    _exceptionMessage = CoreResult.NewData(1006,null,"Basic");
+                    _exceptionMessage = CoreResult.NewData(-1006,null,"Basic");
                     return AuthenticateResult.Fail(_exceptionMessage);
                 }
             }
@@ -116,7 +116,7 @@ namespace CoreWebApi.Middleware
                 {
                     await Options.SessionStore.RemoveAsync(_sessionKey);
                 }
-                _exceptionMessage = CoreResult.NewData(1004,null,"Basic");
+                _exceptionMessage = CoreResult.NewData(-1004,null,"Basic");
                 return AuthenticateResult.Fail(_exceptionMessage);
             }
 
@@ -139,7 +139,7 @@ namespace CoreWebApi.Middleware
 
             if (context.Principal == null)
             {
-                _exceptionMessage = CoreResult.NewData(1005,null,"Basic");
+                _exceptionMessage = CoreResult.NewData(-1005,null,"Basic");
                 return AuthenticateResult.Fail(_exceptionMessage);
             }
 
@@ -343,7 +343,7 @@ namespace CoreWebApi.Middleware
         protected override Task<bool> HandleForbiddenAsync(ChallengeContext context)
         {
             Response.Headers["WWW-Authenticate"] = Options.AuthenticationScheme;
-            var ex = System.Text.Encoding.UTF8.GetBytes(CoreResult.NewData(1001,null,"Basic"));
+            var ex = System.Text.Encoding.UTF8.GetBytes(CoreResult.NewData(-1001,null,"Basic"));
             Response.Body.Write(ex,0,ex.Length);
             return Task.FromResult(true);
         }

@@ -3,9 +3,11 @@ using CoreData.CoreUser;
 using Newtonsoft.Json.Linq;
 using CoreModels.XyCore;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CoreWebApi
 {
+    [AllowAnonymous]
     public class ProfileController : ControllBase
     {
        
