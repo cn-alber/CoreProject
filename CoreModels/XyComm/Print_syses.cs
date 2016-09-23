@@ -1,3 +1,5 @@
+using System;
+
 namespace CoreModels.XyComm
 {
     public partial class print_syses
@@ -8,6 +10,7 @@ namespace CoreModels.XyComm
 		private string _name;
 		private string _tpl_data;
 		private string _setting;
+		private DateTime? _mtime;
 		/// <summary>
 		/// 
 		/// </summary>
@@ -47,6 +50,14 @@ namespace CoreModels.XyComm
 		{
 			set{ _setting=value;}
 			get{return _setting;}
+		}
+		/// <summary>
+		/// 编辑时间
+		/// </summary>
+		public DateTime? mtime
+		{
+			set{ _mtime=value;}
+			get{return _mtime;}
 		}
 		#endregion Model
 
