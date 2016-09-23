@@ -61,4 +61,11 @@ namespace CoreModels.XyComm
 
 	}
 
+	public class AllSysTypes{
+		public int id{get;set;}
+		public int type{get;set;}
+		public string name{get;set;}
+	}
+
+
 }
