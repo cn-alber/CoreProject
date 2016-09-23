@@ -1,0 +1,32 @@
+{
+    "s": 1,
+    "d": {
+        "ID": 1,
+        "ShopName": "京东南极人男装官方旗舰店",
+        "CoID": 1,
+        "SitType": 3,
+        "ShopSite": "京东",
+        "ShopType": "",
+        "Istoken": 0,
+        "ShopUrl": "",
+        "ShopSetting": "",
+        "Enable": true,
+        "Creator": "",
+        "CreateDate": "2016-06-08T09:27:48",
+        "ShortName": "",
+        "Shopkeeper": "",
+        "SendAddress": "",
+        "TelPhone": "",
+        "IDcard": "",
+        "ContactName": "",
+        "ReturnAddress": "",
+        "ReturnMobile": "",
+        "ReturnPhone": "",
+        "Postcode": "",
+        "UpdateSku": false,
+        "DownGoods": false,
+        "UpdateWayBill": false,
+        "Token": ""
+    },
+    "m": "请求成功"
+}
