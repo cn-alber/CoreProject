@@ -42,6 +42,7 @@ namespace CoreWebApi
             string Company = "携云科技";//obj["Company"].ToString(); 
             string UserName = "系统管理员";//obj["UserName"].ToString(); 
             bool Enable = co["Enable"].ToString().ToUpper()=="TRUE"?true:false;
+            
             var data = CompanyHaddle.UpdateComEnable(IDsDic,Company,UserName,Enable);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }

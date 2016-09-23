@@ -22,6 +22,7 @@ OutPut:     CoID            公司编号coid
 参考:input jason 文件:CompanyList_input.json
 参考:output jason 文件:CompanyList_output.json
 
+
 2.CompanySingle() //查询单笔company资料
   路由:http://localhost:5000/Core/Company/GetCompanySingle
 input 参数：id   ID

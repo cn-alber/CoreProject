@@ -101,9 +101,7 @@ namespace CoreData.CoreUser
                    contents = "公司状态停用：";
                }
                contents+= string.Join(",", IDsDic.Values.AsList().ToArray());
-               
-               //CoreUser.
-               //InsertUserLog("修改公司资料", "company", contents, UserName, Company, DateTime.Now);
+               LogComm.InsertUserLog("修改公司资料", "company", contents, UserName, Company, DateTime.Now);
             }
             
             return new DataResult(s,contents);

@@ -26,4 +26,5 @@ namespace CoreModels.XyUser
         public decimal Pagecnt{get;set;}//总页数
         public List<CompanyMulti> Com {get;set;}//公司资料List
     }
+    
 }
