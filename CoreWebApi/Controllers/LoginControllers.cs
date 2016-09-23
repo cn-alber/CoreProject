@@ -23,10 +23,18 @@ namespace CoreWebApi
             test.account = "admin";
             test.password = "admin";
             test.vcode = "123123";
-
+            var user = new User();
+            try{
             var data = UserHaddle.GetUserInfo("admin",GetMD5("admin","Xy@."));
-            var user = data.d as User;
-
+            user = data.d as User;
+            }
+            catch
+            {
+                return CoreResult.NewResponse(1, "数据库", "Basic");
+            }
+            
+            try
+            {
              var userc = new ClaimsPrincipal(
                 new ClaimsIdentity(
                     new[] {
@@ -44,6 +52,11 @@ namespace CoreWebApi
                     ExpiresUtc = DateTime.UtcNow.AddMinutes(20),
                     IsPersistent = false
                 });
+            }
+            catch
+            {
+                return CoreResult.NewResponse(1, "认证", "Basic");
+            }
             var ss = JsonConvert.SerializeObject(test);
             return CoreResult.NewResponse(1, user, "Basic");
         }

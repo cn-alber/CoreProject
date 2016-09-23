@@ -164,7 +164,7 @@ namespace CoreData.CoreUser
                     return new DataResult(s, reslut);
 
                     //无缓存，添加缓存
-                    CacheBase.Set<List<Refresh>>(cname, parent);
+                    // CacheBase.Set<List<Refresh>>(cname, parent);
                 }
             }
             return new DataResult(s, s == 1 ? parent : null);
