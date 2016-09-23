@@ -13,6 +13,19 @@ namespace CoreModels.XyUser
         public string creator {get;set;}
         public DateTime createdate {get;set;}
     }
+    public class CompanySingle
+    {
+        public int id {get;set;}
+        public string name {get;set;}
+        public bool enable {get;set;}
+        public string address {get;set;}
+        public string email {get;set;}
+        public string typelist {get;set;}
+        public string contacts {get;set;}
+        public string telphone {get;set;}
+        public string mobile {get;set;}
+        public string remark {get;set;}
+    }
     public class CompanyParm
     {
         public int CoID {get;set;}//公司id

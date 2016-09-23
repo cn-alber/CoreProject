@@ -25,22 +25,22 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-        // [AllowAnonymous]
-        // [HttpPostAttribute("/Core/Company/GetCompanySingle")]
-        // public ResponseResult CompanySingle([FromBodyAttribute]JObject co)
-        // {   
-        //     int id = int.Parse(co["Id"].ToString());
-        //     var data = CompanyHaddle.GetCompanyEdit(id);
-        //     return CoreResult.NewResponse(data.s, data.d, "Basic"); 
-        // }
+        [AllowAnonymous]
+        [HttpPostAttribute("/Core/Company/GetCompanySingle")]
+        public ResponseResult CompanySingle([FromBodyAttribute]JObject co)
+        {   
+            int id = int.Parse(co["ID"].ToString());
+            var data = CompanyHaddle.GetCompanyEdit(id);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
 
         [AllowAnonymous]
         [HttpPostAttribute("/Core/Company/CompanyEnable")]
         public ResponseResult CompanyEnable([FromBodyAttribute]JObject co)
         {   
             Dictionary<int,string> IDsDic = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<int,string>>(co["IDsDic"].ToString());
-            string Company = "携云科技";//obj["Company"].ToString(); 
-            string UserName = "系统管理员";//obj["UserName"].ToString(); 
+            string Company = co["Company"].ToString();
+            string UserName = GetUname(); 
             bool Enable = co["Enable"].ToString().ToUpper()=="TRUE"?true:false;
             
             var data = CompanyHaddle.UpdateComEnable(IDsDic,Company,UserName,Enable);
