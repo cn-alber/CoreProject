@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using CoreData.CoreUser;
 using Newtonsoft.Json.Linq;
 using CoreModels.XyCore;
-
+using System.Collections.Generic;
 
 namespace CoreWebApi
 {
@@ -96,11 +96,19 @@ namespace CoreWebApi
             }        
             var cid = GetCoid();
             var uid = GetUid();
-            var m =  NotifyHaddle.MsgAdd(content,level,roletype,cid,uid);
+            var uname = GetUname();
+            var m =  NotifyHaddle.MsgAdd(content,level,roletype,cid,uid,uname);
             return CoreResult.NewResponse(m.s, m.d, "Basic");    
         }
 
-
+        [HttpPostAttribute("/core/profile/msgread")]
+        public ResponseResult msgread([FromBodyAttribute]JObject lo)
+        {           
+            
+            var readids =   Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(lo["selectIds"].ToString());             
+            var m = NotifyHaddle.MsgRead(readids,GetUid(),GetUname());
+            return CoreResult.NewResponse(m.s,m.d, "Basic");    
+        }
 
 
 
