@@ -10,11 +10,11 @@ namespace CoreWebApi
     public class ShopController:ControllBase
     {
         [AllowAnonymous]
-        [HttpPostAttribute("/Core/Shop/CallShop")]
-        public ResponseResult CallShop([FromBodyAttribute]JObject obj)
+        [HttpPostAttribute("/Core/Shop/ShopQueryLst")]
+        public ResponseResult ShopQueryLst([FromBodyAttribute]JObject obj)
         {
             var cp = new ShopParam();
-            cp.CoID = int.Parse(obj["CoID"].ToString()); 
+            cp.CoID = int.Parse(GetCoid());
             cp.Enable = obj["Enable"].ToString(); 
             cp.Filter = obj["Filter"].ToString();
             cp.PageSize = int.Parse(obj["PageSize"].ToString());
@@ -30,7 +30,7 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Shop/ShopEdit")]
         public ResponseResult ShopEdit([FromBodyAttribute]JObject obj)
         {
-            var CoID = obj["CoID"].ToString(); 
+            var CoID = GetCoid();
             //CoID = GetCoid();
             string shopid = obj["ShopID"].ToString();
             var res = ShopHaddle.GetShopEdit(CoID,shopid);

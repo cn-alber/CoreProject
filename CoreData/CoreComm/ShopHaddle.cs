@@ -18,6 +18,7 @@ namespace CoreData.CoreComm
             string wheresql = "where 1=1";
             if(IParam.CoID!=1)
             {
+                
                 wheresql = wheresql + " AND CoID="+IParam.CoID;
             }
             if(!string.IsNullOrEmpty(IParam.Enable) && IParam.Enable.ToUpper()!="ALL")//是否启用
@@ -35,14 +36,14 @@ namespace CoreData.CoreComm
             {
                 wheresql = wheresql + " ORDER BY "+IParam.SortField +" "+ IParam.SortDirection;
             }
-            wheresql = "select ShopName,Enable,ShopSite,ShopUrl,Shopkeeper,UpdateSku,DownGoods,UpdateWayBill,TelPhone,SendAddress,CreateDate,Istoken from Shop "+ wheresql;
-            var ShopLst = CoreData.DbBase.CommDB.Query<Shop>(wheresql).AsList();
+            wheresql = "select ID,ShopName,Enable,ShopSite,ShopUrl,Shopkeeper,UpdateSku,DownGoods,UpdateWayBill,TelPhone,SendAddress,CreateDate,Istoken from Shop "+ wheresql;
+            var ShopLst = CoreData.DbBase.CommDB.Query<ShopQuery>(wheresql).AsList();
             IParam.DataCount = ShopLst.Count;
             decimal pagecnt = Math.Ceiling(decimal.Parse(IParam.DataCount.ToString())/decimal.Parse(IParam.PageSize.ToString()));
             IParam.PageCount = Convert.ToInt32(pagecnt);
             int dataindex = (IParam.PageIndex - 1)*IParam.PageSize;
-            wheresql = wheresql + " limit " + dataindex.ToString() + " ," + IParam.PageSize;//分页
-            IParam.ShopLst = CoreData.DbBase.CommDB.Query<Shop>(wheresql).AsList();
+            wheresql = wheresql + " limit " + dataindex.ToString() + " ," + IParam.PageSize;//分页            
+            IParam.ShopLst = CoreData.DbBase.CommDB.Query<ShopQuery>(wheresql).AsList();           
             return new DataResult(s,IParam);
         }
         ///<summary>
