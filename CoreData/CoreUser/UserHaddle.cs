@@ -186,19 +186,19 @@ namespace CoreData.CoreUser
                             key = "",
                             sign_time = "",
                         }
-<<<<<<< HEAD
+// <<<<<<< HEAD
                     };            
                     return new DataResult(s, reslut);
 
                     //无缓存，添加缓存
                     // CacheBase.Set<List<Refresh>>(cname, parent);
-                }
-            }
-            return new DataResult(s, s == 1 ? parent : null);
-=======
-                    };   
-            return new DataResult(s, s == 1 ? reslut : null);
->>>>>>> 0bda08d60cf90f8b44df2c541b86ebf2dfd0ed86
+                // }
+//             }
+//             return new DataResult(s, s == 1 ? parent : null);
+// =======
+//                     };   
+//             return new DataResult(s, s == 1 ? reslut : null);
+// >>>>>>> 0bda08d60cf90f8b44df2c541b86ebf2dfd0ed86
         }
 
         ///<summary>
