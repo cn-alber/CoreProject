@@ -1,16 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using System.Security.Claims;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Microsoft.AspNetCore.Http.Authentication;
-using System;
-using Microsoft.AspNetCore.Http;
-using CoreData.CoreUser;
-using Microsoft.AspNetCore.Authorization;
-using CoreModels.XyUser;
-using System.Linq;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 //using System.Web.Http;
 //using System.
 namespace CoreWebApi

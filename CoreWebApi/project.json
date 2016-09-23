@@ -32,15 +32,27 @@
   "tools": {
     "Microsoft.DotNet.Watcher.Tools": "1.0.0-preview2-final"
   },
-  "scripts": {
-    "postpublish": "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%"
+   "commands": {
+    "run": "run server.urls=http://localhost:5000",
+    "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.Kestrel --server.urls http://localhost:5000"
   },
+  // "runtimes": {
+  //   "win7-x64":"",
+  //   "win7-x86":"",
+  //   "centos.7-x64": {
+  //           "#import": [ "centos.7", "centos-x64", "rhel.7-x64" ]
+  //       }
+  // },
+  // "scripts": {
+  //   "postpublish": "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%"
+  // },
   "publishOptions": {
     "include": [
       "Dockerfile.debug",
       "Dockerfile",
       "docker-compose.debug.yml",
-      "docker-compose.yml"
+      "docker-compose.yml",
+      "appsettings.json"
     ]
   }
 }

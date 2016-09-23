@@ -1,7 +1,8 @@
 接口名称：ShopControllers
 
 function说明
-1.GetShopAll()//查询table Shop 资料
+1.CallShop()//查询table Shop 资料
+    方法：POST
     路由：http://localhost:5000/Core/Shop/CallShop
     参数: CoreModels.ShopParam
     InPut:
@@ -25,3 +26,35 @@ function说明
         ShopLst         List<Shop>  店铺资料(Shop)
     参考:input json 文件:ShopListQuery_input.json
     参考:output json 文件:ShopListQuery_output.json
+
+2.ShopEdit()//查询单笔店铺资料
+    方法：POST
+    路由：http://localhost:5000/Core/Shop/ShopEdit
+    参数：
+    InPut:
+        CoID            int         公司编号CoID
+        ShopID          int         店铺编号ID
+    OutPut:
+        Shop            Shop        指定店铺资料
+    参考：input json 文件：ShopEdit_input.json
+    参考：input json 文件：ShopEdit_output.json
+
+3.ShopEnable()//店铺状态(启用|停用)
+    方法：POST
+    路由：http://localhost:5000/Core/Shop/ShopEnable
+    参数：
+    InPut:
+        IDsDic          Dictionary<int,string>      <Key:店铺ID,Value:店铺名称>
+        Company         string                      公司名称(exp:携云科技)
+        UserName        string                      操作者名称(exp:系统管理员)
+        Enable          string                      指定店铺状态true|false（启用，停用）
+    OutPut:
+        成功：
+            1.更新店铺状态shop.enable
+            2.新增修改记录log
+            3.返回成功信息：s=1,d=店铺状态启用(停用)
+        失败：
+            1.返回错误信息：s=3003.资料更新失败
+    参考：input json 文件：ShopEnable_input.json
+    参考：input json 文件：ShopEnable_output.json
+    
