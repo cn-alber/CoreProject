@@ -19,7 +19,7 @@ namespace CoreWebApi
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder();
-            builder.AddJsonFile("appsettings.json");
+            // builder.AddJsonFile("appsettings.json");
             builder.AddEnvironmentVariables();
             // if(env.IsDevelopment())
             // {
