@@ -19,7 +19,7 @@ namespace CoreDate.CoreComm
             var result = new DataResult(1,null);    
             try
             {
-                var list = DbBase.CommDB.Query<print_sys_types>("SELECT print_sys_types.emu_data FROM print_sys_types WHERE print_sys_types.type ="+type).AsList()[0];
+                var list = DbBase.CommDB.Query<print_sys_types>("SELECT print_sys_types.emu_data FROM print_sys_types WHERE  print_sys_types.deleted =FALSE AND  print_sys_types.type ="+type).AsList()[0];
                 if (list != null)
                 {                   
                     result.d = new{ emu_data = JsonConvert.DeserializeObject<dynamic>(list.emu_data) };                                  
@@ -130,25 +130,27 @@ namespace CoreDate.CoreComm
 		/// 获取print_sys_types list
 		/// </summary>
         public static DataResult getAllSysTypes(){
-            var result = new DataResult(1,null);
-           
-            try
-            {                
-                 using(var conn = DbBase.CommDB){
-
-                    var list = conn.Query<AllSysTypes>("SELECT a.id, a.`name`,a.type FROM print_sys_types as a").AsList();                 
+            var result = new DataResult(1,null);        
+            using(var conn = DbBase.CommDB){
+                try{
+                    var list = conn.Query<AllSysTypes>("SELECT a.id, a.`name`,a.type FROM print_sys_types as a WHERE  print_sys_types.deleted =FALSE AND ").AsList();                 
                     if (list != null)
                     {
                     result.d = list;                 
                     }else{
                         result.s=-4007;
                     }
-                 }   
-            }catch (Exception e){
-                result.s = -1;
-                result.d= e.Message;
-                DbBase.CommDB.Close(); 
-            }
+                    conn.Dispose();
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+
+            } 
+
+
+
             return result;
 
         }
@@ -166,7 +168,7 @@ namespace CoreDate.CoreComm
                 if(sys==null){
                     result.s = -4008;
                 }else{            
-                    var type = DbBase.CommDB.Query<print_sys_types>("SELECT a.setting,a.presets FROM print_sys_types as a WHERE a.type = "+sys.type).AsList()[0];
+                    var type = DbBase.CommDB.Query<print_sys_types>("SELECT a.setting,a.presets FROM print_sys_types as a WHERE   print_sys_types.deleted =FALSE AND a.type = "+sys.type).AsList()[0];
                     if (type == null){
                         result.s = -4009;
                     }else{
@@ -195,12 +197,103 @@ namespace CoreDate.CoreComm
         /// <summary>
 		/// 
 		/// </summary>
-        public static DataResult tplMy(string my_id){
+        public static DataResult tplMy(string admin_id,string my_id){
+            var result = new DataResult(1,null);
+            try
+            {                
+                var my = DbBase.CommDB.Query<print_uses>("SELECT * FROM print_uses as a WHERE a.id = "+my_id+" AND a.admin_id = "+admin_id).AsList()[0];
+                if (my == null){
+                    result.s = -4002;
+                }else{
+                    var type = DbBase.CommDB.Query<print_sys_types>("SELECT * FROM print_sys_types as a WHERE a.deleted=FALSE AND a.type="+my.type).AsList()[0];
+                    if(type!=null){
+                        result.d = new
+                        {
+                            currentTplID = my_id,
+                            tpl_name = my.name,
+                            sys_id = my.sys_id,
+                            states = JsonConvert.DeserializeObject<dynamic>(my.tpl_data),
+                            presets = JsonConvert.DeserializeObject < dynamic >(type.presets),
+                            print_setting = JsonConvert.DeserializeObject<dynamic>(my.print_setting),
+                            type = my.type
+                        };  
+                    }else{
+                        result.s = -4010;
+                    }                    
+                }                                                        
+            }
+            catch (Exception e)
+            {
+                result.s = -1;
+                result.d= e.Message; 
+            }
+            return result;
+        }
+
+        /// <summary>
+		/// 
+		/// </summary>
+        public static DataResult GetSysesByType(printParam param){
 
             var result = new DataResult(1,null);
             try
             {
+                string wheresql = ""; 
+                if(!string.IsNullOrEmpty(param.Filter)){
+                    wheresql += param.Filter;
+                }   
+                if(!string.IsNullOrEmpty(param.SortField)&& !string.IsNullOrEmpty(param.SortDirection))//排序
+                {
+                    wheresql += " ORDER BY "+param.SortField +" "+ param.SortDirection;
+                }
+                if(param.PageIndex>-1&&param.PageSize>-1){
+                    wheresql += " limit "+(param.PageIndex -1)*param.PageSize +" ,"+ param.PageIndex*param.PageSize;
+                }
 
+                wheresql ="SELECT a.id, a.`name`,a.mtime FROM print_syses as a WHERE  "+wheresql; 
+
+                var list = DbBase.CommDB.Query<printSysesList>(wheresql).AsList();
+                if (list != null)
+                {
+                    result.d = new {
+                        list = list,
+                        PageIndex = param.PageIndex,
+                        PageSize = param.PageSize,
+                        TotalPage = list.Count
+                    };                    
+                }
+                else
+                {
+                    result.s = -4007;
+                }
+            }
+            catch (Exception e)
+            {
+                result.s = -1;
+                result.d= e.Message; 
+            }
+            return result;
+        }
+
+
+ /// <summary>
+		/// 获取类型预设
+		/// </summary>
+        public static DataResult tplType(string t){
+
+            var result = new DataResult(1,null);
+            try
+            {
+                var type = DbBase.CommDB.Query<print_sys_types>("SELECT * FROM print_sys_types as a WHERE a.deleted=FALSE AND a.type=1").AsList()[0];
+                if(type == null){
+                    result.s = -4010;
+                }else{
+                    result.d = new
+                    {
+                        states = JsonConvert.DeserializeObject<dynamic>(type.presets),           
+                        print_setting = JsonConvert.DeserializeObject<dynamic>(type.setting),       
+                    };
+                }                
             }
             catch (Exception e)
             {

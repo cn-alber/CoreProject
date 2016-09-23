@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using CoreDate.CoreComm;
 using Microsoft.AspNetCore.Authorization;
+using CoreModels.XyComm;
 
 namespace CoreWebApi
 {
@@ -58,22 +59,37 @@ namespace CoreWebApi
        [HttpGetAttribute("/core/print/tpl/my")]
         public ResponseResult tplmy(string my_id)
         {
-            var m = PrintHaddle.tplMy(my_id);
+            string admin_id = "1";
+            var m = PrintHaddle.tplMy(admin_id,my_id);
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
 
-        #region 根据type获取print_syses list
+        #region 根据type获取系统模板 list
         [HttpGetAttribute("/core/print/tpl/sysesbytype")]
-        public ResponseResult sysesbytype(string my_id)
+        public ResponseResult sysesbytype(string type)
         {
-            var m = PrintHaddle.tplMy(my_id);
+
+            printParam param = new printParam();
+            param.Filter = "type = "+type;
+            param.PageIndex = 1;
+            param.PageSize = 2;
+            
+            var m = PrintHaddle.GetSysesByType(param);
+            return CoreResult.NewResponse(m.s, m.d, "Print");
+        }
+        #endregion
+
+        #region 获取类型预设
+        [HttpGetAttribute("/core/print/tpl/type")]
+        public ResponseResult tpltype(string type)
+        {
+            
+            var m = PrintHaddle.tplType(type);
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
 
         #endregion
-
-
 
 
 

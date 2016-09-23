@@ -63,4 +63,31 @@ namespace CoreModels.XyComm
 
 	}
 
+	public class printSysesList{
+		public int id{get;set;}
+		public string name{get;set;}
+		public string mtime{get;set;}
+
+	}
+
+	///<summary>
+	///分页	
+	///<summary>
+	 /// <param name="Filter">过滤条件</param>
+	public class printParam{
+
+        public string Filter {get;set;}//过滤条件
+        public int PageSize {get;set;}//每页笔数
+        public int PageIndex {get;set;}//页码
+        public int PageCount {get;set;}//总页数
+        public int DataCount {get;set;} //总行数
+        public string SortField {get; set;}//排序字段
+        public string SortDirection {get;set;}//DESC,ASC
+          
+	}
+
+
+
+
+
 }

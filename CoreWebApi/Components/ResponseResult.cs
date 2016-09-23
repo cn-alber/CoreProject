@@ -16,7 +16,8 @@ namespace CoreWebApi
         {
             // var configurationSection = Configuration.GetSection("AppSettings");
             // var m = JsonFile.GetJson<BasicCode>(_fileName,_section).Find(q=>q.Code == s).Message;
-            return new ResponseResult(s, d, JsonFile.GetMessage(s, Section));
+    
+            return new ResponseResult(s, d, s == 1 ? "":JsonFile.GetMessage(s, Section));
         }
     }
     public class ResponseResult

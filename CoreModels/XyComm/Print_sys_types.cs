@@ -9,6 +9,7 @@ namespace CoreModels.XyComm
 		private string _presets;
 		private string _emu_data;
 		private string _setting;
+		private bool _deleted;
 		/// <summary>
 		/// 打印模板-系统组
 		/// </summary>
@@ -56,6 +57,14 @@ namespace CoreModels.XyComm
 		{
 			set{ _setting=value;}
 			get{return _setting;}
+		}
+		/// <summary>
+		/// 是否删除
+		/// </summary>
+		public bool deleted
+		{
+			set{ _deleted=value;}
+			get{return _deleted;}
 		}
 		#endregion Model
 
