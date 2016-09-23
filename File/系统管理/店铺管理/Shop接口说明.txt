@@ -3,10 +3,9 @@
 function说明
 1.CallShop()//查询table Shop 资料
     方法：POST
-    路由：http://localhost:5000/Core/Shop/CallShop
+    路由：http://localhost:5000/Core/Shop/ShopQueryLst
     参数: CoreModels.ShopParam
     InPut:
-        CoID            int         公司编号CoID
         Filter          string      模糊查询匹配(店铺名称,店铺平台归属,创建人)
         Enable          string      启用状态(all/false/true)
         PageIndex       int         当前页码(ex.第一页就给1)
@@ -14,7 +13,6 @@ function说明
         SortField       string      排序字段
         SortDirection   string      排序方向(DESC|ASC)
     OutPut:
-        CoID            int         公司编号CoID
         Filter          string      模糊查询匹配(店铺名称,店铺平台归属,创建人)
         Enable          string      启用状态(all/false/true)
         PageIndex       int         当前页码(ex.第一页就给1)
@@ -23,7 +21,7 @@ function说明
         DataCount       int         资料总笔数
         SortField       string      排序字段
         SortDirection   string      排序方向(DESC|ASC)  
-        ShopLst         List<Shop>  店铺资料(Shop)
+        ShopLst         List<ShopQuery>  店铺资料(Shop)
     参考:input json 文件:ShopListQuery_input.json
     参考:output json 文件:ShopListQuery_output.json
 
@@ -32,7 +30,6 @@ function说明
     路由：http://localhost:5000/Core/Shop/ShopEdit
     参数：
     InPut:
-        CoID            int         公司编号CoID
         ShopID          int         店铺编号ID
     OutPut:
         Shop            Shop        指定店铺资料
