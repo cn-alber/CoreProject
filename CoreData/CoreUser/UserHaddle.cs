@@ -152,7 +152,7 @@ namespace CoreData.CoreUser
         ///<summary>
         ///获取菜单列表(避免与上面部分代码冲突)
         ///</summary>
-        public static DataResult GetRefreshList(string roleid, string coid, string uname, string uid)
+        public static DataResult GetRefreshList(string roleid, string coid,string uname,string uid)
         {
             var s = 1;
             var cname = "Refresh" + coid + roleid;
@@ -161,7 +161,7 @@ namespace CoreData.CoreUser
             //CacheBase.Remove(cname);
             // var parent = CacheBase.Get<List<Refresh>>(cname);
             // var parentRefresh = new List<Refresh>();
-
+            
             // if (parent == null)
             // {
             //     parent = GetRefresh(roleid, coid);
@@ -171,7 +171,7 @@ namespace CoreData.CoreUser
             //     }
             //     else
             //     {
-
+           
             //         CacheBase.Set<List<Refresh>>(cname, parent);        
             //         //return new DataResult(s, reslut);                    
             //     }                
@@ -179,19 +179,17 @@ namespace CoreData.CoreUser
             var parent = GetRefresh(roleid, coid);
             //CacheBase.Set<List<Refresh>>(cname, parent);
 
-            var reslut = new
-            {
-                isLocked = false,
-                permissionMenus = parent,
-                user = new
-                {
-                    name = uname,
-                    avatar = "/path/avatarx80.png",
-                    uid = uid,
-                    key = "",
-                    sign_time = "",
-                }
-            };
+            var reslut = new {
+                        isLocked = false,
+                        permissionMenus = parent,
+                        user = new {
+                            name = uname,
+                            avatar = "/path/avatarx80.png",
+                            uid = uid,
+                            key = "",
+                            sign_time = "",
+                        }
+                    };   
             return new DataResult(s, s == 1 ? reslut : null);
         }
 
