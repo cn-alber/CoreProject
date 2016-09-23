@@ -2,16 +2,19 @@
 using CoreModels;
 using Dapper;
 using System;
-namespace CoreDate.CoreComm
+using System.Collections.Generic;
+using CoreModels.XyComm;
+namespace CoreData.CoreComm
 {
     public static class ShopHaddle
     {
+       
         ///<summary>
         ///查询店铺资料
         ///<summary>
         public static DataResult GetShopAll(ShopParam IParam)
         {
-            var s = 0;
+            var s = 1;
             string wheresql = "where 1=1";
             if(IParam.CoID!=1)
             {
@@ -42,7 +45,61 @@ namespace CoreDate.CoreComm
             IParam.ShopLst = CoreData.DbBase.CommDB.Query<Shop>(wheresql).AsList();
             return new DataResult(s,IParam);
         }
+        ///<summary>
+        ///查询单笔店铺资料
+        ///<summary>
+        public static DataResult GetShopEdit(string coid,string shopid)
+        {
+            var s = 1;
+            var sname = "shop"+coid+shopid;
+            Shop su = null;
+           // var su = CacheBase.Get<Shop>(sname);
+            // if(su==null)
+            // {
+                var u = DbBase.CommDB.Query<Shop>("select * from Shop where id = @sid and CoID = @coid",new{sid = shopid,coid=coid}).AsList();
+                if(u.Count==0)
+                {
+                    s=3001;
+                }
+                else
+                {
+                    su = u[0];
+                    //CacheBase.Set<Shop>(sname,su);
+                }
+            // }
+            return new DataResult(s,su);
+        }
 
-    }
-   
+        ///<summary>
+        ///启用、停用店铺
+        ///<summary>
+        public static DataResult UptShopEnable(Dictionary<int,string> IDsDic,string Company,string UserName,bool Enable)
+        {
+            var s = 1;
+            string contents = string.Empty;            
+            string uptsql = @"update Shop set Enable = @Enable where ID in @ID";
+            var args = new {ID = IDsDic.Keys.AsList(),Enable = Enable};          
+
+            int count = DbBase.CommDB.Execute(uptsql,args);
+            if(count<=0)
+            {
+                s=3003;
+            }
+            else
+            {
+                if(Enable)
+               {
+                   contents = "店铺状态启用：";
+               }
+               else
+               {
+                   contents = "店铺状态停用：";
+               }
+               contents+= string.Join(",", IDsDic.Values.AsList().ToArray());
+               CoreUser.LogComm.InsertUserLog("修改店铺资料", "Shop", contents, UserName, Company, DateTime.Now);
+            }
+            
+            return new DataResult(s,contents);
+        }
+    }   
 }

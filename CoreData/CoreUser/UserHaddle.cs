@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -41,9 +42,12 @@ namespace CoreData.CoreUser
         {
             var s = 1;
             var cname = "role" + coid + roleid;
-            var cu = CacheBase.Get<Role>(cname);
-            if (cu == null)
-            {
+            var cu = new Role(); 
+            try{
+                cu = CacheBase.Get<Role>(cname);               
+                
+            }catch(Exception ex){
+              
                 var u = DbBase.UserDB.Query<Role>("select * from role where id = @rid and companyid = @coid", new { rid = roleid, coid = coid }).AsList();
                 if (u.Count == 0)
                 {
@@ -52,10 +56,25 @@ namespace CoreData.CoreUser
                 else
                 {
                     cu = u[0];
-
-                    CacheBase.Set<Role>(cname, cu);
+                   // CacheBase.Set<Role>(cname, cu);
                 }
+                    
+
             }
+            if (cu == null)
+                {
+                    var u = DbBase.UserDB.Query<Role>("select * from role where id = @rid and companyid = @coid", new { rid = roleid, coid = coid }).AsList();
+                    if (u.Count == 0)
+                    {
+                        s = 2003;
+                    }
+                    else
+                    {
+                        cu = u[0];
+                        CacheBase.Set<Role>(cname, cu);
+                    }
+                }    
+
             return new DataResult(s, cu);
         }
 
@@ -133,24 +152,31 @@ namespace CoreData.CoreUser
         public static DataResult GetRefreshList(string roleid, string coid,string uname,string uid)
         {
             var s = 1;
-            var cname = "menus" + coid + roleid;
+            var cname = "Refresh" + coid + roleid;
 
             //获取菜单缓存
             //CacheBase.Remove(cname);
-            var parent = CacheBase.Get<List<Refresh>>(cname);
-            var parentRefresh = new List<Refresh>();
-        
+            // var parent = CacheBase.Get<List<Refresh>>(cname);
+            // var parentRefresh = new List<Refresh>();
+            
+            // if (parent == null)
+            // {
+            //     parent = GetRefresh(roleid, coid);
+            //     if (parent == null)
+            //     {
+            //         s = 2004;
+            //     }
+            //     else
+            //     {
+           
+            //         CacheBase.Set<List<Refresh>>(cname, parent);        
+            //         //return new DataResult(s, reslut);                    
+            //     }                
+            // }
+            var parent = GetRefresh(roleid, coid);
+            //CacheBase.Set<List<Refresh>>(cname, parent);
 
-            if (parent == null)
-            {
-                parent = GetRefresh(roleid, coid);
-                if (parent == null)
-                {
-                    s = 2004;
-                }
-                else
-                {
-                    var reslut = new {
+            var reslut = new {
                         isLocked = false,
                         permissionMenus = parent,
                         user = new {
@@ -160,6 +186,7 @@ namespace CoreData.CoreUser
                             key = "",
                             sign_time = "",
                         }
+<<<<<<< HEAD
                     };            
                     return new DataResult(s, reslut);
 
@@ -168,6 +195,10 @@ namespace CoreData.CoreUser
                 }
             }
             return new DataResult(s, s == 1 ? parent : null);
+=======
+                    };   
+            return new DataResult(s, s == 1 ? reslut : null);
+>>>>>>> 0bda08d60cf90f8b44df2c541b86ebf2dfd0ed86
         }
 
         ///<summary>
