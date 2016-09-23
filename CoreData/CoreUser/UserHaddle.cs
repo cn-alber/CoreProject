@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -23,7 +22,7 @@ namespace CoreData.CoreUser
             {
                 s = 2001;
             }
-            else if(!u[0].Enable)
+            else if (!u[0].Enable)
             {
                 s = 2005;
             }
@@ -42,12 +41,15 @@ namespace CoreData.CoreUser
         {
             var s = 1;
             var cname = "role" + coid + roleid;
-            var cu = new Role(); 
-            try{
-                cu = CacheBase.Get<Role>(cname);               
-                
-            }catch(Exception ex){
-              
+            var cu = new Role();
+            try
+            {
+                cu = CacheBase.Get<Role>(cname);
+
+            }
+            catch
+            {
+
                 var u = DbBase.UserDB.Query<Role>("select * from role where id = @rid and companyid = @coid", new { rid = roleid, coid = coid }).AsList();
                 if (u.Count == 0)
                 {
@@ -56,34 +58,35 @@ namespace CoreData.CoreUser
                 else
                 {
                     cu = u[0];
-                   // CacheBase.Set<Role>(cname, cu);
+                    // CacheBase.Set<Role>(cname, cu);
                 }
-                    
+
 
             }
             if (cu == null)
+            {
+                var u = DbBase.UserDB.Query<Role>("select * from role where id = @rid and companyid = @coid", new { rid = roleid, coid = coid }).AsList();
+                if (u.Count == 0)
                 {
-                    var u = DbBase.UserDB.Query<Role>("select * from role where id = @rid and companyid = @coid", new { rid = roleid, coid = coid }).AsList();
-                    if (u.Count == 0)
-                    {
-                        s = 2003;
-                    }
-                    else
-                    {
-                        cu = u[0];
-                        CacheBase.Set<Role>(cname, cu);
-                    }
-                }    
+                    s = 2003;
+                }
+                else
+                {
+                    cu = u[0];
+                    CacheBase.Set<Role>(cname, cu);
+                }
+            }
 
             return new DataResult(s, cu);
         }
 
-        public static User GetUser(string uid){
+        public static User GetUser(string uid)
+        {
             var u = DbBase.UserDB.Query<User>("select id, password, name, companyid, roleid, enable, islocked from user where ID = @uid", new { uid = uid }).First();
             return u;
         }
 
-        
+
 
         ///<summary>
         ///获取菜单列表
@@ -149,7 +152,7 @@ namespace CoreData.CoreUser
         ///<summary>
         ///获取菜单列表(避免与上面部分代码冲突)
         ///</summary>
-        public static DataResult GetRefreshList(string roleid, string coid,string uname,string uid)
+        public static DataResult GetRefreshList(string roleid, string coid, string uname, string uid)
         {
             var s = 1;
             var cname = "Refresh" + coid + roleid;
@@ -158,7 +161,7 @@ namespace CoreData.CoreUser
             //CacheBase.Remove(cname);
             // var parent = CacheBase.Get<List<Refresh>>(cname);
             // var parentRefresh = new List<Refresh>();
-            
+
             // if (parent == null)
             // {
             //     parent = GetRefresh(roleid, coid);
@@ -168,7 +171,7 @@ namespace CoreData.CoreUser
             //     }
             //     else
             //     {
-           
+
             //         CacheBase.Set<List<Refresh>>(cname, parent);        
             //         //return new DataResult(s, reslut);                    
             //     }                
@@ -176,29 +179,20 @@ namespace CoreData.CoreUser
             var parent = GetRefresh(roleid, coid);
             //CacheBase.Set<List<Refresh>>(cname, parent);
 
-            var reslut = new {
-                        isLocked = false,
-                        permissionMenus = parent,
-                        user = new {
-                            name = uname,
-                            avatar = "/path/avatarx80.png",
-                            uid = uid,
-                            key = "",
-                            sign_time = "",
-                        }
-<<<<<<< HEAD
-                    };            
-                    return new DataResult(s, reslut);
-
-                    //无缓存，添加缓存
-                    // CacheBase.Set<List<Refresh>>(cname, parent);
+            var reslut = new
+            {
+                isLocked = false,
+                permissionMenus = parent,
+                user = new
+                {
+                    name = uname,
+                    avatar = "/path/avatarx80.png",
+                    uid = uid,
+                    key = "",
+                    sign_time = "",
                 }
-            }
-            return new DataResult(s, s == 1 ? parent : null);
-=======
-                    };   
+            };
             return new DataResult(s, s == 1 ? reslut : null);
->>>>>>> 0bda08d60cf90f8b44df2c541b86ebf2dfd0ed86
         }
 
         ///<summary>
@@ -215,7 +209,8 @@ namespace CoreData.CoreUser
                 var r = role.d as Role;
 
                 var child = DbBase.UserDB.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where viewpowerid in (" + r.ViewList + ") order by ParentID,sortindex").AsList();
-                foreach(var c in child){
+                foreach (var c in child)
+                {
                     c.icon = c.icons.Split(',');
                 }
 
@@ -226,7 +221,7 @@ namespace CoreData.CoreUser
                 var pidarray = (from c in child select c.parentID).Distinct().ToArray();
                 var pid = string.Join(",", pidarray);
                 parent = DbBase.UserDB.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where id in (" + pid + ") order by sortindex").AsList();
-                
+
                 foreach (var p in parent)
                 {
                     p.type = 2;
@@ -241,50 +236,55 @@ namespace CoreData.CoreUser
             return parent;
         }
 
-        public static DataResult lockuser(string uid){
+        public static DataResult lockuser(string uid)
+        {
             int s = 1;
-            try{
-              int rnt =  DbBase.UserDB.Execute("UPDATE `user` SET `user`.IsLocked = 1 WHERE `user`.ID = "+uid);    
-              if(rnt<1)  s = -1;
-            
-            }catch{s = -1;}
-            
-            return new DataResult(s,null);
+            try
+            {
+                int rnt = DbBase.UserDB.Execute("UPDATE `user` SET `user`.IsLocked = 1 WHERE `user`.ID = " + uid);
+                if (rnt < 1) s = -1;
+
+            }
+            catch { s = -1; }
+
+            return new DataResult(s, null);
         }
 
-        public static DataResult unlockuser(string uid,string password){
+        public static DataResult unlockuser(string uid, string password)
+        {
             int s = 1;
-            try{
-                int rnt = DbBase.UserDB.Execute("UPDATE `user` SET `user`.IsLocked = 0 WHERE `user`.ID = @uid AND `user`.`PassWord` = @p ",new { uid = int.Parse(uid) ,p = password }); 
-                if(rnt == 0) s = 2002;
-            }catch{ s = 2002;}
-            return new DataResult(s,null);
+            try
+            {
+                int rnt = DbBase.UserDB.Execute("UPDATE `user` SET `user`.IsLocked = 0 WHERE `user`.ID = @uid AND `user`.`PassWord` = @p ", new { uid = int.Parse(uid), p = password });
+                if (rnt == 0) s = 2002;
+            }
+            catch { s = 2002; }
+            return new DataResult(s, null);
         }
 
-        public static DataResult editPwd(string uid,string oldp,string newp,string reNewPwd){
+        public static DataResult editPwd(string uid, string oldp, string newp, string reNewPwd)
+        {
             int s = 1;
             string regexstr = @".{6,18}";
-            if (string.IsNullOrEmpty(oldp)) {  s = 2006; }
-            if (string.IsNullOrEmpty(newp)) {  s = 2012; }
-            if (!Regex.IsMatch(newp, regexstr)){ s=2007; }
-            if (newp != reNewPwd) {  s=2010; }
-            if(s == 1){
-                try{
+            if (string.IsNullOrEmpty(oldp)) { s = 2006; }
+            if (string.IsNullOrEmpty(newp)) { s = 2012; }
+            if (!Regex.IsMatch(newp, regexstr)) { s = 2007; }
+            if (newp != reNewPwd) { s = 2010; }
+            if (s == 1)
+            {
+                try
+                {
                     int rnt = DbBase.UserDB.Execute("UPDATE `user` SET `user`.`PassWord`= @newp WHERE `user`.ID = @uid AND `user`.`PassWord` = @p ",
-                                                new { newp = newp ,uid = int.Parse(uid) ,p = oldp }); 
-                    if(rnt == 0) s = 2002;
-                }catch{ s = 2002;} 
+                                                new { newp = newp, uid = int.Parse(uid), p = oldp });
+                    if (rnt == 0) s = 2002;
+                }
+                catch { s = 2002; }
             }
- 
-            return new DataResult(s,null);
+
+            return new DataResult(s, null);
         }
-
-
-
-
-
-
-
-
     }
+
+
+
 }
