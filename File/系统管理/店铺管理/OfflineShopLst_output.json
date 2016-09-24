@@ -1,0 +1,35 @@
+{
+    "s": 1,
+    "d": [
+        {
+            "ID": 7,
+            "ShopName": "京东测试1",
+            "CoID": 1,
+            "SitType": 35,
+            "ShopSite": "线下",
+            "ShopType": "Jos",
+            "Istoken": 0,
+            "ShopUrl": "http://www.sohu.com",
+            "ShopSetting": "",
+            "Enable": true,
+            "Creator": "系统管理员",
+            "CreateDate": "2016-07-20T09:44:24",
+            "ShortName": "",
+            "Shopkeeper": "5666",
+            "SendAddress": "常熟",
+            "TelPhone": "13776218043",
+            "IDcard": "",
+            "ContactName": "",
+            "ReturnAddress": "",
+            "ReturnMobile": "13776218043",
+            "ReturnPhone": "",
+            "Postcode": "",
+            "UpdateSku": true,
+            "DownGoods": true,
+            "UpdateWayBill": false,
+            "Token": "19341bde-889e-45e4-8fbb-19c8585d0853",
+            "ShopBegin": "0001-01-01T00:00:00"
+        }
+    ],
+    "m": ""
+}

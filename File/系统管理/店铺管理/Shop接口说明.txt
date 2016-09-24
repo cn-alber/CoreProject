@@ -34,7 +34,7 @@ function说明
     OutPut:
         Shop            Shop        指定店铺资料
     参考：input json 文件：ShopQuery_input.json
-    参考：input json 文件：ShopQuery_output.json
+    参考：output json 文件：ShopQuery_output.json
 
 3.ShopEnable()//店铺状态(启用|停用)
     方法：POST
@@ -53,7 +53,7 @@ function说明
         失败：
             1.返回错误信息：s=3003.资料更新失败
     参考：input json 文件：ShopEnable_input.json
-    参考：input json 文件：ShopEnable_output.json
+    参考：output json 文件：ShopEnable_output.json
     
 4.ShopSave()//保存店铺资料
     方法：POST
@@ -69,5 +69,29 @@ function说明
             3.返回请求成功信息(s=1)
         失败：返回错误信息
     参考: 
-        input json 文件
+        input json 文件：ShopSave_input.json
+        output json 文件：ShopSave_output.json
 
+5.TokenShopLst()//获取所有授权店铺
+    方法：POST
+    路由：http://localhost:5000/Core/Shop/TokenShopLst
+    参数：
+    InPut: NULL
+    OutPut:
+        成功：返回授權店鋪資料    List<Shop>
+        失败：返回错误信息
+    參考：
+        input json 文件：無
+        output json 文件：TokenShopLst_output.json
+
+6.TokenShopLst()//获取所有綫下店铺
+    方法：POST
+    路由：http://localhost:5000/Core/Shop/OfflineShopLst
+    参数：
+    InPut: NULL
+    OutPut:
+        成功：返回綫下店鋪資料    List<Shop>
+        失败：返回错误信息
+    參考：
+        input json 文件：無
+        output json 文件：OfflineShopLst_output.json

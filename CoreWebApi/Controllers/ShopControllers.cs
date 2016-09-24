@@ -86,5 +86,24 @@ namespace CoreWebApi
              return CoreResult.NewResponse(1,isexist.ToString(),"General");
          }
 
+         //获取所有授权店铺
+         [HttpPostAttribute("/Core/Shop/TokenShopLst")]
+         public ResponseResult TokenShopLst()
+         {
+             int CoID = int.Parse(GetCoid());
+             var res = ShopHaddle.GetTokenShopLst(CoID);
+             return CoreResult.NewResponse(res.s,res.d,"General");
+         }
+
+         //获取所有线下店铺
+         [HttpPostAttribute("/Core/Shop/OfflineShopLst")]
+         public ResponseResult OfflineShopLst()
+         {
+             int CoID = int.Parse(GetCoid());
+             var res = ShopHaddle.GetOfflineShopLst(CoID);
+             return CoreResult.NewResponse(res.s,res.d,"General");
+         }
+
+
     }
 }

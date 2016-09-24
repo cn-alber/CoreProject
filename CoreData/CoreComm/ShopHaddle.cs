@@ -6,7 +6,6 @@ using System.Linq;
 using System;
 using System.Text;
 using CoreModels.XyComm;
-using System.Data;
 
 
 
@@ -254,14 +253,14 @@ namespace CoreData.CoreComm
                                     where
                                     ID = @ID
                                     ";
-                    int count = DbBase.CommDB.Execute(str, shop,TransComm);
+                    int count = DbBase.CommDB.Execute(str, shop, TransComm);
                     if (count <= 0)
                     {
                         result.s = -3003;
                     }
                     else
                     {
-                        CoreUser.LogComm.InsertUserLogTran(TransUser,"修改店铺资料", "Shop", contents, UserName, CoID.ToString(), DateTime.Now);
+                        CoreUser.LogComm.InsertUserLogTran(TransUser, "修改店铺资料", "Shop", contents, UserName, CoID.ToString(), DateTime.Now);
                         CacheBase.Set<Shop>(sname, shop);//缓存
                         TransComm.Commit();
                         TransUser.Commit();
@@ -444,5 +443,40 @@ namespace CoreData.CoreComm
 
             return result;
         }
+
+        //summary:
+        //  获取所有授权店铺
+        public static DataResult GetTokenShopLst(int CoID)
+        {
+            var res = new DataResult(1, null);
+            string query = "select * from shop where CoID=@CoID and Istoken=1 and Token!='' and Enable=true";
+            var Lst = DbBase.CommDB.Query<Shop>(query, new { CoID = CoID }).ToList();
+            if (Lst.Count == 0)
+            {
+                res.s = -3001;
+            }
+            else
+            {
+                res.d = Lst;
+            }
+            return res;
+        }
+
+        public static DataResult GetOfflineShopLst(int CoID)
+        {
+            var res = new DataResult(1, null);
+             string query = "select * from shop where CoID=@CoID and SitType=35 and Enable=true";
+            var Lst = DbBase.CommDB.Query<Shop>(query, new { CoID = CoID }).ToList();
+            if (Lst.Count == 0)
+            {
+                res.s = -3001;
+            }
+            else
+            {
+                res.d = Lst;
+            }
+            return res;
+        }
+
     }
 }
