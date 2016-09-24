@@ -4,12 +4,13 @@ using System;
 using CoreModels.XyComm;
 using CoreData;
 using Newtonsoft.Json;
-using System.Collections.Generic;
+using MySql.Data.MySqlClient;
 
 namespace CoreDate.CoreComm
 {
     public static class PrintHaddle
     {
+        // DapperDbBase _dbBase;
         #region 
         /// <summary>
 		/// 获取print_sys_types -> emu_data
@@ -125,13 +126,13 @@ namespace CoreDate.CoreComm
             return result;       
         }
         #endregion
-
+//new MySqlConnection("server=xieyuntestout.mysql.rds.aliyuncs.com;database=xycomm;uid=xieyun;pwd=xieyun123;Port=3306;SslMode=None")
         /// <summary>
 		/// 获取print_sys_types list
 		/// </summary>
         public static DataResult getAllSysTypes(){
             var result = new DataResult(1,null);        
-            using(var conn = DbBase.CommDB){
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try{
                     var list = conn.Query<AllSysTypes>("SELECT a.id, a.`name`,a.type FROM print_sys_types as a WHERE  a.deleted =FALSE  ").AsList();                 
                     if (list != null)
