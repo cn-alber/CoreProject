@@ -12,7 +12,7 @@ namespace CoreWebApi
                             .UseKestrel()
                             .UseContentRoot(Directory.GetCurrentDirectory())
                             .UseStartup<Startup>()
-                            .UseUrls("http://localhost:5000")
+                            .UseUrls("http://192.168.30.180:5000")
                             .Build();
 
                 host.Run();
