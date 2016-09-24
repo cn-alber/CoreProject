@@ -255,12 +255,20 @@ namespace CoreDate.CoreComm
 
                 if (list != null)
                 {
-                    result.d = new {
-                        list = list,
-                        PageIndex = param.PageIndex,
-                        PageSize = param.PageSize,
-                        TotalPage =  Math.Ceiling(decimal.Parse(totallist.Count.ToString())/decimal.Parse(param.PageSize.ToString())) 
-                    };                    
+                    if(param.PageIndex == 1){
+                        result.d = new {
+                            list = list,
+                            Page = param.PageIndex,
+                            PageSize = param.PageSize,
+                            PageTotal =  Math.Ceiling(decimal.Parse(totallist.Count.ToString())/decimal.Parse(param.PageSize.ToString())),
+                            Total = totallist.Count
+                        };
+                    }else{
+                        result.d = new {
+                            list = list,
+                            Page = param.PageIndex,
+                        };
+                    }                    
                 }
                 else
                 {
@@ -303,6 +311,51 @@ namespace CoreDate.CoreComm
             return result;
         }
 
+        
+
+
+
+        /// <summary>
+		/// 
+		/// </summary>
+        public static DataResult DelSysesTypeByID(string id){
+            var result = new DataResult(1,null);
+            try
+            {
+                // var hasSys = DbBase.CommDB.Query<print_syses>("").AsList()[0]; //判断是否在预设模板中被调用
+                // if (hasSys != null)
+                // {
+                //    result.s = -4011;
+                // }else {
+                //     int rnt = DbBase.CommDB.Execute("");
+                //     if (rnt > 0)
+                //     {
+                //         result.s = 2;
+                //     }
+                //     else
+                //     {
+                //         result.s = -4010;                        
+                //     }
+                // }      
+                int rnt = DbBase.CommDB.Execute("UPDATE print_sys_types SET print_sys_types.deleted = TRUE WHERE print_sys_types.id="+id+" AND print_sys_types.deleted=FALSE;");
+                if (rnt > 0)
+                {
+                    result.s = 2;
+                }
+                else
+                {
+                    result.s = -4010;                        
+                }
+            }
+            catch (Exception e)
+            {
+                result.s = -1;
+                result.d= e.Message; 
+            }
+
+            return result;
+        }
+
 
         /// <summary>
 		/// 
@@ -322,6 +375,9 @@ namespace CoreDate.CoreComm
 
             return result;
         }
+
+
+
 
 
 

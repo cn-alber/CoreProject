@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CoreWebApi
 {
-    [AllowAnonymous]
+    
     public class ProfileController : ControllBase
     {
        
@@ -16,9 +16,10 @@ namespace CoreWebApi
         {
             var roleid = GetRoleid();
             var coid = GetCoid();
+            var uid = GetUid();
             // var roleid = "1";
             // var coid = "1";
-            var m = UserHaddle.GetRefreshList(roleid, coid,GetUname(),GetUid());
+            var m = UserHaddle.GetRefreshList(roleid, coid,GetUname(),uid);
             return CoreResult.NewResponse(m.s, m.d, "Basic");
         }
         

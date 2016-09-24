@@ -2,8 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using CoreDate.CoreComm;
 using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyComm;
+using System;
 
-namespace CoreWebApi
+namespace CoreWebApi.Print
 {
     [AllowAnonymous]
     public class PrintController : ControllBase
@@ -21,7 +22,7 @@ namespace CoreWebApi
         [HttpGetAttribute("/core/print/task/tpl")]
         public ResponseResult tasktpl(string my_id)
         {
-            var admin_id = "1";//GetUid();
+            var admin_id = GetUid();
             var m = PrintHaddle.taskTpl(admin_id,my_id);
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
@@ -31,13 +32,13 @@ namespace CoreWebApi
         [HttpGetAttribute("/core/print/side/setdefed")]
         public ResponseResult sidesetdefed(string my_tpl_id)
         {
-            var admin_id = "1";//GetUid();
+            var admin_id = GetUid();
             var m = PrintHaddle.sideSetdefed(admin_id,my_tpl_id);
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
         
-        #region 获取print_sys_types list
+        #region 获取左侧 系统预设模板列表 print_sys_types list
         [HttpGetAttribute("/core/print/tpl/getallsystypes")]
         public ResponseResult getallsystypes()
         {
@@ -59,21 +60,22 @@ namespace CoreWebApi
        [HttpGetAttribute("/core/print/tpl/my")]
         public ResponseResult tplmy(string my_id)
         {
-            string admin_id = "1";
+            string admin_id = GetUid();
             var m = PrintHaddle.tplMy(admin_id,my_id);
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
 
-        #region 根据type获取系统模板 list
+        #region 根据预设模板 type( print_sys_types->type ) 获取系统模板 list
         [HttpGetAttribute("/core/print/tpl/sysesbytype")]
-        public ResponseResult sysesbytype(string type,int PageIndex,int PageSize)
+        public ResponseResult sysesbytype(string type,int Page = 1,int PageSize = 20)
         {
 
             printParam param = new printParam();
             param.Filter = "type = "+type;
-            param.PageIndex = PageIndex;
-            param.PageSize = PageSize;
+            
+            param.PageIndex = Math.Max(Page,1);
+            param.PageSize = Math.Max(PageSize,20);
             
             var m = PrintHaddle.GetSysesByType(param);
             return CoreResult.NewResponse(m.s, m.d, "Print");
@@ -88,14 +90,37 @@ namespace CoreWebApi
             var m = PrintHaddle.tplType(type);
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
+        #endregion
+
+        #region 根据type获取 print_sys_types 系统模板数据 emu_data
+        //与 /core/print/task/data 返回相同，不同地方引用，区分为两个路由
+        [HttpGetAttribute("/core/print/tpl/emu_data")]
+        public ResponseResult tplemu_data(string type)
+        {
+            
+            var m = PrintHaddle.taskData(type); 
+            return CoreResult.NewResponse(m.s, m.d, "Print");
+        }
+        #endregion
+
+        #region 保存个人模板数据
 
         #endregion
 
+        #region 保存系统模板
 
+        #endregion
 
+        #region 删除系统预设模板 print_sys_types 
+        [HttpGetAttribute("/core/print/tpl/delsysestype")]
+        public ResponseResult delsysestype(string id)
+        {
+            
+            var m = PrintHaddle.DelSysesTypeByID(id); 
+            return CoreResult.NewResponse(m.s, m.d, "Print");
+        }
 
-
-
+        #endregion
     }
 
 
