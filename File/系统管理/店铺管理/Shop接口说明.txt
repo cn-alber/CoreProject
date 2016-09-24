@@ -1,7 +1,7 @@
 接口名称：ShopControllers
 
 function说明
-1.CallShop()//查询table Shop 资料
+1.ShopQueryLst()//查询table Shop 资料
     方法：POST
     路由：http://localhost:5000/Core/Shop/ShopQueryLst
     参数: CoreModels.ShopParam
@@ -25,16 +25,16 @@ function说明
     参考:input json 文件:ShopListQuery_input.json
     参考:output json 文件:ShopListQuery_output.json
 
-2.ShopEdit()//查询单笔店铺资料
+2.ShopQuery()//查询单笔店铺资料
     方法：POST
-    路由：http://localhost:5000/Core/Shop/ShopEdit
+    路由：http://localhost:5000/Core/Shop/ShopQuery
     参数：
     InPut:
         ShopID          int         店铺编号ID
     OutPut:
         Shop            Shop        指定店铺资料
-    参考：input json 文件：ShopEdit_input.json
-    参考：input json 文件：ShopEdit_output.json
+    参考：input json 文件：ShopQuery_input.json
+    参考：input json 文件：ShopQuery_output.json
 
 3.ShopEnable()//店铺状态(启用|停用)
     方法：POST
@@ -55,3 +55,19 @@ function说明
     参考：input json 文件：ShopEnable_input.json
     参考：input json 文件：ShopEnable_output.json
     
+4.ShopSave()//保存店铺资料
+    方法：POST
+    路由：http://localhost:5000/Core/Shop/ShopSave
+    参数：
+    InPut:
+        SaveType        string                      保存类型（New.新增|Edit.修改）
+        shop            Shop                        店铺待保存对象
+    OutPut:
+        成功：
+            1.保存店铺资料(新增|修改)
+            2.新增操作记录log
+            3.返回请求成功信息(s=1)
+        失败：返回错误信息
+    参考: 
+        input json 文件
+

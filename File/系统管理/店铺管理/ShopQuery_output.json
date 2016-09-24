@@ -26,7 +26,8 @@
         "UpdateSku": false,
         "DownGoods": false,
         "UpdateWayBill": false,
-        "Token": ""
+        "Token": "",
+        "ShopBegion": "0001-01-01T00:00:00"
     },
-    "m": "请求成功"
+    "m": ""
 }

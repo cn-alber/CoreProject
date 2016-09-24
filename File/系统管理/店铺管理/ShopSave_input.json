@@ -1,0 +1,32 @@
+{   
+"EditType":"Edit",       
+"shop": {
+        "ID": 12,
+        "ShopName": "京东Core测试2",
+        "CoID": 1,
+        "SitType": 3,
+        "ShopSite": "京东",
+        "ShopType": "",
+        "Istoken": 0,
+        "ShopUrl": "",
+        "ShopSetting": "",
+        "Enable": true,
+        "Creator": "",
+        "CreateDate": "2016-06-08T09:27:48",
+        "ShortName": "测试2",
+        "Shopkeeper": "test123",
+        "SendAddress": "",
+        "TelPhone": "",
+        "IDcard": "",
+        "ContactName": "",
+        "ReturnAddress": "",
+        "ReturnMobile": "",
+        "ReturnPhone": "",
+        "Postcode": "",
+        "UpdateSku": false,
+        "DownGoods": false,
+        "UpdateWayBill": false,
+        "Token": "",
+        "ShopBegion": "0001-01-01T00:00:00"
+    }
+}
