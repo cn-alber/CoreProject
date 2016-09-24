@@ -67,13 +67,13 @@ namespace CoreWebApi
 
         #region 根据type获取系统模板 list
         [HttpGetAttribute("/core/print/tpl/sysesbytype")]
-        public ResponseResult sysesbytype(string type)
+        public ResponseResult sysesbytype(string type,int PageIndex,int PageSize)
         {
 
             printParam param = new printParam();
             param.Filter = "type = "+type;
-            param.PageIndex = 1;
-            param.PageSize = 2;
+            param.PageIndex = PageIndex;
+            param.PageSize = PageSize;
             
             var m = PrintHaddle.GetSysesByType(param);
             return CoreResult.NewResponse(m.s, m.d, "Print");

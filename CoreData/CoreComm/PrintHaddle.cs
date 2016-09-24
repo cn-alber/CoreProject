@@ -133,7 +133,7 @@ namespace CoreDate.CoreComm
             var result = new DataResult(1,null);        
             using(var conn = DbBase.CommDB){
                 try{
-                    var list = conn.Query<AllSysTypes>("SELECT a.id, a.`name`,a.type FROM print_sys_types as a WHERE  print_sys_types.deleted =FALSE AND ").AsList();                 
+                    var list = conn.Query<AllSysTypes>("SELECT a.id, a.`name`,a.type FROM print_sys_types as a WHERE  a.deleted =FALSE  ").AsList();                 
                     if (list != null)
                     {
                     result.d = list;                 
@@ -148,9 +148,6 @@ namespace CoreDate.CoreComm
                 }
 
             } 
-
-
-
             return result;
 
         }
@@ -238,7 +235,7 @@ namespace CoreDate.CoreComm
             var result = new DataResult(1,null);
             try
             {
-                string wheresql = ""; 
+                string wheresql = " "; 
                 if(!string.IsNullOrEmpty(param.Filter)){
                     wheresql += param.Filter;
                 }   
@@ -246,6 +243,8 @@ namespace CoreDate.CoreComm
                 {
                     wheresql += " ORDER BY "+param.SortField +" "+ param.SortDirection;
                 }
+                var totalsql = "SELECT a.id, a.`name`,a.mtime FROM print_syses as a WHERE  "+wheresql;
+                var totallist = DbBase.CommDB.Query<printSysesList>(totalsql).AsList();
                 if(param.PageIndex>-1&&param.PageSize>-1){
                     wheresql += " limit "+(param.PageIndex -1)*param.PageSize +" ,"+ param.PageIndex*param.PageSize;
                 }
@@ -253,13 +252,14 @@ namespace CoreDate.CoreComm
                 wheresql ="SELECT a.id, a.`name`,a.mtime FROM print_syses as a WHERE  "+wheresql; 
 
                 var list = DbBase.CommDB.Query<printSysesList>(wheresql).AsList();
+
                 if (list != null)
                 {
                     result.d = new {
                         list = list,
                         PageIndex = param.PageIndex,
                         PageSize = param.PageSize,
-                        TotalPage = list.Count
+                        TotalPage =  Math.Ceiling(decimal.Parse(totallist.Count.ToString())/decimal.Parse(param.PageSize.ToString())) 
                     };                    
                 }
                 else
@@ -276,11 +276,10 @@ namespace CoreDate.CoreComm
         }
 
 
- /// <summary>
+        /// <summary>
 		/// 获取类型预设
 		/// </summary>
         public static DataResult tplType(string t){
-
             var result = new DataResult(1,null);
             try
             {
