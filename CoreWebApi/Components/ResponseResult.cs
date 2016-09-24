@@ -23,7 +23,7 @@ namespace CoreWebApi
                 m = d.ToString(); //try catch报错时，显示exception msg
                 d = null;
             }else{
-                JsonFile.GetMessage(s, Section);
+                m = JsonFile.GetMessage(s, Section);
             }
 
             return new ResponseResult(s, d, m);

@@ -5,12 +5,21 @@ namespace CoreModels.XyCore
 	public  class MsgRelationshiop
 	{
 		
-			#region Model
+		#region Model
+		private int _id;
 		private int _uid;
 		private int _msgid;
 		private bool _readed= false;
 		private DateTime? _readtime;
 		private string _uname;
+		/// <summary>
+		/// 
+		/// </summary>
+		public int id
+		{
+			set{ _id=value;}
+			get{return _id;}
+		}
 		/// <summary>
 		/// 
 		/// </summary>

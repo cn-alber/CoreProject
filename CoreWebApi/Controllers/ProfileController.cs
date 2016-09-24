@@ -60,8 +60,9 @@ namespace CoreWebApi
             }             
 
             msgparam.PageIndex = lo["page"] !=null? int.Parse(lo["page"].ToString()):1;
-            msgparam.PageSize = 20;
-                
+            msgparam.PageSize = lo["pageSize"] !=null? int.Parse(lo["pageSize"].ToString()):20;           
+            msgparam.SortDirection=" ASC ";   
+
             var uid = GetUid();
             var roleid = GetRoleid();
             var m = NotifyHaddle.GetMsgList(uid,roleid,msgparam);
@@ -108,7 +109,7 @@ namespace CoreWebApi
         public ResponseResult msgread([FromBodyAttribute]JObject lo)
         {           
             
-            var readids =   Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(lo["selectIds"].ToString());             
+            var readids =   Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(lo["ids"].ToString());             
             var m = NotifyHaddle.MsgRead(readids,GetUid(),GetUname());
             return CoreResult.NewResponse(m.s,m.d, "Basic");    
         }

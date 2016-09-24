@@ -87,6 +87,13 @@ namespace CoreModels.XyCore{
 
         public int PageIndex{get;set;}
         public int PageSize{get;set;}
+        public int PageCount {get;set;}//总页数
+        public int DataCount {get;set;} //总行数
+        public string SortField {get; set;}//排序字段
+        public string SortDirection {get;set;}//DESC,ASC
+
+
+
 
     }
 

@@ -11,6 +11,7 @@ namespace CoreModels.XyComm
 		private string _tpl_data;
 		private string _setting;
 		private DateTime? _mtime;
+		private bool _deleted= false;
 		/// <summary>
 		/// 
 		/// </summary>
@@ -58,6 +59,14 @@ namespace CoreModels.XyComm
 		{
 			set{ _mtime=value;}
 			get{return _mtime;}
+		}
+		/// <summary>
+		/// 
+		/// </summary>
+		public bool deleted
+		{
+			set{ _deleted=value;}
+			get{return _deleted;}
 		}
 		#endregion Model
 

@@ -3,6 +3,12 @@ using CoreDate.CoreComm;
 using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyComm;
 using System;
+using Newtonsoft.Json.Linq;
+
+
+//  print_sys_types   系统预设模板
+//  print_syses         根据系统预设模板(print_sys_types.type) 生成的 “系统模板”
+//  print_use
 
 namespace CoreWebApi.Print
 {
@@ -18,25 +24,7 @@ namespace CoreWebApi.Print
         }
         #endregion
 
-        #region 获取个人模板 print_uses
-        [HttpGetAttribute("/core/print/task/tpl")]
-        public ResponseResult tasktpl(string my_id)
-        {
-            var admin_id = GetUid();
-            var m = PrintHaddle.taskTpl(admin_id,my_id);
-            return CoreResult.NewResponse(m.s, m.d, "Print");
-        }
-        #endregion
-
-        #region 设定，更新默认模板
-        [HttpGetAttribute("/core/print/side/setdefed")]
-        public ResponseResult sidesetdefed(string my_tpl_id)
-        {
-            var admin_id = GetUid();
-            var m = PrintHaddle.sideSetdefed(admin_id,my_tpl_id);
-            return CoreResult.NewResponse(m.s, m.d, "Print");
-        }
-        #endregion
+        
         
         #region 获取左侧 系统预设模板列表 print_sys_types list
         [HttpGetAttribute("/core/print/tpl/getallsystypes")]
@@ -56,15 +44,7 @@ namespace CoreWebApi.Print
         }
         #endregion
 
-        #region 获取个人模板数据
-       [HttpGetAttribute("/core/print/tpl/my")]
-        public ResponseResult tplmy(string my_id)
-        {
-            string admin_id = GetUid();
-            var m = PrintHaddle.tplMy(admin_id,my_id);
-            return CoreResult.NewResponse(m.s, m.d, "Print");
-        }
-        #endregion
+       
 
         #region 根据预设模板 type( print_sys_types->type ) 获取系统模板 list
         [HttpGetAttribute("/core/print/tpl/sysesbytype")]
@@ -103,24 +83,44 @@ namespace CoreWebApi.Print
         }
         #endregion
 
-        #region 保存个人模板数据
+        #region 保存系统预设模板
+        [HttpPostAttribute("/core/print/tpl/savesysestype")]
+        public ResponseResult savesysestype([FromBodyAttribute]JObject lo)
+        {
+   
+            string ids =String.Join(",",lo["ids"]); 
+            
+            var m = PrintHaddle.saveSysesType(); 
+            return CoreResult.NewResponse(m.s, m.d, "Print");
+        }
 
-        #endregion
-
-        #region 保存系统模板
 
         #endregion
 
         #region 删除系统预设模板 print_sys_types 
-        [HttpGetAttribute("/core/print/tpl/delsysestype")]
-        public ResponseResult delsysestype(string id)
+        [HttpPostAttribute("/core/print/tpl/delsysestype")]
+        public ResponseResult delsysestype([FromBodyAttribute]JObject lo)
         {
-            
-            var m = PrintHaddle.DelSysesTypeByID(id); 
+   
+            string ids =String.Join(",",lo["ids"]); 
+            var m = PrintHaddle.DelSysesTypeByID(ids); 
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
-
         #endregion
+
+        #region 删除系统模板 print_syses 
+        [HttpPostAttribute("/core/print/tpl/delsyses")]
+        public ResponseResult delsyses([FromBodyAttribute]JObject lo)
+        {
+   
+            string ids =String.Join(",",lo["ids"]); 
+            var m = PrintHaddle.DelSysesByID(ids); 
+            return CoreResult.NewResponse(m.s, m.d, "Print");
+        }
+        #endregion
+
+
+
     }
 
 
