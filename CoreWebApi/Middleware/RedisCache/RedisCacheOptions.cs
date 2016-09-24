@@ -1,10 +1,14 @@
 
+using Microsoft.Extensions.Options;
 
-namespace CoreData.Redis
+namespace CoreWebApi.Cache.Redis
 {
-    public class RedisConfig
+    /// <summary>
+    /// Configuration options for <see cref="RedisCache"/>.
+    /// </summary>
+    public class RedisCacheOptions:IOptions<RedisCacheOptions>
     {
-        /// <summary>
+       /// <summary>
         /// 别名
         /// </summary>
         public string Name
@@ -43,6 +47,11 @@ namespace CoreData.Redis
         {
             get;
             set;
+        }
+
+        RedisCacheOptions IOptions<RedisCacheOptions>.Value
+        {
+            get { return this; }
         }
     }
 }

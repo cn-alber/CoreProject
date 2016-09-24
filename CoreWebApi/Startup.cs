@@ -107,7 +107,7 @@ namespace CoreWebApi
                 AuthenticationScheme = "CoreInstance",
                 AutomaticAuthenticate = false,
                 AutomaticChallenge = false,
-                SessionStore = new MemoryCacheTicketStore()
+                SessionStore = new RedisCacheTicketStore()
             });
             
             app.UseSimpleBearerAuthentication(new SimpleBearerOptions

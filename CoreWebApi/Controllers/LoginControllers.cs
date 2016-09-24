@@ -53,9 +53,9 @@ namespace CoreWebApi
                     IsPersistent = false
                 });
             }
-            catch
+            catch(Exception ex)
             {
-                return CoreResult.NewResponse(1, "认证", "Basic");
+                return CoreResult.NewResponse(1, ex.ToString(), "Basic");
             }
             var ss = JsonConvert.SerializeObject(test);
             return CoreResult.NewResponse(1, user, "Basic");

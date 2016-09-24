@@ -36,7 +36,8 @@ namespace CoreData.Redis
             {
                 Hosts = host
                 + ":" +
-                port
+                port,
+                Password = pwd
             };
         }
 
@@ -53,6 +54,7 @@ namespace CoreData.Redis
                 var redisconf = ConfigurationOptions.Parse(config.Hosts);
                 redisconf.AllowAdmin = true;
                 redisconf.ConnectRetry = 2;
+                redisconf.Password = config.Password;
                 multiplexer = ConnectionMultiplexer.Connect(redisconf);
                 _multiplexers.TryAdd(config.Hosts, multiplexer);
             }
