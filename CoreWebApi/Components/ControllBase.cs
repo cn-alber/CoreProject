@@ -12,7 +12,8 @@ namespace CoreWebApi
         ///</summary>
         public string GetUid()
         {
-            return HttpContext.User.Claims.FirstOrDefault(q => q.Type.Equals("uid")).Value;
+            return "1";
+            // return HttpContext.User.Claims.FirstOrDefault(q => q.Type.Equals("uid")).Value;
         }
 
         ///<summary>
@@ -20,7 +21,8 @@ namespace CoreWebApi
         ///</summary>
         public string GetUname()
         {
-            return HttpContext.User.Claims.FirstOrDefault(q => q.Type.Equals("uname")).Value;
+            return "管理员";
+            // return HttpContext.User.Claims.FirstOrDefault(q => q.Type.Equals("uname")).Value;
         }
 
         ///<summary>
@@ -28,7 +30,8 @@ namespace CoreWebApi
         ///</summary>
         public string GetCoid()
         {
-            return HttpContext.User.Claims.FirstOrDefault(q => q.Type.Equals("coid")).Value;
+            return "1";
+            // return HttpContext.User.Claims.FirstOrDefault(q => q.Type.Equals("coid")).Value;
         }
 
         ///<summary>
@@ -36,7 +39,8 @@ namespace CoreWebApi
         ///</summary>
         public string GetRoleid()
         {
-            return HttpContext.User.Claims.FirstOrDefault(q => q.Type.Equals("roleid")).Value;
+            return  "1";
+            // return HttpContext.User.Claims.FirstOrDefault(q => q.Type.Equals("roleid")).Value;
         }
 
         #endregion

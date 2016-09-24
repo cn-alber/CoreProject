@@ -1,35 +1,46 @@
 {
-    "s": 0,
+    
+    "s": 1,
     "d": {
-        "datacnt": 100,
-        "pagecnt": 34.0,
-        "com": [
+        "CoID": 1,
+        "Enable": "all",
+        "Filter": "",
+        "SortField": "id",
+        "SortDirection": "Desc",
+        "NumPerPage": 3,
+        "PageIndex": 5,
+        "Datacnt": 100,
+        "Pagecnt": 34.0,
+        "Com": [
             {
-                "Name": "公司测试test8",
-                "Enable": true,
-                "Address": "",
-                "Remark": "",
-                "TypeList": "0,1",
-                "Creator": "系统管理员",
-                "CreateDate": "2016-04-28T17:50:17"
+                "id": 163,
+                "name": "公司测试test88",
+                "enable": true,
+                "address": "公司测试地址test88",
+                "typelist": "1",
+                "remark": "公司测试备注test88",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:37"
             },
             {
-                "Name": "公司测试test9",
-                "Enable": true,
-                "Address": "",
-                "Remark": "",
-                "TypeList": "0,1",
-                "Creator": "系统管理员",
-                "CreateDate": "2016-04-28T17:50:25"
+                "id": 162,
+                "name": "公司测试test87",
+                "enable": true,
+                "address": "公司测试地址test87",
+                "typelist": "1",
+                "remark": "公司测试备注test87",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:37"
             },
             {
-                "Name": "公司测试test10",
-                "Enable": true,
-                "Address": "",
-                "Remark": "",
-                "TypeList": "0",
-                "Creator": "系统管理员",
-                "CreateDate": "2016-04-28T17:50:30"
+                "id": 161,
+                "name": "公司测试test86",
+                "enable": true,
+                "address": "公司测试地址test86",
+                "typelist": "1",
+                "remark": "公司测试备注test86",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:37"
             }
         ]
     },

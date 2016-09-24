@@ -6,6 +6,8 @@
 .settings/
 /.vscode
 
+/CoreWebApi/Program.cs
+
 # OS #
 .DS_Store
 Thumbs.db

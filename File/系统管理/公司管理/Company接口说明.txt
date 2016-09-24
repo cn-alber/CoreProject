@@ -2,30 +2,69 @@
 
 function说明
 1.CompanyList() //查询table company 资料
-  路由:http://localhost:5000/Core/Company/GetCompany
-input 参数：id             公司编号coid
-            Filter         公司名称匹配值(模糊查询)允许为null
-            Enable         启用状态(all/false/true)
-            PageIndex      资料页数(ex.第一页就给1)
-            NumPerPage     每页显示资料笔数
-OutPut: datacnt 资料总笔数
-        pagecnt 总页数
-        com     company 资料
+  路由:http://localhost:5000/Core/Company/CallCompanyList
+input：     Enable         string         启用状态(all/false/true)
+            Filter         string         公司名称匹配值(模糊查询)允许为null
+            SortField      string         资料页数(ex.第一页就给1)
+            SortDirection  string         每页显示资料笔数
+            PageIndex      int            资料页数(ex.第一页就给1)
+            NumPerPage     int            每页显示资料笔数
+OutPut:     CoID           int            公司编号coid
+            Enable         string         启用状态(all/false/true)
+            Filter         string         公司名称匹配值(模糊查询)允许为null
+            SortField      string         资料页数(ex.第一页就给1)
+            SortDirection  string         每页显示资料笔数
+            PageIndex      int            资料页数(ex.第一页就给1)
+            NumPerPage     int            每页显示资料笔数
+            Datacnt        int            资料总笔数
+            Pagecnt        int            总页数
+            Com            List<Company>  company 资料
 参考:input jason 文件:CompanyList_input.json
 参考:output jason 文件:CompanyList_output.json
 
+
 2.CompanySingle() //查询单笔company资料
   路由:http://localhost:5000/Core/Company/GetCompanySingle
-input 参数：id   ID
+input：ID   公司资料ID
 OutPut: 单笔company 资料
 参考:input jason 文件:CompanySingle_input.json
 参考:output jason 文件:CompanySingle_output.json
 
-3.UpdateEnable()//批次更新公司资料的状态
-路由:http://localhost:5000/Core/Company/UpdateEnable
-input 参数： Id        公司ID list,用逗号隔开
-            NameList  公司名称list,用逗号隔开
-            Enable    状态 true/false
-OutPut: 成功 or 失败讯息
-参考:input jason 文件:UpdateEnable_input.json
-参考:output jason 文件:UpdateEnable_output.json
+3.CompanyEnable()//批次更新公司资料的状态
+路由:http://localhost:5000/Core/Company/CompanyEnable
+input： IDsDic          Dictionary<int,string>      <Key:公司ID,Value:公司名称>
+        Company         string                      登录者公司名称(exp:携云科技)
+        Enable          string                      指定状态true|false（启用，停用）
+OutPut: 成功：
+            1.更新公司状态Company.enable
+            2.新增修改记录log
+            3.返回成功信息：s=1,d=公司状态启用(停用)
+        失败：
+            1.返回错误信息：s=3003.资料更新失败
+参考:input jason 文件:CompanyEnable_input.json
+参考:output jason 文件:CompanyEnable_output.json
+
+4.CompanyCheckExist() //检查公司资料是否已经存在，若已经存在，不允许新增
+路由:http://localhost:5000/Core/Company/CompanyCheckExist
+input：ComName  string 公司名称
+OutPut: true(存在)/false(不存在)
+参考:input jason 文件:CompanyCheckExist_input.json
+参考:output jason 文件:CompanyCheckExist_output.json
+
+5.UpdateCompamy() //保存公司基本资料
+路由:http://localhost:5000/Core/Company/UpdateCompany
+input:ModifyFlag    string    保存方式(new/edit)
+      ID            int       公司id,若为new,赋值null
+      Name          string    公司名称
+      Enable        bool      启用状态
+      Address       string    公司地址
+      Email         string    公司邮箱
+      Typelist      string    公司类型
+      Contacts      string    联络人
+      Telphone      string    固定电话
+      Mobile        string    移动电话
+      Remark        string    备注
+      Company       string    登录者公司名称(exp:携云科技)
+output: s=1成功 else 错误代码
+参考:input jason 文件:UpdateCompamy_input.json
+参考:output jason 文件:UpdateCompamy_output.json

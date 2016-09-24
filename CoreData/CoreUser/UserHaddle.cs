@@ -20,15 +20,15 @@ namespace CoreData.CoreUser
             var u = DbBase.UserDB.Query<User>("select id, password, name, companyid, roleid, enable, islocked from user where account = @acc", new { acc = account }).AsList();
             if (u.Count == 0)
             {
-                s = 2001;
+                s = -2001;
             }
             else if (!u[0].Enable)
             {
-                s = 2005;
+                s = -2005;
             }
             else if (!u[0].PassWord.Equals(password))
             {
-                s = 2002;
+                s = -2002;
             }
 
             return new DataResult(s, s == 1 ? u[0] : null);
@@ -53,7 +53,7 @@ namespace CoreData.CoreUser
                 var u = DbBase.UserDB.Query<Role>("select * from role where id = @rid and companyid = @coid", new { rid = roleid, coid = coid }).AsList();
                 if (u.Count == 0)
                 {
-                    s = 2003;
+                    s = -2003;
                 }
                 else
                 {
@@ -68,7 +68,7 @@ namespace CoreData.CoreUser
                 var u = DbBase.UserDB.Query<Role>("select * from role where id = @rid and companyid = @coid", new { rid = roleid, coid = coid }).AsList();
                 if (u.Count == 0)
                 {
-                    s = 2003;
+                    s = -2003;
                 }
                 else
                 {
@@ -103,7 +103,7 @@ namespace CoreData.CoreUser
                 parent = GetMenu(roleid, coid);
                 if (parent == null)
                 {
-                    s = 2004;
+                    s = -2004;
                 }
                 else
                 {
@@ -254,9 +254,9 @@ namespace CoreData.CoreUser
             try
             {
                 int rnt = DbBase.UserDB.Execute("UPDATE `user` SET `user`.IsLocked = 0 WHERE `user`.ID = @uid AND `user`.`PassWord` = @p ", new { uid = int.Parse(uid), p = password });
-                if (rnt == 0) s = 2002;
+                if (rnt == 0) s = -2002;
             }
-            catch { s = 2002; }
+            catch { s = -2002; }
             return new DataResult(s, null);
         }
 
@@ -264,9 +264,9 @@ namespace CoreData.CoreUser
         {
             int s = 1;
             string regexstr = @".{6,18}";
-            if (string.IsNullOrEmpty(oldp)) { s = 2006; }
-            if (string.IsNullOrEmpty(newp)) { s = 2012; }
-            if (!Regex.IsMatch(newp, regexstr)) { s = 2007; }
+            if (string.IsNullOrEmpty(oldp)) { s = -2006; }
+            if (string.IsNullOrEmpty(newp)) { s = -2012; }
+            if (!Regex.IsMatch(newp, regexstr)) { s = -2007; }
             if (newp != reNewPwd) { s = 2010; }
             if (s == 1)
             {
@@ -274,9 +274,9 @@ namespace CoreData.CoreUser
                 {
                     int rnt = DbBase.UserDB.Execute("UPDATE `user` SET `user`.`PassWord`= @newp WHERE `user`.ID = @uid AND `user`.`PassWord` = @p ",
                                                 new { newp = newp, uid = int.Parse(uid), p = oldp });
-                    if (rnt == 0) s = 2002;
+                    if (rnt == 0) s = -2002;
                 }
-                catch { s = 2002; }
+                catch { s = -2002; }
             }
 
             return new DataResult(s, null);
