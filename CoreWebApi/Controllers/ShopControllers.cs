@@ -4,12 +4,13 @@ using Microsoft.AspNetCore.Authorization;
 using CoreData.CoreComm;
 using CoreModels.XyComm;
 using System.Collections.Generic;
-
+using CoreModels;
 namespace CoreWebApi
 {
+    [AllowAnonymous]
     public class ShopController:ControllBase
     {
-        [AllowAnonymous]
+        //查询多笔店铺资料
         [HttpPostAttribute("/Core/Shop/ShopQueryLst")]
         public ResponseResult ShopQueryLst([FromBodyAttribute]JObject obj)
         {
@@ -26,18 +27,18 @@ namespace CoreWebApi
             return Result;             
         }
 
-        [AllowAnonymous]
-        [HttpPostAttribute("/Core/Shop/ShopEdit")]
-        public ResponseResult ShopEdit([FromBodyAttribute]JObject obj)
+        //查询单笔店铺资料
+        [HttpPostAttribute("/Core/Shop/ShopQuery")]
+        public ResponseResult ShopQuery([FromBodyAttribute]JObject obj)
         {
             var CoID = GetCoid();
-            //CoID = GetCoid();
+        //    var CoID = "1";
             string shopid = obj["ShopID"].ToString();
-            var res = ShopHaddle.GetShopEdit(CoID,shopid);
+            var res = ShopHaddle.ShopQuery(CoID,shopid);
             return CoreResult.NewResponse(res.s,res.d,"General");
         }
 
-        [AllowAnonymous]
+        //修改店铺状态（启用|停用）
         [HttpPostAttribute("/Core/Shop/ShopEnable")]
         public ResponseResult ShopEnable([FromBodyAttribute]JObject obj)
         {    
@@ -49,6 +50,60 @@ namespace CoreWebApi
             var res = ShopHaddle.UptShopEnable(IDsDic,Company,UserName,Enable);
             return CoreResult.NewResponse(res.s,res.d,"General");
         }
+
+
+        //保存店铺资料
+        [HttpPostAttribute("/Core/Shop/ShopSave")]
+         public ResponseResult ShopSave([FromBodyAttribute]JObject obj)
+        {
+            var Type = obj["EditType"].ToString();//new or edit
+            var shop = Newtonsoft.Json.JsonConvert.DeserializeObject<Shop>(obj["shop"].ToString());
+            var Res = new DataResult(1,null);
+            int CoID = int.Parse(GetCoid());
+            string UserName = GetUname();            
+            // int CoID=1;
+            // string UserName = "携云科技";
+            if(Type.ToUpper()=="NEW")
+            {
+                Res = ShopHaddle.InsertShop(shop, CoID, UserName);
+            }
+            else
+            {
+                Res = ShopHaddle.UpdateShop(shop, CoID, UserName);
+            }
+            return CoreResult.NewResponse(Res.s,Res.d,"General");
+        }
+
+        
+        //判断店铺名称是否已经存在    
+        [HttpPostAttribute("/Core/Shop/ShopIsExist")]
+         public ResponseResult ShopIsExist([FromBodyAttribute]JObject obj)
+         {
+             string ShopName = obj["ShopName"].ToString();
+             int ID = int.Parse(obj["ID"].ToString());
+             int CoID = int.Parse(GetCoid());
+             var isexist = ShopHaddle.ExistShop(ShopName, ID, CoID);
+             return CoreResult.NewResponse(1,isexist.ToString(),"General");
+         }
+
+         //获取所有授权店铺
+         [HttpPostAttribute("/Core/Shop/TokenShopLst")]
+         public ResponseResult TokenShopLst()
+         {
+             int CoID = int.Parse(GetCoid());
+             var res = ShopHaddle.GetTokenShopLst(CoID);
+             return CoreResult.NewResponse(res.s,res.d,"General");
+         }
+
+         //获取所有线下店铺
+         [HttpPostAttribute("/Core/Shop/OfflineShopLst")]
+         public ResponseResult OfflineShopLst()
+         {
+             int CoID = int.Parse(GetCoid());
+             var res = ShopHaddle.GetOfflineShopLst(CoID);
+             return CoreResult.NewResponse(res.s,res.d,"General");
+         }
+
 
     }
 }

@@ -1,0 +1,35 @@
+{
+    "s": 1,
+    "d": [
+        {
+            "ID": 8,
+            "ShopName": "雅鹿男装旗舰店",
+            "CoID": 1,
+            "SitType": 3,
+            "ShopSite": "京东",
+            "ShopType": "Jos",
+            "Istoken": 1,
+            "ShopUrl": "",
+            "ShopSetting": "",
+            "Enable": true,
+            "Creator": "系统管理员",
+            "CreateDate": "2016-07-21T14:31:32",
+            "ShortName": "",
+            "Shopkeeper": "jd_ylnz",
+            "SendAddress": "",
+            "TelPhone": "",
+            "IDcard": "",
+            "ContactName": "",
+            "ReturnAddress": "",
+            "ReturnMobile": "",
+            "ReturnPhone": "",
+            "Postcode": "",
+            "UpdateSku": false,
+            "DownGoods": true,
+            "UpdateWayBill": true,
+            "Token": "efb222bd-c318-4b5e-b582-1a216840959c",
+            "ShopBegin": "2016-04-29T00:07:00"
+        }
+    ],
+    "m": ""
+}
