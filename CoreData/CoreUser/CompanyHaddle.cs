@@ -3,6 +3,7 @@ using CoreModels.XyUser;
 using Dapper;
 using System;
 using System.Collections.Generic;
+using MySql.Data.MySqlClient;
 
 namespace CoreData.CoreUser
 {
@@ -13,7 +14,7 @@ namespace CoreData.CoreUser
         ///</summary>
         public static DataResult GetCompanyList(CompanyParm cp)
         {
-            var s = 1;
+            var result = new DataResult(1,null);     
             string wheresql = "where 1 = 1";
             if(cp.CoID != 1)//公司编号
             {
@@ -31,203 +32,264 @@ namespace CoreData.CoreUser
             {
                 wheresql = wheresql + " ORDER BY "+cp.SortField +" "+ cp.SortDirection;
             }
-            wheresql = "select id,name,enable,address,typelist,remark,creator,createdate from company " + wheresql ;//+ " limit 0,10";
-            //计算应抓取资料的笔数
-            var u = DbBase.UserDB.Query<CompanyMulti>(wheresql).AsList();
-            int count = u.Count;
-            decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
+            wheresql = "select id,name,enable,address,typelist,remark,creator,createdate from company " + wheresql ;
+            using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
+                try{    
+                    var u = conn.Query<CompanyMulti>(wheresql).AsList();
+                    int count = u.Count;
+                    decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
 
-            int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
-            wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
-            u = DbBase.UserDB.Query<CompanyMulti>(wheresql).AsList();
+                    int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
+                    wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
+                    u = conn.Query<CompanyMulti>(wheresql).AsList();
 
-            cp.Datacnt = count;
-            cp.Pagecnt = pagecnt;
-            cp.Com = u;
-            if (count == 0)
-            {
-                s = -3001;
-            }
-            return new DataResult(s,cp);
+                    cp.Datacnt = count;
+                    cp.Pagecnt = pagecnt;
+                    cp.Com = u;
+                    if (count == 0)
+                    {
+                        result.s = -3001;
+                        result.d = null;
+                    }
+                    else
+                    {
+                        result.d = cp;
+                    }               
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }           
+            return result;
         }
         ///<summary>
         ///查询单笔公司资料
         ///</summary>
         public static DataResult GetCompanyEdit(int ID)
         {
-            var s = 1;    
+            var result = new DataResult(1,null);        
             var parent = CacheBase.Get<CompanySingle>(ID.ToString());  
             if (parent == null)
             {
-                string wheresql = "select id,name,enable,address,email,typelist,contacts,telphone,mobile,remark from company where id ='" + ID.ToString() + "'" ;
-                var u = DbBase.UserDB.Query<CompanySingle>(wheresql).AsList();
-                if (u.Count == 0)
-                {
-                    s = -3001;
-                }
-                else
-                {
-                    CacheBase.Set<CompanySingle>(ID.ToString(), u[0]);
-                }
-                parent = u[0]; 
+                using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
+                    try{
+                        string wheresql = "select id,name,enable,address,email,typelist,contacts,telphone,mobile,remark from company where id ='" + ID.ToString() + "'" ;
+                        var u = conn.Query<CompanySingle>(wheresql).AsList();
+                        if (u.Count == 0)
+                        {
+                            result.s = -3001;
+                            result.d = null;
+                        }
+                        else
+                        {
+                            CacheBase.Set<CompanySingle>(ID.ToString(), u[0]);
+                            result.d = u;
+                        }
+                    }catch(Exception ex){
+                        result.s = -1;
+                        result.d = ex.Message;
+                        conn.Dispose();
+                    }
+                }                                           
+            }
+            else
+            {
+                result.d = parent;
             }                            
-            return new DataResult(s,parent);
+            return result;
         }
         ///<summary>
         ///检查公司资料是否已经存在
         ///</summary>
         public static DataResult IsComExist(string name)
         {
-            var s = 1;            
-            string wheresql = "select id,name,enable,address,email,typelist,contacts,telphone,mobile,remark from company where name ='" + name + "'" ;//+ " limit 0,10";
-            var u = DbBase.UserDB.Query<CompanySingle>(wheresql).AsList();
-            bool flag = false;
-            if(u.Count > 0)
-            {
-                flag = true;
-            }
-            return new DataResult(s,flag);
+            var result = new DataResult(1,null);   
+            using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
+                try{
+                    string wheresql = "select id,name,enable,address,email,typelist,contacts,telphone,mobile,remark from company where name ='" + name + "'" ;
+                    var u = conn.Query<CompanySingle>(wheresql).AsList();            
+                    if (u.Count > 0)
+                    {
+                        result.d = true;                 
+                    }
+                    else
+                    {
+                        result.d = false;   
+                    }              
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+
+            } 
+            return  result;
         }
         ///<summary>
         ///公司启用停用设置
         ///</summary>
         public static DataResult UpdateComEnable(Dictionary<int,string> IDsDic,string Company,string UserName,bool Enable)
         {
-            var s = 1;
-            string contents = string.Empty;            
-            string uptsql = @"update company set enable = @Enable where id in @ID";
-            var args = new {ID = IDsDic.Keys.AsList(),Enable = Enable};          
-
-            int count = DbBase.UserDB.Execute(uptsql,args);
-            if(count<=0)
-            {
-                s= -3003;
-            }
-            else
-            {
-                if(Enable)
-               {
-                   contents = "公司状态启用：";
-               }
-               else
-               {
-                   contents = "公司状态停用：";
-               }
-               contents+= string.Join(",", IDsDic.Values.AsList().ToArray());
-               LogComm.InsertUserLog("修改公司资料", "company", contents, UserName, Company, DateTime.Now);
-            }
-            
-            return new DataResult(s,contents);
+            var result = new DataResult(1,null);   
+            string contents = string.Empty;
+            using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
+                try{
+                    string uptsql = @"update company set enable = @Enable where id in @ID";
+                    var args = new {ID = IDsDic.Keys.AsList(),Enable = Enable};          
+                    int count = conn.Execute(uptsql,args);
+                    if(count<=0)
+                    {
+                        result.s= -3003;
+                    }
+                    else
+                    {
+                        if(Enable)
+                        {
+                            contents = "公司状态启用：";
+                        }
+                        else
+                        {
+                            contents = "公司状态停用：";
+                        }
+                        contents+= string.Join(",", IDsDic.Values.AsList().ToArray());
+                        LogComm.InsertUserLog("修改公司资料", "company", contents, UserName, Company, DateTime.Now);
+                    }
+                    result.d = contents;           
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return  result;
         }
         ///<summary>
         ///公司基本资料保存
         ///</summary>
         public static DataResult SaveCompany(string modifyFlag,CompanySingle com,string UserName,string Company)
         {
-            var s = 1;     
+            var result = new DataResult(1,null);        
             if (modifyFlag == "new")
             {
                 var iresult = InsertCompany(com,UserName,Company);
-                s = iresult.s;
+                result.s = iresult.s;
+                result.d = iresult.d;
             }
             else
             {
                 var mresult = UpdateCompany(com,UserName,Company);
-                s = mresult.s;
+                result.s = mresult.s;
+                result.d = mresult.d;
             }
-            return new DataResult(s,"");
+            return result;
         }      
         public static DataResult InsertCompany(CompanySingle com,string UserName,string Company)
         {
-            int s = 1;
-            string sqlCommandText = @"INSERT INTO company(name,enable,address,email,typelist,contacts,telphone,mobile,remark,creator) VALUES(
-                    @Name,
-                    @Enable,
-                    @Address,
-                    @Email,
-                    @Typelist,
-                    @Contacts,
-                    @Telphone,
-                    @Mobile,
-                    @Remark,
-                    @UName
-                )";
-            var args = new {Name = com.name,Enable=com.enable,Address = com.address,Email = com.email,Typelist = com.typelist,Contacts = com.contacts,
-                            Telphone = com.telphone,Mobile = com.mobile,Remark = com.remark,UName = UserName};
-            int result = DbBase.UserDB.Execute(sqlCommandText,args);
-            if(result <= 0)
-            {
-                s = -3003;
-            }
-            else
-            {
-                LogComm.InsertUserLog("新增公司资料", "company", "新增公司" + com.name ,UserName, Company, DateTime.Now);
-                string wheresql = "select id,name,enable,address,email,typelist,contacts,telphone,mobile,remark from company where name ='" + com.name + "'" ;
-                var u = DbBase.UserDB.Query<CompanySingle>(wheresql).AsList();
-                if (u.Count > 0)
-                {
-                    CacheBase.Set<CompanySingle>(u[0].id.ToString(), u[0]);
+            var result = new DataResult(1,null);   
+            using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
+                try{
+                    string sqlCommandText = @"INSERT INTO company(name,enable,address,email,typelist,contacts,telphone,mobile,remark,creator) VALUES(
+                            @Name,
+                            @Enable,
+                            @Address,
+                            @Email,
+                            @Typelist,
+                            @Contacts,
+                            @Telphone,
+                            @Mobile,
+                            @Remark,
+                            @UName
+                        )";
+                    var args = new {Name = com.name,Enable=com.enable,Address = com.address,Email = com.email,Typelist = com.typelist,Contacts = com.contacts,
+                                    Telphone = com.telphone,Mobile = com.mobile,Remark = com.remark,UName = UserName};
+                    int count =conn.Execute(sqlCommandText,args);
+                    if(count <= 0)
+                    {
+                        result.s = -3003;
+                    }
+                    else
+                    {
+                        LogComm.InsertUserLog("新增公司资料", "company", "新增公司" + com.name ,UserName, Company, DateTime.Now);
+                        string wheresql = "select id,name,enable,address,email,typelist,contacts,telphone,mobile,remark from company where name ='" + com.name + "'" ;
+                        var u = conn.Query<CompanySingle>(wheresql).AsList();
+                        if (u.Count > 0)
+                        {
+                            CacheBase.Set<CompanySingle>(u[0].id.ToString(), u[0]);
+                        }
+                    }        
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
                 }
-            }
-            return new DataResult(s,"");
+            } 
+            return  result;
         }
         public static DataResult UpdateCompany(CompanySingle com,string UserName,string Company)
         {
-            int s = 1;
-            string contents = string.Empty;
-            string wheresql = "select id,name,enable,address,email,typelist,contacts,telphone,mobile,remark from company where id =" + com.id;
-            var u = DbBase.UserDB.Query<CompanySingle>(wheresql).AsList();
-            if(com.name != u[0].name)
-            {
-                contents = contents + "公司名称" + ":" +u[0].name + "=>" + com.name + ";";
-            }
-            if(com.enable != u[0].enable)
-            {
-                contents = contents + "启用状态" + ":" +u[0].enable + "=>" + com.enable + ";";
-            }
-            if(com.address != u[0].address)
-            {
-                contents = contents + "公司地址" + ":" +u[0].address + "=>" + com.address + ";";
-            }
-            if(com.email != u[0].email)
-            {
-                contents = contents + "公司邮箱" + ":" +u[0].email + "=>" + com.email + ";";
-            }
-            if(com.typelist != u[0].typelist)
-            {
-                contents = contents + "公司类型" + ":" +u[0].typelist + "=>" + com.typelist + ";";
-            }
-            if(com.contacts != u[0].contacts)
-            {
-                contents = contents + "公司联络人" + ":" +u[0].contacts + "=>" + com.contacts + ";";
-            }
-            if(com.telphone != u[0].telphone)
-            {
-                contents = contents + "固定电话" + ":" +u[0].telphone + "=>" + com.telphone + ";";
-            }
-            if(com.mobile != u[0].mobile)
-            {
-                contents = contents + "移动电话" + ":" +u[0].mobile + "=>" + com.mobile + ";";
-            }
-            if(com.remark != u[0].remark)
-            {
-                contents = contents + "备注" + ":" +u[0].remark + "=>" + com.remark + ";";
-            }
-            string uptsql = @"update company set name = @Name,enable = @Enable,address = @Address,email=@Email,typelist=@Typelist,contacts=@Contacts,telphone=@Telphone,mobile=@Mobile,remark=@Remark where id = @ID";
-            var args = new {Name = com.name,Enable=com.enable,Address = com.address,Email = com.email,Typelist = com.typelist,Contacts = com.contacts,
-                            Telphone = com.telphone,Mobile = com.mobile,Remark = com.remark,ID = com.id};
-
-            int count = DbBase.UserDB.Execute(uptsql,args);
-            if(count<=0)
-            {
-                s= -3003;
-            }
-            else
-            {
-                LogComm.InsertUserLog("修改公司资料", "company", contents, UserName, Company, DateTime.Now);               
-                CacheBase.Set<CompanySingle>(com.id.ToString(), com);
-            }
-            return new DataResult(s,"");
+            var result = new DataResult(1,null);  
+            string contents = string.Empty; 
+            using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
+                try{
+                    string wheresql = "select id,name,enable,address,email,typelist,contacts,telphone,mobile,remark from company where id =" + com.id;
+                    var u = conn.Query<CompanySingle>(wheresql).AsList();
+                    if(com.name != u[0].name)
+                    {
+                        contents = contents + "公司名称" + ":" +u[0].name + "=>" + com.name + ";";
+                    }
+                    if(com.enable != u[0].enable)
+                    {
+                        contents = contents + "启用状态" + ":" +u[0].enable + "=>" + com.enable + ";";
+                    }
+                    if(com.address != u[0].address)
+                    {
+                        contents = contents + "公司地址" + ":" +u[0].address + "=>" + com.address + ";";
+                    }
+                    if(com.email != u[0].email)
+                    {
+                        contents = contents + "公司邮箱" + ":" +u[0].email + "=>" + com.email + ";";
+                    }
+                    if(com.typelist != u[0].typelist)
+                    {
+                        contents = contents + "公司类型" + ":" +u[0].typelist + "=>" + com.typelist + ";";
+                    }
+                    if(com.contacts != u[0].contacts)
+                    {
+                        contents = contents + "公司联络人" + ":" +u[0].contacts + "=>" + com.contacts + ";";
+                    }
+                    if(com.telphone != u[0].telphone)
+                    {
+                        contents = contents + "固定电话" + ":" +u[0].telphone + "=>" + com.telphone + ";";
+                    }
+                    if(com.mobile != u[0].mobile)
+                    {
+                        contents = contents + "移动电话" + ":" +u[0].mobile + "=>" + com.mobile + ";";
+                    }
+                    if(com.remark != u[0].remark)
+                    {
+                        contents = contents + "备注" + ":" +u[0].remark + "=>" + com.remark + ";";
+                    }
+                    string uptsql = @"update company set name = @Name,enable = @Enable,address = @Address,email=@Email,typelist=@Typelist,contacts=@Contacts,telphone=@Telphone,mobile=@Mobile,remark=@Remark where id = @ID";
+                    var args = new {Name = com.name,Enable=com.enable,Address = com.address,Email = com.email,Typelist = com.typelist,Contacts = com.contacts,
+                                    Telphone = com.telphone,Mobile = com.mobile,Remark = com.remark,ID = com.id};
+                    int count = conn.Execute(uptsql,args);
+                    if(count<=0)
+                    {
+                        result.s= -3003;
+                    }
+                    else
+                    {
+                        LogComm.InsertUserLog("修改公司资料", "company", contents, UserName, Company, DateTime.Now);               
+                        CacheBase.Set<CompanySingle>(com.id.ToString(), com);
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return  result;
         }
     }
 }
