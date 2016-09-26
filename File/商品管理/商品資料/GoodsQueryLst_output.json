@@ -1,0 +1,32 @@
+{
+    "s": 1,
+    "d": {
+        "DataCount": 603,
+        "PageCount": 201,
+        "GoodsLst": [
+            {
+                "GoodsCode": null,
+                "GoodsName": null,
+                "KName": null,
+                "Brand": null,
+                "Type": 0
+            },
+            {
+                "GoodsCode": "50201",
+                "GoodsName": "50201",
+                "KName": "",
+                "Brand": "",
+                "Type": 0
+            },
+            {
+                "GoodsCode": "50211",
+                "GoodsName": "50211",
+                "KName": "",
+                "Brand": "",
+                "Type": 0
+            }
+        ],
+        "SkuLst": null
+    },
+    "m": ""
+}
