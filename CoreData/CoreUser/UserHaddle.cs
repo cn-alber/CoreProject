@@ -4,6 +4,8 @@ using System.Text.RegularExpressions;
 using CoreModels;
 using CoreModels.XyUser;
 using Dapper;
+using MySql.Data.MySqlClient;
+using System;
 
 namespace CoreData.CoreUser
 {
@@ -241,26 +243,28 @@ namespace CoreData.CoreUser
             return new DataResult(s, null);
         }
 
-        public static DataResult editPwd(string uid, string oldp, string newp, string reNewPwd)
+        public static DataResult editPwd(string uid, string oldp, string newp)
         {
-            int s = 1;
-            string regexstr = @".{6,18}";
-            if (string.IsNullOrEmpty(oldp)) { s = -2006; }
-            if (string.IsNullOrEmpty(newp)) { s = -2012; }
-            if (!Regex.IsMatch(newp, regexstr)) { s = -2007; }
-            if (newp != reNewPwd) { s = 2010; }
-            if (s == 1)
-            {
+      
+            var reslut = new DataResult(2001,null);
+            using(var conn = new MySqlConnection(DbBase.UserConnectString)){
+
                 try
                 {
-                    int rnt = DbBase.UserDB.Execute("UPDATE `user` SET `user`.`PassWord`= @newp WHERE `user`.ID = @uid AND `user`.`PassWord` = @p ",
-                                                new { newp = newp, uid = int.Parse(uid), p = oldp });
-                    if (rnt == 0) s = -2002;
+                    string sql = "UPDATE `user` SET `user`.`PassWord`= '"+newp+"' WHERE `user`.ID = "+uid+" AND `user`.`PassWord` = '"+oldp+"';";
+                    int rnt = DbBase.UserDB.Execute(sql);
+                    if (rnt == 0) reslut.s = -2002;
                 }
-                catch { s = -2002; }
+                catch(Exception ex) {
+                     reslut.s = -1;
+                     reslut.d= ex.Message; 
+                     conn.Dispose(); 
+                     }
             }
 
-            return new DataResult(s, null);
+
+
+            return reslut;
         }
     }
 

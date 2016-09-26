@@ -539,20 +539,92 @@ namespace CoreDate.CoreComm
                 {
                     var current = GetSysesType(type.ToString()).d as print_sys_types;
                     string sql = "";
+                    int rnt =0;
                     if(current!=null){ //更新
-                        sql = "UPDATE";
-
-
+                        sql = "UPDATE print_sys_types SET "+
+                                "print_sys_types.emu_data = '"+emu_data.ToString()+"',"+
+                                "print_sys_types.`name` = '"+name+"',"+
+                                "print_sys_types.presets = '"+presets.ToString()+"',"+
+                                "print_sys_types.setting = '"+setting.ToString()+"' WHERE print_sys_types.type = "+type.ToString();
+                        rnt = conn.Execute(sql);
+                        if(rnt>0){
+                            result.s= 4006;
+                        }else{
+                            result.s = -4018;
+                        }
                     }else{ //新增
-                        
+                        sql = "INSERT INTO print_sys_types( print_sys_types.type,print_sys_types.emu_data,print_sys_types.`name`,print_sys_types.presets,print_sys_types.setting)"+
+                                                   "VALUES("+type.ToString()+",'"+emu_data.ToString()+"','"+name+"','"+presets.ToString()+"','"+setting.ToString()+"');";
+                        rnt = conn.Execute(sql);
+                        if(rnt>0){
+                            result.s= 4005;
+                        }else{
+                            result.s = -4017;
+                        }
                     }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
 
-
-
-
-
-        
-
+        /// <summary>
+		/// 保存系统模板 print_syses
+		/// </summary>
+        public static DataResult saveSyses(int sys_id, string type,dynamic state, string name){
+            var result = new DataResult(1,null);
+            if(GetSysesType(type).d == null){ result.s=-4001;  return result;}
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                   
+                    var tpl = state;
+                    var setting = new{
+                        pageW = state.setting.pageW,
+                        pageH = state.setting.pageH
+                    };
+                    int rnt = 0;
+                    string sql = "";
+                    if (sys_id > 0){//更新
+                        sql = "UPDATE print_syses SET print_syses.`name` = '' ,"+
+                                     "print_syses.setting = '',"+
+                                     "print_syses.tpl_data = '',"+
+                                     "print_syses.type = '',"+
+                                     "print_syses.mtime = NOW() "+
+                                     "WHERE print_syses.id = 1;";
+                        rnt = conn.Execute(sql);
+                        if (rnt>0) {
+                            result.d = new 
+                            {
+                                sys_id = sys_id,
+                            };
+                            result.s = 4008;
+                        }else
+                        {
+                            result.s = -4020;
+                        }
+                    }
+                    else {
+                         sql="INSERT INTO print_syses(print_syses.type,print_syses.`name`,print_syses.setting,print_syses.tpl_data,print_syses.mtime)"+
+                             "VALUES("+type+",'"+name+"','"+setting.ToString()+"','"+tpl.ToString()+"',NOW());"+
+                             "SELECT LAST_INSERT_ID() as lastid;";
+                        sys_id = conn.Query<int>(sql).AsList()[0];                        
+                        if (rnt>0) {
+                            result.d = new
+                            {
+                                sys_id = sys_id,
+                            };
+                            result.s = 4007;
+                        }else
+                        {
+                            result.s = -4019;
+                        }
+                    }                    
                 }
                 catch (Exception e)
                 {

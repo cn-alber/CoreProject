@@ -99,6 +99,21 @@ namespace CoreWebApi.Print
             var m = PrintHaddle.saveSysesType(type,name,presets,emu_data,setting); 
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
+        #endregion
+
+        #region 保存系统模板
+        [HttpPostAttribute("/core/print/tpl/savesys")]
+        public ResponseResult savesyses([FromBodyAttribute]JObject lo)
+        {                   
+            if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4009, null, "Print");}
+            string type = lo["type"].ToString();            
+            string name = lo["name"].ToString();            
+            int  sys_id = string.IsNullOrEmpty(lo["sys_id"].ToString())?0 :int.Parse(lo["sys_id"].ToString());
+            var state = lo["state"];
+              
+            var m = PrintHaddle.saveSyses(sys_id, type,state,name );
+            return CoreResult.NewResponse(m.s, m.d, "Print");
+        }
 
 
         #endregion

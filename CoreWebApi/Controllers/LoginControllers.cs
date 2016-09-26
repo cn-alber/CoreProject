@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using CoreData.CoreUser;
 using CoreModels.XyUser;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace CoreWebApi
 {
@@ -134,11 +135,23 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/account/password")]    
         public ResponseResult  editpassword([FromBodyAttribute]JObject lo   )
         {
+            var response = CoreResult.NewResponse(1,null, "Indentity");
             string oldPwd = lo["oldPwd"].ToString();
             string newPwd = lo["newPwd"].ToString();
             string reNewPwd = lo["reNewPwd"].ToString();
-            var m = UserHaddle.editPwd(GetUid(),oldPwd,newPwd,reNewPwd);
-            return CoreResult.NewResponse(m.s,m.d, "Basic");
+
+            string regexstr = @".{6,18}";
+            if (string.IsNullOrEmpty(oldPwd)) { response.s = -2006; return response; }
+            if (string.IsNullOrEmpty(newPwd)) { response.s = -2012; return response; }
+            if (!Regex.IsMatch(newPwd, regexstr)) { response.s = -2007;  return response;}
+            if (newPwd != reNewPwd) { response.s = 2010; return response; }
+            
+            var m = UserHaddle.editPwd(GetUid(),GetMD5(oldPwd, "Xy@."),GetMD5(newPwd, "Xy@."));
+            response.s = m.s;
+            response.d =m.d;
+            return response;
+            //return CoreResult.NewResponse(m.s,m.d, "Indentity");
+
         }
     }
 }
