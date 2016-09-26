@@ -15,11 +15,11 @@ namespace CoreDate.CoreComm
          /// <summary>
 		/// 获取print_sys_types
 		/// </summary>
-        public static DataResult GetSysesType(string type){
+        public static DataResult GetSysesType(string id){
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try{
-                    var list = conn.Query<print_sys_types>("SELECT * FROM print_sys_types as a WHERE  a.deleted = FALSE AND a.type = "+type).AsList()[0];                                       
+                    var list = conn.Query<print_sys_types>("SELECT * FROM print_sys_types as a WHERE  a.deleted = FALSE AND a.id = "+id).AsList()[0];                                       
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
@@ -531,13 +531,13 @@ namespace CoreDate.CoreComm
         /// <summary>
 		/// 保存预设系统模板
 		/// </summary>
-        public static DataResult saveSysesType(int type,string name,dynamic presets,dynamic emu_data,dynamic setting){
+        public static DataResult saveSysesType(int id,string name,dynamic presets,dynamic emu_data,dynamic setting){
 
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    var current = GetSysesType(type.ToString()).d as print_sys_types;
+                    var current = GetSysesType(id.ToString()).d as print_sys_types;
                     string sql = "";
                     int rnt =0;
                     if(current!=null){ //更新
@@ -545,19 +545,34 @@ namespace CoreDate.CoreComm
                                 "print_sys_types.emu_data = '"+emu_data.ToString()+"',"+
                                 "print_sys_types.`name` = '"+name+"',"+
                                 "print_sys_types.presets = '"+presets.ToString()+"',"+
-                                "print_sys_types.setting = '"+setting.ToString()+"' WHERE print_sys_types.type = "+type.ToString();
+                                "print_sys_types.setting = '"+setting.ToString()+"' WHERE print_sys_types.id = "+id.ToString();
                         rnt = conn.Execute(sql);
                         if(rnt>0){
                             result.s= 4006;
+                            result.d = new {
+                                id = id,
+                                name = name,
+                                type = current.type
+                            };
                         }else{
                             result.s = -4018;
                         }
                     }else{ //新增
+                        sql = "SELECT MAX(print_sys_types.type) FROM print_sys_types;";
+                        int type = conn.Query<int>(sql).AsList()[0]+1;
                         sql = "INSERT INTO print_sys_types( print_sys_types.type,print_sys_types.emu_data,print_sys_types.`name`,print_sys_types.presets,print_sys_types.setting)"+
-                                                   "VALUES("+type.ToString()+",'"+emu_data.ToString()+"','"+name+"','"+presets.ToString()+"','"+setting.ToString()+"');";
-                        rnt = conn.Execute(sql);
+                                                   "VALUES("+type.ToString()+",'"+emu_data.ToString()+"','"+name+"','"+presets.ToString()+"','"+setting.ToString()+"');"+
+                                                   "SELECT LAST_INSERT_ID() as lastid;";
+                        rnt = conn.Query<int>(sql).AsList()[0];                                               
+                        conn.Execute("UPDATE print_sys_types SET print_sys_types.type = "+type+" WHERE print_sys_types.id = "+rnt.ToString());                        
+                        
                         if(rnt>0){
                             result.s= 4005;
+                            result.d = new{
+                                id = rnt,
+                                name = name,
+                                type = type
+                            };
                         }else{
                             result.s = -4017;
                         }
@@ -612,12 +627,14 @@ namespace CoreDate.CoreComm
                     else {
                          sql="INSERT INTO print_syses(print_syses.type,print_syses.`name`,print_syses.setting,print_syses.tpl_data,print_syses.mtime)"+
                              "VALUES("+type+",'"+name+"','"+setting.ToString()+"','"+tpl.ToString()+"',NOW());"+
-                             "SELECT LAST_INSERT_ID() as lastid;";
-                        sys_id = conn.Query<int>(sql).AsList()[0];                        
+                             "SELECT LAST_INSERT_ID() as lastid;";                             
+                        rnt = conn.Query<int>(sql).AsList()[0];   
+      
+
                         if (rnt>0) {
                             result.d = new
                             {
-                                sys_id = sys_id,
+                                sys_id = rnt,
                             };
                             result.s = 4007;
                         }else

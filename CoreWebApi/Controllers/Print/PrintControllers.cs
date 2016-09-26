@@ -36,7 +36,7 @@ namespace CoreWebApi.Print
         #endregion
 
         #region 获取系统模板 print_syses
-        [HttpGetAttribute("/core/print/tpl/sys")]
+        [HttpGetAttribute("/core/print/tpl/sysestype")]
         public ResponseResult tplsys(string sys_id)
         {
             var m = PrintHaddle.tplSys(sys_id);
@@ -84,27 +84,61 @@ namespace CoreWebApi.Print
         #endregion
 
         #region 保存系统预设模板
-        [HttpPostAttribute("/core/print/tpl/savesysestype")]
-        public ResponseResult savesysestype([FromBodyAttribute]JObject lo)
+        [HttpPostAttribute("/core/print/tpl/createSysesType")]
+        public ResponseResult createSysesType([FromBodyAttribute]JObject lo)
         {
-           
-            if(string.IsNullOrEmpty(lo["type"].ToString())){ return CoreResult.NewResponse(-4012, null, "Print");}
+            //只有系统管理员才编辑新增
+            if(!GetRoleid().Equals("1") ){ return CoreResult.NewResponse(-4021, null, "Print");}                       
             if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4009, null, "Print");}
 
-            int type = int.Parse(lo["type"].ToString());            
+            //int id =lo["id"]!=null?int.Parse(lo["id"].ToString()):0;            
             string name = lo["name"].ToString();            
-            var presets = lo["presets"];
-            var emu_data = lo["emu_data"];
-            var setting = lo["setting"];            
-            var m = PrintHaddle.saveSysesType(type,name,presets,emu_data,setting); 
+            var presets = lo["presets"] !=null ? lo["presets"]:"";
+            var emu_data = lo["emu_data"] !=null ? lo["emu_data"]:"";
+            var setting = lo["setting"] !=null ? lo["setting"] :"";            
+            var m = PrintHaddle.saveSysesType(0,name,presets,emu_data,setting); 
+            return CoreResult.NewResponse(m.s, m.d, "Print");
+        }
+        #endregion
+
+        #region 编辑系统预设模板
+        [HttpPostAttribute("/core/print/tpl/modifySysesType")]
+        public ResponseResult modifySysesType([FromBodyAttribute]JObject lo)
+        {
+            //只有系统管理员才编辑新增
+            if(!GetRoleid().Equals("1") ){ return CoreResult.NewResponse(-4021, null, "Print");}                       
+            if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4009, null, "Print");}
+            if(string.IsNullOrEmpty(lo["id"].ToString())){ return CoreResult.NewResponse(-4009, null, "Print");}
+
+            int id =int.Parse(lo["id"].ToString());            
+            string name = lo["name"].ToString();            
+            var presets = lo["presets"] !=null ? lo["presets"]:"";
+            var emu_data = lo["emu_data"] !=null ? lo["emu_data"]:"";
+            var setting = lo["setting"] !=null ? lo["setting"] :"";            
+            var m = PrintHaddle.saveSysesType(id,name,presets,emu_data,setting); 
+            return CoreResult.NewResponse(m.s, m.d, "Print");
+        }
+        #endregion
+
+
+
+
+        #region 删除系统预设模板 print_sys_types 
+        [HttpPostAttribute("/core/print/tpl/deleteSysesType")]
+        public ResponseResult deleteSysesType([FromBodyAttribute]JObject lo)
+        {
+   
+            string ids =String.Join(",",lo["ids"]); 
+            var m = PrintHaddle.DelSysesTypeByID(ids); 
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
 
         #region 保存系统模板
-        [HttpPostAttribute("/core/print/tpl/savesys")]
+        [HttpPostAttribute("/core/print/tpl/savesyses")]
         public ResponseResult savesyses([FromBodyAttribute]JObject lo)
         {                   
+            if(!GetRoleid().Equals("1") ){ return CoreResult.NewResponse(-4022, null, "Print");}
             if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4009, null, "Print");}
             string type = lo["type"].ToString();            
             string name = lo["name"].ToString();            
@@ -114,20 +148,8 @@ namespace CoreWebApi.Print
             var m = PrintHaddle.saveSyses(sys_id, type,state,name );
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
-
-
         #endregion
 
-        #region 删除系统预设模板 print_sys_types 
-        [HttpPostAttribute("/core/print/tpl/delsysestype")]
-        public ResponseResult delsysestype([FromBodyAttribute]JObject lo)
-        {
-   
-            string ids =String.Join(",",lo["ids"]); 
-            var m = PrintHaddle.DelSysesTypeByID(ids); 
-            return CoreResult.NewResponse(m.s, m.d, "Print");
-        }
-        #endregion
 
         #region 删除系统模板 print_syses 
         [HttpPostAttribute("/core/print/tpl/delsyses")]

@@ -141,7 +141,7 @@ namespace CoreData.CoreUser
             var cname = "Refresh" + coid + roleid;
 
             //获取菜单缓存
-            //CacheBase.Remove(cname);
+            CacheBase.Remove(cname);
             var parent = CacheBase.Get<List<Refresh>>(cname);
             var parentRefresh = new List<Refresh>();
             
