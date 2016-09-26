@@ -87,10 +87,16 @@ namespace CoreWebApi.Print
         [HttpPostAttribute("/core/print/tpl/savesysestype")]
         public ResponseResult savesysestype([FromBodyAttribute]JObject lo)
         {
-   
-            string ids =String.Join(",",lo["ids"]); 
-            
-            var m = PrintHaddle.saveSysesType(); 
+           
+            if(string.IsNullOrEmpty(lo["type"].ToString())){ return CoreResult.NewResponse(-4012, null, "Print");}
+            if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4009, null, "Print");}
+
+            int type = int.Parse(lo["type"].ToString());            
+            string name = lo["name"].ToString();            
+            var presets = lo["presets"];
+            var emu_data = lo["emu_data"];
+            var setting = lo["setting"];            
+            var m = PrintHaddle.saveSysesType(type,name,presets,emu_data,setting); 
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
 

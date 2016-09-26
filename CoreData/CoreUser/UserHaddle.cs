@@ -42,27 +42,8 @@ namespace CoreData.CoreUser
             var s = 1;
             var cname = "role" + coid + roleid;
             var cu = new Role();
-            try
-            {
-                cu = CacheBase.Get<Role>(cname);
-
-            }
-            catch
-            {
-
-                var u = DbBase.UserDB.Query<Role>("select * from role where id = @rid and companyid = @coid", new { rid = roleid, coid = coid }).AsList();
-                if (u.Count == 0)
-                {
-                    s = -2003;
-                }
-                else
-                {
-                    cu = u[0];
-                    // CacheBase.Set<Role>(cname, cu);
-                }
-
-
-            }
+          
+            cu = CacheBase.Get<Role>(cname);     
             if (cu == null)
             {
                 var u = DbBase.UserDB.Query<Role>("select * from role where id = @rid and companyid = @coid", new { rid = roleid, coid = coid }).AsList();
@@ -159,24 +140,24 @@ namespace CoreData.CoreUser
 
             //获取菜单缓存
             //CacheBase.Remove(cname);
-            // var parent = CacheBase.Get<List<Refresh>>(cname);
-            // var parentRefresh = new List<Refresh>();
+            var parent = CacheBase.Get<List<Refresh>>(cname);
+            var parentRefresh = new List<Refresh>();
             
-            // if (parent == null)
-            // {
-            //     parent = GetRefresh(roleid, coid);
-            //     if (parent == null)
-            //     {
-            //         s = 2004;
-            //     }
-            //     else
-            //     {
+            if (parent == null)
+            {
+                parent = GetRefresh(roleid, coid);
+                if (parent == null)
+                {
+                    s = 2004;
+                }
+                else
+                {
            
-            //         CacheBase.Set<List<Refresh>>(cname, parent);        
-            //         //return new DataResult(s, reslut);                    
-            //     }                
-            // }
-            var parent = GetRefresh(roleid, coid);
+                    CacheBase.Set<List<Refresh>>(cname, parent);        
+                    //return new DataResult(s, reslut);                    
+                }                
+            }
+            //var parent = GetRefresh(roleid, coid);
             //CacheBase.Set<List<Refresh>>(cname, parent);
 
             var reslut = new {

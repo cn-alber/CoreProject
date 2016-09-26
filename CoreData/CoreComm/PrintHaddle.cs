@@ -11,7 +11,26 @@ namespace CoreDate.CoreComm
 {
     public static class PrintHaddle
     {
-        // DapperDbBase _dbBase;
+        
+         /// <summary>
+		/// 获取print_sys_types
+		/// </summary>
+        public static DataResult GetSysesType(string type){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{
+                    var list = conn.Query<print_sys_types>("SELECT * FROM print_sys_types as a WHERE  a.deleted = FALSE AND a.type = "+type).AsList()[0];                                       
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return result;
+        }
+
+
+
         #region 
         /// <summary>
 		/// 获取print_sys_types -> emu_data
@@ -512,12 +531,26 @@ namespace CoreDate.CoreComm
         /// <summary>
 		/// 保存预设系统模板
 		/// </summary>
-        public static DataResult saveSysesType(){
+        public static DataResult saveSysesType(int type,string name,dynamic presets,dynamic emu_data,dynamic setting){
 
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
+                    var current = GetSysesType(type.ToString()).d as print_sys_types;
+                    string sql = "";
+                    if(current!=null){ //更新
+                        sql = "UPDATE";
+
+
+                    }else{ //新增
+                        
+                    }
+
+
+
+
+
         
 
                 }
