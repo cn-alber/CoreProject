@@ -48,15 +48,6 @@ namespace CoreWebApi
         }
 
         [AllowAnonymous]
-        [HttpPostAttribute("/Core/Company/CompanyCheckExist")]
-        public ResponseResult CompanyCheckExist([FromBodyAttribute]JObject co)
-        {   
-            string name = co["ComName"].ToString();
-            var data = CompanyHaddle.IsComExist(name);
-            return CoreResult.NewResponse(data.s, data.d, "General"); 
-        }
-
-        [AllowAnonymous]
         [HttpPostAttribute("/Core/Company/UpdateCompany")]
         public ResponseResult UpdateCompamy([FromBodyAttribute]JObject co)
         {   
@@ -79,7 +70,7 @@ namespace CoreWebApi
             com.telphone = co["Telphone"].ToString();
             com.mobile = co["Mobile"].ToString();
             com.remark = co["Remark"].ToString();
-            string UserName = "系统管理员";//GetUname(); 
+            string UserName = GetUname(); 
             string Company = co["Company"].ToString();
             if(modifyFlag == "new")
             {

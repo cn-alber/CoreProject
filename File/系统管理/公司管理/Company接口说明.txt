@@ -44,14 +44,7 @@ OutPut: 成功：
 参考:input jason 文件:CompanyEnable_input.json
 参考:output jason 文件:CompanyEnable_output.json
 
-4.CompanyCheckExist() //检查公司资料是否已经存在，若已经存在，不允许新增
-路由:http://localhost:5000/Core/Company/CompanyCheckExist
-input：ComName  string 公司名称
-OutPut: true(存在)/false(不存在)
-参考:input jason 文件:CompanyCheckExist_input.json
-参考:output jason 文件:CompanyCheckExist_output.json
-
-5.UpdateCompamy() //保存公司基本资料
+4.UpdateCompamy() //保存公司基本资料
 路由:http://localhost:5000/Core/Company/UpdateCompany
 input:ModifyFlag    string    保存方式(new/edit)
       ID            int       公司id,若为new,赋值null
