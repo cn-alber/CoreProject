@@ -3,7 +3,6 @@ using CoreData.CoreUser;
 using Newtonsoft.Json.Linq;
 using CoreModels.XyCore;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Authorization;
 
 namespace CoreWebApi
 {
@@ -20,7 +19,7 @@ namespace CoreWebApi
             // var roleid = "1";
             // var coid = "1";
             var m = UserHaddle.GetRefreshList(roleid, coid,GetUname(),uid);
-            return CoreResult.NewResponse(m.s, m.d, "Basic");
+            return CoreResult.NewResponse(m.s, m.d, "Indentity");
         }
         
         [HttpPostAttribute("/core/profile/lock")]

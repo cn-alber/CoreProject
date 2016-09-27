@@ -12,6 +12,9 @@ using Newtonsoft.Json.Linq;
 
 namespace CoreWebApi.Print
 {
+    /// <summary>
+	/// 打印模块 - 系统模块相关 
+	/// </summary>
     [AllowAnonymous]
     public class PrintController : ControllBase
     {
@@ -36,7 +39,7 @@ namespace CoreWebApi.Print
         #endregion
 
         #region 获取系统模板 print_syses
-        [HttpGetAttribute("/core/print/tpl/sysestype")]
+        [HttpGetAttribute("/core/print/tpl/sys")]
         public ResponseResult tplsys(string sys_id)
         {
             var m = PrintHaddle.tplSys(sys_id);
@@ -83,15 +86,28 @@ namespace CoreWebApi.Print
         }
         #endregion
 
+        #region 获取系统预设模板 单条数据
+        [HttpGetAttribute("/core/print/tpl/sysesType")]
+        public ResponseResult sysestype(string id)
+        {
+            if(string.IsNullOrEmpty(id)){return CoreResult.NewResponse(-4023, null, "Print"); }
+            var m = PrintHaddle.GetSysesType(id); 
+            return CoreResult.NewResponse(m.s, m.d, "Print");
+        }
+        #endregion
+
+
         #region 保存系统预设模板
         [HttpPostAttribute("/core/print/tpl/createSysesType")]
         public ResponseResult createSysesType([FromBodyAttribute]JObject lo)
         {
             //只有系统管理员才编辑新增
-            if(!GetRoleid().Equals("1") ){ return CoreResult.NewResponse(-4021, null, "Print");}                       
-            if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4009, null, "Print");}
-
-            //int id =lo["id"]!=null?int.Parse(lo["id"].ToString()):0;            
+            if(!checkIsAdmin() ){ return CoreResult.NewResponse(-4021, null, "Print");}                       
+            if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4012, null, "Print");}
+            if(!isJson(lo["presets"].ToString(),lo["emu_data"].ToString(),lo["setting"].ToString())){
+                return CoreResult.NewResponse(-4024, null, "Print");
+            }
+                     
             string name = lo["name"].ToString();            
             var presets = lo["presets"] !=null ? lo["presets"]:"";
             var emu_data = lo["emu_data"] !=null ? lo["emu_data"]:"";
@@ -106,22 +122,23 @@ namespace CoreWebApi.Print
         public ResponseResult modifySysesType([FromBodyAttribute]JObject lo)
         {
             //只有系统管理员才编辑新增
-            if(!GetRoleid().Equals("1") ){ return CoreResult.NewResponse(-4021, null, "Print");}                       
-            if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4009, null, "Print");}
-            if(string.IsNullOrEmpty(lo["id"].ToString())){ return CoreResult.NewResponse(-4009, null, "Print");}
+            if(!checkIsAdmin()){ return CoreResult.NewResponse(-4021, null, "Print");}                       
+            if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4012, null, "Print");}
+            if(string.IsNullOrEmpty(lo["id"].ToString()))  { return CoreResult.NewResponse(-4023, null, "Print");}
+            if(!isJson(lo["presets"].ToString(),lo["emu_data"].ToString(),lo["setting"].ToString())){
+                return CoreResult.NewResponse(-4024, null, "Print");
+            }
 
             int id =int.Parse(lo["id"].ToString());            
             string name = lo["name"].ToString();            
             var presets = lo["presets"] !=null ? lo["presets"]:"";
             var emu_data = lo["emu_data"] !=null ? lo["emu_data"]:"";
-            var setting = lo["setting"] !=null ? lo["setting"] :"";            
+            var setting = lo["setting"] !=null ? lo["setting"] :""; 
+            
             var m = PrintHaddle.saveSysesType(id,name,presets,emu_data,setting); 
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
-
-
-
 
         #region 删除系统预设模板 print_sys_types 
         [HttpPostAttribute("/core/print/tpl/deleteSysesType")]
@@ -138,7 +155,7 @@ namespace CoreWebApi.Print
         [HttpPostAttribute("/core/print/tpl/savesyses")]
         public ResponseResult savesyses([FromBodyAttribute]JObject lo)
         {                   
-            if(!GetRoleid().Equals("1") ){ return CoreResult.NewResponse(-4022, null, "Print");}
+            if(!checkIsAdmin() ){ return CoreResult.NewResponse(-4022, null, "Print");}
             if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4009, null, "Print");}
             string type = lo["type"].ToString();            
             string name = lo["name"].ToString();            

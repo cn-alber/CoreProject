@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using CoreModels;
 using CoreModels.XyUser;
 using Dapper;
@@ -150,7 +149,7 @@ namespace CoreData.CoreUser
                 parent = GetRefresh(roleid, coid);
                 if (parent == null)
                 {
-                    s = 2004;
+                    s = -2004;
                 }
                 else
                 {
