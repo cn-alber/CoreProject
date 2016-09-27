@@ -55,8 +55,7 @@ namespace CoreWebApi.Print
         {
 
             printParam param = new printParam();
-            param.Filter = "type = "+type;
-            
+            param.Filter = "type = "+type;            
             param.PageIndex = Math.Max(Page,1);
             param.PageSize = Math.Max(PageSize,20);
             
@@ -68,8 +67,7 @@ namespace CoreWebApi.Print
         #region 获取类型预设
         [HttpGetAttribute("/core/print/tpl/type")]
         public ResponseResult tpltype(string type)
-        {
-            
+        {            
             var m = PrintHaddle.tplType(type);
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
@@ -79,8 +77,7 @@ namespace CoreWebApi.Print
         //与 /core/print/task/data 返回相同，不同地方引用，区分为两个路由
         [HttpGetAttribute("/core/print/tpl/emu_data")]
         public ResponseResult tplemu_data(string type)
-        {
-            
+        {            
             var m = PrintHaddle.taskData(type); 
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
@@ -111,7 +108,8 @@ namespace CoreWebApi.Print
             string name = lo["name"].ToString();            
             var presets = lo["presets"] !=null ? lo["presets"]:"";
             var emu_data = lo["emu_data"] !=null ? lo["emu_data"]:"";
-            var setting = lo["setting"] !=null ? lo["setting"] :"";            
+            var setting = lo["setting"] !=null ? lo["setting"] :"";   
+
             var m = PrintHaddle.saveSysesType(0,name,presets,emu_data,setting); 
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
@@ -143,8 +141,7 @@ namespace CoreWebApi.Print
         #region 删除系统预设模板 print_sys_types 
         [HttpPostAttribute("/core/print/tpl/deleteSysesType")]
         public ResponseResult deleteSysesType([FromBodyAttribute]JObject lo)
-        {
-   
+        {   
             string ids =String.Join(",",lo["ids"]); 
             var m = PrintHaddle.DelSysesTypeByID(ids); 
             return CoreResult.NewResponse(m.s, m.d, "Print");
@@ -171,8 +168,7 @@ namespace CoreWebApi.Print
         #region 删除系统模板 print_syses 
         [HttpPostAttribute("/core/print/tpl/delsyses")]
         public ResponseResult delsyses([FromBodyAttribute]JObject lo)
-        {
-   
+        {   
             string ids =String.Join(",",lo["ids"]); 
             var m = PrintHaddle.DelSysesByID(ids); 
             return CoreResult.NewResponse(m.s, m.d, "Print");

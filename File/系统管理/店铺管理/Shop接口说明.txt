@@ -95,3 +95,15 @@ function说明
     參考：
         input json 文件：無
         output json 文件：OfflineShopLst_output.json
+
+7.TokenExpired //店铺token过期        
+    方法：POST
+    路由：http://localhost:5000/Core/Shop/TokenExpired
+    参数：
+    InPut: NULL
+    OutPut:
+        成功：返回调用结果    true/false
+        失败：返回错误信息
+    參考：
+        input json 文件：無
+        output json 文件：tokenexpried_output.json

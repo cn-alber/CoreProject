@@ -5,7 +5,7 @@ using CoreData.CoreComm;
 using CoreModels.XyComm;
 using System.Collections.Generic;
 using CoreModels;
-namespace CoreWebApi
+namespace CoreWebApi.Base
 {
     [AllowAnonymous]
     public class ShopController:ControllBase
@@ -46,8 +46,9 @@ namespace CoreWebApi
             string Company = obj["Company"].ToString(); 
             string UserName = obj["UserName"].ToString(); 
             bool Enable = obj["Enable"].ToString().ToUpper()=="TRUE"?true:false;
-
-            var res = ShopHaddle.UptShopEnable(IDsDic,Company,UserName,Enable);
+            var Coid = GetCoid();
+            
+            var res = ShopHaddle.UptShopEnable(IDsDic,Company,UserName,Enable,Coid);
             return CoreResult.NewResponse(res.s,res.d,"General");
         }
 
@@ -103,6 +104,20 @@ namespace CoreWebApi
              var res = ShopHaddle.GetOfflineShopLst(CoID);
              return CoreResult.NewResponse(res.s,res.d,"General");
          }
+
+         [HttpPostAttribute("/Core/Shop/TokenExpired")]
+         public ResponseResult TokenExpired([FromBodyAttribute]JObject obj)
+         {
+             string shopid = obj["shopid"].ToString();
+             string coid = GetCoid();
+             var res = ShopHaddle.TokenExpired(shopid,coid);
+             return CoreResult.NewResponse(res.s,res.d,"General");
+         }
+
+
+
+
+
 
 
     }
