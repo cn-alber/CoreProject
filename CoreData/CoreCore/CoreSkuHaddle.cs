@@ -1,6 +1,6 @@
 using CoreModels;
 using Dapper;
-// using System.Collections.Generic;
+using System.Collections.Generic;
 // using System.Linq;
 using System;
 using System.Text;
@@ -187,6 +187,117 @@ namespace CoreData.CoreCore
 
             return res;
 
+        }
+        #endregion
+
+        #region 商品管理 - 删除商品 - 修改Delete标记
+        public static DataResult DelGoods(List<string> GoodsLst, bool ISDelete, string UserName, int CoID)
+        {
+            var res = new DataResult(1, null);
+            string Deleter = UserName;
+            DateTime? DeleteDate = DateTime.Now;
+            DateTime? DateNull = null;
+
+            try
+            {
+                string UptSql = @"UPDATE coresku
+                                    SET IsDelete = @ISDelete,
+                                    Deleter = @Deleter,
+                                    DeleteDate = @DeleteDate
+                                    WHERE CoID = @CoID
+                                    AND GoodsCode IN @GoodsLst  ";
+                var p = new DynamicParameters();
+                p.Add("@CoID", CoID);
+                p.Add("@IsDelete", ISDelete);
+                p.Add("@GoodsLst", GoodsLst);
+                if (!ISDelete)
+                {
+                    Deleter = string.Empty;
+                    DeleteDate = DateNull;
+                }
+                p.Add("@Deleter", Deleter);
+                p.Add("@DeleteDate", DeleteDate);
+
+                int count = DbBase.CoreDB.Execute(UptSql, p);
+                if (count <= 0)
+                {
+                    res.s = -3004;
+                }
+            }
+            catch (Exception e)
+            {
+                res.s = -1;
+                res.d = e.Message;
+            }
+            return res;
+        }
+        #endregion
+
+        #region 商品管理 - 删除Sku商品 - 修改Delete标记
+        public static DataResult DelSku(string Sku, bool ISDelete, string UserName, int CoID)
+        {
+            var res = new DataResult(1, null);
+            string Deleter = UserName;
+            DateTime? DeleteDate = DateTime.Now;
+            DateTime? DateNull = null;
+
+            try
+            {
+                string UptSql = @"UPDATE coresku
+                                    SET IsDelete = @ISDelete,
+                                    Deleter = @Deleter,
+                                    DeleteDate = @DeleteDate
+                                    WHERE CoID = @CoID
+                                    AND SkuID = @Sku  ";
+                var p = new DynamicParameters();
+                p.Add("@CoID", CoID);
+                p.Add("@IsDelete", ISDelete);
+                p.Add("@Sku", Sku);
+                if (!ISDelete)
+                {
+                    Deleter = string.Empty;
+                    DeleteDate = DateNull;
+                }
+                p.Add("@Deleter", Deleter);
+                p.Add("@DeleteDate", DeleteDate);
+
+                int count = DbBase.CoreDB.Execute(UptSql, p);
+                if (count <= 0)
+                {
+                    res.s = -3004;
+                }
+            }
+            catch (Exception e)
+            {
+                res.s = -1;
+                res.d = e.Message;
+            }
+            return res;
+        }
+        #endregion
+
+        #region 清除商品回收站
+        public static DataResult DelGoodsRec(List<string> GoodsLst, int CoID)
+        {
+            var res = new DataResult(1, null);
+            try
+            {
+                string strsql = "delete from coresku where CoID = @CoID and GoodsCode in @GoodsLst and IsDelete=1";
+                var p = new DynamicParameters();
+                p.Add("@CoID", CoID);
+                p.Add("@GoodsLst", GoodsLst);
+                int count = DbBase.CoreDB.Execute(strsql, p);
+                if (count <= 0)
+                {
+                    res.s = -3004;
+                }
+            }
+            catch (Exception e)
+            {
+                res.s = -1;
+                res.d = e.Message;
+            }
+            return res;
         }
         #endregion
     }
