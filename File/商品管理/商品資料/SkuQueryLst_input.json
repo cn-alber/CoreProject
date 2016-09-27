@@ -1,0 +1,13 @@
+{
+"CoreSkuParam":{
+"Type":0,
+"GoodsCode":"NJ64F50341",
+"GoodsName":null,
+"Filter",
+"Enable":"true",
+"PageIndex":"1",
+"PageSize":"3",
+"SortField":"GoodsCode",
+"SortDirection":"ASC"
+}
+}

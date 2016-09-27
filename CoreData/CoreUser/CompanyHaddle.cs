@@ -186,7 +186,7 @@ namespace CoreData.CoreUser
         }      
         public static DataResult InsertCompany(CompanySingle com,string UserName,string Company)
         {
-            var result = new DataResult(1,null);   
+            var result = new DataResult(1,"资料新增成功!");   
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{
                     string sqlCommandText = @"INSERT INTO company(name,enable,address,email,typelist,contacts,telphone,mobile,remark,creator) VALUES(
@@ -228,7 +228,7 @@ namespace CoreData.CoreUser
         }
         public static DataResult UpdateCompany(CompanySingle com,string UserName,string Company)
         {
-            var result = new DataResult(1,null);  
+            var result = new DataResult(1,"资料更新成功!");  
             string contents = string.Empty; 
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{

@@ -1,0 +1,47 @@
+{
+    "s": 1,
+    "d": {
+        "DataCount": 9,
+        "PageCount": 3,
+        "GoodsLst": null,
+        "SkuLst": [
+            {
+                "GoodsCode": "NJ64F50341",
+                "GoodsName": "NJ64F50341",
+                "SkuID": "NJ64F50341194170",
+                "SkuName": "南极人 男士中长款商务立领毛呢大衣 2014秋冬新品首发 灰色",
+                "Norm": "灰色;170/88A(M)",
+                "CostPrice": 0.0,
+                "SalePrice": 199.0,
+                "Enable": true,
+                "Creator": "",
+                "CreateDate": "2016-05-18T12:34:11"
+            },
+            {
+                "GoodsCode": "NJ64F50341",
+                "GoodsName": "NJ64F50341",
+                "SkuID": "NJ64F50341194175",
+                "SkuName": "南极人 男士中长款商务立领毛呢大衣 2014秋冬新品首发 灰色",
+                "Norm": "灰色;175/92A(L)",
+                "CostPrice": 0.0,
+                "SalePrice": 199.0,
+                "Enable": true,
+                "Creator": "",
+                "CreateDate": "2016-05-18T12:34:11"
+            },
+            {
+                "GoodsCode": "NJ64F50341",
+                "GoodsName": "NJ64F50341",
+                "SkuID": "NJ64F50341194180",
+                "SkuName": "南极人 男士中长款商务立领毛呢大衣 2014秋冬新品首发 灰色",
+                "Norm": "灰色;180/96A(XL)",
+                "CostPrice": 0.0,
+                "SalePrice": 199.0,
+                "Enable": true,
+                "Creator": "",
+                "CreateDate": "2016-05-18T12:34:11"
+            }
+        ]
+    },
+    "m": ""
+}

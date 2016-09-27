@@ -135,21 +135,19 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/account/password")]    
         public ResponseResult  editpassword([FromBodyAttribute]JObject lo   )
         {
-            var response = CoreResult.NewResponse(1,null, "Indentity");
+           
             string oldPwd = lo["oldPwd"].ToString();
             string newPwd = lo["newPwd"].ToString();
             string reNewPwd = lo["reNewPwd"].ToString();
 
             string regexstr = @".{6,18}";
-            if (string.IsNullOrEmpty(oldPwd)) { response.s = -2006; return response; }
-            if (string.IsNullOrEmpty(newPwd)) { response.s = -2012; return response; }
-            if (!Regex.IsMatch(newPwd, regexstr)) { response.s = -2007;  return response;}
-            if (newPwd != reNewPwd) { response.s = 2010; return response; }
+            if (string.IsNullOrEmpty(oldPwd))     { return CoreResult.NewResponse(-2006,null, "Indentity");; }
+            if (string.IsNullOrEmpty(newPwd))     { return CoreResult.NewResponse(-2012,null, "Indentity");; }
+            if (!Regex.IsMatch(newPwd, regexstr)) { return CoreResult.NewResponse(-2007,null, "Indentity");;}
+            if (newPwd != reNewPwd)               { return CoreResult.NewResponse(-2010,null, "Indentity");; }
             
             var m = UserHaddle.editPwd(GetUid(),GetMD5(oldPwd, "Xy@."),GetMD5(newPwd, "Xy@."));
-            response.s = m.s;
-            response.d =m.d;
-            return response;
+            return CoreResult.NewResponse(m.s,m.d, "Indentity");;
             //return CoreResult.NewResponse(m.s,m.d, "Indentity");
 
         }

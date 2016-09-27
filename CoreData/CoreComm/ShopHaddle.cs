@@ -6,8 +6,7 @@ using System.Linq;
 using System;
 using System.Text;
 using CoreModels.XyComm;
-
-
+using MySql.Data.MySqlClient;
 
 namespace CoreData.CoreComm
 {
@@ -18,94 +17,134 @@ namespace CoreData.CoreComm
         ///查询店铺资料
         ///<summary>
         public static DataResult GetShopAll(ShopParam IParam)
-        {
-            var s = 1;
-            string wheresql = "where 1=1";
-            if (IParam.CoID != 1)
-            {
+        {            
+            var result = new DataResult(1, null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{
+                    string wheresql = "where 1=1";
+                    if (IParam.CoID != 1)
+                    {
 
-                wheresql = wheresql + " AND CoID=" + IParam.CoID;
+                        wheresql = wheresql + " AND CoID=" + IParam.CoID;
+                    }
+                    if (!string.IsNullOrEmpty(IParam.Enable) && IParam.Enable.ToUpper() != "ALL")//是否启用
+                    {
+                        wheresql = wheresql + " AND Enable = " + (IParam.Enable.ToUpper() == "TRUE" ? true : false);
+                    }
+                    if (!string.IsNullOrEmpty(IParam.Filter))//过滤条件
+                    {
+                        wheresql = wheresql +
+                        " AND ( ShopName LIKE '%" + IParam.Filter +
+                        "%' OR ShopSite LIKE '%" + IParam.Filter +
+                        "%' OR Creator LIKE '%" + IParam.Filter + "%')";
+                    }
+                    if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
+                    {
+                        wheresql = wheresql + " ORDER BY " + IParam.SortField + " " + IParam.SortDirection;
+                    }
+                    wheresql = "select ID,ShopName,Enable,ShopSite,ShopUrl,Shopkeeper,UpdateSku,DownGoods,UpdateWayBill,TelPhone,SendAddress,CreateDate,Istoken from Shop " + wheresql;
+                    var ShopLst = conn.Query<ShopQuery>(wheresql).AsList();
+                    IParam.DataCount = ShopLst.Count;
+                    decimal pagecnt = Math.Ceiling(decimal.Parse(IParam.DataCount.ToString()) / decimal.Parse(IParam.PageSize.ToString()));
+                    IParam.PageCount = Convert.ToInt32(pagecnt);
+                    int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
+                    wheresql = wheresql + " limit " + dataindex.ToString() + " ," + IParam.PageSize;//分页            
+                    IParam.ShopLst = conn.Query<ShopQuery>(wheresql).AsList();
+                    result.d = IParam;
+                }catch(Exception e){
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+                
             }
-            if (!string.IsNullOrEmpty(IParam.Enable) && IParam.Enable.ToUpper() != "ALL")//是否启用
-            {
-                wheresql = wheresql + " AND Enable = " + (IParam.Enable.ToUpper() == "TRUE" ? true : false);
-            }
-            if (!string.IsNullOrEmpty(IParam.Filter))//过滤条件
-            {
-                wheresql = wheresql +
-                " AND ( ShopName LIKE '%" + IParam.Filter +
-                "%' OR ShopSite LIKE '%" + IParam.Filter +
-                "%' OR Creator LIKE '%" + IParam.Filter + "%')";
-            }
-            if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
-            {
-                wheresql = wheresql + " ORDER BY " + IParam.SortField + " " + IParam.SortDirection;
-            }
-            wheresql = "select ID,ShopName,Enable,ShopSite,ShopUrl,Shopkeeper,UpdateSku,DownGoods,UpdateWayBill,TelPhone,SendAddress,CreateDate,Istoken from Shop " + wheresql;
-            var ShopLst = CoreData.DbBase.CommDB.Query<ShopQuery>(wheresql).AsList();
-            IParam.DataCount = ShopLst.Count;
-            decimal pagecnt = Math.Ceiling(decimal.Parse(IParam.DataCount.ToString()) / decimal.Parse(IParam.PageSize.ToString()));
-            IParam.PageCount = Convert.ToInt32(pagecnt);
-            int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
-            wheresql = wheresql + " limit " + dataindex.ToString() + " ," + IParam.PageSize;//分页            
-            IParam.ShopLst = CoreData.DbBase.CommDB.Query<ShopQuery>(wheresql).AsList();
-            return new DataResult(s, IParam);
+            return result;
         }
         ///<summary>
         ///查询单笔店铺资料
         ///<summary>
         public static DataResult ShopQuery(string coid, string shopid)
         {
-            var s = 1;
+            var result = new DataResult(1,null);
             var sname = "shop" + coid + shopid;
-            Shop su = null;
-            // var su = CacheBase.Get<Shop>(sname);
-            // if(su==null)
-            // {
-            var u = DbBase.CommDB.Query<Shop>("select * from Shop where id = @sid and CoID = @coid", new { sid = shopid, coid = coid }).AsList();
-            if (u.Count == 0)
+
+            var su = CacheBase.Get<Shop>(sname);
+            if(su==null)
             {
-                s = -3001;
+                using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                    try
+                    {
+                        var u = DbBase.CommDB.Query<Shop>("select * from Shop where id = @sid and CoID = @coid", new { sid = shopid, coid = coid }).AsList();
+                        if (u.Count == 0)
+                        {
+                            result.s = -3001;
+                        }
+                        else
+                        {
+                            su = u[0];
+                            result.d = su;
+                            CacheBase.Set<Shop>(sname,su);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        result.s = -1;
+                        result.d= e.Message; 
+                        conn.Dispose();
+                    }
+                }            
+            }else{
+                result.d = su;
             }
-            else
-            {
-                su = u[0];
-                //CacheBase.Set<Shop>(sname,su);
-            }
-            // }
-            return new DataResult(s, su);
+            return result;
         }
 
         ///<summary>
         ///启用、停用店铺
         ///<summary>
-        public static DataResult UptShopEnable(Dictionary<int, string> IDsDic, string Company, string UserName, bool Enable)
-        {
-            var s = 1;
-            string contents = string.Empty;
-            string uptsql = @"update Shop set Enable = @Enable where ID in @ID";
-            var args = new { ID = IDsDic.Keys.AsList(), Enable = Enable };
-
-            int count = DbBase.CommDB.Execute(uptsql, args);
-            if (count <= 0)
-            {
-                s = -3003;
-            }
-            else
-            {
-                if (Enable)
+        public static DataResult UptShopEnable(Dictionary<int, string> IDsDic, string Company, string UserName, bool Enable,string Coid)
+        {            
+            var result = new DataResult(1,null);                    
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
                 {
-                    contents = "店铺状态启用：";
-                }
-                else
-                {
-                    contents = "店铺状态停用：";
-                }
-                contents += string.Join(",", IDsDic.Values.AsList().ToArray());
-                CoreUser.LogComm.InsertUserLog("修改店铺资料", "Shop", contents, UserName, Company, DateTime.Now);
-            }
+                    //删除缓存
+                    foreach (var item in IDsDic){
+                        CacheBase.Remove("shop" + Coid + item.Key);                
+                    }
+                    string contents = string.Empty;
+                    string uptsql = @"update Shop set Enable = @Enable where ID in @ID";
+                    var args = new { ID = IDsDic.Keys.AsList(), Enable = Enable };
 
-            return new DataResult(s, contents);
+                    int count = conn.Execute(uptsql, args);
+                    if (count <= 0)
+                    {
+                        result.s = -3003;
+                    }
+                    else
+                    {
+                        if (Enable)
+                        {
+                            contents = "店铺状态启用：";
+                        }
+                        else
+                        {
+                            contents = "店铺状态停用：";
+                        }
+                        contents += string.Join(",", IDsDic.Values.AsList().ToArray());
+                        CoreUser.LogComm.InsertUserLog("修改店铺资料", "Shop", contents, UserName, Company, DateTime.Now);
+                        result.d = contents;
+                    }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+                
+            }
+            return result;
         }
 
         ///<summary>
@@ -137,13 +176,17 @@ namespace CoreData.CoreComm
             string contents = string.Empty;
             if (ExistShop(shop.ShopName, shop.ID, shop.CoID))//判断店铺名称是否存在
             {
-                result.s = -3003;
-                result.d = "店铺名称已存在";
+                result.s = -3005;
+                //result.d = "店铺名称已存在";
             }
             else
             {
+
                 var res = ShopQuery(shop.CoID.ToString(), shop.ID.ToString());
-                var shopOld = res.d as Shop;
+                var shopOld = res.d as Shop;                
+                //删除原有缓存
+                CacheBase.Remove(sname);
+                
                 if (shopOld.ShopName != shop.ShopName)
                 {
                     contents = contents + "店铺名称:" + shopOld.ShopName + "=>" + shop.ShopName + ";";
@@ -220,10 +263,12 @@ namespace CoreData.CoreComm
                 {
                     contents = contents + "创店时间:" + shopOld.ShopBegin + "=>" + shop.ShopBegin + ";";
                 }
-                DbBase.CommDB.Open();
-                DbBase.UserDB.Open();
-                var TransComm = DbBase.CommDB.BeginTransaction();
-                var TransUser = DbBase.UserDB.BeginTransaction();
+                var CommDBconn = new MySqlConnection(DbBase.CommConnectString);
+                var UserDBconn = new MySqlConnection(DbBase.UserConnectString);
+                CommDBconn.Open();
+                UserDBconn.Open();
+                var TransComm = CommDBconn.BeginTransaction();
+                var TransUser = UserDBconn.BeginTransaction();
                 try
                 {
                     string str = @"update Shop
@@ -253,7 +298,7 @@ namespace CoreData.CoreComm
                                     where
                                     ID = @ID
                                     ";
-                    int count = DbBase.CommDB.Execute(str, shop, TransComm);
+                    int count = CommDBconn.Execute(str, shop, TransComm);
                     if (count <= 0)
                     {
                         result.s = -3003;
@@ -275,8 +320,8 @@ namespace CoreData.CoreComm
                 {
                     TransComm.Dispose();
                     TransUser.Dispose();
-                    DbBase.CommDB.Close();
-                    DbBase.UserDB.Clone();
+                    CommDBconn.Close();
+                    UserDBconn.Clone();
                 }
             }
             return result;
@@ -287,23 +332,35 @@ namespace CoreData.CoreComm
         ///<summary>    
         public static Boolean ExistShop(string ShopName, int ID, int CoID)
         {
-            string query = string.Empty;
-            // object param = null;
-            StringBuilder querystr = new StringBuilder();
-            querystr.Append("select * from shop where CoID = @CoID and ShopName = @ShopName");
-            var p = new DynamicParameters();
-            p.Add("@CoID", CoID);
-            p.Add("@ShopName", ShopName);
-            if (ID > 0)
-            {
-                querystr.Append(" and ID !=@ID");
-                p.Add("@ID", ID);
+            int count = 0;
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    string query = string.Empty;
+                    // object param = null;
+                    StringBuilder querystr = new StringBuilder();
+                    querystr.Append("select * from shop where CoID = @CoID and ShopName = @ShopName");
+                    var p = new DynamicParameters();
+                    p.Add("@CoID", CoID);
+                    p.Add("@ShopName", ShopName);
+                    if (ID > 0)
+                    {
+                        querystr.Append(" and ID !=@ID");
+                        p.Add("@ID", ID);
+                    }
+                     count= conn.Query<Shop>(querystr.ToString(), p).Count();
+                }
+                catch{
+                    conn.Dispose();
+                }
             }
-            int count = DbBase.CommDB.Query<Shop>(querystr.ToString(), p).Count();
             if (count > 0)
                 return true;
             else
                 return false;
+
+
+
             // if (ID <= 0)
             // {
             //     query = @"select * from shop where CoID = @CoID and ShopName = @ShopName";
@@ -408,14 +465,17 @@ namespace CoreData.CoreComm
             sp.CoID = CoID;
             sp.Creator = UserName;
             sp.CreateDate = DateTime.Now;
-            DbBase.CommDB.Open();
-            DbBase.UserDB.Open();
-            var TransComm = DbBase.CommDB.BeginTransaction();
-            var TransUser = DbBase.UserDB.BeginTransaction();
+
+            var CommDBconn = new MySqlConnection(DbBase.CommConnectString);
+            var UserDBconn = new MySqlConnection(DbBase.UserConnectString);
+            CommDBconn.Open();
+            UserDBconn.Open();
+            var TransComm = CommDBconn.BeginTransaction();
+            var TransUser = UserDBconn.BeginTransaction();
             try
             {
-                int count = DbBase.CommDB.Execute(sqlCommandText, sp, TransComm);
-                // int count = DbBase.CommDB.Execute(sqlCommandText, sp);
+                int count = CommDBconn.Execute(sqlCommandText, sp, TransComm);
+                // int count = CommDBconn.Execute(sqlCommandText, sp);
                 if (count <= 0)
                 {
                     result.s = -3002;
@@ -437,8 +497,8 @@ namespace CoreData.CoreComm
             {
                 TransComm.Dispose();
                 TransUser.Dispose();
-                DbBase.CommDB.Close();
-                DbBase.UserDB.Clone();
+                CommDBconn.Close();
+                UserDBconn.Clone();
             }
 
             return result;
@@ -449,34 +509,83 @@ namespace CoreData.CoreComm
         public static DataResult GetTokenShopLst(int CoID)
         {
             var res = new DataResult(1, null);
-            string query = "select * from shop where CoID=@CoID and Istoken=1 and Token!='' and Enable=true";
-            var Lst = DbBase.CommDB.Query<Shop>(query, new { CoID = CoID }).ToList();
-            if (Lst.Count == 0)
-            {
-                res.s = -3001;
-            }
-            else
-            {
-                res.d = Lst;
-            }
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    string query = "select * from shop where CoID=@CoID and Istoken=1 and Token!='' and Enable=true";
+                    var Lst = conn.Query<Shop>(query, new { CoID = CoID }).ToList();
+                    if (Lst.Count == 0)
+                    {
+                        res.s = -3001;
+                    }
+                    else
+                    {
+                        res.d = Lst;
+                    }
+                }
+                catch (Exception e)
+                {
+                    res.s = -1;
+                    res.d= e.Message; 
+                    conn.Dispose();
+                }
+            }                        
             return res;
         }
 
         public static DataResult GetOfflineShopLst(int CoID)
         {
-            var res = new DataResult(1, null);
-             string query = "select * from shop where CoID=@CoID and SitType=35 and Enable=true";
-            var Lst = DbBase.CommDB.Query<Shop>(query, new { CoID = CoID }).ToList();
-            if (Lst.Count == 0)
-            {
-                res.s = -3001;
+             var res = new DataResult(1, null);
+             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    string query = "select * from shop where CoID=@CoID and SitType=35 and Enable=true";
+                    var Lst = conn.Query<Shop>(query, new { CoID = CoID }).ToList();
+                    if (Lst.Count == 0)
+                    {
+                        res.s = -3001;
+                    }
+                    else
+                    {
+                        res.d = Lst;
+                    }
+                }
+                catch (Exception e)
+                {
+                    res.s = -1;
+                    res.d= e.Message; 
+                    conn.Dispose();
+                }
             }
-            else
-            {
-                res.d = Lst;
+            
+            return res;
+        }
+
+        public static DataResult TokenExpired(string shopid,string coid){
+            var res = new DataResult(1, null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    var rnt= conn.Execute("UPDATE shop SET shop.Token = 2 WHERE shop.ID = "+shopid);
+                    if(rnt>0){
+                        CacheBase.Remove("shop" + coid + shopid);
+                        res.s = 1;
+                    }else{
+                        res.s = -1;
+                    }
+                }
+                catch(Exception e)
+                {
+                    res.s = -1;
+                    res.d= e.Message; 
+                    conn.Dispose();
+                }
             }
             return res;
         }
+
+
+
 
     }
 }
