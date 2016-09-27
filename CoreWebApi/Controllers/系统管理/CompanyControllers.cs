@@ -81,7 +81,14 @@ namespace CoreWebApi
             com.remark = co["Remark"].ToString();
             string UserName = "系统管理员";//GetUname(); 
             string Company = co["Company"].ToString();
-            
+            if(modifyFlag == "new")
+            {
+                var res = CompanyHaddle.IsComExist(com.name);
+                if (bool.Parse(res.d.ToString()) == true)
+                {
+                    return CoreResult.NewResponse(-1, "公司已存在,不允许新增", "General"); 
+                }
+            }
             var data = CompanyHaddle.SaveCompany(modifyFlag,com,UserName,Company);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
