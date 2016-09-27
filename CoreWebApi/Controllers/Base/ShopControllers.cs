@@ -46,7 +46,7 @@ namespace CoreWebApi.Base
             string Company = obj["Company"].ToString(); 
             string UserName = obj["UserName"].ToString(); 
             bool Enable = obj["Enable"].ToString().ToUpper()=="TRUE"?true:false;
-            var Coid = GetCoid();
+            string Coid = GetCoid();
             
             var res = ShopHaddle.UptShopEnable(IDsDic,Company,UserName,Enable,Coid);
             return CoreResult.NewResponse(res.s,res.d,"General");
