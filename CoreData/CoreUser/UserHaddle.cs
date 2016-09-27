@@ -150,7 +150,7 @@ namespace CoreData.CoreUser
                 parent = GetRefresh(roleid, coid);
                 if (parent == null)
                 {
-                    s = 2004;
+                    s = -2004;
                 }
                 else
                 {

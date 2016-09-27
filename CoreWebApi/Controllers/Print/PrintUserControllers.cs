@@ -10,6 +10,7 @@ namespace CoreWebApi.Print
     /// <summary>
 	/// 打印模块 - 个人用户相关 
 	/// </summary>
+    [AllowAnonymous]
     public class PrintUserController : ControllBase
     {
         #region 获取个人模板 print_uses
@@ -36,17 +37,48 @@ namespace CoreWebApi.Print
         [HttpPostAttribute("/core/print/tpl/saveMy")]
         public ResponseResult saveMy([FromBodyAttribute]JObject lo)
         {
+            if(!isJson(lo["print_setting"].ToString(),lo["state"].ToString())){
+                return CoreResult.NewResponse(-4024, null, "Print");
+            }
+            if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4012, null, "Print");}
+
             string admin_id = GetUid();
-            string my_id = lo["my_id"].ToString();
-            string sys_id = lo["sys_id"].ToString();
-            string type = lo["type"].ToString();
+            string my_id =string.IsNullOrEmpty(lo["my_id"].ToString()) ? "0" :lo["my_id"].ToString();
+            string sys_id =string.IsNullOrEmpty(lo["sys_id"].ToString()) ? "0" : lo["sys_id"].ToString();
+            string type = string.IsNullOrEmpty(lo["type"].ToString()) ? "0": lo["type"].ToString();
             string name = lo["tpl_name"].ToString();
             var print_setting = lo["print_setting"];
             var state = lo["state"];
             var m = PrintHaddle.postSaveMy(admin_id, my_id, sys_id, type, name, print_setting, state); 
-            return CoreResult.NewResponse(m.s, m.d, "Print");
-           
+            return CoreResult.NewResponse(m.s, m.d, "Print");           
         }
+        #endregion
+
+        #region 删除个人模板 
+        [HttpPostAttribute("/core/print/tpl/delMyTpl")]
+        public ResponseResult delMyTpl([FromBodyAttribute]JObject lo){
+            string ids =String.Join(",",lo["ids"]); 
+            var m = PrintHaddle.sideRemove(ids);
+            return CoreResult.NewResponse(1,null,"Print");
+        }
+        #endregion
+
+        #region 获取个人模板list  print_uses list
+        [HttpGetAttribute("/core/print/tpl/usesList")]    
+        public ResponseResult useslist(string type,int Page = 1,int PageSize = 20){
+            
+            var admin_id = GetUid();
+            printParam param = new printParam();
+            param.Filter = " a.type = "+type+" AND a.admin_id = "+admin_id+" ";
+            
+            param.PageIndex = Math.Max(Page,1);
+            param.PageSize = Math.Max(PageSize,20);
+
+            
+            var m = PrintHaddle.GetUsesList(param);
+            return CoreResult.NewResponse(m.s,m.d,"Print");
+        }
+
         #endregion
 
 

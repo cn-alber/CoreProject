@@ -13,6 +13,7 @@ namespace CoreModels.XyComm
 		private string _print_setting;
 		private string _tpl_data;
 		private DateTime? _mdate;
+		private bool _deleted= false;
 		/// <summary>
 		/// 
 		/// </summary>
@@ -77,6 +78,14 @@ namespace CoreModels.XyComm
 			set{ _mdate=value;}
 			get{return _mdate;}
 		}
+		/// <summary>
+		/// 
+		/// </summary>
+		public bool deleted
+		{
+			set{ _deleted=value;}
+			get{return _deleted;}
+		}
 		#endregion Model
 
 	}
@@ -86,5 +95,19 @@ namespace CoreModels.XyComm
 		public long id { get; set; }
 		public string name { get; set; }
 	}
+
+	public class useslist{
+		public long id { get; set; }
+		public string name { get; set; }
+		public string mdate{get;set;}
+
+	}
+
+	public class myTplModel {
+		public long id { get; set; }
+		public string name { get; set; }
+		public bool defed { get; set; }
+	}
+
 
 }
