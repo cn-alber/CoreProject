@@ -36,7 +36,7 @@ function说明
     OutPut:       
         PageCount       int         总页数
         DataCount       int         资料总笔数
-        SkuLst        List<SkuQuery>  商品资料(CoreSku)
+        SkuLst          List<SkuQuery>  商品资料(CoreSku)
     参考:input json 文件:SkuQueryLst_input.json
     参考:output json 文件:SkuQueryLst_output.json
 3.GoodsQuery()//查询单笔货品详情    
@@ -47,6 +47,36 @@ function说明
         GoodsCode       string          货号
     OutPut:
         main            CoreSkuAuto     单笔货品详情
-    参考：GoodsQuery_input.json
-    参考：GoodsQuery_output.json
-
+    参考：input json 文件:GoodsQuery_input.json
+    参考：output json 文件:GoodsQuery_output.json
+4.UptGoodsDel()//Update商品删除标记
+    方法：POST
+    路由：http://localhost:5000/Core/XyCore/CoreSku/UptGoodsDel
+    参数：
+    InPut:
+        GoodsLst        List<string>    货号List
+        IsDelete        bool            删除否(true|false)
+    OutPut:返回操作信息
+    参考：input json 文件:UptGoodsDel_input.json
+    参考：output json 文件:UptGoodsDel_output.json
+5.UptSkuDel()//Update商品删除标记
+    方法：POST
+    路由：http://localhost:5000/Core/XyCore/CoreSku/UptSkuDel
+    参数：
+    InPut:
+        Sku             string          商品Sku
+        IsDelete        bool            删除否(true|false)
+    OutPut:
+        更新删除标记，返回操作信息
+    参考：input json 文件:UptSkuDel_input.json
+    参考：output json 文件:UptSkuDel_output.json      
+6.DelGoodsRec()//删除回收站商品
+    方法：POST
+    路由：http://localhost:5000/Core/XyCore/CoreSku/DelGoodsRec
+    参数：
+    InPut:
+        GoodsLst        List<string>    货号List
+    OutPut:
+        清空回收站，返回操作信息
+    参考：input json 文件:DelGoodsRec_input.json
+    参考：output json 文件:DelGoodsRec_output.json      
