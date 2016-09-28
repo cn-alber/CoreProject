@@ -60,14 +60,15 @@ namespace CoreWebApi
             object jsonObj;
             try{
                 foreach(string s in jstring){
-                    jsonObj =  JsonConvert.DeserializeObject(s);       
-                //    Console.WriteLine(jsonObj);
-                //    Console.WriteLine(jsonObj.GetType().FullName);
-                   if(jsonObj.GetType().FullName == "Newtonsoft.Json.Linq.JObject"){
-                       flag =true;
-                   }else{
-                       flag =false;
-                   }
+                    if(!string.IsNullOrEmpty(s)){
+                        jsonObj =  JsonConvert.DeserializeObject(s);       
+                        if(jsonObj.GetType().FullName == "Newtonsoft.Json.Linq.JObject"){
+                            flag =true;
+                        }else{
+                            flag =false;
+                        }
+                    }
+
                 }               
             }catch{
                 flag = false;               

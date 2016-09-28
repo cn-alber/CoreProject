@@ -251,7 +251,7 @@ namespace CoreDate.CoreComm
                                 presets = type.presets!=null? JsonConvert.DeserializeObject<dynamic>(type.presets):"",
                                 print_setting = type.setting!=null? JsonConvert.DeserializeObject<dynamic>(type.setting):"",
                                 type = sys.type,
-                                tpl_name = sys.name + DateTime.Now.ToString("d")
+                                tpl_name = sys.name //+DateTime.Now.ToString("d")
                             };
                         }                    
                     }               
@@ -554,11 +554,12 @@ namespace CoreDate.CoreComm
 		/// </summary>
         public static DataResult saveSyses(int sys_id, string type,dynamic state, string name){
             var result = new DataResult(1,null);
+            
             if(GetSysesType(type).d == null){ result.s=-4001;  return result;}
-            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+            
+            using(var conn = new MySqlConnection(DbBase.CommConnectString)){
                 try
-                {
-                   
+                {                   
                     var tpl = state;
                     var setting = new{
                         pageW = state.setting.pageW,
@@ -566,13 +567,15 @@ namespace CoreDate.CoreComm
                     };
                     int rnt = 0;
                     string sql = "";
+                    
                     if (sys_id > 0){//更新
-                        sql = "UPDATE print_syses SET print_syses.`name` = '' ,"+
-                                     "print_syses.setting = '',"+
-                                     "print_syses.tpl_data = '',"+
-                                     "print_syses.type = '',"+
+                        sql = "UPDATE print_syses SET print_syses.`name` = '"+name+"' ,"+
+                                     "print_syses.setting = '"+setting.ToString()+"',"+
+                                     "print_syses.tpl_data = '"+tpl.ToString()+"',"+
+                                     "print_syses.type = "+type+","+
                                      "print_syses.mtime = NOW() "+
-                                     "WHERE print_syses.id = 1;";
+                                     "WHERE print_syses.id = "+sys_id+";";
+                        Console.WriteLine(sql); 
                         rnt = conn.Execute(sql);
                         if (rnt>0) {
                             result.d = new 
@@ -586,6 +589,9 @@ namespace CoreDate.CoreComm
                         }
                     }
                     else {
+                        if(name.Equals("新模板")){
+                            name = name+DateTime.Now.ToString("d");
+                        }
                          sql="INSERT INTO print_syses(print_syses.type,print_syses.`name`,print_syses.setting,print_syses.tpl_data,print_syses.mtime)"+
                              "VALUES("+type+",'"+name+"','"+setting.ToString()+"','"+tpl.ToString()+"',NOW());"+
                              "SELECT LAST_INSERT_ID() as lastid;";                             

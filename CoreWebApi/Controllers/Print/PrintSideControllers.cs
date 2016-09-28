@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using CoreDate.CoreComm;
+using Newtonsoft.Json.Linq;
 
 namespace CoreWebApi.Print
 {
@@ -10,12 +11,12 @@ namespace CoreWebApi.Print
     {
 
         #region 侧边栏设定，更新默认模板
-        [HttpGetAttribute("/core/print/side/setdefed")]
-        public ResponseResult sidesetdefed(int my_tpl_id)
+        [HttpPostAttribute("/core/print/side/setdefed")]
+        public ResponseResult sidesetdefed([FromBodyAttribute]JObject lo)
         {
-            if(!checkInt(my_tpl_id)) return CoreResult.NewResponse(-4023, null, "Print");
+            if(!checkInt(lo["my_tpl_id"].ToString())) return CoreResult.NewResponse(-4023, null, "Print");
             var admin_id = GetUid();
-            var m = PrintHaddle.sideSetdefed(admin_id,my_tpl_id.ToString());
+            var m = PrintHaddle.sideSetdefed(admin_id,lo["my_tpl_id"].ToString());
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
@@ -32,7 +33,7 @@ namespace CoreWebApi.Print
         #endregion
 
         #region 获取边栏模板内容
-        [HttpGetAttribute("/core/print/side/tpls")]
+        [HttpGetAttribute("/core/print/tpl/sideTpls")]
         public ResponseResult sidetpls(int type)
         {
             if(!checkInt(type)) return CoreResult.NewResponse(-4001, null, "Print");
@@ -41,6 +42,9 @@ namespace CoreWebApi.Print
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
+
+
+        
 
 
 

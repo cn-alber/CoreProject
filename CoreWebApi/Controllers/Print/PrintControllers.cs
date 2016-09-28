@@ -15,7 +15,7 @@ namespace CoreWebApi.Print
     /// <summary>
 	/// 打印模块 - 系统模块相关 
 	/// </summary>
-    [AllowAnonymous]
+    //[AllowAnonymous]
     public class PrintController : ControllBase
     {
         #region 获取print_sys_types -> emu_data
@@ -155,15 +155,15 @@ namespace CoreWebApi.Print
         }
         #endregion
 
-        #region 保存系统模板
-        [HttpPostAttribute("/core/print/tpl/savesyses")]
-        public ResponseResult savesyses([FromBodyAttribute]JObject lo)
+        #region 新建系统模板
+        [HttpPostAttribute("/core/print/tpl/createSys")]
+        public ResponseResult createSys([FromBodyAttribute]JObject lo)
         {                   
             if(!checkIsAdmin() ){ return CoreResult.NewResponse(-1008, null, "Basic");}
             if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4009, null, "Print");}
             string type = lo["type"].ToString();            
             string name = lo["name"].ToString();            
-            int  sys_id = string.IsNullOrEmpty(lo["sys_id"].ToString())?0 :int.Parse(lo["sys_id"].ToString());
+            int  sys_id = 0;
             var state = lo["state"];
               
             var m = PrintHaddle.saveSyses(sys_id, type,state,name );
@@ -171,9 +171,27 @@ namespace CoreWebApi.Print
         }
         #endregion
 
+        #region 编辑系统模板
+        [HttpPostAttribute("/core/print/tpl/modifySys")]
+        public ResponseResult modifySys([FromBodyAttribute]JObject lo)
+        {                   
+            if(!checkIsAdmin() ){ return CoreResult.NewResponse(-1008, null, "Basic");}
+            if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4009, null, "Print");}
+            string type = lo["type"].ToString();            
+            string name = lo["name"].ToString();            
+            int  sys_id = string.IsNullOrEmpty(lo["sys_id"].ToString())?0 :int.Parse(lo["sys_id"].ToString());
+            var state = lo["state"];
+            
+            var m = PrintHaddle.saveSyses(sys_id, type,state,name );
+            return CoreResult.NewResponse(m.s, m.d, "Print");
+        }
+        #endregion
+
+
+
 
         #region 删除系统模板 print_syses 
-        [HttpPostAttribute("/core/print/tpl/delsyses")]
+        [HttpPostAttribute("/core/print/tpl/deleteSys")]
         public ResponseResult delsyses([FromBodyAttribute]JObject lo)
         {   
             string ids =String.Join(",",lo["ids"]); 

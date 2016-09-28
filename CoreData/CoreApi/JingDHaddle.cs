@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CoreModels;
+using Newtonsoft.Json;
 
 namespace CoreDate.CoreApi
 {
@@ -25,7 +26,7 @@ namespace CoreDate.CoreApi
                 client_secret = client_secret
             };
             var response = JsonResponse.CreatePostHttpResponse(url, parameters,obj);
-            result.d = response.Result;
+            result.d = response.Result;//JsonConvert.DeserializeObject(response.Result);
             
             return result;
         }
