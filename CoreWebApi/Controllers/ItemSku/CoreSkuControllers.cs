@@ -92,7 +92,17 @@ namespace CoreWebApi.XyCore
         }
         #endregion
 
-        
+        #region 新增Sku
+        [HttpPostAttribute("Core/XyCore/CoreSku/InsertGoods")]
+        public ResponseResult InsertGoods([FromBodyAttribute]JObject obj)
+        {
+            CoreSkuAuto ckm = Newtonsoft.Json.JsonConvert.DeserializeObject<CoreSkuAuto>(obj["CoreSkuAuto"].ToString());
+            CoreSkuItem cki = Newtonsoft.Json.JsonConvert.DeserializeObject<CoreSkuItem>(obj["CoreSkuItem"].ToString());            
+            var res = CoreSkuHaddle.NewCore(ckm,cki);
+            var Result = CoreResult.NewResponse(res.s, res.d, "General");
+            return Result;
+        }
+        #endregion
 
     }
 
