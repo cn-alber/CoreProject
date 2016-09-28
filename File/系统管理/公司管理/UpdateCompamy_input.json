@@ -1,14 +1,16 @@
-{
-"ModifyFlag":"new",
-"ID":null,
-"Name":"新增测试",
-"Enable":"true",
-"Address":"新增测试1",
-"Email":"新增测试11",
-"Typelist":"1",
-"Contacts":"新增测试111",
-"Telphone":"11",
-"Mobile":"111",
-"Remark":"新增测试1111",
+{   
+"ModifyFlag":"new",       
+"Com": {
+        "id": 0,
+        "name": "测试0928",
+        "enable": true,
+        "address": "22222",
+        "email": "222442",
+        "typelist": "1",
+        "contacts": "rr",
+        "telphone": "11",
+        "mobile": "22",
+        "remark": "00004444"
+    },
 "Company":"携云科技"
 }
