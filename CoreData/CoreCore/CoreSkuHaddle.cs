@@ -300,6 +300,70 @@ namespace CoreData.CoreCore
             return res;
         }
         #endregion
+
+        #region 
+        public static DataResult NewCore(CoreSkuAuto ckm, CoreSkuItem cki)
+        {
+
+            var res = new DataResult(1, null);
+
+            try
+            {
+                string sql = @"INSERT INTO(SkuID,SkuName,Type,Unit,Weight,
+                                       CoID, Brand,  KID, KName,SCoList,
+                                       GoodsCode,GoodsName,ColorID,ColorName,SizeID,
+                                       ParentID,SizeName,CostPrice,SalePrice,Norm,
+                                       Creator,CreateDate
+                                       ) 
+                                VALUES(@SkuID,@SkuName,@Type,@Unit,@Weight,
+                                       @CoID,@Brand,  @KID, @KName,@SCoList,
+                                       @GoodsCode,@GoodsName,@ColorID,@ColorName,@SizeID,
+                                       @ParentID,@SizeName,@CostPrice,@SalePrice,@Norm,
+                                       @Creator,@CreateDate
+                                ) ";
+
+                var sku = new Coresku();
+                sku.SkuID = cki.SkuID;
+                sku.SkuName = ckm.SkuName;
+                sku.Type = 0;
+                sku.Unit = ckm.Unit;
+                sku.Weight = ckm.Weight;
+                sku.CoID = ckm.CoID;
+                sku.Brand = ckm.Brand;
+                sku.KID = ckm.KID;
+                sku.KName = ckm.KName;
+                sku.SCoList = ckm.SCoList;
+                sku.GoodsCode = ckm.GoodsCode;
+                sku.GoodsName = ckm.GoodsName;
+                sku.ColorID = cki.ColorID;
+                sku.ColorName = cki.ColorName;
+                sku.SizeID = cki.SizeID;
+                sku.ParentID = cki.ParentID;
+                sku.SizeName = cki.SizeName;
+                sku.CostPrice = cki.CostPrice;
+                sku.SalePrice = cki.SalePrice;
+                sku.Norm = cki.ColorName + ";" + cki.SizeName;
+                sku.Creator = ckm.Creator;
+                sku.CreateDate = DateTime.Now;
+                int count = DbBase.UserDB.Execute(sql, sku);
+                if(count==0)
+                {
+                    res.s = -3002;
+                }
+            }
+            catch (Exception e)
+            {
+                res.s = -1;
+                res.d = e.Message;
+            }
+            finally
+            {
+
+            }            
+
+            return res;
+        }
+        #endregion
     }
 
 }
