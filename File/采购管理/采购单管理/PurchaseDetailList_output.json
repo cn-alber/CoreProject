@@ -1,0 +1,35 @@
+{
+    "s": 1,
+    "d": {
+        "CoID": 1,
+        "Purid": "10002016057421",
+        "Skuid": "NJR201605070003034",
+        "SkuName": "",
+        "GoodsCode": "",
+        "SortField": "id",
+        "SortDirection": "Desc",
+        "NumPerPage": 6,
+        "PageIndex": 1,
+        "Datacnt": 1,
+        "Pagecnt": 1.0,
+        "Com": [
+            {
+                "id": 38,
+                "purchaseid": "10002016057421",
+                "skuid": "NJR201605070003034",
+                "skuname": "南极人羽绒服",
+                "colorname": "黄色",
+                "sizename": "12",
+                "purqty": 200.0,
+                "price": 60.0,
+                "puramt": 12000.0,
+                "remark": "test222",
+                "goodscode": "NJR20160507",
+                "supplynum": "test2",
+                "recievedate": "2006-02-16T00:00:00",
+                "detailstatus": "部分完成"
+            }
+        ]
+    },
+    "m": ""
+}

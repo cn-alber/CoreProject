@@ -47,16 +47,7 @@ OutPut: 成功：
 4.UpdateCompamy() //保存公司基本资料
 路由:http://localhost:5000/Core/Company/UpdateCompany
 input:ModifyFlag    string    保存方式(new/edit)
-      ID            int       公司id,若为new,赋值null
-      Name          string    公司名称
-      Enable        bool      启用状态
-      Address       string    公司地址
-      Email         string    公司邮箱
-      Typelist      string    公司类型
-      Contacts      string    联络人
-      Telphone      string    固定电话
-      Mobile        string    移动电话
-      Remark        string    备注
+      Com           Company   公司资料
       Company       string    登录者公司名称(exp:携云科技)
 output: s=1成功 else 错误代码
 参考:input jason 文件:UpdateCompamy_input.json
