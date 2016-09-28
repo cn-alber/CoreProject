@@ -15,20 +15,22 @@ namespace CoreWebApi.Print
     {
         #region 获取个人模板 print_uses
         [HttpGetAttribute("/core/print/task/tpl")]
-        public ResponseResult tasktpl(string my_id)
+        public ResponseResult tasktpl(int my_id)
         {
+            if(!checkInt(my_id)) return CoreResult.NewResponse(-4023, null, "Print");
             var admin_id = GetUid();
-            var m = PrintHaddle.taskTpl(admin_id,my_id);
+            var m = PrintHaddle.taskTpl(admin_id,my_id.ToString());
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
 
          #region 获取个人模板数据
        [HttpGetAttribute("/core/print/tpl/my")]
-        public ResponseResult tplmy(string my_id)
+        public ResponseResult tplmy(int my_id)
         {
+            if(!checkInt(my_id)) return CoreResult.NewResponse(-4023, null, "Print");
             string admin_id = GetUid();
-            var m = PrintHaddle.tplMy(admin_id,my_id);
+            var m = PrintHaddle.tplMy(admin_id,my_id.ToString());
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
@@ -58,6 +60,7 @@ namespace CoreWebApi.Print
         [HttpPostAttribute("/core/print/tpl/delMyTpl")]
         public ResponseResult delMyTpl([FromBodyAttribute]JObject lo){
             string ids =String.Join(",",lo["ids"]); 
+            if(!checkInt(ids)) return CoreResult.NewResponse(-4023, null, "Print");
             var m = PrintHaddle.sideRemove(ids);
             return CoreResult.NewResponse(1,null,"Print");
         }
@@ -65,8 +68,9 @@ namespace CoreWebApi.Print
 
         #region 获取个人模板list  print_uses list
         [HttpGetAttribute("/core/print/tpl/usesList")]    
-        public ResponseResult useslist(string type,int Page = 1,int PageSize = 20){
-            
+        public ResponseResult useslist(int type,int Page = 1,int PageSize = 20){
+            if(!checkInt(type)) return CoreResult.NewResponse(-4023, null, "Print");
+
             var admin_id = GetUid();
             printParam param = new printParam();
             param.Filter = " a.type = "+type+" AND a.admin_id = "+admin_id+" ";

@@ -75,6 +75,56 @@ namespace CoreWebApi
             return flag;
         }
 
+        public bool checkInt(params int[]  jstring){
+            bool flag =true;            
+            try{
+                foreach(int s in jstring){
+                    if(s<1){
+                        flag = false;
+                    }
+                }               
+            }catch{
+                flag = false;               
+            }
+            return flag;
+
+        }
+
+        public bool checkInt(string strs){
+            bool flag =true;            
+            try{
+                foreach (string item in strs.Split(','))
+                {
+                   flag =  checkInt(int.Parse(item));
+                }     
+
+
+            }catch{
+                flag = false;               
+            }
+            return flag;
+
+        }
+
+
+
+        public bool checkString(params string[]  jstring){
+            bool flag =true;
+            try{
+                foreach(string s in jstring){
+                    if(string.IsNullOrEmpty(s)){
+                        flag = false;
+                    }else if(s == "undefined"){
+                         flag = false;
+                    }
+
+                }               
+            }catch{
+                flag = false;               
+            }
+            return flag;
+
+        }
 
 
         #region MD5
