@@ -75,7 +75,7 @@ namespace CoreData.CoreCore
                     string uptsql = @"update supplycompany set enable = @Enable where id in @ID";
                     var args = new {ID = IDsDic.Keys.AsList(),Enable = Enable};          
                     int count = conn.Execute(uptsql,args);
-                    if(count<=0)
+                    if(count < 0)
                     {
                         result.s= -3003;
                     }
@@ -214,7 +214,7 @@ namespace CoreData.CoreCore
                                     Contactor = com.contactor,Tel = com.tel,Phone = com.phone,Fax = com.fax,Url = com.url,Email = com.email,Typelist = com.typelist,
                                     Bank = com.bank,Bankid = com.bankid,Taxid = com.taxid,Remark = com.remark,UName = UserName,Coid = CoID};
                     int count =conn.Execute(sqlCommandText,args);
-                    if(count <= 0)
+                    if(count < 0)
                     {
                         result.s = -3003;
                     }
@@ -319,7 +319,7 @@ namespace CoreData.CoreCore
                                     Contactor = com.contactor,Tel = com.tel,Phone = com.phone,Fax = com.fax,Url = com.url,Email = com.email,Typelist = com.typelist,
                                     Bank = com.bank,Bankid = com.bankid,Taxid = com.taxid,Remark = com.remark,ID = com.id};
                     int count = conn.Execute(uptsql,args);
-                    if(count<=0)
+                    if(count < 0)
                     {
                         result.s= -3003;
                     }

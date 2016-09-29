@@ -133,13 +133,15 @@ namespace CoreData.CoreCore
             {
                 #region 新增主表
                 if (sku.mainew == 1)
-                { 
-                    string sql = @"INSERT INTO(CoID,GoodsCode,GoodsName,SkuID,Norm,
-                                        Unit,ValUnit,CnvRate,PurPrice,KID,KName,
-                                        SCoList,ParentID,Type,Creator,CreateDate,IsParent)
-                                    VALUES(@CoID,@GoodsCode,@GoodsName,@SkuID,@Norm,
-                                        @Unit,@ValUnit,@CnvRate,@PurPrice,@KID,@KName,
-                                        @SCoList,@ParentID,@Type,@Creator,@CreateDate,@IsParent)";
+                {
+                    // string sql = @"INSERT INTO(CoID,GoodsCode,GoodsName,SkuID,Norm,Unit,ValUnit,CnvRate,PurPrice,KID,KName,";
+                    // sql = sql + "SCoList,ParentID,Type,Creator,CreateDate,IsParent)";
+                    // sql = sql + " VALUES(@CoID,@GoodsCode,@GoodsName,@SkuID,@Norm,@Unit,@ValUnit,@CnvRate,@PurPrice,@KID,@KName,";
+                    // sql = sql + "@SCoList,@ParentID,@Type,@Creator,@CreateDate,@IsParent)";
+
+                    string sql = @"INSERT INTO coresku(CoID,GoodsCode,GoodsName,SkuID,Norm,Unit,ValUnit,CnvRate,PurPrice,KID,KName,SCoList,ParentID,Type,Creator,CreateDate,IsParent)
+                                   VALUES(@CoID,@GoodsCode,@GoodsName,@SkuID,@Norm,@Unit,@ValUnit,@CnvRate,@PurPrice,@KID,@KName,@SCoList,@ParentID,@Type,@Creator,@CreateDate,@IsParent)                                       
+                                       ";
                     var core = NewMat(sku);
                     count = DbBase.CoreDB.Execute(sql, core, Trans);
                     if (count == 0)
@@ -153,13 +155,13 @@ namespace CoreData.CoreCore
                 if (newitems.Count > 0)
                 {
                     var itemLst = NewMatDetail(sku, newitems);
-                    string itemsql = @"INSERT INTO(CoID,GoodsCode,GoodsName,Norm,Unit,ValUnit,
+                    string itemsql = @"INSERT INTO coresku(CoID,GoodsCode,GoodsName,Norm,Unit,ValUnit,
                                             CnvRate,PurPrice,KID,KName,SCoList,SkuID,ColorID,ColorName,
                                             ParentID,SizeID,SizeName,Type,Creator,CreateDate,IsParent )
                                        VALUES(@CoID,@GoodsCode,@GoodsName,@Norm,@Unit,@ValUnit,
                                             @CnvRate,@PurPrice,@KID,@KName,@SCoList,@SkuID,@ColorID,@ColorName,
                                             @ParentID,@SizeID,@SizeName,@Type,@Creator,@CreateDate,@IsParent)";
-                    count = DbBase.CoreDB.Execute(itemsql, itemLst, Trans);
+                    count = DbBase.CoreDB.Execute(itemsql.ToString(), itemLst, Trans);
                     if (count == 0)
                     {
                         res.s = -3002;
@@ -168,25 +170,38 @@ namespace CoreData.CoreCore
                 #endregion
                 #region 单独修改明细                
                 var edititems = sku.items.Where(a => a.status == 0).AsList();
-                if(edititems.Count>0)
-                {        
+                if (edititems.Count > 0)
+                {
                     string uptsql = @"UPDATE coresku SET SkuID = @SkuID,Remark = @Remark 
                                       WHERE CoID = @CoID AND GoodsCode = @GoodsCode";
-                    count = DbBase.CoreDB.Execute(uptsql, edititems, Trans);
+                    count = DbBase.CoreDB.Execute(uptsql.ToString(), edititems, Trans);
                     if (count == 0)
                     {
                         res.s = -3002;
                     }
                 }
                 #endregion
+                #region 删除明细
+                var delSkuLst = (sku.items.Where(a=>a.status==2).AsList()).Select(b=>b.SkuID).ToList();
+                if (delSkuLst.Count>0)
+                {
+                    string delsql = @"delete from coresku where SkuID in @DelSkuLst";
+                    count = DbBase.CoreDB.Execute(delsql.ToString(), new { DelSkuLst = delSkuLst }, Trans);
+                    if (count == 0)
+                    {
+                        res.s = -3004;
+                    }
+                }
+
+                #endregion
                 #region 主表标记新增
-                if(sku.status==0)
+                if (sku.status == 0)
                 {
                     string uptsql = @"UPDATE coresku SET GoodsName = @GoodsName,Norm = @Norm,Unit = @Unit,
                                     ValUnit = @ValUnit,CnvRate = @CnvRate,PurPrice = @PurPrice,KID = @KID,
                                     KName = @KName,SCoList = @SCoList,ParentID = @ParentID,Enable = @Enable
                                     WHERE CoID = @CoID AND GoodsCode = @GoodsCode";
-                    count = DbBase.CoreDB.Execute(uptsql, sku.items, Trans);
+                    count = DbBase.CoreDB.Execute(uptsql.ToString(), sku, Trans);
                     if (count == 0)
                     {
                         res.s = -3002;
@@ -195,7 +210,7 @@ namespace CoreData.CoreCore
                 }
                 #endregion
 
-                //Trans.Commit();    
+                Trans.Commit();    
             }
             catch (Exception e)
             {
