@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CoreDate.CoreApi;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,15 +8,7 @@ namespace CoreWebApi.Api.JingDong{
     public class JdOrderControllers : ControllBase
     {
 
-        #region 
-        [HttpGetAttribute("/core/Api/JdOrder/hello")]
-        public ResponseResult taskdata()
-        {
-            string code = "LK0EZY";
-            var m = JingDHaddle.GetToken("https://oauth.jd.com/oauth/token", "authorization_code", code, "http://localhost:8080/AppWeb/admin/shop_token.aspx", "7888CE9C0F3AAD424FEE8EEAAC99E10E", "a88b70e6c629465785088f9a9151701a");
-            return CoreResult.NewResponse(m.s, m.d, "Api");
-        }
-        #endregion
+        
 
         #region 
         [HttpGetAttribute("/core/Api/JdOrder/download")]
@@ -30,6 +23,9 @@ namespace CoreWebApi.Api.JingDong{
         [HttpGetAttribute("/core/Api/JdOrder/downByIds")]
         public ResponseResult downByIds(string order_id,string optional_fields,string order_state,string token)
         {            
+            List<string> ids = new List<string>();
+            ids.Add("22919473317");
+            
             var m = JingDHaddle.orderDownByIds(order_id, optional_fields, order_state, token);
             return CoreResult.NewResponse(m.s, m.d, "Api");
         }
