@@ -94,7 +94,7 @@ namespace CoreData.CoreCore
                             KID,KName,SCoList,Unit,ValUnit,
                             CnvRate,PurPrice,ParentID,Enable
                             FROM coresku
-                            WHERE CoID = @CoID AND GoodsCode = @GoodsCode AND IsParent = true";
+                            WHERE CoID = @CoID AND GoodsCode = @GoodsCode AND IsParent = 1";
             try
             {
                 var main = DbBase.CoreDB.QueryFirstOrDefault<CoreSkuMatAuto>(msql, p);
@@ -107,7 +107,7 @@ namespace CoreData.CoreCore
                     string dsql = @"select GoodsCode,SkuID,ColorID,ColorName,
                                         SizeID,SizeName,Remark
                                     from coresku where GoodsCode=@GoodsCode and CoID = @CoID
-                                     AND IsParent = false AND Enable=1";
+                                     AND IsParent = 0 AND Enable=1";
                     var item = DbBase.CoreDB.Query<CoreSkuMatItem>(dsql, p).AsList();
                     main.items = item;
                     res.d = main;

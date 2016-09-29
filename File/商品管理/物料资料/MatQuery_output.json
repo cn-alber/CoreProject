@@ -21,17 +21,6 @@
         "items": [
             {
                 "GoodsCode": "MAT1",
-                "SkuID": "MAT1",
-                "ColorID": null,
-                "ColorName": "",
-                "SizeID": null,
-                "SizeName": "",
-                "Remark": "",
-                "Creator": null,
-                "status": 0
-            },
-            {
-                "GoodsCode": "MAT1",
                 "SkuID": "MAT10002177",
                 "ColorID": "0002",
                 "ColorName": "白色",
