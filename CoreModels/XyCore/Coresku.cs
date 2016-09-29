@@ -135,7 +135,82 @@ namespace CoreModels.XyCore
         public string ParentID { get; set; }
         public string Remark { get; set; }
         public string Creator { get; set; }
-        public int? status { get; set; }
+        public int status { get; set; }
     }
     #endregion 
+
+
+    #region ######### CoreMat
+
+    public class CoreSkuMatQuery
+    {
+        public string GoodsCode { get; set; }
+        public string GoodsName { get; set; }
+        public string KName { get; set; }
+        public string Norm { get; set; }
+        public string ColorName { get; set; }
+        public string SizeName { get; set; }
+        public decimal PurPrice { get; set; }
+        public bool Enable { get; set; }
+        public string Remark { get; set; }
+        public string Creator { get; set; }
+        public DateTime CreateDate { get; set; }
+
+    }
+
+
+    public class CoreSkuMatParms
+    {
+        public int CoID { get; set; }
+        public string SkuID { get; set; }
+        public string Enable { get; set; }
+        public string GoodsCode { get; set; }
+        public string Search { get; set; }
+        public int KID { get; set; }
+        public List<int> KidList { get; set; }
+    }
+
+
+    public class MatQuery
+    {
+        public int DataCount { get; set; } //总行数
+        public int PageCount { get; set; }//总页数
+        public List<CoreSkuMatQuery> SkuLst { get; set; }//返回资料       
+    }
+
+    public partial class CoreSkuMatAuto
+    {
+        public int CoID { get; set; }
+        public string GoodsCode { get; set; }
+        public string GoodsName { get; set; }
+        public string Norm { get; set; }
+        public int KID { get; set; }
+        public string KName { get; set; }
+        public string SCoList { get; set; }
+        public string Unit { get; set; }
+        public string ValUnit { get; set; }
+        public decimal CnvRate { get; set; }
+        public decimal PurPrice { get; set; }
+        public string ParentID { get; set; }
+        public bool Enable { get; set; }
+        public string Creator { get; set; }
+        public string SkuID { get; set; }
+        public int status { get; set; }
+        public int mainew { get; set; }
+        public List<CoreSkuMatItem> items { get; set; }
+    }
+
+    public partial class CoreSkuMatItem
+    {
+        public string GoodsCode { get; set; }
+        public string SkuID { get; set; }
+        public string ColorID { get; set; }
+        public string ColorName { get; set; }
+        public string SizeID { get; set; }
+        public string SizeName { get; set; }
+        public string Remark { get; set; }
+        public string Creator { get; set; }
+        public int status { get; set; }
+    }
+    #endregion
 }

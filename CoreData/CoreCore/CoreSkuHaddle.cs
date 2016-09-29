@@ -240,7 +240,6 @@ namespace CoreData.CoreCore
             string Deleter = UserName;
             DateTime? DeleteDate = DateTime.Now;
             DateTime? DateNull = null;
-
             try
             {
                 string UptSql = @"UPDATE coresku
@@ -306,7 +305,8 @@ namespace CoreData.CoreCore
         {
 
             var res = new DataResult(1, null);
-
+            DbBase.CoreDB.Open();
+            var Trans = DbBase.CoreDB.BeginTransaction();
             try
             {
                 string sql = @"INSERT INTO(SkuID,SkuName,Type,Unit,Weight,
@@ -345,11 +345,12 @@ namespace CoreData.CoreCore
                 sku.Norm = cki.ColorName + ";" + cki.SizeName;
                 sku.Creator = ckm.Creator;
                 sku.CreateDate = DateTime.Now;
-                int count = DbBase.UserDB.Execute(sql, sku);
+                int count = DbBase.UserDB.Execute(sql, sku,Trans);
                 if(count==0)
                 {
                     res.s = -3002;
                 }
+                Trans.Commit();
             }
             catch (Exception e)
             {
@@ -358,7 +359,8 @@ namespace CoreData.CoreCore
             }
             finally
             {
-
+                Trans.Dispose();
+                DbBase.CoreDB.Close();
             }            
 
             return res;
