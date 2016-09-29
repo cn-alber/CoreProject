@@ -56,7 +56,9 @@ namespace CoreDate.CoreApi
             parameters.Add("v", systemParam.v);
             parameters.Add("360buy_param_json", "{\"start_date\":\"" + start_date + "\",\"end_date\":\"" + end_date + "\",\"order_state\":\"" + order_state + "\",\"page\":\"" + page + "\",\"page_size\":\"" + page_size + "\" }");
 
-            var response = JsonResponse.CreatePostHttpResponse(systemParam.url, parameters);
+            var response = JsonResponse.CreatePostHttpResponse(systemParam.url, parameters);            
+            result.d = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}").order_search_response.order_search.order_info_list;
+
             // HttpWebResponse response = jsonResponse.CreatePostHttpResponse(systemParam.url, parameters, encoding);
             // //打印返回值  
             // Stream stream = response.GetResponseStream();
@@ -79,10 +81,8 @@ namespace CoreDate.CoreApi
         public static DataResult orderDownByIds(List<string> order_ids,string optional_fields,string order_state,string token){
             var result = new DataResult(1,null);
             try{
-                List<dynamic> orderinfolist = new List<dynamic>();
-                
+                List<dynamic> orderinfolist = new List<dynamic>();                
                 IDictionary<string, string> parameters = new Dictionary<string, string>();
-
                 parameters.Add("method", "360buy.order.get");
                 parameters.Add("access_token", token);
                 parameters.Add("app_key", systemParam.app_key);
@@ -90,58 +90,16 @@ namespace CoreDate.CoreApi
                 parameters.Add("timestamp", systemParam.timestamp);
                 parameters.Add("v", systemParam.v);
                 foreach(string order_id in order_ids){
-
-                    parameters.Add("360buy_param_json", "{\"order_id\":\"" + order_id + "\",\"optional_fields\":\"" + optional_fields + "\",\"order_state\":\"" + order_state + "\"}");
-                
+                    parameters.Add("360buy_param_json", "{\"order_id\":\"" + order_id + "\",\"optional_fields\":\"" + optional_fields + "\",\"order_state\":\"" + order_state + "\"}");                
                     var response = JsonResponse.CreatePostHttpResponse(systemParam.url, parameters);
                     orderinfolist.Add(JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}").order_get_response.order.orderInfo);
                     parameters.Remove("360buy_param_json");
                 }
                 result.d = orderinfolist;
-                               
-                
-                
-                //result.d = JsonConvert.DeserializeObject<BuyOrderGetResponse>("{'order_get_response':{'code':'0','order':{'orderInfo':{'modified':'2016-09-11 11:29:19','order_id':'22919473317'}}}");
-                
-                
-
             }catch(Exception ex){
                 Console.WriteLine(ex.Message);
                 result.d =  ex.Message;
             }
-
-            // foreach (string order_id in order_ids)
-            // {
-            //     parameters.Add("method", "360buy.order.get");
-            //     parameters.Add("access_token", token);
-            //     parameters.Add("app_key", systemParam.app_key);
-            //     parameters.Add("sign", systemParam.sign);
-            //     parameters.Add("timestamp", systemParam.timestamp);
-            //     parameters.Add("v", systemParam.v);
-            //     parameters.Add("360buy_param_json", "{\"order_id\":\"" + order_id + "\",\"optional_fields\":\"" + optional_fields + "\",\"order_state\":\"" + order_state + "\"}");
-            //     //HttpWebResponse response = jsonResponse.CreatePostHttpResponse(systemParam.url, parameters, encoding);
-            //     var response = JsonResponse.CreatePostHttpResponse(systemParam.url, parameters);
-
-            //     // Stream stream = response.GetResponseStream();
-            //     // StreamReader sr = new StreamReader(stream);
-            //     // html = sr.ReadToEnd();
-            //     // if (html.IndexOf("error") > 0)
-            //     // {
-            //     //     isSuccess = false;
-            //     //     break;
-            //     // }                
-            //     // orderinfolist.Add(JsonConvert.DeserializeObject<BuyOrderGetResponse>(html).order_get_response.order.orderInfo);
-            //     // parameters = new Dictionary<string, string>();
-            // }
-            // if (!isSuccess)
-            // {
-            //     return new BaseResult(false, null, html);
-            // }else {
-            //     return new BaseResult(true, orderinfolist, "success");
-            // }       
-
-
-
             return result;
         }
 
