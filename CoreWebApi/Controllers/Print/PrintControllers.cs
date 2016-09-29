@@ -176,8 +176,6 @@ namespace CoreWebApi.Print
             string name = lo["name"].ToString();            
             int  sys_id = string.IsNullOrEmpty(lo["sys_id"].ToString())?0 :int.Parse(lo["sys_id"].ToString());
             var state = JsonEscape(lo["state"].ToString());
-            
-            var state = lo["state"];
               
             var m = PrintHaddle.saveSyses(sys_id, type,state,name );
             return CoreResult.NewResponse(m.s, m.d, "Print");
