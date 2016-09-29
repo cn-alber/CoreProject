@@ -145,14 +145,19 @@ namespace CoreData.CoreCore
                 {
                     result.s = -3004;
                 }
-                delsql = @"delete from purchasedetail where purchaseid in @PurID and coid = @Coid";
-                count = CoreDBconn.Execute(delsql, p, TransCore);
-                if (count <= 0)
+                else
                 {
-                    result.s = -3004;
+                    delsql = @"delete from purchasedetail where purchaseid in @PurID and coid = @Coid";
+                    count = CoreDBconn.Execute(delsql, p, TransCore);
+                    if (count <= 0)
+                    {
+                        result.s = -3004;
+                    }
                 }
-
-                TransCore.Commit();
+                if(result.s == 1)
+                {
+                    TransCore.Commit();
+                }
             }
             catch (Exception e)
             {
