@@ -109,7 +109,7 @@ namespace CoreModels.XyComm
 		public long id { get; set; }
 		public string name { get; set; }
 		public string mdate{get;set;}
-		public bool deleted{get;set;}
+		public bool defed{get;set;}
 
 	}
 

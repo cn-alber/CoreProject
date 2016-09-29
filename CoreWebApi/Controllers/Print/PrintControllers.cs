@@ -146,7 +146,7 @@ namespace CoreWebApi.Print
         [HttpPostAttribute("/core/print/tpl/deleteSysesType")]
         public ResponseResult deleteSysesType([FromBodyAttribute]JObject lo)
         {   
-            string ids =String.Join(",",lo["ids"]);                   
+            string ids =lo["id"].ToString();                  
             if(!checkInt(ids)) return CoreResult.NewResponse(-4023, null, "Print"); 
             var m = PrintHaddle.DelSysesTypeByID(ids); 
             return CoreResult.NewResponse(m.s, m.d, "Print");

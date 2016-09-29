@@ -775,7 +775,7 @@ namespace CoreDate.CoreComm
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    string wheresql = "  ";//a.deleted = FALSE AND
+                    string wheresql = " a.deleted = FALSE AND ";
                     string totalsql = ""; 
                     var totallist = new List<useslist>();
                     if(!string.IsNullOrEmpty(param.Filter)){
@@ -794,11 +794,14 @@ namespace CoreDate.CoreComm
                         wheresql += " limit "+(param.PageIndex -1)*param.PageSize +" ,"+ param.PageIndex*param.PageSize;
                     }
 
-                    wheresql ="SELECT a.id, a.`name`,a.mdate,a.deleted FROM print_uses as a WHERE  "+wheresql;
+                    wheresql ="SELECT a.id, a.`name`,a.mdate,b.defed_id,if(b.defed_id = a.id ,1,0) as defed "+
+                                "FROM print_uses as a LEFT JOIN print_use_setting as b on a.admin_id = b.admin_id WHERE "+wheresql;
                                         
                     var list = conn.Query<useslist>(wheresql).AsList();
                     if (list != null)
                     {
+
+
                         if(param.PageIndex == 1){
                             result.d = new {
                                 list = list,
