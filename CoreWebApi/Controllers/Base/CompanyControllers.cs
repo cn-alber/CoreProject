@@ -52,24 +52,7 @@ namespace CoreWebApi
         public ResponseResult UpdateCompamy([FromBodyAttribute]JObject co)
         {   
             string modifyFlag = co["ModifyFlag"].ToString();
-            var com = new CompanySingle();
-            if(!string.IsNullOrEmpty(co["ID"].ToString()))
-            {
-                com.id =  int.Parse(co["ID"].ToString());
-            }
-            else
-            {
-                com.id =  0;
-            }            
-            com.name = co["Name"].ToString();
-            com.enable = co["Enable"].ToString().ToUpper()=="TRUE"?true:false;
-            com.address = co["Address"].ToString();
-            com.email = co["Email"].ToString();
-            com.typelist = co["Typelist"].ToString();
-            com.contacts = co["Contacts"].ToString();
-            com.telphone = co["Telphone"].ToString();
-            com.mobile = co["Mobile"].ToString();
-            com.remark = co["Remark"].ToString();
+            var com = Newtonsoft.Json.JsonConvert.DeserializeObject<CompanySingle>(co["Com"].ToString());
             string UserName = GetUname(); 
             string Company = co["Company"].ToString();
             if(modifyFlag == "new")
