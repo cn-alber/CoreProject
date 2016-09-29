@@ -28,3 +28,13 @@ function说明
         main            CoreSkuMatAuto     单笔物料详情
     参考：input json 文件:MatQuery_input.json
     参考：output json 文件:MatQuery_output.json
+3.MatSave()//物料资料保存
+    方法：POST
+    路由：http://localhost:5000/Core/XyCore/CoreSku/MatSave
+    参数：
+    InPut:
+        CoreSkuMatAuto      CoreSkuMatAuto     物料资料
+    OutPut：操作结果
+    参考：input json 文件:MatSave_input.json
+    参考：output json 文件:MatSave_output.json
+    

@@ -1,0 +1,110 @@
+{"CoreSkuMatAuto": {
+        "CoID": 1,
+        "GoodsCode": "MAT5",
+        "GoodsName": "Mat物料1",
+        "Norm": "test",
+        "KID": 66,
+        "KName": "主料",
+        "SCoList": "223,225",
+        "Unit": "米",
+        "ValUnit": "米",
+        "CnvRate": 1.0,
+        "PurPrice": 0.0,
+        "ParentID": "008",
+        "Enable": true,
+        "Creator": null,
+        "SkuID": null,
+        "status": 0,
+        "mainew": 1,
+        "items": [
+            {
+                "GoodsCode": "MAT5",
+                "SkuID": "MAT50002177",
+                "ColorID": "0002",
+                "ColorName": "白色",
+                "SizeID": "177",
+                "SizeName": "L",
+                "Remark": "",
+                "Creator": null,
+                "status": 1
+            },
+            {
+                "GoodsCode": "MAT5",
+                "SkuID": "MAT50002179",
+                "ColorID": "0002",
+                "ColorName": "白色",
+                "SizeID": "179",
+                "SizeName": "M",
+                "Remark": "",
+                "Creator": null,
+                "status": 1
+            },
+            {
+                "GoodsCode": "MAT5",
+                "SkuID": "MAT50002181",
+                "ColorID": "0002",
+                "ColorName": "白色",
+                "SizeID": "181",
+                "SizeName": "S",
+                "Remark": "",
+                "Creator": null,
+                "status": 1
+            },
+            {
+                "GoodsCode": "MAT5",
+                "SkuID": "MAT50002182",
+                "ColorID": "0002",
+                "ColorName": "白色",
+                "SizeID": "182",
+                "SizeName": "XL",
+                "Remark": "",
+                "Creator": null,
+                "status": 1
+            },
+            {
+                "GoodsCode": "MAT5",
+                "SkuID": "MAT50002184",
+                "ColorID": "0002",
+                "ColorName": "白色",
+                "SizeID": "184",
+                "SizeName": "XXL",
+                "Remark": "",
+                "Creator": null,
+                "status": 1
+            },
+            {
+                "GoodsCode": "MAT5",
+                "SkuID": "MAT50002186",
+                "ColorID": "0002",
+                "ColorName": "白色",
+                "SizeID": "186",
+                "SizeName": "XXXL",
+                "Remark": "",
+                "Creator": null,
+                "status": 1
+            },
+            {
+                "GoodsCode": "MAT5",
+                "SkuID": "MAT50002188",
+                "ColorID": "0002",
+                "ColorName": "白色",
+                "SizeID": "188",
+                "SizeName": "XXXXL",
+                "Remark": "",
+                "Creator": null,
+                "status": 1
+            },
+            {
+                "GoodsCode": "MAT5",
+                "SkuID": "MAT50002189",
+                "ColorID": "0002",
+                "ColorName": "白色",
+                "SizeID": "189",
+                "SizeName": "XXXXXL",
+                "Remark": "",
+                "Creator": null,
+                "status": 1
+            }
+        ]
+    }
+}
