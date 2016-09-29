@@ -1,3 +1,4 @@
+using System;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -60,9 +61,11 @@ namespace CoreWebApi
             object jsonObj;
             try{
                 foreach(string s in jstring){
-                    if(!string.IsNullOrEmpty(s)){
-                        jsonObj =  JsonConvert.DeserializeObject(s);       
-                        if(jsonObj.GetType().FullName == "Newtonsoft.Json.Linq.JObject"){
+                    if(!string.IsNullOrEmpty(s)){                        
+                        jsonObj =  JsonConvert.DeserializeObject(s);
+                        //Console.WriteLine(jsonObj);
+                        //Console.WriteLine(jsonObj.GetType().FullName);
+                        if(jsonObj.GetType().FullName == "Newtonsoft.Json.Linq.JObject"||jsonObj.GetType().FullName == "Newtonsoft.Json.Linq.JArray"){
                             flag =true;
                         }else{
                             flag =false;
@@ -75,6 +78,16 @@ namespace CoreWebApi
             }
             return flag;
         }
+
+        ///<summary>
+        ///json文件转义，数据库中 /u1234 -> //u1234
+        ///</summary>
+        public string JsonEscape(string  jstring){
+            if(!string.IsNullOrEmpty(jstring)){
+                jstring = jstring.Replace("\\u","\\\\u");
+            }
+            return jstring;
+        }  
 
         public bool checkInt(params int[]  jstring){
             bool flag =true;            

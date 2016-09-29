@@ -57,7 +57,7 @@ namespace CoreWebApi.Print
         #endregion
 
         #region 删除个人模板 
-        [HttpPostAttribute("/core/print/tpl/delMyTpl")]
+        [HttpPostAttribute("/core/print/tpl/delmine")]
         public ResponseResult delMyTpl([FromBodyAttribute]JObject lo){
             string ids =String.Join(",",lo["ids"]); 
             if(!checkInt(ids)) return CoreResult.NewResponse(-4023, null, "Print");
@@ -67,7 +67,7 @@ namespace CoreWebApi.Print
         #endregion
 
         #region 获取个人模板list  print_uses list
-        [HttpGetAttribute("/core/print/tpl/usesList")]    
+        [HttpGetAttribute("/core/print/tpl/minebytype")]    
         public ResponseResult useslist(int type,int Page = 1,int PageSize = 20){
             if(!checkInt(type)) return CoreResult.NewResponse(-4023, null, "Print");
 

@@ -99,7 +99,7 @@ namespace CoreWebApi.Print
         #endregion
 
 
-        #region 保存系统预设模板
+        #region 新增系统预设模板
         [HttpPostAttribute("/core/print/tpl/createSysesType")]
         public ResponseResult createSysesType([FromBodyAttribute]JObject lo)
         {
@@ -111,9 +111,9 @@ namespace CoreWebApi.Print
             }
                      
             string name = lo["name"].ToString();            
-            var presets = lo["presets"] !=null ? lo["presets"]:"";
-            var emu_data = lo["emu_data"] !=null ? lo["emu_data"]:"";
-            var setting = lo["setting"] !=null ? lo["setting"] :"";   
+            var presets = lo["presets"] !=null ? JsonEscape(lo["presets"].ToString()):"";
+            var emu_data = lo["emu_data"] !=null ? JsonEscape(lo["emu_data"].ToString()):"";
+            var setting = lo["setting"] !=null ? JsonEscape(lo["setting"].ToString()) :""; 
 
             var m = PrintHaddle.saveSysesType(0,name,presets,emu_data,setting); 
             return CoreResult.NewResponse(m.s, m.d, "Print");
@@ -134,9 +134,9 @@ namespace CoreWebApi.Print
 
             int id =int.Parse(lo["id"].ToString());            
             string name = lo["name"].ToString();            
-            var presets = lo["presets"] !=null ? lo["presets"]:"";
-            var emu_data = lo["emu_data"] !=null ? lo["emu_data"]:"";
-            var setting = lo["setting"] !=null ? lo["setting"] :""; 
+            var presets = lo["presets"] !=null ? JsonEscape(lo["presets"].ToString()):"";
+            var emu_data = lo["emu_data"] !=null ? JsonEscape(lo["emu_data"].ToString()):"";
+            var setting = lo["setting"] !=null ? JsonEscape(lo["setting"].ToString()) :""; 
             
             var m = PrintHaddle.saveSysesType(id,name,presets,emu_data,setting); 
             return CoreResult.NewResponse(m.s, m.d, "Print");
@@ -164,7 +164,7 @@ namespace CoreWebApi.Print
             string type = lo["type"].ToString();            
             string name = lo["name"].ToString();            
             int  sys_id = 0;
-            var state = lo["state"];
+            var state = JsonEscape(lo["state"].ToString());
               
             var m = PrintHaddle.saveSyses(sys_id, type,state,name );
             return CoreResult.NewResponse(m.s, m.d, "Print");
@@ -180,15 +180,12 @@ namespace CoreWebApi.Print
             string type = lo["type"].ToString();            
             string name = lo["name"].ToString();            
             int  sys_id = string.IsNullOrEmpty(lo["sys_id"].ToString())?0 :int.Parse(lo["sys_id"].ToString());
-            var state = lo["state"];
+            var state = JsonEscape(lo["state"].ToString());
             
             var m = PrintHaddle.saveSyses(sys_id, type,state,name );
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
-
-
-
 
         #region 删除系统模板 print_syses 
         [HttpPostAttribute("/core/print/tpl/deleteSys")]

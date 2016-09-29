@@ -16,19 +16,18 @@ namespace CoreDate.CoreApi
 //         {
 //             return true; //总是接受     
 //         }
-        public static async  Task<string> CreatePostHttpResponse(string url, IDictionary<string, string> parameters,dynamic obj)
+        public static async  Task<string> CreatePostHttpResponse(string url, IDictionary<string, string> parameters)
         {               
-            using (var httpClient = new HttpClient(new HttpClientHandler
-            {
-              
-              AutomaticDecompression = DecompressionMethods.GZip //防止返回的json乱码
-                                       | DecompressionMethods.Deflate 
-            })){      
+            using (var httpClient = new HttpClient(
+                new HttpClientHandler {              
+                      AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate 
+                    })
+            ){      
                 try{                            
                     httpClient.MaxResponseContentBufferSize = 300000;                                                                    
                     httpClient.DefaultRequestHeaders.Add("user-agent", DefaultUserAgent);//                    
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-www-form-urlencoded"));
-                    httpClient.DefaultRequestHeaders.Add("Accept-Charset", "utf-8");                     
+                    httpClient.DefaultRequestHeaders.Add("Accept-Charset", "gb2312");                     
                 
                     List<KeyValuePair<String, String>> paramList = new List<KeyValuePair<String, String>>();
                     foreach( KeyValuePair<string, string> kvp in parameters)
