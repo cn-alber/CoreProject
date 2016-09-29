@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 namespace CoreModels.XyCore
 {
-    public class PurchaseMulti
+    public class Purchase
     {
         public int id{get;set;}
         public string purchaseid{get;set;}
@@ -10,10 +10,11 @@ namespace CoreModels.XyCore
         public string coname{get;set;}
         public string contract{get;set;}
         public string shpaddress{get;set;}
-        public string status{get;set;}
+        public int status{get;set;}
         public string purtype{get;set;}
         public string buyyer{get;set;}
         public string remark{get;set;}
+        public decimal taxrate{get;set;}
     }
     public class PurchaseDetailMulti
     {
@@ -38,7 +39,7 @@ namespace CoreModels.XyCore
         public string Purid {get;set;}//采购单号
         public DateTime PurdateStart{get;set;}//采购日期起
         public DateTime PurdateEnd{get;set;}//采购日期迄
-        public string Status{get;set;}//状态
+        public int Status{get;set;}//状态
         public string CoName{get;set;}//供应商
         public string SortField{get;set;}//排序栏位
         public string SortDirection{get;set;}//排序方式
@@ -46,7 +47,7 @@ namespace CoreModels.XyCore
         public int PageIndex{get;set;}//页码
         public int Datacnt {get;set;}//总资料笔数
         public decimal Pagecnt{get;set;}//总页数
-        public List<PurchaseMulti> Com {get;set;}//采购单资料List
+        public List<Purchase> Com {get;set;}//采购单资料List
     }
     public class PurchaseDetailParm
     {

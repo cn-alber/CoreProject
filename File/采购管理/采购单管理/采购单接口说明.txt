@@ -53,9 +53,17 @@ OutPut:     CoID            int                   公司编号coid
 参考:input jason 文件:PurchaseDetailList_input.json
 参考:output jason 文件:PurchaseDetailList_output.json
 
-3.DeletePur()//删除采购
+3.DeletePur()//删除采购(前端需检查采购单状态，只有状态 = 0(未审核)的资料才可以执行删除操作)
 路由:http://localhost:5000/Core/Purchase/DeletePur
 input:  PurIdList   List<string>    采购单号List
 OutPut: 1 成功  -3004 失败
 参考:input jason 文件:DeletePur_input.json
 参考:output jason 文件:DeletePur_output.json
+
+4.SavePur()//采购单保存
+路由:http://localhost:5000/Core/Purchase/SavePur
+input:ModifyFlag    string        保存方式(new/edit)
+      Pur           purchase      采购单资料
+output: s=1成功 else 错误代码
+参考:input jason 文件:SavePur_input.json
+参考:output jason 文件:SavePur_output.json

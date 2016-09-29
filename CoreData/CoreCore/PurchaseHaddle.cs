@@ -24,9 +24,9 @@ namespace CoreData.CoreCore
             {
                 wheresql = wheresql + " AND purchaseid like '%"+ cp.Purid + "%'";
             }
-            if(!string.IsNullOrEmpty(cp.Status))//状态
+            if(cp.Status >= 0)//状态
             {
-               wheresql = wheresql + " and status = '" + cp.Status + "'";
+               wheresql = wheresql + " and status = " + cp.Status;
             }
             if(!string.IsNullOrEmpty(cp.CoName))//供应商
             {
@@ -36,16 +36,16 @@ namespace CoreData.CoreCore
             {
                 wheresql = wheresql + " ORDER BY "+cp.SortField +" "+ cp.SortDirection;
             }
-            wheresql = "select id,purchaseid,purchasedate,coname,contract,shpaddress,status,purtype,buyyer,remark from purchase " + wheresql ;
+            wheresql = "select id,purchaseid,purchasedate,coname,contract,shpaddress,status,purtype,buyyer,remark,taxrate from purchase " + wheresql ;
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
-                    var u = conn.Query<PurchaseMulti>(wheresql).AsList();
+                    var u = conn.Query<Purchase>(wheresql).AsList();
                     int count = u.Count;
                     decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
 
                     int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
-                    u = conn.Query<PurchaseMulti>(wheresql).AsList();
+                    u = conn.Query<Purchase>(wheresql).AsList();
 
                     cp.Datacnt = count;
                     cp.Pagecnt = pagecnt;
@@ -171,6 +171,124 @@ namespace CoreData.CoreCore
             }
             return result;
         }
+        ///<summary>
+        ///查询单笔采购单
+        ///</summary>
+        public static DataResult GetPurchaseEdit(int id,int CoID)
+        {
+            var result = new DataResult(1,null);     
+            string wheresql = "select id,purchaseid,purchasedate,coname,contract,shpaddress,status,purtype,buyyer,remark,taxrate from purchase where id =" + id + " and coid =" + CoID ;
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    var u = conn.Query<Purchase>(wheresql).AsList();
+                    if (u.Count == 0)
+                    {
+                        result.s = -3001;
+                        result.d = null;
+                    }
+                    else
+                    {
+                        result.d = u[0];
+                    }               
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }           
+            return result;
+        }
+        ///<summary>
+        ///采购单保存
+        ///</summary>
+        public static DataResult SavePurchase(string modifyFlag,Purchase pur,string UserName,int CoID)
+        {
+            var result = new DataResult(1,null);        
+            if (modifyFlag == "new")
+            {
+                var iresult = InsertPurchase(pur,UserName,CoID);
+                result.s = iresult.s;
+                result.d = iresult.d;
+            }
+            else
+            {
+                var mresult = UpdatePurchase(pur);
+                result.s = mresult.s;
+                result.d = mresult.d;
+            }
+            return result;
+        }    
+        public static DataResult InsertPurchase(Purchase pur,string UserName,int CoID)
+        {
+            var result = new DataResult(1,"资料新增成功!");   
+            //采购单号产生
+            string purid = CoID.ToString();
+            int len = purid.Length;
+            if (len == 1)
+            { purid = purid + "000"; }
+            if (len == 2)
+            { purid = purid + "00"; }
+            if (len == 3)
+            { purid =purid + "0"; }
+            if (len > 3)
+            { purid = purid.Substring(0, 4); }
+            purid = purid + DateTime.Now.ToString("yyyy-MM-dd").Substring(0, 4);
+            purid = purid + DateTime.Now.ToString("yyyy-MM-dd").Substring(5, 2);
+            Random Rd = new Random();
+            purid = purid + Rd.Next(1000, 10000).ToString();
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlCommandText = @"INSERT INTO purchase(purchaseid,purchasedate,coname,contract,shpaddress,purtype,buyyer,remark,taxrate,coid,creator) VALUES(
+                            @PurID,
+                            @Purdate,
+                            @CoName,
+                            @Contract,
+                            @Shpaddress,
+                            @Purtype,
+                            @Buyyer,
+                            @Remark,
+                            @Taxrate,
+                            @Coid,
+                            @UName
+                        )";
+                    var args = new {PurID = purid,Purdate=pur.purchasedate,CoName = pur.coname,Contract = pur.contract,Shpaddress = pur.shpaddress,
+                                    Purtype = pur.purtype,Buyyer = pur.buyyer,Remark = pur.remark,Taxrate = pur.taxrate,Coid = CoID,UName = UserName};
+                    int count =conn.Execute(sqlCommandText,args);
+                    if(count <= 0)
+                    {
+                        result.s = -3002;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return  result;
+        }
+        public static DataResult UpdatePurchase(Purchase pur)
+        {
+            var result = new DataResult(1,"资料更新成功!");  
+            string contents = string.Empty; 
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{               
+                    string uptsql = @"update purchase set purchasedate = @Purdate,coname = @CoName,contract = @Contract,shpaddress=@Shpaddress,purtype=@Purtype,buyyer=@Buyyer,
+                                      remark=@Remark,taxrate=@Taxrate,puramttot = puramtnet*(1+@Taxrate) where id = @ID";
+                    var args = new {Purdate=pur.purchasedate,CoName = pur.coname,Contract = pur.contract,Shpaddress = pur.shpaddress,
+                                    Purtype = pur.purtype,Buyyer = pur.buyyer,Remark = pur.remark,Taxrate = pur.taxrate,ID = pur.id};
+                    int count = conn.Execute(uptsql,args);
+                    if(count<=0)
+                    {
+                        result.s= -3003;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return  result;
+        }  
     }
 }
             

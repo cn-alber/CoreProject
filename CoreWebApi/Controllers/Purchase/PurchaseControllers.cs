@@ -18,7 +18,7 @@ namespace CoreWebApi
             cp.Purid = co["Purid"].ToString();
             cp.PurdateStart = DateTime.Parse(co["PurdateStart"].ToString());
             cp.PurdateEnd = DateTime.Parse(co["PurdateEnd"].ToString());
-            cp.Status = co["Status"].ToString();
+            cp.Status = int.Parse(co["Status"].ToString());
             cp.CoName = co["CoName"].ToString();
             cp.SortField = co["SortField"].ToString();
             cp.SortDirection = co["SortDirection"].ToString();
@@ -53,6 +53,18 @@ namespace CoreWebApi
             List<string> puridList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(co["PurIdList"].ToString());
             int CoId = int.Parse(GetCoid());
             var data = PurchaseHaddle.DeletePur(puridList,CoId);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [AllowAnonymous]
+        [HttpPostAttribute("/Core/Purchase/SavePur")]
+        public ResponseResult SavePur([FromBodyAttribute]JObject co)
+        {   
+            string modifyFlag = co["ModifyFlag"].ToString();
+            var pur = Newtonsoft.Json.JsonConvert.DeserializeObject<Purchase>(co["Pur"].ToString());
+            string UserName = GetUname(); 
+            int CoID = int.Parse(GetCoid());
+            var data = PurchaseHaddle.SavePurchase(modifyFlag,pur,UserName,CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     }
