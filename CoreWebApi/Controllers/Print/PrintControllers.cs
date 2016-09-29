@@ -20,9 +20,10 @@ namespace CoreWebApi.Print
     {
         #region 获取print_sys_types -> emu_data
         [HttpGetAttribute("/core/print/task/data")]
-        public ResponseResult taskdata(string type)
+        public ResponseResult taskdata(int type)
         {
-            var m = PrintHaddle.taskData(type);
+            if(!checkInt(type)) return CoreResult.NewResponse(-4001, null, "Print");
+            var m = PrintHaddle.taskData(type.ToString());
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
@@ -40,9 +41,10 @@ namespace CoreWebApi.Print
 
         #region 获取系统模板 print_syses
         [HttpGetAttribute("/core/print/tpl/sys")]
-        public ResponseResult tplsys(string sys_id)
+        public ResponseResult tplsys(int sys_id)
         {
-            var m = PrintHaddle.tplSys(sys_id);
+            if(!checkInt(sys_id)) return CoreResult.NewResponse(-4001, null, "Print");
+            var m = PrintHaddle.tplSys(sys_id.ToString());
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
@@ -51,9 +53,9 @@ namespace CoreWebApi.Print
 
         #region 根据预设模板 type( print_sys_types->type ) 获取系统模板 list
         [HttpGetAttribute("/core/print/tpl/sysesbytype")]
-        public ResponseResult sysesbytype(string type,int Page = 1,int PageSize = 20)
+        public ResponseResult sysesbytype(int type,int Page = 1,int PageSize = 20)
         {
-
+            if(!checkInt(type)) return CoreResult.NewResponse(-4001, null, "Print");
             printParam param = new printParam();
             param.Filter = "type = "+type;            
             param.PageIndex = Math.Max(Page,1);
@@ -66,9 +68,10 @@ namespace CoreWebApi.Print
 
         #region 获取类型预设
         [HttpGetAttribute("/core/print/tpl/type")]
-        public ResponseResult tpltype(string type)
+        public ResponseResult tpltype(int type)
         {            
-            var m = PrintHaddle.tplType(type);
+            if(!checkInt(type)) return CoreResult.NewResponse(-4001, null, "Print");
+            var m = PrintHaddle.tplType(type.ToString());
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
@@ -76,19 +79,20 @@ namespace CoreWebApi.Print
         #region 根据type获取 print_sys_types 系统模板数据 emu_data
         //与 /core/print/task/data 返回相同，不同地方引用，区分为两个路由
         [HttpGetAttribute("/core/print/tpl/emu_data")]
-        public ResponseResult tplemu_data(string type)
+        public ResponseResult tplemu_data(int type)
         {            
-            var m = PrintHaddle.taskData(type); 
+            if(!checkInt(type)) return CoreResult.NewResponse(-4001, null, "Print");
+            var m = PrintHaddle.taskData(type.ToString());  
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
 
         #region 获取系统预设模板 单条数据
         [HttpGetAttribute("/core/print/tpl/sysesType")]
-        public ResponseResult sysestype(string id)
+        public ResponseResult sysestype(int id)
         {
-            if(string.IsNullOrEmpty(id)){return CoreResult.NewResponse(-4023, null, "Print"); }
-            var m = PrintHaddle.GetSysesType(id); 
+            if(!checkInt(id)) return CoreResult.NewResponse(-4023, null, "Print");
+            var m = PrintHaddle.GetSysesType(id.ToString()); 
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
@@ -99,7 +103,7 @@ namespace CoreWebApi.Print
         public ResponseResult createSysesType([FromBodyAttribute]JObject lo)
         {
             //只有系统管理员才编辑新增
-            if(!checkIsAdmin() ){ return CoreResult.NewResponse(-4021, null, "Print");}                       
+            if(!checkIsAdmin() ){ return CoreResult.NewResponse(-1008, null, "Basic");}                      
             if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4012, null, "Print");}
             if(!isJson(lo["presets"].ToString(),lo["emu_data"].ToString(),lo["setting"].ToString())){
                 return CoreResult.NewResponse(-4024, null, "Print");
@@ -120,9 +124,9 @@ namespace CoreWebApi.Print
         public ResponseResult modifySysesType([FromBodyAttribute]JObject lo)
         {
             //只有系统管理员才编辑新增
-            if(!checkIsAdmin()){ return CoreResult.NewResponse(-4021, null, "Print");}                       
-            if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4012, null, "Print");}
-            if(string.IsNullOrEmpty(lo["id"].ToString()))  { return CoreResult.NewResponse(-4023, null, "Print");}
+            if(!checkIsAdmin() ){ return CoreResult.NewResponse(-1008, null, "Basic");}                      
+            if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4012, null, "Print");}            
+            if(!checkInt(int.Parse(lo["id"].ToString()))) return CoreResult.NewResponse(-4023, null, "Print");
             if(!isJson(lo["presets"].ToString(),lo["emu_data"].ToString(),lo["setting"].ToString())){
                 return CoreResult.NewResponse(-4024, null, "Print");
             }
@@ -142,15 +146,16 @@ namespace CoreWebApi.Print
         [HttpPostAttribute("/core/print/tpl/deleteSysesType")]
         public ResponseResult deleteSysesType([FromBodyAttribute]JObject lo)
         {   
-            string ids =String.Join(",",lo["ids"]); 
+            string ids =String.Join(",",lo["ids"]);                   
+            if(!checkInt(ids)) return CoreResult.NewResponse(-4023, null, "Print"); 
             var m = PrintHaddle.DelSysesTypeByID(ids); 
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
 
         #region 保存系统模板
-        [HttpPostAttribute("/core/print/tpl/savesyses")]
-        public ResponseResult savesyses([FromBodyAttribute]JObject lo)
+        [HttpPostAttribute("/core/print/tpl/createSys")]
+        public ResponseResult createSys([FromBodyAttribute]JObject lo)
         {                   
 
             if(!checkIsAdmin() ){ return CoreResult.NewResponse(-1008, null, "Basic");}
@@ -170,7 +175,6 @@ namespace CoreWebApi.Print
         public ResponseResult modifySys([FromBodyAttribute]JObject lo)
         {                   
             if(!checkIsAdmin() ){ return CoreResult.NewResponse(-1008, null, "Basic");}
-
             if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4009, null, "Print");}
             string type = lo["type"].ToString();            
             string name = lo["name"].ToString();            
