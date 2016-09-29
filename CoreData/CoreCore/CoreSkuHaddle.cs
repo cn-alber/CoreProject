@@ -309,7 +309,7 @@ namespace CoreData.CoreCore
             var Trans = DbBase.CoreDB.BeginTransaction();
             try
             {
-                string sql = @"INSERT INTO(SkuID,SkuName,Type,Unit,Weight,
+                string sql = @"INSERT INTO coresku(SkuID,SkuName,Type,Unit,Weight,
                                        CoID, Brand,  KID, KName,SCoList,
                                        GoodsCode,GoodsName,ColorID,ColorName,SizeID,
                                        ParentID,SizeName,CostPrice,SalePrice,Norm,
