@@ -25,8 +25,13 @@ namespace CoreWebApi.Api.JingDong{
         {            
             List<string> ids = new List<string>();
             ids.Add("22919473317");
-            
-            var m = JingDHaddle.orderDownByIds(order_id, optional_fields, order_state, token);
+            ids.Add("23080116194");
+            ids.Add("22700014989");
+            ids.Add("22765138891");
+            ids.Add("22718110928");
+            ids.Add("22717671671");
+
+            var m = JingDHaddle.orderDownByIds(ids, optional_fields, order_state, token);
             return CoreResult.NewResponse(m.s, m.d, "Api");
         }
         #endregion

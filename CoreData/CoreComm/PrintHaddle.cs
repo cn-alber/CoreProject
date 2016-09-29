@@ -54,7 +54,9 @@ namespace CoreDate.CoreComm
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try{
-                    var list = conn.Query<print_uses>("SELECT * FROM print_uses AS a print_uses WHERE a.deleted = FALSE AND a.id = "+id).AsList()[0];   
+                    string sql = "SELECT * FROM print_uses AS a  WHERE a.deleted = FALSE AND a.id = "+id;
+                    
+                    var list = conn.Query<print_uses>(sql).AsList()[0];   
                     result.d = list;                                    
                 }catch(Exception ex){
                     result.s = -1;
@@ -168,6 +170,50 @@ namespace CoreDate.CoreComm
 
         #region 
         /// <summary>
+		/// 设置lodop_target
+		/// </summary>
+        public static DataResult setLodop(string admin_id,string lodop_target){
+            var result = new DataResult(1,null); 
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    string sql = "SELECT * FROM print_use_setting as a WHERE a.admin_id = "+admin_id;
+                    Console.WriteLine(sql);
+                    var oldmodel = conn.Query<print_use_setting>(sql).AsList()[0];
+                    int rnt = 0;
+                    if (oldmodel != null){        
+                        sql = "UPDATE print_use_setting SET print_use_setting.admin_id = "+admin_id+" ,print_use_setting.lodop_target = '"+lodop_target+"' WHERE print_use_setting.id = "+oldmodel.id;
+                        Console.WriteLine(sql);      
+                        rnt = conn.Execute(sql);
+                        if (rnt > 0){
+                        result.s = 1;
+                        }else{
+                            result.s = -4025;
+                        }
+                    }else {
+                        sql = "INSERT INTO print_use_setting(print_use_setting.admin_id,print_use_setting.lodop_target) VALUES("+admin_id+",'"+lodop_target+"')";
+                        Console.WriteLine(sql);
+                        rnt = conn.Execute(sql);
+                        if (rnt > 0){
+                            result.s = 1;
+                        }else{
+                            result.s = -4025;
+                        }
+                    }                
+                }catch (Exception e){
+                    result.s = -1;
+                    result.d= e.Message;
+                    conn.Dispose();
+                }   
+            }   
+            return result;      
+        }
+        #endregion
+
+
+
+        #region 
+        /// <summary>
 		/// 移除用户模板
 		/// </summary>
         public static DataResult sideRemove(string ids){
@@ -235,10 +281,12 @@ namespace CoreDate.CoreComm
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    var sys = conn.Query<print_syses>("SELECT a.tpl_data,a.type,a.`name` FROM print_syses as a WHERE a.deleted = FALSE AND  a.id = "+sys_id).AsList()[0];
-                    if(sys==null){
+                    var sql = "SELECT a.tpl_data,a.type,a.`name` FROM print_syses as a WHERE a.deleted = FALSE AND  a.id = "+sys_id;                    
+                    var sysList = conn.Query<print_syses>(sql).AsList();                    
+                    if(sysList.Count == 0){
                         result.s = -4008;
-                    }else{            
+                    }else{  
+                        var sys = sysList[0];          
                         var type = conn.Query<print_sys_types>("SELECT a.setting,a.presets FROM print_sys_types as a WHERE   a.deleted =FALSE AND a.type = "+sys.type).AsList()[0];
                         if (type == null){
                             result.s = -4009;
@@ -274,9 +322,11 @@ namespace CoreDate.CoreComm
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
-                {                                    
-                    var my = conn.Query<singalUsesModel>("SELECT a.name,a.sys_id,a.tpl_data,a.print_setting,a.type,b.lodop_target FROM print_uses as a"+
-                                                          "LEFT JOIN print_use_setting as b on b.admin_id = a.admin_id WHERE a.id = "+my_id+" AND a.admin_id = "+admin_id).AsList()[0];
+                {
+                    string sql = "SELECT a.`name`,a.sys_id,a.tpl_data,a.print_setting,a.type,b.lodop_target FROM print_uses as a "+
+                                  "LEFT JOIN print_use_setting as b on b.admin_id = a.admin_id WHERE a.id = "+my_id+" AND a.admin_id = "+admin_id;                                                                                                               
+                    var my = conn.Query<singalUsesModel>(sql).AsList()[0];
+
                     if (my == null){
                         result.s = -4002;
                     }else{
@@ -552,18 +602,20 @@ namespace CoreDate.CoreComm
 		/// 保存系统模板 print_syses
 		/// </summary>
         public static DataResult saveSyses(int sys_id, string type,dynamic state, string name){
-            var result = new DataResult(1,null);
-            if(GetSysesType(type).d == null){ result.s=-4001;  return result;}
+            
+            var result = new DataResult(1,null);            
+            if(GetSysesType(type).d == null){ result.s=-4001;  return result;}            
             using(var conn = new MySqlConnection(DbBase.CommConnectString)){
                 try
                 {
                    
                     var tpl = state;
+                    var stateObj = JsonConvert.DeserializeObject<dynamic>(state);
                     var setting = new{
-                        pageW = state.setting.pageW,
-                        pageH = state.setting.pageH
+                        pageW = stateObj.setting.pageW,
+                        pageH = stateObj.setting.pageH
                     };
-                    int rnt = 0;
+                    int rnt = 0;                    
                     string sql = "";
                     if (sys_id > 0){//更新
                         sql = "UPDATE print_syses SET print_syses.`name` = '"+name+"' ,"+
@@ -590,7 +642,7 @@ namespace CoreDate.CoreComm
                         }
                          sql="INSERT INTO print_syses(print_syses.type,print_syses.`name`,print_syses.setting,print_syses.tpl_data,print_syses.mtime)"+
                              "VALUES("+type+",'"+name+"','"+setting.ToString()+"','"+tpl.ToString()+"',NOW());"+
-                             "SELECT LAST_INSERT_ID() as lastid;";                             
+                             "SELECT LAST_INSERT_ID() as lastid;";            
                         rnt = conn.Query<int>(sql).AsList()[0];   
                   
 
@@ -620,7 +672,7 @@ namespace CoreDate.CoreComm
         /// <summary>
 		/// 保存个人模板
 		/// </summary>
-        public static DataResult postSaveMy(string admin_id,string my_id, string sys_id, string type, string name, dynamic print_setting, dynamic state){
+        public static DataResult postSaveMy(string admin_id,string my_id, string sys_id, string type, string name, dynamic print_setting, dynamic state,string lodop_target){
 
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
@@ -639,53 +691,68 @@ namespace CoreDate.CoreComm
                             { //my_id >0 为更新                                
                                 if (GetUses(my_id).d as print_uses == null){
                                     result.s = -4015;
-                                }else{        
+                                }else{                                          
                                     sql = "UPDATE print_uses SET "+                                            
                                             "print_uses.mdate = NOW(),"+
                                             "print_uses.`name` = '"+name+"',"+
                                             "print_uses.print_setting = '"+print_setting+"',"+
                                             "print_uses.tpl_data = '"+state+"' "+
-                                        "WHERE print_uses.id = 1 ";
+                                        "WHERE print_uses.id =  "+my_id;
 
                                     int rnt = conn.Execute(sql);
                                     if (rnt > 0){
                                         result.d = new {
-                                            id = int.Parse(my_id),
+                                            my_id = int.Parse(my_id),
                                             name = name,
                                             type = type
                                         };
-                                        result.s = 4004;
+                                        //保存 lodop_target
+                                        if(setLodop(admin_id,lodop_target).s == -4025){
+                                            result.s = -4025;
+                                        }else{
+                                            result.s = 4004;
+                                        }
+                                        
                                     }else {
                                         result.s = -4016;
                                     }                        
                                 }                                
-                            }else{//新增
-                                if (int.Parse(sys_id) > 0)
-                                {                                    
-                                    if (GetSyses(sys_id).d as print_syses == null){
-                                        result.s = -4012;
-                                    } else{
-                                        sql ="INSERT INTO print_uses(print_uses.admin_id,print_uses.mdate,print_uses.`name`,print_uses.print_setting,print_uses.sys_id,print_uses.tpl_data,print_uses.type)"+
-                                             "VALUES("+admin_id+",NOW(),'"+name+"','"+print_setting+"',"+sys_id+",'"+state+"',"+type+");"+
-                                             "SELECT LAST_INSERT_ID();";
-                                        int reqn = conn.Query<int>(sql).AsList()[0];
-                                        if (reqn > 0)
-                                        {                                           
-                                            result.d = new
-                                            {
-                                                id = reqn,
-                                                name = name,
-                                                type = type
-                                            };
+                            }else{//新增                                                                                            
+                                if(type == "0"){
+                                    result.s = -4023;
+                                }else{
+                                    Console.WriteLine("---------------------------");
+                                    if(name.Equals("新模板")){
+                                        name = name+DateTime.Now.ToString("d");
+                                    }
+                                    sql ="INSERT INTO print_uses(print_uses.admin_id,print_uses.mdate,print_uses.`name`,print_uses.print_setting,print_uses.sys_id,print_uses.tpl_data,print_uses.type)"+
+                                        "VALUES("+admin_id+",NOW(),'"+name+"','"+print_setting+"',"+sys_id+",'"+state+"',"+type+");"+
+                                        "SELECT LAST_INSERT_ID();";
+                                    int reqn = conn.Query<int>(sql).AsList()[0];
+                                    if (reqn > 0)
+                                    {                                           
+                                        result.d = new
+                                        {
+                                            my_id = reqn,
+                                            name = name,
+                                            type = type
+                                        };
+                                        //保存 lodop_target
+                                        if(setLodop(admin_id,lodop_target).s == -4025){
+                                            result.s = -4025;
+                                        }else{
                                             result.s = 4003;
                                         }
-                                        else
-                                        {
-                                            result.s = 4014;
-                                        }
+                                        
                                     }
-                                } // end of  int.Parse(sys_id)                                
+                                    else
+                                    {
+                                        result.s = 4014;
+                                    }                                    
+                                }
+                                                            
                             }// end of else
+                       
                         }
                     }                                
                 }
@@ -708,7 +775,7 @@ namespace CoreDate.CoreComm
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    string wheresql = " a.deleted = FALSE AND ";
+                    string wheresql = "  ";//a.deleted = FALSE AND
                     string totalsql = ""; 
                     var totallist = new List<useslist>();
                     if(!string.IsNullOrEmpty(param.Filter)){
@@ -727,7 +794,7 @@ namespace CoreDate.CoreComm
                         wheresql += " limit "+(param.PageIndex -1)*param.PageSize +" ,"+ param.PageIndex*param.PageSize;
                     }
 
-                    wheresql ="SELECT a.id, a.`name`,a.mdate FROM print_uses as a WHERE  "+wheresql;
+                    wheresql ="SELECT a.id, a.`name`,a.mdate,a.deleted FROM print_uses as a WHERE  "+wheresql;
                                         
                     var list = conn.Query<useslist>(wheresql).AsList();
                     if (list != null)
@@ -790,7 +857,7 @@ namespace CoreDate.CoreComm
                         }                    
                     }
                     #endregion                    
-                    List<print_syses> type_syses = conn.Query<print_syses>("SELECT a.id,a.`name`,a.setting FROM print_syses as a WHERE a.type = "+t).AsList();
+                    List<print_syses> type_syses = conn.Query<print_syses>("SELECT a.id,a.`name`,a.setting FROM print_syses as a WHERE a.deleted = FALSE AND  a.type = "+t).AsList();
                     result.d = new
                     {
                         myTpls = myTpls,    

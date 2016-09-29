@@ -158,8 +158,8 @@ namespace CoreWebApi.Print
         public ResponseResult createSys([FromBodyAttribute]JObject lo)
         {                   
 
-            if(!checkIsAdmin() ){ return CoreResult.NewResponse(-1008, null, "Basic");}
-            if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4009, null, "Print");}
+            //if(!checkIsAdmin() ){ return CoreResult.NewResponse(-1008, null, "Basic");}
+            //if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4009, null, "Print");}
             string type = lo["type"].ToString();            
             string name = lo["name"].ToString();            
             int  sys_id = 0;
