@@ -35,14 +35,36 @@ namespace CoreWebApi.Print
         }
         #endregion
 
-        #region 保存个人模板数据
-        [HttpPostAttribute("/core/print/tpl/saveMy")]
-        public ResponseResult saveMy([FromBodyAttribute]JObject lo)
+        #region 新建个人模板数据
+        [HttpPostAttribute("/core/print/tpl/createMy")]
+        public ResponseResult createMy([FromBodyAttribute]JObject lo)
         {
             if(!isJson(lo["print_setting"].ToString(),lo["state"].ToString())){
                 return CoreResult.NewResponse(-4024, null, "Print");
             }
-            if(string.IsNullOrEmpty(lo["name"].ToString())){ return CoreResult.NewResponse(-4012, null, "Print");}
+            if(string.IsNullOrEmpty(lo["tpl_name"].ToString())){ return CoreResult.NewResponse(-4012, null, "Print");}
+
+            string admin_id = GetUid();
+            string my_id =string.IsNullOrEmpty(lo["my_id"].ToString()) ? "0" :lo["my_id"].ToString();
+            string sys_id ="0";
+            string type = string.IsNullOrEmpty(lo["type"].ToString()) ? "0": lo["type"].ToString();
+            string name = lo["tpl_name"].ToString();
+            var print_setting = lo["print_setting"];
+            var state = lo["state"];
+            var lodop_target = lo["lodop_target"].ToString();
+            var m = PrintHaddle.postSaveMy(admin_id, my_id, sys_id, type, name, print_setting, state,lodop_target); 
+            return CoreResult.NewResponse(m.s, m.d, "Print");           
+        }
+        #endregion
+
+        #region 新建个人模板数据
+        [HttpPostAttribute("/core/print/tpl/modifyMy")]
+        public ResponseResult modifyMy([FromBodyAttribute]JObject lo)
+        {
+            if(!isJson(lo["print_setting"].ToString(),lo["state"].ToString())){
+                return CoreResult.NewResponse(-4024, null, "Print");
+            }
+            if(string.IsNullOrEmpty(lo["tpl_name"].ToString())){ return CoreResult.NewResponse(-4012, null, "Print");}
 
             string admin_id = GetUid();
             string my_id =string.IsNullOrEmpty(lo["my_id"].ToString()) ? "0" :lo["my_id"].ToString();
@@ -51,10 +73,13 @@ namespace CoreWebApi.Print
             string name = lo["tpl_name"].ToString();
             var print_setting = lo["print_setting"];
             var state = lo["state"];
-            var m = PrintHaddle.postSaveMy(admin_id, my_id, sys_id, type, name, print_setting, state); 
+            var lodop_target = lo["lodop_target"].ToString();
+            var m = PrintHaddle.postSaveMy(admin_id, my_id, sys_id, type, name, print_setting, state,lodop_target); 
             return CoreResult.NewResponse(m.s, m.d, "Print");           
         }
         #endregion
+
+
 
         #region 删除个人模板 
         [HttpPostAttribute("/core/print/tpl/delmine")]
