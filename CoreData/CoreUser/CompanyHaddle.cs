@@ -138,7 +138,7 @@ namespace CoreData.CoreUser
                     string uptsql = @"update company set enable = @Enable where id in @ID";
                     var args = new {ID = IDsDic.Keys.AsList(),Enable = Enable};          
                     int count = conn.Execute(uptsql,args);
-                    if(count<=0)
+                    if(count < 0)
                     {
                         result.s= -3003;
                     }
@@ -204,7 +204,7 @@ namespace CoreData.CoreUser
                     var args = new {Name = com.name,Enable=com.enable,Address = com.address,Email = com.email,Typelist = com.typelist,Contacts = com.contacts,
                                     Telphone = com.telphone,Mobile = com.mobile,Remark = com.remark,UName = UserName};
                     int count =conn.Execute(sqlCommandText,args);
-                    if(count <= 0)
+                    if(count < 0)
                     {
                         result.s = -3003;
                     }
@@ -274,7 +274,7 @@ namespace CoreData.CoreUser
                     var args = new {Name = com.name,Enable=com.enable,Address = com.address,Email = com.email,Typelist = com.typelist,Contacts = com.contacts,
                                     Telphone = com.telphone,Mobile = com.mobile,Remark = com.remark,ID = com.id};
                     int count = conn.Execute(uptsql,args);
-                    if(count<=0)
+                    if(count < 0)
                     {
                         result.s= -3003;
                     }
