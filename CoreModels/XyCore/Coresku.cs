@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 namespace CoreModels.XyCore
 {
+
     #region 
     public class Coresku
     {
@@ -46,7 +47,6 @@ namespace CoreModels.XyCore
         public DateTime DeleteDate { get; set; }
     }
     #endregion
-
     #region 商品主查詢
     public class GoodsQuery
     {
@@ -89,7 +89,6 @@ namespace CoreModels.XyCore
         public int Type { get; set; }
     }
     #endregion
-
     #region 商品管理 - 查询返回列表
     public class CoreSkuQuery
     {
@@ -118,8 +117,7 @@ namespace CoreModels.XyCore
 
         public List<CoreSkuItem> items { get; set; }
     }
-    #endregion 
-
+    #endregion
     #region 商品编辑 - 明细列表
     public partial class CoreSkuItem
     {
