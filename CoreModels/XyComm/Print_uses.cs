@@ -91,16 +91,6 @@ namespace CoreModels.XyComm
 	}
 
 
-
-	public class singalUsesModel{
-		public string name{get;set;}
-		public int sys_id{get;set;}
-		public string tpl_data{get;set;}
-		public string print_setting{get;set;}
-		public int type{get;set;}
-		public string lodop_target{get;set;}
-		
-	}
 	public class usesModel {
 		public long id { get; set; }
 		public string name { get; set; }
@@ -118,7 +108,6 @@ namespace CoreModels.XyComm
 		public string name { get; set; }
 		public bool defed { get; set; }
 	}
-
 
 
 }

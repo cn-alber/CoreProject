@@ -52,3 +52,5 @@ OutPut:     CoID            int                   公司编号coid
             Com             List<PurchaseDetail>  Purchasedetail 资料
 参考:input jason 文件:PurchaseDetailList_input.json
 参考:output jason 文件:PurchaseDetailList_output.json
+
+3.

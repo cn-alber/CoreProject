@@ -3,6 +3,7 @@ using MySql.Data.MySqlClient;
 using System;
 using CoreModels.XyCore;
 using Dapper;
+using System.Collections.Generic;
 
 namespace CoreData.CoreCore
 {
@@ -122,6 +123,47 @@ namespace CoreData.CoreCore
                     conn.Dispose();
                 }
             }           
+            return result;
+        }
+        ///<summary>
+        ///采购单删除
+        ///</summary>
+        public static DataResult DeletePur(List<string> PuridList,int CoID)
+        {
+            var result = new DataResult(1,null);     
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string delsql = @"delete from purchase where purchaseid in @PurID and coid = @Coid";
+                var p = new DynamicParameters();
+                p.Add("@PurID", PuridList);
+                p.Add("@Coid", CoID);
+                int count = CoreDBconn.Execute(delsql, p, TransCore);
+                if (count <= 0)
+                {
+                    result.s = -3004;
+                }
+                delsql = @"delete from purchasedetail where purchaseid in @PurID and coid = @Coid";
+                count = CoreDBconn.Execute(delsql, p, TransCore);
+                if (count <= 0)
+                {
+                    result.s = -3004;
+                }
+
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Close();
+            }
             return result;
         }
     }

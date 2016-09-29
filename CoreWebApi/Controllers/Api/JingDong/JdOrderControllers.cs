@@ -8,8 +8,8 @@ namespace CoreWebApi.Api.JingDong{
     {
 
         #region 
-        [HttpGetAttribute("/core/Api/JdOrder/getToken")]
-        public ResponseResult getToken()
+        [HttpGetAttribute("/core/Api/JdOrder/hello")]
+        public ResponseResult taskdata()
         {
             string code = "LK0EZY";
             var m = JingDHaddle.GetToken("https://oauth.jd.com/oauth/token", "authorization_code", code, "http://localhost:8080/AppWeb/admin/shop_token.aspx", "7888CE9C0F3AAD424FEE8EEAAC99E10E", "a88b70e6c629465785088f9a9151701a");

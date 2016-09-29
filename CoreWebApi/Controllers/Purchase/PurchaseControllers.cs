@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyCore;
 using CoreData.CoreCore;
 using System;
+using System.Collections.Generic;
 namespace CoreWebApi
 {
     public class PurchaseController : ControllBase
@@ -42,6 +43,16 @@ namespace CoreWebApi
             cp.NumPerPage = int.Parse(co["NumPerPage"].ToString());
             cp.PageIndex = int.Parse(co["PageIndex"].ToString());
             var data = PurchaseHaddle.GetPurchaseDetailList(cp);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [AllowAnonymous]
+        [HttpPostAttribute("/Core/Purchase/DeletePur")]
+        public ResponseResult DeletePur([FromBodyAttribute]JObject co)
+        {   
+            List<string> puridList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(co["PurIdList"].ToString());
+            int CoId = int.Parse(GetCoid());
+            var data = PurchaseHaddle.DeletePur(puridList,CoId);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     }

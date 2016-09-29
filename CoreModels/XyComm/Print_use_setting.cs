@@ -8,7 +8,6 @@ namespace CoreModels.XyComm
 		private long _id;
 		private long _admin_id;
 		private long? _defed_id=0;
-		private string _lodop_target;
 		/// <summary>
 		/// 
 		/// </summary>
@@ -33,16 +32,7 @@ namespace CoreModels.XyComm
 			set{ _defed_id=value;}
 			get{return _defed_id;}
 		}
-		/// <summary>
-		/// 云打印目标地址
-		/// </summary>
-		public string lodop_target
-		{
-			set{ _lodop_target=value;}
-			get{return _lodop_target;}
-		}
 		#endregion Model
-
 
 	}
     

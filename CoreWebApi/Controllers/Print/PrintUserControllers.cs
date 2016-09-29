@@ -10,27 +10,25 @@ namespace CoreWebApi.Print
     /// <summary>
 	/// 打印模块 - 个人用户相关 
 	/// </summary>
-    //[AllowAnonymous]
+    [AllowAnonymous]
     public class PrintUserController : ControllBase
     {
         #region 获取个人模板 print_uses
         [HttpGetAttribute("/core/print/task/tpl")]
-        public ResponseResult tasktpl(int my_id)
+        public ResponseResult tasktpl(string my_id)
         {
-            if(!checkInt(my_id)) return CoreResult.NewResponse(-4023, null, "Print");
             var admin_id = GetUid();
-            var m = PrintHaddle.taskTpl(admin_id,my_id.ToString());
+            var m = PrintHaddle.taskTpl(admin_id,my_id);
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
 
          #region 获取个人模板数据
        [HttpGetAttribute("/core/print/tpl/my")]
-        public ResponseResult tplmy(int my_id)
+        public ResponseResult tplmy(string my_id)
         {
-            if(!checkInt(my_id)) return CoreResult.NewResponse(-4023, null, "Print");
             string admin_id = GetUid();
-            var m = PrintHaddle.tplMy(admin_id,my_id.ToString());
+            var m = PrintHaddle.tplMy(admin_id,my_id);
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
@@ -60,7 +58,6 @@ namespace CoreWebApi.Print
         [HttpPostAttribute("/core/print/tpl/delmine")]
         public ResponseResult delMyTpl([FromBodyAttribute]JObject lo){
             string ids =String.Join(",",lo["ids"]); 
-            if(!checkInt(ids)) return CoreResult.NewResponse(-4023, null, "Print");
             var m = PrintHaddle.sideRemove(ids);
             return CoreResult.NewResponse(1,null,"Print");
         }
@@ -69,7 +66,7 @@ namespace CoreWebApi.Print
         #region 获取个人模板list  print_uses list
         [HttpGetAttribute("/core/print/tpl/minebytype")]    
         public ResponseResult useslist(int type,int Page = 1,int PageSize = 20){
-            if(!checkInt(type)) return CoreResult.NewResponse(-4023, null, "Print");
+            // if(!checkInt(type)) return CoreResult.NewResponse(-4023, null, "Print");
 
             var admin_id = GetUid();
             printParam param = new printParam();

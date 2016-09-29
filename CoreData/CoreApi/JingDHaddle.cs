@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using CoreModels;
@@ -44,8 +45,6 @@ namespace CoreDate.CoreApi
             
             return result;
         }
-
-
         public static DataResult jdOrderDownload(string start_date, string end_date, string order_state, string page, string page_size, string token){
             var result = new DataResult(1,null);
 

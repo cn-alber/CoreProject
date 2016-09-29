@@ -140,7 +140,7 @@ namespace CoreData.CoreUser
             var cname = "Refresh" + coid + roleid;
 
             //获取菜单缓存
-            //CacheBase.Remove(cname);
+            CacheBase.Remove(cname);
             var parent = CacheBase.Get<List<Refresh>>(cname);
             var parentRefresh = new List<Refresh>();
             
@@ -181,41 +181,37 @@ namespace CoreData.CoreUser
         public static List<Refresh> GetRefresh(string roleid, string coid)
         {
             var parent = new List<Refresh>();
-            using(var conn = new MySqlConnection(DbBase.UserConnectString)){
+            try
+            {
+                //获取权限列表
+                var role = GetRole(roleid, coid);
+                if (role.s > 1) return null;
+                var r = role.d as Role;
 
-                try
+                var child = DbBase.UserDB.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where viewpowerid in (" + r.ViewList + ") order by ParentID,sortindex").AsList();
+                foreach (var c in child)
                 {
-                    //获取权限列表
-                    var role = GetRole(roleid, coid);
-                    if (role.s > 1) return null;
-                    var r = role.d as Role;
-
-                    var child = conn.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where viewpowerid in (" + r.ViewList + ") order by ParentID,sortindex").AsList();
-                    foreach (var c in child)
-                    {
-                        c.icon = c.icons.Split(',');
-                    }
-
-                    if (child.Count == 0)
-                    {
-                        return null;
-                    }
-                    var pidarray = (from c in child select c.parentID).Distinct().ToArray();
-                    var pid = string.Join(",", pidarray);
-                    parent = conn.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where id in (" + pid + ") order by sortindex").AsList();
-
-                    foreach (var p in parent)
-                    {
-                        p.type = 2;
-                        p.icon = p.icons.Split(',');
-                        p.data = (from c in child where c.parentID == p.id select c).ToList();
-                    }
+                    c.icon = c.icons.Split(',');
                 }
-                catch
+
+                if (child.Count == 0)
                 {
-                    conn.Dispose();
                     return null;
                 }
+                var pidarray = (from c in child select c.parentID).Distinct().ToArray();
+                var pid = string.Join(",", pidarray);
+                parent = DbBase.UserDB.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where id in (" + pid + ") order by sortindex").AsList();
+
+                foreach (var p in parent)
+                {
+                    p.type = 2;
+                    p.icon = p.icons.Split(',');
+                    p.data = (from c in child where c.parentID == p.id select c).ToList();
+                }
+            }
+            catch
+            {
+                return null;
             }
             return parent;
         }
