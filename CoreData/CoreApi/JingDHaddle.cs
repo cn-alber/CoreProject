@@ -1,8 +1,6 @@
-
 using System;
 using System.Collections.Generic;
 using CoreModels;
-using CoreModels.XyApi.JingDong;
 using Newtonsoft.Json;
 
 namespace CoreDate.CoreApi
@@ -78,14 +76,12 @@ namespace CoreDate.CoreApi
             return result;
         }
 
-        public static DataResult orderDownByIds(string order_id,string optional_fields,string order_state,string token){
+        public static DataResult orderDownByIds(List<string> order_ids,string optional_fields,string order_state,string token){
             var result = new DataResult(1,null);
             try{
-                List<order_info_list> orderinfolist = new List<order_info_list>();
+                List<dynamic> orderinfolist = new List<dynamic>();
                 
                 IDictionary<string, string> parameters = new Dictionary<string, string>();
-                string html = "";
-                bool isSuccess = true;
 
                 parameters.Add("method", "360buy.order.get");
                 parameters.Add("access_token", token);
@@ -93,13 +89,21 @@ namespace CoreDate.CoreApi
                 parameters.Add("sign", systemParam.sign);
                 parameters.Add("timestamp", systemParam.timestamp);
                 parameters.Add("v", systemParam.v);
-                parameters.Add("360buy_param_json", "{\"order_id\":\"" + order_id + "\",\"optional_fields\":\"" + optional_fields + "\",\"order_state\":\"" + order_state + "\"}");
-                //HttpWebResponse response = jsonResponse.CreatePostHttpResponse(systemParam.url, parameters, encoding);
-                var response = JsonResponse.CreatePostHttpResponse(systemParam.url, parameters);
+                foreach(string order_id in order_ids){
+
+                    parameters.Add("360buy_param_json", "{\"order_id\":\"" + order_id + "\",\"optional_fields\":\"" + optional_fields + "\",\"order_state\":\"" + order_state + "\"}");
+                
+                    var response = JsonResponse.CreatePostHttpResponse(systemParam.url, parameters);
+                    orderinfolist.Add(JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}").order_get_response.order.orderInfo);
+                    parameters.Remove("360buy_param_json");
+                }
+                result.d = orderinfolist;
+                               
+                
                 
                 //result.d = JsonConvert.DeserializeObject<BuyOrderGetResponse>("{'order_get_response':{'code':'0','order':{'orderInfo':{'modified':'2016-09-11 11:29:19','order_id':'22919473317'}}}");
                 
-                result.d = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}").order_get_response.order.orderInfo;
+                
 
             }catch(Exception ex){
                 Console.WriteLine(ex.Message);

@@ -67,5 +67,15 @@ namespace CoreWebApi
             var data = PurchaseHaddle.SavePurchase(modifyFlag,pur,UserName,CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [AllowAnonymous]
+        [HttpPostAttribute("/Core/Purchase/ConfirmPur")]
+        public ResponseResult ConfirmPur([FromBodyAttribute]JObject co)
+        {   
+            List<string> puridList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(co["PurIdList"].ToString());
+            int CoId = int.Parse(GetCoid());
+            var data = PurchaseHaddle.ConfirmPurchase(puridList,CoId);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
     }
 }

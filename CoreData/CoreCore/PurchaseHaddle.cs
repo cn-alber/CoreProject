@@ -136,27 +136,37 @@ namespace CoreData.CoreCore
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
-                string delsql = @"delete from purchase where purchaseid in @PurID and coid = @Coid";
                 var p = new DynamicParameters();
                 p.Add("@PurID", PuridList);
                 p.Add("@Coid", CoID);
-                int count = CoreDBconn.Execute(delsql, p, TransCore);
-                if (count <= 0)
+                string wheresql = @"select id,purchaseid,purchasedate,coname,contract,shpaddress,status,purtype,buyyer,remark,taxrate from purchase where purchaseid in @PurID and coid = @Coid and status <> 0" ;
+                var u = CoreDBconn.Query<Purchase>(wheresql,p).AsList();
+                if(u.Count > 0)
                 {
-                    result.s = -3004;
+                    result.s = -1;
+                    result.d = "未审核状态的采购单才可删除!";
                 }
                 else
                 {
-                    delsql = @"delete from purchasedetail where purchaseid in @PurID and coid = @Coid";
-                    count = CoreDBconn.Execute(delsql, p, TransCore);
-                    if (count <= 0)
+                    string delsql = @"delete from purchase where purchaseid in @PurID and coid = @Coid";
+                    int count = CoreDBconn.Execute(delsql, p, TransCore);
+                    if (count < 0)
                     {
                         result.s = -3004;
                     }
-                }
-                if(result.s == 1)
-                {
-                    TransCore.Commit();
+                    else
+                    {
+                        delsql = @"delete from purchasedetail where purchaseid in @PurID and coid = @Coid";
+                        count = CoreDBconn.Execute(delsql, p, TransCore);
+                        if (count < 0)
+                        {
+                            result.s = -3004;
+                        }
+                    }
+                    if(result.s == 1)
+                    {
+                        TransCore.Commit();
+                    }
                 }
             }
             catch (Exception e)
@@ -254,7 +264,7 @@ namespace CoreData.CoreCore
                     var args = new {PurID = purid,Purdate=pur.purchasedate,CoName = pur.coname,Contract = pur.contract,Shpaddress = pur.shpaddress,
                                     Purtype = pur.purtype,Buyyer = pur.buyyer,Remark = pur.remark,Taxrate = pur.taxrate,Coid = CoID,UName = UserName};
                     int count =conn.Execute(sqlCommandText,args);
-                    if(count <= 0)
+                    if(count < 0)
                     {
                         result.s = -3002;
                     }
@@ -277,7 +287,7 @@ namespace CoreData.CoreCore
                     var args = new {Purdate=pur.purchasedate,CoName = pur.coname,Contract = pur.contract,Shpaddress = pur.shpaddress,
                                     Purtype = pur.purtype,Buyyer = pur.buyyer,Remark = pur.remark,Taxrate = pur.taxrate,ID = pur.id};
                     int count = conn.Execute(uptsql,args);
-                    if(count<=0)
+                    if(count < 0)
                     {
                         result.s= -3003;
                     }
@@ -289,6 +299,62 @@ namespace CoreData.CoreCore
             } 
             return  result;
         }  
+        ///<summary>
+        ///采购单审核
+        ///</summary>
+        public static DataResult ConfirmPurchase(List<string> PuridList,int CoID)
+        {
+            var result = new DataResult(1,"采购单审核成功!");  
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                var p = new DynamicParameters();
+                p.Add("@PurID", PuridList);
+                p.Add("@Coid", CoID);
+                string wheresql = @"select id,purchaseid,purchasedate,coname,contract,shpaddress,status,purtype,buyyer,remark,taxrate from purchase where purchaseid in @PurID and coid = @Coid and status <> 0" ;
+                var u = CoreDBconn.Query<Purchase>(wheresql,p).AsList();
+                if(u.Count > 0)
+                {
+                    result.s = -1;
+                    result.d = "未审核状态的采购单才可执行审核操作!";
+                }
+                else
+                {
+                    string delsql = @"update purchase set status = 1 where purchaseid in @PurID and coid = @Coid";
+                    int count = CoreDBconn.Execute(delsql, p, TransCore);
+                    if (count < 0)
+                    {
+                        result.s = -3003;
+                    }
+                    else
+                    {
+                        delsql = @"update purchasedetail set detailstatus = 1 where purchaseid in @PurID and coid = @Coid";
+                        count = CoreDBconn.Execute(delsql, p, TransCore);
+                        if (count < 0)
+                        {
+                            result.s = -3003;
+                        }
+                    }
+                    if(result.s == 1)
+                    {
+                        TransCore.Commit();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Close();
+            }
+            return result;
+        }
     }
 }
             
