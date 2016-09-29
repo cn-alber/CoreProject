@@ -52,32 +52,7 @@ namespace CoreWebApi
         {   
             string modifyFlag = co["ModifyFlag"].ToString();
             string CoID = GetCoid();
-            var com = new ScoCompanySingle();
-            if(!string.IsNullOrEmpty(co["ID"].ToString()))
-            {
-                com.id =  int.Parse(co["ID"].ToString());
-            }
-            else
-            {
-                com.id =  0;
-            }            
-            com.sconame = co["ScoName"].ToString();
-            com.enable = co["Enable"].ToString().ToUpper()=="TRUE"?true:false;
-            com.address = co["Address"].ToString();
-            com.email = co["Email"].ToString();
-            com.typelist = co["Typelist"].ToString();
-            com.scosimple = co["ScoSimple"].ToString();
-            com.scocode = co["ScoCode"].ToString();
-            com.country = co["Country"].ToString();
-            com.remark = co["Remark"].ToString();
-            com.taxid = co["Taxid"].ToString();
-            com.contactor = co["Contactor"].ToString();
-            com.tel = co["Tel"].ToString();
-            com.phone = co["Phone"].ToString();
-            com.fax = co["Fax"].ToString();
-            com.url = co["Url"].ToString();
-            com.bank = co["Bank"].ToString();
-            com.bankid = co["Bankid"].ToString();
+            var com = Newtonsoft.Json.JsonConvert.DeserializeObject<ScoCompanySingle>(co["Com"].ToString());
             string UserName = GetUname(); 
             string Company = co["Company"].ToString();
             if(modifyFlag == "new")
