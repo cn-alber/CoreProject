@@ -96,10 +96,11 @@ namespace CoreDate.CoreApi
                 parameters.Add("360buy_param_json", "{\"order_id\":\"" + order_id + "\",\"optional_fields\":\"" + optional_fields + "\",\"order_state\":\"" + order_state + "\"}");
                 //HttpWebResponse response = jsonResponse.CreatePostHttpResponse(systemParam.url, parameters, encoding);
                 var response = JsonResponse.CreatePostHttpResponse(systemParam.url, parameters);
-                Console.WriteLine(response.Result);
-                result.d = JsonConvert.DeserializeObject<BuyOrderGetResponse>("{\"order_get_response\":{\"code\":\"0\",\"order\":{\"orderInfo\":{\"modified\":\"2016-09-11 11:29:19\",\"order_id\":\"22919473317\"}}}");
                 
-                //result.d = response.Result.ToString().Replace("\\","");
+                //result.d = JsonConvert.DeserializeObject<BuyOrderGetResponse>("{'order_get_response':{'code':'0','order':{'orderInfo':{'modified':'2016-09-11 11:29:19','order_id':'22919473317'}}}");
+                
+                result.d = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}").order_get_response.order.orderInfo;
+
             }catch(Exception ex){
                 Console.WriteLine(ex.Message);
                 result.d =  ex.Message;

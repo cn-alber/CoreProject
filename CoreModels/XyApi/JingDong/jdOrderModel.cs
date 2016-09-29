@@ -23,28 +23,28 @@ namespace CoreModels.XyApi.JingDong
     public class order_info_list
     {
         public string modified { get; set; }
-       // public string customs { get; set; }
+        public string customs { get; set; }
         public string order_id { get; set; }
-        // public string vender_id { get; set; }
-        // public string pay_type { get; set; }
-        // public string order_total_price { get; set; }
-        // public string order_seller_price { get; set; }
-        // public string order_payment { get; set; }
-        // public string freight_price { get; set; }
-        // public string seller_discount { get; set; }
-        // public string order_state { get; set; }
-        // public string delivery_type { get; set; }
-        // public string invoice_info { get; set; }
-        // public string order_remark { get; set; }
-        // public string order_start_time { get; set; }
-        // public string order_type { get; set; }
-        // public string order_source { get; set; }
-        // public string store_order { get; set; }
-        // public string customs_model { get; set; }
+        public string vender_id { get; set; }
+        public string pay_type { get; set; }
+        public string order_total_price { get; set; }
+        public string order_seller_price { get; set; }
+        public string order_payment { get; set; }
+        public string freight_price { get; set; }
+        public string seller_discount { get; set; }
+        public string order_state { get; set; }
+        public string delivery_type { get; set; }
+        public string invoice_info { get; set; }
+        public string order_remark { get; set; }
+        public string order_start_time { get; set; }
+        public string order_type { get; set; }
+        public string order_source { get; set; }
+        public string store_order { get; set; }
+        public string customs_model { get; set; }
       
-        // public consignee_info consignee_info {  get; set;}
-        // public List<item_info_list> item_info_list {get; set;  }
-        // public List<coupon_detail_list> coupon_detail_list { get; set; }
+        public consignee_info consignee_info {  get; set;}
+        public List<item_info_list> item_info_list {get; set;  }
+        public List<coupon_detail_list> coupon_detail_list { get; set; }
     }
 
     public class consignee_info {

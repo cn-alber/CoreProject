@@ -387,7 +387,7 @@ namespace CoreDate.CoreComm
                     }else{
                         result.d = new
                         {
-                            states = JsonConvert.DeserializeObject<dynamic>(type.presets),           
+                            presets = JsonConvert.DeserializeObject<dynamic>(type.presets),           
                             print_setting = JsonConvert.DeserializeObject<dynamic>(type.setting),       
                         };
                     }                
