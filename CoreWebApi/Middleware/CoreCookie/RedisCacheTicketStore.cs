@@ -40,7 +40,7 @@ namespace CoreWebApi.Middleware
             // }
             // options.SetSlidingExpiration(TimeSpan.FromHours(1)); // TODO: configurable.
 
-            _cache.Set(key, ticket, TimeSpan.FromHours(1));
+            _cache.Set(key, ticket, TimeSpan.FromHours(4));
 
             return Task.FromResult(0);
         }
