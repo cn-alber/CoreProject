@@ -31,7 +31,7 @@ namespace CoreModels.XyCore
         public string goodscode{get;set;}
         public string supplynum{get;set;}
         public DateTime recievedate{get;set;}
-        public string detailstatus{get;set;}
+        public int detailstatus{get;set;}
     }
     public class PurchaseParm
     {
