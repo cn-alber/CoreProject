@@ -7,13 +7,16 @@ using System.Collections.Generic;
 
 namespace CoreWebApi.XyCore
 {
+    [AllowAnonymous]
     public class CoreSkuMatControllers : ControllBase
     {
         #region 物料管理-获取物料资料
         [HttpPostAttribute("Core/XyCore/CoreSku/MatQueryLst")]
         public ResponseResult MatQueryLst([FromBodyAttribute]JObject obj)
         {
-            var res = new {s=1,d=2};
+            CoreSkuParam cp = Newtonsoft.Json.JsonConvert.DeserializeObject<CoreSkuParam>(obj["CoreSkuParam"].ToString());
+            cp.CoID = int.Parse(GetCoid());
+            var res = CoreSkuMatHaddle.GetMatLst(cp);
             var Result = CoreResult.NewResponse(res.s, res.d, "General");
             return Result;
         }

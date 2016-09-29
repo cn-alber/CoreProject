@@ -21,7 +21,7 @@ namespace CoreData.CoreCore
             ColorName,SizeName,PurPrice,Enable,
             Remark,Creator,CreateDate
             from coresku 
-            where Type = @Type";
+            where Type = @Type AND IsParent=0";
             querysql.Append(sql);
             p.Add("@Type", IParam.Type);
             if (IParam.CoID != 1)
@@ -106,7 +106,8 @@ namespace CoreData.CoreCore
                 {
                     string dsql = @"select GoodsCode,SkuID,ColorID,ColorName,
                                         SizeID,SizeName,Remark
-                                    from coresku where GoodsCode=@GoodsCode and CoID = @CoID";
+                                    from coresku where GoodsCode=@GoodsCode and CoID = @CoID
+                                     AND IsParent = false AND Enable=1";
                     var item = DbBase.CoreDB.Query<CoreSkuMatItem>(dsql, p).AsList();
                     main.items = item;
                     res.d = main;

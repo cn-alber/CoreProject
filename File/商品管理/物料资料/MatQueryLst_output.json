@@ -1,0 +1,49 @@
+{
+    "s": 1,
+    "d": {
+        "DataCount": 12,
+        "PageCount": 4,
+        "SkuLst": [
+            {
+                "GoodsCode": "MAT1",
+                "GoodsName": "Mat物料1",
+                "KName": "主料",
+                "Norm": "test",
+                "ColorName": "白色",
+                "SizeName": "L",
+                "PurPrice": 0.0,
+                "Enable": true,
+                "Remark": "",
+                "Creator": "系统管理员",
+                "CreateDate": "2016-06-08T09:40:39"
+            },
+            {
+                "GoodsCode": "MAT1",
+                "GoodsName": "Mat物料1",
+                "KName": "主料",
+                "Norm": "test",
+                "ColorName": "白色",
+                "SizeName": "M",
+                "PurPrice": 0.0,
+                "Enable": true,
+                "Remark": "",
+                "Creator": "系统管理员",
+                "CreateDate": "2016-06-08T09:40:39"
+            },
+            {
+                "GoodsCode": "MAT1",
+                "GoodsName": "Mat物料1",
+                "KName": "主料",
+                "Norm": "test",
+                "ColorName": "白色",
+                "SizeName": "S",
+                "PurPrice": 0.0,
+                "Enable": true,
+                "Remark": "",
+                "Creator": "系统管理员",
+                "CreateDate": "2016-06-08T09:40:39"
+            }
+        ]
+    },
+    "m": ""
+}

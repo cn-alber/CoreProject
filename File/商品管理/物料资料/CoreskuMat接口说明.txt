@@ -1,0 +1,30 @@
+接口名称：CoreSkuControllers
+function说明
+1.GoodsQueryLst()//物料管理-获取物料资料
+    方法：POST
+    路由：http://localhost:5000/Core/XyCore/CoreSku/MatQueryLst
+    参数: CoreModels.CoreSkuParam
+    InPut:
+        Type            int         类别(0:成品;1:组合商品;2:原物料;3:非成品)
+        Filter          string      模糊查询匹配(GoodsCode,GoodsName,Brand,ColorName,SizeName,SkuID,SkuName,Norm)
+        Enable          string      启用状态(all/false/true)
+        PageIndex       int         当前页码(ex.第一页就给1)
+        PageSize        int         每页显示资料笔数
+        SortField       string      排序字段
+        SortDirection   string      排序方向(DESC|ASC)
+    OutPut:       
+        PageCount       int         总页数
+        DataCount       int         资料总笔数
+        SkuLst          List<CoreSkuMatQuery>  物料资料(CoreSku)
+    参考:input json 文件:MatQueryLst_input.json
+    参考:output json 文件:MatQueryLst_output.json
+2.MatQuery()//查询单笔物料详情    
+    方法：POST
+    路由：http://localhost:5000/Core/XyCore/CoreSku/MatQuery
+    参数: 
+    InPut:
+        GoodsCode       string          货号
+    OutPut:
+        main            CoreSkuMatAuto     单笔物料详情
+    参考：input json 文件:MatQuery_input.json
+    参考：output json 文件:MatQuery_output.json

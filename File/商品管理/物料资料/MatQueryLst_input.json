@@ -1,0 +1,11 @@
+{
+"CoreSkuParam":{
+"Type":2,
+"Filter":null,
+"Enable":"true",
+"PageIndex":"1",
+"PageSize":"3",
+"SortField":"GoodsCode",
+"SortDirection":"ASC"
+}
+}
