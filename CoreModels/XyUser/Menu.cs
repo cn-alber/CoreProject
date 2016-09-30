@@ -135,6 +135,10 @@ namespace CoreModels.XyUser
         public string order{get;set;} //排序
         public string remark{get;set;}//备注
         public int parentid {get;set;}
+        
+        public string NewIcon { get; set; }
+        public string NewIconPre {get;set;}
+        public string[] icon {get;set;}
         public List<Menu> children { get; set; }
     }
     
@@ -146,12 +150,18 @@ namespace CoreModels.XyUser
         public int type{get;set;}
         public int id { get; set; }
         public string name { get; set; }
-        public string icons { get; set; }
+        public string NewIcon { get; set; }
+        public string NewIconPre {get;set;}
         public string[] icon {get;set;}
         public string path { get; set; }
         public int parentID { get; set; }
         public List<Refresh> data { get; set; }
     }
+
+
+
+
+    
 
 
 

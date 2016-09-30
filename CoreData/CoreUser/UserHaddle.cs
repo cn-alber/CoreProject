@@ -204,11 +204,18 @@ namespace CoreData.CoreUser
                     if (role.s > 1) return null;
                     var r = role.d as Role;
 
-                    var child = conn.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where viewpowerid in (" +
-                                                 r.ViewList + ") order by ParentID,sortindex").AsList();
+                    // var child = conn.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where viewpowerid in (" +
+                    //                              r.ViewList + ") order by ParentID,sortindex").AsList();
+                    var child = conn.Query<Refresh>("select id,name,NewIcon, NewIconPre,NewUrl as path,ParentID from menus where viewpowerid in (" +
+                                r.ViewList + ") order by ParentID,sortindex").AsList();
                     foreach (var c in child)
                     {
-                        c.icon = c.icons.Split(',');
+                        if(!string.IsNullOrEmpty(c.NewIconPre)){
+                            c.icon = new string[]{c.NewIcon,c.NewIconPre};
+                        }else{
+                            c.icon = new string[]{c.NewIcon,""};
+                        }
+                        
                     }
 
                     if (child.Count == 0)
@@ -217,12 +224,12 @@ namespace CoreData.CoreUser
                     }
                     var pidarray = (from c in child select c.parentID).Distinct().ToArray();
                     var pid = string.Join(",", pidarray);
-                    parent = conn.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where id in (" + pid + ") order by sortindex").AsList();
-
+                    //parent = conn.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where id in (" + pid + ") order by sortindex").AsList();
+                    parent = conn.Query<Refresh>("select id,name,NewIcon , NewIconPre ,NewUrl as path,ParentID from menus where id in (" + pid + ") order by sortindex").AsList();
                     foreach (var p in parent)
                     {
-                        p.type = 2;
-                        p.icon = p.icons.Split(',');
+                        p.type = 2;                                                
+                        p.icon = new string[]{p.NewIcon,p.NewIconPre};                     
                         p.data = (from c in child where c.parentID == p.id select c).ToList();
                     }
                 }
