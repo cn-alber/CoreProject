@@ -128,14 +128,16 @@ namespace CoreModels.XyUser
     public class Menu
     {
      
-        public int ID { get; set; }
-        public string Name { get; set; }
-        public string NewIcon { get; set; }
-        public string NewIconPre { get; set; }
-        public string NavigateUrl { get; set; }
-        public int ParentID { get; set; }
-        public List<Menu> Data { get; set; }
+        public int id { get; set; }
+        public string name { get; set; }
+        public string router { get; set; }
+        public string access{get;set;} //权限
+        public string order{get;set;} //排序
+        public string remark{get;set;}//备注
+        public int parentid {get;set;}
+        public List<Menu> children { get; set; }
     }
+    
 
 
     public class Refresh

@@ -80,10 +80,10 @@ namespace CoreData.CoreUser
             var cname = "menus" + coid + roleid;
 
             //获取菜单缓存
-            var parent = CacheBase.Get<List<Menu>>(cname);
-            if (parent == null)
-            {
-                parent = GetMenu(roleid, coid);
+            // var parent = CacheBase.Get<List<Menu>>(cname);
+            // if (parent == null)
+            // {
+                var parent = GetMenu(roleid, coid);
                 if (parent == null)
                 {
                     s = -2004;
@@ -91,9 +91,9 @@ namespace CoreData.CoreUser
                 else
                 {
                     //无缓存，添加缓存
-                    CacheBase.Set<List<Menu>>(cname, parent);
+                    //CacheBase.Set<List<Menu>>(cname, parent);
                 }
-            }
+            //}
             return new DataResult(s, s == 1 ? parent : null);
         }
 
@@ -103,30 +103,41 @@ namespace CoreData.CoreUser
         public static List<Menu> GetMenu(string roleid, string coid)
         {
             var parent = new List<Menu>();
-            try
+            using (var conn = new MySqlConnection(DbBase.UserConnectString))
             {
-                //获取权限列表
-                var role = GetRole(roleid, coid);
-                if (role.s > 1) return null;
-                var r = role.d as Role;
-
-                var child = DbBase.UserDB.Query<Menu>("select name,NewIcon,NewIconPre,NavigateUrl,ParentID from menus where viewpowerid in (" + r.ViewList + ") order by ParentID,sortindex").AsList();
-                if (child.Count == 0)
+                try
                 {
+                    //获取权限列表
+                    var role = GetRole(roleid, coid);
+                    if (role.s > 1) return null;
+                    var r = role.d as Role;
+                    //"select name,NewIcon,NewIconPre,NavigateUrl,ParentID from menus where viewpowerid in (" + r.ViewList + ") order by ParentID,sortindex"
+                    string sql = "select menus.id, menus.`Name` as `name`,NewUrl as router,SortIndex as `order`, menus.Remark, ParentID ,power.Title as access from menus "+
+                                "LEFT JOIN power on power.ID = menus.ViewPowerID where viewpowerid in (" + r.ViewList + ") order by ParentID,sortindex"; 
+
+                    var child = conn.Query<Menu>(sql).AsList();
+                    if (child.Count == 0)
+                    {
+                        return null;
+                    }
+                    var pidarray = (from c in child select c.parentid).Distinct().ToArray();
+                    var pid = string.Join(",", pidarray);
+                    //"select id,name,NewIcon,NewIconPre,NavigateUrl,ParentID from menus where id in (" + pid + ") order by sortindex"
+                    sql = "select menus.id, menus.`Name` as `name`,NewUrl as router,SortIndex as `order`, menus.Remark, ParentID ,power.Title as access from menus "+
+                                "LEFT JOIN power on power.ID = menus.ViewPowerID where menus.id in (" + pid + ") order by sortindex"; 
+                    
+                    parent = conn.Query<Menu>(sql).AsList();
+
+                    foreach (var p in parent)
+                    {
+                        p.children = (from c in child where c.parentid == p.id select c).ToList();
+                    }
+                }
+                catch
+                {
+                    conn.Dispose();
                     return null;
                 }
-                var pidarray = (from c in child select c.ParentID).Distinct().ToArray();
-                var pid = string.Join(",", pidarray);
-                parent = DbBase.UserDB.Query<Menu>("select id,name,NewIcon,NewIconPre,NavigateUrl,ParentID from menus where id in (" + pid + ") order by sortindex").AsList();
-
-                foreach (var p in parent)
-                {
-                    p.Data = (from c in child where c.ParentID == p.ID select c).ToList();
-                }
-            }
-            catch
-            {
-                return null;
             }
             return parent;
         }
