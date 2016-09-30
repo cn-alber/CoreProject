@@ -3,6 +3,7 @@ using CoreData.CoreUser;
 using Newtonsoft.Json.Linq;
 using CoreModels.XyCore;
 using System.Collections.Generic;
+using System;
 
 namespace CoreWebApi
 {
@@ -105,7 +106,7 @@ namespace CoreWebApi
         [HttpPostAttribute("/core/profile/msgread")]
         public ResponseResult msgread([FromBodyAttribute]JObject lo)
         {           
-            
+            if(!checkInt(String.Join(",",lo["ids"]))) return CoreResult.NewResponse(-1009, null, "Basic");
             var readids =   Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(lo["ids"].ToString());             
             var m = NotifyHaddle.MsgRead(readids,GetUid(),GetUname());
             return CoreResult.NewResponse(m.s,m.d, "Basic");    

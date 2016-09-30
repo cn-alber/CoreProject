@@ -49,6 +49,7 @@ OutPut:     CoID            int                   公司编号coid
             NumPerPage      int                   每页显示资料笔数
             Datacnt         int                   资料总笔数
             Pagecnt         int                   总页数
+            enable          bool                  明细是否允许编辑(true允许/false不允许)
             Com             List<PurchaseDetail>  Purchasedetail 资料
 参考:input jason 文件:PurchaseDetailList_input.json
 参考:output jason 文件:PurchaseDetailList_output.json
@@ -74,3 +75,32 @@ input:  PurIdList   List<string>    采购单号List
 OutPut: 1 成功  -3003 失败
 参考:input jason 文件:ConfirmPur_input.json
 参考:output jason 文件:ConfirmPur_output.json
+
+6.ForcePur()//采购单强制完成
+路由:http://localhost:5000/Core/Purchase/ForcePur
+input:  PurIdList   List<string>    采购单号List
+OutPut: 1 成功  -3003 失败
+参考:input jason 文件:ForcePur_input.json
+参考:output jason 文件:ForcePur_output.json
+
+7.InsertPurDetail()//新增采购单明细
+路由:http://localhost:5000/Core/Purchase/InsertPurDetail
+input:  PurDetail   purchasedetail    采购单明细资料
+OutPut: 1 成功  else 失败代号
+参考:input jason 文件:InsertPurDetail_input.json
+参考:output jason 文件:InsertPurDetail_output.json
+
+8.UpdatePurDetail()//更新采购单明细
+路由:http://localhost:5000/Core/Purchase/UpdatePurDetail
+input:  PurDetail   purchasedetail    采购单明细资料
+OutPut: 1 成功  else 失败代号
+参考:input jason 文件:UpdatePurDetail_input.json
+参考:output jason 文件:UpdatePurDetail_output.json
+
+9.DelPurDetail()//删除采购单明细
+路由:http://localhost:5000/Core/Purchase/DelPurDetail
+input:  ID        int         采购单ID
+        DetailID  List<int>   采购单明细ID
+OutPut: 1 成功  else 失败代号
+参考:input jason 文件:DelPurDetail_input.json
+参考:output jason 文件:DelPurDetail_output.json

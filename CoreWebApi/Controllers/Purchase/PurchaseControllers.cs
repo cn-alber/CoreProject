@@ -77,5 +77,46 @@ namespace CoreWebApi
             var data = PurchaseHaddle.ConfirmPurchase(puridList,CoId);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
+
+        [AllowAnonymous]
+        [HttpPostAttribute("/Core/Purchase/ForcePur")]
+        public ResponseResult ForcePur([FromBodyAttribute]JObject co)
+        {   
+            List<string> puridList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(co["PurIdList"].ToString());
+            int CoId = int.Parse(GetCoid());
+            var data = PurchaseHaddle.ForcePurchase(puridList,CoId);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
+
+        [AllowAnonymous]
+        [HttpPostAttribute("/Core/Purchase/InsertPurDetail")]
+        public ResponseResult InsertPurDetail([FromBodyAttribute]JObject co)
+        {   
+            var detail = Newtonsoft.Json.JsonConvert.DeserializeObject<PurchaseDetail>(co["PurDetail"].ToString());
+            int CoId = int.Parse(GetCoid());
+            var data = PurchaseHaddle.InsertPurDetail(detail,CoId);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
+
+        [AllowAnonymous]
+        [HttpPostAttribute("/Core/Purchase/UpdatePurDetail")]
+        public ResponseResult UpdatePurDetail([FromBodyAttribute]JObject co)
+        {   
+            var detail = Newtonsoft.Json.JsonConvert.DeserializeObject<PurchaseDetail>(co["PurDetail"].ToString());
+            int CoId = int.Parse(GetCoid());
+            var data = PurchaseHaddle.UpdatePurDetail(detail,CoId);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
+
+        [AllowAnonymous]
+        [HttpPostAttribute("/Core/Purchase/DelPurDetail")]
+        public ResponseResult DelPurDetail([FromBodyAttribute]JObject co)
+        {   
+            int id = int.Parse(co["ID"].ToString());
+            List<int> detailid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["DetailID"].ToString());
+            int CoId = int.Parse(GetCoid());
+            var data = PurchaseHaddle.DeletePurDetail(id,detailid,CoId);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
     }
 }

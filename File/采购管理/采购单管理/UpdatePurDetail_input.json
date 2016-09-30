@@ -1,0 +1,20 @@
+{       
+"PurDetail": {
+        "id": 1105,
+        "purchaseid": "10002016097583",
+        "skuid": "NJR201605070011015",
+        "skuname": "南极人羽绒服",
+        "colorname": "蓝色",
+        "sizename": "47",
+        "purqty": 20,
+        "price": 6,
+        "puramt": 120,
+        "remark": "75555",
+        "goodscode":"NJR20160507", 
+        "supplynum": "33333",
+        "recievedate": "2015-10-10",
+        "detailstatus": 0,
+        "norm": "蓝色;47",
+        "coid":0
+    }
+}
