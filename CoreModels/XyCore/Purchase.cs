@@ -16,7 +16,7 @@ namespace CoreModels.XyCore
         public string remark{get;set;}
         public decimal taxrate{get;set;}
     }
-    public class PurchaseDetailMulti
+    public class PurchaseDetail
     {
         public int id{get;set;}
         public string purchaseid{get;set;}
@@ -32,6 +32,8 @@ namespace CoreModels.XyCore
         public string supplynum{get;set;}
         public DateTime recievedate{get;set;}
         public int detailstatus{get;set;}
+        public string norm {get;set;}
+        public int coid {get;set;}
     }
     public class PurchaseParm
     {
@@ -62,6 +64,13 @@ namespace CoreModels.XyCore
         public int PageIndex{get;set;}//页码
         public int Datacnt {get;set;}//总资料笔数
         public decimal Pagecnt{get;set;}//总页数
-        public List<PurchaseDetailMulti> Com {get;set;}//采购单明细资料List
+        public bool enable {get;set;} //明细是否允许修改
+        public List<PurchaseDetail> Com {get;set;}//采购单明细资料List
+    }
+
+    public class CalPurchase
+    {
+        public decimal purqty{get;set;}
+        public decimal puramt{get;set;}
     }
 }
