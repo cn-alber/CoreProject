@@ -1,0 +1,120 @@
+{
+    "s": 1,
+    "d": {
+        "PageCount": 1,
+        "DataCount": 10,
+        "UserLst": [
+            {
+                "ID": 32,
+                "Account": "user001",
+                "Name": "用户001",
+                "Enable": true,
+                "Email": "123@qq.com",
+                "Gender": "男",
+                "CompanyName": "携云科技",
+                "RoleName": "系统管理员",
+                "CreateDate": "2016-04-28T18:26:25"
+            },
+            {
+                "ID": 33,
+                "Account": "user002",
+                "Name": "用户002",
+                "Enable": true,
+                "Email": "Account@qq.com",
+                "Gender": "男",
+                "CompanyName": "携云科技",
+                "RoleName": "系统管理员",
+                "CreateDate": "2016-04-28T18:28:40"
+            },
+            {
+                "ID": 34,
+                "Account": "user003",
+                "Name": "用户003",
+                "Enable": true,
+                "Email": "xad@13.com",
+                "Gender": "男",
+                "CompanyName": "携云科技",
+                "RoleName": "系统管理员",
+                "CreateDate": "2016-04-28T18:38:39"
+            },
+            {
+                "ID": 35,
+                "Account": "user004",
+                "Name": "用户004",
+                "Enable": true,
+                "Email": "13@qq.com",
+                "Gender": "男",
+                "CompanyName": "携云科技",
+                "RoleName": "系统管理员",
+                "CreateDate": "2016-04-28T18:40:02"
+            },
+            {
+                "ID": 1,
+                "Account": "admin",
+                "Name": "系统管理员",
+                "Enable": true,
+                "Email": "346517865@qq.com",
+                "Gender": "男",
+                "CompanyName": "携云科技",
+                "RoleName": "系统管理员",
+                "CreateDate": "2016-04-28T19:08:23"
+            },
+            {
+                "ID": 40,
+                "Account": "user005",
+                "Name": "用户005",
+                "Enable": true,
+                "Email": "adsf@qq.com",
+                "Gender": "女",
+                "CompanyName": "携云科技",
+                "RoleName": "系统管理员",
+                "CreateDate": "2016-04-29T09:14:42"
+            },
+            {
+                "ID": 41,
+                "Account": "user006",
+                "Name": "用户006",
+                "Enable": true,
+                "Email": "123@qq.com",
+                "Gender": "男",
+                "CompanyName": "携云科技",
+                "RoleName": "系统管理员",
+                "CreateDate": "2016-04-29T09:17:31"
+            },
+            {
+                "ID": 42,
+                "Account": "user007",
+                "Name": "用户007",
+                "Enable": true,
+                "Email": "123@qq.com",
+                "Gender": "女",
+                "CompanyName": "携云科技",
+                "RoleName": "系统管理员",
+                "CreateDate": "2016-04-29T09:18:00"
+            },
+            {
+                "ID": 43,
+                "Account": "user008",
+                "Name": "用户008",
+                "Enable": true,
+                "Email": "2@qq.com",
+                "Gender": "男",
+                "CompanyName": "携云科技",
+                "RoleName": "系统管理员",
+                "CreateDate": "2016-04-29T09:40:43"
+            },
+            {
+                "ID": 48,
+                "Account": "user100",
+                "Name": "用户100",
+                "Enable": true,
+                "Email": "xadf@qq.com",
+                "Gender": "女",
+                "CompanyName": "携云科技",
+                "RoleName": "测试角色",
+                "CreateDate": "2016-04-29T12:56:18"
+            }
+        ]
+    },
+    "m": ""
+}

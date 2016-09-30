@@ -1,0 +1,20 @@
+{
+    "User": {
+        "ID": 0,
+        "Account": "admintest1",
+        "SecretID": "7222c9835a9b97b03ba7673bf3e3a5a1",
+        "Name": "系统管理员",
+        "PassWord": "1bb80ddcd9b3943d07a09e5796451c8f",
+        "Enable": true,
+        "Email": "346517865@qq.com",
+        "Gender": "男",
+        "Mobile": "13814987627",
+        "QQ": "346517865",
+        "CompanyID": 1,
+        "RoleID": 1,
+        "Creator": "",
+        "CreateDate": "2016-04-28T19:08:23",
+        "CompanyName": "携云科技",
+        "RoleName": "系统管理员"
+    }
+}

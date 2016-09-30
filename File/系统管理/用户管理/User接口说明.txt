@@ -1,0 +1,108 @@
+接口名称：UserControllers
+
+function说明
+1.UserQueryLst()//查询table User 资料
+    方法：POST
+    路由：http://localhost:5000/Core/XyUser/User/UserLst
+    参数: CoreModels.XyUser.UserParam
+    InPut:
+        Filter          string      模糊查询匹配(用户账号Account,用户名称Name)
+        Enable          string      启用状态(all/false/true)
+        PageIndex       int         当前页码(ex.第一页就给1)
+        PageSize        int         每页显示资料笔数
+        SortField       string      排序字段
+        SortDirection   string      排序方向(DESC|ASC)
+    OutPut:    
+        PageCount       int             总页数
+        DataCount       int             资料总笔数       
+        UserLst         List<UserData>  店铺资料(User)
+    参考:input json 文件:UserListQuery_input.json
+    参考:output json 文件:UserListQuery_output.json
+2.UserEdit()//编辑单笔用户资料
+    方法：POST
+    路由：http://localhost:5000/Core/XyUser/User/UserEdit
+    参数：
+    InPut:
+        UserID          int             用户编号ID
+    OutPut:
+        user            UserEdit        指定用户资料
+    参考：input json 文件：UserEdit_input.json
+    参考：output json 文件：UserEdit_output.json
+3.UserQuery()查询单笔用户资料
+    方法：POST
+    路由：http://localhost:5000/Core/XyUser/User/UserQuery
+    参数：
+    InPut:
+        UserID          int             用户编号ID
+    OutPut:
+        user            UserEdit        指定用户资料
+    参考：input json 文件：UserQuery_input.json
+    参考：output json 文件：UserQuery_output.json
+4.UserCache()从缓存读取数据
+    方法：POST
+    路由：http://localhost:5000/Core/XyUser/User/UserCache
+    参数：
+    InPut:
+        Account         string          用户账号
+    OutPut:
+        user            UserEdit        指定用户资料
+    参考：input json 文件：UserQuery_input.json
+    参考：output json 文件：UserQuery_output.json
+5.UserEnable()//用户状态启用|停用
+    方法：POST
+    路由：http://localhost:5000/Core/XyUser/User/UserEnable
+    参数：
+    InPut:
+        IDsDic          Dictionary<int,string>      <Key:用户ID,Value:用户账号Account>
+        Company         string                      公司名称(exp:携云科技)
+        UserName        string                      操作者名称(exp:系统管理员)
+        Enable          string                      指定店铺状态true|false（启用，停用）
+    OutPut:
+        成功：
+            1.更新用户状态user.enable
+            2.新增修改记录log
+            3.返回成功信息：s=1,d=用户状态启用(停用)
+        失败：
+            1.返回错误信息：s=3003.资料更新失败
+    参考：input json 文件：UserEnable_input.json
+    参考：output json 文件：UserEnable_output.json
+6.IsExistUser()//检查用户账号是否存在
+    方法：POST
+    路由：http://localhost:5000/Core/XyUser/User/IsExistUser
+    参数：
+    InPut:
+        Account         string          用户账号
+        ID              int             用户ID        
+    OutPut:
+        1 -> 不存在
+        -1-> 账号已存在 or Exception
+    参考：input json 文件：IsExistUser_input.json
+    参考：output json 文件：IsExistUser_output.json
+7.InsertUser()//新增用户
+    方法：POST
+    路由：http://localhost:5000/Core/XyUser/User/InsertUser
+    参数：
+    InPut:
+        user            UserEdit        待新增用户      
+    OutPut:
+        成功：
+            1.新增资料
+            2.新增操作记录log
+            3.返回请求成功信息(s=1)
+        失败：返回错误信息
+    参考：input json 文件：InsertUser_input.json
+    参考：output json 文件：InsertUser_output.json
+8.UpdateUser()//修改用户
+    方法：POST
+    路由：http://localhost:5000/Core/XyUser/User/UpdateUser
+    参数：
+    InPut:
+        user            UserEdit        待新增用户      
+    OutPut:
+        成功：
+            1.修改用户资料
+            2.新增操作记录log
+            3.返回请求成功信息(s=1)
+        失败：返回错误信息
+    参考：input json 文件：UpdateUser_input.json
+    参考：output json 文件：UpdateUser_output.json
