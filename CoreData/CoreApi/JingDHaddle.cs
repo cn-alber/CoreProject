@@ -6,25 +6,26 @@ using Newtonsoft.Json;
 namespace CoreDate.CoreApi
 {
     
-    public static class JingDHaddle{
+    public  class JingDHaddle{
 
-        public static SystemP systemParam = new SystemP() {
-                                                            app_key = "7888CE9C0F3AAD424FEE8EEAAC99E10E",
-                                                            sign = "123",
-                                                            app_secret = "a88b70e6c629465785088f9a9151701a",
-                                                            timestamp = System.DateTime.Now.AddMinutes(6).ToString(),
-                                                            url = "https://api.jd.com/routerjson",
-                                                            v="2.0"
-                                                        } ;
-                                                        
+        public static string SERVER_URL = "https://api.jd.com/routerjson";                                                        
+        public static IDictionary<string, string> jdparam = new Dictionary<string, string>{
+            {"app_key", "7888CE9C0F3AAD424FEE8EEAAC99E10E"},
+            {"sign", "123"},
+            {"timestamp", System.DateTime.Now.AddMinutes(6).ToString()},
+            {"v", "2.0"}
+        };                                                 
 
-
+        public static void cleanParam(){
+            jdparam.Remove("method");
+            jdparam.Remove("access_token");
+            jdparam.Remove("360buy_param_json");
+        }
         /// <summary>
 		/// 获取token
 		/// </summary>
         public static DataResult GetToken(string url, string grant_type, string code, string redirect_uri, string client_id, string client_secret){
-            var result = new DataResult(1,null);
-            
+            var result = new DataResult(1,null);            
             IDictionary<string, string> parameters = new Dictionary<string, string>();
             parameters.Add("grant_type", grant_type);
             parameters.Add("code", code);
@@ -39,42 +40,22 @@ namespace CoreDate.CoreApi
                 client_secret = client_secret
             };
             var response = JsonResponse.CreatePostHttpResponse(url, parameters);
-            result.d = response.Result;//JsonConvert.DeserializeObject(response.Result);
-            
+            result.d = response.Result;//JsonConvert.DeserializeObject(response.Result);            
             return result;
         }
         public static DataResult jdOrderDownload(string start_date, string end_date, string order_state, string page, string page_size, string token){
             var result = new DataResult(1,null);
-
-            IDictionary<string, string> parameters = new Dictionary<string, string>();
-            
-            parameters.Add("method", "360buy.order.search");
-            parameters.Add("access_token", token);
-            parameters.Add("app_key", systemParam.app_key);
-            parameters.Add("sign", systemParam.sign);
-            parameters.Add("timestamp", systemParam.timestamp);
-            parameters.Add("v", systemParam.v);
-            parameters.Add("360buy_param_json", "{\"start_date\":\"" + start_date + "\",\"end_date\":\"" + end_date + "\",\"order_state\":\"" + order_state + "\",\"page\":\"" + page + "\",\"page_size\":\"" + page_size + "\" }");
-
-            var response = JsonResponse.CreatePostHttpResponse(systemParam.url, parameters);            
-            result.d = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}").order_search_response.order_search.order_info_list;
-
-            // HttpWebResponse response = jsonResponse.CreatePostHttpResponse(systemParam.url, parameters, encoding);
-            // //打印返回值  
-            // Stream stream = response.GetResponseStream();
-            // StreamReader sr = new StreamReader(stream);
-            // string html = sr.ReadToEnd();
-            // if (html.IndexOf("error") > 0)
-            // {
-            //     return new BaseResult(false, null, html);
-            // }
-            // else
-            // {
-            //     BuyOrderSearchResponse orderResponce = JsonConvert.DeserializeObject<BuyOrderSearchResponse>(html);
-            //     return new BaseResult(true, orderResponce.order_search_response.order_search.order_info_list, "success", int.Parse(orderResponce.order_search_response.order_search.order_total));
-            // }       
-
-
+            try{              
+                jdparam.Add("method", "360buy.order.search");
+                jdparam.Add("access_token", token);
+                jdparam.Add("360buy_param_json", "{\"start_date\":\"" + start_date + "\",\"end_date\":\"" + end_date + "\",\"order_state\":\"" + order_state + "\",\"page\":\"" + page + "\",\"page_size\":\"" + page_size + "\" }");
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, jdparam);            
+                result.d = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}").order_search_response.order_search.order_info_list;
+            }catch(Exception ex){
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
             return result;
         }
 
@@ -82,23 +63,19 @@ namespace CoreDate.CoreApi
             var result = new DataResult(1,null);
             try{
                 List<dynamic> orderinfolist = new List<dynamic>();                
-                IDictionary<string, string> parameters = new Dictionary<string, string>();
-                parameters.Add("method", "360buy.order.get");
-                parameters.Add("access_token", token);
-                parameters.Add("app_key", systemParam.app_key);
-                parameters.Add("sign", systemParam.sign);
-                parameters.Add("timestamp", systemParam.timestamp);
-                parameters.Add("v", systemParam.v);
+                jdparam.Add("method", "360buy.order.get");
+                jdparam.Add("access_token", token);
                 foreach(string order_id in order_ids){
-                    parameters.Add("360buy_param_json", "{\"order_id\":\"" + order_id + "\",\"optional_fields\":\"" + optional_fields + "\",\"order_state\":\"" + order_state + "\"}");                
-                    var response = JsonResponse.CreatePostHttpResponse(systemParam.url, parameters);
+                    jdparam.Add("360buy_param_json", "{\"order_id\":\"" + order_id + "\",\"optional_fields\":\"" + optional_fields + "\",\"order_state\":\"" + order_state + "\"}");                
+                    var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, jdparam);
                     orderinfolist.Add(JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}").order_get_response.order.orderInfo);
-                    parameters.Remove("360buy_param_json");
+                    jdparam.Remove("360buy_param_json");
                 }
                 result.d = orderinfolist;
-            }catch(Exception ex){
-                Console.WriteLine(ex.Message);
+            }catch(Exception ex){                
                 result.d =  ex.Message;
+            }finally{
+                cleanParam();
             }
             return result;
         }

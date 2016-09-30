@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 using CoreData.CoreUser;
 using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyUser;
-using System.Collections.Generic;
+
 
 namespace CoreWebApi
 {
