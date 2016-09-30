@@ -109,15 +109,15 @@ namespace CoreWebApi
             return CoreResult.NewResponse(1, null, "Basic");
         }
 
-        [HttpGetAttribute("/core/sign/mune")]
-        public ResponseResult MenuList()
-        {
-            var roleid = GetRoleid();
-            var coid = GetCoid();
+        // [HttpGetAttribute("/core/sign/mune")]
+        // public ResponseResult MenuList()
+        // {
+        //     var roleid = GetRoleid();
+        //     var coid = GetCoid();
 
-            var m = UserHaddle.GetMenuList(roleid, coid);
-            return CoreResult.NewResponse(m.s, m.d, "Basic");
-        }
+        //     var m = UserHaddle.GetMenuList(roleid, coid);
+        //     return CoreResult.NewResponse(m.s, m.d, "Basic");
+        // }
 
         // [HttpPostAttribute("/Core/sign/out")]    
         // public async Task loginout()
