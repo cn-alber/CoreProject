@@ -486,21 +486,130 @@ namespace CoreData.CoreCore
         ///<summary>
         ///采购单明细新增
         ///</summary>
-        // public static DataResult InsertPurDetail()
-        // {
-        //     var result = new DataResult(1,"采购单明细新增成功!");  
-            
-        //     return result;
-        // }
-        // ///<summary>
-        // ///采购单明细新增
-        // ///</summary>
-        // public static DataResult InsertPurDetail()
-        // {
-        //     var result = new DataResult(1,"采购单明细新增成功!");  
-            
-        //     return result;
-        // }
+        public static DataResult UpdatePurDetail(PurchaseDetail detail,int CoID)
+        {
+            var result = new DataResult(1,"采购单明细更新成功!");  
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string wheresql = "select id,purchaseid,skuid,skuname,colorname,sizename,purqty,price,puramt,remark,goodscode,supplynum,recievedate,detailstatus,norm,coid from purchasedetail where id = " + detail.id;
+                var pur = CoreDBconn.Query<PurchaseDetail>(wheresql).AsList();
+                if (pur.Count == 0)
+                {
+                    result.s = -3001;
+                }
+                else
+                {
+                    decimal qty = pur[0].purqty;
+                    decimal amt = pur[0].puramt;
+                    string sqlCommandText = @"update purchasedetail set skuid = @Skuid,skuname = @Skuname,price = @Price,purqty = @Purqty,puramt = @Puramt,recievedate = @Recdate,
+                                            remark = @Remark,colorname = @Colorname,sizename = @Sizename,norm = @Norm,goodscode = @Goodscode,supplynum = @Supplynum where id = @ID ";
+                    var args = new {Skuid=detail.skuid,Skuname = detail.skuname,Price = detail.price,Purqty = detail.purqty,Puramt = detail.puramt,
+                                    Recdate = detail.recievedate,Remark = detail.remark,Colorname = detail.colorname,Sizename = detail.sizename ,Norm = detail.norm ,
+                                    Goodscode = detail.goodscode ,Supplynum = detail.supplynum,ID = detail.id};
+                    int count = CoreDBconn.Execute(sqlCommandText,args,TransCore);
+                    if(count <= 0)
+                    {
+                        result.s = -3003;
+                    }
+                    wheresql = "select id,purchaseid,purchasedate,coname,contract,shpaddress,status,purtype,buyyer,remark,taxrate from purchase where purchaseid = '" + detail.purchaseid + "' and coid =" + CoID ;
+                    var u = CoreDBconn.Query<Purchase>(wheresql).AsList();
+                    if (u.Count == 0)
+                    {
+                        result.s = -3001;
+                    }
+                    else
+                    {
+                        string uptsql = @"update purchase set purqtytot = purqtytot - @Qty + @Purqty,puramtnet = puramtnet - @Amt + @Puramt,puramttot = puramtnet*(1 + taxrate) where purchaseid = @PurID and coid = @Coid";
+                        var upargs = new {Purqty = detail.purqty,Qty = qty,Puramt = detail.puramt,Amt = amt,PurID = detail.purchaseid,Coid = CoID};
+                        count = CoreDBconn.Execute(uptsql,upargs);
+                        if(count < 0)
+                        {
+                            result.s= -3003;
+                        }
+                    }
+                } 
+                if(result.s == 1)
+                {
+                    TransCore.Commit();
+                }
+            }
+            catch (Exception e)
+            {
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Close();
+            }
+            return result;
+        }
+        ///<summary>
+        ///采购单明细删除
+        ///</summary>
+        public static DataResult DeletePurDetail(int id,List<int> detailid,int CoID)
+        {
+            var result = new DataResult(1,"采购单明细删除成功!");    
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string wheresql = "select sum(purqty) as purqty,sum(puramt) as puramt from purchasedetail where id in @ID";
+                var argss = new {ID = detailid};
+                var pur = CoreDBconn.Query<CalPurchase>(wheresql,argss).AsList();
+                if (pur.Count == 0)
+                {
+                    result.s = -3001;
+                }
+                else
+                {
+                    decimal qty = pur[0].purqty;
+                    decimal amt = pur[0].puramt;
+                    string sqlCommandText = @"delete from  purchasedetail where id = @ID ";
+                    int count = CoreDBconn.Execute(sqlCommandText,argss,TransCore);
+                    if(count <= 0)
+                    {
+                        result.s = -3004;
+                    }
+                    wheresql = "select id,purchaseid,purchasedate,coname,contract,shpaddress,status,purtype,buyyer,remark,taxrate from purchase where id = '" + id + "' and coid =" + CoID ;
+                    var u = CoreDBconn.Query<Purchase>(wheresql).AsList();
+                    if (u.Count == 0)
+                    {
+                        result.s = -3001;
+                    }
+                    else
+                    {
+                        string uptsql = @"update purchase set purqtytot = purqtytot - @Qty ,puramtnet = puramtnet - @Amt ,puramttot = puramtnet*(1 + taxrate) where id = @ID and coid = @Coid";
+                        var upargs = new {Qty = qty,Amt = amt,ID = id,Coid = CoID};
+                        count = CoreDBconn.Execute(uptsql,upargs);
+                        if(count < 0)
+                        {
+                            result.s= -3003;
+                        }
+                    }
+                } 
+                if(result.s == 1)
+                {
+                    TransCore.Commit();
+                }
+            }
+            catch (Exception e)
+            {
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Close();
+            }
+            return result;
+        }
     }
 }
             

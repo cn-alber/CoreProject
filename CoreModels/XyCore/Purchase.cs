@@ -67,4 +67,10 @@ namespace CoreModels.XyCore
         public bool enable {get;set;} //明细是否允许修改
         public List<PurchaseDetail> Com {get;set;}//采购单明细资料List
     }
+
+    public class CalPurchase
+    {
+        public decimal purqty{get;set;}
+        public decimal puramt{get;set;}
+    }
 }

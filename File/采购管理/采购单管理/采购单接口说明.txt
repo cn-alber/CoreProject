@@ -89,3 +89,18 @@ input:  PurDetail   purchasedetail    采购单明细资料
 OutPut: 1 成功  else 失败代号
 参考:input jason 文件:InsertPurDetail_input.json
 参考:output jason 文件:InsertPurDetail_output.json
+
+8.UpdatePurDetail()//更新采购单明细
+路由:http://localhost:5000/Core/Purchase/UpdatePurDetail
+input:  PurDetail   purchasedetail    采购单明细资料
+OutPut: 1 成功  else 失败代号
+参考:input jason 文件:UpdatePurDetail_input.json
+参考:output jason 文件:UpdatePurDetail_output.json
+
+9.DelPurDetail()//删除采购单明细
+路由:http://localhost:5000/Core/Purchase/DelPurDetail
+input:  ID        int         采购单ID
+        DetailID  List<int>   采购单明细ID
+OutPut: 1 成功  else 失败代号
+参考:input jason 文件:DelPurDetail_input.json
+参考:output jason 文件:DelPurDetail_output.json
