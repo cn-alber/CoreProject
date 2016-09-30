@@ -94,16 +94,34 @@ namespace CoreData.CoreCore
             {
                 wheresql = wheresql + " ORDER BY "+cp.SortField +" "+ cp.SortDirection;
             }
-            wheresql = "select id,purchaseid,skuid,skuname,colorname,sizename,purqty,price,puramt,remark,goodscode,supplynum,recievedate,detailstatus from purchasedetail " + wheresql ;
+            wheresql = "select id,purchaseid,skuid,skuname,colorname,sizename,purqty,price,puramt,remark,goodscode,supplynum,recievedate,detailstatus,norm,coid from purchasedetail " + wheresql ;
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
-                    var u = conn.Query<PurchaseDetailMulti>(wheresql).AsList();
+                    string pursql = "select id,purchaseid,purchasedate,coname,contract,shpaddress,status,purtype,buyyer,remark,taxrate from purchase where purchaseid = '" + cp.Purid + "' and coid =" + cp.CoID ;
+                    var pur = conn.Query<Purchase>(pursql).AsList();
+                    if (pur.Count == 0)
+                    {
+                        result.s = -3001;
+                        result.d = null;
+                    }
+                    else
+                    {
+                        if(pur[0].status == 0)
+                        {
+                            cp.enable = true;
+                        }
+                        else
+                        {
+                            cp.enable = false;
+                        }
+                    }           
+                    var u = conn.Query<PurchaseDetail>(wheresql).AsList();
                     int count = u.Count;
                     decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
 
                     int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
-                    u = conn.Query<PurchaseDetailMulti>(wheresql).AsList();
+                    u = conn.Query<PurchaseDetail>(wheresql).AsList();
 
                     cp.Datacnt = count;
                     cp.Pagecnt = pagecnt;
@@ -355,6 +373,134 @@ namespace CoreData.CoreCore
             }
             return result;
         }
+        ///<summary>
+        ///采购单审核
+        ///</summary>
+        public static DataResult ForcePurchase(List<string> PuridList,int CoID)
+        {
+            var result = new DataResult(1,"采购单强制完成成功!");  
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                var p = new DynamicParameters();
+                p.Add("@PurID", PuridList);
+                p.Add("@Coid", CoID);
+                string wheresql = @"select id,purchaseid,purchasedate,coname,contract,shpaddress,status,purtype,buyyer,remark,taxrate from purchase where purchaseid in @PurID and coid = @Coid and status not in (1,2)" ;
+                var u = CoreDBconn.Query<Purchase>(wheresql,p).AsList();
+                if(u.Count > 0)
+                {
+                    result.s = -1;
+                    result.d = "审核通过&&部分完成状态的采购单才可执行此操作!";
+                }
+                else
+                {
+                    string delsql = @"update purchase set status = 4 where purchaseid in @PurID and coid = @Coid";
+                    int count = CoreDBconn.Execute(delsql, p, TransCore);
+                    if (count < 0)
+                    {
+                        result.s = -3003;
+                    }
+                    else
+                    {
+                        delsql = @"update purchasedetail set detailstatus = 4 where purchaseid in @PurID and coid = @Coid";
+                        count = CoreDBconn.Execute(delsql, p, TransCore);
+                        if (count < 0)
+                        {
+                            result.s = -3003;
+                        }
+                    }
+                    if(result.s == 1)
+                    {
+                        TransCore.Commit();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Close();
+            }
+            return result;
+        }
+        ///<summary>
+        ///采购单明细新增
+        ///</summary>
+        public static DataResult InsertPurDetail(PurchaseDetail detail,int CoID)
+        {
+            var result = new DataResult(1,"采购单明细新增成功!");  
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlCommandText = @"INSERT INTO purchasedetail(purchaseid,skuid,skuname,price,purqty,puramt,recievedate,remark,colorname,sizename,norm,goodscode,supplynum,coid) 
+                                            VALUES(@PurID,@Skuid,@Skuname,@Price,@Purqty,@Puramt,@Recdate,@Remark,@Colorname,@Sizename,@Norm,@Goodscode,@Supplynum,@Coid)";
+                var args = new {PurID = detail.purchaseid,Skuid=detail.skuid,Skuname = detail.skuname,Price = detail.price,Purqty = detail.purqty,Puramt = detail.puramt,
+                                Recdate = detail.recievedate,Remark = detail.remark,Colorname = detail.colorname,Sizename = detail.sizename ,Norm = detail.norm ,
+                                Goodscode = detail.goodscode ,Supplynum = detail.supplynum,Coid = CoID};
+                int count = CoreDBconn.Execute(sqlCommandText,args,TransCore);
+                if(count <= 0)
+                {
+                    result.s = -3002;
+                }
+                string wheresql = "select id,purchaseid,purchasedate,coname,contract,shpaddress,status,purtype,buyyer,remark,taxrate from purchase where purchaseid = '" + detail.purchaseid + "' and coid =" + CoID ;
+                var u = CoreDBconn.Query<Purchase>(wheresql).AsList();
+                if (u.Count == 0)
+                {
+                    result.s = -3001;
+                }
+                else
+                {
+                    string uptsql = @"update purchase set purqtytot = purqtytot + @Purqty,puramtnet = puramtnet + @Puramt,puramttot = puramtnet*(1 + taxrate) where purchaseid = @PurID and coid = @Coid";
+                    var upargs = new {Purqty = detail.purqty,Puramt = detail.puramt,PurID = detail.purchaseid,Coid = CoID};
+                    count = CoreDBconn.Execute(uptsql,upargs);
+                    if(count < 0)
+                    {
+                        result.s= -3003;
+                    }
+                }
+                if(result.s == 1)
+                {
+                    TransCore.Commit();
+                }
+            }
+            catch (Exception e)
+            {
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Close();
+            }
+            return result;
+        }
+        ///<summary>
+        ///采购单明细新增
+        ///</summary>
+        // public static DataResult InsertPurDetail()
+        // {
+        //     var result = new DataResult(1,"采购单明细新增成功!");  
+            
+        //     return result;
+        // }
+        // ///<summary>
+        // ///采购单明细新增
+        // ///</summary>
+        // public static DataResult InsertPurDetail()
+        // {
+        //     var result = new DataResult(1,"采购单明细新增成功!");  
+            
+        //     return result;
+        // }
     }
 }
             
