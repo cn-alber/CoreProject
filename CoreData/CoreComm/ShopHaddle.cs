@@ -17,10 +17,12 @@ namespace CoreData.CoreComm
         ///查询店铺资料
         ///<summary>
         public static DataResult GetShopAll(ShopParam IParam)
-        {            
+        {
             var result = new DataResult(1, null);
-            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
-                try{
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
                     string wheresql = "where 1=1";
                     if (IParam.CoID != 1)
                     {
@@ -51,12 +53,14 @@ namespace CoreData.CoreComm
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + IParam.PageSize;//分页            
                     IParam.ShopLst = conn.Query<ShopQuery>(wheresql).AsList();
                     result.d = IParam;
-                }catch(Exception e){
+                }
+                catch (Exception e)
+                {
                     result.s = -1;
-                    result.d= e.Message; 
+                    result.d = e.Message;
                     conn.Dispose();
                 }
-                
+
             }
             return result;
         }
@@ -65,13 +69,14 @@ namespace CoreData.CoreComm
         ///<summary>
         public static DataResult ShopQuery(string coid, string shopid)
         {
-            var result = new DataResult(1,null);
+            var result = new DataResult(1, null);
             var sname = "shop" + coid + shopid;
 
             var su = CacheBase.Get<Shop>(sname);
-            if(su==null)
+            if (su == null)
             {
-                using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                using (var conn = new MySqlConnection(DbBase.CommConnectString))
+                {
                     try
                     {
                         var u = DbBase.CommDB.Query<Shop>("select * from Shop where id = @sid and CoID = @coid", new { sid = shopid, coid = coid }).AsList();
@@ -83,17 +88,19 @@ namespace CoreData.CoreComm
                         {
                             su = u[0];
                             result.d = su;
-                            CacheBase.Set<Shop>(sname,su);
+                            CacheBase.Set<Shop>(sname, su);
                         }
                     }
                     catch (Exception e)
                     {
                         result.s = -1;
-                        result.d= e.Message; 
+                        result.d = e.Message;
                         conn.Dispose();
                     }
-                }            
-            }else{
+                }
+            }
+            else
+            {
                 result.d = su;
             }
             return result;
@@ -102,15 +109,17 @@ namespace CoreData.CoreComm
         ///<summary>
         ///启用、停用店铺
         ///<summary>
-        public static DataResult UptShopEnable(Dictionary<int, string> IDsDic, string Company, string UserName, bool Enable,string Coid)
-        {            
-            var result = new DataResult(1,null);                    
-            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+        public static DataResult UptShopEnable(Dictionary<int, string> IDsDic, string Company, string UserName, bool Enable, string Coid)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
                 try
                 {
                     //删除缓存
-                    foreach (var item in IDsDic){
-                        CacheBase.Remove("shop" + Coid + item.Key);                
+                    foreach (var item in IDsDic)
+                    {
+                        CacheBase.Remove("shop" + Coid + item.Key);
                     }
                     string contents = string.Empty;
                     string uptsql = @"update Shop set Enable = @Enable where ID in @ID";
@@ -139,10 +148,10 @@ namespace CoreData.CoreComm
                 catch (Exception e)
                 {
                     result.s = -1;
-                    result.d= e.Message; 
+                    result.d = e.Message;
                     conn.Dispose();
                 }
-                
+
             }
             return result;
         }
@@ -183,10 +192,10 @@ namespace CoreData.CoreComm
             {
 
                 var res = ShopQuery(shop.CoID.ToString(), shop.ID.ToString());
-                var shopOld = res.d as Shop;                
+                var shopOld = res.d as Shop;
                 //删除原有缓存
                 CacheBase.Remove(sname);
-                
+
                 if (shopOld.ShopName != shop.ShopName)
                 {
                     contents = contents + "店铺名称:" + shopOld.ShopName + "=>" + shop.ShopName + ";";
@@ -313,6 +322,8 @@ namespace CoreData.CoreComm
                 }
                 catch (Exception e)
                 {
+                    TransComm.Rollback();
+                    TransUser.Rollback();
                     result.s = -1;
                     result.d = e.Message;
                 }
@@ -333,7 +344,8 @@ namespace CoreData.CoreComm
         public static Boolean ExistShop(string ShopName, int ID, int CoID)
         {
             int count = 0;
-            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
                 try
                 {
                     string query = string.Empty;
@@ -348,9 +360,10 @@ namespace CoreData.CoreComm
                         querystr.Append(" and ID !=@ID");
                         p.Add("@ID", ID);
                     }
-                     count= conn.Query<Shop>(querystr.ToString(), p).Count();
+                    count = conn.Query<Shop>(querystr.ToString(), p).Count();
                 }
-                catch{
+                catch
+                {
                     conn.Dispose();
                 }
             }
@@ -490,6 +503,8 @@ namespace CoreData.CoreComm
             }
             catch (Exception e)
             {
+                TransComm.Dispose();
+                TransUser.Dispose();
                 result.s = -1;
                 result.d = e.Message;
             }
@@ -509,7 +524,8 @@ namespace CoreData.CoreComm
         public static DataResult GetTokenShopLst(int CoID)
         {
             var res = new DataResult(1, null);
-            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
                 try
                 {
                     string query = "select * from shop where CoID=@CoID and Istoken=1 and Token!='' and Enable=true";
@@ -526,17 +542,18 @@ namespace CoreData.CoreComm
                 catch (Exception e)
                 {
                     res.s = -1;
-                    res.d= e.Message; 
+                    res.d = e.Message;
                     conn.Dispose();
                 }
-            }                        
+            }
             return res;
         }
 
         public static DataResult GetOfflineShopLst(int CoID)
         {
-             var res = new DataResult(1, null);
-             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
                 try
                 {
                     string query = "select * from shop where CoID=@CoID and SitType=35 and Enable=true";
@@ -553,31 +570,36 @@ namespace CoreData.CoreComm
                 catch (Exception e)
                 {
                     res.s = -1;
-                    res.d= e.Message; 
+                    res.d = e.Message;
                     conn.Dispose();
                 }
             }
-            
+
             return res;
         }
 
-        public static DataResult TokenExpired(string shopid,string coid){
+        public static DataResult TokenExpired(string shopid, string coid)
+        {
             var res = new DataResult(1, null);
-            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
                 try
                 {
-                    var rnt= conn.Execute("UPDATE shop SET shop.Token = 2 WHERE shop.ID = "+shopid);
-                    if(rnt>0){
+                    var rnt = conn.Execute("UPDATE shop SET shop.Token = 2 WHERE shop.ID = " + shopid);
+                    if (rnt > 0)
+                    {
                         CacheBase.Remove("shop" + coid + shopid);
                         res.s = 1;
-                    }else{
+                    }
+                    else
+                    {
                         res.s = -1;
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     res.s = -1;
-                    res.d= e.Message; 
+                    res.d = e.Message;
                     conn.Dispose();
                 }
             }
