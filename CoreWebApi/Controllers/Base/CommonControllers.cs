@@ -11,8 +11,8 @@ namespace CoreWebApi
     [AllowAnonymous]
     public class CommonController : ControllBase
     {
-        [HttpGetAttribute("/Core/Common/ScoCompany")]
-        public ResponseResult GetScoCompany()
+        [HttpGetAttribute("/Core/Common/ScoCompanySimple")]
+        public ResponseResult GetScoCompanySimple()
         {   
             int CoId = int.Parse(GetCoid());
             var data = ScoCompanyHaddle.GetScoCompanyAll(CoId);

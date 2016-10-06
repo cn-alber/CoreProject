@@ -104,10 +104,3 @@ input:  ID        int         采购单ID
 OutPut: 1 成功  else 失败代号
 参考:input jason 文件:DelPurDetail_input.json
 参考:output jason 文件:DelPurDetail_output.json
-
-10.GetSkuAll()//抓取商品资料
-路由:http://localhost:5000/Core/Purchase/GetSkuAll
-input:  SkuParam        SkuParam      商品查询
-OutPut: 商品资料
-参考:input jason 文件:GetSkuAll_input.json
-参考:output jason 文件:GetSkuAll_output.json
