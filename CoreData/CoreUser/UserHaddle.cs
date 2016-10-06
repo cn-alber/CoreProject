@@ -301,7 +301,7 @@ namespace CoreData.CoreUser
         {
             var res = new DataResult(1, null);
             var us = new UserData();
-            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            using (var conn = new MySqlConnection(DbBase.UserConnectString))
             {
                 try
                 {
@@ -314,31 +314,25 @@ namespace CoreData.CoreUser
                                         `user`.`Enable`,
                                         `user`.Email,
                                         `user`.Gender,
-                                        company.`Name` AS 'CompanyName',
-                                        role.`Name` AS 'RoleName',
+                                        company.`Name` AS CompanyName,
+                                        role.`Name` AS RoleName,
                                         `user`.CreateDate
                                     FROM
-                                        `user`,
-                                        company,
-                                        role
-                                    WHERE
-                                        `user`.CompanyID = company.ID
-                                    AND `user`.RoleID = role.ID
-                                    AND `user`.CompanyID = @CoID";
+                                        `user`
+                                    LEFT OUTER JOIN company ON `user`.CompanyID = company.ID
+                                    LEFT OUTER JOIN role ON `user`.RoleID = role.ID
+                                    WHERE `user`.CompanyID = @CoID";
                     querysql.Append(sql);
-                    if (IParam.CoID != 1)
-                    {
-                        querysql.Append(" AND CoID = @CoID");
-                        p.Add("@CoID", IParam.CoID);
-                    }
+                    p.Add("@CoID", IParam.CoID);
+
                     if (!string.IsNullOrEmpty(IParam.Enable) && IParam.Enable.ToUpper() != "ALL")//是否启用
                     {
-                        querysql.Append(" AND Enable = @Enable");
+                        querysql.Append(" AND `user`.Enable = @Enable");
                         p.Add("@Enable", IParam.Enable == "true" ? true : false);
                     }
                     if (!string.IsNullOrEmpty(IParam.Filter))
                     {
-                        querysql.Append(" AND (SkuID like @Filter or SkuName like @Filter or Norm like @Filter)");
+                        querysql.Append(" AND (`user`.Name like @Filter or Account like @Filter)");
                         p.Add("@Filter", "'%" + IParam.Filter + "'");
                     }
                     if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
@@ -368,6 +362,9 @@ namespace CoreData.CoreUser
                 {
                     res.s = -1;
                     res.d = e.Message;
+                }
+                finally
+                {
                     conn.Dispose();
                 }
             }
@@ -375,6 +372,386 @@ namespace CoreData.CoreUser
         }
         #endregion
 
+        #region 单笔用户资料 - 编辑|查询
+        public static DataResult GetUserEdit(string UserID)
+        {
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.UserConnectString))
+            {
+                try
+                {
+                    string querysql = @"SELECT
+                                            u.*, b. NAME AS CompanyName,
+                                            r. NAME AS RoleName
+                                        FROM
+                                            `user` u
+                                        INNER JOIN company b ON u.CompanyID = b.ID
+                                        INNER JOIN role r ON u.RoleID = r.ID
+                                        WHERE
+                                            u.ID = @UserID";
+                    var p = new { UserID = UserID };
+                    var us = DbBase.UserDB.QueryFirst<UserEdit>(querysql, p);
+                    if (us == null)
+                    {
+                        res.s = -3001;
+                    }
+                    res.d = us;
+                }
+                catch (Exception e)
+                {
+                    res.s = -1;
+                    res.d = e.Message;
+                }
+                finally
+                {
+                    conn.Dispose();
+                }
+            }
+            return res;
+        }
+        #endregion
 
+        #region 从缓存读取数据
+        public static DataResult GetUserCache(int CoID, string Account)
+        {
+            var res = new DataResult(1, null);
+            string usname = "user" + CoID.ToString() + Account;
+            var us = CacheBase.Get<UserEdit>(usname);//读取缓存
+            if (us == null)
+            {
+                try
+                {
+                    string querysql = @"SELECT
+                                            u.*, b. NAME AS CompanyName,
+                                            r. NAME AS RoleName
+                                        FROM
+                                            `user` u
+                                        INNER JOIN company b ON u.CompanyID = b.ID
+                                        INNER JOIN role r ON u.RoleID = r.ID
+                                        WHERE
+                                            u.Account = @Account and u.CompanyID=@CoID";
+                    var p = new { Account = Account, CoID = CoID };
+                    us = DbBase.UserDB.QueryFirst<UserEdit>(querysql, p);
+                    if (us == null)
+                    {
+                        res.s = -3001;
+                    }
+                    res.d = us;
+                    CacheBase.Set(usname, us);//新增缓存
+                }
+                catch (Exception e)
+                {
+                    res.s = -1;
+                    res.d = e.Message;
+                }
+            }
+            return res;
+        }
+        #endregion
+
+        #region 启用|停用用户
+        public static DataResult UptUserEnable(Dictionary<int, string> IDsDic, string Company, string UserName, bool Enable, string CoID)
+        {
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.UserConnectString))
+            {
+                try
+                {
+                    //删除缓存
+                    foreach (var item in IDsDic)
+                    {
+                        CacheBase.Remove("user" + CoID + item.Key);
+                    }
+                    string contents = string.Empty;
+                    string uptsql = @"update user set Enable = @Enable where ID in @ID";
+                    var args = new { ID = IDsDic.Keys.AsList(), Enable = Enable };
+
+                    int count = conn.Execute(uptsql, args);
+                    if (count <= 0)
+                    {
+                        res.s = -3003;
+                    }
+                    else
+                    {
+                        if (Enable)
+                        {
+                            contents = "用户状态启用：";
+                        }
+                        else
+                        {
+                            contents = "用户状态停用：";
+                        }
+                        contents += string.Join(",", IDsDic.Values.AsList().ToArray());
+                        CoreUser.LogComm.InsertUserLog("修改用户状态", "User", contents, UserName, Company, DateTime.Now);
+                        res.d = contents;
+                        string querysql = @"SELECT
+                                            u.*, b. NAME AS CompanyName,
+                                            r. NAME AS RoleName
+                                        FROM
+                                            `user` u
+                                        INNER JOIN company b ON u.CompanyID = b.ID
+                                        INNER JOIN role r ON u.RoleID = r.ID
+                                        WHERE
+                                            u.ID in @ID";
+                        var p = new { ID = IDsDic.Keys.AsList() };
+                        var userLst = DbBase.UserDB.Query<UserEdit>(querysql, p).ToList();
+                        if (userLst.Count() == 0)
+                        {
+                            res.s = -3001;
+                        }
+                        res.d = contents;
+                        //添加缓存
+                        foreach (var item in userLst)
+                        {
+                            CacheBase.Set("user" + CoID + item.Account, item);
+                        }
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    res.s = -1;
+                    res.d = e.Message;
+                }
+                finally
+                {
+                    conn.Dispose();
+                    conn.Close();
+                }
+            }
+            return res;
+        }
+        #endregion
+
+        #region 检查用户账号是否存在
+        public static DataResult ExistUser(string Account, int ID, int CoID)
+        {
+            int count = 0;
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.UserConnectString))
+            {
+                try
+                {
+                    string query = string.Empty;
+                    // object param = null;
+                    StringBuilder querystr = new StringBuilder();
+                    querystr.Append("select * from user where CompanyID = @CoID and Account = @Account");
+                    var p = new DynamicParameters();
+                    p.Add("@CoID", CoID);
+                    p.Add("@Account", Account);
+                    if (ID > 0)
+                    {
+                        querystr.Append(" and ID !=@ID");
+                        p.Add("@ID", ID);
+                    }
+                    count = conn.Query(querystr.ToString(), p).Count();
+                    if (count > 0)
+                    {
+                        res.s = -1;
+                        res.d = "账号已存在";
+                    }
+                    return res;
+                }
+                catch (Exception e)
+                {
+                    res.s = -1;
+                    res.d = e.Message;
+                }
+                finally
+                {
+                    conn.Dispose();
+                }
+            }
+            return res;
+        }
+        #endregion
+
+        #region 新增用户
+        public static DataResult SaveInsertUser(UserEdit user, int CoID, string UserName)
+        {
+            var result = ExistUser(user.Account, 0, CoID);
+            if (result.s == 1)
+            {
+                result = AddUser(user,CoID,UserName);
+            }
+            return result;
+        }
+
+        public static DataResult AddUser(UserEdit user, int CoID, string UserName)
+        {
+            var usname = "user" + CoID + user.Account;
+            var result = new DataResult(1, null);
+            string sqlCommandText = @"INSERT INTO `user`
+                        (Account,
+                        SecretID,
+                        `Name`,
+                        `PassWord`,
+                        `Enable`,
+                        Email,
+                        Gender,
+                        Mobile,
+                        QQ,
+                        CompanyID,
+                        RoleID,
+                        Creator,
+                        CreateDate) VALUES(
+                        @Account,
+                        @SecretID,
+                        @Name,
+                        @PassWord,
+                        @Enable,
+                        @Email,
+                        @Gender,
+                        @Mobile,
+                        @QQ,
+                        @CompanyID,
+                        @RoleID,
+                        @Creator,
+                        @CreateDate
+                        )";
+            var us = new UserEdit();
+            us.Account = user.Account;
+            us.SecretID = user.SecretID;
+            us.Name = user.Name;
+            us.PassWord = user.PassWord;
+            us.Enable = user.Enable;
+            us.Email = user.Email;
+            us.Gender = user.Gender;
+            us.Mobile = user.Mobile;
+            us.QQ = user.QQ;
+            us.CompanyID = user.CompanyID;
+            us.RoleID = user.RoleID;
+            us.Creator = UserName;
+            us.CreateDate = DateTime.Now;
+            var UserDBconn = new MySqlConnection(DbBase.UserConnectString);
+            UserDBconn.Open();
+            var TransUser = UserDBconn.BeginTransaction();
+            try
+            {
+                int count = UserDBconn.Execute(sqlCommandText, us, TransUser);
+                if (count < 0)
+                {
+                    result.s = -3002;
+                }
+                else
+                {
+                    CoreUser.LogComm.InsertUserLogTran(TransUser, "新增用户资料", "User", user.Name, UserName, CoID.ToString(), DateTime.Now);
+                    CacheBase.Set<UserEdit>(usname, user);//缓存
+                }
+                if (result.s == 1)
+                {
+                    TransUser.Commit();
+                }
+            }
+            catch (Exception e)
+            {
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransUser.Dispose();
+                UserDBconn.Clone();
+            }
+            return result;
+        }
+        #endregion
+
+
+        #region 修改用户
+        public static DataResult SaveUpdateUser(UserEdit user, int CoID, string UserName)
+        {           
+            var sname = "user" + CoID + user.ID;
+            string contents = string.Empty;
+            var result = ExistUser(user.Account, user.ID, CoID);
+            if (result.s == 1)
+            {
+                var res = GetUserEdit(user.ID.ToString());
+                var userOld = res.d as UserEdit;
+                //删除原有缓存
+                CacheBase.Remove(sname);
+                if(userOld.Account!=user.Account)
+                {
+                     contents = contents + "账号:" + userOld.Account + "=>" + user.Account + ";";
+                }
+                if(userOld.Name!=user.Name)
+                {
+                     contents = contents + "名称:" + userOld.Name + "=>" + user.Name + ";";
+                }
+                if(userOld.PassWord!=user.PassWord)
+                {
+                     contents = contents + "密码:" + userOld.PassWord + "=>" + user.PassWord + ";";
+                }
+                if(userOld.Enable!=user.Enable)
+                {
+                     contents = contents + "用户状态:" + userOld.Enable + "=>" + user.Enable + ";";
+                }
+                if(userOld.Email!=user.Email)
+                {
+                     contents = contents + "邮箱:" + userOld.Email + "=>" + user.Email + ";";
+                }
+                if(userOld.Gender!=user.Gender)
+                {
+                     contents = contents + "性别:" + userOld.Gender + "=>" + user.Gender + ";";
+                }
+                if(userOld.Mobile!=user.Mobile)
+                {
+                     contents = contents + "联系电话:" + userOld.Mobile + "=>" + user.Mobile + ";";
+                }
+                if(userOld.QQ!=user.QQ)
+                {
+                     contents = contents + "QQ:" + userOld.QQ + "=>" + user.QQ + ";";
+                }
+                if(userOld.RoleID!=user.RoleID)
+                {
+                     contents = contents + "角色:" + userOld.RoleID+"."+userOld.RoleName + "=>" + user.RoleID +"."+user.RoleName+ ";";
+                }
+
+                var UserDBconn = new MySqlConnection(DbBase.UserConnectString);
+                UserDBconn.Open();
+                var TransUser = UserDBconn.BeginTransaction();
+                try
+                {
+                    string str = @"UPDATE user
+                    SET Account = @Account,
+                        SecretID = @SecretID,
+                        `Name` = @Name,
+                        `PassWord` = @PassWord,
+                        `Enable` = @Enable,
+                        Email = @Email,
+                        Gender = @Gender,
+                        Mobile = @Mobile,
+                        QQ = @QQ,
+                        CompanyID = @CompanyID,
+                        RoleID = @RoleID
+                    WHERE ID = @ID               
+                    ";
+                    int count = UserDBconn.Execute(str,user,TransUser);
+                    if (count <= 0)
+                    {
+                        result.s = -3003;
+                    }
+                    else
+                    {
+                        CoreUser.LogComm.InsertUserLogTran(TransUser, "修改用户资料", "User", contents, UserName, CoID.ToString(), DateTime.Now);
+                        CacheBase.Set<UserEdit>(sname, user);//缓存
+                        TransUser.Commit();
+                    }
+                }
+                catch(Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+                finally
+                {                    
+                    TransUser.Dispose();                    
+                    UserDBconn.Clone();
+                }
+                CacheBase.Set(sname,user);
+            }
+            return result;
+        }
+        #endregion
     }
 }
