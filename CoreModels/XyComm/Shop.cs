@@ -50,7 +50,7 @@ namespace CoreModels.XyComm
         public bool UpdateWayBill{get;set;}
         public string TelPhone{get;set;}
         public string SendAddress{get;set;}
-        public DateTime CreateDate {get;set;}
+        public string CreateDate {get;set;}
         public int Istoken{get;set;} 
         #endregion
     }
