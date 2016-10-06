@@ -105,14 +105,7 @@ OutPut: 1 成功  else 失败代号
 参考:input jason 文件:DelPurDetail_input.json
 参考:output jason 文件:DelPurDetail_output.json
 
-10.GetScoCompany()//抓取供应商列表
-路由:http://localhost:5000/Core/Purchase/GetScoCompany
-input:  None
-OutPut: List<supplycompany> 供应商列表资料
-参考:input jason 文件:None
-参考:output jason 文件:GetScoCompany_output.json
-
-11.GetSkuAll()//抓取商品资料
+10.GetSkuAll()//抓取商品资料
 路由:http://localhost:5000/Core/Purchase/GetSkuAll
 input:  SkuParam        SkuParam      商品查询
 OutPut: 商品资料
