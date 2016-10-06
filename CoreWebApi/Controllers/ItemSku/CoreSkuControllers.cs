@@ -104,6 +104,18 @@ namespace CoreWebApi.XyCore
         }
         #endregion    
 
+        #region 采购查询
+        [HttpPostAttribute("Core/XyCore/CoreSku/SkuQuery")]
+        public ResponseResult SkuQuery([FromBodyAttribute]JObject obj)
+        {
+        var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<SkuParam>(obj["SkuParam"].ToString());
+        int CoID = int.Parse(GetCoid());
+        var res = CoreSkuHaddle.GetSkuAll(cp,CoID);
+        var Result = CoreResult.NewResponse(res.s, res.d, "General");
+        return Result;
+        }
+
+        #endregion
     }
 
 }
