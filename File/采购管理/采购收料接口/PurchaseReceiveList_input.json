@@ -1,0 +1,11 @@
+{
+    "Recid":"",
+    "Purid": "", 
+    "Skuname": "",  
+    "Warehousename": "",
+    "Status": 0,   
+    "SortField": "id",
+    "SortDirection": "Desc",
+    "NumPerPage": "2",
+    "PageIndex": "1"
+}

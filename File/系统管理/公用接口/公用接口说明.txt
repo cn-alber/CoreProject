@@ -1,0 +1,9 @@
+接口名称:CommonController
+
+function说明
+1.GetScoCompany()//抓取供应商列表
+路由:http://localhost:5000/Core/Common/GetScoCompany
+input:  None
+OutPut: List<supplycompany> 供应商列表资料
+参考:input jason 文件:None
+参考:output jason 文件:GetScoCompany_output.json

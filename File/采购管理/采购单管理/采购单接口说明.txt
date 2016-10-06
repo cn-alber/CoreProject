@@ -6,7 +6,7 @@ function说明
 input:      Purid           string          采购单号
             PurdateStart    datetime        采购时间起
             PurdateEnd      datetime        采购时间迄
-            Status          string          状态
+            Status          int             状态
             CoName          string          供应商
             SortField       string          排序栏位名称
             SortDirection   string          排序方式
@@ -16,7 +16,7 @@ OutPut:     CoID            int             公司编号coid
             Purid           string          采购单号
             PurdateStart    datetime        采购时间起
             PurdateEnd      datetime        采购时间迄
-            Status          string          状态
+            Status          int             状态
             CoName          string          供应商
             SortField       string          排序栏位名称
             SortDirection   string          排序方式
@@ -104,3 +104,10 @@ input:  ID        int         采购单ID
 OutPut: 1 成功  else 失败代号
 参考:input jason 文件:DelPurDetail_input.json
 参考:output jason 文件:DelPurDetail_output.json
+
+10.GetSkuAll()//抓取商品资料
+路由:http://localhost:5000/Core/Purchase/GetSkuAll
+input:  SkuParam        SkuParam      商品查询
+OutPut: 商品资料
+参考:input jason 文件:GetSkuAll_input.json
+参考:output jason 文件:GetSkuAll_output.json

@@ -118,5 +118,24 @@ namespace CoreWebApi
             var data = PurchaseHaddle.DeletePurDetail(id,detailid,CoId);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
+
+        [AllowAnonymous]
+        [HttpPostAttribute("/Core/Purchase/GetScoCompany")]
+        public ResponseResult GetScoCompany()
+        {   
+            int CoId = int.Parse(GetCoid());
+            var data = ScoCompanyHaddle.GetScoCompanyAll(CoId);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
+
+        [AllowAnonymous]
+        [HttpPostAttribute("/Core/Purchase/GetSkuAll")]
+        public ResponseResult GetSkuAll([FromBodyAttribute]JObject co)
+        {   
+            SkuParam cp = Newtonsoft.Json.JsonConvert.DeserializeObject<SkuParam>(co["SkuParam"].ToString());
+            int CoId = int.Parse(GetCoid());
+            var data = CoreSkuHaddle.GetSkuAll(cp,CoId,2);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
     }
 }

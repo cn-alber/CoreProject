@@ -1,0 +1,44 @@
+接口名称：AdminControllers
+
+function说明
+1.查询权限列表
+    方法：Get
+    路由：http://localhost:5000/core/admin/power
+    参数: CoreModels.XyUser.UserParam
+    InPut:
+        search          string      模糊查询匹配        
+        page            int         当前页码(ex.第一页就给1,默认1)
+        pageSize        int         每页显示资料笔数（默认 20）
+    OutPut:    
+        list                    
+        page                    当前页
+        pageSize                每页显示数
+        pageTotal               总页数
+        total                   查询总行数
+    参考:input json 文件:powerList_input.json
+    参考:output json 文件:powerList_output.json
+
+2.获取可用权限
+    方法：Get
+    路由：http://localhost:5000/core/admin/GetViewPowerList
+    参数: CoreModels.XyUser.UserParam
+    InPut:
+        无
+    OutPut:    
+        id                      权限ID
+        access                  权限名称
+    
+    参考:output json 文件:GetViewPowerList_output.json
+
+2.新增、编辑权限时获取可用权限
+    方法：Get
+    路由：http://localhost:5000/core/admin/GetViewPowerListEdit
+    参数: CoreModels.XyUser.UserParam
+    InPut:
+        ViewPowerID             权限ID
+    OutPut:    
+        id                      权限ID
+        access                  权限名称
+    参考:input json 文件:GetViewPowerListEdit_input.json
+    参考:output json 文件:GetViewPowerListEdit_output.json
+
