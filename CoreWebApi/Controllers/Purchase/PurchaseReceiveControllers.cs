@@ -27,5 +27,7 @@ namespace CoreWebApi
             var data = PurchaseReceiveHaddle.GetPurchaseRecList(cp);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        
     }
 }
