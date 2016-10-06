@@ -2,7 +2,7 @@
     "Purid": "", 
     "PurdateStart": "2016-5-1",  
     "PurdateEnd": "2016-5-31",
-    "Status": "部分完成",   
+    "Status": 2,   
     "CoName": "南极云商有限公司",   
     "SortField": "id",
     "SortDirection": "Desc",

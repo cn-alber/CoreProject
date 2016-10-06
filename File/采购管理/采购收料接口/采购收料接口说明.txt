@@ -1,0 +1,28 @@
+接口名称:PurchaseReceiveControllers
+
+function说明
+1.PurchaseReceiveList() //查询table purchasereceive 资料
+  路由:http://localhost:5000/Core/PurchaseReceive/PurchaseReceiveList
+input:      Recid           string          收料单号
+            Purid           string          采购单号
+            Skuname         string          商品名称
+            Warehousename   string          仓库代号
+            Status          int             状态
+            SortField       string          排序栏位名称
+            SortDirection   string          排序方式
+            PageIndex       int             资料页数(ex.第一页就给1)
+            NumPerPage      int             每页显示资料笔数
+OutPut:     CoID            int             公司编号coid
+            Purid           string          采购单号
+            Skuname         string          商品名称
+            Warehousename   string          仓库代号
+            Status          int             状态
+            SortField       string          排序栏位名称
+            SortDirection   string          排序方式
+            PageIndex       int             资料页数(ex.第一页就给1)
+            NumPerPage      int             每页显示资料笔数
+            Datacnt         int             资料总笔数
+            Pagecnt         int             总页数
+            Rec             List<PurRec>    PurchaseReceive 资料
+参考:input jason 文件:PurchaseReceiveList_input.json
+参考:output jason 文件:PurchaseReceiveList_output.json

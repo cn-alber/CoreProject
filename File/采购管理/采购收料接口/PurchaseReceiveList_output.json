@@ -1,0 +1,50 @@
+{
+    "s": 1,
+    "d": {
+        "CoID": 1,
+        "Recid": "",
+        "Purid": "",
+        "Skuname": "",
+        "Warehousename": "",
+        "Status": 0,
+        "SortField": "id",
+        "SortDirection": "Desc",
+        "NumPerPage": 2,
+        "PageIndex": 1,
+        "Datacnt": 44,
+        "Pagecnt": 22.0,
+        "Rec": [
+            {
+                "id": 51,
+                "receiveid": "RE10002016071255558",
+                "purchaseid": "10002016057421",
+                "warehouseid": 30,
+                "warehousename": "dss入库暂存仓",
+                "receivedate": "2016-07-12T00:00:00",
+                "skuid": "NJR201605070003043",
+                "skuname": "南极人羽绒服",
+                "norm": "黄色;11",
+                "status": 0,
+                "recqty": 3.0,
+                "creator": "系统管理员",
+                "createdate": "2016-07-12T13:21:20"
+            },
+            {
+                "id": 50,
+                "receiveid": "RE10002016071135122",
+                "purchaseid": "10002016051741",
+                "warehouseid": 30,
+                "warehousename": "dss入库暂存仓",
+                "receivedate": "2016-07-11T00:00:00",
+                "skuid": "test2510002014",
+                "skuname": "南极人2016男装夹克休闲版",
+                "norm": "",
+                "status": 0,
+                "recqty": 2.0,
+                "creator": "系统管理员",
+                "createdate": "2016-07-11T09:21:58"
+            }
+        ]
+    },
+    "m": ""
+}
