@@ -106,3 +106,12 @@ function说明
         失败：返回错误信息
     参考：input json 文件：UpdateUser_input.json
     参考：output json 文件：UpdateUser_output.json
+9.DeleteUser()//删除用户
+    方法：POST
+    路由：http://localhost:5000/Core/XyUser/User/DeleteUser
+    参数：
+    InPut:
+         AccountLst     List<string>    用户账号Account
+    OutPut:
+         成功：1.删除用户缓存；2.删除用户资料；3.新增操作记录log；4.返回成功信息
+         失败：返回错误信息
