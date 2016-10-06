@@ -369,7 +369,7 @@ namespace CoreData.CoreCore
 
 
         #region 根据条件抓取商品list(采购用)
-        public static DataResult GetSkuAll(SkuParam cp, int CoID)
+        public static DataResult GetSkuAll(SkuParam cp, int CoID,int Type)
         {
             var result = new DataResult(1, null);
             StringBuilder querysql = new StringBuilder();
@@ -377,10 +377,11 @@ namespace CoreData.CoreCore
                                 GoodsCode,SalePrice,
                                 ColorName,SizeName 
                         from coresku
-                        where CoID = @CoID ";
+                        where CoID = @CoID AND Type = @Type AND Enable = 1 ";
             querysql.Append(sql);
             var p = new DynamicParameters();
             p.Add("@CoID", CoID);
+            p.Add("@Type",Type);
              
             if (!string.IsNullOrEmpty(cp.GoodsCode))
             {

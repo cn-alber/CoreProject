@@ -110,7 +110,7 @@ namespace CoreWebApi.XyCore
         {
         var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<SkuParam>(obj["SkuParam"].ToString());
         int CoID = int.Parse(GetCoid());
-        var res = CoreSkuHaddle.GetSkuAll(cp,CoID);
+        var res = CoreSkuHaddle.GetSkuAll(cp,CoID,2);
         var Result = CoreResult.NewResponse(res.s, res.d, "General");
         return Result;
         }
