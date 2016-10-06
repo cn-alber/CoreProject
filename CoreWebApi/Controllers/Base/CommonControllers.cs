@@ -1,13 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using CoreData.CoreCore;
-using Microsoft.AspNetCore.Authorization;
 
 namespace CoreWebApi
 {
     public class CommonController : ControllBase
     {
-        [AllowAnonymous]
-        [HttpPostAttribute("/Core/Common/GetScoCompany")]
+        [HttpGetAttribute("/Core/Common/ScoCompany")]
         public ResponseResult GetScoCompany()
         {   
             int CoId = int.Parse(GetCoid());
