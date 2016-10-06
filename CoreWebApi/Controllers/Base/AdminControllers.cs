@@ -19,6 +19,7 @@ namespace CoreWebApi
             var m = AdminHaddle.GetMenuList(roleid, coid);
             return CoreResult.NewResponse(m.s, m.d, "Indentity");           
          }
+
          //创建菜单
          [HttpPostAttribute("/core/admin/createmenus")]
          public ResponseResult createmenus([FromBodyAttribute]JObject lo)
@@ -46,11 +47,11 @@ namespace CoreWebApi
              var id = lo["id"].ToString();
              var name = lo["name"].ToString();
              var router = lo["router"].ToString();
-             var icon = String.Join(",",lo["icon"]);
+             var icon = new string[]{lo["iconName"].ToString(),lo["iconPrefix"].ToString()};
              var order = lo["order"].ToString();
              var remark = lo["remark"].ToString();
-             var parentid = lo["parentid"].ToString();
-             var accessid = lo["accessid"].ToString();
+             var parentid = lo["pid"].ToString();
+             var accessid = "1";//lo["accessid"].ToString();
 
              var uname = GetUname();
              var coid = GetCoid();        
