@@ -77,7 +77,7 @@ namespace CoreWebApi
             return new OkObjectResult(test);
         }
 
-        [AllowAnonymous]
+        
         [HttpPostAttribute("/Core/sign/in")]
         public async Task<ResponseResult> login([FromBodyAttribute]JObject lo)
         {
