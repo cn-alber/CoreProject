@@ -211,4 +211,13 @@ namespace CoreModels.XyCore
         public int status { get; set; }
     }
     #endregion
+
+    #region 商品抓取Param（采购）
+    public class SkuParam
+    {
+        public string GoodsCode { get; set; }
+        public string SkuID { get; set; }
+        public string SkuName { get; set; }
+    }
+    #endregion
 }

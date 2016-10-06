@@ -345,8 +345,8 @@ namespace CoreData.CoreCore
                 sku.Norm = cki.ColorName + ";" + cki.SizeName;
                 sku.Creator = ckm.Creator;
                 sku.CreateDate = DateTime.Now;
-                int count = DbBase.UserDB.Execute(sql, sku,Trans);
-                if(count==0)
+                int count = DbBase.UserDB.Execute(sql, sku, Trans);
+                if (count == 0)
                 {
                     res.s = -3002;
                 }
@@ -361,9 +361,63 @@ namespace CoreData.CoreCore
             {
                 Trans.Dispose();
                 DbBase.CoreDB.Close();
-            }            
+            }
 
             return res;
+        }
+        #endregion
+
+
+        #region 根据条件抓取商品list(采购用)
+        public static DataResult GetSkuAll(SkuParam cp, int CoID)
+        {
+            var result = new DataResult(1, null);
+            StringBuilder querysql = new StringBuilder();
+            var sql = @"select  SkuID,SkuName,
+                                GoodsCode,SalePrice,
+                                ColorName,SizeName 
+                        from coresku
+                        where CoID = @CoID ";
+            querysql.Append(sql);
+            var p = new DynamicParameters();
+            p.Add("@CoID", CoID);
+             
+            if (!string.IsNullOrEmpty(cp.GoodsCode))
+            {
+                querysql.Append(" AND GoodsCode like @GoodsCode");
+                p.Add("@GoodsCode", "%" + cp.GoodsCode + "%");
+            }
+            if(!string.IsNullOrEmpty(cp.SkuID))
+            {
+                querysql.Append(" AND SkuID like @SkuID");
+                p.Add("@SkuID","%"+cp.SkuID+"%");
+            }
+            if(!string.IsNullOrEmpty(cp.SkuName))
+            {
+                querysql.Append(" AND SkuName like @SkuName");
+                p.Add("@SkuName","%"+cp.SkuName+"%");
+            }
+            try
+            {
+                var Lst = DbBase.CoreDB.Query<SkuQuery>(querysql.ToString(), p).AsList();
+                if (Lst.Count <= 0)
+                {
+                    result.s = -1;
+                    result.d = -3001;
+                }
+                else
+                {
+                    result.d = Lst;
+                }
+
+            }
+            catch (Exception e)
+            {
+                result.s = -1;
+                result.d = e.Message;
+            }
+
+            return result;
         }
         #endregion
     }
