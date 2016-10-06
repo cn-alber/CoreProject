@@ -403,14 +403,12 @@ namespace CoreData.CoreCore
                 var Lst = DbBase.CoreDB.Query<SkuQuery>(querysql.ToString(), p).AsList();
                 if (Lst.Count <= 0)
                 {
-                    result.s = -1;
-                    result.d = -3001;
+                    result.s = -3001;
                 }
                 else
                 {
                     result.d = Lst;
                 }
-
             }
             catch (Exception e)
             {
