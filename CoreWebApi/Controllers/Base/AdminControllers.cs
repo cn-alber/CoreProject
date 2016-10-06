@@ -80,7 +80,7 @@ namespace CoreWebApi
 
          //获取权限列表
          [HttpGetAttribute("/core/admin/power")]
-         public ResponseResult power(string search,int Page = 1,int PageSize = 20)
+         public ResponseResult power(string search = "",int Page = 1,int PageSize = 20)
          {
 
             powerParam param = new powerParam();

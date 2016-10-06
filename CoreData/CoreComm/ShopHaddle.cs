@@ -50,7 +50,22 @@ namespace CoreData.CoreComm
                     int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + IParam.PageSize;//分页            
                     IParam.ShopLst = conn.Query<ShopQuery>(wheresql).AsList();
-                    result.d = IParam;
+                    
+                    if(IParam.PageIndex == 1){
+                        result.d = new {
+                            list = IParam.ShopLst,
+                            page = IParam.PageIndex,
+                            pageSize = IParam.PageSize,
+                            pageTotal =  IParam.PageCount,
+                            total = IParam.DataCount
+                        };
+                    }else{
+                        result.d = new {
+                            list = IParam.ShopLst,
+                            page = IParam.PageIndex,
+                        };
+                    }
+                    //result.d = IParam;
                 }catch(Exception e){
                     result.s = -1;
                     result.d= e.Message; 

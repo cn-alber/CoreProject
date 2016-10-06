@@ -1,0 +1,172 @@
+{
+    "s": 1,
+    "d": {
+        "list": [
+            {
+                "ID": 1,
+                "Name": "CoreUserView",
+                "GroupName": "CoreUser",
+                "Title": "浏览用户列表",
+                "Remark": "浏览权限",
+                "Type": 0
+            },
+            {
+                "ID": 4,
+                "Name": "CorePowerView",
+                "GroupName": "CorePower",
+                "Title": "浏览权限列表",
+                "Remark": "remark",
+                "Type": 0
+            },
+            {
+                "ID": 8,
+                "Name": "CoreMenusView",
+                "GroupName": "CoreMenus",
+                "Title": "浏览菜单列表",
+                "Remark": "",
+                "Type": 0
+            },
+            {
+                "ID": 12,
+                "Name": "CorePowerNew",
+                "GroupName": "CorePower",
+                "Title": "新增权限",
+                "Remark": "",
+                "Type": 1
+            },
+            {
+                "ID": 13,
+                "Name": "CorePowerEdit",
+                "GroupName": "CorePower",
+                "Title": "修改权限",
+                "Remark": "",
+                "Type": 1
+            },
+            {
+                "ID": 14,
+                "Name": "CorePowerDelete",
+                "GroupName": "CorePower",
+                "Title": "删除权限",
+                "Remark": "",
+                "Type": 1
+            },
+            {
+                "ID": 15,
+                "Name": "CoreMenusNew",
+                "GroupName": "CoreMenus",
+                "Title": "新增菜单",
+                "Remark": "新增菜单",
+                "Type": 1
+            },
+            {
+                "ID": 16,
+                "Name": "CoreMenusEdit",
+                "GroupName": "CoreMenus",
+                "Title": "修改菜单",
+                "Remark": "",
+                "Type": 1
+            },
+            {
+                "ID": 17,
+                "Name": "CoreMenusDelete",
+                "GroupName": "CoreMenus",
+                "Title": "删除菜单",
+                "Remark": "",
+                "Type": 1
+            },
+            {
+                "ID": 18,
+                "Name": "CoreRolePowerView",
+                "GroupName": "CoreRolePower",
+                "Title": "浏览角色权限",
+                "Remark": "",
+                "Type": 0
+            },
+            {
+                "ID": 19,
+                "Name": "CoreRoleNew",
+                "GroupName": "CoreRolePower",
+                "Title": "新增角色",
+                "Remark": "",
+                "Type": 1
+            },
+            {
+                "ID": 20,
+                "Name": "CoreCompanyView",
+                "GroupName": "CoreCompany",
+                "Title": "浏览公司管理",
+                "Remark": "",
+                "Type": 0
+            },
+            {
+                "ID": 21,
+                "Name": "CoreRolePowerEdit",
+                "GroupName": "CoreRolePower",
+                "Title": "角色权限修改",
+                "Remark": "",
+                "Type": 1
+            },
+            {
+                "ID": 23,
+                "Name": "CoreUserNew",
+                "GroupName": "CoreUser",
+                "Title": "新增用户",
+                "Remark": "",
+                "Type": 1
+            },
+            {
+                "ID": 25,
+                "Name": "CoreCompanyNew",
+                "GroupName": "CoreCompany",
+                "Title": "新增公司",
+                "Remark": "",
+                "Type": 1
+            },
+            {
+                "ID": 26,
+                "Name": "CoreCompanyEdit",
+                "GroupName": "CoreCompany",
+                "Title": "修改公司",
+                "Remark": "",
+                "Type": 1
+            },
+            {
+                "ID": 27,
+                "Name": "CoreUserEdit",
+                "GroupName": "CoreUser",
+                "Title": "修改用户",
+                "Remark": "",
+                "Type": 1
+            },
+            {
+                "ID": 28,
+                "Name": "CoreUserDelete",
+                "GroupName": "CoreUser",
+                "Title": "删除用户",
+                "Remark": "",
+                "Type": 1
+            },
+            {
+                "ID": 33,
+                "Name": "CoreRoleDelete",
+                "GroupName": "CoreRolePower",
+                "Title": "删除角色",
+                "Remark": "",
+                "Type": 1
+            },
+            {
+                "ID": 34,
+                "Name": "CoreRoleUserNew",
+                "GroupName": "CoreRolePower",
+                "Title": "添加用户到角色",
+                "Remark": "",
+                "Type": 1
+            }
+        ],
+        "page": 1,
+        "pageSize": 20,
+        "pageTotal": 8,
+        "total": 142
+    },
+    "m": ""
+}
