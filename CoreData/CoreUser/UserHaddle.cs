@@ -125,7 +125,7 @@ namespace CoreData.CoreUser
         //             //"select id,name,NewIcon,NewIconPre,NavigateUrl,ParentID from menus where id in (" + pid + ") order by sortindex"
         //             sql = "select menus.id, menus.`Name` as `name`,NewUrl as router,SortIndex as `order`, menus.Remark, ParentID ,power.Title as access from menus "+
         //                         "LEFT JOIN power on power.ID = menus.ViewPowerID where menus.id in (" + pid + ") order by sortindex"; 
-                    
+
         //             parent = conn.Query<Menu>(sql).AsList();
 
         //             foreach (var p in parent)
@@ -210,12 +210,15 @@ namespace CoreData.CoreUser
                                 r.ViewList + ") order by ParentID,sortindex").AsList();
                     foreach (var c in child)
                     {
-                        if(!string.IsNullOrEmpty(c.NewIconPre)){
-                            c.icon = new string[]{c.NewIcon,c.NewIconPre};
-                        }else{
-                            c.icon = new string[]{c.NewIcon,""};
+                        if (!string.IsNullOrEmpty(c.NewIconPre))
+                        {
+                            c.icon = new string[] { c.NewIcon, c.NewIconPre };
                         }
-                        
+                        else
+                        {
+                            c.icon = new string[] { c.NewIcon, "" };
+                        }
+
                     }
 
                     if (child.Count == 0)
@@ -228,8 +231,8 @@ namespace CoreData.CoreUser
                     parent = conn.Query<Refresh>("select id,name,NewIcon , NewIconPre ,NewUrl as path,ParentID from menus where id in (" + pid + ") order by sortindex").AsList();
                     foreach (var p in parent)
                     {
-                        p.type = 2;                                                
-                        p.icon = new string[]{p.NewIcon,p.NewIconPre};                     
+                        p.type = 2;
+                        p.icon = new string[] { p.NewIcon, p.NewIconPre };
                         p.data = (from c in child where c.parentID == p.id select c).ToList();
                     }
                 }
@@ -455,19 +458,20 @@ namespace CoreData.CoreUser
             var res = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.UserConnectString))
             {
+                var TransUser = conn.BeginTransaction();
                 try
                 {
                     //删除缓存
                     foreach (var item in IDsDic)
                     {
-                        CacheBase.Remove("user" + CoID + item.Key);
+                        CacheBase.Remove("user" + CoID + item.Value);
                     }
                     string contents = string.Empty;
                     string uptsql = @"update user set Enable = @Enable where ID in @ID";
                     var args = new { ID = IDsDic.Keys.AsList(), Enable = Enable };
 
-                    int count = conn.Execute(uptsql, args);
-                    if (count <= 0)
+                    int count = conn.Execute(uptsql, args, TransUser);
+                    if (count < 0)
                     {
                         res.s = -3003;
                     }
@@ -482,7 +486,7 @@ namespace CoreData.CoreUser
                             contents = "用户状态停用：";
                         }
                         contents += string.Join(",", IDsDic.Values.AsList().ToArray());
-                        CoreUser.LogComm.InsertUserLog("修改用户状态", "User", contents, UserName, Company, DateTime.Now);
+                        CoreUser.LogComm.InsertUserLogTran(TransUser, "修改用户状态", "User", contents, UserName, Company, DateTime.Now);
                         res.d = contents;
                         string querysql = @"SELECT
                                             u.*, b. NAME AS CompanyName,
@@ -494,7 +498,7 @@ namespace CoreData.CoreUser
                                         WHERE
                                             u.ID in @ID";
                         var p = new { ID = IDsDic.Keys.AsList() };
-                        var userLst = DbBase.UserDB.Query<UserEdit>(querysql, p).ToList();
+                        var userLst = DbBase.UserDB.Query<UserEdit>(querysql, p, TransUser).ToList();
                         if (userLst.Count() == 0)
                         {
                             res.s = -3001;
@@ -505,11 +509,15 @@ namespace CoreData.CoreUser
                         {
                             CacheBase.Set("user" + CoID + item.Account, item);
                         }
+                        if (res.s == 1)
+                        {
+                            TransUser.Commit();
+                        }
                     }
-
                 }
                 catch (Exception e)
                 {
+                    TransUser.Rollback();
                     res.s = -1;
                     res.d = e.Message;
                 }
@@ -572,7 +580,7 @@ namespace CoreData.CoreUser
             var result = ExistUser(user.Account, 0, CoID);
             if (result.s == 1)
             {
-                result = AddUser(user,CoID,UserName);
+                result = AddUser(user, CoID, UserName);
             }
             return result;
         }
@@ -645,13 +653,14 @@ namespace CoreData.CoreUser
             }
             catch (Exception e)
             {
+                TransUser.Rollback();
                 result.s = -1;
                 result.d = e.Message;
             }
             finally
             {
                 TransUser.Dispose();
-                UserDBconn.Clone();
+                UserDBconn.Close();
             }
             return result;
         }
@@ -660,8 +669,8 @@ namespace CoreData.CoreUser
 
         #region 修改用户
         public static DataResult SaveUpdateUser(UserEdit user, int CoID, string UserName)
-        {           
-            var sname = "user" + CoID + user.ID;
+        {
+            var sname = "user" + CoID + user.Account;
             string contents = string.Empty;
             var result = ExistUser(user.Account, user.ID, CoID);
             if (result.s == 1)
@@ -670,41 +679,41 @@ namespace CoreData.CoreUser
                 var userOld = res.d as UserEdit;
                 //删除原有缓存
                 CacheBase.Remove(sname);
-                if(userOld.Account!=user.Account)
+                if (userOld.Account != user.Account)
                 {
-                     contents = contents + "账号:" + userOld.Account + "=>" + user.Account + ";";
+                    contents = contents + "账号:" + userOld.Account + "=>" + user.Account + ";";
                 }
-                if(userOld.Name!=user.Name)
+                if (userOld.Name != user.Name)
                 {
-                     contents = contents + "名称:" + userOld.Name + "=>" + user.Name + ";";
+                    contents = contents + "名称:" + userOld.Name + "=>" + user.Name + ";";
                 }
-                if(userOld.PassWord!=user.PassWord)
+                if (userOld.PassWord != user.PassWord)
                 {
-                     contents = contents + "密码:" + userOld.PassWord + "=>" + user.PassWord + ";";
+                    contents = contents + "密码:" + userOld.PassWord + "=>" + user.PassWord + ";";
                 }
-                if(userOld.Enable!=user.Enable)
+                if (userOld.Enable != user.Enable)
                 {
-                     contents = contents + "用户状态:" + userOld.Enable + "=>" + user.Enable + ";";
+                    contents = contents + "用户状态:" + userOld.Enable + "=>" + user.Enable + ";";
                 }
-                if(userOld.Email!=user.Email)
+                if (userOld.Email != user.Email)
                 {
-                     contents = contents + "邮箱:" + userOld.Email + "=>" + user.Email + ";";
+                    contents = contents + "邮箱:" + userOld.Email + "=>" + user.Email + ";";
                 }
-                if(userOld.Gender!=user.Gender)
+                if (userOld.Gender != user.Gender)
                 {
-                     contents = contents + "性别:" + userOld.Gender + "=>" + user.Gender + ";";
+                    contents = contents + "性别:" + userOld.Gender + "=>" + user.Gender + ";";
                 }
-                if(userOld.Mobile!=user.Mobile)
+                if (userOld.Mobile != user.Mobile)
                 {
-                     contents = contents + "联系电话:" + userOld.Mobile + "=>" + user.Mobile + ";";
+                    contents = contents + "联系电话:" + userOld.Mobile + "=>" + user.Mobile + ";";
                 }
-                if(userOld.QQ!=user.QQ)
+                if (userOld.QQ != user.QQ)
                 {
-                     contents = contents + "QQ:" + userOld.QQ + "=>" + user.QQ + ";";
+                    contents = contents + "QQ:" + userOld.QQ + "=>" + user.QQ + ";";
                 }
-                if(userOld.RoleID!=user.RoleID)
+                if (userOld.RoleID != user.RoleID)
                 {
-                     contents = contents + "角色:" + userOld.RoleID+"."+userOld.RoleName + "=>" + user.RoleID +"."+user.RoleName+ ";";
+                    contents = contents + "角色:" + userOld.RoleID + "." + userOld.RoleName + "=>" + user.RoleID + "." + user.RoleName + ";";
                 }
 
                 var UserDBconn = new MySqlConnection(DbBase.UserConnectString);
@@ -726,7 +735,7 @@ namespace CoreData.CoreUser
                         RoleID = @RoleID
                     WHERE ID = @ID               
                     ";
-                    int count = UserDBconn.Execute(str,user,TransUser);
+                    int count = UserDBconn.Execute(str, user, TransUser);
                     if (count <= 0)
                     {
                         result.s = -3003;
@@ -738,17 +747,59 @@ namespace CoreData.CoreUser
                         TransUser.Commit();
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
+                    TransUser.Rollback();
                     result.s = -1;
                     result.d = e.Message;
                 }
                 finally
-                {                    
-                    TransUser.Dispose();                    
-                    UserDBconn.Clone();
+                {
+                    TransUser.Dispose();
+                    UserDBconn.Close();
                 }
-                CacheBase.Set(sname,user);
+                CacheBase.Set(sname, user);
+            }
+            return result;
+        }
+        #endregion
+
+        #region 删除用户
+        public static DataResult DeleteUserAccount(List<string> AccountLst, int CoID, string UserName)
+        {
+            var result = new DataResult(1, null);
+            foreach (var u in AccountLst)
+            {
+                var sname = "user" + CoID + u;
+                CacheBase.Remove(sname);
+            }
+            var UserDBconn = new MySqlConnection(DbBase.UserConnectString);
+            UserDBconn.Open();
+            var TransUser = UserDBconn.BeginTransaction();
+            try
+            {
+                var sql = "delete from user where CompanyID = @CoID and Account in @AccountLst";
+                var p = new DynamicParameters();
+                p.Add("@CoID", CoID);
+                p.Add("@AccountLst", AccountLst);
+                int count = DbBase.UserDB.Execute(sql, p, TransUser);
+                if (count > 0)
+                {
+                    string contents = "删除用户=>" + string.Join(",", AccountLst);
+                    LogComm.InsertUserLogTran(TransUser, "删除用户资料", "User", contents, UserName, CoID.ToString(), DateTime.Now);
+                }
+                TransUser.Commit();
+            }
+            catch (Exception e)
+            {
+                TransUser.Rollback();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransUser.Dispose();
+                UserDBconn.Dispose();
             }
             return result;
         }

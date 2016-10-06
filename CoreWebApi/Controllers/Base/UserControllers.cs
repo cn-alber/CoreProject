@@ -101,5 +101,17 @@ namespace CoreWebApi
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
+
+        #region 删除用户
+        [HttpPostAttribute("/Core/XyUser/User/DeleteUser")]
+        public ResponseResult DeleteUser([FromBodyAttribute]JObject obj)
+        {
+            var userLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(obj["AccountLst"].ToString());
+            int CoID = int.Parse(GetCoid());
+            string UserName = GetUname();
+            var res = UserHaddle.DeleteUserAccount(userLst,CoID,UserName);
+            return CoreResult.NewResponse(res.s,res.d,"General");
+        }
+        #endregion
     }
 }
