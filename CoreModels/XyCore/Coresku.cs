@@ -66,6 +66,8 @@ namespace CoreModels.XyCore
         public string SkuID { get; set; }
         public string SkuName { get; set; }
         public string Norm { get; set; }
+        public string GBCode{get;set;}
+        public string Brand{get;set;}
         public decimal CostPrice { get; set; }
         public decimal SalePrice { get; set; }
         public bool Enable { get; set; }
@@ -87,7 +89,7 @@ namespace CoreModels.XyCore
         public string SortField { get; set; }//排序字段
         public string SortDirection { get; set; }//DESC,ASC
         public int Type { get; set; }
-    }
+    }   
     #endregion
     #region 商品管理 - 查询返回列表
     public class CoreSkuQuery
@@ -218,6 +220,24 @@ namespace CoreModels.XyCore
         public string GoodsCode { get; set; }
         public string SkuID { get; set; }
         public string SkuName { get; set; }
+    }
+    #endregion
+
+    #region 通用查询参数 - Sku
+     public class CommSkuParam
+    {
+        public int CoID { get; set; }//公司编号
+        public string GoodsCode { get; set; }//款式编码
+        public string SkuID { get; set; }//商品编码
+        public string SCoID { get; set; }//选择供应商
+        public string Brand { get; set; }//商品品牌
+        public string Filter { get; set; }//过滤条件
+        public string Enable { get; set; }//是否启用
+        public int PageSize { get; set; }//每页笔数
+        public int PageIndex { get; set; }//页码
+        public string SortField { get; set; }//排序字段
+        public string SortDirection { get; set; }//DESC,ASC
+        public string Type { get; set; }
     }
     #endregion
 }

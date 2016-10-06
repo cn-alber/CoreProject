@@ -1,0 +1,15 @@
+{
+"CommSkuParam":{
+"Type":"0",
+"GoodsCode":null,
+"SkuID":null,
+"SCoID":"225",
+"Brand":null,
+"Filter":null,
+"Enable":"true",
+"PageIndex":"1",
+"PageSize":"3",
+"SortField":"GoodsCode",
+"SortDirection":"ASC"
+}
+}

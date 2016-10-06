@@ -419,6 +419,92 @@ namespace CoreData.CoreCore
             return result;
         }
         #endregion
+
+
+        #region 商品资料管理-查询SKU明细-通用查询
+        public static DataResult GetCommSkuLst(CommSkuParam IParam)
+        {
+            var cs = new CoreSkuQuery();
+            var res = new DataResult(1, null);
+            StringBuilder querysql = new StringBuilder();
+            var p = new DynamicParameters();
+            querysql.Append("select GoodsCode,GoodsName,SkuID,SkuName,Norm,GBCode,Brand,CostPrice,SalePrice,Enable,Creator,CreateDate from coresku where Type = @Type");
+            p.Add("@Type", IParam.Type);
+            if (IParam.CoID != 1)
+            {
+                querysql.Append(" AND CoID = @CoID");
+                p.Add("@CoID", IParam.CoID);
+            }
+            if (!string.IsNullOrEmpty(IParam.Enable) && IParam.Enable.ToUpper() != "ALL")//是否启用
+            {
+                querysql.Append(" AND Enable = @Enable");
+                p.Add("@Enable", IParam.Enable == "true" ? true : false);
+            }
+            if (!string.IsNullOrEmpty(IParam.GoodsCode))
+            {
+                querysql.Append(" AND GoodsCode = @GoodsCode");
+                p.Add("@GoodsCode", IParam.GoodsCode);
+            }
+            if (!string.IsNullOrEmpty(IParam.SkuID))
+            {
+                querysql.Append(" AND SkuID = @SkuID");
+                p.Add("@SkuID", IParam.SkuID);
+            }
+            if (!string.IsNullOrEmpty(IParam.Type))
+            {
+                querysql.Append(" AND Type = @Type");
+                p.Add("@Type", int.Parse(IParam.Type));
+            }
+            if (!string.IsNullOrEmpty(IParam.Brand))
+            {
+                querysql.Append(" AND Brand = @Brand");
+                p.Add("@Brand", IParam.Brand);
+            }
+            if(!string.IsNullOrEmpty(IParam.SCoID))
+            {
+                querysql.Append(" AND CONCAT(',',IFNULL(SCoList,''),',') LIKE @SCoID");
+                p.Add("@SCoID", "%,"+IParam.SCoID+",%");
+            }
+            if (!string.IsNullOrEmpty(IParam.Filter))
+            {
+                querysql.Append(" AND (GoodsName like @Filter or SkuName like @Filter or Norm like @Filter)");
+                p.Add("@Filter", "%" + IParam.Filter + "%");
+            }
+            if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
+            {
+                querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
+            }
+            try
+            {
+                var SkuLst = CoreData.DbBase.CoreDB.Query<SkuQuery>(querysql.ToString(), p).AsList();
+                if (SkuLst.Count == 0)
+                {
+                    res.s = -3001;
+                }
+                else
+                {
+                    cs.DataCount = SkuLst.Count;
+                    decimal pagecnt = Math.Ceiling(decimal.Parse(cs.DataCount.ToString()) / decimal.Parse(IParam.PageSize.ToString()));
+                    cs.PageCount = Convert.ToInt32(pagecnt);
+                    int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
+                    querysql.Append(" LIMIT @ls , @le");
+                    p.Add("@ls", dataindex);
+                    p.Add("@le", IParam.PageSize);
+                    SkuLst = CoreData.DbBase.CoreDB.Query<SkuQuery>(querysql.ToString(), p).AsList();
+                    cs.SkuLst = SkuLst;
+                    res.d = cs;
+                }
+            }
+            catch (Exception e)
+            {
+                res.s = -1;
+                res.d = e.Message;
+            }
+
+
+            return res;
+        }
+        #endregion
     }
 
 }

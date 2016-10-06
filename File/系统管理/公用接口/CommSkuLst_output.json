@@ -1,0 +1,53 @@
+{
+    "s": 1,
+    "d": {
+        "DataCount": 4,
+        "PageCount": 2,
+        "GoodsLst": null,
+        "SkuLst": [
+            {
+                "GoodsCode": "NJR2016",
+                "GoodsName": "男士羽绒服",
+                "SkuID": "NJR20160004048",
+                "SkuName": "南极人2016男士秋羽绒",
+                "Norm": "红色1;41",
+                "GBCode": "",
+                "Brand": "南极人",
+                "CostPrice": 5.0,
+                "SalePrice": 6.0,
+                "Enable": true,
+                "Creator": "系统管理员",
+                "CreateDate": "2016-05-11T11:26:33"
+            },
+            {
+                "GoodsCode": "NJR2016",
+                "GoodsName": "男士羽绒服",
+                "SkuID": "NJR20160004049",
+                "SkuName": "南极人2016男士秋羽绒",
+                "Norm": "红色1;42",
+                "GBCode": "",
+                "Brand": "南极人",
+                "CostPrice": 5.0,
+                "SalePrice": 6.0,
+                "Enable": true,
+                "Creator": "系统管理员",
+                "CreateDate": "2016-05-11T11:26:33"
+            },
+            {
+                "GoodsCode": "NJR2016",
+                "GoodsName": "男士羽绒服",
+                "SkuID": "NJR20160002048",
+                "SkuName": "南极人2016男士秋羽绒",
+                "Norm": "白色;41",
+                "GBCode": "",
+                "Brand": "南极人",
+                "CostPrice": 8.0,
+                "SalePrice": 6.0,
+                "Enable": true,
+                "Creator": "系统管理员",
+                "CreateDate": "2016-05-11T11:26:33"
+            }
+        ]
+    },
+    "m": ""
+}
