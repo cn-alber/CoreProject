@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CoreWebApi
 {
-    public class BasicController : ControllBase
+    public class CommonController : ControllBase
     {
         [AllowAnonymous]
-        [HttpPostAttribute("/Core/Basic/GetScoCompany")]
+        [HttpPostAttribute("/Core/Common/GetScoCompany")]
         public ResponseResult GetScoCompany()
         {   
             int CoId = int.Parse(GetCoid());
