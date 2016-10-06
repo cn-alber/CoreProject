@@ -134,14 +134,27 @@ namespace CoreModels.XyUser
         public string access{get;set;} //权限
         public string order{get;set;} //排序
         public string remark{get;set;}//备注
-        public int parentid {get;set;}
-        
+        public int parentid {get;set;}        
         public string NewIcon { get; set; }
         public string NewIconPre {get;set;}
         public string[] icon {get;set;}
         public List<Menu> children { get; set; }
     }
     
+
+    public class MenuSimple
+    {
+     
+        public int id { get; set; }
+        public string name { get; set; }
+        public string router { get; set; }
+        public string access{get;set;} //权限
+        public string order{get;set;} //排序
+        public string remark{get;set;}//备注
+        public int parentid {get;set;}        
+        public string[] icon {get;set;}
+        public List<MenuSimple> children { get; set; }
+    }
 
 
     public class Refresh
@@ -161,7 +174,7 @@ namespace CoreModels.XyUser
 
 
 
-    
+
 
 
 

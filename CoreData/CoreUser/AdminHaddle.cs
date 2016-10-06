@@ -5,37 +5,14 @@ using CoreModels.XyUser;
 using Dapper;
 using MySql.Data.MySqlClient;
 using System;
+using Newtonsoft.Json;
 
 namespace CoreData.CoreUser
 {
     public static class AdminHaddle
     {
   
-        ///<summary>
-        ///获取菜单列表
-        ///</summary>
-        public static DataResult GetMenuList(string roleid, string coid)
-        {
-            var s = 1;
-            var cname = "menus" + coid + roleid;
-
-            //获取菜单缓存
-            // var parent = CacheBase.Get<List<Menu>>(cname);
-            // if (parent == null)
-            // {
-                var parent = GetMenu(roleid, coid);
-                if (parent == null)
-                {
-                    s = -2004;
-                }
-                else
-                {
-                    //无缓存，添加缓存
-                    //CacheBase.Set<List<Menu>>(cname, parent);
-                }
-            //}
-            return new DataResult(s, s == 1 ? parent : null);
-        }
+      
 
         public static bool isMenuExist(string name){
             bool flag = true;
@@ -61,6 +38,41 @@ namespace CoreData.CoreUser
             return flag;
         }
 
+
+          ///<summary>
+        ///获取菜单列表
+        ///</summary>
+        public static DataResult GetMenuList(string roleid, string coid)
+        {
+            var s = 1;
+            var cname = "menus" + coid + roleid;
+
+            //获取菜单缓存
+            // var parent = CacheBase.Get<List<Menu>>(cname);
+            // if (parent == null)
+            // {
+            try{
+                var parent = JsonConvert.DeserializeObject<List<MenuSimple>>(JsonConvert.SerializeObject(GetMenu(roleid, coid)));
+                if (parent == null)
+                {
+                    s = -2004;
+                }
+                else
+                {
+                    //无缓存，添加缓存
+                    //CacheBase.Set<List<Menu>>(cname, parent);
+                }
+                return new DataResult(s, s == 1 ? parent : null);
+            }catch(Exception ex){
+                Console.WriteLine(ex.Message);
+                return new DataResult(s,  ex.Message);
+            }
+                
+
+
+            //}
+            
+        }
         ///<summary>
         ///获取菜单列表数据
         ///</summary>
@@ -76,18 +88,15 @@ namespace CoreData.CoreUser
                     if (role.s > 1) return null;
                     var r = role.d as Role;
                     //"select name,NewIcon,NewIconPre,NavigateUrl,ParentID from menus where viewpowerid in (" + r.ViewList + ") order by ParentID,sortindex"
-                    string sql = "select menus.id, menus.`Name` as `name`,NewIcon,NewIconPre,NewUrl as router,SortIndex as `order`, menus.Remark, ParentID ,power.Title as access from menus "+
+                    string sql = "select menus.id, menus.`Name` as `name`, NewIcon,NewIconPre,NewUrl as router,SortIndex as `order`, menus.Remark, ParentID ,power.Title as access from menus "+
                                 "LEFT JOIN power on power.ID = menus.ViewPowerID where deleted = FALSE AND viewpowerid in (" + r.ViewList + ") order by ParentID,sortindex"; 
 
                     var child = conn.Query<Menu>(sql).AsList();
+                    if (child.Count == 0){ return null;}
                     foreach (var c in child)
                     {
-                        if(!string.IsNullOrEmpty(c.NewIconPre)){
-                            c.icon = new string[]{c.NewIcon,c.NewIconPre};
-                        }else{
-                            c.icon = new string[]{c.NewIcon,""};
-                        }
                         
+                         c.icon = new string[]{c.NewIcon,c.NewIconPre};                                                 
                     }
                     if (child.Count == 0)
                     {
@@ -113,7 +122,7 @@ namespace CoreData.CoreUser
                     return null;
                 }
             }
-            return parent;
+            return parent ;
         }
 
         public static DataResult CreatMenu(string name,string router,string icon,string order,string remark,string parentid,string accessid,string uname,string coid){            
@@ -150,12 +159,12 @@ namespace CoreData.CoreUser
         }
 
   
-        public static DataResult modifyMenu(string id,string name,string router,string icon,string order,string remark,string parentid,string accessid,string uname,string coid){
+        public static DataResult modifyMenu(string id,string name,string router,string[] iconArr,string order,string remark,string parentid,string accessid,string uname,string coid){
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try
                 {
-                    var iconArr = icon.Split(',');
+                    
                     string iconfont = !string.IsNullOrEmpty(iconArr[1]) ? "menus.NewIcon='"+iconArr[0]+"',menus.NewIconPre='"+iconArr[1]+"'": "menus.NewIcon='"+iconArr[0]+"',menus.NewIconPre=''";                    
                     string sql = "Update menus SET menus.`Name`='"+name+"',menus.NewUrl='"+router+"',"+iconfont+","+
                                  "menus.SortIndex='"+order+"',menus.Remark='"+remark+"',menus.ParentID="+parentid+" WHERE menus.id="+id;//,menus.ViewPowerID="+accessid+"
@@ -184,7 +193,7 @@ namespace CoreData.CoreUser
                 try
                 {
                    string sql = "select menus.id, menus.`Name` as `name`,NewIcon,NewIconPre,NewUrl as router,SortIndex as `order`, menus.Remark, ParentID ,power.Title as access from menus "+ 
-                                "INNER JOIN power on power.ID = menus.ViewPowerID where menus.ID ="+id;
+                                "LEFT JOIN power on power.ID = menus.ViewPowerID where menus.ID ="+id;
                                 Console.WriteLine(sql);
                    var data = conn.Query<Menu>(sql).AsList()[0];
                    if(data!=null){                       
