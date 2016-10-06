@@ -342,7 +342,7 @@ namespace CoreData.CoreCore
         public static DataResult GetScoCompanyAll(int CoID)
         {
             var result = new DataResult(1,null);     
-            string wheresql = "where 1 = 1";
+            string wheresql = "where enable = true";
             if(CoID != 1)//公司编号
             {
                 wheresql = wheresql + " and coid = " + CoID;
