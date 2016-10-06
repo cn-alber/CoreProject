@@ -25,13 +25,15 @@ namespace CoreWebApi
          public ResponseResult createmenus([FromBodyAttribute]JObject lo)
          {
 
-             var name = lo["name"].ToString();
-             var router = lo["router"].ToString();
-             var icon = String.Join(",",lo["icon"]);
-             var order = lo["order"].ToString();
-             var remark = lo["remark"].ToString();
-             var parentid = lo["parentid"].ToString();
-             var accessid = lo["accessid"].ToString();
+             var name = lo["router"]!= null ? lo["name"].ToString():"";
+             var router = lo["router"]!= null ? lo["router"].ToString():"";
+             string iconName = lo["iconName"]!=null ? lo["iconName"].ToString():"";
+             string iconPrefix = lo["iconPrefix"]!=null ? lo["iconPrefix"].ToString():"";
+             var icon = new string[]{iconName,iconPrefix};
+             var order = lo["order"]!= null ? lo["order"].ToString():"";
+             var remark = lo["remark"]!= null ?lo["remark"].ToString():"";
+             var parentid = lo["pid"]!= null ? lo["pid"].ToString():"";
+             var accessid = lo["accessid"]!= null ? lo["accessid"].ToString():"0";
 
              var uname = GetUname();
              var coid = GetCoid();        
@@ -43,15 +45,17 @@ namespace CoreWebApi
          public ResponseResult modifymenus([FromBodyAttribute]JObject lo)
          {
              
-             if(!checkInt(lo["id"].ToString())) return CoreResult.NewResponse(-2016, null, "Print");
+             if(!checkInt(lo["id"].ToString())) return CoreResult.NewResponse(-2016, null, "Indentity");
              var id = lo["id"].ToString();
-             var name = lo["name"].ToString();
-             var router = lo["router"].ToString();
-             var icon = new string[]{lo["iconName"].ToString(),lo["iconPrefix"].ToString()};
-             var order = lo["order"].ToString();
-             var remark = lo["remark"].ToString();
-             var parentid = lo["pid"].ToString();
-             var accessid = "1";//lo["accessid"].ToString();
+             var name = lo["router"]!= null ? lo["name"].ToString():"";
+             var router = lo["router"]!= null ? lo["router"].ToString():"";
+             string iconName = lo["iconName"]!=null ? lo["iconName"].ToString():"";
+             string iconPrefix = lo["iconPrefix"]!=null ? lo["iconPrefix"].ToString():"";
+             var icon = new string[]{iconName,iconPrefix};
+             var order = lo["order"]!= null ? lo["order"].ToString():"";
+             var remark = lo["remark"]!= null ?lo["remark"].ToString():"";
+             var parentid = lo["pid"]!= null ? lo["pid"].ToString():"";
+             var accessid = lo["accessid"]!= null ? lo["accessid"].ToString():"0";
 
              var uname = GetUname();
              var coid = GetCoid();        

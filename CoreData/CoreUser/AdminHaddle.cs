@@ -125,19 +125,18 @@ namespace CoreData.CoreUser
             return parent ;
         }
 
-        public static DataResult CreatMenu(string name,string router,string icon,string order,string remark,string parentid,string accessid,string uname,string coid){            
+        public static DataResult CreatMenu(string name,string router,string[] iconArr,string order,string remark,string parentid,string accessid,string uname,string coid){            
             var result = new DataResult(1,null);
             if(isMenuExist(name)){
                 result.s = -2017;
             }else{
                 using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                     try
-                    {                
-                        var iconArr = icon.Split(',');
+                    {                                        
                         string iconfont = !string.IsNullOrEmpty(iconArr[1]) ? "menus.NewIcon='"+iconArr[0]+"',menus.NewIconPre='"+iconArr[1]+"'": "menus.NewIcon='"+iconArr[0]+"',menus.NewIconPre=''";
-
                         string sql = "INSERT menus SET menus.`Name`='"+name+"',menus.NewUrl='"+router+"',"+iconfont+","+
                                     "menus.SortIndex='"+order+"',menus.Remark='"+remark+"',menus.ParentID="+parentid+",menus.ViewPowerID="+accessid;
+                        Console.WriteLine(sql);                                    
                         int rnt = conn.Execute(sql);
                         if(rnt > 0){
                             result.s = 1;
@@ -169,7 +168,7 @@ namespace CoreData.CoreUser
                     string sql = "Update menus SET menus.`Name`='"+name+"',menus.NewUrl='"+router+"',"+iconfont+","+
                                  "menus.SortIndex='"+order+"',menus.Remark='"+remark+"',menus.ParentID="+parentid+" WHERE menus.id="+id;//,menus.ViewPowerID="+accessid+"
                     Console.WriteLine(sql);             
-                    int rnt = 1;//conn.Execute(sql);
+                    int rnt = conn.Execute(sql);
                     if(rnt > 0){
                         result.s = 1;
                     }else{
