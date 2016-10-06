@@ -1,0 +1,39 @@
+{
+    "s": 1,
+    "d": [
+        {
+            "id": 1,
+            "scocode": "T01",
+            "enable": true,
+            "sconame": "携云供应链管理",
+            "scosimple": "01",
+            "typelist": "0,2",
+            "remark": "",
+            "creator": "系统管理员",
+            "createdate": "2016-05-04T10:32:29"
+        },
+        {
+            "id": 2,
+            "scocode": "T02",
+            "enable": true,
+            "sconame": "南极云商有限公司",
+            "scosimple": "02",
+            "typelist": "0,1",
+            "remark": "",
+            "creator": "系统管理员",
+            "createdate": "2016-05-04T10:34:24"
+        },
+        {
+            "id": 3,
+            "scocode": "T03",
+            "enable": true,
+            "sconame": "携云科技有限公司",
+            "scosimple": "03",
+            "typelist": "1",
+            "remark": "",
+            "creator": "系统管理员",
+            "createdate": "2016-05-04T10:35:35"
+        }
+    ],
+    "m": ""
+}
