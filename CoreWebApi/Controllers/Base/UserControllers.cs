@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using CoreData.CoreUser;
-using Microsoft.AspNetCore.Authorization;
+//using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyUser;
 using System.Collections.Generic;
 using CoreData.CoreComm;
@@ -10,7 +10,7 @@ using CoreModels;
 
 namespace CoreWebApi
 {
-    [AllowAnonymous]
+    //[AllowAnonymous]
     public class UserController : ControllBase
     {
         #region 用户管理 - 查询
