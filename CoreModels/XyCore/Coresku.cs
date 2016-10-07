@@ -66,8 +66,8 @@ namespace CoreModels.XyCore
         public string SkuID { get; set; }
         public string SkuName { get; set; }
         public string Norm { get; set; }
-        public string GBCode{get;set;}
-        public string Brand{get;set;}
+        public string GBCode { get; set; }
+        public string Brand { get; set; }
         public decimal CostPrice { get; set; }
         public decimal SalePrice { get; set; }
         public bool Enable { get; set; }
@@ -89,7 +89,7 @@ namespace CoreModels.XyCore
         public string SortField { get; set; }//排序字段
         public string SortDirection { get; set; }//DESC,ASC
         public int Type { get; set; }
-    }   
+    }
     #endregion
     #region 商品管理 - 查询返回列表
     public class CoreSkuQuery
@@ -224,20 +224,83 @@ namespace CoreModels.XyCore
     #endregion
 
     #region 通用查询参数 - Sku
-     public class CommSkuParam
+    public class CommSkuParam
     {
-        public int CoID { get; set; }//公司编号
-        public string GoodsCode { get; set; }//款式编码
-        public string SkuID { get; set; }//商品编码
-        public string SCoID { get; set; }//选择供应商
-        public string Brand { get; set; }//商品品牌
-        public string Filter { get; set; }//过滤条件
-        public string Enable { get; set; }//是否启用
-        public int PageSize { get; set; }//每页笔数
-        public int PageIndex { get; set; }//页码
-        public string SortField { get; set; }//排序字段
-        public string SortDirection { get; set; }//DESC,ASC
-        public string Type { get; set; }
+        public int _CoID = 1;//公司编号
+        public string _GoodsCode;//款式编码
+        public string _SkuID;//商品编码
+        public string _SCoID;//选择供应商
+        public string _Brand;//商品品牌
+        public string _Filter;//过滤条件
+        public string _Enable = "all";//是否启用
+        public int _PageSize = 20;//每页笔数
+        public int _PageIndex = 1;//页码
+        public string _SortField;//排序字段
+        public string _SortDirection = "ASC";//DESC,ASC
+        public string _Type;
+        public int CoID
+        {
+            get { return _CoID; }
+            set { this._CoID = value; }
+        }//公司编号
+        public string GoodsCode
+        {
+            get { return _GoodsCode; }
+            set { this._GoodsCode = value; }
+        }//款式编码
+        public string SkuID 
+        {
+            get { return _SkuID; }
+            set { this._SkuID = value; }
+        }//商品编码
+        public string SCoID 
+        {
+            get { return _SCoID; }
+            set { this._SCoID = value; }
+        }//选择供应商
+        public string Brand 
+        {
+            get { return _Brand; }
+            set { this._Brand = value; }
+        }//商品品牌
+        public string Filter 
+        {
+            get { return _Filter; }
+            set { this._Filter = value; }
+        }//过滤条件
+        public string Enable 
+        {
+            get { return _Enable; }
+            set { this._Enable = value; }
+        }//是否启用
+        public int PageSize 
+        {
+            get { return _PageSize; }
+            set { this._PageSize = value; }
+        }//每页笔数
+        public int PageIndex 
+        {
+            get { return _PageIndex; }
+            set { this._PageIndex = value; }
+        }//页码
+        public string SortField 
+        {
+            get { return _SortField; }
+            set { this._SortField = value; }
+        }//排序字段
+        public string SortDirection 
+        {
+            get { return _SortDirection; }
+            set { this._SortDirection = value; }
+        }//DESC,ASC
+        public string Type 
+        {
+            get { return _Type; }
+            set { this._Type = value; }
+        }
     }
     #endregion
+
+
+
 }
