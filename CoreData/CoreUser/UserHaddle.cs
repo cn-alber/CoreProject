@@ -77,7 +77,7 @@ namespace CoreData.CoreUser
         public static DataResult GetRefreshList(string roleid, string coid, string uname, string uid)
         {
             var s = 1;
-            var cname = "Refresh" + coid + roleid;
+            var cname = "refresh" + coid + roleid;
 
             //获取菜单缓存
             CacheBase.Remove(cname);

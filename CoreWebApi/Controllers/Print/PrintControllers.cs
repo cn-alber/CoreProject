@@ -14,8 +14,7 @@ namespace CoreWebApi.Print
 {
     /// <summary>
 	/// 打印模块 - 系统模块相关 
-	/// </summary>
-    [AllowAnonymous]
+	/// </summary>    
     public class PrintController : ControllBase
     {
         #region 获取print_sys_types -> emu_data
