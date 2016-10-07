@@ -384,7 +384,7 @@ namespace CoreData.CoreUser
         #endregion
 
         #region 启用|停用用户
-        public static DataResult UptUserEnable(Dictionary<int, string> IDsDic, string Company, string UserName, bool Enable, string CoID)
+        public static DataResult UptUserEnable(List<int> IDLst, string CoID, string UserName, bool Enable)
         {
             var res = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.UserConnectString))
@@ -392,14 +392,14 @@ namespace CoreData.CoreUser
                 var TransUser = conn.BeginTransaction();
                 try
                 {
-                    //删除缓存
-                    foreach (var item in IDsDic)
+                    //删除缓存                    
+                    foreach (var item in IDLst)
                     {
-                        CacheBase.Remove("user" + CoID + item.Key);
+                        CacheBase.Remove("user" + CoID + item);
                     }
                     string contents = string.Empty;
                     string uptsql = @"update user set Enable = @Enable where ID in @ID";
-                    var args = new { ID = IDsDic.Keys.AsList(), Enable = Enable };
+                    var args = new { ID = IDLst, Enable = Enable };
 
                     int count = conn.Execute(uptsql, args, TransUser);
                     if (count < 0)
@@ -416,8 +416,8 @@ namespace CoreData.CoreUser
                         {
                             contents = "用户状态停用：";
                         }
-                        contents += string.Join(",", IDsDic.Values.AsList().ToArray());
-                        CoreUser.LogComm.InsertUserLogTran(TransUser, "修改用户状态", "User", contents, UserName, Company, DateTime.Now);
+                        contents += string.Join(",", IDLst.ToArray());
+                        CoreUser.LogComm.InsertUserLogTran(TransUser, "修改用户状态", "User", contents, UserName, CoID, DateTime.Now);
                         res.d = contents;
                         string querysql = @"SELECT
                                             u.*, b. NAME AS CompanyName,
@@ -428,7 +428,7 @@ namespace CoreData.CoreUser
                                         INNER JOIN role r ON u.RoleID = r.ID
                                         WHERE
                                             u.ID in @ID AND IsDelete = 0";
-                        var p = new { ID = IDsDic.Keys.AsList() };
+                        var p = new { ID = IDLst };
                         var userLst = DbBase.UserDB.Query<UserEdit>(querysql, p, TransUser).ToList();
                         if (userLst.Count() == 0)
                         {
@@ -561,7 +561,7 @@ namespace CoreData.CoreUser
             us.CompanyID = user.CompanyID;
             us.RoleID = user.RoleID;
             us.Creator = UserName;
-            us.CreateDate = DateTime.Now;
+            us.CreateDate = DateTime.Now.ToString();
             var UserDBconn = new MySqlConnection(DbBase.UserConnectString);
             UserDBconn.Open();
             var TransUser = UserDBconn.BeginTransaction();
@@ -618,10 +618,10 @@ namespace CoreData.CoreUser
                 {
                     contents = contents + "名称:" + userOld.Name + "=>" + user.Name + ";";
                 }
-                if (!string.IsNullOrEmpty(user.PassWord) && userOld.PassWord != user.PassWord)
-                {
-                    contents = contents + "密码:" + userOld.PassWord + "=>" + user.PassWord + ";";
-                }
+                // if (!string.IsNullOrEmpty(user.PassWord) && userOld.PassWord != user.PassWord)
+                // {
+                //     contents = contents + "密码:" + userOld.PassWord + "=>" + user.PassWord + ";";
+                // }
                 if (userOld.Enable != user.Enable)
                 {
                     contents = contents + "用户状态:" + userOld.Enable + "=>" + user.Enable + ";";
@@ -652,12 +652,13 @@ namespace CoreData.CoreUser
                 var TransUser = UserDBconn.BeginTransaction();
                 try
                 {
+                    
+                    //  `PassWord` = @PassWord,
+                    //     `Enable` = @Enable,
                     string str = @"UPDATE user
                     SET Account = @Account,
                         SecretID = @SecretID,
-                        `Name` = @Name,
-                        `PassWord` = @PassWord,
-                        `Enable` = @Enable,
+                        `Name` = @Name,                       
                         Email = @Email,
                         Gender = @Gender,
                         Mobile = @Mobile,

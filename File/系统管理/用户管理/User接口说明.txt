@@ -3,7 +3,7 @@
 function说明
 
 用户缓存："user"+公司ID+用户ID
-
+##########################################
 1.UserQueryLst()//查询table User 资料
     方法：GET
     路由：http://localhost:5000/Core/XyUser/User/UserLst?Filter=&Enable=&PageIndex=1&PageSize=&SortField=&SortDirection=
@@ -21,6 +21,7 @@ function说明
         UserLst         List<UserData>  店铺资料(User)
     参考:input json 文件:UserListQuery_input.json
     参考:output json 文件:UserListQuery_output.json
+##########################################
 2.UserEdit()//编辑单笔用户资料
     方法：GET
     路由：http://localhost:5000/Core/XyUser/User/UserEdit?ID=32
@@ -31,6 +32,7 @@ function说明
         user            UserEdit        指定用户资料
     参考：input json 文件：UserEdit_input.json
     参考：output json 文件：UserEdit_output.json
+##########################################
 3.UserQuery()查询单笔用户资料
     方法：GET
     路由：http://localhost:5000/Core/XyUser/User/UserQuery?ID=32
@@ -41,6 +43,7 @@ function说明
         user            UserEdit        指定用户资料
     参考：input json 文件：UserQuery_input.json
     参考：output json 文件：UserQuery_output.json
+##########################################
 4.UserCache()从缓存读取数据
     方法：GET
     路由：http://localhost:5000/Core/XyUser/User/UserCache?Account=admin
@@ -51,15 +54,14 @@ function说明
         user            UserEdit        指定用户资料
     参考：input json 文件：UserQuery_input.json
     参考：output json 文件：UserQuery_output.json
+##########################################
 5.UserEnable()//用户状态启用|停用
     方法：POST
     路由：http://localhost:5000/Core/XyUser/User/UserEnable
     参数：
     InPut:
-        IDsDic          Dictionary<int,string>      <Key:用户ID,Value:用户账号Account>
-        Company         string                      公司名称(exp:携云科技)
-        UserName        string                      操作者名称(exp:系统管理员)
-        Enable          string                      指定店铺状态true|false（启用，停用）
+        IDLst         List<int>      用户ID
+        Enable        string         指定店铺状态true|false（启用，停用）
     OutPut:
         成功：
             1.更新用户状态user.enable
@@ -68,7 +70,8 @@ function说明
         失败：
             1.返回错误信息：s=3003.资料更新失败
     参考：input json 文件：UserEnable_input.json
-    参考：output json 文件：UserEnable_output.json
+    参考：output json 文件：UserEnable_output.json    
+##########################################
 6.IsExistUser()//检查用户账号是否存在
     方法：POST
     路由：http://localhost:5000/Core/XyUser/User/IsExistUser
@@ -81,6 +84,7 @@ function说明
         -1-> 账号已存在 or Exception
     参考：input json 文件：IsExistUser_input.json
     参考：output json 文件：IsExistUser_output.json
+##########################################
 7.InsertUser()//新增用户
     方法：POST
     路由：http://localhost:5000/Core/XyUser/User/InsertUser
@@ -95,6 +99,7 @@ function说明
         失败：返回错误信息
     参考：input json 文件：InsertUser_input.json
     参考：output json 文件：InsertUser_output.json
+##########################################
 8.UpdateUser()//修改用户
     方法：POST
     路由：http://localhost:5000/Core/XyUser/User/UpdateUser
@@ -109,6 +114,7 @@ function说明
         失败：返回错误信息
     参考：input json 文件：UpdateUser_input.json
     参考：output json 文件：UpdateUser_output.json
+##########################################
 9.DeleteUser()//删除用户
     方法：POST
     路由：http://localhost:5000/Core/XyUser/User/DeleteUser
@@ -119,3 +125,18 @@ function说明
     OutPut:
          成功：1.删除用户缓存；2.删除用户资料；3.新增操作记录log；4.返回成功信息
          失败：返回错误信息
+##########################################
+10.editpassword()//修改密码
+    方法：POST
+    路由：http://localhost:5000/Core/account/password
+    参数：
+    InPut:
+        oldPwd          string          旧密码
+        newPwd          string          新密码
+        reNewPwd        string          确认新密码
+    OutPut:
+        返回提示信息
+    
+
+
+

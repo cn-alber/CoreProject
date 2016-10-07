@@ -155,7 +155,7 @@ namespace CoreModels.XyUser
         public string Gender { get; set; }
         public string CompanyName { get; set; }
         public string RoleName { get; set; }
-        public DateTime CreateDate { get; set; }
+        public string CreateDate { get; set; }
     }
     #endregion
 
@@ -231,7 +231,7 @@ namespace CoreModels.XyUser
         public int CompanyID{get;set;}
         public int RoleID{get;set;}
         public string Creator{get;set;}
-        public DateTime CreateDate{get;set;}
+        public string CreateDate{get;set;}
         public string CompanyName { get; set; }
         public string RoleName { get; set; }
     }
