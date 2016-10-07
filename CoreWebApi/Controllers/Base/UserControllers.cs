@@ -163,21 +163,21 @@ namespace CoreWebApi
         {
             var res = new DataResult(1, null);
             var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
-            var isdel = obj["IsDelete"].ToString();
-            int IsDelete = 0;
-            if (!string.IsNullOrEmpty(isdel))
-            {
-                int x;
-                if (int.TryParse(isdel, out x))
-                {
-                    IsDelete = int.Parse(isdel);
-                }
-            }
+            //var isdel = obj["IsDelete"].ToString();
+            // int IsDelete = 0;
+            // if (!string.IsNullOrEmpty(isdel))
+            // {
+            //     int x;
+            //     if (int.TryParse(isdel, out x))
+            //     {
+            //         IsDelete = int.Parse(isdel);
+            //     }
+            // }
             if (IDLst.Count > 0)
             {
                 int CoID = int.Parse(GetCoid());
                 string UserName = GetUname();
-                res = UserHaddle.DeleteUserAccount(IDLst,IsDelete, CoID, UserName);
+                res = UserHaddle.DeleteUserAccount(IDLst,0, CoID, UserName);
             }
             else
             {

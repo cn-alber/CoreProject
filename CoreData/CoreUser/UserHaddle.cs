@@ -711,17 +711,17 @@ namespace CoreData.CoreUser
             {
                 var sql = string.Empty;
                 var p = new DynamicParameters();
-                if (IsDelete == 1)
-                {
-                    sql = "delete from user where CompanyID = @CoID and ID in @IDLst";
-                }
-                else
-                {//软删除
+                // if (IsDelete == 1)
+                // {
+                //     sql = "delete from user where CompanyID = @CoID and ID in @IDLst";
+                // }
+                // else
+                // {//软删除
                     sql = "update user set IsDelete = @IsDelete,Deleter=@Deleter,DeleteDate=@DeleteDate where CompanyID = @CoID and ID in @IDLst";
                     p.Add("@IsDelete", 1);
                     p.Add("@Deleter", UserName);
                     p.Add("@DeleteDate",DateTime.Now);
-                }
+                // }
 
                 p.Add("@CoID", CoID);
                 p.Add("@IDLst", IDLst);
