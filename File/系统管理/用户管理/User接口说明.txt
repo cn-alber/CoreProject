@@ -2,8 +2,8 @@
 
 function说明
 1.UserQueryLst()//查询table User 资料
-    方法：POST
-    路由：http://localhost:5000/Core/XyUser/User/UserLst
+    方法：GET
+    路由：http://localhost:5000/Core/XyUser/User/UserLst?Filter=&Enable=&PageIndex=1&PageSize=&SortField=&SortDirection=
     参数: CoreModels.XyUser.UserParam
     InPut:
         Filter          string      模糊查询匹配(用户账号Account,用户名称Name)
@@ -19,8 +19,8 @@ function说明
     参考:input json 文件:UserListQuery_input.json
     参考:output json 文件:UserListQuery_output.json
 2.UserEdit()//编辑单笔用户资料
-    方法：POST
-    路由：http://localhost:5000/Core/XyUser/User/UserEdit
+    方法：GET
+    路由：http://localhost:5000/Core/XyUser/User/UserEdit?ID=32
     参数：
     InPut:
         UserID          int             用户编号ID
@@ -29,8 +29,8 @@ function说明
     参考：input json 文件：UserEdit_input.json
     参考：output json 文件：UserEdit_output.json
 3.UserQuery()查询单笔用户资料
-    方法：POST
-    路由：http://localhost:5000/Core/XyUser/User/UserQuery
+    方法：GET
+    路由：http://localhost:5000/Core/XyUser/User/UserQuery?ID=32
     参数：
     InPut:
         UserID          int             用户编号ID
@@ -39,8 +39,8 @@ function说明
     参考：input json 文件：UserQuery_input.json
     参考：output json 文件：UserQuery_output.json
 4.UserCache()从缓存读取数据
-    方法：POST
-    路由：http://localhost:5000/Core/XyUser/User/UserCache
+    方法：GET
+    路由：http://localhost:5000/Core/XyUser/User/UserCache?Account=admin
     参数：
     InPut:
         Account         string          用户账号

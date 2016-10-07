@@ -328,6 +328,7 @@ namespace CoreData.CoreUser
                     {
                         res.s = -3001;
                     }
+                    us.PassWord = string.Empty;//密码不带回资料
                     res.d = us;
                 }
                 catch (Exception e)
@@ -617,7 +618,7 @@ namespace CoreData.CoreUser
                 {
                     contents = contents + "名称:" + userOld.Name + "=>" + user.Name + ";";
                 }
-                if (userOld.PassWord != user.PassWord)
+                if (!string.IsNullOrEmpty(user.PassWord) && userOld.PassWord != user.PassWord)
                 {
                     contents = contents + "密码:" + userOld.PassWord + "=>" + user.PassWord + ";";
                 }
