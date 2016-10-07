@@ -561,7 +561,7 @@ namespace CoreData.CoreUser
             us.CompanyID = user.CompanyID;
             us.RoleID = user.RoleID;
             us.Creator = UserName;
-            us.CreateDate = DateTime.Now;
+            us.CreateDate = DateTime.Now.ToString();
             var UserDBconn = new MySqlConnection(DbBase.UserConnectString);
             UserDBconn.Open();
             var TransUser = UserDBconn.BeginTransaction();
