@@ -1,0 +1,70 @@
+接口名称：NoticeControllers
+
+function说明
+##########################################
+1.NoticeLst()//查询table Notice 资料
+    方法：GET
+    路由：http://localhost:5000/Core/XyUser/Notice/NoticeLst?Filter=&Enable=&PageIndex=1&PageSize=&SortField=&SortDirection=
+    参数: CoreModels.XyUser.NoticeParam
+    InPut:
+        Filter          string      模糊查询匹配(用户账号Account,用户名称Name)
+        Enable          string      启用状态(all/false/true)
+        PageIndex       int         当前页码(ex.第一页就给1)
+        PageSize        int         每页显示资料笔数
+        SortField       string      排序字段
+        SortDirection   string      排序方向(DESC|ASC)
+    OutPut:    
+        PageCount       int             总页数
+        DataCount       int             资料总笔数       
+        UserLst         List<Notice>  店铺资料(User)
+    参考:output json 文件:NoticeLstQuery_output.json
+##########################################
+2.NoticeEdit()//编辑单笔系统通知
+    方法：GET
+    路由：http://localhost:5000/Core/XyUser/Notice/NoticeEdit?ID=2
+    参数：
+    InPut:
+        ID              int            系统通知ID
+    OutPut:
+        not             Notice         指定系统通知
+    参考：output json 文件：NoticeEdit_output.json
+##########################################
+3.NoticeQuery()查询单笔系统通知
+    方法：GET
+    路由：http://localhost:5000/Core/XyUser/Notice/NoticeQuery?ID=2
+    参数：
+    InPut:
+        ID              int            系统通知ID
+    OutPut:
+        not             Notice         指定系统通知
+    参考：output json 文件：NoticeQuery_output.json
+##########################################
+4.InsertNotice()//新增通知
+    方法：POST
+    路由：http://localhost:5000/Core/XyUser/Notice/InsertNotice
+    参数：
+    InPut:
+        Notice            Notice        待新增通知      
+    OutPut:
+        成功：
+            1.新增资料
+            2.新增操作记录log
+            3.返回请求成功信息(s=1)
+        失败：返回错误信息
+    参考：input json 文件：InsertNotice_input.json
+    参考：output json 文件：InsertNotice_output.json
+##########################################
+5.UpdateNotice()//修改通知
+    方法：POST
+    路由：http://localhost:5000/Core/XyUser/Notice/UpdateNotice
+    参数：
+    InPut:
+        Notice            Notice        待修改通知      
+    OutPut:
+        成功：
+            1.修改系统通知
+            2.新增操作记录log
+            3.返回请求成功信息(s=1)
+        失败：返回错误信息
+    参考：input json 文件：UpdateNotice_input.json
+    参考：output json 文件：UpdateNotice_output.json

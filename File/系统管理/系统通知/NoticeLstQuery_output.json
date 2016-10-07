@@ -1,0 +1,74 @@
+{
+    "s": 1,
+    "d": {
+        "PageCount": 1,
+        "DataCount": 8,
+        "NoticeLst": [
+            {
+                "ID": 1,
+                "Coid": 1,
+                "Title": "研究机器学习（Machine Learning）的程序员必知的10大算法",
+                "Content": "毫无疑问，机器学习/人工智能的子领域在过去几年越来越流行。由于大数据是目前科技领域最热门的趋势，基于这些大规模的数据，机器学习在预测和计算建议方面变得不可思议的强大。最常见的机器学习的例子就是 Netflix(一家在线影片租赁提供商)的算法，它能基于你过去看过的电影来推荐电影，或着 Amazon 的算法，它能基于你过去买的书，来推荐书给你。",
+                "CreateTime": "2016/8/15 18:11:08",
+                "Type": true
+            },
+            {
+                "ID": 2,
+                "Coid": 1,
+                "Title": "【CCAI大咖秀】李德毅院士：机器人产业需做好交互认知",
+                "Content": "作为一门交叉学科，人工智能重要的一角就是认知科学。人类通过交互、记忆和计算获得认知，然而关注认知尤其是交互认知的研究者并不多见。当前交互认知方面有哪些新的发展，这些成果又能够为人工智能应用带来什么？",
+                "CreateTime": "2016/8/15 18:10:01",
+                "Type": true
+            },
+            {
+                "ID": 4,
+                "Coid": 1,
+                "Title": "1",
+                "Content": "&lt;p&gt;1&lt;/p&gt;",
+                "CreateTime": "2016/8/16 15:32:18",
+                "Type": true
+            },
+            {
+                "ID": 5,
+                "Coid": 1,
+                "Title": "5",
+                "Content": "<p>511</p>",
+                "CreateTime": "2016/8/17 11:09:24",
+                "Type": true
+            },
+            {
+                "ID": 6,
+                "Coid": 1,
+                "Title": "【CCAI大咖秀】崔鹏：物理模型结合大数据建模，弃用深度学习",
+                "Content": "<p style=\"margin-top: 0px; margin-bottom: 20px; color: rgb(51, 51, 51); font-family: \" microsoft=\"\" line-height:=\"\" text-align:=\"\" white-space:=\"\">8月26-27日，由中国人工智能学会（CAAI）发起并主办、中科院自动化研究所与CSDN共同承办的<a href=\"http://ccai.caai.cn/\" target=\"_blank\" style=\"color: rgb(51, 122, 183); text-decoration: none; background-color: transparent;\">2016中国人工智能大会（CCAI 2016）</a>将于在北京·辽宁大厦盛大召开，汇聚全球顶级人工智能专家共论前沿技术与产业实践。除了重磅主题报告，大会设置了“人工智能驱动的人机交互”、“机器学习的明天”、“人工智能青年论坛”和“人工智能产业论坛”等四大专题论坛，邀请来自知名院校及创新企业的专家担任论坛主席，就当前人工智能领域的核心问题展开讨论。</p><p style=\"margin-top: 0px; margin-bottom: 20px; color: rgb(51, 51, 51); font-family: \" microsoft=\"\" line-height:=\"\" text-align:=\"\" white-space:=\"\">大会前夕，“人工智能青年论坛”联席主席，清华大学计算机科学与技术系特别研究员崔鹏接受CSDN记者专访，介绍了他在人工智能领域的研究和进展，所采用的方法和心得，以及人工智能青年论坛的策划思路。</p><p style=\"margin-top: 0px; margin-bottom: 20px; color: rgb(51, 51, 51); font-family: \" microsoft=\"\" line-height:=\"\" text-align:=\"\" white-space:=\"\">崔鹏的兴趣在于对人的理解、对人的行为建模，出于人的行为机理的复杂性以及动态性，他使用物理学理论模型与大数据模型相结合的方法来处理，目前已经可以构建一个关键统计指标和真实社交网络基本一致的社交网络，可以对社交网络信息传播进行准确的预测。深度学习在大数据处理上虽然性能很好，但是是黑盒的，与简洁、精确刻画人类行为机理的初衷相违背，所以不能用在这个模型。</p><p><br/></p>",
+                "CreateTime": "2016/8/18 17:33:49",
+                "Type": true
+            },
+            {
+                "ID": 7,
+                "Coid": 1,
+                "Title": "【20160818】更新日志",
+                "Content": "<p>-<strong><span style=\"color:#ff0000\">修正</span></strong>IPhone&amp;iPad下，当表单内容过长时不能流畅操作滚动条的问题。&nbsp;</p><p>-<strong>修正</strong>文件上传时，如果后台返回错误，无法弹出默认错误提示窗体的问题。&nbsp;</p><p>-<strong>增加</strong>示例：内联框架-&gt;面板高度随IFrame的高度变化。&nbsp;</p><p>-<strong>增加</strong>示例：其他杂项-&gt;服务器错误（自行拦截）。</p><p><strong>增加</strong>配置项LoadingImageNumber，内置 30 种不同的页面加载动画。</p><p><br/></p>",
+                "CreateTime": "2016/8/18 10:03:42",
+                "Type": false
+            },
+            {
+                "ID": 8,
+                "Coid": 1,
+                "Title": "【20160819】更新日志",
+                "Content": "1",
+                "CreateTime": "2016/8/19 13:36:22",
+                "Type": false
+            },
+            {
+                "ID": 13,
+                "Coid": 1,
+                "Title": "dfafda",
+                "Content": "<p>testeates</p>",
+                "CreateTime": "2016/10/6 14:16:54",
+                "Type": true
+            }
+        ]
+    },
+    "m": ""
+}
