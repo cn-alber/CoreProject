@@ -69,79 +69,7 @@ namespace CoreData.CoreUser
             return u;
         }
 
-
-
-        ///<summary>
-        ///获取菜单列表
-        ///</summary>
-        // public static DataResult GetMenuList(string roleid, string coid)
-        // {
-        //     var s = 1;
-        //     var cname = "menus" + coid + roleid;
-
-        //     //获取菜单缓存
-        //     // var parent = CacheBase.Get<List<Menu>>(cname);
-        //     // if (parent == null)
-        //     // {
-        //         var parent = GetMenu(roleid, coid);
-        //         if (parent == null)
-        //         {
-        //             s = -2004;
-        //         }
-        //         else
-        //         {
-        //             //无缓存，添加缓存
-        //             //CacheBase.Set<List<Menu>>(cname, parent);
-        //         }
-        //     //}
-        //     return new DataResult(s, s == 1 ? parent : null);
-        // }
-
-        // ///<summary>
-        // ///获取菜单列表数据
-        // ///</summary>
-        // public static List<Menu> GetMenu(string roleid, string coid)
-        // {
-        //     var parent = new List<Menu>();
-        //     using (var conn = new MySqlConnection(DbBase.UserConnectString))
-        //     {
-        //         try
-        //         {
-        //             //获取权限列表
-        //             var role = GetRole(roleid, coid);
-        //             if (role.s > 1) return null;
-        //             var r = role.d as Role;
-        //             //"select name,NewIcon,NewIconPre,NavigateUrl,ParentID from menus where viewpowerid in (" + r.ViewList + ") order by ParentID,sortindex"
-        //             string sql = "select menus.id, menus.`Name` as `name`,NewUrl as router,SortIndex as `order`, menus.Remark, ParentID ,power.Title as access from menus "+
-        //                         "LEFT JOIN power on power.ID = menus.ViewPowerID where viewpowerid in (" + r.ViewList + ") order by ParentID,sortindex"; 
-
-        //             var child = conn.Query<Menu>(sql).AsList();
-        //             if (child.Count == 0)
-        //             {
-        //                 return null;
-        //             }
-        //             var pidarray = (from c in child select c.parentid).Distinct().ToArray();
-        //             var pid = string.Join(",", pidarray);
-        //             //"select id,name,NewIcon,NewIconPre,NavigateUrl,ParentID from menus where id in (" + pid + ") order by sortindex"
-        //             sql = "select menus.id, menus.`Name` as `name`,NewUrl as router,SortIndex as `order`, menus.Remark, ParentID ,power.Title as access from menus "+
-        //                         "LEFT JOIN power on power.ID = menus.ViewPowerID where menus.id in (" + pid + ") order by sortindex"; 
-
-        //             parent = conn.Query<Menu>(sql).AsList();
-
-        //             foreach (var p in parent)
-        //             {
-        //                 p.children = (from c in child where c.parentid == p.id select c).ToList();
-        //             }
-        //         }
-        //         catch
-        //         {
-        //             conn.Dispose();
-        //             return null;
-        //         }
-        //     }
-        //     return parent;
-        // }
-
+       
 
         ///<summary>
         ///获取菜单列表(避免与上面部分代码冲突)
@@ -206,8 +134,9 @@ namespace CoreData.CoreUser
 
                     // var child = conn.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where viewpowerid in (" +
                     //                              r.ViewList + ") order by ParentID,sortindex").AsList();
-                    var child = conn.Query<Refresh>("select id,name,NewIcon, NewIconPre,NewUrl as path,ParentID from menus where viewpowerid in (" +
+                    var child = conn.Query<Refresh>("select id,name,NewIcon, NewIconPre,NewUrl as path,ParentID from menus where NewUrl != '' and viewpowerid in (" +
                                 r.ViewList + ") order by ParentID,sortindex").AsList();
+                              
                     foreach (var c in child)
                     {
                         if (!string.IsNullOrEmpty(c.NewIconPre))
@@ -221,12 +150,13 @@ namespace CoreData.CoreUser
 
                     }
 
-                    if (child.Count == 0)
-                    {
-                        return null;
-                    }
+                    // if (child.Count == 0)
+                    // {
+                    //     return null;
+                    // }
                     var pidarray = (from c in child select c.parentID).Distinct().ToArray();
                     var pid = string.Join(",", pidarray);
+                    
                     //parent = conn.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where id in (" + pid + ") order by sortindex").AsList();
                     parent = conn.Query<Refresh>("select id,name,NewIcon , NewIconPre ,NewUrl as path,ParentID from menus where id in (" + pid + ") order by sortindex").AsList();
                     foreach (var p in parent)
@@ -234,7 +164,7 @@ namespace CoreData.CoreUser
                         p.type = 2;
                         p.icon = new string[] { p.NewIcon, p.NewIconPre };
                         p.data = (from c in child where c.parentID == p.id select c).ToList();
-                    }
+                    }                
                 }
                 catch
                 {
