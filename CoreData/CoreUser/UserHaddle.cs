@@ -396,6 +396,7 @@ namespace CoreData.CoreUser
             var res = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.UserConnectString))
             {
+                conn.Open();
                 var TransUser = conn.BeginTransaction();
                 try
                 {
