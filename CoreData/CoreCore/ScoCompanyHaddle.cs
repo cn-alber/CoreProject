@@ -32,6 +32,7 @@ namespace CoreData.CoreCore
             {
                 wheresql = wheresql + " ORDER BY "+cp.SortField +" "+ cp.SortDirection;
             }
+            var res = new ScoCompanyData();
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
                     var u = conn.Query<ScoCompanyMulti>(wheresql).AsList();
@@ -42,9 +43,9 @@ namespace CoreData.CoreCore
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
                     u = conn.Query<ScoCompanyMulti>(wheresql).AsList();
 
-                    cp.Datacnt = count;
-                    cp.Pagecnt = pagecnt;
-                    cp.Com = u;
+                    res.Datacnt = count;
+                    res.Pagecnt = pagecnt;
+                    res.Com = u;
                     if (count == 0)
                     {
                         result.s = -3001;
@@ -52,7 +53,7 @@ namespace CoreData.CoreCore
                     }
                     else
                     {
-                        result.d = cp;
+                        result.d = res;
                     }               
                 }catch(Exception ex){
                     result.s = -1;

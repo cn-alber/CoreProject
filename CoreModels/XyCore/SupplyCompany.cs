@@ -45,9 +45,6 @@ namespace CoreModels.XyCore
         public string _SortDirection = "desc";//排序方式
         public int _NumPerPage = 20 ;//每页显示资料笔数
         public int _PageIndex = 1;//页码
-        public int _Datacnt ;//总资料笔数
-        public decimal _Pagecnt;//总页数
-        public List<ScoCompanyMulti> _Com;//公司资料List
         public int CoID
         {
             get { return _CoID; }
@@ -83,20 +80,11 @@ namespace CoreModels.XyCore
             get { return _PageIndex; }
             set { this._PageIndex = value;}
         }
-        public int Datacnt
-        {
-            get { return _Datacnt; }
-            set { this._Datacnt = value;}
-        }
-        public decimal Pagecnt
-        {
-            get { return _Pagecnt; }
-            set { this._Pagecnt = value;}
-        }
-        public List<ScoCompanyMulti> Com
-        {
-            get { return _Com; }
-            set { this._Com = value;}
-        }
+    }
+    public class ScoCompanyData
+    {
+        public int Datacnt {get;set;}//总资料笔数
+        public decimal Pagecnt {get;set;}//总页数
+        public List<ScoCompanyMulti> Com {get;set;}//公司资料List
     }
 }

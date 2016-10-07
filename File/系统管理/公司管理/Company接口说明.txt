@@ -7,16 +7,9 @@ input：     Enable         string         启用状态(all/false/true) default 
             Filter         string         公司名称匹配值(模糊查询)default null
             SortField      string         排序字段 default id
             SortDirection  string         排序方式(ASC|DESC) default DESC
-            PageIndex      int            资料页数(ex.第一页就给1) default 1
-            NumPerPage     int            每页显示资料笔数 default 20
-OutPut:     CoID           int            公司编号coid
-            Enable         string         启用状态(all/false/true) default all
-            Filter         string         公司名称匹配值(模糊查询)default null
-            SortField      string         排序字段 default id
-            SortDirection  string         排序方式(ASC|DESC) default DESC
-            PageIndex      int            资料页数(ex.第一页就给1) default 1
-            NumPerPage     int            每页显示资料笔数 default 20
-            Datacnt        int            资料总笔数
+            PageIndex      string         资料页数(ex.第一页就给1) default 1
+            NumPerPage     string         每页显示资料笔数 default 20
+OutPut:     Datacnt        int            资料总笔数
             Pagecnt        int            总页数
             Com            List<Company>  company 资料
 参考:output jason 文件:CompanyList_output.json
