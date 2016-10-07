@@ -3,23 +3,22 @@
 function说明
 1.CompanyList() //查询table company 资料
   路由:http://localhost:5000/Core/Company/CallCompanyList
-input：     Enable         string         启用状态(all/false/true)
-            Filter         string         公司名称匹配值(模糊查询)允许为null
-            SortField      string         资料页数(ex.第一页就给1)
-            SortDirection  string         每页显示资料笔数
-            PageIndex      int            资料页数(ex.第一页就给1)
-            NumPerPage     int            每页显示资料笔数
+input：     Enable         string         启用状态(all/false/true) default all
+            Filter         string         公司名称匹配值(模糊查询)default null
+            SortField      string         排序字段 default id
+            SortDirection  string         排序方式(ASC|DESC) default DESC
+            PageIndex      int            资料页数(ex.第一页就给1) default 1
+            NumPerPage     int            每页显示资料笔数 default 20
 OutPut:     CoID           int            公司编号coid
-            Enable         string         启用状态(all/false/true)
-            Filter         string         公司名称匹配值(模糊查询)允许为null
-            SortField      string         资料页数(ex.第一页就给1)
-            SortDirection  string         每页显示资料笔数
-            PageIndex      int            资料页数(ex.第一页就给1)
-            NumPerPage     int            每页显示资料笔数
+            Enable         string         启用状态(all/false/true) default all
+            Filter         string         公司名称匹配值(模糊查询)default null
+            SortField      string         排序字段 default id
+            SortDirection  string         排序方式(ASC|DESC) default DESC
+            PageIndex      int            资料页数(ex.第一页就给1) default 1
+            NumPerPage     int            每页显示资料笔数 default 20
             Datacnt        int            资料总笔数
             Pagecnt        int            总页数
             Com            List<Company>  company 资料
-参考:input jason 文件:CompanyList_input.json
 参考:output jason 文件:CompanyList_output.json
 
 
@@ -27,7 +26,6 @@ OutPut:     CoID           int            公司编号coid
   路由:http://localhost:5000/Core/Company/GetCompanySingle
 input：ID   公司资料ID
 OutPut: 单笔company 资料
-参考:input jason 文件:CompanySingle_input.json
 参考:output jason 文件:CompanySingle_output.json
 
 3.CompanyEnable()//批次更新公司资料的状态

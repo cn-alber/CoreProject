@@ -1,17 +1,206 @@
 {
-    
     "s": 1,
     "d": {
-        "CoID": 1,
-        "Enable": "all",
-        "Filter": "",
-        "SortField": "id",
-        "SortDirection": "Desc",
-        "NumPerPage": 3,
-        "PageIndex": 5,
-        "Datacnt": 100,
-        "Pagecnt": 34.0,
-        "Com": [
+        "_CoID": 1,
+        "_Enable": "all",
+        "_Filter": null,
+        "_SortField": "id",
+        "_SortDirection": "desc",
+        "_NumPerPage": 20,
+        "_PageIndex": 1,
+        "_Datacnt": 107,
+        "_Pagecnt": 6,
+        "_Com": [
+            {
+                "id": 182,
+                "name": "测试0929",
+                "enable": true,
+                "address": "22222",
+                "typelist": "1",
+                "remark": "00004444",
+                "creator": "管理员",
+                "createdate": "2016-09-29T11:15:30"
+            },
+            {
+                "id": 181,
+                "name": "测试0928",
+                "enable": true,
+                "address": "22222",
+                "typelist": "1",
+                "remark": "00004444",
+                "creator": "管理员",
+                "createdate": "2016-09-28T15:14:21"
+            },
+            {
+                "id": 180,
+                "name": "新增测试bb",
+                "enable": true,
+                "address": "新增测试1",
+                "typelist": "1",
+                "remark": "新增测试1111",
+                "creator": "系统管理员",
+                "createdate": "2016-09-26T14:46:27"
+            },
+            {
+                "id": 179,
+                "name": "新增测试",
+                "enable": true,
+                "address": "新增测试1",
+                "typelist": "1",
+                "remark": "新增测试1111",
+                "creator": "系统管理员",
+                "createdate": "2016-09-26T14:35:25"
+            },
+            {
+                "id": 178,
+                "name": "新增测试31",
+                "enable": true,
+                "address": "新增测试1",
+                "typelist": "1",
+                "remark": "新增测试1111",
+                "creator": "系统管理员",
+                "createdate": "2016-09-26T14:35:20"
+            },
+            {
+                "id": 177,
+                "name": "新增测试333",
+                "enable": true,
+                "address": "新增测试1",
+                "typelist": "1",
+                "remark": "新增测试1111",
+                "creator": "系统管理员",
+                "createdate": "2016-09-26T09:30:32"
+            },
+            {
+                "id": 176,
+                "name": "新增测试3",
+                "enable": true,
+                "address": "新增测试3",
+                "typelist": "1",
+                "remark": "新增测试111188888",
+                "creator": "系统管理员",
+                "createdate": "2016-09-23T14:43:30"
+            },
+            {
+                "id": 175,
+                "name": "test0504",
+                "enable": true,
+                "address": "ffffffd",
+                "typelist": "1",
+                "remark": "",
+                "creator": "系统管理员",
+                "createdate": "2016-05-04T13:06:36"
+            },
+            {
+                "id": 174,
+                "name": "公司测试test99",
+                "enable": false,
+                "address": "公司测试地址test99",
+                "typelist": "1",
+                "remark": "公司测试备注test99",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:40"
+            },
+            {
+                "id": 173,
+                "name": "公司测试test98",
+                "enable": false,
+                "address": "公司测试地址test98123",
+                "typelist": "0,2",
+                "remark": "公司测试备注test98",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:40"
+            },
+            {
+                "id": 172,
+                "name": "公司测试test97",
+                "enable": true,
+                "address": "公司测试地址test97",
+                "typelist": "1",
+                "remark": "公司测试备注test97",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:39"
+            },
+            {
+                "id": 171,
+                "name": "公司测试test96",
+                "enable": true,
+                "address": "公司测试地址test96",
+                "typelist": "1",
+                "remark": "公司测试备注test96",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:39"
+            },
+            {
+                "id": 170,
+                "name": "公司测试test95",
+                "enable": true,
+                "address": "公司测试地址test95",
+                "typelist": "1",
+                "remark": "公司测试备注test95",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:39"
+            },
+            {
+                "id": 169,
+                "name": "公司测试test94",
+                "enable": false,
+                "address": "公司测试地址test94",
+                "typelist": "1",
+                "remark": "公司测试备注test94",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:39"
+            },
+            {
+                "id": 168,
+                "name": "公司测试test93",
+                "enable": true,
+                "address": "公司测试地址test93",
+                "typelist": "1",
+                "remark": "公司测试备注test93",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:38"
+            },
+            {
+                "id": 167,
+                "name": "公司测试test92",
+                "enable": true,
+                "address": "公司测试地址test92",
+                "typelist": "1",
+                "remark": "公司测试备注test92",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:38"
+            },
+            {
+                "id": 166,
+                "name": "公司测试test91",
+                "enable": true,
+                "address": "公司测试地址test91",
+                "typelist": "1",
+                "remark": "公司测试备注test91",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:38"
+            },
+            {
+                "id": 165,
+                "name": "公司测试test90",
+                "enable": true,
+                "address": "公司测试地址test90",
+                "typelist": "1",
+                "remark": "公司测试备注test90",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:38"
+            },
+            {
+                "id": 164,
+                "name": "公司测试test89",
+                "enable": true,
+                "address": "公司测试地址test89",
+                "typelist": "1",
+                "remark": "公司测试备注test89",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:37"
+            },
             {
                 "id": 163,
                 "name": "公司测试test88",
@@ -21,28 +210,219 @@
                 "remark": "公司测试备注test88",
                 "creator": "系统管理员",
                 "createdate": "2016-04-29T15:14:37"
+            }
+        ],
+        "CoID": 1,
+        "Enable": "all",
+        "Filter": null,
+        "SortField": "id",
+        "SortDirection": "desc",
+        "NumPerPage": 20,
+        "PageIndex": 1,
+        "Datacnt": 107,
+        "Pagecnt": 6,
+        "Com": [
+            {
+                "id": 182,
+                "name": "测试0929",
+                "enable": true,
+                "address": "22222",
+                "typelist": "1",
+                "remark": "00004444",
+                "creator": "管理员",
+                "createdate": "2016-09-29T11:15:30"
             },
             {
-                "id": 162,
-                "name": "公司测试test87",
+                "id": 181,
+                "name": "测试0928",
                 "enable": true,
-                "address": "公司测试地址test87",
+                "address": "22222",
                 "typelist": "1",
-                "remark": "公司测试备注test87",
+                "remark": "00004444",
+                "creator": "管理员",
+                "createdate": "2016-09-28T15:14:21"
+            },
+            {
+                "id": 180,
+                "name": "新增测试bb",
+                "enable": true,
+                "address": "新增测试1",
+                "typelist": "1",
+                "remark": "新增测试1111",
+                "creator": "系统管理员",
+                "createdate": "2016-09-26T14:46:27"
+            },
+            {
+                "id": 179,
+                "name": "新增测试",
+                "enable": true,
+                "address": "新增测试1",
+                "typelist": "1",
+                "remark": "新增测试1111",
+                "creator": "系统管理员",
+                "createdate": "2016-09-26T14:35:25"
+            },
+            {
+                "id": 178,
+                "name": "新增测试31",
+                "enable": true,
+                "address": "新增测试1",
+                "typelist": "1",
+                "remark": "新增测试1111",
+                "creator": "系统管理员",
+                "createdate": "2016-09-26T14:35:20"
+            },
+            {
+                "id": 177,
+                "name": "新增测试333",
+                "enable": true,
+                "address": "新增测试1",
+                "typelist": "1",
+                "remark": "新增测试1111",
+                "creator": "系统管理员",
+                "createdate": "2016-09-26T09:30:32"
+            },
+            {
+                "id": 176,
+                "name": "新增测试3",
+                "enable": true,
+                "address": "新增测试3",
+                "typelist": "1",
+                "remark": "新增测试111188888",
+                "creator": "系统管理员",
+                "createdate": "2016-09-23T14:43:30"
+            },
+            {
+                "id": 175,
+                "name": "test0504",
+                "enable": true,
+                "address": "ffffffd",
+                "typelist": "1",
+                "remark": "",
+                "creator": "系统管理员",
+                "createdate": "2016-05-04T13:06:36"
+            },
+            {
+                "id": 174,
+                "name": "公司测试test99",
+                "enable": false,
+                "address": "公司测试地址test99",
+                "typelist": "1",
+                "remark": "公司测试备注test99",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:40"
+            },
+            {
+                "id": 173,
+                "name": "公司测试test98",
+                "enable": false,
+                "address": "公司测试地址test98123",
+                "typelist": "0,2",
+                "remark": "公司测试备注test98",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:40"
+            },
+            {
+                "id": 172,
+                "name": "公司测试test97",
+                "enable": true,
+                "address": "公司测试地址test97",
+                "typelist": "1",
+                "remark": "公司测试备注test97",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:39"
+            },
+            {
+                "id": 171,
+                "name": "公司测试test96",
+                "enable": true,
+                "address": "公司测试地址test96",
+                "typelist": "1",
+                "remark": "公司测试备注test96",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:39"
+            },
+            {
+                "id": 170,
+                "name": "公司测试test95",
+                "enable": true,
+                "address": "公司测试地址test95",
+                "typelist": "1",
+                "remark": "公司测试备注test95",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:39"
+            },
+            {
+                "id": 169,
+                "name": "公司测试test94",
+                "enable": false,
+                "address": "公司测试地址test94",
+                "typelist": "1",
+                "remark": "公司测试备注test94",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:39"
+            },
+            {
+                "id": 168,
+                "name": "公司测试test93",
+                "enable": true,
+                "address": "公司测试地址test93",
+                "typelist": "1",
+                "remark": "公司测试备注test93",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:38"
+            },
+            {
+                "id": 167,
+                "name": "公司测试test92",
+                "enable": true,
+                "address": "公司测试地址test92",
+                "typelist": "1",
+                "remark": "公司测试备注test92",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:38"
+            },
+            {
+                "id": 166,
+                "name": "公司测试test91",
+                "enable": true,
+                "address": "公司测试地址test91",
+                "typelist": "1",
+                "remark": "公司测试备注test91",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:38"
+            },
+            {
+                "id": 165,
+                "name": "公司测试test90",
+                "enable": true,
+                "address": "公司测试地址test90",
+                "typelist": "1",
+                "remark": "公司测试备注test90",
+                "creator": "系统管理员",
+                "createdate": "2016-04-29T15:14:38"
+            },
+            {
+                "id": 164,
+                "name": "公司测试test89",
+                "enable": true,
+                "address": "公司测试地址test89",
+                "typelist": "1",
+                "remark": "公司测试备注test89",
                 "creator": "系统管理员",
                 "createdate": "2016-04-29T15:14:37"
             },
             {
-                "id": 161,
-                "name": "公司测试test86",
+                "id": 163,
+                "name": "公司测试test88",
                 "enable": true,
-                "address": "公司测试地址test86",
+                "address": "公司测试地址test88",
                 "typelist": "1",
-                "remark": "公司测试备注test86",
+                "remark": "公司测试备注test88",
                 "creator": "系统管理员",
                 "createdate": "2016-04-29T15:14:37"
             }
         ]
     },
-    "m": "请求成功"
+    "m": ""
 }

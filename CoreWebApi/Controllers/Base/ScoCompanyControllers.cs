@@ -22,7 +22,7 @@ namespace CoreWebApi
                 cp.Enable = Enable;
             }
             cp.Filter = Filter;
-            if(CommHaddle.SysColumnExists(DbBase.CoreConnectString,"supplycompany","SortField").s == 1)
+            if(CommHaddle.SysColumnExists(DbBase.CoreConnectString,"supplycompany",SortField).s == 1)
             {
                 cp.SortField = SortField;
             }

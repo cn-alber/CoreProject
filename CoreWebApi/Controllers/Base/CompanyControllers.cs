@@ -1,40 +1,65 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using CoreData.CoreUser;
-using Microsoft.AspNetCore.Authorization;
+// using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyUser;
 using System.Collections.Generic;
-
+using CoreData.CoreComm;
+using CoreData;
+using CoreModels;
 namespace CoreWebApi
 {
     public class CompanyController : ControllBase
     {
-        [AllowAnonymous]
-        [HttpPostAttribute("/Core/Company/CallCompanyList")]
-        public ResponseResult CompanyList([FromBodyAttribute]JObject co)
+        [HttpGetAttribute("/Core/Company/CompanyList")]
+        public ResponseResult CompanyList(string Enable,string Filter,string SortField,string SortDirection,string PageIndex,string NumPerPage)
         {   
             var cp = new CompanyParm();
             cp.CoID = int.Parse(GetCoid());
-            cp.Enable = co["Enable"].ToString();
-            cp.Filter = co["Filter"].ToString();
-            cp.SortField = co["SortField"].ToString();
-            cp.SortDirection = co["SortDirection"].ToString();
-            cp.NumPerPage = int.Parse(co["NumPerPage"].ToString());
-            cp.PageIndex = int.Parse(co["PageIndex"].ToString());
+            if(Enable.ToUpper() == "TRUE" || Enable.ToUpper() == "FALSE")
+            {
+                cp.Enable = Enable;
+            }
+            cp.Filter = Filter;
+            if(CommHaddle.SysColumnExists(DbBase.CoreConnectString,"company",SortField).s == 1)
+            {
+                cp.SortField = SortField;
+            }
+            if(SortDirection.ToUpper() == "ASC")
+            {
+                cp.SortDirection = SortDirection;
+            }
+            int x;
+            if (int.TryParse(NumPerPage, out x))
+            {
+                cp.NumPerPage = int.Parse(NumPerPage);
+            }
+            if (int.TryParse(PageIndex, out x))
+            {
+                cp.PageIndex = int.Parse(PageIndex);
+            }
             var data = CompanyHaddle.GetCompanyList(cp);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-        [AllowAnonymous]
-        [HttpPostAttribute("/Core/Company/GetCompanySingle")]
-        public ResponseResult CompanySingle([FromBodyAttribute]JObject co)
+        [HttpGetAttribute("/Core/Company/GetCompanySingle")]
+        public ResponseResult CompanySingle(string ID)
         {   
-            int id = int.Parse(co["ID"].ToString());
-            var data = CompanyHaddle.GetCompanyEdit(id);
+            int x,id;
+            var data = new DataResult(1,null);  
+            if (int.TryParse(ID, out x))
+            {
+                id = int.Parse(ID);
+                data = CompanyHaddle.GetCompanyEdit(id);
+            }
+            else
+            {
+                data.s = -1;
+                data.d = "参数无效!";
+            }
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-        [AllowAnonymous]
         [HttpPostAttribute("/Core/Company/CompanyEnable")]
         public ResponseResult CompanyEnable([FromBodyAttribute]JObject co)
         {   
@@ -47,7 +72,6 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-        [AllowAnonymous]
         [HttpPostAttribute("/Core/Company/UpdateCompany")]
         public ResponseResult UpdateCompamy([FromBodyAttribute]JObject co)
         {   
