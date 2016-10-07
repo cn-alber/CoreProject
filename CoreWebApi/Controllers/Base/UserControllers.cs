@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using CoreData.CoreUser;
-//using Microsoft.AspNetCore.Authorization;
+// using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyUser;
 using System.Collections.Generic;
 using CoreData.CoreComm;
@@ -10,7 +10,7 @@ using CoreModels;
 
 namespace CoreWebApi
 {
-    //[AllowAnonymous]
+    // [AllowAnonymous]
     public class UserController : ControllBase
     {
         #region 用户管理 - 查询
@@ -20,7 +20,7 @@ namespace CoreWebApi
             var cp = new UserParam();
             //var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<UserParam>(obj["UserParam"].ToString());
             cp.Filter = Filter;
-            if(!string.IsNullOrEmpty(Enable)&&(Enable.ToUpper()=="TRUE"||Enable.ToUpper()=="FALSE"))
+            if (!string.IsNullOrEmpty(Enable) && (Enable.ToUpper() == "TRUE" || Enable.ToUpper() == "FALSE"))
             {
                 cp.Enable = Enable.ToUpper();
             }
@@ -34,18 +34,18 @@ namespace CoreWebApi
                 cp.PageSize = int.Parse(PageSize);
             }
             //排序参数赋值
-            if(!string.IsNullOrEmpty(SortField))
+            if (!string.IsNullOrEmpty(SortField))
             {
-                var res = CommHaddle.SysColumnExists(DbBase.CommConnectString,"coresku",SortField);
-                if(res.s == 1)
+                var res = CommHaddle.SysColumnExists(DbBase.CommConnectString, "coresku", SortField);
+                if (res.s == 1)
                 {
                     cp.SortField = SortField;
-                    if(!string.IsNullOrEmpty(SortDirection)&&(SortDirection.ToUpper()=="DESC"||SortDirection.ToUpper()=="ASC"))
+                    if (!string.IsNullOrEmpty(SortDirection) && (SortDirection.ToUpper() == "DESC" || SortDirection.ToUpper() == "ASC"))
                     {
                         cp.SortDirection = SortDirection.ToUpper();
                     }
                 }
-            }     
+            }
             cp.CoID = int.Parse(GetCoid());
             var result = UserHaddle.GetUserLst(cp);
             return CoreResult.NewResponse(result.s, result.d, "General");
@@ -56,17 +56,17 @@ namespace CoreWebApi
         [HttpGetAttribute("/Core/XyUser/User/UserEdit")]
         public ResponseResult UserEdit(string ID)
         {
-            var res = new DataResult(1,null);
+            var res = new DataResult(1, null);
             int x;
             if (int.TryParse(ID, out x))
             {
-                res = UserHaddle.GetUserEdit(ID);                
+                res = UserHaddle.GetUserEdit(ID);
             }
             else
             {
-                res.s=-1;
-                res.d="无效参数ID";                
-            }            
+                res.s = -1;
+                res.d = "无效参数ID";
+            }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
@@ -75,17 +75,17 @@ namespace CoreWebApi
         [HttpGetAttribute("/Core/XyUser/User/UserQuery")]
         public ResponseResult UserQuery(string ID)
         {
-           var res = new DataResult(1,null);
+            var res = new DataResult(1, null);
             int x;
             if (int.TryParse(ID, out x))
             {
-                res = UserHaddle.GetUserEdit(ID);                
+                res = UserHaddle.GetUserEdit(ID);
             }
             else
             {
-                res.s=-1;
-                res.d="无效参数ID";                
-            }            
+                res.s = -1;
+                res.d = "无效参数ID";
+            }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
@@ -95,8 +95,8 @@ namespace CoreWebApi
         public ResponseResult UserCache(string Account)
         {
             //var Account = obj["Account"].ToString();
-            var res = new DataResult(1,null);
-            if(string.IsNullOrEmpty(Account))
+            var res = new DataResult(1, null);
+            if (string.IsNullOrEmpty(Account))
             {
                 res.s = -1;
                 res.d = "请指定读取账号";
@@ -161,11 +161,31 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/XyUser/User/DeleteUser")]
         public ResponseResult DeleteUser([FromBodyAttribute]JObject obj)
         {
-            var userLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(obj["AccountLst"].ToString());
-            int CoID = int.Parse(GetCoid());
-            string UserName = GetUname();
-            var res = UserHaddle.DeleteUserAccount(userLst,CoID,UserName);
-            return CoreResult.NewResponse(res.s,res.d,"General");
+            var res = new DataResult(1, null);
+            var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
+            var isdel = obj["IsDelete"].ToString();
+            int IsDelete = 0;
+            if (!string.IsNullOrEmpty(isdel))
+            {
+                int x;
+                if (int.TryParse(isdel, out x))
+                {
+                    IsDelete = int.Parse(isdel);
+                }
+            }
+            if (IDLst.Count > 0)
+            {
+                int CoID = int.Parse(GetCoid());
+                string UserName = GetUname();
+                res = UserHaddle.DeleteUserAccount(IDLst,IsDelete, CoID, UserName);
+            }
+            else
+            {
+                res.s = -1;
+                res.d = "请选中要删除的资料";
+            }
+
+            return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
     }

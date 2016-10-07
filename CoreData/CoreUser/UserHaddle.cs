@@ -69,7 +69,7 @@ namespace CoreData.CoreUser
             return u;
         }
 
-       
+
 
         ///<summary>
         ///获取菜单列表(避免与上面部分代码冲突)
@@ -136,7 +136,7 @@ namespace CoreData.CoreUser
                     //                              r.ViewList + ") order by ParentID,sortindex").AsList();
                     var child = conn.Query<Refresh>("select id,name,NewIcon, NewIconPre,NewUrl as path,ParentID from menus where NewUrl != '' and viewpowerid in (" +
                                 r.ViewList + ") order by ParentID,sortindex").AsList();
-                              
+
                     foreach (var c in child)
                     {
                         if (!string.IsNullOrEmpty(c.NewIconPre))
@@ -156,7 +156,7 @@ namespace CoreData.CoreUser
                     // }
                     var pidarray = (from c in child select c.parentID).Distinct().ToArray();
                     var pid = string.Join(",", pidarray);
-                    
+
                     //parent = conn.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where id in (" + pid + ") order by sortindex").AsList();
                     parent = conn.Query<Refresh>("select id,name,NewIcon , NewIconPre ,NewUrl as path,ParentID from menus where id in (" + pid + ") order by sortindex").AsList();
                     foreach (var p in parent)
@@ -164,7 +164,7 @@ namespace CoreData.CoreUser
                         p.type = 2;
                         p.icon = new string[] { p.NewIcon, p.NewIconPre };
                         p.data = (from c in child where c.parentID == p.id select c).ToList();
-                    }                
+                    }
                 }
                 catch
                 {
@@ -254,7 +254,7 @@ namespace CoreData.CoreUser
                                         `user`
                                     LEFT OUTER JOIN company ON `user`.CompanyID = company.ID
                                     LEFT OUTER JOIN role ON `user`.RoleID = role.ID
-                                    WHERE `user`.CompanyID = @CoID";
+                                    WHERE `user`.CompanyID = @CoID AND IsDelete = 0";
                     querysql.Append(sql);
                     p.Add("@CoID", IParam.CoID);
 
@@ -321,7 +321,7 @@ namespace CoreData.CoreUser
                                         INNER JOIN company b ON u.CompanyID = b.ID
                                         INNER JOIN role r ON u.RoleID = r.ID
                                         WHERE
-                                            u.ID = @UserID";
+                                            u.ID = @UserID AND IsDelete = 0";
                     var p = new { UserID = UserID };
                     var us = DbBase.UserDB.QueryFirst<UserEdit>(querysql, p);
                     if (us == null)
@@ -346,10 +346,10 @@ namespace CoreData.CoreUser
         #endregion
 
         #region 从缓存读取数据
-        public static DataResult GetUserCache(int CoID, string Account)
+        public static DataResult GetUserCache(int CoID, string ID)
         {
             var res = new DataResult(1, null);
-            string usname = "user" + CoID.ToString() + Account;
+            string usname = "user" + CoID.ToString() + ID;
             var us = CacheBase.Get<UserEdit>(usname);//读取缓存
             if (us == null)
             {
@@ -363,8 +363,8 @@ namespace CoreData.CoreUser
                                         INNER JOIN company b ON u.CompanyID = b.ID
                                         INNER JOIN role r ON u.RoleID = r.ID
                                         WHERE
-                                            u.Account = @Account and u.CompanyID=@CoID";
-                    var p = new { Account = Account, CoID = CoID };
+                                            u.ID = @ID and u.CompanyID=@CoID AND IsDelete = 0";
+                    var p = new { ID = ID, CoID = CoID };
                     us = DbBase.UserDB.QueryFirst<UserEdit>(querysql, p);
                     if (us == null)
                     {
@@ -395,7 +395,7 @@ namespace CoreData.CoreUser
                     //删除缓存
                     foreach (var item in IDsDic)
                     {
-                        CacheBase.Remove("user" + CoID + item.Value);
+                        CacheBase.Remove("user" + CoID + item.Key);
                     }
                     string contents = string.Empty;
                     string uptsql = @"update user set Enable = @Enable where ID in @ID";
@@ -427,7 +427,7 @@ namespace CoreData.CoreUser
                                         INNER JOIN company b ON u.CompanyID = b.ID
                                         INNER JOIN role r ON u.RoleID = r.ID
                                         WHERE
-                                            u.ID in @ID";
+                                            u.ID in @ID AND IsDelete = 0";
                         var p = new { ID = IDsDic.Keys.AsList() };
                         var userLst = DbBase.UserDB.Query<UserEdit>(querysql, p, TransUser).ToList();
                         if (userLst.Count() == 0)
@@ -438,7 +438,7 @@ namespace CoreData.CoreUser
                         //添加缓存
                         foreach (var item in userLst)
                         {
-                            CacheBase.Set("user" + CoID + item.Account, item);
+                            CacheBase.Set("user" + CoID + item.ID, item);
                         }
                         if (res.s == 1)
                         {
@@ -518,7 +518,7 @@ namespace CoreData.CoreUser
 
         public static DataResult AddUser(UserEdit user, int CoID, string UserName)
         {
-            var usname = "user" + CoID + user.Account;
+            var usname = "user" + CoID + user.ID;
             var result = new DataResult(1, null);
             string sqlCommandText = @"INSERT INTO `user`
                         (Account,
@@ -601,7 +601,7 @@ namespace CoreData.CoreUser
         #region 修改用户
         public static DataResult SaveUpdateUser(UserEdit user, int CoID, string UserName)
         {
-            var sname = "user" + CoID + user.Account;
+            var sname = "user" + CoID + user.ID;
             string contents = string.Empty;
             var result = ExistUser(user.Account, user.ID, CoID);
             if (result.s == 1)
@@ -696,10 +696,10 @@ namespace CoreData.CoreUser
         #endregion
 
         #region 删除用户
-        public static DataResult DeleteUserAccount(List<string> AccountLst, int CoID, string UserName)
+        public static DataResult DeleteUserAccount(List<int> IDLst, int IsDelete, int CoID, string UserName)
         {
             var result = new DataResult(1, null);
-            foreach (var u in AccountLst)
+            foreach (var u in IDLst)
             {
                 var sname = "user" + CoID + u;
                 CacheBase.Remove(sname);
@@ -709,14 +709,27 @@ namespace CoreData.CoreUser
             var TransUser = UserDBconn.BeginTransaction();
             try
             {
-                var sql = "delete from user where CompanyID = @CoID and Account in @AccountLst";
+                var sql = string.Empty;
                 var p = new DynamicParameters();
+                if (IsDelete == 1)
+                {
+                    sql = "delete from user where CompanyID = @CoID and ID in @IDLst";
+                }
+                else
+                {//软删除
+                    sql = "update user set IsDelete = @IsDelete,Deleter=@Deleter,DeleteDate=@DeleteDate where CompanyID = @CoID and ID in @IDLst";
+                    p.Add("@IsDelete", 1);
+                    p.Add("@Deleter", UserName);
+                    p.Add("@DeleteDate",DateTime.Now);
+                }
+
                 p.Add("@CoID", CoID);
-                p.Add("@AccountLst", AccountLst);
+                p.Add("@IDLst", IDLst);
+
                 int count = DbBase.UserDB.Execute(sql, p, TransUser);
                 if (count > 0)
                 {
-                    string contents = "删除用户=>" + string.Join(",", AccountLst);
+                    string contents = "删除用户=>" + string.Join(",", IDLst);
                     LogComm.InsertUserLogTran(TransUser, "删除用户资料", "User", contents, UserName, CoID.ToString(), DateTime.Now);
                 }
                 TransUser.Commit();
