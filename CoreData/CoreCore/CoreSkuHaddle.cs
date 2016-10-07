@@ -369,7 +369,7 @@ namespace CoreData.CoreCore
 
 
         #region 根据条件抓取商品list(采购用)
-        public static DataResult GetSkuAll(SkuParam cp, int CoID,int Type)
+        public static DataResult GetSkuAll(SkuParam cp, int CoID, int Type)
         {
             var result = new DataResult(1, null);
             StringBuilder querysql = new StringBuilder();
@@ -381,22 +381,22 @@ namespace CoreData.CoreCore
             querysql.Append(sql);
             var p = new DynamicParameters();
             p.Add("@CoID", CoID);
-            p.Add("@Type",Type);
-             
+            p.Add("@Type", Type);
+
             if (!string.IsNullOrEmpty(cp.GoodsCode))
             {
                 querysql.Append(" AND GoodsCode like @GoodsCode");
                 p.Add("@GoodsCode", "%" + cp.GoodsCode + "%");
             }
-            if(!string.IsNullOrEmpty(cp.SkuID))
+            if (!string.IsNullOrEmpty(cp.SkuID))
             {
                 querysql.Append(" AND SkuID like @SkuID");
-                p.Add("@SkuID","%"+cp.SkuID+"%");
+                p.Add("@SkuID", "%" + cp.SkuID + "%");
             }
-            if(!string.IsNullOrEmpty(cp.SkuName))
+            if (!string.IsNullOrEmpty(cp.SkuName))
             {
                 querysql.Append(" AND SkuName like @SkuName");
-                p.Add("@SkuName","%"+cp.SkuName+"%");
+                p.Add("@SkuName", "%" + cp.SkuName + "%");
             }
             try
             {
@@ -428,8 +428,12 @@ namespace CoreData.CoreCore
             var res = new DataResult(1, null);
             StringBuilder querysql = new StringBuilder();
             var p = new DynamicParameters();
-            querysql.Append("select GoodsCode,GoodsName,SkuID,SkuName,Norm,GBCode,Brand,CostPrice,SalePrice,Enable,Creator,CreateDate from coresku where Type = @Type");
-            p.Add("@Type", IParam.Type);
+            querysql.Append("select GoodsCode,GoodsName,SkuID,SkuName,Norm,GBCode,Brand,CostPrice,SalePrice,Enable,Creator,CreateDate from coresku where 1=1");
+            if (!string.IsNullOrEmpty(IParam.Type))
+            {
+                querysql.Append(" AND Type = @Type");
+                p.Add("@Type", IParam.Type);
+            }
             if (IParam.CoID != 1)
             {
                 querysql.Append(" AND CoID = @CoID");
@@ -460,10 +464,10 @@ namespace CoreData.CoreCore
                 querysql.Append(" AND Brand = @Brand");
                 p.Add("@Brand", IParam.Brand);
             }
-            if(!string.IsNullOrEmpty(IParam.SCoID))
+            if (!string.IsNullOrEmpty(IParam.SCoID))
             {
                 querysql.Append(" AND CONCAT(',',IFNULL(SCoList,''),',') LIKE @SCoID");
-                p.Add("@SCoID", "%,"+IParam.SCoID+",%");
+                p.Add("@SCoID", "%," + IParam.SCoID + ",%");
             }
             if (!string.IsNullOrEmpty(IParam.Filter))
             {
