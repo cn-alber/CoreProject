@@ -15,16 +15,20 @@ namespace CoreWebApi
     {
         #region 用户管理 - 查询
         [HttpGetAttribute("/Core/XyUser/User/UserLst")]
-        public ResponseResult UserLst(string Filter, string Enable, string PageIndex, string PageSize, string SortField, string SortDirection)
+        public ResponseResult UserLst(string Filter,string FilterType, string Enable, string PageIndex, string PageSize, string SortField, string SortDirection)
         {
             var cp = new UserParam();
-            //var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<UserParam>(obj["UserParam"].ToString());
-            cp.Filter = Filter;
+            //var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<UserParam>(obj["UserParam"].ToString());           
             if (!string.IsNullOrEmpty(Enable) && (Enable.ToUpper() == "TRUE" || Enable.ToUpper() == "FALSE"))
             {
                 cp.Enable = Enable.ToUpper();
             }
             int x;
+            cp.Filter = Filter;            
+            if(int.TryParse(FilterType,out x))
+            {
+                cp.FilterType = int.Parse(FilterType);
+            }
             if (int.TryParse(PageIndex, out x))
             {
                 cp.PageIndex = int.Parse(PageIndex);

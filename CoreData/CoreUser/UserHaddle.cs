@@ -261,12 +261,19 @@ namespace CoreData.CoreUser
                     if (!string.IsNullOrEmpty(IParam.Enable) && IParam.Enable.ToUpper() != "ALL")//是否启用
                     {
                         querysql.Append(" AND `user`.Enable = @Enable");
-                        p.Add("@Enable", IParam.Enable == "true" ? true : false);
+                        p.Add("@Enable", IParam.Enable.ToUpper() == "TRUE" ? true : false);
                     }
                     if (!string.IsNullOrEmpty(IParam.Filter))
                     {
-                        querysql.Append(" AND (`user`.Name like @Filter or Account like @Filter)");
-                        p.Add("@Filter", "'%" + IParam.Filter + "'");
+                        if(IParam.FilterType == 1)
+                        {
+                            querysql.Append(" AND Account like @Filter");
+                        }
+                        else
+                        {
+                            querysql.Append(" AND `user`.Name like @Filter");   
+                        }                        
+                        p.Add("@Filter", "%" + IParam.Filter + "%");
                     }
                     if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
                     {

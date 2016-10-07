@@ -164,6 +164,7 @@ namespace CoreModels.XyUser
 	{
         private int _CoID ;//公司编号
         private string _Filter;//过滤条件
+        private int _FilterType = 1;//过滤类型
         private string _Enable = "all";//是否启用
         private int _PageSize = 20;//每页笔数
         private int _PageIndex = 1;//页码
@@ -180,6 +181,11 @@ namespace CoreModels.XyUser
             get { return _Filter; }
             set { this._Filter = value; }
         }//过滤条件
+         public int FilterType 
+        {
+            get { return _FilterType; }
+            set { this._FilterType = value; }
+        }//过滤类型
         public string Enable 
         {
             get { return _Enable; }

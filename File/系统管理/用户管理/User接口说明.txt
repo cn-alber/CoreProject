@@ -6,15 +6,16 @@ function说明
 ##########################################
 1.UserQueryLst()//查询table User 资料
     方法：GET
-    路由：http://localhost:5000/Core/XyUser/User/UserLst?Filter=&Enable=&PageIndex=1&PageSize=&SortField=&SortDirection=
+    路由：http://localhost:5000/Core/XyUser/User/UserLst?Filter=&FilterType=&Enable=&PageIndex=1&PageSize=&SortField=&SortDirection=
     参数: CoreModels.XyUser.UserParam
     InPut:
-        Filter          string      模糊查询匹配(用户账号Account,用户名称Name)
-        Enable          string      启用状态(all/false/true)
+        Filter          string      模糊查询匹配(用户账号Account,用户名称Name,default null)
+        FilterType      int         1.按账号(default)，2.按用户名
+        Enable          string      启用状态(all/false/true,default：all)
         PageIndex       int         当前页码(ex.第一页就给1)
-        PageSize        int         每页显示资料笔数
-        SortField       string      排序字段
-        SortDirection   string      排序方向(DESC|ASC)
+        PageSize        int         每页显示资料笔数(default:20)
+        SortField       string      排序字段(default:null)
+        SortDirection   string      排序方向(DESC|ASC,default:ASC)
     OutPut:    
         PageCount       int             总页数
         DataCount       int             资料总笔数       
