@@ -134,7 +134,7 @@ namespace CoreData.CoreUser
 
                     // var child = conn.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where viewpowerid in (" +
                     //                              r.ViewList + ") order by ParentID,sortindex").AsList();
-                    var child = conn.Query<Refresh>("select id,name,NewIcon, NewIconPre,NewUrl as path,ParentID from menus where NewUrl != '' and viewpowerid in (" +
+                    var child = conn.Query<Refresh>("select id,name,NewIcon, NewIconPre,NewUrl as path,ParentID from menus where viewpowerid in (" +
                                 r.ViewList + ") order by ParentID,sortindex").AsList();
                               
                     foreach (var c in child)
