@@ -618,10 +618,10 @@ namespace CoreData.CoreUser
                 {
                     contents = contents + "名称:" + userOld.Name + "=>" + user.Name + ";";
                 }
-                if (!string.IsNullOrEmpty(user.PassWord) && userOld.PassWord != user.PassWord)
-                {
-                    contents = contents + "密码:" + userOld.PassWord + "=>" + user.PassWord + ";";
-                }
+                // if (!string.IsNullOrEmpty(user.PassWord) && userOld.PassWord != user.PassWord)
+                // {
+                //     contents = contents + "密码:" + userOld.PassWord + "=>" + user.PassWord + ";";
+                // }
                 if (userOld.Enable != user.Enable)
                 {
                     contents = contents + "用户状态:" + userOld.Enable + "=>" + user.Enable + ";";
@@ -652,12 +652,13 @@ namespace CoreData.CoreUser
                 var TransUser = UserDBconn.BeginTransaction();
                 try
                 {
+                    
+                    //  `PassWord` = @PassWord,
+                    //     `Enable` = @Enable,
                     string str = @"UPDATE user
                     SET Account = @Account,
                         SecretID = @SecretID,
-                        `Name` = @Name,
-                        `PassWord` = @PassWord,
-                        `Enable` = @Enable,
+                        `Name` = @Name,                       
                         Email = @Email,
                         Gender = @Gender,
                         Mobile = @Mobile,

@@ -119,3 +119,17 @@ function说明
     OutPut:
          成功：1.删除用户缓存；2.删除用户资料；3.新增操作记录log；4.返回成功信息
          失败：返回错误信息
+10.editpassword()//修改密码
+    方法：POST
+    路由：http://localhost:5000/Core/account/password
+    参数：
+    InPut:
+        oldPwd          string          旧密码
+        newPwd          string          新密码
+        reNewPwd        string          确认新密码
+    OutPut:
+        返回提示信息
+    
+
+
+
