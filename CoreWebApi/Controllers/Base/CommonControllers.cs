@@ -76,5 +76,11 @@ namespace CoreWebApi
         // }
 
         #endregion
+        [HttpGetAttribute("/Core/Common/shopsite")]
+        public ResponseResult shopsite()
+        {            
+            var data = ShopHaddle.GetShopSite();
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
     }
 }

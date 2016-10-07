@@ -7,6 +7,7 @@ using System;
 using System.Text;
 using CoreModels.XyComm;
 using MySql.Data.MySqlClient;
+using static CoreModels.Enum.OrderE;
 
 namespace CoreData.CoreComm
 {
@@ -596,6 +597,38 @@ namespace CoreData.CoreComm
 
             return res;
         }
+
+        public static DataResult GetShopSite()
+        {
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    var site = new siteTree();
+                    var siteList = new List<siteTree>();
+                    foreach (int  myCode in Enum.GetValues(typeof(ShopSit)))
+                    {
+                        string strName =Enum.GetName(typeof(ShopSit), myCode);//获取名称
+                        //string strVaule = myCode.ToString();//获取值
+                        site.id = myCode;
+                        site.title = strName;
+                        siteList.Add(site);
+                        site = new siteTree();
+                    }
+                    res.d = siteList;
+                }
+                catch (Exception e)
+                {
+                    res.s = -1;
+                    res.d = e.Message;
+                    conn.Dispose();
+                }
+            }
+
+            return res;
+        }
+
 
         public static DataResult TokenExpired(string shopid, string coid)
         {
