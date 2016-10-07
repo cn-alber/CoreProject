@@ -105,8 +105,9 @@ namespace CoreData.CoreCore
         ///</summary>
         public static DataResult GetScoCompanyEdit(int ID)
         {
-            var result = new DataResult(1,null);        
-            var parent = CacheBase.Get<ScoCompanySingle>(ID.ToString());  
+            var result = new DataResult(1,null);   
+            string scoName = "scocompany" + ID.ToString();     
+            var parent = CacheBase.Get<ScoCompanySingle>(scoName);  
             if (parent == null)
             {
                 using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
@@ -120,7 +121,7 @@ namespace CoreData.CoreCore
                         }
                         else
                         {
-                            CacheBase.Set<ScoCompanySingle>(ID.ToString(), u[0]);
+                            CacheBase.Set<ScoCompanySingle>(scoName, u[0]);
                             result.d = u;
                         }
                     }catch(Exception ex){
@@ -224,7 +225,7 @@ namespace CoreData.CoreCore
                         var u = conn.Query<ScoCompanySingle>(wheresql).AsList();
                         if (u.Count > 0)
                         {
-                            CacheBase.Set<ScoCompanySingle>(u[0].id.ToString(), u[0]);
+                            CacheBase.Set<ScoCompanySingle>("scocompany" + u[0].id.ToString(), u[0]);
                         }
                     }        
                 }catch(Exception ex){
@@ -325,7 +326,7 @@ namespace CoreData.CoreCore
                     else
                     {
                         CoreUser.LogComm.InsertUserLog("修改客户资料", "supplycompany", contents, UserName, Company, DateTime.Now);               
-                        CacheBase.Set<ScoCompanySingle>(com.id.ToString(), com);
+                        CacheBase.Set<ScoCompanySingle>("scocompany" + com.id.ToString(), com);
                     }
                 }catch(Exception ex){
                     result.s = -1;
