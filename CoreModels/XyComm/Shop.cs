@@ -70,4 +70,9 @@ namespace CoreModels.XyComm
         public List<ShopQuery> ShopLst {get; set;}//返回资料        
     }
 
+    public  class siteTree{
+        public int id{get;set;}
+        public string title{get;set;}
+    }
+
 }

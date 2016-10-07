@@ -54,24 +54,29 @@ namespace CoreWebApi.Base
 
 
         //保存店铺资料
-        [HttpPostAttribute("/Core/Shop/ShopSave")]
-         public ResponseResult ShopSave([FromBodyAttribute]JObject obj)
+        [HttpPostAttribute("/Core/Shop/createshop")]
+         public ResponseResult createshop([FromBodyAttribute]JObject obj)
         {
-            var Type = obj["EditType"].ToString();//new or edit
             var shop = Newtonsoft.Json.JsonConvert.DeserializeObject<Shop>(obj["shop"].ToString());
             var Res = new DataResult(1,null);
             int CoID = int.Parse(GetCoid());
             string UserName = GetUname();            
             // int CoID=1;
             // string UserName = "携云科技";
-            if(Type.ToUpper()=="NEW")
-            {
-                Res = ShopHaddle.InsertShop(shop, CoID, UserName);
-            }
-            else
-            {
-                Res = ShopHaddle.UpdateShop(shop, CoID, UserName);
-            }
+            Res = ShopHaddle.InsertShop(shop, CoID, UserName);      
+            return CoreResult.NewResponse(Res.s,Res.d,"General");
+        }
+
+        [HttpPostAttribute("/Core/Shop/modifyshop")]
+         public ResponseResult modifyshop([FromBodyAttribute]JObject obj)
+        {
+            var shop = Newtonsoft.Json.JsonConvert.DeserializeObject<Shop>(obj["shop"].ToString());
+            var Res = new DataResult(1,null);
+            int CoID = int.Parse(GetCoid());
+            string UserName = GetUname();            
+            // int CoID=1;
+            // string UserName = "携云科技";
+            Res = ShopHaddle.UpdateShop(shop, CoID, UserName);            
             return CoreResult.NewResponse(Res.s,Res.d,"General");
         }
 
