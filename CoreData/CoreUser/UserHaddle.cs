@@ -136,6 +136,7 @@ namespace CoreData.CoreUser
                     //                              r.ViewList + ") order by ParentID,sortindex").AsList();
                     var child = conn.Query<Refresh>("select id,name,NewIcon, NewIconPre,NewUrl as path,ParentID from menus where NewUrl != '' and viewpowerid in (" +
                                 r.ViewList + ") order by ParentID,sortindex").AsList();
+                              
                     foreach (var c in child)
                     {
                         if (!string.IsNullOrEmpty(c.NewIconPre))
@@ -149,20 +150,21 @@ namespace CoreData.CoreUser
 
                     }
 
-                    if (child.Count == 0)
-                    {
-                        return null;
-                    }
+                    // if (child.Count == 0)
+                    // {
+                    //     return null;
+                    // }
                     var pidarray = (from c in child select c.parentID).Distinct().ToArray();
                     var pid = string.Join(",", pidarray);
+                    
                     //parent = conn.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where id in (" + pid + ") order by sortindex").AsList();
-                    parent = conn.Query<Refresh>("select id,name,NewIcon , NewIconPre ,NewUrl as path,ParentID from menus where NewUrl != '' and id in (" + pid + ") order by sortindex").AsList();
+                    parent = conn.Query<Refresh>("select id,name,NewIcon , NewIconPre ,NewUrl as path,ParentID from menus where id in (" + pid + ") order by sortindex").AsList();
                     foreach (var p in parent)
                     {
                         p.type = 2;
                         p.icon = new string[] { p.NewIcon, p.NewIconPre };
                         p.data = (from c in child where c.parentID == p.id select c).ToList();
-                    }
+                    }                
                 }
                 catch
                 {
