@@ -68,7 +68,7 @@ namespace CoreData.CoreUser
         public static DataResult GetCompanyEdit(int ID)
         {
             var result = new DataResult(1,null);        
-            var parent = CacheBase.Get<CompanySingle>(ID.ToString());  
+            var parent = CacheBase.Get<CompanySingle>("company" + ID.ToString());  
             if (parent == null)
             {
                 using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
@@ -82,7 +82,7 @@ namespace CoreData.CoreUser
                         }
                         else
                         {
-                            CacheBase.Set<CompanySingle>(ID.ToString(), u[0]);
+                            CacheBase.Set<CompanySingle>("company" + ID.ToString(), u[0]);
                             result.d = u;
                         }
                     }catch(Exception ex){
@@ -214,7 +214,7 @@ namespace CoreData.CoreUser
                         var u = conn.Query<CompanySingle>(wheresql).AsList();
                         if (u.Count > 0)
                         {
-                            CacheBase.Set<CompanySingle>(u[0].id.ToString(), u[0]);
+                            CacheBase.Set<CompanySingle>("company" + u[0].id.ToString(), u[0]);
                         }
                     }        
                 }catch(Exception ex){
@@ -280,7 +280,7 @@ namespace CoreData.CoreUser
                     else
                     {
                         LogComm.InsertUserLog("修改公司资料", "company", contents, UserName, Company, DateTime.Now);               
-                        CacheBase.Set<CompanySingle>(com.id.ToString(), com);
+                        CacheBase.Set<CompanySingle>("company" + com.id.ToString(), com);
                     }
                 }catch(Exception ex){
                     result.s = -1;
