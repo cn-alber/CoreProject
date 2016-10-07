@@ -15,14 +15,15 @@ namespace CoreData.CoreCore
         public static DataResult GetPurchaseList(PurchaseParm cp)
         {
             var result = new DataResult(1,null);     
-            string wheresql = "where purchasedate between '" + cp.PurdateStart + "' and '" + cp.PurdateEnd + "'"; //采购日期
+            string wheresql = "select id,purchasedate,coname,contract,shplogistics,shpcity,shpdistrict,shpaddress,warehousename,status,purtype,buyyer,remark,taxrate " + 
+                              "from purchase where purchasedate between '" + cp.PurdateStart + "' and '" + cp.PurdateEnd + "'"; //采购日期;
             if(cp.CoID != 1)//公司编号
             {
                 wheresql = wheresql + " and coid = " + cp.CoID;
             }
-            if (!string.IsNullOrEmpty(cp.Purid))//采购单号
+            if (cp.Purid > 0)//采购单号
             {
-                wheresql = wheresql + " AND purchaseid like '%"+ cp.Purid + "%'";
+                wheresql = wheresql + " AND id = "+ cp.Purid ;
             }
             if(cp.Status >= 0)//状态
             {
@@ -32,11 +33,23 @@ namespace CoreData.CoreCore
             {
                wheresql = wheresql + " and coname = '" + cp.CoName + "'";
             }
+            if (cp.Warehouseid > 0)//仓库代号
+            {
+                wheresql = wheresql + " AND warehouseid = "+ cp.Warehouseid ;
+            }
+            if(!string.IsNullOrEmpty(cp.Buyyer))//采购员
+            {
+               wheresql = wheresql + " and buyyer = '" + cp.Buyyer + "'";
+            }
+            if(!string.IsNullOrEmpty(cp.Skuid))//商品编码
+            {
+               wheresql = wheresql + " and exists(select skuid from purchasedetail where purchaseid = purchase.id and skuid = '" + cp.Skuid + "')";
+            }
             if(!string.IsNullOrEmpty(cp.SortField)&& !string.IsNullOrEmpty(cp.SortDirection))//排序
             {
                 wheresql = wheresql + " ORDER BY "+cp.SortField +" "+ cp.SortDirection;
             }
-            wheresql = "select id,purchaseid,purchasedate,coname,contract,shpaddress,status,purtype,buyyer,remark,taxrate from purchase " + wheresql ;
+            var res = new PurchaseData();
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
                     var u = conn.Query<Purchase>(wheresql).AsList();
@@ -47,9 +60,9 @@ namespace CoreData.CoreCore
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
                     u = conn.Query<Purchase>(wheresql).AsList();
 
-                    cp.Datacnt = count;
-                    cp.Pagecnt = pagecnt;
-                    cp.Com = u;
+                    res.Datacnt = count;
+                    res.Pagecnt = pagecnt;
+                    res.Pur = u;
                     if (count == 0)
                     {
                         result.s = -3001;
@@ -57,7 +70,7 @@ namespace CoreData.CoreCore
                     }
                     else
                     {
-                        result.d = cp;
+                        result.d = res;
                     }               
                 }catch(Exception ex){
                     result.s = -1;
@@ -73,7 +86,8 @@ namespace CoreData.CoreCore
         public static DataResult GetPurchaseDetailList(PurchaseDetailParm cp)
         {
             var result = new DataResult(1,null);     
-            string wheresql = "where purchaseid = '" + cp.Purid + "'"; //采购单号
+            string wheresql = "select id,purchaseid,img,skuid,skuname,purqty,suggestpurqty,recqty,price,puramt,remark,goodscode,supplynum,supplycode,planqty,planamt,recievedate,norm,packingnum " + 
+                              "from purchasedetail where purchaseid = " + cp.Purid; //采购单号
             if(cp.CoID != 1)//公司编号
             {
                 wheresql = wheresql + " and coid = " + cp.CoID;
@@ -94,10 +108,10 @@ namespace CoreData.CoreCore
             {
                 wheresql = wheresql + " ORDER BY "+cp.SortField +" "+ cp.SortDirection;
             }
-            wheresql = "select id,purchaseid,skuid,skuname,colorname,sizename,purqty,price,puramt,remark,goodscode,supplynum,recievedate,detailstatus,norm,coid from purchasedetail " + wheresql ;
+            var res = new PurchaseDetailData();
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
-                    string pursql = "select id,purchaseid,purchasedate,coname,contract,shpaddress,status,purtype,buyyer,remark,taxrate from purchase where purchaseid = '" + cp.Purid + "' and coid =" + cp.CoID ;
+                    string pursql = "select id,purchaseid,img,skuid,skuname,purqty,suggestpurqty,recqty,price,puramt,remark,goodscode,supplynum,supplycode,planqty,planamt,recievedate,norm,packingnum from purchasedetail where purchaseid = " + cp.Purid + " and coid =" + cp.CoID ;
                     var pur = conn.Query<Purchase>(pursql).AsList();
                     if (pur.Count == 0)
                     {
@@ -108,11 +122,11 @@ namespace CoreData.CoreCore
                     {
                         if(pur[0].status == 0)
                         {
-                            cp.enable = true;
+                            res.enable = true;
                         }
                         else
                         {
-                            cp.enable = false;
+                            res.enable = false;
                         }
                     }           
                     var u = conn.Query<PurchaseDetail>(wheresql).AsList();
@@ -123,9 +137,9 @@ namespace CoreData.CoreCore
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
                     u = conn.Query<PurchaseDetail>(wheresql).AsList();
 
-                    cp.Datacnt = count;
-                    cp.Pagecnt = pagecnt;
-                    cp.Com = u;
+                    res.Datacnt = count;
+                    res.Pagecnt = pagecnt;
+                    res.Pur = u;
                     if (count == 0)
                     {
                         result.s = -3001;
@@ -133,7 +147,7 @@ namespace CoreData.CoreCore
                     }
                     else
                     {
-                        result.d = cp;
+                        result.d = res;
                     }               
                 }catch(Exception ex){
                     result.s = -1;
@@ -443,7 +457,7 @@ namespace CoreData.CoreCore
                 string sqlCommandText = @"INSERT INTO purchasedetail(purchaseid,skuid,skuname,price,purqty,puramt,recievedate,remark,colorname,sizename,norm,goodscode,supplynum,coid) 
                                             VALUES(@PurID,@Skuid,@Skuname,@Price,@Purqty,@Puramt,@Recdate,@Remark,@Colorname,@Sizename,@Norm,@Goodscode,@Supplynum,@Coid)";
                 var args = new {PurID = detail.purchaseid,Skuid=detail.skuid,Skuname = detail.skuname,Price = detail.price,Purqty = detail.purqty,Puramt = detail.puramt,
-                                Recdate = detail.recievedate,Remark = detail.remark,Colorname = detail.colorname,Sizename = detail.sizename ,Norm = detail.norm ,
+                                Recdate = detail.recievedate,Remark = detail.remark,Colorname = "",Sizename = "",Norm = detail.norm ,
                                 Goodscode = detail.goodscode ,Supplynum = detail.supplynum,Coid = CoID};
                 int count = CoreDBconn.Execute(sqlCommandText,args,TransCore);
                 if(count <= 0)
@@ -507,7 +521,7 @@ namespace CoreData.CoreCore
                     string sqlCommandText = @"update purchasedetail set skuid = @Skuid,skuname = @Skuname,price = @Price,purqty = @Purqty,puramt = @Puramt,recievedate = @Recdate,
                                             remark = @Remark,colorname = @Colorname,sizename = @Sizename,norm = @Norm,goodscode = @Goodscode,supplynum = @Supplynum where id = @ID ";
                     var args = new {Skuid=detail.skuid,Skuname = detail.skuname,Price = detail.price,Purqty = detail.purqty,Puramt = detail.puramt,
-                                    Recdate = detail.recievedate,Remark = detail.remark,Colorname = detail.colorname,Sizename = detail.sizename ,Norm = detail.norm ,
+                                    Recdate = detail.recievedate,Remark = detail.remark,Colorname = "",Sizename = "" ,Norm = detail.norm ,
                                     Goodscode = detail.goodscode ,Supplynum = detail.supplynum,ID = detail.id};
                     int count = CoreDBconn.Execute(sqlCommandText,args,TransCore);
                     if(count <= 0)

@@ -32,6 +32,7 @@ namespace CoreData.CoreUser
             {
                 wheresql = wheresql + " ORDER BY "+cp.SortField +" "+ cp.SortDirection;
             }
+            var res = new CompanyData();
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{    
                     var u = conn.Query<CompanyMulti>(wheresql).AsList();
@@ -42,9 +43,9 @@ namespace CoreData.CoreUser
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
                     u = conn.Query<CompanyMulti>(wheresql).AsList();
 
-                    cp.Datacnt = count;
-                    cp.Pagecnt = pagecnt;
-                    cp.Com = u;
+                    res.Datacnt = count;
+                    res.Pagecnt = pagecnt;
+                    res.Com = u;
                     if (count == 0)
                     {
                         result.s = -3001;
@@ -52,7 +53,7 @@ namespace CoreData.CoreUser
                     }
                     else
                     {
-                        result.d = cp;
+                        result.d = res;
                     }               
                 }catch(Exception ex){
                     result.s = -1;

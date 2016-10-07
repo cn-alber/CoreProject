@@ -4,44 +4,92 @@ using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyCore;
 using CoreData.CoreCore;
 using System;
+using CoreData.CoreComm;
+using CoreData;
 using System.Collections.Generic;
 namespace CoreWebApi
 {
     public class PurchaseController : ControllBase
     {
-        [AllowAnonymous]
-        [HttpPostAttribute("/Core/Purchase/PurchaseList")]
-        public ResponseResult PurchaseList([FromBodyAttribute]JObject co)
+        [HttpGetAttribute("/Core/Purchase/PurchaseList")]
+        public ResponseResult PurchaseList(string Purid,string PurdateStart,string PurdateEnd,string Status,string Coname,string Skuid,string Warehouseid,string Buyyer,string SortField,string SortDirection,string PageIndex,string NumPerPage)
         {   
+            int x;
             var cp = new PurchaseParm();
             cp.CoID = int.Parse(GetCoid());
-            cp.Purid = co["Purid"].ToString();
-            cp.PurdateStart = DateTime.Parse(co["PurdateStart"].ToString());
-            cp.PurdateEnd = DateTime.Parse(co["PurdateEnd"].ToString());
-            cp.Status = int.Parse(co["Status"].ToString());
-            cp.CoName = co["CoName"].ToString();
-            cp.SortField = co["SortField"].ToString();
-            cp.SortDirection = co["SortDirection"].ToString();
-            cp.NumPerPage = int.Parse(co["NumPerPage"].ToString());
-            cp.PageIndex = int.Parse(co["PageIndex"].ToString());
+            if (int.TryParse(Purid, out x))
+            {
+                cp.Purid = int.Parse(Purid);
+            }
+            DateTime date;
+            if (DateTime.TryParse(PurdateStart, out date))
+            {
+                cp.PurdateStart = DateTime.Parse(PurdateStart);
+            }
+            if (DateTime.TryParse(PurdateEnd, out date))
+            {
+                cp.PurdateEnd = DateTime.Parse(PurdateEnd);
+            }
+            if (int.TryParse(Status, out x))
+            {
+                cp.Status = int.Parse(Status);
+            }
+            cp.CoName = Coname;
+            cp.Skuid = Skuid;
+            if (int.TryParse(Warehouseid, out x))
+            {
+                cp.Warehouseid = int.Parse(Warehouseid);
+            }
+            cp.Buyyer = Buyyer;
+            if(CommHaddle.SysColumnExists(DbBase.CoreConnectString,"purchase",SortField).s == 1)
+            {
+                cp.SortField = SortField;
+            }
+            if(SortDirection.ToUpper() == "ASC")
+            {
+                cp.SortDirection = SortDirection;
+            }
+            if (int.TryParse(NumPerPage, out x))
+            {
+                cp.NumPerPage = int.Parse(NumPerPage);
+            }
+            if (int.TryParse(PageIndex, out x))
+            {
+                cp.PageIndex = int.Parse(PageIndex);
+            }
             var data = PurchaseHaddle.GetPurchaseList(cp);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-        [AllowAnonymous]
-        [HttpPostAttribute("/Core/Purchase/PurchaseDetailList")]
-        public ResponseResult PurchaseDetailList([FromBodyAttribute]JObject co)
+        [HttpGetAttribute("/Core/Purchase/PurchaseDetailList")]
+        public ResponseResult PurchaseDetailList(string Purid,string Skuid,string SkuName,string GoodsCode,string SortField,string SortDirection,string PageIndex,string NumPerPage)
         {   
             var cp = new PurchaseDetailParm();
             cp.CoID = int.Parse(GetCoid());
-            cp.Purid = co["Purid"].ToString();
-            cp.Skuid = co["Skuid"].ToString();
-            cp.SkuName = co["SkuName"].ToString();
-            cp.GoodsCode = co["GoodsCode"].ToString();
-            cp.SortField = co["SortField"].ToString();
-            cp.SortDirection = co["SortDirection"].ToString();
-            cp.NumPerPage = int.Parse(co["NumPerPage"].ToString());
-            cp.PageIndex = int.Parse(co["PageIndex"].ToString());
+            int x;
+            if (int.TryParse(Purid, out x))
+            {
+                cp.Purid = int.Parse(Purid);
+            }
+            cp.Skuid = Skuid;
+            cp.SkuName = SkuName;
+            cp.GoodsCode = GoodsCode;
+            if(CommHaddle.SysColumnExists(DbBase.CoreConnectString,"purchasedetail",SortField).s == 1)
+            {
+                cp.SortField = SortField;
+            }
+            if(SortDirection.ToUpper() == "ASC")
+            {
+                cp.SortDirection = SortDirection;
+            }
+            if (int.TryParse(NumPerPage, out x))
+            {
+                cp.NumPerPage = int.Parse(NumPerPage);
+            }
+            if (int.TryParse(PageIndex, out x))
+            {
+                cp.PageIndex = int.Parse(PageIndex);
+            }
             var data = PurchaseHaddle.GetPurchaseDetailList(cp);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }

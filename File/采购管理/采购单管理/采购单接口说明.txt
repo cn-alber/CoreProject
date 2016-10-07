@@ -3,56 +3,69 @@
 function说明
 1.PurchaseList() //查询table purchase 资料
   路由:http://localhost:5000/Core/Purchase/PurchaseList
-input:      Purid           string          采购单号
-            PurdateStart    datetime        采购时间起
-            PurdateEnd      datetime        采购时间迄
-            Status          int             状态
-            CoName          string          供应商
-            SortField       string          排序栏位名称
-            SortDirection   string          排序方式
-            PageIndex       int             资料页数(ex.第一页就给1)
-            NumPerPage      int             每页显示资料笔数
-OutPut:     CoID            int             公司编号coid
-            Purid           string          采购单号
-            PurdateStart    datetime        采购时间起
-            PurdateEnd      datetime        采购时间迄
-            Status          int             状态
-            CoName          string          供应商
-            SortField       string          排序栏位名称
-            SortDirection   string          排序方式
-            PageIndex       int             资料页数(ex.第一页就给1)
-            NumPerPage      int             每页显示资料笔数
-            Datacnt         int             资料总笔数
+input:      Purid           string          采购单号 default null
+            PurdateStart    string          采购时间起 default null
+            PurdateEnd      string          采购时间迄 default null
+            Status          string          状态 default null
+            CoName          string          供应商 default null
+            Skuid           string          商品编码 default null
+            Warehouseid     string          仓库代号 default null
+            Buyyer          string          采购员 default null
+            SortField       string          排序栏位名称 default id
+            SortDirection   string          排序方式 default DESC
+            PageIndex       int             资料页数(ex.第一页就给1) default 1
+            NumPerPage      int             每页显示资料笔数 default 20
+OutPut:     Datacnt         int             资料总笔数
             Pagecnt         int             总页数
             Com             List<Purchase>  Purchase 资料
-参考:input jason 文件:PurchaseList_input.json
 参考:output jason 文件:PurchaseList_output.json
 
 2.PurchaseDetailList() //查询table purchasedetail 资料
   路由:http://localhost:5000/Core/Purchase/PurchaseDetailList
-input:      Purid           string                采购单号
-            Skuid           string                商品编号
-            SkuName         string                商品名称
-            GoodsCode       string                款式编号
-            SortField       string                排序栏位名称
-            SortDirection   string                排序方式
-            PageIndex       int                   资料页数(ex.第一页就给1)
-            NumPerPage      int                   每页显示资料笔数
-OutPut:     CoID            int                   公司编号coid
-            Purid           string                采购单号
-            Skuid           string                商品编号
-            SkuName         string                商品名称
-            GoodsCode       string                款式编号
-            SortField       string                排序栏位名称
-            SortDirection   string                排序方式
-            PageIndex       int                   资料页数(ex.第一页就给1)
-            NumPerPage      int                   每页显示资料笔数
-            Datacnt         int                   资料总笔数
+input:      Purid           string                采购单号 必填
+            Skuid           string                商品编号  default null
+            SkuName         string                商品名称 default null
+            GoodsCode       string                款式编号 default null
+            SortField       string                排序栏位名称 default id
+            SortDirection   string                排序方式 default asc
+            PageIndex       int                   资料页数(ex.第一页就给1) default 1
+            NumPerPage      int                   每页显示资料笔数  default 20
+OutPut:     Datacnt         int                   资料总笔数
             Pagecnt         int                   总页数
             enable          bool                  明细是否允许编辑(true允许/false不允许)
             Com             List<PurchaseDetail>  Purchasedetail 资料
-参考:input jason 文件:PurchaseDetailList_input.json
 参考:output jason 文件:PurchaseDetailList_output.json
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 3.DeletePur()//删除采购
 路由:http://localhost:5000/Core/Purchase/DeletePur
