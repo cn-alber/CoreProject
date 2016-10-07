@@ -111,12 +111,22 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/XyUser/User/UserEnable")]
         public ResponseResult UserEnable([FromBodyAttribute]JObject obj)
         {
-            Dictionary<int, string> IDsDic = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<int, string>>(obj["IDsDic"].ToString());
-            string Company = obj["Company"].ToString();
-            bool Enable = obj["Enable"].ToString().ToUpper() == "TRUE" ? true : false;
-            string CoID = GetCoid();
-            string UserName = GetUname();
-            var res = UserHaddle.UptUserEnable(IDsDic, Company, UserName, Enable, CoID);
+            //Dictionary<int, string> IDsDic = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<int, string>>(obj["IDsDic"].ToString());
+            //string Company = obj["Company"].ToString();
+            var res = new DataResult(1, null);
+            var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
+            if (IDLst.Count == 0)
+            {
+                res.s = -1;
+                res.d = "请先选中操作明细";
+            }
+            else
+            {
+                bool Enable = obj["Enable"].ToString().ToUpper() == "TRUE" ? true : false;
+                string CoID = GetCoid();
+                string UserName = GetUname();
+                res = UserHaddle.UptUserEnable(IDLst, CoID, UserName, Enable);
+            }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
@@ -177,7 +187,7 @@ namespace CoreWebApi
             {
                 int CoID = int.Parse(GetCoid());
                 string UserName = GetUname();
-                res = UserHaddle.DeleteUserAccount(IDLst,0, CoID, UserName);
+                res = UserHaddle.DeleteUserAccount(IDLst, 0, CoID, UserName);
             }
             else
             {
