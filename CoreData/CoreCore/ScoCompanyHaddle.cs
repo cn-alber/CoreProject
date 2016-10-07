@@ -15,7 +15,7 @@ namespace CoreData.CoreCore
         public static DataResult GetScoCompanyList(ScoCompanyParm cp)
         {
             var result = new DataResult(1,null);     
-            string wheresql = "where 1 = 1";
+            string wheresql = "select id,scocode,enable,sconame,scosimple,typelist,remark,creator,createdate from supplycompany where 1 = 1";
             if(cp.CoID != 1)//公司编号
             {
                 wheresql = wheresql + " and coid = " + cp.CoID;
@@ -32,7 +32,6 @@ namespace CoreData.CoreCore
             {
                 wheresql = wheresql + " ORDER BY "+cp.SortField +" "+ cp.SortDirection;
             }
-            wheresql = "select id,scocode,enable,sconame,scosimple,typelist,remark,creator,createdate from supplycompany " + wheresql ;
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
                     var u = conn.Query<ScoCompanyMulti>(wheresql).AsList();

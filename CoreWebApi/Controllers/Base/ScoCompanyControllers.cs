@@ -1,30 +1,48 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using Microsoft.AspNetCore.Authorization;
+// using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyCore;
 using CoreData.CoreCore;
 using System.Collections.Generic;
+using CoreData.CoreComm;
+using CoreData;
+using CoreModels;
+
 namespace CoreWebApi
 {
     public class ScoCompanyController : ControllBase
     {
-        [AllowAnonymous]
-        [HttpPostAttribute("/Core/ScoCompany/CallScoCompanyList")]
-        public ResponseResult ScoCompanyList([FromBodyAttribute]JObject co)
+        [HttpGetAttribute("/Core/ScoCompany/ScoCompanyList")]
+        public ResponseResult ScoCompanyList(string Enable,string Filter,string SortField,string SortDirection,string PageIndex,string NumPerPage)
         {   
             var cp = new ScoCompanyParm();
             cp.CoID = int.Parse(GetCoid());
-            cp.Enable = co["Enable"].ToString();
-            cp.Filter = co["Filter"].ToString();
-            cp.SortField = co["SortField"].ToString();
-            cp.SortDirection = co["SortDirection"].ToString();
-            cp.NumPerPage = int.Parse(co["NumPerPage"].ToString());
-            cp.PageIndex = int.Parse(co["PageIndex"].ToString());
+            if(Enable.ToUpper() == "TRUE" || Enable.ToUpper() == "FALSE")
+            {
+                cp.Enable = Enable;
+            }
+            cp.Filter = Filter;
+            if(CommHaddle.SysColumnExists(DbBase.CoreConnectString,"supplycompany","SortField").s == 1)
+            {
+                cp.SortField = SortField;
+            }
+            if(SortDirection.ToUpper() == "ASC")
+            {
+                cp.SortDirection = SortDirection;
+            }
+            int x;
+            if (int.TryParse(NumPerPage, out x))
+            {
+                cp.NumPerPage = int.Parse(NumPerPage);
+            }
+            if (int.TryParse(PageIndex, out x))
+            {
+                cp.PageIndex = int.Parse(PageIndex);
+            }
             var data = ScoCompanyHaddle.GetScoCompanyList(cp);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-        [AllowAnonymous]
         [HttpPostAttribute("/Core/ScoCompany/ScoCompanyEnable")]
         public ResponseResult CompanyEnable([FromBodyAttribute]JObject co)
         {   
@@ -37,16 +55,24 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-        [AllowAnonymous]
-        [HttpPostAttribute("/Core/ScoCompany/ScoCompanySingle")]
-        public ResponseResult ScoCompanySingle([FromBodyAttribute]JObject co)
+        [HttpGetAttribute("/Core/ScoCompany/ScoCompanySingle")]
+        public ResponseResult ScoCompanySingle(string ID)
         {   
-            int id = int.Parse(co["ID"].ToString());
-            var data = ScoCompanyHaddle.GetScoCompanyEdit(id);
+            int x,id;
+            var data = new DataResult(1,null);  
+            if (int.TryParse(ID, out x))
+            {
+                id = int.Parse(ID);
+                data = ScoCompanyHaddle.GetScoCompanyEdit(id);
+            }
+            else
+            {
+                data.s = -1;
+                data.d = "参数无效!";
+            }
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-        [AllowAnonymous]
         [HttpPostAttribute("/Core/ScoCompany/UpdateScoCompany")]
         public ResponseResult UpdateScoCompany([FromBodyAttribute]JObject co)
         {   
@@ -66,15 +92,5 @@ namespace CoreWebApi
             var data = ScoCompanyHaddle.SaveScoCompany(modifyFlag,com,UserName,Company,int.Parse(CoID));
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
-
-        [AllowAnonymous]
-        [HttpPostAttribute("/Core/ScoCompany/GetScoCompanyAll")]
-        public ResponseResult GetScoCompanyAll()
-        {   
-            int CoID = int.Parse(GetCoid());
-            var data = ScoCompanyHaddle.GetScoCompanyAll(CoID);
-            return CoreResult.NewResponse(data.s, data.d, "General"); 
-        }
-
     }
 }
