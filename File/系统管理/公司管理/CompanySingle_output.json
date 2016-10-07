@@ -2,17 +2,17 @@
     "s": 1,
     "d": [
         {
-            "id": 1,
-            "name": "携云科技",
+            "id": 4,
+            "name": "公司test3",
             "enable": true,
-            "address": "携云科技有限公司",
-            "email": "346517865@qq.com",
-            "typelist": "0,1",
-            "contacts": "联系人c1",
-            "telphone": "52777879-5001",
-            "mobile": "13814987627",
-            "remark": "系统主账号"
+            "address": "公司地址12233444",
+            "email": "",
+            "typelist": "0",
+            "contacts": "G先生",
+            "telphone": "123456789",
+            "mobile": "123456778",
+            "remark": ""
         }
     ],
-    "m": "请求成功"
+    "m": ""
 }

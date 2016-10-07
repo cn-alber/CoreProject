@@ -2,24 +2,23 @@
 
 function说明
 1.ScoCompanyList() //查询table supplycompany 资料
-  路由:http://localhost:5000/Core/ScoCompany/CallScoCompanyList
-input：     Enable         string                   启用状态(all/false/true)
-            Filter         string                   公司名称匹配值(模糊查询)允许为null
-            SortField      string                   资料页数(ex.第一页就给1)
-            SortDirection  string                   每页显示资料笔数
-            PageIndex      int                      资料页数(ex.第一页就给1)
-            NumPerPage     int                      每页显示资料笔数
+  路由:http://localhost:5000/Core/ScoCompany/ScoCompanyList
+input：     Enable         string                   启用状态(all/false/true)default null
+            Filter         string                   公司名称匹配值(模糊查询)default null
+            SortField      string                   排序字段 default id
+            SortDirection  string                   排序方式(ASC|DESC) default DESC
+            PageIndex      string                   资料页数(ex.第一页就给1) default 1
+            NumPerPage     string                   每页显示资料笔数 default 20
 OutPut:     CoID           int                      公司编号coid
-            Enable         string                   启用状态(all/false/true)
-            Filter         string                   公司名称匹配值(模糊查询)允许为null
-            SortField      string                   资料页数(ex.第一页就给1)
-            SortDirection  string                   每页显示资料笔数
-            PageIndex      int                      资料页数(ex.第一页就给1)
-            NumPerPage     int                      每页显示资料笔数
+            Enable         string                   启用状态(all/false/true)default null
+            Filter         string                   公司名称匹配值(模糊查询)default null
+            SortField      string                   排序字段 default id
+            SortDirection  string                   排序方式(ASC|DESC) default DESC
+            PageIndex      int                      资料页数(ex.第一页就给1) default 1
+            NumPerPage     int                      每页显示资料笔数 default 20
             Datacnt        int                      资料总笔数
             Pagecnt        int                      总页数
             Com            List<ScoCompanyMulti>    supplycompany 资料
-参考:input jason 文件:ScoCompanyList_input.json
 参考:output jason 文件:ScoCompanyList_output.json
 
 2.ScoCompanyEnable()//批次更新客户资料的状态
@@ -40,7 +39,6 @@ OutPut: 成功：
   路由:http://localhost:5000/Core/ScoCompany/ScoCompanySingle
 input：ID   客户资料ID
 OutPut: 单笔 supplycompany 资料
-参考:input jason 文件:ScoCompanySingle_input.json
 参考:output jason 文件:ScoCompanySingle_output.json
 
 4.UpdateScoCompany() //保存客户基本资料

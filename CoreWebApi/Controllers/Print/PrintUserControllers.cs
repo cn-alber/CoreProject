@@ -10,7 +10,7 @@ namespace CoreWebApi.Print
     /// <summary>
 	/// 打印模块 - 个人用户相关 
 	/// </summary>
-    [AllowAnonymous]
+    
     public class PrintUserController : ControllBase
     {
         #region 获取个人模板 print_uses

@@ -15,7 +15,7 @@ namespace CoreData.CoreUser
         public static DataResult GetCompanyList(CompanyParm cp)
         {
             var result = new DataResult(1,null);     
-            string wheresql = "where 1 = 1";
+            string wheresql = "select id,name,enable,address,typelist,remark,creator,createdate from company where 1 = 1";
             if(cp.CoID != 1)//公司编号
             {
                 wheresql = wheresql + " and id = " + cp.CoID;
@@ -32,7 +32,6 @@ namespace CoreData.CoreUser
             {
                 wheresql = wheresql + " ORDER BY "+cp.SortField +" "+ cp.SortDirection;
             }
-            wheresql = "select id,name,enable,address,typelist,remark,creator,createdate from company " + wheresql ;
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{    
                     var u = conn.Query<CompanyMulti>(wheresql).AsList();
