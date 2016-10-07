@@ -79,19 +79,19 @@ namespace CoreData.Redis
         }
         public bool Remove(string key)
         {
-            return Cache.KeyDelete(key);
+            return Cache.KeyDelete(key.ToLower());
         }
         public bool Set<T>(string key, T value)
         {
-            return Cache.StringSet(key, JsonConvert.SerializeObject(value));
+            return Cache.StringSet(key.ToLower(), JsonConvert.SerializeObject(value));
         }
         public bool Set<T>(string key, T value, TimeSpan expiresIn)
         {
-            return Cache.StringSet(key, JsonConvert.SerializeObject(value), expiresIn);
+            return Cache.StringSet(key.ToLower(), JsonConvert.SerializeObject(value), expiresIn);
         }
         public T Get<T>(string key)
         {
-            var result = Cache.StringGet(key);
+            var result = Cache.StringGet(key.ToLower());
 
             if (result != RedisValue.Null)
             {
