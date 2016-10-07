@@ -756,5 +756,29 @@ namespace CoreData.CoreUser
             return result;
         }
         #endregion
+
+        #region 修改用户密码
+          public static DataResult ModifyPwd(string uid, string newp)
+        {
+
+            var reslut = new DataResult(2001, null);
+            using (var conn = new MySqlConnection(DbBase.UserConnectString))
+            {
+                try
+                {
+                    string sql = "UPDATE `user` SET `user`.`PassWord`= '" + newp + "' WHERE `user`.ID = " + uid;
+                    int rnt = DbBase.UserDB.Execute(sql);
+                    if (rnt == 0) reslut.s = -2002;
+                }
+                catch (Exception ex)
+                {
+                    reslut.s = -1;
+                    reslut.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+            return reslut;
+        }
+        #endregion
     }
 }

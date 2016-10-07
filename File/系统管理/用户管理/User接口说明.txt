@@ -106,7 +106,7 @@ function说明
     路由：http://localhost:5000/Core/XyUser/User/UpdateUser
     参数：
     InPut:
-        user            UserEdit        待新增用户      
+        user            UserEdit        待修改用户      
     OutPut:
         成功：
             1.修改用户资料
@@ -129,12 +129,11 @@ function说明
 ##########################################
 10.editpassword()//修改密码
     方法：POST
-    路由：http://localhost:5000/Core/account/password
+    路由：http://localhost:5000/Core/XyUser/User/ModifyPassWord
     参数：
     InPut:
-        oldPwd          string          旧密码
-        newPwd          string          新密码
-        reNewPwd        string          确认新密码
+        ID          string          用户ID
+        newPwd      string          新密码
     OutPut:
         返回提示信息
     

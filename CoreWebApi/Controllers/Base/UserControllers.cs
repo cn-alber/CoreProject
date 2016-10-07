@@ -202,5 +202,16 @@ namespace CoreWebApi
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
+
+        #region 修改用户密码        
+        [HttpPostAttribute("/Core/XyUser/User/ModifyPassWord")]
+         public ResponseResult ModifyPassWord([FromBodyAttribute]JObject obj)
+         {
+            string Password = obj["newPwd"].ToString();
+            var ID = obj["ID"].ToString();
+            var res = UserHaddle.ModifyPwd(ID,GetMD5(Password, "Xy@."));
+            return CoreResult.NewResponse(res.s, res.d, "Indentity");
+         }
+        #endregion
     }
 }
