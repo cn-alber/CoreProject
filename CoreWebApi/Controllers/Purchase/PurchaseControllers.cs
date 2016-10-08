@@ -104,15 +104,21 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-        [AllowAnonymous]
-        [HttpPostAttribute("/Core/Purchase/SavePur")]
-        public ResponseResult SavePur([FromBodyAttribute]JObject co)
+        [HttpPostAttribute("/Core/Purchase/InsertPur")]
+        public ResponseResult InsertPur([FromBodyAttribute]JObject co)
         {   
-            string modifyFlag = co["ModifyFlag"].ToString();
             var pur = Newtonsoft.Json.JsonConvert.DeserializeObject<Purchase>(co["Pur"].ToString());
             string UserName = GetUname(); 
             int CoID = int.Parse(GetCoid());
-            var data = PurchaseHaddle.SavePurchase(modifyFlag,pur,UserName,CoID);
+            var data = PurchaseHaddle.InsertPurchase(pur,UserName,CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Purchase/UpdatePur")]
+        public ResponseResult UpdatePur([FromBodyAttribute]JObject co)
+        {   
+            var pur = Newtonsoft.Json.JsonConvert.DeserializeObject<Purchase>(co["Pur"].ToString());
+            var data = PurchaseHaddle.UpdatePurchase(pur);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 

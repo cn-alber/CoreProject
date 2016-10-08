@@ -12,6 +12,7 @@ namespace CoreModels.XyCore
         public string shpcity{get;set;}
         public string shpdistrict{get;set;}
         public string shpaddress{get;set;}
+        public int warehouseid{get;set;}
         public string warehousename{get;set;}
         public int status{get;set;}
         public string purtype{get;set;}
