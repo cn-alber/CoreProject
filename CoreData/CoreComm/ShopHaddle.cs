@@ -129,7 +129,7 @@ namespace CoreData.CoreComm
         ///<summary>
         ///启用、停用店铺
         ///<summary>
-        public static DataResult UptShopEnable(Dictionary<int, string> IDsDic, string Company, string UserName, bool Enable, string Coid)
+        public static DataResult UptShopEnable(List<int> IDsDic, string UserName, bool Enable, string Coid)
         {
             var result = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CommConnectString))
@@ -139,11 +139,11 @@ namespace CoreData.CoreComm
                     //删除缓存
                     foreach (var item in IDsDic)
                     {
-                        CacheBase.Remove("shop" + Coid + item.Key);
+                        CacheBase.Remove("shop" + Coid + item);
                     }
                     string contents = string.Empty;
                     string uptsql = @"update Shop set Enable = @Enable where ID in @ID";
-                    var args = new { ID = IDsDic.Keys.AsList(), Enable = Enable };
+                    var args = new { ID = IDsDic, Enable = Enable };
 
                     int count = conn.Execute(uptsql, args);
                     if (count <= 0)
@@ -155,14 +155,16 @@ namespace CoreData.CoreComm
                         if (Enable)
                         {
                             contents = "店铺状态启用：";
+                            result.s = 3001;
                         }
                         else
                         {
                             contents = "店铺状态停用：";
+                            result.s = 3002;
                         }
-                        contents += string.Join(",", IDsDic.Values.AsList().ToArray());
-                        CoreUser.LogComm.InsertUserLog("修改店铺资料", "Shop", contents, UserName, Company, DateTime.Now);
-                        result.d = contents;
+                        contents += string.Join(",", IDsDic.ToArray());
+                        CoreUser.LogComm.InsertUserLog("修改店铺资料", "Shop", contents, UserName, Coid, DateTime.Now);
+                        
                     }
                 }
                 catch (Exception e)
@@ -175,6 +177,44 @@ namespace CoreData.CoreComm
             }
             return result;
         }
+
+        ///<summary>
+        ///店铺Api授权
+        ///<summary>
+        public static DataResult uptApiEnable(shopApi shopapi,string Coid)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try{
+                    CacheBase.Remove("shop" + Coid + shopapi.sid);                    
+                    string api = "";
+                    if(shopapi.apiname == "UpdateSku"){
+                        api += " shop.UpdateSku = "+shopapi.enable+", ";
+                    }
+                    if(shopapi.apiname == "DownGoods"){
+                        api += " shop.DownGoods = "+shopapi.enable+", ";
+                    }
+                    if(shopapi.apiname == "Updatewaybill"){
+                        api += " shop.Updatewaybill = "+shopapi.enable+", ";
+                    }
+                    api=api.Substring(0,api.Length-1);
+                    string sql = "update Shop set "+api+" WHERE ID in ("+shopapi.sid+") ";
+                    int count = conn.Execute(sql);
+                    if(count>0){
+                        result.s = 5001;
+                    }else{
+                        result.s = -5001;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
 
         ///<summary>
         ///店铺新增

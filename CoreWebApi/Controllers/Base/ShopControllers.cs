@@ -44,13 +44,12 @@ namespace CoreWebApi.Base
         [HttpPostAttribute("/Core/Shop/ShopEnable")]
         public ResponseResult ShopEnable([FromBodyAttribute]JObject obj)
         {    
-            Dictionary<int,string> IDsDic = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<int,string>>(obj["IDsDic"].ToString());
-            string Company = obj["Company"].ToString(); 
-            string UserName = obj["UserName"].ToString(); 
+            var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());            
+            string UserName = GetUname(); 
             bool Enable = obj["Enable"].ToString().ToUpper()=="TRUE"?true:false;
             string Coid = GetCoid();
             
-            var res = ShopHaddle.UptShopEnable(IDsDic,Company,UserName,Enable,Coid);
+            var res = ShopHaddle.UptShopEnable(IDLst,UserName,Enable,Coid);
             return CoreResult.NewResponse(res.s,res.d,"General");
         }
 
@@ -121,6 +120,19 @@ namespace CoreWebApi.Base
              var res = ShopHaddle.TokenExpired(shopid,coid);
              return CoreResult.NewResponse(res.s,res.d,"General");
          }
+
+         //修改店铺状态（启用|停用）
+        [HttpPostAttribute("/Core/Shop/apienable")]
+        public ResponseResult apienable([FromBodyAttribute]JObject obj)
+        {    
+            var shopapi = Newtonsoft.Json.JsonConvert.DeserializeObject<shopApi>(obj.ToString());            
+            string UserName = GetUname();            
+            string Coid = GetCoid();
+            
+            var res = ShopHaddle.uptApiEnable(shopapi,Coid);
+            return CoreResult.NewResponse(res.s,res.d,"General");
+        }
+
 
 
 
