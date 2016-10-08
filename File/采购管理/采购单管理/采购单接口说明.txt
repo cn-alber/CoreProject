@@ -37,7 +37,19 @@ OutPut:     Datacnt         int                   资料总笔数
 参考:output jason 文件:PurchaseDetailList_output.json
 
 
+3.InsertPur()//采购单新增
+路由:http://localhost:5000/Core/Purchase/InsertPur
+input:Pur           purchase      采购单资料
+output: s=1成功 else 错误代码
+参考:input jason 文件:InsertPur_input.json
+参考:output jason 文件:InsertPur_output.json
 
+4.UpdatePur()//采购单更新
+路由:http://localhost:5000/Core/Purchase/UpdatePur
+input:Pur           purchase      采购单资料
+output: s=1成功 else 错误代码
+参考:input jason 文件:UpdatePur_input.json
+参考:output jason 文件:UpdatePur_output.json
 
 
 

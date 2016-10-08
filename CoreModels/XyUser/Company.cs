@@ -8,7 +8,6 @@ namespace CoreModels.XyUser
         public string name {get;set;}
         public bool enable {get;set;}
         public string address {get;set;}
-        public string typelist {get;set;}
         public string remark {get;set;}
         public string creator {get;set;}
         public DateTime createdate {get;set;}
@@ -20,7 +19,6 @@ namespace CoreModels.XyUser
         public bool enable {get;set;}
         public string address {get;set;}
         public string email {get;set;}
-        public string typelist {get;set;}
         public string contacts {get;set;}
         public string telphone {get;set;}
         public string mobile {get;set;}
