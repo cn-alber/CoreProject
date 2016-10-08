@@ -238,8 +238,16 @@ namespace CoreData.CoreUser
             {
                 try
                 {
+                    StringBuilder querycount = new StringBuilder();
                     StringBuilder querysql = new StringBuilder();
                     var p = new DynamicParameters();
+                    string countsql = @"
+                                    SELECT
+                                        count(`user`.ID)
+                                    FROM
+                                        `user`       
+                                    WHERE `user`.CompanyID = @CoID AND IsDelete = 0
+                                     ";
                     string sql = @"SELECT
                                         `user`.ID,
                                         `user`.Account,
@@ -247,19 +255,19 @@ namespace CoreData.CoreUser
                                         `user`.`Enable`,
                                         `user`.Email,
                                         `user`.Gender,
-                                        company.`Name` AS CompanyName,
                                         role.`Name` AS RoleName,
                                         `user`.CreateDate
                                     FROM
-                                        `user`
-                                    LEFT OUTER JOIN company ON `user`.CompanyID = company.ID
+                                        `user`                                   
                                     LEFT OUTER JOIN role ON `user`.RoleID = role.ID
                                     WHERE `user`.CompanyID = @CoID AND IsDelete = 0";
+                    querycount.Append(countsql);
                     querysql.Append(sql);
                     p.Add("@CoID", IParam.CoID);
 
                     if (!string.IsNullOrEmpty(IParam.Enable) && IParam.Enable.ToUpper() != "ALL")//是否启用
                     {
+                        querycount.Append(" AND `user`.Enable = @Enable");
                         querysql.Append(" AND `user`.Enable = @Enable");
                         p.Add("@Enable", IParam.Enable.ToUpper() == "TRUE" ? true : false);
                     }
@@ -267,33 +275,36 @@ namespace CoreData.CoreUser
                     {
                         if(IParam.FilterType == 1)
                         {
+                            querycount.Append(" AND Account like @Filter");
                             querysql.Append(" AND Account like @Filter");
                         }
                         else
                         {
+                            querycount.Append(" AND `user`.Name like @Filter");   
                             querysql.Append(" AND `user`.Name like @Filter");   
                         }                        
                         p.Add("@Filter", "%" + IParam.Filter + "%");
                     }
                     if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
                     {
+                        querycount.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                         querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                     }
-                    var UserLst = CoreData.DbBase.UserDB.Query<UserQuery>(querysql.ToString(), p).AsList();
-                    if (UserLst.Count == 0)
+                    var DataCount= CoreData.DbBase.UserDB.QueryFirst<int>(querycount.ToString(), p);
+                    if (DataCount == 0)
                     {
                         res.s = -3001;
                     }
                     else
                     {
-                        us.DataCount = UserLst.Count;
+                        us.DataCount = DataCount;
                         decimal pagecnt = Math.Ceiling(decimal.Parse(us.DataCount.ToString()) / decimal.Parse(IParam.PageSize.ToString()));
                         us.PageCount = Convert.ToInt32(pagecnt);
                         int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
                         querysql.Append(" LIMIT @ls , @le");
                         p.Add("@ls", dataindex);
                         p.Add("@le", IParam.PageSize);
-                        UserLst = CoreData.DbBase.UserDB.Query<UserQuery>(querysql.ToString(), p).AsList();
+                        var UserLst = CoreData.DbBase.UserDB.Query<UserQuery>(querysql.ToString(), p).AsList();
                         us.UserLst = UserLst;
                         res.d = us;
                     }

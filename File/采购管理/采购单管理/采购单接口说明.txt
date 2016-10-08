@@ -51,6 +51,32 @@ output: s=1成功 else 错误代码
 参考:input jason 文件:UpdatePur_input.json
 参考:output jason 文件:UpdatePur_output.json
 
+5.CanclePur()//作废采购
+路由:http://localhost:5000/Core/Purchase/CanclePur
+input:  PurIdList   List<int>    采购单号List
+OutPut: 1 成功  -3003 失败
+参考:input jason 文件:CanclePur_input.json
+参考:output jason 文件:CanclePur_output.json
+
+6.ConfirmPur()//审核采购
+路由:http://localhost:5000/Core/Purchase/ConfirmPur
+input:  PurIdList   List<int>    采购单号List
+OutPut: 1 成功  -3003 失败
+参考:input jason 文件:ConfirmPur_input.json
+参考:output jason 文件:ConfirmPur_output.json
+
+7.PurchaseSingle()//查询单笔采购单资料
+路由:http://localhost:5000/Core/Purchase/PurchaseSingle
+input:      ID           string           采购单号
+OutPut:     Pur          Purchase         Purchase 资料
+参考:output jason 文件:PurchaseSingle_output.json
+
+8.CompletePur()//采购单完成
+路由:http://localhost:5000/Core/Purchase/CompletePur
+input:  PurIdList   List<int>    采购单号List
+OutPut: 1 成功  -3003 失败
+参考:input jason 文件:CompletePur_input.json
+参考:output jason 文件:CompletePur_output.json
 
 
 
@@ -74,17 +100,6 @@ output: s=1成功 else 错误代码
 
 
 
-
-
-
-
-
-3.DeletePur()//删除采购
-路由:http://localhost:5000/Core/Purchase/DeletePur
-input:  PurIdList   List<string>    采购单号List
-OutPut: 1 成功  -3004 失败
-参考:input jason 文件:DeletePur_input.json
-参考:output jason 文件:DeletePur_output.json
 
 4.SavePur()//采购单保存
 路由:http://localhost:5000/Core/Purchase/SavePur
@@ -94,19 +109,9 @@ output: s=1成功 else 错误代码
 参考:input jason 文件:SavePur_input.json
 参考:output jason 文件:SavePur_output.json
 
-5.ConfirmPur()//审核采购
-路由:http://localhost:5000/Core/Purchase/ConfirmPur
-input:  PurIdList   List<string>    采购单号List
-OutPut: 1 成功  -3003 失败
-参考:input jason 文件:ConfirmPur_input.json
-参考:output jason 文件:ConfirmPur_output.json
 
-6.ForcePur()//采购单强制完成
-路由:http://localhost:5000/Core/Purchase/ForcePur
-input:  PurIdList   List<string>    采购单号List
-OutPut: 1 成功  -3003 失败
-参考:input jason 文件:ForcePur_input.json
-参考:output jason 文件:ForcePur_output.json
+
+
 
 7.InsertPurDetail()//新增采购单明细
 路由:http://localhost:5000/Core/Purchase/InsertPurDetail

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-
 namespace CoreModels.XyUser
 {
     public class User
@@ -223,7 +222,7 @@ namespace CoreModels.XyUser
 
     #region
     public class UserEdit
-    {
+    {        
         public int ID{get;set;}
         public string Account{get;set;}
         public string SecretID{get;set;}
@@ -236,7 +235,7 @@ namespace CoreModels.XyUser
         public string QQ{get;set;}
         public int CompanyID{get;set;}
         public int RoleID{get;set;}
-        public string Creator{get;set;}
+        public string Creator{get;set;}                
         public string CreateDate{get;set;}
         //public string CompanyName { get; set; }
         public string RoleName { get; set; }

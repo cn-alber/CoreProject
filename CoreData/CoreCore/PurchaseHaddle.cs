@@ -158,11 +158,11 @@ namespace CoreData.CoreCore
             return result;
         }
         ///<summary>
-        ///采购单删除
+        ///采购单作废
         ///</summary>
-        public static DataResult DeletePur(List<string> PuridList,int CoID)
+        public static DataResult CanclePurchase(List<int> PuridList,int CoID)
         {
-            var result = new DataResult(1,null);     
+            var result = new DataResult(1,"资料作废成功!");     
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
             var TransCore = CoreDBconn.BeginTransaction();
@@ -171,28 +171,28 @@ namespace CoreData.CoreCore
                 var p = new DynamicParameters();
                 p.Add("@PurID", PuridList);
                 p.Add("@Coid", CoID);
-                string wheresql = @"select id,purchaseid,purchasedate,coname,contract,shpaddress,status,purtype,buyyer,remark,taxrate from purchase where purchaseid in @PurID and coid = @Coid and status <> 0" ;
-                var u = CoreDBconn.Query<Purchase>(wheresql,p).AsList();
-                if(u.Count > 0)
+                string wheresql = @"select count(*) from purchase where id in @PurID and coid = @Coid and status <> 0" ;
+                int u = CoreDBconn.QueryFirst<int>(wheresql,p);
+                if(u > 0)
                 {
                     result.s = -1;
-                    result.d = "未审核状态的采购单才可删除!";
+                    result.d = "未审核状态的采购单才可作废!";
                 }
                 else
                 {
-                    string delsql = @"delete from purchase where purchaseid in @PurID and coid = @Coid";
+                    string delsql = @"update purchase set status = 5 where id in @PurID and coid = @Coid";
                     int count = CoreDBconn.Execute(delsql, p, TransCore);
                     if (count < 0)
                     {
-                        result.s = -3004;
+                        result.s = -3003;
                     }
                     else
                     {
-                        delsql = @"delete from purchasedetail where purchaseid in @PurID and coid = @Coid";
+                        delsql = @"update purchasedetail set detailstatus = 5 where purchaseid in @PurID and coid = @Coid";
                         count = CoreDBconn.Execute(delsql, p, TransCore);
                         if (count < 0)
                         {
-                            result.s = -3004;
+                            result.s = -3003;
                         }
                     }
                     if(result.s == 1)
@@ -219,7 +219,7 @@ namespace CoreData.CoreCore
         public static DataResult GetPurchaseEdit(int id,int CoID)
         {
             var result = new DataResult(1,null);     
-            string wheresql = "select id,purchaseid,purchasedate,coname,contract,shpaddress,status,purtype,buyyer,remark,taxrate from purchase where id =" + id + " and coid =" + CoID ;
+            string wheresql = "select id,purchasedate,coname,contract,shplogistics,shpcity,shpdistrict,shpaddress,warehouseid,warehousename,status,purtype,buyyer,remark,taxrate from purchase where id =" + id + " and coid =" + CoID ;
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
                     var u = conn.Query<Purchase>(wheresql).AsList();
@@ -240,26 +240,6 @@ namespace CoreData.CoreCore
             }           
             return result;
         }
-        ///<summary>
-        ///采购单保存
-        ///</summary>
-        public static DataResult SavePurchase(string modifyFlag,Purchase pur,string UserName,int CoID)
-        {
-            var result = new DataResult(1,null);        
-            if (modifyFlag == "new")
-            {
-                var iresult = InsertPurchase(pur,UserName,CoID);
-                result.s = iresult.s;
-                result.d = iresult.d;
-            }
-            else
-            {
-                var mresult = UpdatePurchase(pur);
-                result.s = mresult.s;
-                result.d = mresult.d;
-            }
-            return result;
-        }    
         ///<summary>
         ///采购单新增
         ///</summary>
@@ -318,7 +298,7 @@ namespace CoreData.CoreCore
         ///<summary>
         ///采购单审核
         ///</summary>
-        public static DataResult ConfirmPurchase(List<string> PuridList,int CoID)
+        public static DataResult ConfirmPurchase(List<int> PuridList,int CoID)
         {
             var result = new DataResult(1,"采购单审核成功!");  
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
@@ -329,16 +309,16 @@ namespace CoreData.CoreCore
                 var p = new DynamicParameters();
                 p.Add("@PurID", PuridList);
                 p.Add("@Coid", CoID);
-                string wheresql = @"select id,purchaseid,purchasedate,coname,contract,shpaddress,status,purtype,buyyer,remark,taxrate from purchase where purchaseid in @PurID and coid = @Coid and status <> 0" ;
-                var u = CoreDBconn.Query<Purchase>(wheresql,p).AsList();
-                if(u.Count > 0)
+                string wheresql = @"select count(*) from purchase where id in @PurID and coid = @Coid and status <> 0" ;
+                int u = CoreDBconn.QueryFirst<int>(wheresql,p);
+                if(u > 0)
                 {
                     result.s = -1;
                     result.d = "未审核状态的采购单才可执行审核操作!";
                 }
                 else
                 {
-                    string delsql = @"update purchase set status = 1 where purchaseid in @PurID and coid = @Coid";
+                    string delsql = @"update purchase set status = 1 where id in @PurID and coid = @Coid";
                     int count = CoreDBconn.Execute(delsql, p, TransCore);
                     if (count < 0)
                     {
@@ -374,9 +354,9 @@ namespace CoreData.CoreCore
         ///<summary>
         ///采购单审核
         ///</summary>
-        public static DataResult ForcePurchase(List<string> PuridList,int CoID)
+        public static DataResult CompletePurchase(List<int> PuridList,int CoID)
         {
-            var result = new DataResult(1,"采购单强制完成成功!");  
+            var result = new DataResult(1,"采购单完成!");  
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
             var TransCore = CoreDBconn.BeginTransaction();
@@ -385,16 +365,16 @@ namespace CoreData.CoreCore
                 var p = new DynamicParameters();
                 p.Add("@PurID", PuridList);
                 p.Add("@Coid", CoID);
-                string wheresql = @"select id,purchaseid,purchasedate,coname,contract,shpaddress,status,purtype,buyyer,remark,taxrate from purchase where purchaseid in @PurID and coid = @Coid and status not in (1,2)" ;
-                var u = CoreDBconn.Query<Purchase>(wheresql,p).AsList();
-                if(u.Count > 0)
+                string wheresql = @"select count(*) from purchase where id in @PurID and coid = @Coid and status not in (1,3,4)" ;
+                var u = CoreDBconn.QueryFirst<int>(wheresql,p);
+                if(u > 0)
                 {
                     result.s = -1;
-                    result.d = "审核通过&&部分完成状态的采购单才可执行此操作!";
+                    result.d = "已确认&&待发货&&待收货状态的采购单才可执行此操作!";
                 }
                 else
                 {
-                    string delsql = @"update purchase set status = 4 where purchaseid in @PurID and coid = @Coid";
+                    string delsql = @"update purchase set status = 2 where id in @PurID and coid = @Coid";
                     int count = CoreDBconn.Execute(delsql, p, TransCore);
                     if (count < 0)
                     {
@@ -402,7 +382,7 @@ namespace CoreData.CoreCore
                     }
                     else
                     {
-                        delsql = @"update purchasedetail set detailstatus = 4 where purchaseid in @PurID and coid = @Coid";
+                        delsql = @"update purchasedetail set detailstatus = 2 where purchaseid in @PurID and coid = @Coid";
                         count = CoreDBconn.Execute(delsql, p, TransCore);
                         if (count < 0)
                         {
