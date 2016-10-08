@@ -35,7 +35,7 @@ namespace CoreWebApi
             //排序参数赋值
             if (!string.IsNullOrEmpty(SortField))
             {
-                var res = CommHaddle.SysColumnExists(DbBase.CommConnectString, "coresku", SortField);
+                var res = CommHaddle.SysColumnExists(DbBase.UserConnectString, "Notice", SortField);
                 if (res.s == 1)
                 {
                     cp.SortField = SortField;
