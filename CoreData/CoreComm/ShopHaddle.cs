@@ -497,7 +497,7 @@ namespace CoreData.CoreComm
             sp.Token = shop.Token;
             sp.CoID = CoID;
             sp.Creator = UserName;
-            sp.CreateDate = DateTime.Now;
+            sp.CreateDate = DateTime.Now.ToString();
 
             var CommDBconn = new MySqlConnection(DbBase.CommConnectString);
             var UserDBconn = new MySqlConnection(DbBase.UserConnectString);

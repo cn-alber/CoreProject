@@ -17,7 +17,7 @@ namespace CoreModels.XyComm
         public string ShopSetting{get;set;}
         public bool Enable {get;set;}//启用店铺
         public string Creator{get;set;}
-        public DateTime CreateDate {get;set;}
+        public string CreateDate {get;set;}
         public string ShortName{get;set;}//店铺简称
         public string Shopkeeper{get;set;}//掌柜昵称
         public string SendAddress{get;set;}//发货地址
@@ -33,13 +33,16 @@ namespace CoreModels.XyComm
         public bool UpdateWayBill{get;set;}//上传快递单（发货信息）
         public string Token{get;set;}    
         public DateTime ShopBegin {get;set;} // 创店日期
+        public bool Deleted {get;set;} //是否删除
         #endregion
     }
+
 
      public class ShopQuery
     {
         #region Model
         public int ID{get;set;}
+        public int CoID{get;set;}
         public string ShopName{get;set;}
         public bool Enable {get;set;}
         public string ShopSite{get;set;}
@@ -47,7 +50,7 @@ namespace CoreModels.XyComm
         public string Shopkeeper{get;set;}
         public bool UpdateSku{get;set;}
         public bool DownGoods{get;set;}
-        public bool UpdateWayBill{get;set;}
+        public bool Updatewaybill{get;set;}
         public string TelPhone{get;set;}
         public string SendAddress{get;set;}
         public string CreateDate {get;set;}

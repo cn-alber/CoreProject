@@ -86,4 +86,12 @@ namespace CoreModels.XyUser
 		}
 		#endregion Model
     }
+
+	public class RoleList{
+		public int id{get;set;}
+		public string name{get;set;}
+	}
+
+
+
 }
