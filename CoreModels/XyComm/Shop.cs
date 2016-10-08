@@ -45,6 +45,7 @@ namespace CoreModels.XyComm
         public int CoID{get;set;}
         public string ShopName{get;set;}
         public bool Enable {get;set;}
+        public int SitType{get;set;}
         public string ShopSite{get;set;}
         public string ShopUrl{get;set;}
         public string Shopkeeper{get;set;}

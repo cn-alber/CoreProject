@@ -194,17 +194,17 @@ namespace CoreData.CoreUser
                    string sql = "select menus.id, menus.`Name` as `name`,NewIcon,NewIconPre,NewUrl as router,SortIndex as `order`, menus.Remark, ParentID ,power.Title as access from menus "+ 
                                 "LEFT JOIN power on power.ID = menus.ViewPowerID where menus.ID ="+id;
                                 Console.WriteLine(sql);
-                   var data = conn.Query<Menu>(sql).AsList()[0];
-                   if(data!=null){                       
+                   var res = conn.Query<Menu>(sql).AsList();                                      
+                   if(res.Count!=0){                                              
                        result.d = new {
-                           id = data.id,
-                           name = data.name,
-                           router = data.router,
-                           access = data.access,
-                           order = data.order,
-                           remark = data.remark,
-                           parentid = data.parentid,
-                           icon = new string[]{data.NewIcon,data.NewIconPre}
+                           id = res[0].id,
+                           name = res[0].name,
+                           router = res[0].router,
+                           access = res[0].access,
+                           order = res[0].order,
+                           remark = res[0].remark,
+                           parentid = res[0].parentid,
+                           icon = new string[]{res[0].NewIcon,res[0].NewIconPre}
                        };
                    }else{
                        result.s = -2016;
