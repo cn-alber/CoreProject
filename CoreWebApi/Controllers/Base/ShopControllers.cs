@@ -5,6 +5,8 @@ using CoreData.CoreComm;
 using CoreModels.XyComm;
 using System.Collections.Generic;
 using CoreModels;
+using System;
+
 namespace CoreWebApi.Base
 {
     [AllowAnonymous]
@@ -56,21 +58,22 @@ namespace CoreWebApi.Base
         //保存店铺资料
         [HttpPostAttribute("/Core/Shop/createshop")]
          public ResponseResult createshop([FromBodyAttribute]JObject obj)
-        {
-            var shop = Newtonsoft.Json.JsonConvert.DeserializeObject<Shop>(obj["shop"].ToString());
+        {             
+            var shop = Newtonsoft.Json.JsonConvert.DeserializeObject<Shop>(obj.ToString());
             var Res = new DataResult(1,null);
             int CoID = int.Parse(GetCoid());
-            string UserName = GetUname();            
+            string UserName = GetUname();                     
             // int CoID=1;
             // string UserName = "携云科技";
             Res = ShopHaddle.InsertShop(shop, CoID, UserName);      
             return CoreResult.NewResponse(Res.s,Res.d,"General");
+            //return CoreResult.NewResponse(1,shop,"General");
         }
 
         [HttpPostAttribute("/Core/Shop/modifyshop")]
          public ResponseResult modifyshop([FromBodyAttribute]JObject obj)
         {
-            var shop = Newtonsoft.Json.JsonConvert.DeserializeObject<Shop>(obj["shop"].ToString());
+            var shop = Newtonsoft.Json.JsonConvert.DeserializeObject<Shop>(obj.ToString());
             var Res = new DataResult(1,null);
             int CoID = int.Parse(GetCoid());
             string UserName = GetUname();            
