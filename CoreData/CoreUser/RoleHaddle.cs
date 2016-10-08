@@ -7,12 +7,12 @@ using MySql.Data.MySqlClient;
 namespace CoreData.CoreUser
 {
     public static class RoleHaddle{
-        public static DataResult getrolelist(){
+        public static DataResult getrolelist(string coid){
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try
                 {
-                    string sql = "SELECT a.ID, a.`Name` FROM role as a;";
+                    string sql = "SELECT a.ID, a.`Name` FROM role as a WHERE a.CompanyID ="+coid;
                     var rnt = conn.Query<RoleList>(sql).AsList();
                     result.d = rnt;
                 }
