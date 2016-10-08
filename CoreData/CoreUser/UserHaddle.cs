@@ -419,14 +419,15 @@ namespace CoreData.CoreUser
                         if (Enable)
                         {
                             contents = "用户状态启用：";
+                            res.s = 3001;
                         }
                         else
                         {
-                            contents = "用户状态停用：";
+                            contents = "用户状态停用：";                            
+                            res.s = 3002;
                         }
                         contents += string.Join(",", IDLst.ToArray());
                         CoreUser.LogComm.InsertUserLogTran(TransUser, "修改用户状态", "User", contents, UserName, CoID, DateTime.Now);
-                        res.d = contents;
                         string querysql = @"SELECT
                                             u.*, b. NAME AS CompanyName,
                                             r. NAME AS RoleName
@@ -442,7 +443,7 @@ namespace CoreData.CoreUser
                         {
                             res.s = -3001;
                         }
-                        res.d = contents;
+                       // res.d = contents;
                         //添加缓存
                         foreach (var item in userLst)
                         {
