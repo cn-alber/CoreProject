@@ -9,7 +9,8 @@ namespace CoreModels.XyUser
         public int Coid { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
-        public string CreateTime { get; set; }
+        public string Creator{get;set;}
+        public string CreateDate { get; set; }
         public bool Type { get; set; }
     }
 

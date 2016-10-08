@@ -25,10 +25,11 @@ namespace CoreData.CoreUser
                                     notice.Coid,
                                     notice.Title,
                                     notice.Content,
-                                    notice.CreateTime,
+                                    notice.Creator,
+                                    notice.CreateDate,
                                     notice.Type
                                 FROM notice
-                                WHERE notice.Coid = @CoID";
+                                WHERE notice.Coid = @CoID AND IsDelete = 0";
                     querysql.Append(sql);
                     p.Add("@CoID", IParam.CoID);
 
@@ -92,10 +93,11 @@ namespace CoreData.CoreUser
                                     notice.Coid,
                                     notice.Title,
                                     notice.Content,
-                                    notice.CreateTime,
+                                    notice.Creator,
+                                    notice.CreateDate,
                                     notice.Type
                                 FROM notice
-                                WHERE ID = @NotID";
+                                WHERE ID = @NotID AND IsDelete = 0";
                     var p = new { NotID = NotID };
                     var us = DbBase.UserDB.QueryFirst<Notice>(querysql, p);
                     if (us == null)
@@ -128,19 +130,22 @@ namespace CoreData.CoreUser
                                         (Coid,
                                         Title,
                                         Content,
-                                        CreateTime,
+                                        Creator,
+                                        CreateDate,
                                         Type) VALUES(
                                         @Coid,
                                         @Title,
                                         @Content,
-                                        @CreateTime,
+                                        @Creator,
+                                        @CreateDate,
                                         @Type)";
 
             var n = new Notice();
             n.Coid = CoID;
             n.Title = not.Title;
             n.Content = not.Content;
-            n.CreateTime = DateTime.Now.ToString();
+            n.Creator = UserName;
+            n.CreateDate = DateTime.Now.ToString();
             n.Type = not.Type;
             var UserDBconn = new MySqlConnection(DbBase.UserConnectString);
             UserDBconn.Open();
@@ -237,23 +242,27 @@ namespace CoreData.CoreUser
         #endregion
 
         #region 删除系统通知
-        public static DataResult DeleteNot(Dictionary<int, string> IDsDic, int CoID, string UserName)
+        public static DataResult DeleteNot(List<int> IDLst, int CoID, string UserName)
         {
             var result = new DataResult(1, null);
             using (var UserDBconn = new MySqlConnection(DbBase.UserConnectString))
             {
+                UserDBconn.Open();
                 var TransUser = UserDBconn.BeginTransaction();
                 try
                 {
-
-                    var sql = "delete from notice where Coid = @CoID and ID in @ID";
                     var p = new DynamicParameters();
+                    //var sql = "delete from notice where Coid = @CoID and ID in @ID";
+                    var sql = "update notice set IsDelete = @IsDelete,Deleter=@Deleter,DeleteDate=@DeleteDate where Coid = @CoID and ID in @ID";
+                    p.Add("@IsDelete", 1);
+                    p.Add("@Deleter", UserName);
+                    p.Add("@DeleteDate",DateTime.Now);                   
                     p.Add("@CoID", CoID);
-                    p.Add("@ID", IDsDic.Keys.AsList());
+                    p.Add("@ID", IDLst);
                     int count = DbBase.UserDB.Execute(sql, p, TransUser);
                     if (count > 0)
                     {
-                        string contents = "删除通知=>" + string.Join(",", IDsDic.Values.AsList());
+                        string contents = "删除通知=>" + string.Join(",", IDLst);
                         LogComm.InsertUserLogTran(TransUser, "删除通知", "Notice", contents, UserName, CoID.ToString(), DateTime.Now);
                     }
                     TransUser.Commit();

@@ -97,7 +97,7 @@ namespace CoreWebApi
             var not = Newtonsoft.Json.JsonConvert.DeserializeObject<Notice>(obj["Notice"].ToString());
             int CoID = int.Parse(GetCoid());
             string UserName = GetUname();
-            var res = NoticeHaddle.SaveInsertNot(not,CoID,UserName);
+            var res = NoticeHaddle.SaveInsertNot(not, CoID, UserName);
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
@@ -109,7 +109,7 @@ namespace CoreWebApi
             var not = Newtonsoft.Json.JsonConvert.DeserializeObject<Notice>(obj["Notice"].ToString());
             int CoID = int.Parse(GetCoid());
             string UserName = GetUname();
-            var res = NoticeHaddle.SaveUpdateNot(not,CoID,UserName);
+            var res = NoticeHaddle.SaveUpdateNot(not, CoID, UserName);
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
@@ -118,10 +118,20 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/XyUser/Notice/DeleteNotice")]
         public ResponseResult DeleteNotice([FromBodyAttribute]JObject obj)
         {
-            var IDsDic = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<int, string>>(obj["IDsDic"].ToString());
-            int CoID = int.Parse(GetCoid());
-            string UserName = GetUname();
-            var res = NoticeHaddle.DeleteNot(IDsDic,CoID,UserName);
+            // var IDsDic = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<int, string>>(obj["IDsDic"].ToString());     
+            var res = new DataResult(1, null);
+            var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
+            if (IDLst.Count > 0)
+            {
+                int CoID = int.Parse(GetCoid());
+                string UserName = GetUname();
+                res = NoticeHaddle.DeleteNot(IDLst, CoID, UserName);
+            }
+            else
+            {
+                res.s = -1;
+                res.d = "请选中要删除的资料";
+            }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
