@@ -1,4 +1,4 @@
-
+using Newtonsoft.Json;
 namespace CoreWebApi
 {
     public static class CoreResult
@@ -8,8 +8,10 @@ namespace CoreWebApi
         public static string NewData(int s, object d, string Section)
         {
             // var configurationSection = Configuration.GetSection("AppSettings");
-            // var m = JsonFile.GetJson<BasicCode>(_fileName,_section).Find(q=>q.Code == s).Message;
-            return Newtonsoft.Json.JsonConvert.SerializeObject(new ResponseResult(s, d, JsonFile.GetMessage(s, Section)));
+            // var m = JsonFile.GetJson<BasicCode>(_fileName,_section).Find(q=>q.Code == s).Message;  
+            Newtonsoft.Json.Converters.IsoDateTimeConverter timeFormat = new Newtonsoft.Json.Converters.IsoDateTimeConverter();  
+            timeFormat.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";       
+            return Newtonsoft.Json.JsonConvert.SerializeObject(new ResponseResult(s, d, JsonFile.GetMessage(s, Section)),Formatting.None, timeFormat);
         }
 
         public static ResponseResult NewResponse(int s, object d, string Section)
@@ -17,12 +19,17 @@ namespace CoreWebApi
             // var configurationSection = Configuration.GetSection("AppSettings");
             // var m = JsonFile.GetJson<BasicCode>(_fileName,_section).Find(q=>q.Code == s).Message;
             var m = "";
-            if(s==1){ // 操作成功不返回信息
+            if (s == 1)
+            { // 操作成功不返回信息
                 m = "";
-            }else if(s == -1){
+            }
+            else if (s == -1)
+            {
                 m = d.ToString(); //try catch报错时，显示exception msg
                 d = null;
-            }else{
+            }
+            else
+            {
                 m = JsonFile.GetMessage(s, Section);
             }
 

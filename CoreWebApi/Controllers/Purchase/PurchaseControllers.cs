@@ -7,6 +7,7 @@ using System;
 using CoreData.CoreComm;
 using CoreData;
 using System.Collections.Generic;
+using CoreModels;
 namespace CoreWebApi
 {
     public class PurchaseController : ControllBase
@@ -94,13 +95,12 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-        [AllowAnonymous]
-        [HttpPostAttribute("/Core/Purchase/DeletePur")]
-        public ResponseResult DeletePur([FromBodyAttribute]JObject co)
+        [HttpPostAttribute("/Core/Purchase/CanclePur")]
+        public ResponseResult CanclePur([FromBodyAttribute]JObject co)
         {   
-            List<string> puridList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(co["PurIdList"].ToString());
+            List<int> puridList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["PurIdList"].ToString());
             int CoId = int.Parse(GetCoid());
-            var data = PurchaseHaddle.DeletePur(puridList,CoId);
+            var data = PurchaseHaddle.CanclePurchase(puridList,CoId);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -122,23 +122,40 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-        [AllowAnonymous]
         [HttpPostAttribute("/Core/Purchase/ConfirmPur")]
         public ResponseResult ConfirmPur([FromBodyAttribute]JObject co)
         {   
-            List<string> puridList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(co["PurIdList"].ToString());
+            List<int> puridList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["PurIdList"].ToString());
             int CoId = int.Parse(GetCoid());
             var data = PurchaseHaddle.ConfirmPurchase(puridList,CoId);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
-        [AllowAnonymous]
-        [HttpPostAttribute("/Core/Purchase/ForcePur")]
-        public ResponseResult ForcePur([FromBodyAttribute]JObject co)
+        [HttpGetAttribute("/Core/Purchase/PurchaseSingle")]
+        public ResponseResult PurchaseSingle(string ID)
         {   
-            List<string> puridList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(co["PurIdList"].ToString());
+            int x,id = 0;
+            var data = new DataResult(1,null);  
+            int CoID = int.Parse(GetCoid());
+            if (int.TryParse(ID, out x))
+            {
+                id = int.Parse(ID);
+                data = PurchaseHaddle.GetPurchaseEdit(id,CoID);
+            }
+            else
+            {
+                data.s = -1;
+                data.d = "参数无效!";
+            }
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Purchase/CompletePur")]
+        public ResponseResult CompletePur([FromBodyAttribute]JObject co)
+        {   
+            List<int> puridList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["PurIdList"].ToString());
             int CoId = int.Parse(GetCoid());
-            var data = PurchaseHaddle.ForcePurchase(puridList,CoId);
+            var data = PurchaseHaddle.CompletePurchase(puridList,CoId);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
