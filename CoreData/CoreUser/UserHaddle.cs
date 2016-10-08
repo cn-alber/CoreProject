@@ -321,11 +321,10 @@ namespace CoreData.CoreUser
                 try
                 {
                     string querysql = @"SELECT
-                                            u.*, b. NAME AS CompanyName,
+                                            u.*,
                                             r. NAME AS RoleName
                                         FROM
                                             `user` u
-                                        INNER JOIN company b ON u.CompanyID = b.ID
                                         INNER JOIN role r ON u.RoleID = r.ID
                                         WHERE
                                             u.ID = @UserID AND IsDelete = 0";
@@ -363,11 +362,10 @@ namespace CoreData.CoreUser
                 try
                 {
                     string querysql = @"SELECT
-                                            u.*, b. NAME AS CompanyName,
+                                            u.*, 
                                             r. NAME AS RoleName
                                         FROM
-                                            `user` u
-                                        INNER JOIN company b ON u.CompanyID = b.ID
+                                            `user` u                                        
                                         INNER JOIN role r ON u.RoleID = r.ID
                                         WHERE
                                             u.ID = @ID and u.CompanyID=@CoID AND IsDelete = 0";
