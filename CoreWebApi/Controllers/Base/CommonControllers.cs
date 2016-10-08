@@ -1,16 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using CoreData.CoreCore;
 // using Newtonsoft.Json.Linq;
-//using Microsoft.AspNetCore.Authorization;
+// using Microsoft.AspNetCore.Authorization;
 // using CoreData.CoreCore;
 using CoreModels.XyCore;
 using CoreData.CoreComm;
 using CoreData;
+using CoreModels;
 // using System.Collections.Generic;
 
 namespace CoreWebApi
 {
-    //[AllowAnonymous]
+    // [AllowAnonymous]
     public class CommonController : ControllBase
     {
         [HttpGetAttribute("/Core/Common/ScoCompanySimple")]
@@ -27,7 +28,7 @@ namespace CoreWebApi
         {
 
             var cp = new CommSkuParam();
-            if(!string.IsNullOrEmpty(Type))
+            if (!string.IsNullOrEmpty(Type))
             {
                 cp.Type = Type;
             }
@@ -36,7 +37,7 @@ namespace CoreWebApi
             cp.SCoID = SCoID;
             cp.Brand = Brand;
             cp.Filter = Filter;
-            if(!string.IsNullOrEmpty(Enable)&&(Enable.ToUpper()=="TRUE"||Enable.ToUpper()=="FALSE"))
+            if (!string.IsNullOrEmpty(Enable) && (Enable.ToUpper() == "TRUE" || Enable.ToUpper() == "FALSE"))
             {
                 cp.Enable = Enable.ToUpper();
             }
@@ -50,18 +51,18 @@ namespace CoreWebApi
                 cp.PageSize = int.Parse(PageSize);
             }
             //排序参数赋值
-            if(!string.IsNullOrEmpty(SortField))
+            if (!string.IsNullOrEmpty(SortField))
             {
-                var res = CommHaddle.SysColumnExists(DbBase.CommConnectString,"coresku",SortField);
-                if(res.s == 1)
+                var res = CommHaddle.SysColumnExists(DbBase.CommConnectString, "coresku", SortField);
+                if (res.s == 1)
                 {
                     cp.SortField = SortField;
-                    if(!string.IsNullOrEmpty(SortDirection)&&(SortDirection.ToUpper()=="DESC"||SortDirection.ToUpper()=="ASC"))
+                    if (!string.IsNullOrEmpty(SortDirection) && (SortDirection.ToUpper() == "DESC" || SortDirection.ToUpper() == "ASC"))
                     {
                         cp.SortDirection = SortDirection.ToUpper();
                     }
                 }
-            }     
+            }
             var result = CoreSkuHaddle.GetCommSkuLst(cp);
             return CoreResult.NewResponse(result.s, result.d, "General");
         }
@@ -76,11 +77,38 @@ namespace CoreWebApi
         // }
 
         #endregion
+        #region 站点列表
         [HttpGetAttribute("/Core/Common/shopsite")]
         public ResponseResult shopsite()
-        {            
+        {
             var data = ShopHaddle.GetShopSite();
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
+        #endregion
+
+        #region 0.国/1.省/2.市/3.区列表
+        [HttpGetAttribute("/Core/Common/AreaLst")]
+        public ResponseResult AreaLst(string LevelType, string ParentId)
+        {
+            var res = new DataResult(1, null);
+            int level, pid;
+            if (!int.TryParse(LevelType, out level))
+            {
+                res.s = -1;
+                res.d = "无效参数LevelType";
+            }
+            if (!int.TryParse(ParentId, out pid))
+            {
+                res.s = -1;
+                res.d = "无效参数ParentId";
+            }
+            if(res.s==1)
+            {
+                res = CommHaddle.GetAreaLst(int.Parse(LevelType), int.Parse(ParentId));
+            }            
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+
+        #endregion
     }
 }
