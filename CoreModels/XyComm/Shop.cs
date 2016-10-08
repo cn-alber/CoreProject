@@ -79,4 +79,12 @@ namespace CoreModels.XyComm
         public string title{get;set;}
     }
 
+    public class shopApi{
+        public int sid{get;set;}
+        public string  apiname{get;set;}
+        public bool enable{get;set;}
+
+    }
+
+
 }
