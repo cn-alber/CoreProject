@@ -190,16 +190,17 @@ namespace CoreData.CoreComm
                     CacheBase.Remove("shop" + Coid + shopapi.sid);                    
                     string api = "";
                     if(shopapi.apiname == "UpdateSku"){
-                        api += " shop.UpdateSku = "+shopapi.enable+", ";
+                        api += " shop.UpdateSku = "+shopapi.enable+",";
                     }
                     if(shopapi.apiname == "DownGoods"){
-                        api += " shop.DownGoods = "+shopapi.enable+", ";
+                        api += " shop.DownGoods = "+shopapi.enable+",";
                     }
                     if(shopapi.apiname == "Updatewaybill"){
-                        api += " shop.Updatewaybill = "+shopapi.enable+", ";
+                        api += " shop.Updatewaybill = "+shopapi.enable+",";
                     }
                     api=api.Substring(0,api.Length-1);
-                    string sql = "update Shop set "+api+" WHERE ID in ("+shopapi.sid+") ";
+                    string sql = "update shop set "+api+" WHERE shop.ID in ("+shopapi.sid+") ";
+                    Console.WriteLine(sql);
                     int count = conn.Execute(sql);
                     if(count>0){
                         result.s = 5001;

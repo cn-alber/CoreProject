@@ -130,7 +130,7 @@ namespace CoreWebApi.Base
             string Coid = GetCoid();
             
             var res = ShopHaddle.uptApiEnable(shopapi,Coid);
-            return CoreResult.NewResponse(res.s,res.d,"General");
+            return CoreResult.NewResponse(res.s,res.d,"Api");
         }
 
 
