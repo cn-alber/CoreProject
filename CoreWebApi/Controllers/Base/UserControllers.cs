@@ -151,7 +151,8 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/XyUser/User/InsertUser")]
         public ResponseResult InsertUser([FromBodyAttribute]JObject obj)
         {
-            var user = Newtonsoft.Json.JsonConvert.DeserializeObject<UserEdit>(obj["User"].ToString());
+            var user = Newtonsoft.Json.JsonConvert.DeserializeObject<UserEdit>(obj.ToString());
+            user.PassWord = GetMD5(user.PassWord, "Xy@.");//密码转译
             int CoID = int.Parse(GetCoid());
             string UserName = GetUname();
             var res = UserHaddle.SaveInsertUser(user, CoID, UserName);
@@ -163,7 +164,7 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/XyUser/User/UpdateUser")]
         public ResponseResult UpdateUser([FromBodyAttribute]JObject obj)
         {
-            var user = Newtonsoft.Json.JsonConvert.DeserializeObject<UserEdit>(obj["User"].ToString());
+            var user = Newtonsoft.Json.JsonConvert.DeserializeObject<UserEdit>(obj.ToString());
             int CoID = int.Parse(GetCoid());
             string UserName = GetUname();
             var res = UserHaddle.SaveUpdateUser(user, CoID, UserName);

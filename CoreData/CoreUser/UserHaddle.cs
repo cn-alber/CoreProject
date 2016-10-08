@@ -540,7 +540,6 @@ namespace CoreData.CoreUser
             var result = new DataResult(1, null);
             string sqlCommandText = @"INSERT INTO `user`
                         (Account,
-                        SecretID,
                         `Name`,
                         `PassWord`,
                         `Enable`,
@@ -553,7 +552,6 @@ namespace CoreData.CoreUser
                         Creator,
                         CreateDate) VALUES(
                         @Account,
-                        @SecretID,
                         @Name,
                         @PassWord,
                         @Enable,
@@ -568,7 +566,7 @@ namespace CoreData.CoreUser
                         )";
             var us = new UserEdit();
             us.Account = user.Account;
-            us.SecretID = user.SecretID;
+           // us.SecretID = user.SecretID;
             us.Name = user.Name;
             us.PassWord = user.PassWord;
             us.Enable = user.Enable;
@@ -576,7 +574,7 @@ namespace CoreData.CoreUser
             us.Gender = user.Gender;
             us.Mobile = user.Mobile;
             us.QQ = user.QQ;
-            us.CompanyID = user.CompanyID;
+            us.CompanyID = CoID;
             us.RoleID = user.RoleID;
             us.Creator = UserName;
             us.CreateDate = DateTime.Now.ToString();
@@ -675,7 +673,6 @@ namespace CoreData.CoreUser
                     //     `Enable` = @Enable,
                     string str = @"UPDATE user
                     SET Account = @Account,
-                        SecretID = @SecretID,
                         `Name` = @Name,                       
                         Email = @Email,
                         Gender = @Gender,
