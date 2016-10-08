@@ -18,8 +18,8 @@ namespace CoreWebApi.Base
         {
             var cp = new ShopParam();
             cp.CoID = int.Parse(GetCoid());
-            cp.Enable = obj["Enable"].ToString(); 
-            cp.Filter = obj["Filter"].ToString();
+            cp.Enable = obj["Enable"]!=null?obj["Enable"].ToString():""; 
+            cp.Filter = obj["Filter"]!=null?obj["Filter"].ToString():"";
             cp.PageSize = int.Parse(obj["PageSize"].ToString());
             cp.PageIndex = int.Parse(obj["PageIndex"].ToString());
             cp.SortField = obj["SortField"].ToString();
