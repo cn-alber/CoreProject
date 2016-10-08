@@ -418,25 +418,25 @@ namespace CoreData.CoreCore
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
-                string sqlCommandText = @"INSERT INTO purchasedetail(purchaseid,skuid,skuname,price,purqty,puramt,recievedate,remark,colorname,sizename,norm,goodscode,supplynum,coid) 
-                                            VALUES(@PurID,@Skuid,@Skuname,@Price,@Purqty,@Puramt,@Recdate,@Remark,@Colorname,@Sizename,@Norm,@Goodscode,@Supplynum,@Coid)";
-                var args = new {PurID = detail.purchaseid,Skuid=detail.skuid,Skuname = detail.skuname,Price = detail.price,Purqty = detail.purqty,Puramt = detail.puramt,
-                                Recdate = detail.recievedate,Remark = detail.remark,Colorname = "",Sizename = "",Norm = detail.norm ,
-                                Goodscode = detail.goodscode ,Supplynum = detail.supplynum,Coid = CoID};
+                string sqlCommandText = @"INSERT INTO purchasedetail(purchaseid,skuid,skuname,price,purqty,suggestpurqty,puramt,recievedate,remark,norm,img,goodscode,supplynum,supplycode,planqty,planamt,packingnum,coid) 
+                                            VALUES(@PurID,@Skuid,@Skuname,@Price,@Purqty,@Suggestpurqty,@Puramt,@Recdate,@Remark,@Norm,@Img,@Goodscode,@Supplynum,@Supplycode,@Planqty,@Planamt,@Packingnum,@Coid)";
+                var args = new {PurID = detail.purchaseid,Skuid=detail.skuid,Skuname = detail.skuname,Price = detail.price,Purqty = detail.purqty,Suggestpurqty = detail.suggestpurqty,Puramt = detail.puramt,
+                                Recdate = detail.recievedate,Remark = detail.remark,Norm = detail.norm ,Img = detail.img,Goodscode = detail.goodscode ,Supplynum = detail.supplynum,Supplycode = detail.supplycode,
+                                Planqty = detail.planqty,Planamt = detail.planamt,Packingnum = detail.packingnum,Coid = CoID};
                 int count = CoreDBconn.Execute(sqlCommandText,args,TransCore);
                 if(count <= 0)
                 {
                     result.s = -3002;
                 }
-                string wheresql = "select id,purchaseid,purchasedate,coname,contract,shpaddress,status,purtype,buyyer,remark,taxrate from purchase where purchaseid = '" + detail.purchaseid + "' and coid =" + CoID ;
-                var u = CoreDBconn.Query<Purchase>(wheresql).AsList();
-                if (u.Count == 0)
+                string wheresql = "select count(*) from purchase where id = '" + detail.purchaseid + "' and coid =" + CoID ;
+                int u = CoreDBconn.QueryFirst<int>(wheresql);
+                if (u == 0)
                 {
                     result.s = -3001;
                 }
                 else
                 {
-                    string uptsql = @"update purchase set purqtytot = purqtytot + @Purqty,puramtnet = puramtnet + @Puramt,puramttot = puramtnet*(1 + taxrate) where purchaseid = @PurID and coid = @Coid";
+                    string uptsql = @"update purchase set purqtytot = purqtytot + @Purqty,puramtnet = puramtnet + @Puramt,puramttot = puramtnet*(1 + taxrate/100) where id = @PurID and coid = @Coid";
                     var upargs = new {Purqty = detail.purqty,Puramt = detail.puramt,PurID = detail.purchaseid,Coid = CoID};
                     count = CoreDBconn.Execute(uptsql,upargs);
                     if(count < 0)
@@ -462,7 +462,7 @@ namespace CoreData.CoreCore
             return result;
         }
         ///<summary>
-        ///采购单明细新增
+        ///采购单明细更新
         ///</summary>
         public static DataResult UpdatePurDetail(PurchaseDetail detail,int CoID)
         {
@@ -472,7 +472,7 @@ namespace CoreData.CoreCore
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
-                string wheresql = "select id,purchaseid,skuid,skuname,colorname,sizename,purqty,price,puramt,remark,goodscode,supplynum,recievedate,detailstatus,norm,coid from purchasedetail where id = " + detail.id;
+                string wheresql = "select id,purchaseid,img,skuid,skuname,purqty,suggestpurqty,recqty,price,puramt,remark,goodscode,supplynum,supplycode,planqty,planamt,recievedate,norm,packingnum from purchasedetail where id = " + detail.id;
                 var pur = CoreDBconn.Query<PurchaseDetail>(wheresql).AsList();
                 if (pur.Count == 0)
                 {
@@ -482,25 +482,26 @@ namespace CoreData.CoreCore
                 {
                     decimal qty = pur[0].purqty;
                     decimal amt = pur[0].puramt;
-                    string sqlCommandText = @"update purchasedetail set skuid = @Skuid,skuname = @Skuname,price = @Price,purqty = @Purqty,puramt = @Puramt,recievedate = @Recdate,
-                                            remark = @Remark,colorname = @Colorname,sizename = @Sizename,norm = @Norm,goodscode = @Goodscode,supplynum = @Supplynum where id = @ID ";
-                    var args = new {Skuid=detail.skuid,Skuname = detail.skuname,Price = detail.price,Purqty = detail.purqty,Puramt = detail.puramt,
-                                    Recdate = detail.recievedate,Remark = detail.remark,Colorname = "",Sizename = "" ,Norm = detail.norm ,
-                                    Goodscode = detail.goodscode ,Supplynum = detail.supplynum,ID = detail.id};
+                    string sqlCommandText = @"update purchasedetail set skuid = @Skuid,skuname = @Skuname,price = @Price,purqty = @Purqty,suggestpurqty = @Suggestpurqty,puramt = @Puramt,
+                                            recievedate = @Recdate,remark = @Remark,norm = @Norm,img = @Img,goodscode = @Goodscode,supplynum = @Supplynum,supplycode= @Supplycode,
+                                            planqty = @Planqty,planamt = @Planamt,packingnum = @Packingnum where id = @ID ";
+                    var args = new {Skuid=detail.skuid,Skuname = detail.skuname,Price = detail.price,Purqty = detail.purqty,Suggestpurqty = detail.suggestpurqty,Puramt = detail.puramt,
+                                    Recdate = detail.recievedate,Remark = detail.remark,Norm = detail.norm,Img = detail.img,Goodscode = detail.goodscode ,Supplynum = detail.supplynum,
+                                    Supplycode = detail.supplycode,Planqty = detail.planqty,Planamt = detail.planamt,Packingnum = detail.packingnum,ID = detail.id};
                     int count = CoreDBconn.Execute(sqlCommandText,args,TransCore);
                     if(count <= 0)
                     {
                         result.s = -3003;
                     }
-                    wheresql = "select id,purchaseid,purchasedate,coname,contract,shpaddress,status,purtype,buyyer,remark,taxrate from purchase where purchaseid = '" + detail.purchaseid + "' and coid =" + CoID ;
-                    var u = CoreDBconn.Query<Purchase>(wheresql).AsList();
-                    if (u.Count == 0)
+                    wheresql = "select count(*) from purchase where id = '" + detail.purchaseid + "' and coid =" + CoID ;
+                    int u = CoreDBconn.QueryFirst<int>(wheresql);
+                    if (u == 0)
                     {
                         result.s = -3001;
                     }
                     else
                     {
-                        string uptsql = @"update purchase set purqtytot = purqtytot - @Qty + @Purqty,puramtnet = puramtnet - @Amt + @Puramt,puramttot = puramtnet*(1 + taxrate) where purchaseid = @PurID and coid = @Coid";
+                        string uptsql = @"update purchase set purqtytot = purqtytot - @Qty + @Purqty,puramtnet = puramtnet - @Amt + @Puramt,puramttot = puramtnet*(1 + taxrate/100) where id = @PurID and coid = @Coid";
                         var upargs = new {Purqty = detail.purqty,Qty = qty,Puramt = detail.puramt,Amt = amt,PurID = detail.purchaseid,Coid = CoID};
                         count = CoreDBconn.Execute(uptsql,upargs);
                         if(count < 0)
@@ -554,15 +555,15 @@ namespace CoreData.CoreCore
                     {
                         result.s = -3004;
                     }
-                    wheresql = "select id,purchaseid,purchasedate,coname,contract,shpaddress,status,purtype,buyyer,remark,taxrate from purchase where id = '" + id + "' and coid =" + CoID ;
-                    var u = CoreDBconn.Query<Purchase>(wheresql).AsList();
-                    if (u.Count == 0)
+                    wheresql = "select count(*) from purchase where id = '" + id + "' and coid =" + CoID ;
+                    int u = CoreDBconn.QueryFirst<int>(wheresql);
+                    if (u == 0)
                     {
                         result.s = -3001;
                     }
                     else
                     {
-                        string uptsql = @"update purchase set purqtytot = purqtytot - @Qty ,puramtnet = puramtnet - @Amt ,puramttot = puramtnet*(1 + taxrate) where id = @ID and coid = @Coid";
+                        string uptsql = @"update purchase set purqtytot = purqtytot - @Qty ,puramtnet = puramtnet - @Amt ,puramttot = puramtnet*(1 + taxrate/100) where id = @ID and coid = @Coid";
                         var upargs = new {Qty = qty,Amt = amt,ID = id,Coid = CoID};
                         count = CoreDBconn.Execute(uptsql,upargs);
                         if(count < 0)

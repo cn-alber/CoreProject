@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using Microsoft.AspNetCore.Authorization;
+// using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyCore;
 using CoreData.CoreCore;
 using System;
@@ -159,7 +159,6 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
-        [AllowAnonymous]
         [HttpPostAttribute("/Core/Purchase/InsertPurDetail")]
         public ResponseResult InsertPurDetail([FromBodyAttribute]JObject co)
         {   
@@ -169,7 +168,6 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
-        [AllowAnonymous]
         [HttpPostAttribute("/Core/Purchase/UpdatePurDetail")]
         public ResponseResult UpdatePurDetail([FromBodyAttribute]JObject co)
         {   
@@ -179,7 +177,6 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
-        [AllowAnonymous]
         [HttpPostAttribute("/Core/Purchase/DelPurDetail")]
         public ResponseResult DelPurDetail([FromBodyAttribute]JObject co)
         {   
@@ -190,23 +187,6 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
-        [AllowAnonymous]
-        [HttpPostAttribute("/Core/Purchase/GetScoCompany")]
-        public ResponseResult GetScoCompany()
-        {   
-            int CoId = int.Parse(GetCoid());
-            var data = ScoCompanyHaddle.GetScoCompanyAll(CoId);
-            return CoreResult.NewResponse(data.s, data.d, "General");
-        }
-
-        [AllowAnonymous]
-        [HttpPostAttribute("/Core/Purchase/GetSkuAll")]
-        public ResponseResult GetSkuAll([FromBodyAttribute]JObject co)
-        {   
-            SkuParam cp = Newtonsoft.Json.JsonConvert.DeserializeObject<SkuParam>(co["SkuParam"].ToString());
-            int CoId = int.Parse(GetCoid());
-            var data = CoreSkuHaddle.GetSkuAll(cp,CoId,2);
-            return CoreResult.NewResponse(data.s, data.d, "General");
-        }
+        
     }
 }
