@@ -1,0 +1,19 @@
+{       
+"Pur": {
+        "id": 27,
+        "purchasedate": "2016-10-08",
+        "coname": "南极云商有限公司",
+        "contract": "222222",
+        "shplogistics":"江苏省",
+        "shpcity":"苏州市",
+        "shpdistrict":"常熟市",
+        "shpaddress": "333333",
+        "warehouseid":"1",
+        "warehousename":"test0001",
+        "status": "0",
+        "purtype": "0",
+        "buyyer": "66666",
+        "remark": "777777",
+        "taxrate":8
+    }
+}

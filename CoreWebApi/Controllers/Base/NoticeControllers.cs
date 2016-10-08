@@ -4,38 +4,88 @@ using CoreData.CoreUser;
 using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyUser;
 using System.Collections.Generic;
+using CoreData.CoreComm;
+using CoreData;
+using CoreModels;
 namespace CoreWebApi
 {
     [AllowAnonymous]
     public class NoticeController : ControllBase
     {
         #region 系统通知 - 资料查询
-        [HttpPostAttribute("/Core/XyUser/Notice/NoticeLst")]
-        public ResponseResult NoticeLst([FromBodyAttribute]JObject obj)
+        [HttpGetAttribute("/Core/XyUser/Notice/NoticeLst")]
+        public ResponseResult NoticeLst(string Filter, string Enable, string PageIndex, string PageSize, string SortField, string SortDirection)
         {
-            var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<NoticeParam>(obj["NoticeParam"].ToString());
+            var cp = new NoticeParam();
+            //var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<NoticeParam>(obj["NoticeParam"].ToString());
+            cp.Filter = Filter;
+            if (!string.IsNullOrEmpty(Enable) && (Enable.ToUpper() == "TRUE" || Enable.ToUpper() == "FALSE"))
+            {
+                cp.Enable = Enable.ToUpper();
+            }
+            int x;
+            if (int.TryParse(PageIndex, out x))
+            {
+                cp.PageIndex = int.Parse(PageIndex);
+            }
+            if (int.TryParse(PageSize, out x))
+            {
+                cp.PageSize = int.Parse(PageSize);
+            }
+            //排序参数赋值
+            if (!string.IsNullOrEmpty(SortField))
+            {
+                var res = CommHaddle.SysColumnExists(DbBase.CommConnectString, "coresku", SortField);
+                if (res.s == 1)
+                {
+                    cp.SortField = SortField;
+                    if (!string.IsNullOrEmpty(SortDirection) && (SortDirection.ToUpper() == "DESC" || SortDirection.ToUpper() == "ASC"))
+                    {
+                        cp.SortDirection = SortDirection.ToUpper();
+                    }
+                }
+            }
             cp.CoID = int.Parse(GetCoid());
-            var res = NoticeHaddle.GetNoticeLst(cp);
-            return CoreResult.NewResponse(res.s, res.d, "General");
+            var result = NoticeHaddle.GetNoticeLst(cp);
+            return CoreResult.NewResponse(result.s, result.d, "General");
         }
         #endregion
 
         #region 单笔系统通知 - 编辑
-        [HttpPostAttribute("/Core/XyUser/Notice/NoticeEdit")]
-        public ResponseResult NoticeEdit([FromBodyAttribute]JObject obj)
+        [HttpGetAttribute("/Core/XyUser/Notice/NoticeEdit")]
+        public ResponseResult NoticeEdit(string ID)
         {
-            var NotID = obj["NotID"].ToString();
-            var res = NoticeHaddle.GetNoticeEdit(NotID);
+            // var NotID = obj["NotID"].ToString();
+            var res = new DataResult(1, null);
+            int x;
+            if (int.TryParse(ID, out x))
+            {
+                res = NoticeHaddle.GetNoticeEdit(ID);
+            }
+            else
+            {
+                res.s = -1;
+                res.d = "无效参数ID";
+            }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
 
         #region 单笔系统通知 - 查询
-        [HttpPostAttribute("/Core/XyUser/Notice/NoticeQuery")]
-        public ResponseResult NoticeQuery([FromBodyAttribute]JObject obj)
+        [HttpGetAttribute("/Core/XyUser/Notice/NoticeQuery")]
+        public ResponseResult NoticeQuery(string ID)
         {
-            var NotID = obj["NotID"].ToString();
-            var res = NoticeHaddle.GetNoticeEdit(NotID);
+            var res = new DataResult(1, null);
+            int x;
+            if (int.TryParse(ID, out x))
+            {
+                res = NoticeHaddle.GetNoticeEdit(ID);
+            }
+            else
+            {
+                res.s = -1;
+                res.d = "无效参数ID";
+            }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion

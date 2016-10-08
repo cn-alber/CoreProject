@@ -153,7 +153,7 @@ namespace CoreModels.XyUser
         public bool Enable { get; set; }
         public string Email { get; set; }
         public string Gender { get; set; }
-        public string CompanyName { get; set; }
+        //public string CompanyName { get; set; }
         public string RoleName { get; set; }
         public string CreateDate { get; set; }
     }
@@ -238,7 +238,7 @@ namespace CoreModels.XyUser
         public int RoleID{get;set;}
         public string Creator{get;set;}
         public string CreateDate{get;set;}
-        public string CompanyName { get; set; }
+        //public string CompanyName { get; set; }
         public string RoleName { get; set; }
     }
 

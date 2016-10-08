@@ -15,7 +15,7 @@ namespace CoreData.CoreCore
         public static DataResult GetPurchaseList(PurchaseParm cp)
         {
             var result = new DataResult(1,null);     
-            string wheresql = "select id,purchasedate,coname,contract,shplogistics,shpcity,shpdistrict,shpaddress,warehousename,status,purtype,buyyer,remark,taxrate " + 
+            string wheresql = "select id,purchasedate,coname,contract,shplogistics,shpcity,shpdistrict,shpaddress,warehouseid,warehousename,status,purtype,buyyer,remark,taxrate " + 
                               "from purchase where purchasedate between '" + cp.PurdateStart + "' and '" + cp.PurdateEnd + "'"; //采购日期;
             if(cp.CoID != 1)//公司编号
             {
@@ -260,41 +260,19 @@ namespace CoreData.CoreCore
             }
             return result;
         }    
+        ///<summary>
+        ///采购单新增
+        ///</summary>
         public static DataResult InsertPurchase(Purchase pur,string UserName,int CoID)
         {
             var result = new DataResult(1,"资料新增成功!");   
-            //采购单号产生
-            string purid = CoID.ToString();
-            int len = purid.Length;
-            if (len == 1)
-            { purid = purid + "000"; }
-            if (len == 2)
-            { purid = purid + "00"; }
-            if (len == 3)
-            { purid =purid + "0"; }
-            if (len > 3)
-            { purid = purid.Substring(0, 4); }
-            purid = purid + DateTime.Now.ToString("yyyy-MM-dd").Substring(0, 4);
-            purid = purid + DateTime.Now.ToString("yyyy-MM-dd").Substring(5, 2);
-            Random Rd = new Random();
-            purid = purid + Rd.Next(1000, 10000).ToString();
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{
-                    string sqlCommandText = @"INSERT INTO purchase(purchaseid,purchasedate,coname,contract,shpaddress,purtype,buyyer,remark,taxrate,coid,creator) VALUES(
-                            @PurID,
-                            @Purdate,
-                            @CoName,
-                            @Contract,
-                            @Shpaddress,
-                            @Purtype,
-                            @Buyyer,
-                            @Remark,
-                            @Taxrate,
-                            @Coid,
-                            @UName
-                        )";
-                    var args = new {PurID = purid,Purdate=pur.purchasedate,CoName = pur.coname,Contract = pur.contract,Shpaddress = pur.shpaddress,
-                                    Purtype = pur.purtype,Buyyer = pur.buyyer,Remark = pur.remark,Taxrate = pur.taxrate,Coid = CoID,UName = UserName};
+                    string sqlCommandText = @"INSERT INTO purchase(purchasedate,coname,contract,shplogistics,shpcity,shpdistrict,shpaddress,purtype,buyyer,remark,warehouseid,warehousename,taxrate,coid,creator) VALUES(
+                            @Purdate,@CoName,@Contract,@Shplogistics,@Shpcity,@Shpdistrict,@Shpaddress,@Purtype,@Buyyer,@Remark,@Warehouseid,@Warehousename,@Taxrate,@Coid,@UName)";
+                    var args = new {Purdate=pur.purchasedate,CoName = pur.coname,Contract = pur.contract,Shplogistics = pur.shplogistics,Shpcity = pur.shpcity,Shpdistrict = pur.shpdistrict,
+                                    Shpaddress = pur.shpaddress,Purtype = pur.purtype,Buyyer = pur.buyyer,Remark = pur.remark,Warehouseid = pur.warehouseid,Warehousename = pur.warehousename,
+                                    Taxrate = pur.taxrate,Coid = CoID,UName = UserName};
                     int count =conn.Execute(sqlCommandText,args);
                     if(count < 0)
                     {
@@ -308,15 +286,20 @@ namespace CoreData.CoreCore
             } 
             return  result;
         }
+        ///<summary>
+        ///采购单更新
+        ///</summary>
         public static DataResult UpdatePurchase(Purchase pur)
         {
             var result = new DataResult(1,"资料更新成功!");  
             string contents = string.Empty; 
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{               
-                    string uptsql = @"update purchase set purchasedate = @Purdate,coname = @CoName,contract = @Contract,shpaddress=@Shpaddress,purtype=@Purtype,buyyer=@Buyyer,
-                                      remark=@Remark,taxrate=@Taxrate,puramttot = puramtnet*(1+@Taxrate) where id = @ID";
-                    var args = new {Purdate=pur.purchasedate,CoName = pur.coname,Contract = pur.contract,Shpaddress = pur.shpaddress,
+                    string uptsql = @"update purchase set purchasedate = @Purdate,coname = @CoName,remark=@Remark,shplogistics = @Shplogistics,shpcity = @Shpcity,shpdistrict = @Shpdistrict,
+                                        shpaddress=@Shpaddress,contract = @Contract,purtype=@Purtype,buyyer=@Buyyer,warehouseid = @Warehouseid,warehousename = @Warehousename,
+                                        taxrate=@Taxrate,puramttot = puramtnet*(1 + taxrate/100) where id = @ID";
+                    var args = new {Purdate=pur.purchasedate,CoName = pur.coname,Contract = pur.contract,Shpaddress = pur.shpaddress,Warehousename = pur.warehousename,
+                                    Shplogistics = pur.shplogistics,Shpcity = pur.shpcity,Shpdistrict = pur.shpdistrict,Warehouseid = pur.warehouseid,
                                     Purtype = pur.purtype,Buyyer = pur.buyyer,Remark = pur.remark,Taxrate = pur.taxrate,ID = pur.id};
                     int count = conn.Execute(uptsql,args);
                     if(count < 0)
@@ -329,6 +312,7 @@ namespace CoreData.CoreCore
                     conn.Dispose();
                 }
             } 
+            //purchasedate,coname,contract,,,,shpaddress,purtype,buyyer,remark,,,taxrate,coid,creator
             return  result;
         }  
         ///<summary>

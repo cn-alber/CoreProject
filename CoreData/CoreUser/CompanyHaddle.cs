@@ -15,7 +15,7 @@ namespace CoreData.CoreUser
         public static DataResult GetCompanyList(CompanyParm cp)
         {
             var result = new DataResult(1,null);     
-            string wheresql = "select id,name,enable,address,typelist,remark,creator,createdate from company where 1 = 1";
+            string wheresql = "select id,name,enable,address,remark,creator,createdate from company where 1 = 1";
             if(cp.CoID != 1)//公司编号
             {
                 wheresql = wheresql + " and id = " + cp.CoID;
@@ -74,7 +74,7 @@ namespace CoreData.CoreUser
             {
                 using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                     try{
-                        string wheresql = "select id,name,enable,address,email,typelist,contacts,telphone,mobile,remark from company where id ='" + ID.ToString() + "'" ;
+                        string wheresql = "select id,name,enable,address,email,contacts,telphone,mobile,remark from company where id ='" + ID.ToString() + "'" ;
                         var u = conn.Query<CompanySingle>(wheresql).AsList();
                         if (u.Count == 0)
                         {
@@ -107,7 +107,7 @@ namespace CoreData.CoreUser
             var result = new DataResult(1,null);   
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{
-                    string wheresql = "select id,name,enable,address,email,typelist,contacts,telphone,mobile,remark from company where name ='" + name + "'" ;
+                    string wheresql = "select id,name,enable,address,email,contacts,telphone,mobile,remark from company where name ='" + name + "'" ;
                     var u = conn.Query<CompanySingle>(wheresql).AsList();            
                     if (u.Count > 0)
                     {
@@ -189,19 +189,18 @@ namespace CoreData.CoreUser
             var result = new DataResult(1,"资料新增成功!");   
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{
-                    string sqlCommandText = @"INSERT INTO company(name,enable,address,email,typelist,contacts,telphone,mobile,remark,creator) VALUES(
+                    string sqlCommandText = @"INSERT INTO company(name,enable,address,email,contacts,telphone,mobile,remark,creator) VALUES(
                             @Name,
                             @Enable,
                             @Address,
                             @Email,
-                            @Typelist,
                             @Contacts,
                             @Telphone,
                             @Mobile,
                             @Remark,
                             @UName
                         )";
-                    var args = new {Name = com.name,Enable=com.enable,Address = com.address,Email = com.email,Typelist = com.typelist,Contacts = com.contacts,
+                    var args = new {Name = com.name,Enable=com.enable,Address = com.address,Email = com.email,Contacts = com.contacts,
                                     Telphone = com.telphone,Mobile = com.mobile,Remark = com.remark,UName = UserName};
                     int count =conn.Execute(sqlCommandText,args);
                     if(count < 0)
@@ -211,7 +210,7 @@ namespace CoreData.CoreUser
                     else
                     {
                         LogComm.InsertUserLog("新增公司资料", "company", "新增公司" + com.name ,UserName, Company, DateTime.Now);
-                        string wheresql = "select id,name,enable,address,email,typelist,contacts,telphone,mobile,remark from company where name ='" + com.name + "'" ;
+                        string wheresql = "select id,name,enable,address,email,contacts,telphone,mobile,remark from company where name ='" + com.name + "'" ;
                         var u = conn.Query<CompanySingle>(wheresql).AsList();
                         if (u.Count > 0)
                         {
@@ -232,7 +231,7 @@ namespace CoreData.CoreUser
             string contents = string.Empty; 
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{
-                    string wheresql = "select id,name,enable,address,email,typelist,contacts,telphone,mobile,remark from company where id =" + com.id;
+                    string wheresql = "select id,name,enable,address,email,contacts,telphone,mobile,remark from company where id =" + com.id;
                     var u = conn.Query<CompanySingle>(wheresql).AsList();
                     if(com.name != u[0].name)
                     {
@@ -250,10 +249,6 @@ namespace CoreData.CoreUser
                     {
                         contents = contents + "公司邮箱" + ":" +u[0].email + "=>" + com.email + ";";
                     }
-                    if(com.typelist != u[0].typelist)
-                    {
-                        contents = contents + "公司类型" + ":" +u[0].typelist + "=>" + com.typelist + ";";
-                    }
                     if(com.contacts != u[0].contacts)
                     {
                         contents = contents + "公司联络人" + ":" +u[0].contacts + "=>" + com.contacts + ";";
@@ -270,8 +265,8 @@ namespace CoreData.CoreUser
                     {
                         contents = contents + "备注" + ":" +u[0].remark + "=>" + com.remark + ";";
                     }
-                    string uptsql = @"update company set name = @Name,enable = @Enable,address = @Address,email=@Email,typelist=@Typelist,contacts=@Contacts,telphone=@Telphone,mobile=@Mobile,remark=@Remark where id = @ID";
-                    var args = new {Name = com.name,Enable=com.enable,Address = com.address,Email = com.email,Typelist = com.typelist,Contacts = com.contacts,
+                    string uptsql = @"update company set name = @Name,enable = @Enable,address = @Address,email=@Email,contacts=@Contacts,telphone=@Telphone,mobile=@Mobile,remark=@Remark where id = @ID";
+                    var args = new {Name = com.name,Enable=com.enable,Address = com.address,Email = com.email,Contacts = com.contacts,
                                     Telphone = com.telphone,Mobile = com.mobile,Remark = com.remark,ID = com.id};
                     int count = conn.Execute(uptsql,args);
                     if(count < 0)

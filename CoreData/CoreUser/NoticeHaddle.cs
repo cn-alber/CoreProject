@@ -35,7 +35,7 @@ namespace CoreData.CoreUser
                     if (!string.IsNullOrEmpty(IParam.Enable) && IParam.Enable.ToUpper() != "ALL")//是否启用
                     {
                         querysql.Append(" AND `user`.Enable = @Enable");
-                        p.Add("@Enable", IParam.Enable == "true" ? true : false);
+                        p.Add("@Enable", IParam.Enable.ToUpper() == "TRUE" ? true : false);
                     }
                     if (!string.IsNullOrEmpty(IParam.Filter))
                     {
@@ -140,7 +140,7 @@ namespace CoreData.CoreUser
             n.Coid = CoID;
             n.Title = not.Title;
             n.Content = not.Content;
-            n.CreateTime = DateTime.Now;
+            n.CreateTime = DateTime.Now.ToString();
             n.Type = not.Type;
             var UserDBconn = new MySqlConnection(DbBase.UserConnectString);
             UserDBconn.Open();
@@ -199,6 +199,7 @@ namespace CoreData.CoreUser
             }
             using (var UserDBconn = new MySqlConnection(DbBase.UserConnectString))
             {
+                UserDBconn.Open();
                 var TransUser = UserDBconn.BeginTransaction();
                 try
                 {
