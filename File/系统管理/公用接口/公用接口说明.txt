@@ -1,13 +1,14 @@
 接口名称:CommonController
 
 function说明
+#######################################################
 1.GetScoCompanySimple()//抓取供应商列表
 路由:http://localhost:5000/Core/Common/ScoCompanySimple
 input:  None
 OutPut: List<supplycompany> 供应商列表资料
 参考:input jason 文件:None
 参考:output jason 文件:GetScoCompanySimple_output.json
-
+#######################################################
 2.CommSkuLst()//获取商品Sku列表
 路由：http://localhost:5000/Core/Common/CommSkuLst
 http://localhost:5000/Core/Common/CommSkuLst?Type=&GoodsCode=&SkuID=&SCoID=&Brand=&Filter=&Enable=&PageIndex=1&PageSize=&SortField=&SortDirection=
@@ -31,3 +32,14 @@ OutPut:
     SkuLst          List<SkuQuery>  商品资料(CoreSku)
 参考:input json 文件:CommSkuLst_input.json
 参考:output json 文件:CommSkuLst_output.json
+#######################################################
+3.AreaLst()//获取省市区列表
+路由：http://localhost:5000/Core/Common/AreaLst?LevelType=1&ParentId=100000
+方法：GET
+InPut:
+     LevelType      int         级别（0.国家 1.省 2.市 3.区）
+     ParentId       int         上级ID
+OutPut:
+     AreaLst        List<Area>  省市区列表     
+参考：output json 文件: AreaLst_output.json
+

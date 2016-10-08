@@ -7,10 +7,9 @@ namespace CoreWebApi
     {
          [HttpGetAttribute("/core/role/rolelist")]
          public ResponseResult rolelist()
-         {             
-            var roleid = GetRoleid();
+         {                         
             var coid = GetCoid();        
-            var m = RoleHaddle.getrolelist();
+            var m = RoleHaddle.getrolelist(coid);
             return CoreResult.NewResponse(m.s, m.d, "Indentity");           
          }
 
