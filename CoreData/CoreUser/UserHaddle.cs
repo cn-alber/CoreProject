@@ -340,7 +340,7 @@ namespace CoreData.CoreUser
                 catch (Exception e)
                 {
                     res.s = -1;
-                    res.d = e.Message;
+                    res.d = e;
                 }
                 finally
                 {
