@@ -28,7 +28,7 @@ namespace CoreData.CoreCore
             if (!string.IsNullOrEmpty(IParam.Enable) && IParam.Enable.ToUpper() != "ALL")//是否启用
             {
                 querysql.Append(" AND Enable = @Enable");
-                p.Add("@Enable", IParam.Enable == "true" ? true : false);
+                p.Add("@Enable", IParam.Enable.ToUpper() == "TRUE" ? true : false);
             }
             if (!string.IsNullOrEmpty(IParam.GoodsCode))
             {
@@ -95,7 +95,7 @@ namespace CoreData.CoreCore
             if (!string.IsNullOrEmpty(IParam.Enable) && IParam.Enable.ToUpper() != "ALL")//是否启用
             {
                 querysql.Append(" AND Enable = @Enable");
-                p.Add("@Enable", IParam.Enable == "true" ? true : false);
+                p.Add("@Enable", IParam.Enable.ToUpper() == "TRUE" ? true : false);
             }
             if (!string.IsNullOrEmpty(IParam.GoodsCode))
             {
@@ -442,7 +442,7 @@ namespace CoreData.CoreCore
             if (!string.IsNullOrEmpty(IParam.Enable) && IParam.Enable.ToUpper() != "ALL")//是否启用
             {
                 querysql.Append(" AND Enable = @Enable");
-                p.Add("@Enable", IParam.Enable == "true" ? true : false);
+                p.Add("@Enable", IParam.Enable.ToUpper() == "TRUE" ? true : false);
             }
             if (!string.IsNullOrEmpty(IParam.GoodsCode))
             {
