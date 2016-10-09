@@ -45,7 +45,7 @@ namespace CoreData.CoreComm
                     {
                         wheresql = wheresql + " ORDER BY " + IParam.SortField + " " + IParam.SortDirection;
                     }
-                    wheresql = "select ID,ShopName,Enable,ShopSite,ShopUrl,Shopkeeper,UpdateSku,DownGoods,UpdateWayBill,TelPhone,SendAddress,CreateDate,Istoken from Shop " + wheresql;
+                    wheresql = "select ID,ShopName,Enable,ShopSite,ShopUrl,Shopkeeper,UpdateSku,DownGoods,UpdateWayBill,TelPhone,SendAddress,CreateDate,ReturnAddress,Istoken from Shop " + wheresql;
                     var ShopLst = conn.Query<ShopQuery>(wheresql).AsList();
                     IParam.DataCount = ShopLst.Count;
                     decimal pagecnt = Math.Ceiling(decimal.Parse(IParam.DataCount.ToString()) / decimal.Parse(IParam.PageSize.ToString()));
@@ -515,8 +515,8 @@ namespace CoreData.CoreComm
             var sp = new Shop();
             sp.ShopName = shop.ShopName;
             sp.SitType = shop.SitType;
-            sp.ShopSite = shop.ShopSite;
-            sp.ShopType = shop.ShopSite;
+            sp.ShopSite = Enum.GetName(typeof(ShopSit), 0);//shop.ShopSite;
+            sp.ShopType = Enum.GetName(typeof(ApiTypes), 0);//shop.ShopSite;
             sp.ShopUrl = shop.ShopUrl;
             sp.ShopSetting = shop.ShopSetting;
             sp.Enable = shop.Enable;

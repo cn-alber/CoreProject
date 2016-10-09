@@ -56,6 +56,7 @@ namespace CoreModels.XyComm
         public string SendAddress{get;set;}
         public string CreateDate {get;set;}
         public int Istoken{get;set;} 
+        public string ReturnAddress{get;set;}//退货地址
         #endregion
     }
 
