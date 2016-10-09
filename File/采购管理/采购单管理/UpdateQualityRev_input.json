@@ -1,0 +1,14 @@
+{
+    "Quality":
+        {
+            "id": 2,
+            "purchaseid": 27,
+            "recorddate": "2016-10-10",
+            "recorder": "系统管理员",
+            "drawrate": 0.1,
+            "type": "抽检",
+            "conclusion": "testt",
+            "remark": "dfffff",
+            "status": 0
+        }
+}
