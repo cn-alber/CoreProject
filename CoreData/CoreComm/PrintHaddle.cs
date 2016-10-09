@@ -19,8 +19,12 @@ namespace CoreDate.CoreComm
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try{
-                    var list = conn.Query<print_sys_types>("SELECT * FROM print_sys_types as a WHERE  a.deleted = FALSE AND a.id = "+id).AsList()[0];   
-                    result.d = list;                                    
+                    var list = conn.Query<print_sys_types>("SELECT * FROM print_sys_types as a WHERE  a.deleted = FALSE AND a.id = "+id).AsList();  
+                    if(list.Count>0){
+                        result.d = list[0];
+                    }else{
+                        result.s = -4023;
+                    }                                                         
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
@@ -35,8 +39,12 @@ namespace CoreDate.CoreComm
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try{
-                    var list = conn.Query<print_syses>("SELECT * FROM print_syses as a WHERE   a.id = "+id).AsList()[0];   
-                    result.d = list;                                    
+                    var list = conn.Query<print_syses>("SELECT * FROM print_syses as a WHERE   a.id = "+id).AsList();   
+                    if(list.Count>0){
+                        result.d = list[0];
+                    }else{
+                        result.s = -4008;
+                    }                                     
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
@@ -56,8 +64,12 @@ namespace CoreDate.CoreComm
                 try{
                     string sql = "SELECT * FROM print_uses AS a  WHERE a.deleted = FALSE AND a.id = "+id;
                     
-                    var list = conn.Query<print_uses>(sql).AsList()[0];   
-                    result.d = list;                                    
+                    var list = conn.Query<print_uses>(sql).AsList();   
+                    if(list.Count>0){
+                        result.d = list[0];
+                    }else{
+                        result.s = -4008;
+                    }                                     
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
@@ -80,10 +92,10 @@ namespace CoreDate.CoreComm
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    var list = conn.Query<print_sys_types>("SELECT print_sys_types.emu_data FROM print_sys_types WHERE  print_sys_types.deleted =FALSE AND  print_sys_types.type ="+type).AsList()[0];
-                    if (list != null)
+                    var list = conn.Query<print_sys_types>("SELECT print_sys_types.emu_data FROM print_sys_types WHERE  print_sys_types.deleted =FALSE AND  print_sys_types.type ="+type).AsList();
+                    if (list.Count >0)
                     {                   
-                        result.d = new{ emu_data = JsonConvert.DeserializeObject<dynamic>(list.emu_data) };                                  
+                        result.d = new{ emu_data = JsonConvert.DeserializeObject<dynamic>(list[0].emu_data) };                                  
                     }else {
                         result.s = -4001;                   
                     }               
@@ -108,18 +120,22 @@ namespace CoreDate.CoreComm
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    var my = conn.Query<print_uses>("SELECT * FROM print_uses as a WHERE a.id = "+my_id+" AND a.admin_id ="+admin_id).AsList()[0];
-                    if (my == null) { result.s = -4002; }               
-                    result.d = new{
-                        currentTplID = int.Parse(my_id),
-                        tpl_name = my.name,
-                        sys_id = my.sys_id,
-                        states = JsonConvert.DeserializeObject<dynamic>(my.tpl_data),
-                        print_setting = JsonConvert.DeserializeObject<dynamic>(my.print_setting),
-                        type = my.type,
-                        tpls = conn.Query<usesModel>("SELECT a.id,a.name FROM print_uses as a WHERE a.type = "+my.type+" ").AsList(),
-                        print_ori = "http://localhost:8000/CLodopfuncs.js?priority=1"
-                    };                
+                    var my = conn.Query<print_uses>("SELECT * FROM print_uses as a WHERE a.id = "+my_id+" AND a.admin_id ="+admin_id).AsList();
+                    if (my.Count >0 ) {  
+                        result.d = new{
+                            currentTplID = int.Parse(my_id),
+                            tpl_name = my[0].name,
+                            sys_id = my[0].sys_id,
+                            states = JsonConvert.DeserializeObject<dynamic>(my[0].tpl_data),
+                            print_setting = JsonConvert.DeserializeObject<dynamic>(my[0].print_setting),
+                            type = my[0].type,
+                            tpls = conn.Query<usesModel>("SELECT a.id,a.name FROM print_uses as a WHERE a.type = "+my[0].type+" ").AsList(),
+                            print_ori = "http://localhost:8000/CLodopfuncs.js?priority=1"
+                        };      
+                    }else{
+                        result.s = -4002;
+                    }               
+                              
                 }
                 catch (Exception e)
                 {
@@ -141,10 +157,10 @@ namespace CoreDate.CoreComm
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    var oldmodel = conn.Query<print_use_setting>("SELECT * FROM print_use_setting as a WHERE a.admin_id = "+admin_id).AsList()[0];
+                    var oldmodel = conn.Query<print_use_setting>("SELECT * FROM print_use_setting as a WHERE a.admin_id = "+admin_id).AsList();
                     int rnt = 0;
-                    if (oldmodel != null){                   
-                        rnt = conn.Execute("UPDATE print_use_setting SET print_use_setting.admin_id = "+admin_id+" ,print_use_setting.defed_id = "+my_tpl_id+" WHERE print_use_setting.id = "+oldmodel.id);
+                    if (oldmodel.Count > 0){                   
+                        rnt = conn.Execute("UPDATE print_use_setting SET print_use_setting.admin_id = "+admin_id+" ,print_use_setting.defed_id = "+my_tpl_id+" WHERE print_use_setting.id = "+oldmodel[0].id);
                         if (rnt > 0){
                         result.s = 1;
                         }else{
@@ -179,10 +195,10 @@ namespace CoreDate.CoreComm
                 {
                     string sql = "SELECT * FROM print_use_setting as a WHERE a.admin_id = "+admin_id;
                     Console.WriteLine(sql);
-                    var oldmodel = conn.Query<print_use_setting>(sql).AsList()[0];
+                    var oldmodel = conn.Query<print_use_setting>(sql).AsList();
                     int rnt = 0;
-                    if (oldmodel != null){        
-                        sql = "UPDATE print_use_setting SET print_use_setting.admin_id = "+admin_id+" ,print_use_setting.lodop_target = '"+lodop_target+"' WHERE print_use_setting.id = "+oldmodel.id;
+                    if (oldmodel.Count>0){        
+                        sql = "UPDATE print_use_setting SET print_use_setting.admin_id = "+admin_id+" ,print_use_setting.lodop_target = '"+lodop_target+"' WHERE print_use_setting.id = "+oldmodel[0].id;
                         Console.WriteLine(sql);      
                         rnt = conn.Execute(sql);
                         if (rnt > 0){
@@ -325,23 +341,23 @@ namespace CoreDate.CoreComm
                 {
                     string sql = "SELECT a.`name`,a.sys_id,a.tpl_data,a.print_setting,a.type,b.lodop_target FROM print_uses as a "+
                                   "LEFT JOIN print_use_setting as b on b.admin_id = a.admin_id WHERE a.id = "+my_id+" AND a.admin_id = "+admin_id;                                                                                                               
-                    var my = conn.Query<singalUsesModel>(sql).AsList()[0];
+                    var my = conn.Query<singalUsesModel>(sql).AsList();
 
-                    if (my == null){
+                    if (my.Count == 0){
                         result.s = -4002;
                     }else{
-                        var type = conn.Query<print_sys_types>("SELECT * FROM print_sys_types as a WHERE a.deleted=FALSE AND a.type="+my.type).AsList()[0];
-                        if(type!=null){
+                        var type = conn.Query<print_sys_types>("SELECT * FROM print_sys_types as a WHERE a.deleted=FALSE AND a.type="+my[0].type).AsList();
+                        if(type.Count>0){
                             result.d = new
                             {
                                 currentTplID = my_id,
-                                tpl_name = my.name,
-                                sys_id = my.sys_id,
-                                states = JsonConvert.DeserializeObject<dynamic>(my.tpl_data),
-                                presets = JsonConvert.DeserializeObject < dynamic >(type.presets),
-                                print_setting = JsonConvert.DeserializeObject<dynamic>(my.print_setting),
-                                type = my.type,
-                               lodop_target = my.lodop_target
+                                tpl_name = my[0].name,
+                                sys_id = my[0].sys_id,
+                                states = JsonConvert.DeserializeObject<dynamic>(my[0].tpl_data),
+                                presets = JsonConvert.DeserializeObject < dynamic >(type[0].presets),
+                                print_setting = JsonConvert.DeserializeObject<dynamic>(my[0].print_setting),
+                                type = my[0].type,
+                               lodop_target = my[0].lodop_target
                             };  
                         }else{
                             result.s = -4010;
@@ -431,14 +447,14 @@ namespace CoreDate.CoreComm
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    var type = conn.Query<print_sys_types>("SELECT * FROM print_sys_types as a WHERE a.deleted=FALSE AND a.type="+t).AsList()[0];
-                    if(type == null){
+                    var type = conn.Query<print_sys_types>("SELECT * FROM print_sys_types as a WHERE a.deleted=FALSE AND a.type="+t).AsList();
+                    if(type.Count == 0){
                         result.s = -4010;
                     }else{
                         result.d = new
                         {
-                            presets = JsonConvert.DeserializeObject<dynamic>(type.presets),           
-                            print_setting = JsonConvert.DeserializeObject<dynamic>(type.setting),       
+                            presets = JsonConvert.DeserializeObject<dynamic>(type[0].presets),           
+                            print_setting = JsonConvert.DeserializeObject<dynamic>(type[0].setting),       
                         };
                     }                
                 }

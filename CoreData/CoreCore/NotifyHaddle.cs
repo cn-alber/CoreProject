@@ -96,7 +96,7 @@ namespace CoreData.CoreUser
                 int rnt =  conn.Execute("INSERT INTO userwebmsg(userwebmsg.CoId,userwebmsg.Content,userwebmsg.`Create`,userwebmsg.Creater,userwebmsg.`Level`,userwebmsg.RoleType)"+ 
                                     "VALUES("+cid+",'"+content+"',NOW(),"+uid+","+level+",'"+roletype+"');");
                 //获取最新插入ID                                  
-                int lastid = conn.Query<int>("SELECT um.Id FROM userwebmsg as um ORDER BY um.`Create` DESC LIMIT 0,1").AsList()[0];
+                var lastid = conn.Query<int>("SELECT um.Id FROM userwebmsg as um ORDER BY um.`Create` DESC LIMIT 0,1").AsList()[0];                 
                 //更新 msgrelationshiop 和 msgmask
                 string sql = "INSERT INTO msgrelationshiop(msgrelationshiop.Uid,msgrelationshiop.MsgId,msgrelationshiop.Readed,msgrelationshiop.ReadTime,msgrelationshiop.Uname) VALUES("+uid+","+lastid.ToString()+",1,NOW(),'"+uname+"');"+
                             "UPDATE msgmask SET msgmask.MsgMaskId = "+lastid.ToString()+" WHERE msgmask.Uid = "+uid+";"; 
