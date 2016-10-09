@@ -295,7 +295,7 @@ namespace CoreModels.XyCore
         public int _PageIndex = 1;//页码
         public string _SortField;//排序字段
         public string _SortDirection = "ASC";//DESC,ASC
-        public string _Type;
+        public string _Type ;
         public int CoID
         {
             get { return _CoID; }

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using CoreData.CoreCore;
 // using Newtonsoft.Json.Linq;
-// using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 // using CoreData.CoreCore;
 using CoreModels.XyCore;
 using CoreData.CoreComm;
@@ -27,10 +27,14 @@ namespace CoreWebApi
         public ResponseResult CommSkuLst(string Type, string GoodsCode, string SkuID, string SCoID, string Brand, string Filter, string Enable, string PageIndex, string PageSize, string SortField, string SortDirection)
         {
 
-            var cp = new CommSkuParam();
+            var cp = new CommSkuParam();            
+            int x;
             if (!string.IsNullOrEmpty(Type))
             {
-                cp.Type = Type;
+                if(int.TryParse(Type, out x))
+                {
+                    cp.Type = Type;
+                }                
             }
             cp.GoodsCode = GoodsCode;
             cp.SkuID = SkuID;
@@ -41,7 +45,6 @@ namespace CoreWebApi
             {
                 cp.Enable = Enable.ToUpper();
             }
-            int x;
             if (int.TryParse(PageIndex, out x))
             {
                 cp.PageIndex = int.Parse(PageIndex);
