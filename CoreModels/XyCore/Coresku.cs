@@ -79,16 +79,74 @@ namespace CoreModels.XyCore
     #region 商品管理 - 查询过滤条件
     public class CoreSkuParam
     {
-        public int CoID { get; set; }//公司编号
-        public string GoodsCode { get; set; }//指定货号查询
-        public string GoodsName { get; set; }//指定货品名称查询
-        public string Filter { get; set; }//过滤条件
-        public string Enable { get; set; }//是否启用
-        public int PageSize { get; set; }//每页笔数
-        public int PageIndex { get; set; }//页码
-        public string SortField { get; set; }//排序字段
-        public string SortDirection { get; set; }//DESC,ASC
-        public int Type { get; set; }
+        private int _CoID ;//公司编号
+        private string _Filter;//过滤条件
+        private int _FilterType = 1;//过滤类型
+        private string _Enable = "all";//是否启用
+        private int _PageSize = 20;//每页笔数
+        private int _PageIndex = 1;//页码
+        private string _SortField;//排序字段
+        private string _SortDirection = "ASC";//DESC,ASC
+        private string _GoodsCode;
+        private string _GoodsName;
+        private int _Type = 0;
+        
+         public int CoID
+        {
+            get { return _CoID; }
+            set { this._CoID = value; }
+        }//公司编号
+        public string Filter 
+        {
+            get { return _Filter; }
+            set { this._Filter = value; }
+        }//过滤条件
+         public int FilterType 
+        {
+            get { return _FilterType; }
+            set { this._FilterType = value; }
+        }//过滤类型
+        public string Enable 
+        {
+            get { return _Enable; }
+            set { this._Enable = value; }
+        }//是否启用
+        public int PageSize 
+        {
+            get { return _PageSize; }
+            set { this._PageSize = value; }
+        }//每页笔数
+        public int PageIndex 
+        {
+            get { return _PageIndex; }
+            set { this._PageIndex = value; }
+        }//页码
+        public string SortField 
+        {
+            get { return _SortField; }
+            set { this._SortField = value; }
+        }//排序字段
+        public string SortDirection 
+        {
+            get { return _SortDirection; }
+            set { this._SortDirection = value; }
+        }//DESC,ASC 
+
+        public string GoodsCode
+        {
+            get { return _GoodsCode; }
+            set { this._GoodsCode = value; }
+        }//指定货号查询
+        public string GoodsName
+        {
+            get { return _GoodsName; }
+            set { this._GoodsName = value; }
+        }//指定货品名称查询
+        public int Type 
+        {
+            get { return _Type; }
+            set { this._Type = value; }
+        }
     }
     #endregion
     #region 商品管理 - 查询返回列表

@@ -4,21 +4,56 @@ using Microsoft.AspNetCore.Authorization;
 using CoreData.CoreCore;
 using CoreModels.XyCore;
 using System.Collections.Generic;
+using CoreData.CoreComm;
+using CoreData;
 // using CoreModels;
 namespace CoreWebApi.XyCore
+
 {
-    [AllowAnonymous]
+    // [AllowAnonymous]
     public class CoreSkuControllers : ControllBase
     {
         #region 商品管理-获取商品主要资料
-        [HttpPostAttribute("Core/XyCore/CoreSku/GoodsQueryLst")]
-        public ResponseResult GoodsQueryLst([FromBodyAttribute]JObject obj)
+        [HttpGetAttribute("Core/XyCore/CoreSku/GoodsQueryLst")]
+        public ResponseResult GoodsQueryLst(string Type,string GoodsCode,string GoodsName, string Filter, string Enable, string PageIndex, string PageSize, string SortField, string SortDirection)
         {
-            var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<CoreSkuParam>(obj["CoreSkuParam"].ToString());
+            var cp = new CoreSkuParam();
+            int x;
+            cp.Filter = Filter;
+            if (!string.IsNullOrEmpty(Type)&&int.TryParse(Type, out x))
+            {
+                cp.Type = int.Parse(Type);
+            }
+            if (!string.IsNullOrEmpty(Enable) && (Enable.ToUpper() == "TRUE" || Enable.ToUpper() == "FALSE"))
+            {
+                cp.Enable = Enable.ToUpper();
+            }
+            if (int.TryParse(PageIndex, out x))
+            {
+                cp.PageIndex = int.Parse(PageIndex);
+            }
+            if (int.TryParse(PageSize, out x))
+            {
+                cp.PageSize = int.Parse(PageSize);
+            }
+            //排序参数赋值
+            if (!string.IsNullOrEmpty(SortField))
+            {
+                var res = CommHaddle.SysColumnExists(DbBase.CoreConnectString, "coresku", SortField);
+                if (res.s == 1)
+                {
+                    cp.SortField = SortField;
+                    if (!string.IsNullOrEmpty(SortDirection) && (SortDirection.ToUpper() == "DESC" || SortDirection.ToUpper() == "ASC"))
+                    {
+                        cp.SortDirection = SortDirection.ToUpper();
+                    }
+                }
+            }
             cp.CoID = int.Parse(GetCoid());
-            var res = CoreSkuHaddle.GetGoodsLst(cp);
-            var Result = CoreResult.NewResponse(res.s, res.d, "General");
-            return Result;
+            // var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<CoreSkuParam>(obj["CoreSkuParam"].ToString());
+            cp.CoID = int.Parse(GetCoid());
+            var Result = CoreSkuHaddle.GetGoodsLst(cp);
+            return  CoreResult.NewResponse(Result.s, Result.d, "General");
         }
         #endregion
         #region 商品管理 - 获取商品明细列表

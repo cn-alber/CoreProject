@@ -1,18 +1,18 @@
 接口名称：CoreSkuControllers
 function说明
 1.GoodsQueryLst()//查询商品主要资料
-    方法：POST
-    路由：http://localhost:5000/Core/XyCore/CoreSku/GoodsQueryLst
+    方法：Get
+    路由：http://localhost:5000/Core/XyCore/CoreSku/GoodsQueryLst?Type=&GoodsCode=&GoodsName=&Filter=&Enable=&PageIndex=1&PageSize=&SortField=&SortDirection=
     参数: CoreModels.CoreSkuParam
     InPut:
-        Type            int         类别(0:成品;1:组合商品;2:原物料;3:非成品)
-        GoodsCode       string      查询匹配(货号)
-        GoodsName       string      查询匹配(货品名称)
-        Enable          string      启用状态(all/false/true)
+        Type            int         类别(0:成品;1:组合商品;2:原物料;3:非成品)(Default:0.成品)
+        GoodsCode       string      查询匹配(货号,Default:null)
+        GoodsName       string      查询匹配(货品名称,Default:null)
+        Enable          string      启用状态(all/false/true,Default:all)
         PageIndex       int         当前页码(ex.第一页就给1)
-        PageSize        int         每页显示资料笔数
-        SortField       string      排序字段
-        SortDirection   string      排序方向(DESC|ASC)
+        PageSize        int         每页显示资料笔数(Default:20)
+        SortField       string      排序字段(Default:all)
+        SortDirection   string      排序方向(DESC|ASC,Default:ASC)
     OutPut:       
         PageCount       int         总页数
         DataCount       int         资料总笔数
