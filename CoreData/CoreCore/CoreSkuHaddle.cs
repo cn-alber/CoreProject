@@ -84,57 +84,63 @@ namespace CoreData.CoreCore
             var cs = new CoreSkuQuery();
             var res = new DataResult(1, null);
             StringBuilder querysql = new StringBuilder();
+            StringBuilder querycount = new StringBuilder();
             var p = new DynamicParameters();
+            querycount.Append("SELECT count(GoodsCode) FROM coresku where Type = @Type");
             querysql.Append("select ID,GoodsCode,GoodsName,SkuID,SkuName,Norm,CostPrice,SalePrice,Enable,Creator,CreateDate from coresku where Type = @Type");
             p.Add("@Type", IParam.Type);
             if (IParam.CoID != 1)
             {
+                querycount.Append(" AND CoID = @CoID");
                 querysql.Append(" AND CoID = @CoID");
                 p.Add("@CoID", IParam.CoID);
             }
             if (!string.IsNullOrEmpty(IParam.Enable) && IParam.Enable.ToUpper() != "ALL")//是否启用
             {
+                querycount.Append(" AND Enable = @Enable");
                 querysql.Append(" AND Enable = @Enable");
                 p.Add("@Enable", IParam.Enable.ToUpper() == "TRUE" ? true : false);
             }
             if (!string.IsNullOrEmpty(IParam.GoodsCode))
             {
+                querycount.Append(" AND GoodsCode = @GoodsCode");
                 querysql.Append(" AND GoodsCode = @GoodsCode");
                 p.Add("@GoodsCode", IParam.GoodsCode);
             }
             if (!string.IsNullOrEmpty(IParam.GoodsName))
             {
+                querycount.Append(" AND GoodsName = @GoodsName");
                 querysql.Append(" AND GoodsName = @GoodsName");
                 p.Add("@GoodsName", IParam.GoodsName);
             }
             if (!string.IsNullOrEmpty(IParam.Filter))
             {
+                querycount.Append(" AND (SkuID like @Filter or SkuName like @Filter or Norm like @Filter)");
                 querysql.Append(" AND (SkuID like @Filter or SkuName like @Filter or Norm like @Filter)");
                 p.Add("@Filter", "'%" + IParam.Filter + "'");
             }
             if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
             {
+                querycount.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                 querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
-                // p.Add("@SortField", IParam.SortField);
-                // p.Add("@SortDirection", IParam.SortDirection);
             }
             try
             {
-                var SkuLst = CoreData.DbBase.CoreDB.Query<SkuQuery>(querysql.ToString(), p).AsList();
-                if (SkuLst.Count < 0)
+                var DataCount = CoreData.DbBase.CoreDB.QueryFirst<int>(querycount.ToString(), p);
+                if (DataCount < 0)
                 {
                     res.s = -3001;
                 }
                 else
                 {
-                    cs.DataCount = SkuLst.Count;
+                    cs.DataCount = DataCount;
                     decimal pagecnt = Math.Ceiling(decimal.Parse(cs.DataCount.ToString()) / decimal.Parse(IParam.PageSize.ToString()));
                     cs.PageCount = Convert.ToInt32(pagecnt);
                     int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
                     querysql.Append(" LIMIT @ls , @le");
                     p.Add("@ls", dataindex);
                     p.Add("@le", IParam.PageSize);
-                    SkuLst = CoreData.DbBase.CoreDB.Query<SkuQuery>(querysql.ToString(), p).AsList();
+                    var SkuLst = CoreData.DbBase.CoreDB.Query<SkuQuery>(querysql.ToString(), p).AsList();
                     cs.SkuLst = SkuLst;
                     res.d = cs;
                 }
@@ -144,8 +150,6 @@ namespace CoreData.CoreCore
                 res.s = -1;
                 res.d = e.Message;
             }
-
-
             return res;
         }
         #endregion
@@ -460,12 +464,6 @@ namespace CoreData.CoreCore
                 querycount.Append(" AND SkuID = @SkuID");
                 querysql.Append(" AND SkuID = @SkuID");
                 p.Add("@SkuID", IParam.SkuID);
-            }
-            if (!string.IsNullOrEmpty(IParam.Type))
-            {
-                querycount.Append(" AND Type = @Type");
-                querysql.Append(" AND Type = @Type");
-                p.Add("@Type", int.Parse(IParam.Type));
             }
             if (!string.IsNullOrEmpty(IParam.Brand))
             {
