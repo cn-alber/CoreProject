@@ -564,6 +564,8 @@ namespace CoreData.CoreComm
             }
             catch (Exception e)
             {
+                TransComm.Rollback();
+                TransUser.Rollback();
                 TransComm.Dispose();
                 TransUser.Dispose();
                 result.s = -1;
@@ -573,8 +575,8 @@ namespace CoreData.CoreComm
             {
                 TransComm.Dispose();
                 TransUser.Dispose();
-                CommDBconn.Close();
-                UserDBconn.Clone();
+                CommDBconn.Dispose();
+                UserDBconn.Dispose();
             }
 
             return result;
