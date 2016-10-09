@@ -788,5 +788,31 @@ namespace CoreData.CoreUser
             return reslut;
         }
         #endregion
+
+        #region 用户登录日志
+          public static DataResult loginLog(int uid,string useragent,string ipaddress)
+        {
+
+            var reslut = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.UserConnectString))
+            {
+                try
+                {
+                   string sql = "INSERT loginlog SET loginlog.ip='"+ipaddress+"',loginlog.logintime=NOW(), loginlog.uid="+uid+", loginlog.useragent='"+useragent+"'";
+                   conn.Execute(sql);
+
+                }
+                catch (Exception ex)
+                {
+                    reslut.s = -1;
+                    reslut.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+            return reslut;
+        }
+        #endregion
+
+
     }
 }

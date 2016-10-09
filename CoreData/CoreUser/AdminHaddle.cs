@@ -20,8 +20,8 @@ namespace CoreData.CoreUser
                 try
                 {
                     string sql = "SELECT ID FROM menus WHERE menus.deleted = FALSE AND menus.`Name` = '"+name+"'; ";
-                    int rnt = conn.Query<int>(sql).AsList()[0];
-                    if(rnt > 0){
+                    var rnt = conn.Query<int>(sql).AsList();
+                    if(rnt.Count > 0){
                         flag = true;
                     }else{
                         flag = false;

@@ -1,20 +1,23 @@
 {       
 "PurDetail": {
-        "id": 1105,
-        "purchaseid": "10002016097583",
-        "skuid": "NJR201605070011015",
-        "skuname": "南极人羽绒服",
-        "colorname": "蓝色",
-        "sizename": "47",
+        "id": 1108,
+        "purchaseid": 27,
+        "img":"",
+        "skuid": "test2510002024",
+        "skuname": "南极人2016男装夹克休闲版",
         "purqty": 20,
+        "suggestpurqty":0,
+        "recqty":0,
         "price": 6,
         "puramt": 120,
         "remark": "75555",
         "goodscode":"NJR20160507", 
         "supplynum": "33333",
+        "supplycode":"2222",
+        "planqty":0,
+        "planamt":0,
         "recievedate": "2015-10-10",
-        "detailstatus": 0,
-        "norm": "蓝色;47",
-        "coid":0
+        "norm": "白色;43",
+        "packingnum":"555555"
     }
 }
