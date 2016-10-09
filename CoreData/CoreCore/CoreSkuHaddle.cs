@@ -49,7 +49,7 @@ namespace CoreData.CoreCore
             try
             {
                 var GoodsLst = CoreData.DbBase.CoreDB.Query<GoodsQuery>(querysql.ToString(), p).AsList();
-                if (GoodsLst.Count == 0)
+                if (GoodsLst.Count < 0)
                 {
                     res.s = -3001;
                 }
@@ -121,7 +121,7 @@ namespace CoreData.CoreCore
             try
             {
                 var SkuLst = CoreData.DbBase.CoreDB.Query<SkuQuery>(querysql.ToString(), p).AsList();
-                if (SkuLst.Count == 0)
+                if (SkuLst.Count < 0)
                 {
                     res.s = -3001;
                 }
@@ -401,7 +401,7 @@ namespace CoreData.CoreCore
             try
             {
                 var Lst = DbBase.CoreDB.Query<SkuQuery>(querysql.ToString(), p).AsList();
-                if (Lst.Count <= 0)
+                if (Lst.Count < 0)
                 {
                     result.s = -3001;
                 }
@@ -481,7 +481,7 @@ namespace CoreData.CoreCore
             try
             {
                 var SkuLst = CoreData.DbBase.CoreDB.Query<SkuQuery>(querysql.ToString(), p).AsList();
-                if (SkuLst.Count == 0)
+                if (SkuLst.Count < 0)
                 {
                     res.s = -3001;
                 }
