@@ -61,6 +61,7 @@ namespace CoreModels.XyCore
     #region 商品明細
     public class SkuQuery
     {
+        public int ID { get; set; }
         public string GoodsCode { get; set; }
         public string GoodsName { get; set; }
         public string SkuID { get; set; }
@@ -202,6 +203,7 @@ namespace CoreModels.XyCore
 
     public class CoreSkuMatQuery
     {
+        public int ID { get; set; }
         public string GoodsCode { get; set; }
         public string GoodsName { get; set; }
         public string KName { get; set; }

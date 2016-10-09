@@ -85,7 +85,7 @@ namespace CoreData.CoreCore
             var res = new DataResult(1, null);
             StringBuilder querysql = new StringBuilder();
             var p = new DynamicParameters();
-            querysql.Append("select GoodsCode,GoodsName,SkuID,SkuName,Norm,CostPrice,SalePrice,Enable,Creator,CreateDate from coresku where Type = @Type");
+            querysql.Append("select ID,GoodsCode,GoodsName,SkuID,SkuName,Norm,CostPrice,SalePrice,Enable,Creator,CreateDate from coresku where Type = @Type");
             p.Add("@Type", IParam.Type);
             if (IParam.CoID != 1)
             {
@@ -428,7 +428,7 @@ namespace CoreData.CoreCore
             var res = new DataResult(1, null);
             StringBuilder querysql = new StringBuilder();
             var p = new DynamicParameters();
-            querysql.Append("select GoodsCode,GoodsName,SkuID,SkuName,Norm,GBCode,Brand,CostPrice,SalePrice,Enable,Creator,CreateDate from coresku where 1=1");
+            querysql.Append("select ID,GoodsCode,GoodsName,SkuID,SkuName,Norm,GBCode,Brand,CostPrice,SalePrice,Enable,Creator,CreateDate from coresku where 1=1");
             if (!string.IsNullOrEmpty(IParam.Type))
             {
                 querysql.Append(" AND Type = @Type");
