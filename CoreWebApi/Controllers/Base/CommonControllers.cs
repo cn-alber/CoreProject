@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using CoreData.CoreCore;
 // using Newtonsoft.Json.Linq;
-using Microsoft.AspNetCore.Authorization;
+// using Microsoft.AspNetCore.Authorization;
 // using CoreData.CoreCore;
 using CoreModels.XyCore;
 using CoreData.CoreComm;
@@ -11,7 +11,7 @@ using CoreModels;
 
 namespace CoreWebApi
 {
-    [AllowAnonymous]
+    // [AllowAnonymous]
     public class CommonController : ControllBase
     {
         [HttpGetAttribute("/Core/Common/ScoCompanySimple")]
