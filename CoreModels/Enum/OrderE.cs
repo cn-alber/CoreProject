@@ -42,6 +42,49 @@ namespace CoreModels.Enum
             蜜芽 = 34,
             线下 = 35
         }
+                
+        public enum ApiTypes
+    {
+        Unknow = -1,
+        Taobao = 0,
+        Tmall = 1,
+        Alibaba = 2,
+        Jos = 3,
+        Vip =4,
+        Dd = 5,
+        Amazon = 6,
+        Sunning = 7,
+        Yhd = 8,
+        Youzan = 9,
+        Jm =10,
+        Gm = 11,
+        Mls =12,
+        Ccj =13,
+        Mgj = 14,
+        Koudai = 15,
+        Aliexpress = 16,
+        Zhe800 = 17,
+        Beibei = 18,
+        Weimob = 19,
+        Mengdian = 20,
+        Mkf = 21,
+        Weizoom=22,
+        Feiniu = 23,
+        Meituan = 24,
+        Iqiyi = 25,
+        Xf9 = 26,
+        Guanai = 27,
+        Gaopeng =28,
+        Hichao = 29,
+        Juanpi = 30,
+        Gongshang = 31,
+        Kaola = 32,
+        Pinduoduo =33,
+        Mia = 34,
+        Xianxia = 35,
+        Base = 36,
+
+    }
         public enum OrdType
         {
             普通订单 = 0,
