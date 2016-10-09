@@ -42,4 +42,12 @@ InPut:
 OutPut:
      AreaLst        List<Area>  省市区列表     
 参考：output json 文件: AreaLst_output.json
+#######################################################
+4.CommBrandLst()//获取品牌列表
+路由：http://localhost:5000/Core/Common/CommBrandLst
+input:  None
+OutPut: List<Brand> 品牌列表资料
+参考:input jason 文件:None
+参考:output jason 文件:CommBrandLst_output.json
+
 

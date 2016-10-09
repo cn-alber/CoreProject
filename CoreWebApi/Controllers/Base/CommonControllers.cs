@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using CoreData.CoreCore;
 // using Newtonsoft.Json.Linq;
-// using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 // using CoreData.CoreCore;
 using CoreModels.XyCore;
 using CoreData.CoreComm;
@@ -11,7 +11,7 @@ using CoreModels;
 
 namespace CoreWebApi
 {
-    // [AllowAnonymous]
+    [AllowAnonymous]
     public class CommonController : ControllBase
     {
         [HttpGetAttribute("/Core/Common/ScoCompanySimple")]
@@ -77,6 +77,7 @@ namespace CoreWebApi
         // }
 
         #endregion
+
         #region 站点列表
         [HttpGetAttribute("/Core/Common/shopsite")]
         public ResponseResult shopsite()
@@ -108,7 +109,16 @@ namespace CoreWebApi
             }            
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
+        #endregion
 
+        #region 获取品牌列表
+        [HttpGetAttribute("/Core/Common/CommBrandLst")]
+        public ResponseResult CommBrandLst()
+        {
+            int CoId = int.Parse(GetCoid());
+            var data = BrandHaddle.GetBrandALL(CoId);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
         #endregion
     }
 }
