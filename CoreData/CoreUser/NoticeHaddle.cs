@@ -124,8 +124,6 @@ namespace CoreData.CoreUser
         public static DataResult SaveInsertNot(Notice not, int CoID, String UserName)
         {
             var result = new DataResult(1, null);
-
-
             string sqlCommandText = @"INSERT INTO notice
                                         (Coid,
                                         Title,
