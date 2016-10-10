@@ -132,6 +132,15 @@ namespace CoreWebApi.Base
             return CoreResult.NewResponse(res.s,res.d,"Api");
         }
 
+        [HttpPostAttribute("/Core/Shop/delete")]
+        public ResponseResult delete([FromBodyAttribute]JObject obj)
+        {    
+            var shopapi = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(obj["IDLst"].ToString());                      
+            string Coid = GetCoid();
+            
+            var res = ShopHaddle.DelShop(shopapi,Coid);
+            return CoreResult.NewResponse(res.s,res.d,"Api");
+        }
 
 
 

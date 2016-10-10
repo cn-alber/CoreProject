@@ -1,6 +1,11 @@
 using System;
 using System.Collections.Generic;
+using CoreData;
+using CoreData.CoreComm;
 using CoreModels;
+using CoreModels.XyComm;
+using Dapper;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 
 namespace CoreDate.CoreApi
@@ -21,6 +26,34 @@ namespace CoreDate.CoreApi
             jdparam.Remove("access_token");
             jdparam.Remove("360buy_param_json");
         }
+        
+        public static DataResult getAipLog(string shopid,string coid)
+        {
+            var res = new DataResult(1, null);  
+            //ShopHaddle.ShopQuery(coid,shopid);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    
+                    string sql ="SELECT job_id,enabled , shop_id, api_name,api_key ,api_interval ,run_eof ,run_times ,"+
+                                "(run_total+err_total) as total ,run_total ,err_total ,err_timestamp , err_message FROM api_job WHERE shop_id="+shopid;
+                    var data = conn.Query<apilog>(sql).AsList();
+                    res.d = data;
+
+                }
+                catch (Exception e)
+                {
+                    res.s = -1;
+                    res.d = e.Message;
+                    conn.Dispose();
+                }
+            }
+            return res;
+        }
+
+
+
         /// <summary>
 		/// 获取token
 		/// </summary>
@@ -40,7 +73,7 @@ namespace CoreDate.CoreApi
                 client_secret = client_secret
             };
             var response = JsonResponse.CreatePostHttpResponse(url, parameters);
-            result.d = response.Result;//JsonConvert.DeserializeObject(response.Result);            
+            result.d = JsonConvert.DeserializeObject(response.Result.ToString().Replace("\"","\'")+"}");//JsonConvert.DeserializeObject(response.Result);            
             return result;
         }
         public static DataResult jdOrderDownload(string start_date, string end_date, string order_state, string page, string page_size, string token){
