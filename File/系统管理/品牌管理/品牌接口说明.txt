@@ -2,3 +2,86 @@
 
 function说明
 #######################################################
+1.BrandLst()//查询table Brand 资料
+    方法：GET
+    路由：http://localhost:5000/Core/XyComm/Comm/BrandLst?Filter=&Enable=&PageIndex=1&PageSize=&SortField=&SortDirection=
+    参数: CoreModels.XyComm.BrandParam
+    InPut:
+        Filter          string      模糊查询匹配(品牌名称,default null)
+        Enable          string      启用状态(all/false/true,default：all)
+        PageIndex       int         当前页码(ex.第一页就给1)
+        PageSize        int         每页显示资料笔数(default:20)
+        SortField       string      排序字段(default:null)
+        SortDirection   string      排序方向(DESC|ASC,default:ASC)
+    OutPut:    
+        PageCount       int             总页数
+        DataCount       int             资料总笔数       
+        BrandLst        List<Brand>     品牌资料(Brand)
+    参考:output json 文件:BrandList_output.json
+#######################################################
+2.BrandEdit()//编辑单笔品牌资料
+    方法：GET
+    路由：http://localhost:5000/Core/XyComm/Comm/BrandEdit?ID=3
+    参数：
+    InPut:
+        ID              int             品牌编号ID
+    OutPut:
+        brand           Brand           指定品牌资料
+    参考：input json 文件：UserEdit_input.json
+    参考：output json 文件：UserEdit_output.json
+#######################################################
+3.BrandUpdate()//品牌状态启用|停用
+方法：POST
+    路由：http://localhost:5000/Core/XyComm/Brand/BrandEnable
+    参数：
+    InPut:
+        IDLst         List<int>      品牌ID
+        Enable        string         指定品牌状态true|false（启用，停用）
+    OutPut:
+        成功：
+            1.更新品牌状态brand.enable
+            2.新增修改记录log
+            3.返回成功信息：s=1,d=品牌状态启用(停用)
+        失败：
+            1.返回错误信息：s=3003.资料更新失败
+    参考：input json 文件：BrandEnable_input.json
+    参考：output json 文件：BrandEnable_output.json    
+#######################################################
+4.InsertBrand()//新增品牌
+    方法：POST
+    路由：http://localhost:5000/Core/XyComm/Brand/InsertBrand
+    参数：
+    InPut:
+        brand            Brand        待新增品牌      
+    OutPut:
+        成功：
+            1.新增资料
+            2.新增操作记录log
+            3.返回请求成功信息(s=1)
+        失败：返回错误信息
+    参考：input json 文件：InsertBrand_input.json
+    参考：output json 文件：InsertBrand_output.json
+5.UpdateBrand()//修改品牌
+    方法：POST
+    路由：http://localhost:5000/Core/XyComm/Brand/UpdateBrand
+    参数：
+    InPut:
+         brand            Brand        待修改品牌     
+    OutPut:
+        成功：
+            1.修改品牌资料
+            2.新增操作记录log
+            3.返回请求成功信息(s=1)
+        失败：返回错误信息
+    参考：input json 文件：UpdateBrand_input.json
+    参考：output json 文件：UpdateBrand_output.json
+##########################################
+6.DeleteUser()//删除品牌
+    方法：POST
+    路由：http://localhost:5000/Core/XyComm/Brand/DeleteBrand
+    参数：
+    InPut:
+          IDLst           List<int>      品牌ID
+    OutPut:
+         成功：1.删除品牌缓存；2.删除品牌资料；3.新增操作记录log；4.返回成功信息
+         失败：返回错误信息
