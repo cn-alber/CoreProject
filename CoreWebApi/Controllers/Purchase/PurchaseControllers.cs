@@ -187,6 +187,56 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
-        
+        [HttpGetAttribute("/Core/Purchase/QualityRevList")]
+        public ResponseResult QualityRevList(string Purid)
+        {   
+            var data = new DataResult(1,null);
+            int CoID = int.Parse(GetCoid());
+            int x;
+            if (int.TryParse(Purid, out x))
+            {
+                int id = int.Parse(Purid);
+                data = PurchaseHaddle.QualityRevList(id,CoID);
+            }
+            else
+            {
+                data.s = -1;
+                data.d = "参数无效!";
+            }
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Purchase/InsertQualityRev")]
+        public ResponseResult InsertQualityRev([FromBodyAttribute]JObject co)
+        {   
+            var qua = Newtonsoft.Json.JsonConvert.DeserializeObject<QualityRev>(co["Quality"].ToString());
+            int CoId = int.Parse(GetCoid());
+            var data = PurchaseHaddle.InsertQualityRev(qua,CoId);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
+
+        [HttpPostAttribute("/Core/Purchase/UpdateQualityRev")]
+        public ResponseResult UpdateQualityRev([FromBodyAttribute]JObject co)
+        {   
+            var qua = Newtonsoft.Json.JsonConvert.DeserializeObject<QualityRev>(co["Quality"].ToString());
+            var data = PurchaseHaddle.UpdateQualityRev(qua);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
+
+        [HttpPostAttribute("/Core/Purchase/DeleteQualityRev")]
+        public ResponseResult DeleteQualityRev([FromBodyAttribute]JObject co)
+        {   
+            List<int> id = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["ID"].ToString());
+            var data = PurchaseHaddle.DeleteQualityRev(id);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
+
+        [HttpPostAttribute("/Core/Purchase/ConfirmQualityRev")]
+        public ResponseResult ConfirmQualityRev([FromBodyAttribute]JObject co)
+        {   
+            List<int> id = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["ID"].ToString());
+            var data = PurchaseHaddle.ConfirmQualityRev(id);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
     }
 }

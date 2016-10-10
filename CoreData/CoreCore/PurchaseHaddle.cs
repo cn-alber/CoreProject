@@ -589,6 +589,160 @@ namespace CoreData.CoreCore
             }
             return result;
         }
+        ///<summary>
+        ///质检资料查询
+        ///</summary>
+        public static DataResult QualityRevList(int purid,int CoID)
+        {
+            var result = new DataResult(1,null);
+            string wheresql = "select id,purchaseid,recorddate,recorder,drawrate,type,conclusion,remark,status from qualityrev where purchaseid = " + purid + " and coid = " + CoID + " order by id asc";
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    var u = conn.Query<QualityRev>(wheresql).AsList();
+                    if (u.Count == 0)
+                    {
+                        result.s = -3001;
+                        result.d = null;
+                    }
+                    else
+                    {
+                        result.d = u;
+                    }               
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }     
+            return result;
+        }
+        ///<summary>
+        ///质检资料新增
+        ///</summary>
+        public static DataResult InsertQualityRev(QualityRev qua,int CoID)
+        {
+            var result = new DataResult(1,"质检资料新增成功!");  
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try
+                {
+                    string sqlCommandText = @"INSERT INTO qualityrev(recorddate,recorder,drawrate,type,conclusion,remark,purchaseid,coid) 
+                                                VALUES(@Recorddate,@Recorder,@Drawrate,@Type,@Conclusion,@Remark,@Purchaseid,@Coid)";
+                    var args = new {Recorddate = qua.recorddate,Recorder=qua.recorder,Drawrate = qua.drawrate,Type = qua.type,
+                                    Conclusion = qua.conclusion,Remark = qua.remark,Purchaseid = qua.purchaseid ,Coid = CoID};
+                    int count = conn.Execute(sqlCommandText,args);
+                    if(count <= 0)
+                    {
+                        result.s = -3002;
+                    }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+
+        ///<summary>
+        ///质检资料更新
+        ///</summary>
+        public static DataResult UpdateQualityRev(QualityRev qua)
+        {
+            var result = new DataResult(1,"质检资料更新成功!");  
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try
+                {
+                    string sqlCommandText = @"update qualityrev set recorddate = @Recorddate,recorder = @Recorder,drawrate = @Drawrate,type = @Type,conclusion = @Conclusion,
+                                                remark = @Remark where id = @ID";
+                    var args = new {Recorddate = qua.recorddate,Recorder=qua.recorder,Drawrate = qua.drawrate,Type = qua.type,
+                                    Conclusion = qua.conclusion,Remark = qua.remark,ID = qua.id};
+                    int count = conn.Execute(sqlCommandText,args);
+                    if(count < 0)
+                    {
+                        result.s = -3003;
+                    }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+
+        
+        ///<summary>
+        ///质检资料删除
+        ///</summary>
+        public static DataResult DeleteQualityRev(List<int> id)
+        {
+            var result = new DataResult(1,"质检资料删除成功!");  
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try
+                {
+                    int u = conn.QueryFirst<int>("select count(*) from qualityrev where id in @ID and status <> 0",new {ID = id});
+                    if (u > 0)
+                    {
+                        result.s = -1;
+                        result.d = "已确认的资料不可删除";
+                    }
+                    else
+                    {
+                        string sqlCommandText = @"delete from qualityrev where id in @ID";
+                        var args = new {ID = id};
+                        int count = conn.Execute(sqlCommandText,args);
+                        if(count < 0)
+                        {
+                            result.s = -3004;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+
+          ///<summary>
+        ///质检资料确认
+        ///</summary>
+        public static DataResult ConfirmQualityRev(List<int> id)
+        {
+            var result = new DataResult(1,"质检资料更新成功!");  
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try
+                {
+                    int u = conn.QueryFirst<int>("select count(*) from qualityrev where id in @ID and status <> 0",new {ID = id});
+                    if (u > 0)
+                    {
+                        result.s = -1;
+                        result.d = "待审核的资料才可执行此操作";
+                    }
+                    else
+                    {
+                        string sqlCommandText = @"update qualityrev set status = 1 where id in @ID";
+                        var args = new {ID = id};
+                        int count = conn.Execute(sqlCommandText,args);
+                        if(count < 0)
+                        {
+                            result.s = -3003;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+
     }
 }
             

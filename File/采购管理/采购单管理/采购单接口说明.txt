@@ -99,3 +99,37 @@ input:  ID        int         采购单ID
 OutPut: 1 成功  else 失败代号
 参考:input jason 文件:DelPurDetail_input.json
 参考:output jason 文件:DelPurDetail_output.json
+
+12.QualityRevList()//查询质检资料
+路由:http://localhost:5000/Core/Purchase/QualityRevList
+input:  Purid        string         采购单ID
+OutPut: 1 成功  else 失败代号
+参考:output jason 文件:QualityRevList_output.json
+
+13.InsertQualityRev()//新增质检明细
+路由:http://localhost:5000/Core/Purchase/InsertQualityRev
+input:  Quality   qualityrev    质检明细
+OutPut: 1 成功  else 失败代号
+参考:input jason 文件:InsertQualityRev_input.json
+参考:output jason 文件:InsertQualityRev_output.json
+
+14.UpdateQualityRev()//更新质检明细
+路由:http://localhost:5000/Core/Purchase/UpdateQualityRev
+input:  Quality   qualityrev    质检明细
+OutPut: 1 成功  else 失败代号
+参考:input jason 文件:UpdateQualityRev_input.json
+参考:output jason 文件:UpdateQualityRev_output.json
+
+15.DeleteQualityRev()//删除质检明细
+路由:http://localhost:5000/Core/Purchase/DeleteQualityRev
+input:  ID        List<int>         质检单ID
+OutPut: 1 成功  else 失败代号
+参考:input jason 文件:DeleteQualityRev_input.json
+参考:output jason 文件:DeleteQualityRev_output.json
+
+16.ConfirmQualityRev()//质检明细确认
+路由:http://localhost:5000/Core/Purchase/ConfirmQualityRev
+input:  ID        List<int>         质检单ID
+OutPut: 1 成功  else 失败代号
+参考:input jason 文件:ConfirmQualityRev_input.json
+参考:output jason 文件:ConfirmQualityRev_output.json

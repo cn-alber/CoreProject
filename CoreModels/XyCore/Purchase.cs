@@ -199,4 +199,16 @@ namespace CoreModels.XyCore
         public bool enable {get;set;} //明细是否允许修改
         public List<PurchaseDetail> Pur {get;set;}//采购单明细资料List
     }
+    public class QualityRev
+    {
+        public int id {get;set;}
+        public int purchaseid{get;set;}
+        public DateTime recorddate {get;set;}
+        public string recorder {get;set;}
+        public decimal drawrate {get;set;}
+        public string type {get;set;}
+        public string  conclusion {get;set;}
+        public string remark {get;set;}
+        public int status {get;set;}
+    }
 }
