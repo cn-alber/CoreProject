@@ -7,7 +7,6 @@ using CoreModels.XyUser;
 
 namespace CoreWebApi
 {
-    [AllowAnonymous]
      public class AdminController : ControllBase
      {
          [HttpGetAttribute("/core/admin/menus")]

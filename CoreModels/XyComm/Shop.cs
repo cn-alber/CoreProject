@@ -32,7 +32,7 @@ namespace CoreModels.XyComm
         public bool DownGoods{get;set;}//下载商品（自动同步）
         public bool UpdateWayBill{get;set;}//上传快递单（发货信息）
         public string Token{get;set;}    
-        public DateTime ShopBegin {get;set;} // 创店日期
+        public string ShopBegin{get;set;} // 创店日期
         public bool Deleted {get;set;} //是否删除
         #endregion
     }
@@ -54,7 +54,7 @@ namespace CoreModels.XyComm
         public bool Updatewaybill{get;set;}
         public string TelPhone{get;set;}
         public string SendAddress{get;set;}
-        public string CreateDate {get;set;}
+        public string ShopBegin {get;set;}
         public int Istoken{get;set;} 
         public string ReturnAddress{get;set;}//退货地址
         #endregion
