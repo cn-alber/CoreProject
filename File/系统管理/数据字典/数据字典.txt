@@ -1,0 +1,97 @@
+接口名称:BaseinfoController
+
+function说明
+#######################################################
+1.BaseinfoLst()//查询table Baseinfo 资料
+    方法：GET
+    路由：http://localhost:5000/Core/XyComm/Baseinfo/BaseinfoLst?Filter=&Enable=&PageIndex=1&PageSize=&SortField=&SortDirection=
+    参数: CoreModels.XyComm.BrandParam
+    InPut:
+        Filter          string      模糊查询匹配(Name,default null)
+        Enable          string      启用状态(all/false/true,default：all)
+        PageIndex       int         当前页码(ex.第一页就给1)
+        PageSize        int         每页显示资料笔数(default:20)
+        SortField       string      排序字段(default:null)
+        SortDirection   string      排序方向(DESC|ASC,default:ASC)
+    OutPut:    
+        PageCount       int                 总页数
+        DataCount       int                 资料总笔数       
+        BaseinfoLst     List<Baseinfo>      数据字典资料(Baseinfo)
+    参考:output json 文件:BaseinfoLst_output.json
+#######################################################
+2.BaseinfoEdit()//编辑单笔数据资料
+    方法：GET
+    路由：http://localhost:5000/Core/XyComm/Baseinfo/BaseinfoEdit?ID=3
+    参数：
+    InPut:
+        ID             int             数据字典编号ID
+    OutPut:
+        info           Baseinfo         指定数据字典
+    参考：output json 文件：BaseinfoEdit_output.json    
+#######################################################
+3.BaseinfoQuery()//查询单笔数据资料
+    方法：GET
+    路由：http://localhost:5000/Core/XyComm/Baseinfo/BaseinfoQuery?ID=3
+    参数：
+    InPut:
+        ID             int             数据字典编号ID
+    OutPut:
+        info           Baseinfo         指定数据字典
+    参考：output json 文件：BaseinfoQuery_output.json    
+#######################################################
+4.BaseinfoEnable()//品牌状态启用|停用
+方法：POST
+    路由：http://localhost:5000/Core/XyComm/Baseinfo/BaseinfoEnable
+    参数：
+    InPut:
+        IDLst         List<int>      品牌ID
+        Enable        string         指定数据字典状态true|false（启用，停用）
+    OutPut:
+        成功：
+            1.更新数据字典状态brand.enable
+            2.新增修改记录log
+            3.返回成功信息：s=1,d=数据字典状态启用(停用)
+        失败：
+            1.返回错误信息：s=3003.资料更新失败
+    参考：input json 文件：BaseinfoEnable_input.json
+    参考：output json 文件：BaseinfoEnable_output.json    
+#######################################################
+5.InsertBaseinfo()//新增数据字典
+    方法：POST
+    路由：http://localhost:5000/Core/XyComm/Baseinfo/InsertBaseinfo
+    参数：
+    InPut:
+        info            Baseinfo        待新增数据字典      
+    OutPut:
+        成功：
+            1.新增资料
+            2.新增操作记录log
+            3.返回请求成功信息(s=1)
+        失败：返回错误信息
+    参考：input json 文件：InsertBaseinfo_input.json
+    参考：output json 文件：InsertBaseinfo_output.json
+6.UpdateBaseinfo()//修改数据字典
+    方法：POST
+    路由：http://localhost:5000/Core/XyComm/Baseinfo/UpdateBaseinfo
+    参数：
+    InPut:
+         info          Baseinfo       待修改数据字典     
+    OutPut:
+        成功：
+            1.修改资料
+            2.新增操作记录log
+            3.返回请求成功信息(s=1)
+        失败：返回错误信息
+    参考：input json 文件：UpdateBaseinfo_input.json
+    参考：output json 文件：UpdateBaseinfo_output.json
+##########################################
+7.DeleteBaseinfo()//删除数据字典
+    方法：POST
+    路由：http://localhost:5000/Core/XyComm/Baseinfo/DeleteBaseinfo
+    参数：
+    InPut:
+          IDLst        List<int>      数据字典ID
+    OutPut:
+         成功：1.数据字典资料；2.新增操作记录log；3.返回成功信息
+         失败：返回错误信息
+    

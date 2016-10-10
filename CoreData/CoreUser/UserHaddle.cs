@@ -291,7 +291,7 @@ namespace CoreData.CoreUser
                         querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                     }
                     var DataCount= CoreData.DbBase.UserDB.QueryFirst<int>(querycount.ToString(), p);
-                    if (DataCount == 0)
+                    if (DataCount < 0)
                     {
                         res.s = -3001;
                     }

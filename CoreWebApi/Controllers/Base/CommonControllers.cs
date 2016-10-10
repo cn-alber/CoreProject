@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using CoreData.CoreCore;
 // using Newtonsoft.Json.Linq;
-using Microsoft.AspNetCore.Authorization;
+// using Microsoft.AspNetCore.Authorization;
 // using CoreData.CoreCore;
 using CoreModels.XyCore;
 using CoreData.CoreComm;
@@ -121,6 +121,15 @@ namespace CoreWebApi
             int CoId = int.Parse(GetCoid());
             var data = BrandHaddle.GetBrandALL(CoId);
             return CoreResult.NewResponse(data.s, data.d, "General");
+        }
+        #endregion
+        #region 获取仓库列表
+        [HttpGetAttribute("/Core/Common/GetWarehouseAll")]
+        public ResponseResult GetWarehouseAll()
+        {   
+            int CoID = int.Parse(GetCoid());
+            var data = WarehouseHaddle.GetWarehouseAll(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
         #endregion
     }

@@ -1,0 +1,17 @@
+{
+    "s": 1,
+    "d": {
+        "ID": 3,
+        "Kind": "币别",
+        "Order": 3,
+        "Name": "EUR",
+        "Content": "EUR",
+        "Value": "",
+        "Enable": true,
+        "Remark": "",
+        "CoID": 1,
+        "Creator": "系统管理员",
+        "CreateDate": "2016/5/14 12:50:44"
+    },
+    "m": ""
+}
