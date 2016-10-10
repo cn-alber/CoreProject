@@ -1,0 +1,16 @@
+{
+    "s": 1,
+    "d": [
+        {
+            "id": 131,
+            "warehouseid": 119,
+            "warehousename": "出库暂存仓",
+            "enable": true,
+            "parentid": 1,
+            "type": 5,
+            "creator": "系统管理员",
+            "createdate": "2016-07-15T16:49:30"
+        }
+    ],
+    "m": ""
+}

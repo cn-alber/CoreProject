@@ -1,0 +1,13 @@
+{       
+"Warehouse": {
+        "id": 132,
+        "warehouseid":120,
+        "warehousename": "测试1010",
+        "enable": false,
+        "parentid": 0,
+        "type": 0,
+        "creator": "",
+        "createdate": "2015-10-10"
+    },
+"Company":"携云科技"
+}
