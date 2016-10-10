@@ -1,0 +1,17 @@
+{
+    "s": 1,
+    "d": [
+        {
+            "id": 1,
+            "purchaseid": 27,
+            "recorddate": "2016-05-02T00:00:00",
+            "recorder": "系统管理员",
+            "drawrate": 0.07,
+            "type": "抽检",
+            "conclusion": "testt",
+            "remark": "dfffff",
+            "status": 0
+        }
+    ],
+    "m": ""
+}

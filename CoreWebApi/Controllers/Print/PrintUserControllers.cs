@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using CoreDate.CoreComm;
-using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyComm;
 using System;
 using Newtonsoft.Json.Linq;
