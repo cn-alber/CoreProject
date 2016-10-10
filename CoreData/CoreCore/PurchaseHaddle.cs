@@ -4,7 +4,7 @@ using System;
 using CoreModels.XyCore;
 using Dapper;
 using System.Collections.Generic;
-
+using CoreModels.XyComm;
 namespace CoreData.CoreCore
 {
     public static class PurchaseHaddle
@@ -670,9 +670,7 @@ namespace CoreData.CoreCore
                 }
             }
             return result;
-        }
-
-        
+        }        
         ///<summary>
         ///质检资料删除
         ///</summary>
@@ -708,7 +706,7 @@ namespace CoreData.CoreCore
             return result;
         }
 
-          ///<summary>
+        ///<summary>
         ///质检资料确认
         ///</summary>
         public static DataResult ConfirmQualityRev(List<int> id)
@@ -743,6 +741,65 @@ namespace CoreData.CoreCore
             return result;
         }
 
+        ///<summary>
+        ///采购单初始资料
+        ///</summary>
+        public static DataResult GetPurchaseInit(int CoID)
+        {
+            var result = new DataResult(1,null);   
+            var res = new PurchaseInitData();  
+            //采购单状态
+            Dictionary<int,string> status = new Dictionary<int,string>();
+            status.Add(0,"待审核");
+            status.Add(1,"已确认");
+            status.Add(2,"已完成");
+            status.Add(3,"待发货");
+            status.Add(4,"待收货");
+            status.Add(5,"作废");
+            res.status = status;
+            //仓库列表
+            var wh = CoreComm.WarehouseHaddle.GetWarehouseAll(CoID);
+            if(wh.s == 1)
+            {
+                res.warehouse = wh.d as List<Warehouse>;//Newtonsoft.Json.JsonConvert.DeserializeObject<>(wh.d.ToString());
+            }
+            //采购单基本资料
+            string wheresql = "select id,purchasedate,coname,contract,shplogistics,shpcity,shpdistrict,shpaddress,warehouseid,warehousename,status,purtype,buyyer,remark,taxrate " + 
+                              "from purchase where 1 = 1"; 
+            if(CoID != 1)//公司编号
+            {
+                wheresql = wheresql + " and coid = " + CoID;
+            }
+            wheresql = wheresql + " order by id desc";
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    var u = conn.Query<Purchase>(wheresql).AsList();
+                    int count = u.Count;
+                    decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/20);
+
+                    wheresql = wheresql + " limit 0,20";
+                    u = conn.Query<Purchase>(wheresql).AsList();
+
+                    res.Datacnt = count;
+                    res.Pagecnt = pagecnt;
+                    res.Pur = u;
+                    if (count == 0)
+                    {
+                        result.s = -3001;
+                        result.d = null;
+                    }
+                    else
+                    {
+                        result.d = res;
+                    }               
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }           
+            return result;
+        }
     }
 }
             

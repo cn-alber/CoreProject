@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CoreModels.XyComm;
 namespace CoreModels.XyCore
 {
     public class Purchase
@@ -210,5 +211,13 @@ namespace CoreModels.XyCore
         public string  conclusion {get;set;}
         public string remark {get;set;}
         public int status {get;set;}
+    }
+    public class PurchaseInitData
+    {
+        public Dictionary<int,string> status{get;set;}//状态
+        public List<Warehouse> warehouse {get;set;}//仓库列表
+        public int Datacnt {get;set;}//总资料笔数
+        public decimal Pagecnt{get;set;}//总页数
+        public List<Purchase> Pur {get;set;}//采购单资料List
     }
 }

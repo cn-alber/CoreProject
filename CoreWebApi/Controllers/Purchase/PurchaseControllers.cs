@@ -238,5 +238,13 @@ namespace CoreWebApi
             var data = PurchaseHaddle.ConfirmQualityRev(id);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
+
+        [HttpGetAttribute("/Core/Purchase/GetPurchaseInit")]
+        public ResponseResult GetPurchaseInit()
+        {   
+            int CoID = int.Parse(GetCoid());
+            var data = PurchaseHaddle.GetPurchaseInit(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
     }
 }

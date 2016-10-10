@@ -133,3 +133,14 @@ input:  ID        List<int>         质检单ID
 OutPut: 1 成功  else 失败代号
 参考:input jason 文件:ConfirmQualityRev_input.json
 参考:output jason 文件:ConfirmQualityRev_output.json
+
+16.GetPurchaseInit()//Pageload
+路由:http://localhost:5000/Core/Purchase/GetPurchaseInit
+input:
+OutPut:     
+            status          Dictionary<int,string>    状态列表
+            warehouse       List<Warehouse>           仓库资料
+            Datacnt         int                       资料总笔数
+            Pagecnt         int                       总页数
+            Pur             List<Purchase>            Purchase 资料
+参考:output jason 文件:GetPurchaseInit_output.json
