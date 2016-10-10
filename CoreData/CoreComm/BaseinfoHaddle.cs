@@ -35,10 +35,10 @@ namespace CoreData.CoreComm
                                         baseinfo.CreateDate
                                     FROM
                                         baseinfo
-                                    WHERE CoID = @CoID";
+                                    WHERE CoID = @CoID AND IsDelete = 0";
                     querysql.Append(sql);
                     p.Add("@CoID", IParam.CoID);
-                    if (!string.IsNullOrEmpty(IParam.Kind) || IParam.Kind != "数据类型")
+                    if (!string.IsNullOrEmpty(IParam.Kind) && IParam.Kind != "数据类型")
                     {
                         querysql.Append(" AND baseinfo.kind = @Kind");
                         p.Add("@Kind", IParam.Kind);
@@ -57,7 +57,7 @@ namespace CoreData.CoreComm
                     {
                         querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                     }
-                    var BaseinfoLst = DbBase.UserDB.Query<Baseinfo>(querysql.ToString(), p).AsList();
+                    var BaseinfoLst = DbBase.CommDB.Query<Baseinfo>(querysql.ToString(), p).AsList();
                     if (BaseinfoLst.Count == 0)
                     {
                         res.s = -3001;
@@ -113,7 +113,7 @@ namespace CoreData.CoreComm
                                             baseinfo
                                         WHERE ID = @ID ";
                     var p = new { ID = infoID };
-                    var info = DbBase.UserDB.QueryFirst<Baseinfo>(querysql, p);
+                    var info = DbBase.CommDB.QueryFirst<Baseinfo>(querysql, p);
                     if (info == null)
                     {
                         res.s = -3001;
@@ -255,13 +255,13 @@ namespace CoreData.CoreComm
             {
                 string str = @"UPDATE baseinfo
                     SET Kind = @Kind,
-                    Order = @Order,
-                    Name = @Name,
+                    `Order` = @Order,
+                    `Name` = @Name,
                     Content = @Content,
-                    Value = @Value,
+                    `Value` = @Value,
                     Remark = @Remark
                     WHERE ID = @ID";
-                int count = UserDBconn.Execute(str, info, TransComm);
+                int count = CommDBconn.Execute(str, info, TransComm);
                 if (count <= 0)
                 {
                     result.s = -3003;
@@ -312,7 +312,7 @@ namespace CoreData.CoreComm
                     p.Add("@DeleteDate",DateTime.Now);                   
                     p.Add("@CoID", CoID);
                     p.Add("@ID", IDLst);
-                    int count = DbBase.UserDB.Execute(sql, p, TransComm);
+                    int count = DbBase.CommDB.Execute(sql, p, TransComm);
                     if (count > 0)
                     {
                         string contents = "删除数据字典=>" + string.Join(",", IDLst);

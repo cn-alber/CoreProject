@@ -10,7 +10,7 @@ using CoreData;
 using CoreModels;
 namespace CoreWebApi
 {
-    // [AllowAnonymous]
+    [AllowAnonymous]
     public class BaseinfoController : ControllBase
     {
         #region 数据字典 - 资料查询
@@ -56,7 +56,7 @@ namespace CoreWebApi
         #endregion
 
         #region 数据字典 - 单笔资料编辑
-        [HttpGetAttribute("/Core/XyUser/Baseinfo/BaseinfoEdit")]
+        [HttpGetAttribute("/Core/XyComm/Baseinfo/BaseinfoEdit")]
         public ResponseResult BaseinfoEdit(string ID)
         {
             var res = new DataResult(1, null);
@@ -75,7 +75,7 @@ namespace CoreWebApi
         #endregion
 
         #region 数据字典 - 单笔资料查询
-        [HttpGetAttribute("/Core/XyUser/Baseinfo/BaseinfoQuery")]
+        [HttpGetAttribute("/Core/XyComm/Baseinfo/BaseinfoQuery")]
         public ResponseResult BaseinfoQuery(string ID)
         {
             var res = new DataResult(1, null);
@@ -94,11 +94,11 @@ namespace CoreWebApi
         #endregion
 
         #region 数据字典 - 启用|停用
-        [HttpGetAttribute("/Core/XyUser/Baseinfo/BaseinfoEnable")]
+        [HttpPostAttribute("/Core/XyComm/Baseinfo/BaseinfoEnable")]
         public ResponseResult BaseinfoEnable([FromBodyAttribute]JObject obj)
         {
-            var res = new DataResult(1,null);
-             var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
+            var res = new DataResult(1, null);
+            var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
             if (IDLst.Count == 0)
             {
                 res.s = -1;
@@ -112,6 +112,46 @@ namespace CoreWebApi
                 // res = UserHaddle.UptUserEnable(IDLst, CoID, UserName, Enable);
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 数据字典 - 新增
+        [HttpPostAttribute("/Core/XyComm/Baseinfo/InsertBaseinfo")]
+        public ResponseResult InsertBaseinfo([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            var info = Newtonsoft.Json.JsonConvert.DeserializeObject<Baseinfo>(obj.ToString());
+            int CoID = int.Parse(GetCoid());
+            string UserName = GetUname();
+            res = BaseinfoHaddle.SaveInsertinfo(info, CoID, UserName);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 数据字典 - 修改
+        [HttpPostAttribute("/Core/XyComm/Baseinfo/UpdateBaseinfo")]
+        public ResponseResult UpdateBaseinfo([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            var info = Newtonsoft.Json.JsonConvert.DeserializeObject<Baseinfo>(obj.ToString());
+            int CoID = int.Parse(GetCoid());
+            string UserName = GetUname();
+            res = BaseinfoHaddle.SaveUpdateinfo(info, CoID, UserName);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 数据字典 - 删除
+        [HttpPostAttribute("/Core/XyComm/Baseinfo/DeleteBaseinfo")]
+        public ResponseResult DeleteBaseinfo([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
+            int CoID = int.Parse(GetCoid());
+            string UserName = GetUname();
+            res = BaseinfoHaddle.Deleteinfo(IDLst, CoID, UserName);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+
         }
         #endregion
     }
