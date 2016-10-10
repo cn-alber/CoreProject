@@ -13,7 +13,7 @@ namespace CoreWebApi
     public class PurchaseController : ControllBase
     {
         [HttpGetAttribute("/Core/Purchase/PurchaseList")]
-        public ResponseResult PurchaseList(string Purid,string PurdateStart,string PurdateEnd,string Status,string Coname,string Skuid,string Warehouseid,string Buyyer,string SortField,string SortDirection,string PageIndex,string NumPerPage)
+        public ResponseResult PurchaseList(string Purid,string PurdateStart,string PurdateEnd,string Status,string Scoid,string Skuid,string Warehouseid,string Buyyer,string SortField,string SortDirection,string PageIndex,string NumPerPage)
         {   
             int x;
             var cp = new PurchaseParm();
@@ -35,7 +35,10 @@ namespace CoreWebApi
             {
                 cp.Status = int.Parse(Status);
             }
-            cp.CoName = Coname;
+            if (int.TryParse(Scoid, out x))
+            {
+                cp.Scoid = int.Parse(Scoid);
+            }
             cp.Skuid = Skuid;
             if (int.TryParse(Warehouseid, out x))
             {

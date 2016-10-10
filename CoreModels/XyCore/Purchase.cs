@@ -7,7 +7,7 @@ namespace CoreModels.XyCore
     {
         public int id{get;set;}
         public DateTime purchasedate{get;set;}
-        public string coname{get;set;}
+        public int scoid {get;set;}
         public string contract{get;set;}
         public string shplogistics{get;set;}
         public string shpcity{get;set;}
@@ -50,7 +50,7 @@ namespace CoreModels.XyCore
         public DateTime _PurdateStart = DateTime.Parse("1900-01-01");//采购日期起
         public DateTime _PurdateEnd = DateTime.Parse("2999-12-31");//采购日期迄
         public int _Status = -1;//状态
-        public string _CoName = null;//供应商
+        public int _Scoid = 0;//供应商
         public string _Skuid = null;//商品编码
         public int _Warehouseid = 0;//仓库代号
         public string _Buyyer = null;//采购员
@@ -83,10 +83,10 @@ namespace CoreModels.XyCore
             get { return _Status; }
             set { this._Status = value;}
         }
-        public string CoName
+        public int Scoid
         {
-            get { return _CoName; }
-            set { this._CoName = value;}
+            get { return _Scoid; }
+            set { this._Scoid = value;}
         }
         public int Warehouseid
         {
