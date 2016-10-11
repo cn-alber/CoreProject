@@ -442,14 +442,28 @@ namespace CoreData.CoreUser
                                                     power.Title=@Title,
                                                     power.Type=@Type
                                                     WHERE power.ID=@ID";  
-                    
+                    if(p.Name != power.Name){
+                        p.Name = power.Name;
+                    }
+                    if(p.GroupName != power.Name){
+                        p.GroupName = power.Name;
+                    }
+                    if(p.Remark != power.Remark){
+                        p.Remark = power.Remark;
+                    }
+                    if(p.Title != power.Title){
+                        p.Title = power.Title;
+                    }
+                    if(p.Type != power.Type){
+                        p.Type = power.Type;
+                    }
                    
-                    // int rnt = conn.Execute(sql,p);
-                    // if(rnt > 0){
-                    //     result.s=1;
-                    // }else{
-                    //     result.s=-2019;
-                    // }                                                    
+                    int rnt = conn.Execute(sql,p);
+                    if(rnt > 0){
+                        result.s=1;
+                    }else{
+                        result.s=-2020;
+                    }                                                    
 
 
                 }
