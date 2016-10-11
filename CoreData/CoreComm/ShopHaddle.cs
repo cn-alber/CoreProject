@@ -39,6 +39,7 @@ namespace CoreData.CoreComm
                         wheresql = wheresql +
                         " AND ( ShopName LIKE '%" + IParam.Filter +
                         "%' OR ShopSite LIKE '%" + IParam.Filter +
+                        "%' OR Shopkeeper LIKE '%" + IParam.Filter +
                         "%' OR Creator LIKE '%" + IParam.Filter + "%')";
                     }
                     if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
