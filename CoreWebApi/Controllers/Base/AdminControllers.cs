@@ -114,8 +114,22 @@ namespace CoreWebApi
          }
 
          //增加权限
+         [HttpPostAttribute("/core/admin/createaccess")]
+         public ResponseResult createaccess([FromBodyAttribute]JObject lo)
+         {
+            var power = Newtonsoft.Json.JsonConvert.DeserializeObject<Power>(lo.ToString());
+            var m = AdminHaddle.insertPower(power);
+            return CoreResult.NewResponse(m.s, m.d, "Indentity");           
+         }
 
-         
+         //编辑权限
+         [HttpPostAttribute("/core/admin/modifyaccess")]
+         public ResponseResult modifyaccess([FromBodyAttribute]JObject lo)
+         {
+            var power = Newtonsoft.Json.JsonConvert.DeserializeObject<Power>(lo.ToString());
+            var m = AdminHaddle.upDatePower(power);
+            return CoreResult.NewResponse(m.s, m.d, "Indentity");           
+         }
          
 
 
