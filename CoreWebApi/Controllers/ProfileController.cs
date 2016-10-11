@@ -47,8 +47,8 @@ namespace CoreWebApi
         {
             var msgparam = new MsgParam();
             msgparam.IsRead = lo["readed"].ToString();
-            if(string.IsNullOrEmpty(lo["levels"].ToString())){
-                msgparam.LevelList = "";
+            if(Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(lo["levels"].ToString()).Count == 0){
+                msgparam.LevelList = "5";
             }else{
                 foreach (string  i in lo["levels"])
                 {

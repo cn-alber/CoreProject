@@ -28,6 +28,7 @@ namespace CoreData.CoreUser
                     if(msgp.PageIndex == 1){//pageindex 不为 1 时，不再传total 
                             totalsql = "SELECT m.`Id`, m.`Level` as MsgLevel,m.Content as Msg,m.`Create` as CreateDate,ms.Readed as Isreaded ,ms.ReadTime as ReadDate,GROUP_CONCAT(ms.uname) as Reador FROM userwebmsg as m "+
                                 "LEFT JOIN  msgrelationshiop as ms  ON  m.Id = ms.MsgId WHERE "+wheresql;
+                            Console.WriteLine(totalsql);                                
                             totallist = conn.Query<NotifyMsg>(totalsql).AsList();
                     }
                     wheresql += " limit "+(msgp.PageIndex -1)*msgp.PageSize +" ,"+ msgp.PageIndex*msgp.PageSize;            

@@ -1,0 +1,32 @@
+{
+    "s": 1,
+    "d": [
+        {
+            "id": 1,
+            "ismergeorder": true,
+            "isautosetexpress": false,
+            "isignoresku": false,
+            "isautogoodsreviewed": true,
+            "isupdateskuall": false,
+            "isupdatepresalesku": false,
+            "isskulock": true,
+            "ispresaleskulock": false,
+            "ischeckfirst": true,
+            "isjustcheckex": true,
+            "isautosendafftercheck": false,
+            "isneedkg": false,
+            "isautoremarks": false,
+            "isexceptions": true,
+            "cabinetheight": true,
+            "cabinetnumber": true,
+            "ispositionaccurate": false,
+            "goodsuniquecode": false,
+            "isgoodsrule": true,
+            "isbeyondcount": true,
+            "pickingmethod": false,
+            "tempnominus": false,
+            "mixedpicking": false
+        }
+    ],
+    "m": ""
+}

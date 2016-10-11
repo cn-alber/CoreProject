@@ -6,7 +6,7 @@ namespace CoreModels.XyCore
     public class Purchase
     {
         public int id{get;set;}
-        public DateTime purchasedate{get;set;}
+        public string purchasedate{get;set;}
         public int scoid {get;set;}
         public string sconame{get;set;}
         public string contract{get;set;}
@@ -20,7 +20,7 @@ namespace CoreModels.XyCore
         public int purtype{get;set;}
         public string buyyer{get;set;}
         public string remark{get;set;}
-        public decimal taxrate{get;set;}
+        public string taxrate{get;set;}
     }
     public class PurchaseDetail
     {
@@ -29,25 +29,25 @@ namespace CoreModels.XyCore
         public string img{get;set;}
         public string skuid{get;set;}
         public string skuname{get;set;}
-        public decimal purqty{get;set;}
-        public decimal suggestpurqty{get;set;}
-        public decimal recqty{get;set;}
-        public decimal price{get;set;}
-        public decimal puramt{get;set;}
+        public string purqty{get;set;}
+        public string suggestpurqty{get;set;}
+        public string recqty{get;set;}
+        public string price{get;set;}
+        public string puramt{get;set;}
         public string remark{get;set;}
         public string goodscode{get;set;}
         public string supplynum{get;set;}
         public string supplycode{get;set;}
-        public decimal planqty{get;set;}
-        public decimal planamt{get;set;}
-        public DateTime recievedate{get;set;}
+        public string planqty{get;set;}
+        public string planamt{get;set;}
+        public string recievedate{get;set;}
         public string norm {get;set;}
         public string packingnum {get;set;}
     }
     public class PurchaseParm
     {
         public int _CoID ;//公司id
-        public int _Purid = 0;//采购单号
+        public int _Purid = -1;//采购单号
         public DateTime _PurdateStart = DateTime.Parse("1900-01-01");//采购日期起
         public DateTime _PurdateEnd = DateTime.Parse("2999-12-31");//采购日期迄
         public int _Status = -1;//状态
