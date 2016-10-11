@@ -46,7 +46,7 @@ namespace CoreData.CoreComm
             // string strCache = CacheBase.Get<string>(areaname);
             var AreaLst = CacheBase.Get<List<Area>>(areaname);
             // if (string.IsNullOrEmpty(strCache))
-            if(AreaLst==null || AreaLst.Count==0)
+            if (AreaLst == null || AreaLst.Count == 0)
             {
                 string sql = @"SELECT
                                 area.ID,
@@ -79,7 +79,7 @@ namespace CoreData.CoreComm
                         }
                         res.d = AreaLst;
                         //strCache = JsonConvert.SerializeObject(AreaLst);
-                        CacheBase.Set(areaname,AreaLst);
+                        CacheBase.Set(areaname, AreaLst);
                     }
                     catch (Exception e)
                     {
@@ -98,6 +98,29 @@ namespace CoreData.CoreComm
                 res.d = AreaLst;
             }
             return res;
+        }
+        #endregion
+
+        #region 获取单据编号
+        public static string GetRecordID(int CoID)
+        {
+            string comp = CoID.ToString();
+            int a = comp.Length;
+            if (a == 1)
+            { comp = comp + "000"; }
+            if (a == 2)
+            { comp = comp + "00"; }
+            if (a == 3)
+            { comp = comp + "0"; }
+            if (a > 3)
+            { comp = comp.Substring(0, 4); }
+            comp = comp + DateTime.Now.ToString("yyyy-MM-dd").Substring(0, 4);
+            comp = comp + DateTime.Now.ToString("yyyy-MM-dd").Substring(5, 2);
+            comp = comp + DateTime.Now.ToString("yyyy-MM-dd").Substring(8, 2);
+            Random Rd = new Random((int)DateTime.Now.Ticks);
+            string rds = Rd.Next().ToString();
+            comp = comp + rds.Remove(0, rds.Length - 5);
+            return comp;
         }
         #endregion
     }

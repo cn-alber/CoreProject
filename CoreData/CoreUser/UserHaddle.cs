@@ -273,16 +273,16 @@ namespace CoreData.CoreUser
                     }
                     if (!string.IsNullOrEmpty(IParam.Filter))
                     {
-                        if(IParam.FilterType == 1)
+                        if (IParam.FilterType == 1)
                         {
                             querycount.Append(" AND Account like @Filter");
                             querysql.Append(" AND Account like @Filter");
                         }
                         else
                         {
-                            querycount.Append(" AND `user`.Name like @Filter");   
-                            querysql.Append(" AND `user`.Name like @Filter");   
-                        }                        
+                            querycount.Append(" AND `user`.Name like @Filter");
+                            querysql.Append(" AND `user`.Name like @Filter");
+                        }
                         p.Add("@Filter", "%" + IParam.Filter + "%");
                     }
                     if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
@@ -290,7 +290,7 @@ namespace CoreData.CoreUser
                         querycount.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                         querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                     }
-                    var DataCount= CoreData.DbBase.UserDB.QueryFirst<int>(querycount.ToString(), p);
+                    var DataCount = CoreData.DbBase.UserDB.QueryFirst<int>(querycount.ToString(), p);
                     if (DataCount < 0)
                     {
                         res.s = -3001;
@@ -409,35 +409,35 @@ namespace CoreData.CoreUser
             //     var TransUser = conn.BeginTransaction();
             //     try
             //     {
-                    //删除缓存                    
-                    foreach (var item in IDLst)
-                    {
-                        CacheBase.Remove("user" + CoID + item);
-                    }
-                    string contents = string.Empty;
-                    string uptsql = @"update user set Enable = @Enable where ID in @ID";
-                    var args = new { ID = IDLst.ToArray(), Enable = Enable };
-                    int count = DbBase.UserDB.Execute(uptsql, args);
-                    // int count = conn.Execute(uptsql, args, TransUser);
-                    if (count < 0)
-                    {
-                        res.s = -3003;
-                    }
-                    else
-                    {
-                        if (Enable)
-                        {
-                            contents = "用户状态启用：";
-                            res.s = 3001;
-                        }
-                        else
-                        {
-                            contents = "用户状态停用：";                            
-                            res.s = 3002;
-                        }
-                        contents += string.Join(",", IDLst.ToArray());
-                        CoreUser.LogComm.InsertUserLog( "修改用户状态", "User", contents, UserName, CoID, DateTime.Now);
-                        string querysql = @"SELECT
+            //删除缓存                    
+            foreach (var item in IDLst)
+            {
+                CacheBase.Remove("user" + CoID + item);
+            }
+            string contents = string.Empty;
+            string uptsql = @"update user set Enable = @Enable where ID in @ID";
+            var args = new { ID = IDLst.ToArray(), Enable = Enable };
+            int count = DbBase.UserDB.Execute(uptsql, args);
+            // int count = conn.Execute(uptsql, args, TransUser);
+            if (count < 0)
+            {
+                res.s = -3003;
+            }
+            else
+            {
+                if (Enable)
+                {
+                    contents = "用户状态启用：";
+                    res.s = 3001;
+                }
+                else
+                {
+                    contents = "用户状态停用：";
+                    res.s = 3002;
+                }
+                contents += string.Join(",", IDLst.ToArray());
+                CoreUser.LogComm.InsertUserLog("修改用户状态", "User", contents, UserName, CoID, DateTime.Now);
+                string querysql = @"SELECT
                                             u.*, b. NAME AS CompanyName,
                                             r. NAME AS RoleName
                                         FROM
@@ -446,18 +446,18 @@ namespace CoreData.CoreUser
                                         INNER JOIN role r ON u.RoleID = r.ID
                                         WHERE
                                             u.ID in @ID AND IsDelete = 0";
-                        var p = new { ID = IDLst };
-                        var userLst = DbBase.UserDB.Query<UserEdit>(querysql, p).ToList();
-                        if (userLst.Count() == 0)
-                        {
-                            res.s = -3001;
-                        }
-                       // res.d = contents;
-                        //添加缓存
-                        foreach (var item in userLst)
-                        {
-                            CacheBase.Set("user" + CoID + item.ID, item);
-                        }
+                var p = new { ID = IDLst };
+                var userLst = DbBase.UserDB.Query<UserEdit>(querysql, p).ToList();
+                if (userLst.Count() == 0)
+                {
+                    res.s = -3001;
+                }
+                // res.d = contents;
+                //添加缓存
+                foreach (var item in userLst)
+                {
+                    CacheBase.Set("user" + CoID + item.ID, item);
+                }
                 //         if (res.s == 1)
                 //         {
                 //             TransUser.Commit();
@@ -489,25 +489,25 @@ namespace CoreData.CoreUser
             // {
             //     try
             //     {
-                    string query = string.Empty;
-                    // object param = null;
-                    StringBuilder querystr = new StringBuilder();
-                    querystr.Append("select * from user where CompanyID = @CoID and Account = @Account");
-                    var p = new DynamicParameters();
-                    p.Add("@CoID", CoID);
-                    p.Add("@Account", Account);
-                    if (ID > 0)
-                    {
-                        querystr.Append(" and ID !=@ID");
-                        p.Add("@ID", ID);
-                    }
-                    count = DbBase.UserDB.Query(querystr.ToString(), p).Count();
-                    if (count > 0)
-                    {
-                        res.s = -1;
-                        res.d = "账号已存在";
-                    }
-                    return res;
+            string query = string.Empty;
+            // object param = null;
+            StringBuilder querystr = new StringBuilder();
+            querystr.Append("select * from user where CompanyID = @CoID and Account = @Account");
+            var p = new DynamicParameters();
+            p.Add("@CoID", CoID);
+            p.Add("@Account", Account);
+            if (ID > 0)
+            {
+                querystr.Append(" and ID !=@ID");
+                p.Add("@ID", ID);
+            }
+            count = DbBase.UserDB.Query(querystr.ToString(), p).Count();
+            if (count > 0)
+            {
+                res.s = -1;
+                res.d = "账号已存在";
+            }
+            return res;
             //     }
             //     catch (Exception e)
             //     {
@@ -566,7 +566,7 @@ namespace CoreData.CoreUser
                         )";
             var us = new UserEdit();
             us.Account = user.Account;
-           // us.SecretID = user.SecretID;
+            // us.SecretID = user.SecretID;
             us.Name = user.Name;
             us.PassWord = user.PassWord;
             us.Enable = user.Enable;
@@ -667,7 +667,7 @@ namespace CoreData.CoreUser
                 var TransUser = UserDBconn.BeginTransaction();
                 try
                 {
-                    
+
                     //  `PassWord` = @PassWord,
                     //     `Enable` = @Enable,
                     string str = @"UPDATE user
@@ -712,7 +712,7 @@ namespace CoreData.CoreUser
         #region 删除用户
         public static DataResult DeleteUserAccount(List<int> IDLst, int IsDelete, int CoID, string UserName)
         {
-            var result = new DataResult(1, null);
+            var result = new DataResult(1, null);           
             foreach (var u in IDLst)
             {
                 var sname = "user" + CoID + u;
@@ -731,10 +731,10 @@ namespace CoreData.CoreUser
                 // }
                 // else
                 // {//软删除
-                    sql = "update user set IsDelete = @IsDelete,Deleter=@Deleter,DeleteDate=@DeleteDate where CompanyID = @CoID and ID in @IDLst";
-                    p.Add("@IsDelete", 1);
-                    p.Add("@Deleter", UserName);
-                    p.Add("@DeleteDate",DateTime.Now);
+                sql = "update user set IsDelete = @IsDelete,Deleter=@Deleter,DeleteDate=@DeleteDate where CompanyID = @CoID and ID in @IDLst";
+                p.Add("@IsDelete", 1);
+                p.Add("@Deleter", UserName);
+                p.Add("@DeleteDate", DateTime.Now);
                 // }
 
                 p.Add("@CoID", CoID);
@@ -764,7 +764,7 @@ namespace CoreData.CoreUser
         #endregion
 
         #region 修改用户密码
-          public static DataResult ModifyPwd(string uid, string newp)
+        public static DataResult ModifyPwd(string uid, string newp)
         {
 
             var reslut = new DataResult(2001, null);
@@ -788,7 +788,7 @@ namespace CoreData.CoreUser
         #endregion
 
         #region 用户登录日志
-          public static DataResult loginLog(int uid,string useragent,string ipaddress)
+        public static DataResult loginLog(int uid, string useragent, string ipaddress)
         {
 
             var reslut = new DataResult(1, null);
@@ -796,8 +796,8 @@ namespace CoreData.CoreUser
             {
                 try
                 {
-                   string sql = "INSERT loginlog SET loginlog.ip='"+ipaddress+"',loginlog.logintime=NOW(), loginlog.uid="+uid+", loginlog.useragent='"+useragent+"'";
-                   conn.Execute(sql);
+                    string sql = "INSERT loginlog SET loginlog.ip='" + ipaddress + "',loginlog.logintime=NOW(), loginlog.uid=" + uid + ", loginlog.useragent='" + useragent + "'";
+                    conn.Execute(sql);
 
                 }
                 catch (Exception ex)
