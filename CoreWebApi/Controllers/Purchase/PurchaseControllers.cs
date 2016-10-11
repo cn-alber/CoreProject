@@ -112,7 +112,7 @@ namespace CoreWebApi
             var data = PurchaseHaddle.CanclePurchase(puridList,CoId);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
-
+        [AllowAnonymous]
         [HttpPostAttribute("/Core/Purchase/InsertPur")]
         public ResponseResult InsertPur([FromBodyAttribute]JObject co)
         {   
@@ -255,7 +255,7 @@ namespace CoreWebApi
             var data = PurchaseHaddle.GetPurchaseInit(CoID);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
-        [AllowAnonymous]
+
         [HttpPostAttribute("/Core/Purchase/UpdatePurRemark")]
         public ResponseResult UpdatePurRemark([FromBodyAttribute]JObject co)
         {   
@@ -264,5 +264,6 @@ namespace CoreWebApi
             var data = PurchaseHaddle.UpdatePurRemark(id,remark);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
     }
 }

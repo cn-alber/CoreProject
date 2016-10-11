@@ -6,7 +6,7 @@ namespace CoreModels.XyCore
     public class Purchase
     {
         public int id{get;set;}
-        public DateTime purchasedate{get;set;}
+        public string purchasedate{get;set;}
         public int scoid {get;set;}
         public string sconame{get;set;}
         public string contract{get;set;}
@@ -40,7 +40,7 @@ namespace CoreModels.XyCore
         public string supplycode{get;set;}
         public decimal planqty{get;set;}
         public decimal planamt{get;set;}
-        public DateTime recievedate{get;set;}
+        public string recievedate{get;set;}
         public string norm {get;set;}
         public string packingnum {get;set;}
     }

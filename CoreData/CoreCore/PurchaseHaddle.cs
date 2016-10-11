@@ -63,15 +63,15 @@ namespace CoreData.CoreCore
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;
                     res.Pur = u;
-                    if (count == 0)
-                    {
-                        result.s = -3001;
-                        result.d = null;
-                    }
-                    else
-                    {
+                    // if (count == 0)
+                    // {
+                    //     result.s = -3001;
+                    //     result.d = null;
+                    // }
+                    // else
+                    // {
                         result.d = res;
-                    }               
+                    // }               
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
@@ -140,15 +140,15 @@ namespace CoreData.CoreCore
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;
                     res.Pur = u;
-                    if (count == 0)
-                    {
-                        result.s = -3001;
-                        result.d = null;
-                    }
-                    else
-                    {
+                    // if (count == 0)
+                    // {
+                    //     result.s = -3001;
+                    //     result.d = null;
+                    // }
+                    // else
+                    // {
                         result.d = res;
-                    }               
+                    // }               
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
@@ -351,7 +351,7 @@ namespace CoreData.CoreCore
             return result;
         }
         ///<summary>
-        ///采购单审核
+        ///采购单完成
         ///</summary>
         public static DataResult CompletePurchase(List<int> PuridList,int CoID)
         {
@@ -598,15 +598,15 @@ namespace CoreData.CoreCore
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
                     var u = conn.Query<QualityRev>(wheresql).AsList();
-                    if (u.Count == 0)
-                    {
-                        result.s = -3001;
-                        result.d = null;
-                    }
-                    else
-                    {
+                    // if (u.Count == 0)
+                    // {
+                    //     result.s = -3001;
+                    //     result.d = null;
+                    // }
+                    // else
+                    // {
                         result.d = u;
-                    }               
+                    // }               
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
@@ -782,15 +782,15 @@ namespace CoreData.CoreCore
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;
                     res.Pur = u;
-                    if (count == 0)
-                    {
-                        result.s = -3001;
-                        result.d = null;
-                    }
-                    else
-                    {
+                    // if (count == 0)
+                    // {
+                    //     result.s = -3001;
+                    //     result.d = null;
+                    // }
+                    // else
+                    // {
                         result.d = res;
-                    }               
+                    // }               
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
