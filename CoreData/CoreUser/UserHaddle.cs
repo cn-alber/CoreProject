@@ -403,12 +403,12 @@ namespace CoreData.CoreUser
         public static DataResult UptUserEnable(List<int> IDLst, string CoID, string UserName, bool Enable)
         {
             var res = new DataResult(1, null);
-            using (var conn = new MySqlConnection(DbBase.UserConnectString))
-            {
-                conn.Open();
-                var TransUser = conn.BeginTransaction();
-                try
-                {
+            // using (var conn = new MySqlConnection(DbBase.UserConnectString))
+            // {
+            //     conn.Open();
+            //     var TransUser = conn.BeginTransaction();
+            //     try
+            //     {
                     //删除缓存                    
                     foreach (var item in IDLst)
                     {
@@ -416,9 +416,9 @@ namespace CoreData.CoreUser
                     }
                     string contents = string.Empty;
                     string uptsql = @"update user set Enable = @Enable where ID in @ID";
-                    var args = new { ID = IDLst, Enable = Enable };
-
-                    int count = conn.Execute(uptsql, args, TransUser);
+                    var args = new { ID = IDLst.ToArray(), Enable = Enable };
+                    int count = DbBase.UserDB.Execute(uptsql, args);
+                    // int count = conn.Execute(uptsql, args, TransUser);
                     if (count < 0)
                     {
                         res.s = -3003;
@@ -436,7 +436,7 @@ namespace CoreData.CoreUser
                             res.s = 3002;
                         }
                         contents += string.Join(",", IDLst.ToArray());
-                        CoreUser.LogComm.InsertUserLogTran(TransUser, "修改用户状态", "User", contents, UserName, CoID, DateTime.Now);
+                        CoreUser.LogComm.InsertUserLog( "修改用户状态", "User", contents, UserName, CoID, DateTime.Now);
                         string querysql = @"SELECT
                                             u.*, b. NAME AS CompanyName,
                                             r. NAME AS RoleName
@@ -447,7 +447,7 @@ namespace CoreData.CoreUser
                                         WHERE
                                             u.ID in @ID AND IsDelete = 0";
                         var p = new { ID = IDLst };
-                        var userLst = DbBase.UserDB.Query<UserEdit>(querysql, p, TransUser).ToList();
+                        var userLst = DbBase.UserDB.Query<UserEdit>(querysql, p).ToList();
                         if (userLst.Count() == 0)
                         {
                             res.s = -3001;
@@ -458,23 +458,23 @@ namespace CoreData.CoreUser
                         {
                             CacheBase.Set("user" + CoID + item.ID, item);
                         }
-                        if (res.s == 1)
-                        {
-                            TransUser.Commit();
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    TransUser.Rollback();
-                    res.s = -1;
-                    res.d = e.Message;
-                }
-                finally
-                {
-                    conn.Dispose();
-                    conn.Close();
-                }
+                //         if (res.s == 1)
+                //         {
+                //             TransUser.Commit();
+                //         }
+                //     }
+                // }
+                // catch (Exception e)
+                // {
+                //     TransUser.Rollback();
+                //     res.s = -1;
+                //     res.d = e.Message;
+                // }
+                // finally
+                // {
+                //     conn.Dispose();
+                //     TransUser.Dispose();
+                // }
             }
             return res;
         }
@@ -485,10 +485,10 @@ namespace CoreData.CoreUser
         {
             int count = 0;
             var res = new DataResult(1, null);
-            using (var conn = new MySqlConnection(DbBase.UserConnectString))
-            {
-                try
-                {
+            // using (var conn = new MySqlConnection(DbBase.UserConnectString))
+            // {
+            //     try
+            //     {
                     string query = string.Empty;
                     // object param = null;
                     StringBuilder querystr = new StringBuilder();
@@ -501,25 +501,25 @@ namespace CoreData.CoreUser
                         querystr.Append(" and ID !=@ID");
                         p.Add("@ID", ID);
                     }
-                    count = conn.Query(querystr.ToString(), p).Count();
+                    count = DbBase.UserDB.Query(querystr.ToString(), p).Count();
                     if (count > 0)
                     {
                         res.s = -1;
                         res.d = "账号已存在";
                     }
                     return res;
-                }
-                catch (Exception e)
-                {
-                    res.s = -1;
-                    res.d = e.Message;
-                }
-                finally
-                {
-                    conn.Dispose();
-                }
-            }
-            return res;
+            //     }
+            //     catch (Exception e)
+            //     {
+            //         res.s = -1;
+            //         res.d = e.Message;
+            //     }
+            //     finally
+            //     {
+            //         conn.Dispose();
+            //     }
+            // }
+            // return res;
         }
         #endregion
 
@@ -607,7 +607,6 @@ namespace CoreData.CoreUser
             finally
             {
                 TransUser.Dispose();
-                UserDBconn.Close();
             }
             return result;
         }
@@ -682,7 +681,7 @@ namespace CoreData.CoreUser
                         RoleID = @RoleID
                     WHERE ID = @ID               
                     ";
-                    int count = UserDBconn.Execute(str, user, TransUser);
+                    int count = DbBase.UserDB.Execute(str, user, TransUser);
                     if (count <= 0)
                     {
                         result.s = -3003;
@@ -703,7 +702,7 @@ namespace CoreData.CoreUser
                 finally
                 {
                     TransUser.Dispose();
-                    UserDBconn.Close();
+                    UserDBconn.Dispose();
                 }
                 CacheBase.Set(sname, user);
             }
