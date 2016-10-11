@@ -49,9 +49,12 @@ namespace CoreWebApi
             {
                 cp.SortField = SortField;
             }
-            if(SortDirection.ToUpper() == "ASC")
+            if(!string.IsNullOrEmpty(SortDirection))
             {
-                cp.SortDirection = SortDirection;
+                 if(SortDirection.ToUpper() == "ASC")
+                {
+                    cp.SortDirection = SortDirection;
+                }
             }
             if (int.TryParse(NumPerPage, out x))
             {
@@ -82,9 +85,12 @@ namespace CoreWebApi
             {
                 cp.SortField = SortField;
             }
-            if(SortDirection.ToUpper() == "ASC")
+            if(!string.IsNullOrEmpty(SortDirection))
             {
-                cp.SortDirection = SortDirection;
+                 if(SortDirection.ToUpper() == "ASC")
+                {
+                    cp.SortDirection = SortDirection;
+                }
             }
             if (int.TryParse(NumPerPage, out x))
             {
