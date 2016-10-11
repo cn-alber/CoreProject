@@ -24,7 +24,7 @@ namespace CoreData.CoreComm
             {
                 try
                 {
-                    string wheresql = "where 1=1";
+                    string wheresql = "where Deleted=FALSE ";
                     if (IParam.CoID != 1)
                     {
 
@@ -39,13 +39,14 @@ namespace CoreData.CoreComm
                         wheresql = wheresql +
                         " AND ( ShopName LIKE '%" + IParam.Filter +
                         "%' OR ShopSite LIKE '%" + IParam.Filter +
+                        "%' OR Shopkeeper LIKE '%" + IParam.Filter +
                         "%' OR Creator LIKE '%" + IParam.Filter + "%')";
                     }
                     if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
                     {
                         wheresql = wheresql + " ORDER BY " + IParam.SortField + " " + IParam.SortDirection;
                     }
-                    wheresql = "select ID,ShopName,Enable,ShopSite,ShopUrl,Shopkeeper,UpdateSku,DownGoods,UpdateWayBill,TelPhone,SendAddress,CreateDate,ReturnAddress,Istoken from Shop " + wheresql;
+                    wheresql = "select ID,ShopName,Enable,ShopSite,ShopUrl,Shopkeeper,UpdateSku,DownGoods,UpdateWayBill,TelPhone,SendAddress,ShopBegin,ReturnAddress,Istoken from Shop " + wheresql;
                     var ShopLst = conn.Query<ShopQuery>(wheresql).AsList();
                     IParam.DataCount = ShopLst.Count;
                     decimal pagecnt = Math.Ceiling(decimal.Parse(IParam.DataCount.ToString()) / decimal.Parse(IParam.PageSize.ToString()));
@@ -56,9 +57,11 @@ namespace CoreData.CoreComm
                     //result.d = IParam;  
                     if (IParam.PageIndex == 1)
                     {
+                        var shopsit = ShopHaddle.GetShopSite();
                         result.d = new
                         {
                             list = IParam.ShopLst,
+                            sitemenus = shopsit.d,
                             page = IParam.PageIndex,
                             pageSize = IParam.PageSize,
                             pageTotal = IParam.PageCount,
@@ -91,7 +94,7 @@ namespace CoreData.CoreComm
         {
             var result = new DataResult(1, null);
             var sname = "shop" + coid + shopid;
-
+            
             var su = CacheBase.Get<Shop>(sname);
             if (su == null)
             {
@@ -99,7 +102,7 @@ namespace CoreData.CoreComm
                 {
                     try
                     {
-                        var u = DbBase.CommDB.Query<Shop>("select * from Shop where id = @sid and CoID = @coid", new { sid = shopid, coid = coid }).AsList();
+                        var u = DbBase.CommDB.Query<Shop>("select * from Shop where Deleted=FALSE AND id = @sid and CoID = @coid", new { sid = shopid, coid = coid }).AsList();
                         if (u.Count == 0)
                         {
                             result.s = -3001;
@@ -257,6 +260,11 @@ namespace CoreData.CoreComm
                 //删除原有缓存
                 CacheBase.Remove(sname);
 
+                if(!string.IsNullOrEmpty(shop.Token)){
+                    shop.Istoken = 1;
+                }else{
+                    shop.Istoken = 0;
+                }
                 if (shopOld.ShopName != shop.ShopName)
                 {
                     contents = contents + "店铺名称:" + shopOld.ShopName + "=>" + shop.ShopName + ";";
@@ -533,8 +541,17 @@ namespace CoreData.CoreComm
             sp.UpdateSku = shop.UpdateSku;
             sp.DownGoods = shop.DownGoods;
             sp.UpdateWayBill = shop.UpdateWayBill;
-            sp.ShopBegin = shop.ShopBegin;
-            sp.Istoken = shop.Istoken;
+            if(!string.IsNullOrEmpty(shop.ShopBegin)){
+                sp.ShopBegin = shop.ShopBegin;
+            }else{
+                sp.ShopBegin = DateTime.Now.ToString();
+            }            
+            if(!string.IsNullOrEmpty(shop.Token)){
+                sp.Istoken = 1;
+            }else{
+                sp.Istoken = 0;
+            }
+            
             sp.Token = shop.Token;
             sp.CoID = CoID;
             sp.Creator = UserName;
@@ -701,6 +718,38 @@ namespace CoreData.CoreComm
             return res;
         }
 
+        public static DataResult DelShop(List<string> ids,string coid)
+        {
+            var res = new DataResult(1, null);            
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    string sql = "";
+                    foreach(string shopid in ids){
+                        CacheBase.Remove("shop" + coid + shopid);
+                        sql += "UPDATE shop SET shop.Deleted = TRUE WHERE shop.ID = " + shopid +";";
+                    }
+                    Console.WriteLine(sql);
+                    var rnt = conn.Execute(sql);
+                    if (rnt > 0)
+                    {                        
+                        res.s = 1;
+                    }
+                    else
+                    {
+                        res.s = -1;
+                    }
+                }
+                catch (Exception e)
+                {
+                    res.s = -1;
+                    res.d = e.Message;
+                    conn.Dispose();
+                }
+            }
+            return res;
+        }
 
 
 

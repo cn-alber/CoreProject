@@ -7,7 +7,6 @@ using CoreModels.XyUser;
 
 namespace CoreWebApi
 {
-    [AllowAnonymous]
      public class AdminController : ControllBase
      {
          [HttpGetAttribute("/core/admin/menus")]
@@ -80,14 +79,21 @@ namespace CoreWebApi
 
          //获取权限列表
          [HttpGetAttribute("/core/admin/power")]
-         public ResponseResult power(string search = "",int Page = 1,int PageSize = 20)
+         public ResponseResult power(string Filter = "",int Page = 1,int PageSize = 20)
          {
 
             powerParam param = new powerParam();
-            param.Filter = search;            
+            param.Filter = Filter;            
             param.page = Math.Max(Page,1);
             param.PageSize = Math.Max(PageSize,20);
             var m = AdminHaddle.getPowerList(param);
+            return CoreResult.NewResponse(m.s, m.d, "Indentity");           
+         }
+         //获取单个权限
+         [HttpGetAttribute("/core/admin/powerQuery")]
+         public ResponseResult powerQuery(string aid)
+         {    
+            var m = AdminHaddle.getPowerById(aid);
             return CoreResult.NewResponse(m.s, m.d, "Indentity");           
          }
         
@@ -108,6 +114,22 @@ namespace CoreWebApi
          }
 
          //增加权限
+         [HttpPostAttribute("/core/admin/createaccess")]
+         public ResponseResult createaccess([FromBodyAttribute]JObject lo)
+         {
+            var power = Newtonsoft.Json.JsonConvert.DeserializeObject<Power>(lo.ToString());
+            var m = AdminHaddle.insertPower(power);
+            return CoreResult.NewResponse(m.s, m.d, "Indentity");           
+         }
+
+         //编辑权限
+         [HttpPostAttribute("/core/admin/modifyaccess")]
+         public ResponseResult modifyaccess([FromBodyAttribute]JObject lo)
+         {
+            var power = Newtonsoft.Json.JsonConvert.DeserializeObject<Power>(lo.ToString());
+            var m = AdminHaddle.upDatePower(power);
+            return CoreResult.NewResponse(m.s, m.d, "Indentity");           
+         }
          
 
 

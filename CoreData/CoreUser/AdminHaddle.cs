@@ -257,6 +257,7 @@ namespace CoreData.CoreUser
                      string wheresql = " 1=1 ";
                     string totalsql = ""; 
                     var totallist = new List<Power>();
+                    Console.WriteLine(param.Filter);
                     if(!string.IsNullOrEmpty(param.Filter)){
                         wheresql += " and (Name like '%"+ param.Filter +"%' "+
                                     " or GroupName like '%"+ param.Filter +"%' "+
@@ -276,7 +277,7 @@ namespace CoreData.CoreUser
                     }
 
                     wheresql ="SELECT * FROM power  WHERE  "+wheresql; 
-
+                    Console.WriteLine(wheresql);
                     var list = conn.Query<Power>(wheresql).AsList();
 
                     if (list != null)
@@ -309,6 +310,30 @@ namespace CoreData.CoreUser
                 }
             }
             return result;
+        }
+
+        public static DataResult getPowerById(string id){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
+                try
+                {
+                    string sql = "SELECT * FROM power WHERE power.ID = "+id;
+                    var res = conn.Query<Power>(sql).AsList();
+                    if(res.Count > 0){
+                        result.d = res[0];
+                    }else{
+                        result.s = -2016;
+                    }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+
         }
 
         public static DataResult GetViewPowerList(){
@@ -347,7 +372,110 @@ namespace CoreData.CoreUser
             return result;
         }
 
-        
+        public static bool ExistPower(string name){
+            var result = false;
+            using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
+                try
+                {
+                    string sql = "SELECT * FROM power WHERE power.`Name`='"+name+"'";
+                    var data = conn.Query<Power>(sql).AsList();
+                    if(data.Count>0){
+                        result = true ;
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+        public static DataResult insertPower(Power power){
+            var result = new DataResult(1,null);
+            if(ExistPower(power.Name)){
+                result.s = -2018;
+                return result;
+            }
+            using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
+                try
+                {
+                    string sql = @"INSERT power SET power.GroupName=@GroupName,
+                                                    power.`Name`=@Name,
+                                                    power.Remark=@Remark,
+                                                    power.Title=@Title,
+                                                    power.Type=@Type";                                                                        
+                    int rnt = conn.Execute(sql,power);
+                    if(rnt > 0){
+                        result.s=1;
+                    }else{
+                        result.s=-2019;
+                    }                                                    
+
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+        public static DataResult upDatePower(Power power){
+            var result = new DataResult(1,null);
+            var pRes = getPowerById(power.ID.ToString());
+            var p =new Power();
+            if(pRes.s!=1){ //id 不存在则直接返回报错
+                result.s = pRes.s;
+                result.d = pRes.d;
+                return result;
+            }else{
+                p = pRes.d as Power;
+            }
+            using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
+                try
+                {
+                    string sql = @"UPDATE power SET power.GroupName=@GroupName,
+                                                    power.`Name`=@Name,
+                                                    power.Remark=@Remark,
+                                                    power.Title=@Title,
+                                                    power.Type=@Type
+                                                    WHERE power.ID=@ID";  
+                    if(p.Name != power.Name){
+                        p.Name = power.Name;
+                    }
+                    if(p.GroupName != power.Name){
+                        p.GroupName = power.Name;
+                    }
+                    if(p.Remark != power.Remark){
+                        p.Remark = power.Remark;
+                    }
+                    if(p.Title != power.Title){
+                        p.Title = power.Title;
+                    }
+                    if(p.Type != power.Type){
+                        p.Type = power.Type;
+                    }
+                   
+                    int rnt = conn.Execute(sql,p);
+                    if(rnt > 0){
+                        result.s=1;
+                    }else{
+                        result.s=-2020;
+                    }                                                    
+
+
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
 
         public static DataResult demo(int sys_id){
             var result = new DataResult(1,null);

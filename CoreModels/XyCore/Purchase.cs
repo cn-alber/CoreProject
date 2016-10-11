@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
+using CoreModels.XyComm;
 namespace CoreModels.XyCore
 {
     public class Purchase
     {
         public int id{get;set;}
         public DateTime purchasedate{get;set;}
-        public string coname{get;set;}
+        public int scoid {get;set;}
+        public string sconame{get;set;}
         public string contract{get;set;}
         public string shplogistics{get;set;}
         public string shpcity{get;set;}
@@ -15,7 +17,7 @@ namespace CoreModels.XyCore
         public int warehouseid{get;set;}
         public string warehousename{get;set;}
         public int status{get;set;}
-        public string purtype{get;set;}
+        public int purtype{get;set;}
         public string buyyer{get;set;}
         public string remark{get;set;}
         public decimal taxrate{get;set;}
@@ -49,7 +51,7 @@ namespace CoreModels.XyCore
         public DateTime _PurdateStart = DateTime.Parse("1900-01-01");//采购日期起
         public DateTime _PurdateEnd = DateTime.Parse("2999-12-31");//采购日期迄
         public int _Status = -1;//状态
-        public string _CoName = null;//供应商
+        public int _Scoid = 0;//供应商
         public string _Skuid = null;//商品编码
         public int _Warehouseid = 0;//仓库代号
         public string _Buyyer = null;//采购员
@@ -82,10 +84,10 @@ namespace CoreModels.XyCore
             get { return _Status; }
             set { this._Status = value;}
         }
-        public string CoName
+        public int Scoid
         {
-            get { return _CoName; }
-            set { this._CoName = value;}
+            get { return _Scoid; }
+            set { this._Scoid = value;}
         }
         public int Warehouseid
         {
@@ -210,5 +212,13 @@ namespace CoreModels.XyCore
         public string  conclusion {get;set;}
         public string remark {get;set;}
         public int status {get;set;}
+    }
+    public class PurchaseInitData
+    {
+        public Dictionary<int,string> status{get;set;}//状态
+        public List<Warehouse> warehouse {get;set;}//仓库列表
+        public int Datacnt {get;set;}//总资料笔数
+        public decimal Pagecnt{get;set;}//总页数
+        public List<Purchase> Pur {get;set;}//采购单资料List
     }
 }

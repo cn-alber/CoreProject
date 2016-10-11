@@ -6,25 +6,25 @@
         "enable": true,
         "Pur": [
             {
-                "id": 6,
-                "purchaseid": 5,
-                "img": "",
-                "skuid": "test1234560004007",
-                "skuname": "南极人2016男装夹克",
-                "purqty": 50,
-                "suggestpurqty": 0,
-                "recqty": 81,
-                "price": 3,
-                "puramt": 150,
-                "remark": "5466666",
-                "goodscode": "test123456",
-                "supplynum": "22222",
-                "supplycode": "",
-                "planqty": 0,
-                "planamt": 0,
-                "recievedate": "2016-05-13T00:00:00",
-                "norm": "红色1;43",
-                "packingnum": ""
+                "id": 6,//明细id
+                "purchaseid": 5,//采购单号
+                "img": "",//图片地址
+                "skuid": "test1234560004007",//商品代号
+                "skuname": "南极人2016男装夹克",//商品名称
+                "purqty": 50,//采购数量
+                "suggestpurqty": 0,//建议采购数量
+                "recqty": 81,//已入库数量
+                "price": 3,//单价
+                "puramt": 150,//金额
+                "remark": "5466666",//备注
+                "goodscode": "test123456",//款式编码
+                "supplynum": "22222",//供应商款号
+                "supplycode": "",//供应商编码
+                "planqty": 0,//预计到货数量
+                "planamt": 0,//预计到货金额
+                "recievedate": "2016-05-13T00:00:00",//预计到货日期
+                "norm": "红色1;43",//规格
+                "packingnum": ""//装箱编号
             },
             {
                 "id": 7,

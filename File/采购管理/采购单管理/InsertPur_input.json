@@ -2,7 +2,8 @@
 "Pur": {
         "id": 0,
         "purchasedate": "2016-10-08",
-        "coname": "南极云商有限公司",
+        "scoid": 1,
+        "sconame":"携云供应链管理",
         "contract": "2",
         "shplogistics":"江苏省",
         "shpcity":"苏州市",
@@ -11,7 +12,7 @@
         "warehouseid":"1",
         "warehousename":"test0001",
         "status": "0",
-        "purtype": "0",
+        "purtype": 0,
         "buyyer": "6",
         "remark": "7",
         "taxrate":5

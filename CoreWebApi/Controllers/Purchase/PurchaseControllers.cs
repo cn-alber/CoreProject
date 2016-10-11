@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-// using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyCore;
 using CoreData.CoreCore;
 using System;
@@ -13,7 +13,7 @@ namespace CoreWebApi
     public class PurchaseController : ControllBase
     {
         [HttpGetAttribute("/Core/Purchase/PurchaseList")]
-        public ResponseResult PurchaseList(string Purid,string PurdateStart,string PurdateEnd,string Status,string Coname,string Skuid,string Warehouseid,string Buyyer,string SortField,string SortDirection,string PageIndex,string NumPerPage)
+        public ResponseResult PurchaseList(string Purid,string PurdateStart,string PurdateEnd,string Status,string Scoid,string Skuid,string Warehouseid,string Buyyer,string SortField,string SortDirection,string PageIndex,string NumPerPage)
         {   
             int x;
             var cp = new PurchaseParm();
@@ -35,7 +35,10 @@ namespace CoreWebApi
             {
                 cp.Status = int.Parse(Status);
             }
-            cp.CoName = Coname;
+            if (int.TryParse(Scoid, out x))
+            {
+                cp.Scoid = int.Parse(Scoid);
+            }
             cp.Skuid = Skuid;
             if (int.TryParse(Warehouseid, out x))
             {
@@ -46,9 +49,12 @@ namespace CoreWebApi
             {
                 cp.SortField = SortField;
             }
-            if(SortDirection.ToUpper() == "ASC")
+            if(!string.IsNullOrEmpty(SortDirection))
             {
-                cp.SortDirection = SortDirection;
+                 if(SortDirection.ToUpper() == "ASC")
+                {
+                    cp.SortDirection = SortDirection;
+                }
             }
             if (int.TryParse(NumPerPage, out x))
             {
@@ -79,9 +85,12 @@ namespace CoreWebApi
             {
                 cp.SortField = SortField;
             }
-            if(SortDirection.ToUpper() == "ASC")
+            if(!string.IsNullOrEmpty(SortDirection))
             {
-                cp.SortDirection = SortDirection;
+                 if(SortDirection.ToUpper() == "ASC")
+                {
+                    cp.SortDirection = SortDirection;
+                }
             }
             if (int.TryParse(NumPerPage, out x))
             {
@@ -237,6 +246,23 @@ namespace CoreWebApi
             List<int> id = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["ID"].ToString());
             var data = PurchaseHaddle.ConfirmQualityRev(id);
             return CoreResult.NewResponse(data.s, data.d, "General");
+        }
+
+        [HttpGetAttribute("/Core/Purchase/GetPurchaseInit")]
+        public ResponseResult GetPurchaseInit()
+        {   
+            int CoID = int.Parse(GetCoid());
+            var data = PurchaseHaddle.GetPurchaseInit(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
+        [AllowAnonymous]
+        [HttpPostAttribute("/Core/Purchase/UpdatePurRemark")]
+        public ResponseResult UpdatePurRemark([FromBodyAttribute]JObject co)
+        {   
+            int id = int.Parse(co["ID"].ToString());
+            string remark = co["Remark"].ToString();
+            var data = PurchaseHaddle.UpdatePurRemark(id,remark);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     }
 }
