@@ -20,7 +20,7 @@ namespace CoreModels.XyCore
         public int purtype{get;set;}
         public string buyyer{get;set;}
         public string remark{get;set;}
-        public decimal taxrate{get;set;}
+        public string taxrate{get;set;}
     }
     public class PurchaseDetail
     {
@@ -29,17 +29,17 @@ namespace CoreModels.XyCore
         public string img{get;set;}
         public string skuid{get;set;}
         public string skuname{get;set;}
-        public decimal purqty{get;set;}
-        public decimal suggestpurqty{get;set;}
-        public decimal recqty{get;set;}
-        public decimal price{get;set;}
-        public decimal puramt{get;set;}
+        public string purqty{get;set;}
+        public string suggestpurqty{get;set;}
+        public string recqty{get;set;}
+        public string price{get;set;}
+        public string puramt{get;set;}
         public string remark{get;set;}
         public string goodscode{get;set;}
         public string supplynum{get;set;}
         public string supplycode{get;set;}
-        public decimal planqty{get;set;}
-        public decimal planamt{get;set;}
+        public string planqty{get;set;}
+        public string planamt{get;set;}
         public string recievedate{get;set;}
         public string norm {get;set;}
         public string packingnum {get;set;}

@@ -2,6 +2,7 @@ namespace CoreModels.XyUser
 {
     public class Business
     {
+        public int id {get;set;}
         public bool ismergeorder {get;set;}
         public bool isautosetexpress {get;set;}
         public bool isignoresku {get;set;}
