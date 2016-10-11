@@ -18,9 +18,16 @@ namespace CoreWebApi
             int x;
             var cp = new PurchaseParm();
             cp.CoID = int.Parse(GetCoid());
-            if (int.TryParse(Purid, out x))
+            if(!string.IsNullOrEmpty(Purid))
             {
-                cp.Purid = int.Parse(Purid);
+                if (int.TryParse(Purid, out x))
+                {
+                    cp.Purid = int.Parse(Purid);
+                }
+                else
+                {
+                    cp.Purid = 0;
+                }
             }
             DateTime date;
             if (DateTime.TryParse(PurdateStart, out date))
@@ -112,7 +119,7 @@ namespace CoreWebApi
             var data = PurchaseHaddle.CanclePurchase(puridList,CoId);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
-        [AllowAnonymous]
+        
         [HttpPostAttribute("/Core/Purchase/InsertPur")]
         public ResponseResult InsertPur([FromBodyAttribute]JObject co)
         {   
@@ -167,7 +174,7 @@ namespace CoreWebApi
             var data = PurchaseHaddle.CompletePurchase(puridList,CoId);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
-
+        [AllowAnonymous]
         [HttpPostAttribute("/Core/Purchase/InsertPurDetail")]
         public ResponseResult InsertPurDetail([FromBodyAttribute]JObject co)
         {   

@@ -21,7 +21,7 @@ namespace CoreData.CoreCore
             {
                 wheresql = wheresql + " and coid = " + cp.CoID;
             }
-            if (cp.Purid > 0)//采购单号
+            if (cp.Purid >= 0)//采购单号
             {
                 wheresql = wheresql + " AND id = "+ cp.Purid ;
             }
@@ -479,8 +479,8 @@ namespace CoreData.CoreCore
                 }
                 else
                 {
-                    decimal qty = pur[0].purqty;
-                    decimal amt = pur[0].puramt;
+                    decimal qty = decimal.Parse(pur[0].purqty);
+                    decimal amt = decimal.Parse(pur[0].puramt);
                     string sqlCommandText = @"update purchasedetail set skuid = @Skuid,skuname = @Skuname,price = @Price,purqty = @Purqty,suggestpurqty = @Suggestpurqty,puramt = @Puramt,
                                             recievedate = @Recdate,remark = @Remark,norm = @Norm,img = @Img,goodscode = @Goodscode,supplynum = @Supplynum,supplycode= @Supplycode,
                                             planqty = @Planqty,planamt = @Planamt,packingnum = @Packingnum where id = @ID ";
