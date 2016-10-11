@@ -18,13 +18,16 @@ namespace CoreWebApi
             int x;
             var cp = new PurchaseParm();
             cp.CoID = int.Parse(GetCoid());
-            if (int.TryParse(Purid, out x))
+            if(!string.IsNullOrEmpty(Purid))
             {
-                cp.Purid = int.Parse(Purid);
-            }
-            else
-            {
-                cp.Purid = 0;
+                if (int.TryParse(Purid, out x))
+                {
+                    cp.Purid = int.Parse(Purid);
+                }
+                else
+                {
+                    cp.Purid = 0;
+                }
             }
             DateTime date;
             if (DateTime.TryParse(PurdateStart, out date))
