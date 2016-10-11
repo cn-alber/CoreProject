@@ -49,7 +49,6 @@ namespace CoreWebApi.XyCore
                     }
                 }
             }
-            cp.CoID = int.Parse(GetCoid());
             // var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<CoreSkuParam>(obj["CoreSkuParam"].ToString());
             cp.CoID = int.Parse(GetCoid());
             var Result = CoreSkuHaddle.GetGoodsLst(cp);

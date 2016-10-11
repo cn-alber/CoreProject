@@ -1,0 +1,40 @@
+接口名称：InventoryControllers
+function说明
+1.InventQuery()//查询商品库存
+    方法：Get
+    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/InventQuery?SkuID=&SkuName=&StockQtyb=&StockQtye=&WarehouseID=&Status=&PageIndex=1&PageSize=&SortField=&SortDirection=
+    参数: CoreModels.XyCore.InvQueryParam
+    InPut:        
+        SkuID           string      查询匹配(商品编号,Default:null)
+        SkuName         string      查询匹配(商品名称,Default:null)
+        StockQtyb       int         主仓实际库存数量起(Default:0)
+        StockQtye       int         主仓实际库存数量起(Default:999999999)
+        WarehouseID     int         商品仓库ID(Default:0)
+        Status          int         库存状态:0.全部,1.充足,2.预警
+        PageIndex       int         当前页码(ex.第一页就给1)
+        PageSize        int         每页显示资料笔数(Default:20)
+        SortField       string      排序字段(Default:all)
+        SortDirection   string      排序方向(DESC|ASC,Default:ASC)
+    OutPut:       
+        PageCount       int         总页数
+        DataCount       int         资料总笔数
+        InvLst          List<Inventory>  商品库存(Inventory)
+    参考:output json 文件:InventQuery_output.json
+2.InvDetailQuery()//查询商品交易明细
+    方法：Get
+    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/InvDetailQuery?SkuID=&WarehouseID=&DocType=&DocDateB=&DocDateE=&PageIndex=1&PageSize=&SortField=&SortDirection=
+    InPut:
+        SkuID           string      查询匹配(商品编号,Default:null)
+        WarehouseID     int         商品仓库ID(Default:0)
+        DocType         string      交易类型(Default:null)
+        DocDateB        DateTime    单据日期起(Default:1999/01/01)
+        DocDateE        DateTime    单据日期迄(Default:DateTime.Now)
+        PageIndex       int         当前页码(ex.第一页就给1)
+        PageSize        int         每页显示资料笔数(Default:20)
+        SortField       string      排序字段(Default:all)
+        SortDirection   string      排序方向(DESC|ASC,Default:ASC)
+    OutPut:       
+        PageCount       int         总页数
+        DataCount       int         资料总笔数
+        InvItemLst      List<Invinoutitem>  商品交易明细(Invinoutitem)
+    参考:output json 文件:InvDetailQuery_output.json
