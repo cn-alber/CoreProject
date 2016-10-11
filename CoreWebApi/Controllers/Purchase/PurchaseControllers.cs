@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-// using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyCore;
 using CoreData.CoreCore;
 using System;
@@ -254,6 +254,15 @@ namespace CoreWebApi
             int CoID = int.Parse(GetCoid());
             var data = PurchaseHaddle.GetPurchaseInit(CoID);
             return CoreResult.NewResponse(data.s, data.d, "General");
+        }
+        [AllowAnonymous]
+        [HttpPostAttribute("/Core/Purchase/UpdatePurRemark")]
+        public ResponseResult UpdatePurRemark([FromBodyAttribute]JObject co)
+        {   
+            int id = int.Parse(co["ID"].ToString());
+            string remark = co["Remark"].ToString();
+            var data = PurchaseHaddle.UpdatePurRemark(id,remark);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     }
 }
