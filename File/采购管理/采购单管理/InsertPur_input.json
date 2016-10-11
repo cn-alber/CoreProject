@@ -2,7 +2,8 @@
 "Pur": {
         "id": 0,
         "purchasedate": "2016-10-08",
-        "scoid": 4,
+        "scoid": 1,
+        "sconame":"携云供应链管理",
         "contract": "2",
         "shplogistics":"江苏省",
         "shpcity":"苏州市",
