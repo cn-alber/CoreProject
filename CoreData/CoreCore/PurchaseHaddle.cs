@@ -800,6 +800,30 @@ namespace CoreData.CoreCore
             }           
             return result;
         }
+        ///<summary>
+        ///采购单更新备注
+        ///</summary>
+        public static DataResult UpdatePurRemark(int id,string remark)
+        {
+            var result = new DataResult(1,"资料更新成功!");  
+            string contents = string.Empty; 
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{               
+                    string uptsql = @"update purchase set remark=@Remark where id = @ID";
+                    var args = new {Remark = remark,ID = id};
+                    int count = conn.Execute(uptsql,args);
+                    if(count < 0)
+                    {
+                        result.s= -3003;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return  result;
+        }  
     }
 }
             

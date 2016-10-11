@@ -134,7 +134,7 @@ OutPut: 1 成功  else 失败代号
 参考:input jason 文件:ConfirmQualityRev_input.json
 参考:output jason 文件:ConfirmQualityRev_output.json
 
-16.GetPurchaseInit()//Pageload
+17.GetPurchaseInit()//Pageload
 路由:http://localhost:5000/Core/Purchase/GetPurchaseInit
 input:
 OutPut:     
@@ -144,3 +144,11 @@ OutPut:
             Pagecnt         int                       总页数
             Pur             List<Purchase>            Purchase 资料
 参考:output jason 文件:GetPurchaseInit_output.json
+
+18.UpdatePurRemark()//采购单备注更新
+路由:http://localhost:5000/Core/Purchase/UpdatePurRemark
+input:  ID        int         采购单ID
+        Remark    string      备注说明
+OutPut: 1 成功  else 失败代号
+参考:input jason 文件:UpdatePurRemark_input.json
+参考:output jason 文件:UpdatePurRemark_output.json
