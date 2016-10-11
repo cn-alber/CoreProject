@@ -34,13 +34,11 @@ namespace CoreDate.CoreApi
             using (var conn = new MySqlConnection(DbBase.CommConnectString))
             {
                 try
-                {
-                    
+                {                    
                     string sql ="SELECT job_id,enabled , shop_id, api_name,api_key ,api_interval ,run_eof ,run_times ,"+
                                 "(run_total+err_total) as total ,run_total ,err_total ,err_timestamp , err_message FROM api_job WHERE shop_id="+shopid;
                     var data = conn.Query<apilog>(sql).AsList();
                     res.d = data;
-
                 }
                 catch (Exception e)
                 {
@@ -78,7 +76,7 @@ namespace CoreDate.CoreApi
         }
         
         #region Order 订单
-        public static DataResult jdOrderDownload(string start_date, string end_date, string order_state, string page, string page_size, string token){
+        public static DataResult jdOrderDownload(string start_date, string end_date, string order_state, int page, int page_size, string token){
             var result = new DataResult(1,null);
             try{              
                 jdparam.Add("method", "360buy.order.search");
@@ -281,16 +279,16 @@ namespace CoreDate.CoreApi
         public static DataResult jdSkuAdd(string ware_id,string attributes,string jd_price,string stock_num,string trade_no,string outer_id,string token){
             var result = new DataResult(1,null);
             try{                             
-                jdparam.Add("method", "");  
+                jdparam.Add("method", "360buy.ware.sku.add");  
                 jdparam.Add("access_token", token);  
-                jdparam.Add("360buy_param_json", "");              
+                jdparam.Add("360buy_param_json","{\"ware_id\":\"" + ware_id + "\",\"attributes\":\"" + attributes + "\",\"jd_price\":\"" + jd_price + "\",\"stock_num\":\"" + stock_num + "\",\"trade_no\":\"" + trade_no + "\",\"outer_id\":\"" + outer_id + "\"  }");              
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, jdparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
                     result.d = res.error_response.code+" : "+res.error_response.zh_desc;
                 }else{
-                    result.d = res;
+                    result.d = res.ware_sku_add_response.code;
                 }
             }catch(Exception ex){
                 result.d =  ex.Message;
@@ -300,6 +298,257 @@ namespace CoreDate.CoreApi
             return result;
         }
 
+        /// <summary>
+        ///  修改SKU库存信息
+        /// </summary>
+        /// <param name="sku_id">sku的id </param>
+        /// <param name="ware_id">商品id</param>
+        /// <param name="outer_id">可为空，外部id</param>
+        /// <param name="jd_price">	京东价格 </param>
+        /// <param name="stock_num">库存</param>
+        /// <param name="trade_no">流水号</param>
+        /// <returns></returns>
+        public static DataResult jdSkuUpdate(string sku_id,string ware_id,string outer_id,string jd_price,string stock_num,string trade_no,string token){
+            var result = new DataResult(1,null);
+            try{                             
+                jdparam.Add("method", "360buy.ware.sku.update");  
+                jdparam.Add("access_token", token);  
+                jdparam.Add("360buy_param_json", "{\"sku_id\":\"" + sku_id + "\",\"ware_id\":\"" + ware_id + "\",\"outer_id\":\"" + outer_id + "\",\"jd_price\":\"" + jd_price + "\",\"stock_num\":\"" + stock_num + "\",\"trade_no\":\"" + trade_no + "\"  }");              
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, jdparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d = res.error_response.code+" : "+res.error_response.zh_desc;
+                }else{
+                    result.d = res.ware_sku_update_response.code;
+                }
+            }catch(Exception ex){
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+
+        /// <summary>
+        ///  删除Sku信息
+        /// </summary>
+        public static DataResult jdSkuDelete(string sku_id,string token){
+            var result = new DataResult(1,null);
+            try{                             
+                jdparam.Add("method", "360buy.ware.sku.delete");  
+                jdparam.Add("access_token", token);  
+                jdparam.Add("360buy_param_json", "{\"sku_id\":\"" + sku_id + "\" }");              
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, jdparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d = res.error_response.code+" : "+res.error_response.zh_desc;
+                }else{
+                    result.d = res.ware_sku_delete_response.code;
+                }
+            }catch(Exception ex){
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+
+        /// <summary>
+        /// 根据外部ID获取商品SKU   
+        /// </summary>
+        /// <param name="outer_id">sku的外部商家ID 对应商家后台“商家SKU”字段 </param>
+        /// <returns></returns>
+        public static DataResult jdCustomGet(string outer_id,string token){
+            var result = new DataResult(1,null);
+            try{                             
+                jdparam.Add("method", "360buy.sku.custom.get");  
+                jdparam.Add("access_token", token);  
+                jdparam.Add("360buy_param_json", "{\"outer_id\":\"" + outer_id + "\" }");              
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, jdparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d = res.error_response.code+" : "+res.error_response.zh_desc;
+                }else{
+                    result.d = res.sku_custom_get_response.sku;
+                }
+            }catch(Exception ex){
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+
+        /// <summary>
+        /// 根据商品ID列表获取商品SKU信息
+        /// </summary>
+        /// <param name="ware_ids">sku所属商品id，必选。ware_ids个数不能超过10个</param>
+        public static DataResult jdSkusGet(string ware_ids,string token) {
+            var result = new DataResult(1,null);
+            try{                             
+                jdparam.Add("method", "360buy.ware.skus.get");  
+                jdparam.Add("access_token", token);  
+                jdparam.Add("360buy_param_json", "{\"ware_ids\":\"" + ware_ids + "\" }");              
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, jdparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d = res.error_response.code+" : "+res.error_response.zh_desc;
+                }else{
+                    result.d = res.ware_skus_get_response.skus;
+                }
+            }catch(Exception ex){
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+
+        /// <summary>
+        /// 获取单个Sku信息
+        /// </summary>
+        /// <param name="sku_id"></param>
+        /// <returns></returns>
+        public static DataResult jdSkuGet(string sku_id,string token){
+            var result = new DataResult(1,null);
+            try{                             
+                jdparam.Add("method", "360buy.ware.sku.get");  
+                jdparam.Add("access_token", token);  
+                jdparam.Add("360buy_param_json", "{\"sku_id\":\"" + sku_id + "\" }");              
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, jdparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d = res.error_response.code+" : "+res.error_response.zh_desc;
+                }else{
+                    result.d = res.ware_sku_get_response.sku;
+                }
+            }catch(Exception ex){
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+
+        //根据Skuid 获取Sku信息
+        public static DataResult jdFindSkuById(string skuId, string token){
+            var result = new DataResult(1,null);
+            try{                             
+                jdparam.Add("method", "jingdong.sku.read.findSkuById");  
+                jdparam.Add("access_token", token);  
+                jdparam.Add("360buy_param_json", "{\"skuId\":\"" + skuId + "\" }");              
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, jdparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d = res.error_response.code+" : "+res.error_response.zh_desc;
+                }else{
+                    result.d = res.jingdong_sku_read_findSkuById_responce.sku;
+                }
+            }catch(Exception ex){
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+
+        /// <summary>
+        /// 获取商品上架的商品信息
+        /// </summary>
+        /// <param name="cid">可为空，类目id </param>
+        /// <param name="page">分页（范围是0至999）</param>
+        /// <param name="page_size">每页多少条（范围是0至100）</param>
+        /// <param name="end_modified">	结束的上架修改时间(online_time) 如不输入，默认返回半年内的上架商品数据 </param>
+        /// <param name="start_modified">需返回的字段列表。可选值：ware结构体中的所有字段；字段之间用,分隔 </param>
+        /// <param name="getAll">All,是否获取时间区间内所有数据 </param>
+        public static DataResult jdListingGet(string cid,string page,string page_size,string end_modified,string start_modified,string token){
+            var result = new DataResult(1,null);
+            try{                             
+                jdparam.Add("method", "360buy.ware.listing.get");  
+                jdparam.Add("access_token", token);  
+                jdparam.Add("360buy_param_json", "{\"cid\":\"" + cid + "\",\"page\":\"" + page + "\",\"page_size\":\"" + page_size + "\",\"end_modified\":\"" + end_modified + "\",\"start_modified\":\"" + start_modified + "\" }");              
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, jdparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d = res.error_response.code+" : "+res.error_response.zh_desc;
+                }else{
+                    result.d = res.ware_listing_get_response.ware_infos;
+                }
+            }catch(Exception ex){
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+
+        /// <summary>
+        /// 获取商品下架的商品信息
+        /// </summary>
+        /// <param name="cid">可为空，类目id </param>
+        /// <param name="page">分页（范围是0至999）</param>
+        /// <param name="page_size">每页多少条（范围是0至100）</param>
+        /// <param name="end_modified">	结束的上架修改时间(online_time) 如不输入，默认返回半年内的上架商品数据 </param>
+        /// <param name="start_modified">需返回的字段列表。可选值：ware结构体中的所有字段；字段之间用,分隔 </param>
+        /// <param name="getAll">All,是否获取时间区间内所有数据 </param>
+        public static DataResult jdDelistingGet(string cid, string page, string page_size, string end_modified, string start_modified,string token){
+            var result = new DataResult(1,null);
+            try{                             
+                jdparam.Add("method", "360buy.ware.delisting.get");  
+                jdparam.Add("access_token", token);  
+                jdparam.Add("360buy_param_json", "{\"cid\":\"" + cid + "\",\"page\":\"" + page + "\",\"page_size\":\"" + page_size + "\",\"end_modified\":\"" + end_modified + "\",\"start_modified\":\"" + start_modified + "\" }");              
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, jdparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d = res.error_response.code+" : "+res.error_response.zh_desc;
+                }else{
+                    result.d = res.ware_delisting_get_response.ware_infos;
+                }
+            }catch(Exception ex){
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+
+        /// <summary>
+        /// Sku搜索服务
+        /// </summary>
+        /// <param name="skuStatuValue">	SKU状态：1:上架 2:下架 4:删除  ,多选用英文逗号隔开</param>
+        /// <param name="startCreatedTime">	创建时间 </param>
+        /// <param name="endCreatedTime">结束时间</param>
+        /// <param name="pageNo">页码</param>
+        /// <returns></returns>
+        public static DataResult jdSearchSkuList(string token,string skuStatuValue,string startCreatedTime, string endCreatedTime,string pageNo,string field){
+            var result = new DataResult(1,null);
+            try{                             
+                jdparam.Add("method", "jingdong.sku.read.searchSkuList");  
+                jdparam.Add("access_token", token);  
+                jdparam.Add("360buy_param_json", "{\"skuStatuValue\":\"" + skuStatuValue + "\",\"startCreatedTime\":\"" + startCreatedTime + "\",\"endCreatedTime\":\"" + endCreatedTime + "\",\"pageNo\":\"" + pageNo + "\",\"field\":\"" + field + "\" }");              
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, jdparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d = res.error_response.code+" : "+res.error_response.zh_desc;
+                }else{
+                    result.d = res.jingdong_sku_read_searchSkuList_responce.page;
+                }
+            }catch(Exception ex){
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
 
 
         #endregion
