@@ -13,8 +13,8 @@ input:      Purid           string          采购单号 default null
             Buyyer          string          采购员 default null
             SortField       string          排序栏位名称 default id
             SortDirection   string          排序方式 default DESC
-            PageIndex       int             资料页数(ex.第一页就给1) default 1
-            NumPerPage      int             每页显示资料笔数 default 20
+            PageIndex       string          资料页数(ex.第一页就给1) default 1
+            NumPerPage      string          每页显示资料笔数 default 20
 OutPut:     Datacnt         int             资料总笔数
             Pagecnt         int             总页数
             Com             List<Purchase>  Purchase 资料
@@ -28,8 +28,8 @@ input:      Purid           string                采购单号 必填
             GoodsCode       string                款式编号 default null
             SortField       string                排序栏位名称 default id
             SortDirection   string                排序方式 default asc
-            PageIndex       int                   资料页数(ex.第一页就给1) default 1
-            NumPerPage      int                   每页显示资料笔数  default 20
+            PageIndex       string                资料页数(ex.第一页就给1) default 1
+            NumPerPage      string                每页显示资料笔数  default 20
 OutPut:     Datacnt         int                   资料总笔数
             Pagecnt         int                   总页数
             enable          bool                  明细是否允许编辑(true允许/false不允许)

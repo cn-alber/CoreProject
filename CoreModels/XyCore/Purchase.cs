@@ -8,6 +8,7 @@ namespace CoreModels.XyCore
         public int id{get;set;}
         public DateTime purchasedate{get;set;}
         public int scoid {get;set;}
+        public string sconame{get;set;}
         public string contract{get;set;}
         public string shplogistics{get;set;}
         public string shpcity{get;set;}
