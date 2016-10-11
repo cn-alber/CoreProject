@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using CoreModels.XyComm;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 // using Newtonsoft.Json;
 
 
@@ -100,6 +101,52 @@ namespace CoreData.CoreComm
             return res;
         }
         #endregion
+
+        #region 获取所有省市区
+        public static DataResult GetAllArea(){
+            var result = new DataResult(1,null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+                {
+                    try
+                    {
+                        string sql = @"SELECT  area.ID as value,  area.ParentId ,  area.`Name` as label FROM area WHERE LevelType = 1 AND ParentId = 100000 ";
+                        string cSql = "";
+                        var province = conn.Query<AreaAll>(sql).AsList();
+                        foreach(AreaAll p in province){
+                                cSql = @"SELECT  area.ID as value,  area.ParentId ,  area.`Name` as label FROM area WHERE LevelType = 2 AND ParentId =  "+p.value;
+                                p.children = new List<AreaAll>();
+                                var citys = conn.Query<AreaAll>(cSql).AsList();
+                                p.children = citys;
+                                cSql = "";
+                                string dSql="";
+                                foreach(AreaAll c in citys){
+                                    dSql = @"SELECT  area.ID as value,  area.ParentId ,  area.`Name` as label FROM area WHERE LevelType = 3 AND ParentId =  "+c.value;
+                                    c.children = new List<AreaAll>();
+                                    var district = conn.Query<AreaAll>(dSql).AsList();
+                                    c.children = district;
+                                    dSql = "";
+                                }
+                        }
+
+                        result.d = JsonConvert.DeserializeObject<List<AreaCascader>>(JsonConvert.SerializeObject(province));                        
+                    }
+                    catch (Exception e)
+                    {
+                        result.s = -1;
+                        result.d = e.Message;
+                    }
+                    finally
+                    {
+                        conn.Dispose();
+                    }
+                }
+
+            return result;
+        }
+
+
+        #endregion
+
 
         #region 获取单据编号
         public static string GetRecordID(int CoID)
