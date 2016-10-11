@@ -677,7 +677,6 @@ namespace CoreData.CoreUser
                         Gender = @Gender,
                         Mobile = @Mobile,
                         QQ = @QQ,
-                        CompanyID = @CompanyID,
                         RoleID = @RoleID
                     WHERE ID = @ID               
                     ";
