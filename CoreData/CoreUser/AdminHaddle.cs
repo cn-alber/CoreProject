@@ -254,7 +254,7 @@ namespace CoreData.CoreUser
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try
                 {
-                     string wheresql = " 1=1 ";
+                     string wheresql = " Deleted=FALSE ";
                     string totalsql = ""; 
                     var totallist = new List<Power>();
                     Console.WriteLine(param.Filter);
@@ -317,7 +317,7 @@ namespace CoreData.CoreUser
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try
                 {
-                    string sql = "SELECT * FROM power WHERE power.ID = "+id;
+                    string sql = "SELECT * FROM power WHERE power.Deleted=FALSE AND power.ID = "+id;
                     var res = conn.Query<Power>(sql).AsList();
                     if(res.Count > 0){
                         result.d = res[0];
@@ -341,7 +341,7 @@ namespace CoreData.CoreUser
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try
                 {
-                    string sql = "SELECT A.ID,A.Title FROM power A WHERE TYPE = 0 AND NOT EXISTS (SELECT 1 FROM menus B WHERE B.ViewPowerID = A.ID)";
+                    string sql = "SELECT A.ID,A.Title FROM power A WHERE A.Deleted=FALSE AND TYPE = 0 AND NOT EXISTS (SELECT 1 FROM menus B WHERE B.ViewPowerID = A.ID)";
                     result.d = conn.Query<ViewPower>(sql).AsList();
                 }
                 catch (Exception e)
@@ -359,7 +359,7 @@ namespace CoreData.CoreUser
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try
                 {
-                    string sql = "SELECT A.ID,A.Title FROM power A WHERE TYPE = 0 AND NOT EXISTS (SELECT 1 FROM menus B WHERE B.ViewPowerID = A.ID AND B.VIEWPOWERID != "+ViewPowerID+")";
+                    string sql = "SELECT A.ID,A.Title FROM power A WHERE A.Deleted=FALSE AND TYPE = 0 AND NOT EXISTS (SELECT 1 FROM menus B WHERE B.ViewPowerID = A.ID AND B.VIEWPOWERID != "+ViewPowerID+")";
                     result.d = conn.Query<ViewPower>(sql).AsList();
                 }
                 catch (Exception e)
@@ -377,14 +377,14 @@ namespace CoreData.CoreUser
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try
                 {
-                    string sql = "SELECT * FROM power WHERE power.`Name`='"+name+"'";
+                    string sql = "SELECT * FROM power WHERE power.Deleted=FALSE AND power.`Name`='"+name+"'";
                     var data = conn.Query<Power>(sql).AsList();
                     if(data.Count>0){
                         result = true ;
                     }
 
                 }
-                catch (Exception e)
+                catch
                 {
                     conn.Dispose();
                 }
@@ -476,6 +476,34 @@ namespace CoreData.CoreUser
             }
             return result;
         }
+
+        public static DataResult delpower(List<string> ids){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
+                try
+                {
+                    string sql="";
+                    foreach(string id in ids){
+                        sql += "UPDATE power SET power.Deleted = TRUE WHERE power.ID ="+id+";";
+                    }
+                    int rnt = conn.Execute(sql);
+                    if(rnt>0){
+                        result.s=1;
+                    }else{
+                        result.s=-2016;
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
 
         public static DataResult demo(int sys_id){
             var result = new DataResult(1,null);

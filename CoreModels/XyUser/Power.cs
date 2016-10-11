@@ -10,6 +10,7 @@ namespace CoreModels.XyUser
 		private string _title;
 		private string _remark;
 		private int _type=0;
+		private bool _deleted= false;
 		/// <summary>
 		/// 
 		/// </summary>
@@ -57,6 +58,14 @@ namespace CoreModels.XyUser
 		{
 			set{ _type=value;}
 			get{return _type;}
+		}
+		/// <summary>
+		/// 
+		/// </summary>
+		public bool Deleted
+		{
+			set{ _deleted=value;}
+			get{return _deleted;}
 		}
 		#endregion Model
     }

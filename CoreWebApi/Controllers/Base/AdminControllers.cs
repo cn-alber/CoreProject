@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using CoreData.CoreUser;
-using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json.Linq;
 using System;
 using CoreModels.XyUser;
+using System.Collections.Generic;
 
 namespace CoreWebApi
 {
@@ -131,7 +131,14 @@ namespace CoreWebApi
             return CoreResult.NewResponse(m.s, m.d, "Indentity");           
          }
          
-
+         //删除权限
+         [HttpPostAttribute("/core/admin/delaccess")]
+         public ResponseResult delaccess([FromBodyAttribute]JObject lo)
+         {
+            var ids = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(lo["IDLst"].ToString());
+            var m = AdminHaddle.delpower(ids);
+            return CoreResult.NewResponse(m.s, m.d, "Indentity");           
+         }
 
 
 
