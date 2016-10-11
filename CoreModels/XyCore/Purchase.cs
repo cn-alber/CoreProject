@@ -16,7 +16,7 @@ namespace CoreModels.XyCore
         public int warehouseid{get;set;}
         public string warehousename{get;set;}
         public int status{get;set;}
-        public string purtype{get;set;}
+        public int purtype{get;set;}
         public string buyyer{get;set;}
         public string remark{get;set;}
         public decimal taxrate{get;set;}

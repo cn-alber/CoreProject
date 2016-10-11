@@ -2,15 +2,15 @@
     "s": 1,
     "d": [
         {
-            "id": 1,
-            "purchaseid": 27,
-            "recorddate": "2016-05-02T00:00:00",
-            "recorder": "系统管理员",
-            "drawrate": 0.07,
-            "type": "抽检",
-            "conclusion": "testt",
-            "remark": "dfffff",
-            "status": 0
+            "id": 1,//质检Id
+            "purchaseid": 27,//采购id
+            "recorddate": "2016-05-02T00:00:00",//检验时间
+            "recorder": "系统管理员",//质检员
+            "drawrate": 0.07,//抽检比例
+            "type": "抽检",//质检类型
+            "conclusion": "testt",//结论
+            "remark": "dfffff",//备注
+            "status": 0//状态
         }
     ],
     "m": ""

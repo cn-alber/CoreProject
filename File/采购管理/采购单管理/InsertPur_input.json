@@ -11,7 +11,7 @@
         "warehouseid":"1",
         "warehousename":"test0001",
         "status": "0",
-        "purtype": "0",
+        "purtype": 0,
         "buyyer": "6",
         "remark": "7",
         "taxrate":5

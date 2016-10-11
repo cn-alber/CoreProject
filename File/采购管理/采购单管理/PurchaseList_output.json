@@ -7,7 +7,7 @@
             {
                 "id": 9,
                 "purchasedate": "2016-05-11T00:00:00",
-                "coname": "携云供应链管理",
+                "scoid": 1,
                 "contract": "",
                 "shplogistics": "",
                 "shpcity": "",
@@ -15,7 +15,7 @@
                 "shpaddress": "teasssss",
                 "warehousename": "",
                 "status": 4,
-                "purtype": "成品",
+                "purtype": 0,
                 "buyyer": "test",
                 "remark": "",
                 "taxrate": 0.17
@@ -23,7 +23,7 @@
             {
                 "id": 5,
                 "purchasedate": "2016-05-01T00:00:00",
-                "coname": "测试资料01",
+                "scoid": 2,
                 "contract": "1",
                 "shplogistics": "",
                 "shpcity": "",
@@ -31,7 +31,7 @@
                 "shpaddress": "11",
                 "warehousename": "",
                 "status": 4,
-                "purtype": "111",
+                "purtype": 0,
                 "buyyer": "1111",
                 "remark": "11111",
                 "taxrate": 1
