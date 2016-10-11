@@ -384,7 +384,7 @@ namespace CoreData.CoreUser
                     }
 
                 }
-                catch (Exception e)
+                catch
                 {
                     conn.Dispose();
                 }
