@@ -22,6 +22,10 @@ namespace CoreWebApi
             {
                 cp.Purid = int.Parse(Purid);
             }
+            else
+            {
+                cp.Purid = 0;
+            }
             DateTime date;
             if (DateTime.TryParse(PurdateStart, out date))
             {

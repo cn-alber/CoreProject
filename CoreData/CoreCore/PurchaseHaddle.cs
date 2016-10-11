@@ -21,7 +21,7 @@ namespace CoreData.CoreCore
             {
                 wheresql = wheresql + " and coid = " + cp.CoID;
             }
-            if (cp.Purid > 0)//采购单号
+            if (cp.Purid >= 0)//采购单号
             {
                 wheresql = wheresql + " AND id = "+ cp.Purid ;
             }

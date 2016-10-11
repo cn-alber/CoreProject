@@ -1,0 +1,24 @@
+接口名称:BusinessControllers
+
+function说明
+1.GetBusiness() //查询table business 资料
+  路由:http://localhost:5000/Core/Business/GetBusiness
+input：     none
+OutPut:     List<business>  business 资料
+参考:output jason 文件:GetBusiness_output.json
+
+2.InsertBusiness() //新增资料
+路由:http://localhost:5000/Core/Business/InsertBusiness
+input:Business      Business  资料
+      Company       string    登录者公司名称(exp:携云科技)
+output: s=1成功 else 错误代码
+参考:input jason 文件:InsertBusiness_input.json
+参考:output jason 文件:InsertBusiness_output.json
+
+3.UpdateBusiness() //更新资料
+路由:http://localhost:5000/Core/Business/UpdateBusiness
+input:Business      Business  资料
+      Company       string    登录者公司名称(exp:携云科技)
+output: s=1成功 else 错误代码
+参考:input jason 文件:UpdateBusiness_input.json
+参考:output jason 文件:UpdateBusinessoutput.json

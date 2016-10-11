@@ -47,7 +47,7 @@ namespace CoreModels.XyCore
     public class PurchaseParm
     {
         public int _CoID ;//公司id
-        public int _Purid = 0;//采购单号
+        public int _Purid = -1;//采购单号
         public DateTime _PurdateStart = DateTime.Parse("1900-01-01");//采购日期起
         public DateTime _PurdateEnd = DateTime.Parse("2999-12-31");//采购日期迄
         public int _Status = -1;//状态
