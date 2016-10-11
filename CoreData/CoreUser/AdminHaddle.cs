@@ -425,11 +425,13 @@ namespace CoreData.CoreUser
         public static DataResult upDatePower(Power power){
             var result = new DataResult(1,null);
             var pRes = getPowerById(power.ID.ToString());
-            if(pRes.s!=1){
+            var p =new Power();
+            if(pRes.s!=1){ //id 不存在则直接返回报错
                 result.s = pRes.s;
                 result.d = pRes.d;
+                return result;
             }else{
-
+                p = pRes.d as Power;
             }
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try
