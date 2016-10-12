@@ -111,7 +111,7 @@ namespace CoreData.CoreCore
             var res = new PurchaseDetailData();
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
-                    string pursql = "select id,purchaseid,img,skuid,skuname,purqty,suggestpurqty,recqty,price,puramt,remark,goodscode,supplynum,supplycode,planqty,planamt,recievedate,norm,packingnum from purchasedetail where purchaseid = " + cp.Purid + " and coid =" + cp.CoID ;
+                    string pursql = "select id,purchasedate,scoid,sconame,contract,shplogistics,shpcity,shpdistrict,shpaddress,warehouseid,warehousename,status,purtype,buyyer,remark,taxrate from purchase where id = " + cp.Purid;
                     var pur = conn.Query<Purchase>(pursql).AsList();
                     if (pur.Count == 0)
                     {
