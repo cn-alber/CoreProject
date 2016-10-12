@@ -6,7 +6,7 @@ namespace CoreModels.XyCore
     public class Purchase
     {
         public int id{get;set;}
-        public string purchasedate{get;set;}
+        public string _purchasedate {get;set;}
         public int scoid {get;set;}
         public string sconame{get;set;}
         public string contract{get;set;}
@@ -21,6 +21,11 @@ namespace CoreModels.XyCore
         public string buyyer{get;set;}
         public string remark{get;set;}
         public string taxrate{get;set;}
+        public string purchasedate
+        {
+            get { return _purchasedate; }
+            set { this._purchasedate = value.Substring(0,10);}
+        }
     }
     public class PurchaseDetail
     {
