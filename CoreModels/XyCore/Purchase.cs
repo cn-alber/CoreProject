@@ -24,7 +24,7 @@ namespace CoreModels.XyCore
         public string purchasedate
         {
             get { return _purchasedate; }
-            set { this._purchasedate = value.Substring(0,10);}
+            set { this._purchasedate = value.ToString().Substring(0,10);}
         }
     }
     public class PurchaseDetail
