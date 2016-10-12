@@ -453,9 +453,8 @@ namespace CoreDate.CoreApi
         /// <param name="page">分页（范围是0至999）</param>
         /// <param name="page_size">每页多少条（范围是0至100）</param>
         /// <param name="end_modified">	结束的上架修改时间(online_time) 如不输入，默认返回半年内的上架商品数据 </param>
-        /// <param name="start_modified">需返回的字段列表。可选值：ware结构体中的所有字段；字段之间用,分隔 </param>
-        /// <param name="getAll">All,是否获取时间区间内所有数据 </param>
-        public static DataResult jdListingGet(string cid,string page,string page_size,string end_modified,string start_modified,string token){
+        /// <param name="start_modified"></param>        
+        public static DataResult jdListingGet(string cid,int page,int page_size,string end_modified,string start_modified,string token){
             var result = new DataResult(1,null);
             try{                             
                 jdparam.Add("method", "360buy.ware.listing.get");  
@@ -484,9 +483,8 @@ namespace CoreDate.CoreApi
         /// <param name="page">分页（范围是0至999）</param>
         /// <param name="page_size">每页多少条（范围是0至100）</param>
         /// <param name="end_modified">	结束的上架修改时间(online_time) 如不输入，默认返回半年内的上架商品数据 </param>
-        /// <param name="start_modified">需返回的字段列表。可选值：ware结构体中的所有字段；字段之间用,分隔 </param>
-        /// <param name="getAll">All,是否获取时间区间内所有数据 </param>
-        public static DataResult jdDelistingGet(string cid, string page, string page_size, string end_modified, string start_modified,string token){
+        /// <param name="start_modified"> </param>        
+        public static DataResult jdDelistingGet(string cid, int page, int page_size, string end_modified, string start_modified,string token){
             var result = new DataResult(1,null);
             try{                             
                 jdparam.Add("method", "360buy.ware.delisting.get");  
@@ -516,7 +514,7 @@ namespace CoreDate.CoreApi
         /// <param name="endCreatedTime">结束时间</param>
         /// <param name="pageNo">页码</param>
         /// <returns></returns>
-        public static DataResult jdSearchSkuList(string token,string skuStatuValue,string startCreatedTime, string endCreatedTime,string pageNo,string field){
+        public static DataResult jdSearchSkuList(string token,string skuStatuValue,string startCreatedTime, string endCreatedTime,int pageNo,string field){
             var result = new DataResult(1,null);
             try{                             
                 jdparam.Add("method", "jingdong.sku.read.searchSkuList");  

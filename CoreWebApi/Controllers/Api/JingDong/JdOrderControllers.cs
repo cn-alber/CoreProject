@@ -211,11 +211,54 @@ namespace CoreWebApi.Api.JingDong{
             var m = new DataResult(1,null);
             if(string.IsNullOrEmpty(token)){
                 m.s = -5000;
+            }else if(string.IsNullOrEmpty(skuId)){
+                m.s = -5004;
             }else{
-                
+                m = JingDHaddle.jdFindSkuById(skuId, token);
             }
+            return CoreResult.NewResponse(m.s, m.d, "Api");
+        }
+        #endregion
 
+        #region 获取商品上架的商品信息
+        [HttpGetAttribute("/core/Api/JdOrder/ListingGet")]
+        public ResponseResult ListingGet(string end_modified,string start_modified,string token,string cid="",int page=1,int page_size=100){
+            var m = new DataResult(1,null);
+            if(string.IsNullOrEmpty(token)){
+                m.s = -5000;
+            }else{
+                page = Math.Max(page,1);
+                page_size = Math.Min(page_size,100);
+                m = JingDHaddle.jdListingGet( cid, page, page_size, end_modified, start_modified, token);
+            }
+            return CoreResult.NewResponse(m.s, m.d, "Api");
+        }
+        #endregion
 
+        #region 获取商品下架的商品信息
+        [HttpGetAttribute("/core/Api/JdOrder/DelistingGet")]
+        public ResponseResult DelistingGet(string end_modified, string start_modified,string token,string cid="", int page=1, int page_size=100){
+            var m = new DataResult(1,null);
+            if(string.IsNullOrEmpty(token)){
+                m.s = -5000;
+            }else{
+                page = Math.Max(page,1);
+                page_size = Math.Min(page_size,100);
+                m = JingDHaddle.jdDelistingGet(cid,page, page_size, end_modified, start_modified, token);
+            }
+            return CoreResult.NewResponse(m.s, m.d, "Api");
+        }
+        #endregion
+
+        #region
+        [HttpGetAttribute("/core/Api/JdOrder/SearchSkuList")]
+        public ResponseResult SearchSkuList(string token,string skuStatuValue="",string startCreatedTime="", string endCreatedTime="",int pageNo=1,string field=""){
+            var m = new DataResult(1,null);
+            if(string.IsNullOrEmpty(token)){
+                m.s = -5000;
+            }else{
+                m = JingDHaddle.jdSearchSkuList(token,skuStatuValue,startCreatedTime, endCreatedTime,pageNo,field);
+            }
             return CoreResult.NewResponse(m.s, m.d, "Api");
         }
         #endregion
