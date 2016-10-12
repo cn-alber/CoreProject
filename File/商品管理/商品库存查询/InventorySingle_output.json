@@ -1,0 +1,24 @@
+{
+    "s": 1,
+    "d": {
+        "ID": 257277,
+        "GoodsCode": "N3L4F51221-1",
+        "SkuID": "10031542983",
+        "Name": "南极人 秋冬装男士休闲轻薄款羽绒服韩版修身青年立领短款男装外套 藏青色",
+        "Norm": "藏青色;165",
+        "WarehouseID": 30,
+        "WarehouseName": "dss",
+        "StockQty": 11499.00,
+        "LockQty": 0.00,
+        "PickQty": 0.00,
+        "WaitInQty": 0.00,
+        "ReturnQty": 0.00,
+        "SafeQty": 0.00,
+        "DefectiveQty": 0.00,
+        "VirtualQty": 0.00,
+        "PurchaseQty": 0.00,
+        "Pic": "",
+        "CoID": 1
+    },
+    "m": ""
+}

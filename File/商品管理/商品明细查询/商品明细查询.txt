@@ -1,0 +1,21 @@
+接口名称：InventoryControllers
+function说明
+############################################################
+1. InvInOutQuery()//商品明细查询
+    方法：Get
+    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/InvInOutQuery?SkuID=&SkuName=&RecordID=&DocDateB=&DocDateE=&PageIndex=1&PageSize=&SortField=&SortDirection=
+    InPut:
+        SkuID           string      查询匹配(商品编号,Default:null)
+        SkuName         string      查询匹配(商品名称,Default:null)
+        RecordID        string      查询匹配(单据编号,Default:null)
+        DocDateB        DateTime    单据日期起(Default:1999/01/01)
+        DocDateE        DateTime    单据日期迄(Default:DateTime.Now)
+        PageIndex       int         当前页码(ex.第一页就给1)
+        PageSize        int         每页显示资料笔数(Default:20)
+        SortField       string      排序字段(Default:all)
+        SortDirection   string      排序方向(DESC|ASC,Default:ASC)
+    OutPut:
+        PageCount       int         总页数
+        DataCount       int         资料总笔数
+        InvItemLst      List<Invinoutitem>  商品交易明细(Invinoutitem)
+    参考:output json 文件:InvInOutQuery_output.json
