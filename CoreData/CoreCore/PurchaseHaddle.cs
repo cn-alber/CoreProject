@@ -251,7 +251,7 @@ namespace CoreData.CoreCore
                     string sqlCommandText = @"INSERT INTO purchase(purchasedate,scoid,sconame,contract,shplogistics,shpcity,shpdistrict,shpaddress,purtype,buyyer,remark,warehouseid,warehousename,taxrate,coid,creator) VALUES(
                             @Purdate,@Scoid,@Sconame,@Contract,@Shplogistics,@Shpcity,@Shpdistrict,@Shpaddress,@Purtype,@Buyyer,@Remark,@Warehouseid,@Warehousename,@Taxrate,@Coid,@UName)";
                     var args = new {Purdate=pur.purchasedate,Scoid = pur.scoid,Sconame = pur.sconame,Contract = pur.contract,Shplogistics = pur.shplogistics,Shpcity = pur.shpcity,Shpdistrict = pur.shpdistrict,
-                                    Shpaddress = pur.shpaddress,Purtype = pur.purtype,Buyyer = pur.buyyer,Remark = pur.remark,Warehouseid = pur.warehouseid,Warehousename = pur.warehousename,
+                                    Shpaddress = pur.shpaddress,Purtype = pur.purtype,Buyyer = UserName,Remark = pur.remark,Warehouseid = pur.warehouseid,Warehousename = pur.warehousename,
                                     Taxrate = pur.taxrate,Coid = CoID,UName = UserName};
                     int count =conn.Execute(sqlCommandText,args);
                     if(count < 0)
