@@ -1,0 +1,12 @@
+{
+    "Rec": {
+        "scoid": 3,
+        "sconame": "携云科技有限公司",
+        "purchaseid": 27,
+        "warehouseid": 1,
+        "warehousename": "test0001",
+        "remark": "remark",
+        "logisticsno": "logisticsno",
+        "receivedate": "2016-10-12"
+    }
+}

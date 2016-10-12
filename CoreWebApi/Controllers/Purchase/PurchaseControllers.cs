@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using Microsoft.AspNetCore.Authorization;
+// using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyCore;
 using CoreData.CoreCore;
 using System;
@@ -174,7 +174,7 @@ namespace CoreWebApi
             var data = PurchaseHaddle.CompletePurchase(puridList,CoId);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
-        [AllowAnonymous]
+
         [HttpPostAttribute("/Core/Purchase/InsertPurDetail")]
         public ResponseResult InsertPurDetail([FromBodyAttribute]JObject co)
         {   

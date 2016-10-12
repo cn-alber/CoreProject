@@ -3,26 +3,95 @@
 function说明
 1.PurchaseReceiveList() //查询table purchasereceive 资料
   路由:http://localhost:5000/Core/PurchaseReceive/PurchaseReceiveList
-input:      Recid           string          收料单号
-            Purid           string          采购单号
-            Skuname         string          商品名称
-            Warehousename   string          仓库代号
-            Status          int             状态
-            SortField       string          排序栏位名称
-            SortDirection   string          排序方式
-            PageIndex       int             资料页数(ex.第一页就给1)
-            NumPerPage      int             每页显示资料笔数
-OutPut:     CoID            int             公司编号coid
-            Purid           string          采购单号
-            Skuname         string          商品名称
-            Warehousename   string          仓库代号
-            Status          int             状态
-            SortField       string          排序栏位名称
-            SortDirection   string          排序方式
-            PageIndex       int             资料页数(ex.第一页就给1)
-            NumPerPage      int             每页显示资料笔数
-            Datacnt         int             资料总笔数
-            Pagecnt         int             总页数
-            Rec             List<PurRec>    PurchaseReceive 资料
-参考:input jason 文件:PurchaseReceiveList_input.json
+input:      Purid           string                采购单号 default null
+            IsNotPur        string                无采购单件 default null
+            RecdateStart    string                收料时间起 default null
+            RecdateEnd      string                收料时间迄 default null
+            Status          string                状态 default null
+            FinStatus       string                财务状态 default null
+            Scoid           string                供应商 default null
+            Skuid           string                商品编码 default null
+            Remark          string                备注 default null
+            SortField       string                排序栏位名称 default id
+            SortDirection   string                排序方式 default DESC
+            PageIndex       string                资料页数(ex.第一页就给1) default 1
+            NumPerPage      string                每页显示资料笔数 default 20
+OutPut:     Datacnt         int                   资料总笔数
+            Pagecnt         int                   总页数
+            PurRec          List<purchasereceive> purchasereceive 资料
 参考:output jason 文件:PurchaseReceiveList_output.json
+
+2.PurchaseRecDetailList() //查询table purchaserecdetail 资料
+  路由:http://localhost:5000/Core/PurchaseReceive/PurchaseRecDetailList
+input:      Recid           string                  收料单号 default null
+            SortField       string                  排序栏位名称 default id
+            SortDirection   string                  排序方式 default DESC
+            PageIndex       string                  资料页数(ex.第一页就给1) default 1
+            NumPerPage      string                  每页显示资料笔数 default 20
+OutPut:     Datacnt         int                     资料总笔数
+            Pagecnt         int                     总页数
+            PurRecDetail    List<purchaserecdetail> purchaserecdetail 资料
+参考:output jason 文件:PurchaseRecDetailList_output.json
+
+3.InsertRec()//收料单新增
+http://localhost:5000/Core/PurchaseReceive/InsertRec
+input:Rec           purchasereceive      收料单资料
+output: s=1成功 else 错误代码
+参考:input jason 文件:InsertRec_input.json
+参考:output jason 文件:InsertRec_output.json
+
+4.UpdateRec()//收料单更新
+路由:http://localhost:5000/Core/PurchaseReceive/UpdateRec
+input:Rec           purchasereceive      收料单资料
+output: s=1成功 else 错误代码
+参考:input jason 文件:UpdateRec_input.json
+参考:output jason 文件:UpdateRec_output.json
+
+5.CancleReceive()//作废收料单
+路由:http://localhost:5000/Core/PurchaseReceive/CancleReceive
+input:  RecIdList   List<int>    收料单号List
+OutPut: 1 成功  -3003 失败
+参考:input jason 文件:CancleReceive_input.json
+参考:output jason 文件:CancleReceive_output.json
+
+***6.ConfirmRec()//审核采购
+路由:http://localhost:5000/Core/Purchase/ConfirmPur
+input:  PurIdList   List<int>    采购单号List
+OutPut: 1 成功  -3003 失败
+参考:input jason 文件:ConfirmPur_input.json
+参考:output jason 文件:ConfirmPur_output.json
+
+***7.PurchaseRecSingle()//查询单笔采购单资料
+路由:http://localhost:5000/Core/Purchase/PurchaseSingle
+input:      ID           string           采购单号
+OutPut:     Pur          Purchase         Purchase 资料
+参考:output jason 文件:PurchaseSingle_output.json
+
+***8.FinConfirmRec()//采购单完成
+路由:http://localhost:5000/Core/Purchase/CompletePur
+input:  PurIdList   List<int>    采购单号List
+OutPut: 1 成功  -3003 失败
+参考:input jason 文件:CompletePur_input.json
+参考:output jason 文件:CompletePur_output.json
+
+***9.InsertPurDetail()//新增采购单明细
+路由:http://localhost:5000/Core/Purchase/InsertPurDetail
+input:  PurDetail   purchasedetail    采购单明细资料
+OutPut: 1 成功  else 失败代号
+参考:input jason 文件:InsertPurDetail_input.json
+参考:output jason 文件:InsertPurDetail_output.json
+
+***10.UpdatePurDetail()//更新采购单明细
+路由:http://localhost:5000/Core/Purchase/UpdatePurDetail
+input:  PurDetail   purchasedetail    采购单明细资料
+OutPut: 1 成功  else 失败代号
+参考:input jason 文件:UpdatePurDetail_input.json
+参考:output jason 文件:UpdatePurDetail_output.json
+
+***11.DelPurDetail()//删除采购单明细
+路由:http://localhost:5000/Core/Purchase/DelPurDetail
+input:  ID        int         采购单ID
+        DetailID  List<int>   采购单明细ID
+OutPut: 1 成功  else 失败代号
+参考:input jason 文件:DelPurDetail_input.json
+参考:output jason 文件:DelPurDetail_output.json
