@@ -114,6 +114,18 @@ namespace CoreWebApi
         }
         #endregion
 
+        #region //获取省市区所有列表 
+        [HttpGetAttribute("/Core/Common/allArea")]
+        public ResponseResult allArea()
+        {            
+            var res = CommHaddle.GetAllArea();            
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+
+
+
         #region 获取品牌列表
         [HttpGetAttribute("/Core/Common/CommBrandLst")]
         public ResponseResult CommBrandLst()

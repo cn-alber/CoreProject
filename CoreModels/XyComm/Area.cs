@@ -18,4 +18,31 @@ namespace CoreModels.XyComm
 		public string Jianpin{get;set;}
 		public string FirstChar{get;set;}
      }
+
+	 public class AreaAll{
+		 public int value{get;set;}
+		 public string label{get;set;}
+		 public int ParentId{get;set;}
+		 public List<AreaAll> children{get;set;}
+	 }
+
+	 public class AreaCascader{
+		 public int value{get;set;}
+		 public string label{get;set;}
+		 public List<AreaCascader2> children{get;set;}
+
+	 }
+
+	public class AreaCascader2{
+		 public int value{get;set;}
+		 public string label{get;set;}
+		 public List<AreaCascader3> children{get;set;}
+
+	 }
+	public class AreaCascader3{
+		 public int value{get;set;}
+		 public string label{get;set;}
+
+	 }
+
 }

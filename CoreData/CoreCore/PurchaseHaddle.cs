@@ -111,7 +111,7 @@ namespace CoreData.CoreCore
             var res = new PurchaseDetailData();
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
-                    string pursql = "select id,purchaseid,img,skuid,skuname,purqty,suggestpurqty,recqty,price,puramt,remark,goodscode,supplynum,supplycode,planqty,planamt,recievedate,norm,packingnum from purchasedetail where purchaseid = " + cp.Purid + " and coid =" + cp.CoID ;
+                    string pursql = "select id,purchasedate,scoid,sconame,contract,shplogistics,shpcity,shpdistrict,shpaddress,warehouseid,warehousename,status,purtype,buyyer,remark,taxrate from purchase where id = " + cp.Purid;
                     var pur = conn.Query<Purchase>(pursql).AsList();
                     if (pur.Count == 0)
                     {
@@ -162,7 +162,7 @@ namespace CoreData.CoreCore
         ///</summary>
         public static DataResult CanclePurchase(List<int> PuridList,int CoID)
         {
-            var result = new DataResult(1,"资料作废成功!");     
+            var result = new DataResult(1,null);     
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
             var TransCore = CoreDBconn.BeginTransaction();
@@ -245,18 +245,22 @@ namespace CoreData.CoreCore
         ///</summary>
         public static DataResult InsertPurchase(Purchase pur,string UserName,int CoID)
         {
-            var result = new DataResult(1,"资料新增成功!");   
+            var result = new DataResult(1,null);   
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{
                     string sqlCommandText = @"INSERT INTO purchase(purchasedate,scoid,sconame,contract,shplogistics,shpcity,shpdistrict,shpaddress,purtype,buyyer,remark,warehouseid,warehousename,taxrate,coid,creator) VALUES(
                             @Purdate,@Scoid,@Sconame,@Contract,@Shplogistics,@Shpcity,@Shpdistrict,@Shpaddress,@Purtype,@Buyyer,@Remark,@Warehouseid,@Warehousename,@Taxrate,@Coid,@UName)";
                     var args = new {Purdate=pur.purchasedate,Scoid = pur.scoid,Sconame = pur.sconame,Contract = pur.contract,Shplogistics = pur.shplogistics,Shpcity = pur.shpcity,Shpdistrict = pur.shpdistrict,
-                                    Shpaddress = pur.shpaddress,Purtype = pur.purtype,Buyyer = pur.buyyer,Remark = pur.remark,Warehouseid = pur.warehouseid,Warehousename = pur.warehousename,
+                                    Shpaddress = pur.shpaddress,Purtype = pur.purtype,Buyyer = UserName,Remark = pur.remark,Warehouseid = pur.warehouseid,Warehousename = pur.warehousename,
                                     Taxrate = pur.taxrate,Coid = CoID,UName = UserName};
                     int count =conn.Execute(sqlCommandText,args);
                     if(count < 0)
                     {
                         result.s = -3002;
+                    }
+                    else
+                    {
+                        result.d = count;
                     }
                 }catch(Exception ex){
                     result.s = -1;
@@ -271,7 +275,7 @@ namespace CoreData.CoreCore
         ///</summary>
         public static DataResult UpdatePurchase(Purchase pur)
         {
-            var result = new DataResult(1,"资料更新成功!");  
+            var result = new DataResult(1,null);  
             string contents = string.Empty; 
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{               
@@ -299,7 +303,7 @@ namespace CoreData.CoreCore
         ///</summary>
         public static DataResult ConfirmPurchase(List<int> PuridList,int CoID)
         {
-            var result = new DataResult(1,"采购单审核成功!");  
+            var result = new DataResult(1,null);  
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
             var TransCore = CoreDBconn.BeginTransaction();
@@ -355,7 +359,7 @@ namespace CoreData.CoreCore
         ///</summary>
         public static DataResult CompletePurchase(List<int> PuridList,int CoID)
         {
-            var result = new DataResult(1,"采购单完成!");  
+            var result = new DataResult(1,null);  
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
             var TransCore = CoreDBconn.BeginTransaction();
@@ -411,7 +415,7 @@ namespace CoreData.CoreCore
         ///</summary>
         public static DataResult InsertPurDetail(PurchaseDetail detail,int CoID)
         {
-            var result = new DataResult(1,"采购单明细新增成功!");  
+            var result = new DataResult(1,null);  
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
             var TransCore = CoreDBconn.BeginTransaction();
@@ -426,6 +430,10 @@ namespace CoreData.CoreCore
                 if(count <= 0)
                 {
                     result.s = -3002;
+                }
+                else
+                {
+                    result.d = count;
                 }
                 string wheresql = "select count(*) from purchase where id = '" + detail.purchaseid + "' and coid =" + CoID ;
                 int u = CoreDBconn.QueryFirst<int>(wheresql);
@@ -465,7 +473,7 @@ namespace CoreData.CoreCore
         ///</summary>
         public static DataResult UpdatePurDetail(PurchaseDetail detail,int CoID)
         {
-            var result = new DataResult(1,"采购单明细更新成功!");  
+            var result = new DataResult(1,null);  
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
             var TransCore = CoreDBconn.BeginTransaction();
@@ -531,7 +539,7 @@ namespace CoreData.CoreCore
         ///</summary>
         public static DataResult DeletePurDetail(int id,List<int> detailid,int CoID)
         {
-            var result = new DataResult(1,"采购单明细删除成功!");    
+            var result = new DataResult(1,null);    
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
             var TransCore = CoreDBconn.BeginTransaction();
@@ -620,10 +628,18 @@ namespace CoreData.CoreCore
         ///</summary>
         public static DataResult InsertQualityRev(QualityRev qua,int CoID)
         {
-            var result = new DataResult(1,"质检资料新增成功!");  
+            var result = new DataResult(1,null);  
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try
                 {
+                    string wheresql = @"select count(*) from purchase where id = " + qua.purchaseid + " and status in (0,1)";
+                    int u = conn.QueryFirst<int>(wheresql);
+                    if(u == 0)
+                    {
+                        result.s = -1;
+                        result.d = "不允许新增质检资料";
+                        return result;
+                    }
                     string sqlCommandText = @"INSERT INTO qualityrev(recorddate,recorder,drawrate,type,conclusion,remark,purchaseid,coid) 
                                                 VALUES(@Recorddate,@Recorder,@Drawrate,@Type,@Conclusion,@Remark,@Purchaseid,@Coid)";
                     var args = new {Recorddate = qua.recorddate,Recorder=qua.recorder,Drawrate = qua.drawrate,Type = qua.type,
@@ -632,6 +648,10 @@ namespace CoreData.CoreCore
                     if(count <= 0)
                     {
                         result.s = -3002;
+                    }
+                    else
+                    {
+                        result.d = count;
                     }
                 }
                 catch (Exception e)
@@ -648,10 +668,18 @@ namespace CoreData.CoreCore
         ///</summary>
         public static DataResult UpdateQualityRev(QualityRev qua)
         {
-            var result = new DataResult(1,"质检资料更新成功!");  
+            var result = new DataResult(1,null);  
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try
                 {
+                    string wheresql = @"select count(*) from purchase where id = " + qua.purchaseid + " and status in (0,1)";
+                    int u = conn.QueryFirst<int>(wheresql);
+                    if(u == 0)
+                    {
+                        result.s = -1;
+                        result.d = "不允许更新质检资料";
+                        return result;
+                    }
                     string sqlCommandText = @"update qualityrev set recorddate = @Recorddate,recorder = @Recorder,drawrate = @Drawrate,type = @Type,conclusion = @Conclusion,
                                                 remark = @Remark where id = @ID";
                     var args = new {Recorddate = qua.recorddate,Recorder=qua.recorder,Drawrate = qua.drawrate,Type = qua.type,
@@ -675,7 +703,7 @@ namespace CoreData.CoreCore
         ///</summary>
         public static DataResult DeleteQualityRev(List<int> id)
         {
-            var result = new DataResult(1,"质检资料删除成功!");  
+            var result = new DataResult(1,null);  
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try
                 {
@@ -710,7 +738,7 @@ namespace CoreData.CoreCore
         ///</summary>
         public static DataResult ConfirmQualityRev(List<int> id)
         {
-            var result = new DataResult(1,"质检资料更新成功!");  
+            var result = new DataResult(1,null);  
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try
                 {
@@ -804,7 +832,7 @@ namespace CoreData.CoreCore
         ///</summary>
         public static DataResult UpdatePurRemark(int id,string remark)
         {
-            var result = new DataResult(1,"资料更新成功!");  
+            var result = new DataResult(1,null);  
             string contents = string.Empty; 
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{               
