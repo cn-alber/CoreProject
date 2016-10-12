@@ -147,7 +147,7 @@ namespace CoreDate.CoreApi
         /// <param name="checkTimeEnd">可为空，审核日期(END) 格式类型（yyyy-MM-dd hh:mm:ss,2013-08-06 21:02:07）</param>
         /// <param name="pageIndex">页码(显示多少页，区间为1-1000) </param>
         /// <param name="pageSize">	每页显示多少条（区间为1-50）</param>
-        public static DataResult jdRefundList(string ids, string status, string orderId, string buyerId, string buyerName, string applyTimeStart, string applyTimeEnd, string checkTimeStart, string checkTimeEnd, string pageIndex, string pageSize,string token){
+        public static DataResult jdRefundList(string ids, string status, string orderId, string buyerId, string buyerName, string applyTimeStart, string applyTimeEnd, string checkTimeStart, string checkTimeEnd, int pageIndex, int pageSize,string token){
             var result = new DataResult(1,null);
             try{
                 jdparam.Add("method", "jingdong.pop.afs.soa.refundapply.queryPageList");                              
@@ -170,7 +170,7 @@ namespace CoreDate.CoreApi
             return result;
         }
                     
-        public static DataResult jdRefundById(string id,string token){
+        public static DataResult jdRefundById(int id,string token){
             var result = new DataResult(1,null);
             try{                             
                 jdparam.Add("method", "jingdong.pop.afs.soa.refundapply.queryById");  
@@ -196,26 +196,14 @@ namespace CoreDate.CoreApi
         ///  商家审核退款单
         /// </summary>
         /// <param name="status">退款申请单状态：1审核通过 2审核不通过 6拦截并退款 9强制关单)</param>
-        /// <param name="status">退款单ID</param>
+        /// <param name="id">退款单ID</param>
         /// <param name="checkUserName">审核人 </param>
         /// <param name="remark">	审核备注,除强制关单外的其它审核状态下必填 </param>
         /// <param name="rejectType">仅在审核不通过时填写该值。1: 商品已在配送途中,无法取消,烦请谅解；2：商品已签收,无法取消,烦请谅解；3：国际站保税区订单，已报关</param>
         /// <param name="outWareStatus">实际是否已出库:1已出库 2未出</param>
-        public static DataResult jdReplyRefund(string status, string id , string checkUserName,string remark,string rejectType,string outWareStatus,string token){
+        public static DataResult jdReplyRefund(int status, string id , string checkUserName,string remark,string rejectType,string outWareStatus,string token){
             var result = new DataResult(1,null);
-            if (status != "9")
-            {
-                if (remark == "")
-                {            
-                    result.s = -5002;         
-                    return result;
-                }
-            }
-            else if (status == "2")
-            {                
-                result.s = -5003;
-                return result;
-            }
+ 
             try{                             
                 jdparam.Add("method", "jingdong.pop.afs.soa.refundapply.replyRefund");  
                 jdparam.Add("access_token", token);  
@@ -276,7 +264,7 @@ namespace CoreDate.CoreApi
         /// <param name="trade_no">可为空，流水号</param>
         /// <param name="outer_id">可为空，sku外部id（指商品本身的货号，对应商家后台“商家skuid”） </param>
         /// <returns></returns>
-        public static DataResult jdSkuAdd(string ware_id,string attributes,string jd_price,string stock_num,string trade_no,string outer_id,string token){
+        public static DataResult jdSkuAdd(string ware_id,string attributes,string jd_price,int stock_num,string trade_no,string outer_id,string token){
             var result = new DataResult(1,null);
             try{                             
                 jdparam.Add("method", "360buy.ware.sku.add");  
