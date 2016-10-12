@@ -9,7 +9,7 @@ namespace CoreWebApi.Api.JingDong{
     {
         #region 
         [HttpGetAttribute("/core/Api/JdOrder/download")]
-        public ResponseResult orderDownload(string start_date="", string end_date="", string order_state="", int page=1, int page_size=100, string token="")
+        public ResponseResult orderDownload(string start_date="", string end_date="", string order_state="", int page=1, int pageSize=100, string token="")
         {            
             // string start_date="2016-08-15 11:29:19";
             // string end_date ="2016-09-11 11:29:19";
@@ -18,9 +18,9 @@ namespace CoreWebApi.Api.JingDong{
             // string   page_size = "10";
             // string   token="fc8e04d5-2d8d-458c-b188-d55852af94f3";
             page = Math.Max(page,1);
-            page_size = Math.Min(page_size,100);
+            pageSize = Math.Min(pageSize,100);
 
-            var m = JingDHaddle.jdOrderDownload(start_date, end_date, order_state, page, page_size, token);
+            var m = JingDHaddle.jdOrderDownload(start_date, end_date, order_state, page, pageSize, token);
             return CoreResult.NewResponse(m.s, m.d, "Api");
         }
         #endregion
