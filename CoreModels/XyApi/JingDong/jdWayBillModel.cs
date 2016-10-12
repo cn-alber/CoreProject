@@ -141,7 +141,22 @@ namespace CoreModels.XyApi.JingDong
     }
 
 
+    public class WaybillSend{
+        public string deliveryId{get;set;}
+        public string salePlat{get;set;}
+        public string customerCode{get;set;}
+        public string orderId{get;set;}
+        public List<string> thrOrderIds{get;set;}
+        public string senderName{get;set;}
+        public string senderAddress{get;set;}
+        public string receiveName{get;set;}
+        public string receiveAddress{get;set;}
+        public int packageCount{get;set;}
+        public decimal weight{get;set;} 
+        public decimal vloumn{get;set;}
+        public string token{get;set;}
 
+    }
 
 
 
