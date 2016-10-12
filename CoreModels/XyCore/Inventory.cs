@@ -40,8 +40,9 @@ namespace CoreModels.XyCore
         private int _WarehouseID = 0;//仓库ID
         private int _Status = 0;//库存状态:0.全部,1.充足,2.预警
         private DateTime _DocDateB = Convert.ToDateTime("1999/01/01");//单据日期起
-        private DateTime _DocDateE = DateTime.Now;//单据日期迄
+        private DateTime _DocDateE = DateTime.Now;//单据日期迄        
         private string _DocType;//单据类型
+        private string _RecordID;//单据编号
         public int CoID
         {
             get { return _CoID; }
@@ -123,6 +124,11 @@ namespace CoreModels.XyCore
             get { return _DocType; }
             set { this._DocType = value; }
         }//单据类型
+        public string RecordID
+        {
+            get { return _RecordID; }
+            set { this._RecordID = value; }
+        }//单据编号
     }
 
     public class InventoryData
@@ -131,5 +137,11 @@ namespace CoreModels.XyCore
         public int DataCount { get; set; } //总行数
         public List<Inventory> InvLst { get; set; }//返回查询结果
     }
-  
+
+    public class InventParams
+    {
+        public int ID { get; set; }
+        public decimal SafeQty { get; set; }
+    }
+
 }

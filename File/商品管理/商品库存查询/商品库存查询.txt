@@ -1,5 +1,6 @@
 接口名称：InventoryControllers
 function说明
+############################################################
 1.InventQuery()//查询商品库存
     方法：Get
     路由：http://192.168.30.29:5000/Core/XyCore/Inventory/InventQuery?SkuID=&SkuName=&StockQtyb=&StockQtye=&WarehouseID=&Status=&PageIndex=1&PageSize=&SortField=&SortDirection=
@@ -20,6 +21,7 @@ function说明
         DataCount       int         资料总笔数
         InvLst          List<Inventory>  商品库存(Inventory)
     参考:output json 文件:InventQuery_output.json
+############################################################
 2.InvDetailQuery()//查询商品交易明细
     方法：Get
     路由：http://192.168.30.29:5000/Core/XyCore/Inventory/InvDetailQuery?SkuID=&WarehouseID=&DocType=&DocDateB=&DocDateE=&PageIndex=1&PageSize=&SortField=&SortDirection=
@@ -38,3 +40,41 @@ function说明
         DataCount       int         资料总笔数
         InvItemLst      List<Invinoutitem>  商品交易明细(Invinoutitem)
     参考:output json 文件:InvDetailQuery_output.json
+############################################################
+3.InventorySingle()//修改现有库存-查询单笔库存明细
+    方法：Get
+    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/InventorySingle?ID=257277
+    InPut:
+        ID              int         商品库存ID
+    OutPut:
+        Inv             Inventory   单笔商品库存(Inventory)
+    参考:output json 文件:InventorySingle_output.json
+4.UptStockQtySingle()//修改现有库存 - 产生盘点交易
+    方法：POST
+    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/UptStockQtySingle
+    InPut:
+        ID              int         商品库存ID(inventory.ID)
+        SetQty          int         库存盘点数量
+    OutPut:
+        成功：返回请求成功信息(s=1)
+        失败：返回错误信息
+############################################################
+5.InvSafeQtyLst()//修改安全库存 - 查询GoodsCode库存明细
+    方法：Get
+    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/InvSafeQtyLst?GoodsCode=&WarehouseID=
+    InPut:
+        GoodsCode       string         货号GoodsCode
+        WarehouseID     int            商品仓库编号
+    OutPut:
+        invLst          List<Inventory> 商品库存
+    参考:output json 文件:InvSaveQtyLst_output.json
+6.UptInvSafeQty()//修改安全库存 - 保存商品库存
+    方法：POST
+    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/UptInvSafeQty
+    InPut:
+        InvLst          List<InventParams>  商品安全库存参数
+    OutPut:
+        成功：返回请求成功信息(s=1)
+        失败：返回错误信息
+    参考:input json 文件:UptInvSafeQty_input.json
+    参考:output json 文件:UptInvSafeQty_output.json
