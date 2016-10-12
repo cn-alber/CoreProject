@@ -179,8 +179,10 @@ namespace CoreWebApi.Api.JingDong{
             var m = new DataResult(1,null);
             if(string.IsNullOrEmpty(token)){
                 m.s = -5000;
+            }else if(string.IsNullOrEmpty(ware_ids)){
+                m.s = -5004;
             }else{
-               //m = JingDHaddle.jdSkusGet();
+               m = JingDHaddle.jdSkusGet(ware_ids,token);
             }
 
 
@@ -188,6 +190,35 @@ namespace CoreWebApi.Api.JingDong{
         }
         #endregion
 
+        #region
+        [HttpGetAttribute("/core/Api/JdOrder/SkuGet")]
+        public ResponseResult SkuGet(string sku_id,string token){
+            var m = new DataResult(1,null);
+            if(string.IsNullOrEmpty(token)){
+                m.s = -5000;
+            }else if(string.IsNullOrEmpty(sku_id)){
+                m.s = -5004;
+            }else{
+                m = JingDHaddle.jdSkuGet(sku_id,token);
+            }
+            return CoreResult.NewResponse(m.s, m.d, "Api");
+        }
+        #endregion
+
+        #region
+        [HttpGetAttribute("/core/Api/JdOrder/FindSkuById")]
+        public ResponseResult FindSkuById(string skuId, string token){
+            var m = new DataResult(1,null);
+            if(string.IsNullOrEmpty(token)){
+                m.s = -5000;
+            }else{
+                
+            }
+
+
+            return CoreResult.NewResponse(m.s, m.d, "Api");
+        }
+        #endregion
 
 
         #region
