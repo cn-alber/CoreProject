@@ -4,6 +4,8 @@ using Dapper;
 using System;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
+// using System.Data;
+
 
 namespace CoreData.CoreUser
 {
@@ -186,20 +188,11 @@ namespace CoreData.CoreUser
         }      
         public static DataResult InsertCompany(CompanySingle com,string UserName,string Company)
         {
-            var result = new DataResult(1,"资料新增成功!");   
+            var result = new DataResult(1,null);   
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{
                     string sqlCommandText = @"INSERT INTO company(name,enable,address,email,contacts,telphone,mobile,remark,creator) VALUES(
-                            @Name,
-                            @Enable,
-                            @Address,
-                            @Email,
-                            @Contacts,
-                            @Telphone,
-                            @Mobile,
-                            @Remark,
-                            @UName
-                        )";
+                            @Name,@Enable,@Address,@Email,@Contacts,@Telphone,@Mobile,@Remark,@UName)";
                     var args = new {Name = com.name,Enable=com.enable,Address = com.address,Email = com.email,Contacts = com.contacts,
                                     Telphone = com.telphone,Mobile = com.mobile,Remark = com.remark,UName = UserName};
                     int count =conn.Execute(sqlCommandText,args);
@@ -209,6 +202,8 @@ namespace CoreData.CoreUser
                     }
                     else
                     {
+                        int rtn = conn.QueryFirst<int>("select LAST_INSERT_ID()");
+                        result.d = rtn;
                         LogComm.InsertUserLog("新增公司资料", "company", "新增公司" + com.name ,UserName, Company, DateTime.Now);
                         string wheresql = "select id,name,enable,address,email,contacts,telphone,mobile,remark from company where name ='" + com.name + "'" ;
                         var u = conn.Query<CompanySingle>(wheresql).AsList();
@@ -227,7 +222,7 @@ namespace CoreData.CoreUser
         }
         public static DataResult UpdateCompany(CompanySingle com,string UserName,string Company)
         {
-            var result = new DataResult(1,"资料更新成功!");  
+            var result = new DataResult(1,null);  
             string contents = string.Empty; 
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{

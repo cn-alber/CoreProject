@@ -210,13 +210,18 @@ namespace CoreModels.XyCore
     {
         public int id {get;set;}
         public int purchaseid{get;set;}
-        public DateTime recorddate {get;set;}
+        public string _recorddate;
         public string recorder {get;set;}
-        public decimal drawrate {get;set;}
+        public string drawrate {get;set;}
         public string type {get;set;}
         public string  conclusion {get;set;}
         public string remark {get;set;}
         public int status {get;set;}
+        public string recorddate
+        {
+            get { return _recorddate; }
+            set { this._recorddate = value.ToString().Substring(0,10);}
+        }
     }
     public class PurchaseInitData
     {

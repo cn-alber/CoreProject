@@ -9,6 +9,7 @@ using CoreData;
 using CoreModels;
 namespace CoreWebApi
 {
+    // [AllowAnonymous]
     public class CompanyController : ControllBase
     {
         [HttpGetAttribute("/Core/Company/CompanyList")]

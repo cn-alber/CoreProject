@@ -10,6 +10,7 @@ using CoreModels;
 
 namespace CoreWebApi
 {
+    // [AllowAnonymous]
     public class ScoCompanyController : ControllBase
     {
         [HttpGetAttribute("/Core/ScoCompany/ScoCompanyList")]

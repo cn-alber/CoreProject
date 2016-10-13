@@ -180,23 +180,23 @@ namespace CoreWebApi
         //     return CoreResult.NewResponse(data.s, data.d, "General");
         // }
 
-        // [HttpPostAttribute("/Core/PurchaseReceive/InsertRecDetail")]
-        // public ResponseResult InsertRecDetail([FromBodyAttribute]JObject co)
-        // {   
-        //     var detail = Newtonsoft.Json.JsonConvert.DeserializeObject<PurchaseRecDetail>(co["RecDetail"].ToString());
-        //     int CoId = int.Parse(GetCoid());
-        //     var data = PurchaseReceiveHaddle.InsertRecDetail(detail,CoId);
-        //     return CoreResult.NewResponse(data.s, data.d, "General");
-        // }
+        [HttpPostAttribute("/Core/PurchaseReceive/InsertRecDetail")]
+        public ResponseResult InsertRecDetail([FromBodyAttribute]JObject co)
+        {   
+            var detail = Newtonsoft.Json.JsonConvert.DeserializeObject<PurchaseRecDetail>(co["RecDetail"].ToString());
+            int CoId = int.Parse(GetCoid());
+            var data = PurchaseReceiveHaddle.InsertRecDetail(detail,CoId);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
 
-        // [HttpPostAttribute("/Core/Purchase/UpdatePurDetail")]
-        // public ResponseResult UpdatePurDetail([FromBodyAttribute]JObject co)
-        // {   
-        //     var detail = Newtonsoft.Json.JsonConvert.DeserializeObject<PurchaseDetail>(co["PurDetail"].ToString());
-        //     int CoId = int.Parse(GetCoid());
-        //     var data = PurchaseHaddle.UpdatePurDetail(detail,CoId);
-        //     return CoreResult.NewResponse(data.s, data.d, "General");
-        // }
+        [HttpPostAttribute("/Core/PurchaseReceive/UpdateRecDetail")]
+        public ResponseResult UpdateRecDetail([FromBodyAttribute]JObject co)
+        {   
+            var detail = Newtonsoft.Json.JsonConvert.DeserializeObject<PurchaseRecDetail>(co["RecDetail"].ToString());
+            int CoId = int.Parse(GetCoid());
+            var data = PurchaseReceiveHaddle.UpdateRecDetail(detail,CoId);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
 
         // [HttpPostAttribute("/Core/Purchase/DelPurDetail")]
         // public ResponseResult DelPurDetail([FromBodyAttribute]JObject co)

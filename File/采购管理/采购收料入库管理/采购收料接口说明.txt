@@ -74,12 +74,12 @@ OutPut: 1 成功  -3003 失败
 参考:input jason 文件:CompletePur_input.json
 参考:output jason 文件:CompletePur_output.json
 
-***9.InsertPurDetail()//新增采购单明细
-路由:http://localhost:5000/Core/Purchase/InsertPurDetail
-input:  PurDetail   purchasedetail    采购单明细资料
+9.InsertRecDetail()//新增收料单明细
+路由:http://localhost:5000/Core/PurchaseReceive/InsertRecDetail
+input:  RecDetail   purchaserecdetail    收料单明细资料
 OutPut: 1 成功  else 失败代号
-参考:input jason 文件:InsertPurDetail_input.json
-参考:output jason 文件:InsertPurDetail_output.json
+参考:input jason 文件:InsertRecDetail_input.json
+参考:output jason 文件:InsertRecDetail_output.json
 
 ***10.UpdatePurDetail()//更新采购单明细
 路由:http://localhost:5000/Core/Purchase/UpdatePurDetail
