@@ -260,7 +260,8 @@ namespace CoreData.CoreCore
                     }
                     else
                     {
-                        result.d = count;
+                        int rtn = conn.QueryFirst<int>("select LAST_INSERT_ID()");
+                        result.d = rtn;
                     }
                 }catch(Exception ex){
                     result.s = -1;
@@ -433,7 +434,8 @@ namespace CoreData.CoreCore
                 }
                 else
                 {
-                    result.d = count;
+                    int rtn = CoreDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
+                    result.d = rtn;
                 }
                 string wheresql = "select count(*) from purchase where id = '" + detail.purchaseid + "' and coid =" + CoID ;
                 int u = CoreDBconn.QueryFirst<int>(wheresql);
@@ -626,7 +628,7 @@ namespace CoreData.CoreCore
         ///<summary>
         ///质检资料新增
         ///</summary>
-        public static DataResult InsertQualityRev(QualityRev qua,int CoID)
+        public static DataResult InsertQualityRev(QualityRev qua,int CoID,string Username)
         {
             var result = new DataResult(1,null);  
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
@@ -640,6 +642,10 @@ namespace CoreData.CoreCore
                         result.d = "不允许新增质检资料";
                         return result;
                     }
+                    if(qua.recorder== null || qua.recorder== "")
+                    {
+                        qua.recorder = Username;
+                    }
                     string sqlCommandText = @"INSERT INTO qualityrev(recorddate,recorder,drawrate,type,conclusion,remark,purchaseid,coid) 
                                                 VALUES(@Recorddate,@Recorder,@Drawrate,@Type,@Conclusion,@Remark,@Purchaseid,@Coid)";
                     var args = new {Recorddate = qua.recorddate,Recorder=qua.recorder,Drawrate = qua.drawrate,Type = qua.type,
@@ -651,7 +657,8 @@ namespace CoreData.CoreCore
                     }
                     else
                     {
-                        result.d = count;
+                        int rtn = conn.QueryFirst<int>("select LAST_INSERT_ID()");
+                        result.d = rtn;
                     }
                 }
                 catch (Exception e)
@@ -736,13 +743,13 @@ namespace CoreData.CoreCore
         ///<summary>
         ///质检资料确认
         ///</summary>
-        public static DataResult ConfirmQualityRev(List<int> id)
+        public static DataResult ConfirmQualityRev(int id)
         {
             var result = new DataResult(1,null);  
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try
                 {
-                    int u = conn.QueryFirst<int>("select count(*) from qualityrev where id in @ID and status <> 0",new {ID = id});
+                    int u = conn.QueryFirst<int>("select count(*) from qualityrev where id = @ID and status <> 0",new {ID = id});
                     if (u > 0)
                     {
                         result.s = -1;
@@ -750,7 +757,7 @@ namespace CoreData.CoreCore
                     }
                     else
                     {
-                        string sqlCommandText = @"update qualityrev set status = 1 where id in @ID";
+                        string sqlCommandText = @"update qualityrev set status = 1 where id = @ID";
                         var args = new {ID = id};
                         int count = conn.Execute(sqlCommandText,args);
                         if(count < 0)

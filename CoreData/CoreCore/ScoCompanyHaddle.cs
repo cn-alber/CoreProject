@@ -187,7 +187,7 @@ namespace CoreData.CoreCore
         }      
         public static DataResult InsertScoCompany(int CoID,ScoCompanySingle com,string UserName,string Company)
         {
-            var result = new DataResult(1,"资料新增成功!");   
+            var result = new DataResult(1,null);   
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{
                     string sqlCommandText = @"INSERT INTO supplycompany(sconame,scosimple,enable,scocode,address,country,contactor,tel,phone,fax,url,email,typelist,bank,bankid,taxid,remark,creator,coid) VALUES(
@@ -221,6 +221,8 @@ namespace CoreData.CoreCore
                     }
                     else
                     {
+                        int rtn = conn.QueryFirst<int>("select LAST_INSERT_ID()");
+                        result.d = rtn;
                         CoreUser.LogComm.InsertUserLog("新增客户资料", "supplycompany", "新增客户" + com.sconame ,UserName, Company, DateTime.Now);
                         string wheresql = "select id,sconame,scosimple,enable,scocode,address,country,contactor,tel,phone,fax,url,email,typelist,bank,bankid,taxid,remark from supplycompany where sconame ='" + com.sconame + "' and coid =" + CoID ;
                         var u = conn.Query<ScoCompanySingle>(wheresql).AsList();
@@ -239,7 +241,7 @@ namespace CoreData.CoreCore
         }
         public static DataResult UpdateScoCompany(int CoID,ScoCompanySingle com,string UserName,string Company)
         {
-            var result = new DataResult(1,"资料更新成功!");  
+            var result = new DataResult(1,null);  
             string contents = string.Empty; 
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-// using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyCore;
 using CoreData.CoreCore;
 using System;
@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using CoreModels;
 namespace CoreWebApi
 {
+    [AllowAnonymous]
     public class PurchaseController : ControllBase
     {
         [HttpGetAttribute("/Core/Purchase/PurchaseList")]
@@ -227,7 +228,8 @@ namespace CoreWebApi
         {   
             var qua = Newtonsoft.Json.JsonConvert.DeserializeObject<QualityRev>(co["Quality"].ToString());
             int CoId = int.Parse(GetCoid());
-            var data = PurchaseHaddle.InsertQualityRev(qua,CoId);
+            string Username = GetUname();
+            var data = PurchaseHaddle.InsertQualityRev(qua,CoId,Username);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
@@ -250,7 +252,7 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Purchase/ConfirmQualityRev")]
         public ResponseResult ConfirmQualityRev([FromBodyAttribute]JObject co)
         {   
-            List<int> id = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["ID"].ToString());
+            int id = Newtonsoft.Json.JsonConvert.DeserializeObject<int>(co["ID"].ToString());
             var data = PurchaseHaddle.ConfirmQualityRev(id);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }

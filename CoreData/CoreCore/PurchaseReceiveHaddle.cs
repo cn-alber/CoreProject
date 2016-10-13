@@ -258,72 +258,51 @@ namespace CoreData.CoreCore
             }
             return result;
         }
-        // ///<summary>
-        // ///采购单明细更新
-        // ///</summary>
-        // public static DataResult UpdatePurDetail(PurchaseDetail detail,int CoID)
-        // {
-        //     var result = new DataResult(1,"采购单明细更新成功!");  
-        //     var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
-        //     CoreDBconn.Open();
-        //     var TransCore = CoreDBconn.BeginTransaction();
-        //     try
-        //     {
-        //         string wheresql = "select id,purchaseid,img,skuid,skuname,purqty,suggestpurqty,recqty,price,puramt,remark,goodscode,supplynum,supplycode,planqty,planamt,recievedate,norm,packingnum from purchasedetail where id = " + detail.id;
-        //         var pur = CoreDBconn.Query<PurchaseDetail>(wheresql).AsList();
-        //         if (pur.Count == 0)
-        //         {
-        //             result.s = -3001;
-        //         }
-        //         else
-        //         {
-        //             decimal qty = decimal.Parse(pur[0].purqty);
-        //             decimal amt = decimal.Parse(pur[0].puramt);
-        //             string sqlCommandText = @"update purchasedetail set skuid = @Skuid,skuname = @Skuname,price = @Price,purqty = @Purqty,suggestpurqty = @Suggestpurqty,puramt = @Puramt,
-        //                                     recievedate = @Recdate,remark = @Remark,norm = @Norm,img = @Img,goodscode = @Goodscode,supplynum = @Supplynum,supplycode= @Supplycode,
-        //                                     planqty = @Planqty,planamt = @Planamt,packingnum = @Packingnum where id = @ID ";
-        //             var args = new {Skuid=detail.skuid,Skuname = detail.skuname,Price = detail.price,Purqty = detail.purqty,Suggestpurqty = detail.suggestpurqty,Puramt = detail.puramt,
-        //                             Recdate = detail.recievedate,Remark = detail.remark,Norm = detail.norm,Img = detail.img,Goodscode = detail.goodscode ,Supplynum = detail.supplynum,
-        //                             Supplycode = detail.supplycode,Planqty = detail.planqty,Planamt = detail.planamt,Packingnum = detail.packingnum,ID = detail.id};
-        //             int count = CoreDBconn.Execute(sqlCommandText,args,TransCore);
-        //             if(count <= 0)
-        //             {
-        //                 result.s = -3003;
-        //             }
-        //             wheresql = "select count(*) from purchase where id = '" + detail.purchaseid + "' and coid =" + CoID ;
-        //             int u = CoreDBconn.QueryFirst<int>(wheresql);
-        //             if (u == 0)
-        //             {
-        //                 result.s = -3001;
-        //             }
-        //             else
-        //             {
-        //                 string uptsql = @"update purchase set purqtytot = purqtytot - @Qty + @Purqty,puramtnet = puramtnet - @Amt + @Puramt,puramttot = puramtnet*(1 + taxrate/100) where id = @PurID and coid = @Coid";
-        //                 var upargs = new {Purqty = detail.purqty,Qty = qty,Puramt = detail.puramt,Amt = amt,PurID = detail.purchaseid,Coid = CoID};
-        //                 count = CoreDBconn.Execute(uptsql,upargs);
-        //                 if(count < 0)
-        //                 {
-        //                     result.s= -3003;
-        //                 }
-        //             }
-        //         } 
-        //         if(result.s == 1)
-        //         {
-        //             TransCore.Commit();
-        //         }
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         result.s = -1;
-        //         result.d = e.Message;
-        //     }
-        //     finally
-        //     {
-        //         TransCore.Dispose();
-        //         CoreDBconn.Close();
-        //     }
-        //     return result;
-        // }
+        ///<summary>
+        ///收料单明细更新
+        ///</summary>
+        public static DataResult UpdateRecDetail(PurchaseRecDetail detail,int CoID)
+        {
+            var result = new DataResult(1,null);  
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try
+                {
+                    // string sqlCommandText = @"update purchasedetail set skuid = @Skuid,skuname = @Skuname,price = @Price,purqty = @Purqty,suggestpurqty = @Suggestpurqty,puramt = @Puramt,
+                    //                         recievedate = @Recdate,remark = @Remark,norm = @Norm,img = @Img,goodscode = @Goodscode,supplynum = @Supplynum,supplycode= @Supplycode,
+                    //                         planqty = @Planqty,planamt = @Planamt,packingnum = @Packingnum where id = @ID ";
+                    // var args = new {Skuid=detail.skuid,Skuname = detail.skuname,Price = detail.price,Purqty = detail.purqty,Suggestpurqty = detail.suggestpurqty,Puramt = detail.puramt,
+                    //                 Recdate = detail.recievedate,Remark = detail.remark,Norm = detail.norm,Img = detail.img,Goodscode = detail.goodscode ,Supplynum = detail.supplynum,
+                    //                 Supplycode = detail.supplycode,Planqty = detail.planqty,Planamt = detail.planamt,Packingnum = detail.packingnum,ID = detail.id};
+                    // int count = CoreDBconn.Execute(sqlCommandText,args,TransCore);
+                    // if(count <= 0)
+                    // {
+                    //     result.s = -3003;
+                    // }
+                    // wheresql = "select count(*) from purchase where id = '" + detail.purchaseid + "' and coid =" + CoID ;
+                    // int u = CoreDBconn.QueryFirst<int>(wheresql);
+                    // if (u == 0)
+                    // {
+                    //     result.s = -3001;
+                    // }
+                    // else
+                    // {
+                    //     string uptsql = @"update purchase set purqtytot = purqtytot - @Qty + @Purqty,puramtnet = puramtnet - @Amt + @Puramt,puramttot = puramtnet*(1 + taxrate/100) where id = @PurID and coid = @Coid";
+                    //     var upargs = new {Purqty = detail.purqty,Qty = qty,Puramt = detail.puramt,Amt = amt,PurID = detail.purchaseid,Coid = CoID};
+                    //     count = CoreDBconn.Execute(uptsql,upargs);
+                    //     if(count < 0)
+                    //     {
+                    //         result.s= -3003;
+                    //     }
+                    // }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
         // ///<summary>
         // ///采购单明细删除
         // ///</summary>
