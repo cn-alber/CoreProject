@@ -198,14 +198,12 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
-        // [HttpPostAttribute("/Core/Purchase/DelPurDetail")]
-        // public ResponseResult DelPurDetail([FromBodyAttribute]JObject co)
-        // {   
-        //     int id = int.Parse(co["ID"].ToString());
-        //     List<int> detailid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["DetailID"].ToString());
-        //     int CoId = int.Parse(GetCoid());
-        //     var data = PurchaseHaddle.DeletePurDetail(id,detailid,CoId);
-        //     return CoreResult.NewResponse(data.s, data.d, "General");
-        // }
+        [HttpPostAttribute("/Core/PurchaseReceive/DelRecDetail")]
+        public ResponseResult DelRecDetail([FromBodyAttribute]JObject co)
+        {   
+            List<int> detailid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["DetailID"].ToString());
+            var data = PurchaseReceiveHaddle.DelRecDetail(detailid);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
     }
 }

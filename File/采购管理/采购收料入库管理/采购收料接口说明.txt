@@ -81,17 +81,35 @@ OutPut: 1 成功  else 失败代号
 参考:input jason 文件:InsertRecDetail_input.json
 参考:output jason 文件:InsertRecDetail_output.json
 
-***10.UpdatePurDetail()//更新采购单明细
-路由:http://localhost:5000/Core/Purchase/UpdatePurDetail
-input:  PurDetail   purchasedetail    采购单明细资料
+10.UpdateRecDetail()//更新收料单明细
+路由:http://localhost:5000/Core/PurchaseReceive/UpdateRecDetail
+input:  RecDetail   purchaserecdetail    收料单明细资料
 OutPut: 1 成功  else 失败代号
-参考:input jason 文件:UpdatePurDetail_input.json
-参考:output jason 文件:UpdatePurDetail_output.json
+参考:input jason 文件:UpdateRecDetail_input.json
+参考:output jason 文件:UpdateRecDetail_output.json
 
-***11.DelPurDetail()//删除采购单明细
-路由:http://localhost:5000/Core/Purchase/DelPurDetail
-input:  ID        int         采购单ID
-        DetailID  List<int>   采购单明细ID
+11.DelRecDetail()//删除收料单明细
+路由:http://localhost:5000/Core/PurchaseReceive/DelRecDetail
+input:  DetailID  List<int>   收料单明细ID
 OutPut: 1 成功  else 失败代号
-参考:input jason 文件:DelPurDetail_input.json
-参考:output jason 文件:DelPurDetail_output.json
+参考:input jason 文件:DelRecDetail_input.json
+参考:output jason 文件:DelRecDetail_output.json
+
+***12.GetPurchaseInit()//Pageload
+路由:http://localhost:5000/Core/Purchase/GetPurchaseInit
+input:
+OutPut:     
+            status          Dictionary<int,string>    状态列表
+            warehouse       List<Warehouse>           仓库资料
+            Datacnt         int                       资料总笔数
+            Pagecnt         int                       总页数
+            Pur             List<Purchase>            Purchase 资料
+参考:output jason 文件:GetPurchaseInit_output.json
+
+***13.UpdatePurRemark()//采购单备注更新
+路由:http://localhost:5000/Core/Purchase/UpdatePurRemark
+input:  ID        int         采购单ID
+        Remark    string      备注说明
+OutPut: 1 成功  else 失败代号
+参考:input jason 文件:UpdatePurRemark_input.json
+参考:output jason 文件:UpdatePurRemark_output.json

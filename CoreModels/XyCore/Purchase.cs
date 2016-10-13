@@ -231,4 +231,10 @@ namespace CoreModels.XyCore
         public decimal Pagecnt{get;set;}//总页数
         public List<Purchase> Pur {get;set;}//采购单资料List
     }
+    public class QualityRevData
+    {
+        public int Datacnt {get;set;}//总资料笔数
+        public decimal Pagecnt{get;set;}//总页数
+        public List<QualityRev> Qua {get;set;}//资料List
+    }
 }

@@ -558,7 +558,7 @@ namespace CoreData.CoreCore
                 {
                     decimal qty = pur[0].purqty;
                     decimal amt = pur[0].puramt;
-                    string sqlCommandText = @"delete from  purchasedetail where id = @ID ";
+                    string sqlCommandText = @"delete from  purchasedetail where id in @ID ";
                     int count = CoreDBconn.Execute(sqlCommandText,argss,TransCore);
                     if(count <= 0)
                     {
@@ -601,22 +601,24 @@ namespace CoreData.CoreCore
         ///<summary>
         ///质检资料查询
         ///</summary>
-        public static DataResult QualityRevList(int purid,int CoID)
+        public static DataResult QualityRevList(int purid,int CoID,int PageIndex,int NumPerPage)
         {
             var result = new DataResult(1,null);
             string wheresql = "select id,purchaseid,recorddate,recorder,drawrate,type,conclusion,remark,status from qualityrev where purchaseid = " + purid + " and coid = " + CoID + " order by id asc";
+            var res =new QualityRevData();
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
                     var u = conn.Query<QualityRev>(wheresql).AsList();
-                    // if (u.Count == 0)
-                    // {
-                    //     result.s = -3001;
-                    //     result.d = null;
-                    // }
-                    // else
-                    // {
-                        result.d = u;
-                    // }               
+                    int count = u.Count;
+                    decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(NumPerPage.ToString()));
+
+                    int dataindex = (PageIndex - 1)* NumPerPage;
+                    wheresql = wheresql + " limit " + dataindex.ToString() + " ," + NumPerPage.ToString();
+                    u = conn.Query<QualityRev>(wheresql).AsList();
+                    res.Datacnt = count;
+                    res.Pagecnt = pagecnt;
+                    res.Qua = u;
+                    result.d = res;  
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
