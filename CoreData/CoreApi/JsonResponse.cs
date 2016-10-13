@@ -84,9 +84,9 @@ namespace CoreDate.CoreApi
             {
                 string key = dem.Current.Key;
                 string value = dem.Current.Value;
-                if (!string.IsNullOrEmpty(key) && !string.IsNullOrEmpty(value))
+                if (!string.IsNullOrEmpty(key))
                 {
-                    query.Append(key).Append(value);
+                    query.Append(key).Append(value);                    
                 }
             }
         
