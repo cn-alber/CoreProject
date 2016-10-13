@@ -312,5 +312,33 @@ namespace CoreData.CoreCore
             }
             return result;
         }
+        ///<summary>
+        ///查询单笔收料单
+        ///</summary>
+        public static DataResult PurReceiveSingle(int id,int CoID)
+        {
+            var result = new DataResult(1,null);   
+            string wheresql = "select id,scoid,sconame,purchaseid,creator,warehouseid,warehousename,status,finstatus,receivedate,remark,logisticsno,modifydate,finconfirmer,finconfirmdate " + 
+                              "from purchasereceive where id =" + id + " and coid =" + CoID ;
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    var u = conn.Query<PurchaseReceive>(wheresql).AsList();
+                    if (u.Count == 0)
+                    {
+                        result.s = -3001;
+                        result.d = null;
+                    }
+                    else
+                    {
+                        result.d = u[0];
+                    }               
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }           
+            return result;
+        }
     }
 }

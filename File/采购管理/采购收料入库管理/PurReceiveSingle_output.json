@@ -1,0 +1,22 @@
+{
+    "s": 1,
+    "d": {
+        "_receivedate": "2016-10-12",
+        "id": 53,
+        "scoid": 3,
+        "sconame": "携云科技有限公司",
+        "purchaseid": 27,
+        "warehouseid": 1,
+        "warehousename": "test0001",
+        "remark": "remark",
+        "logisticsno": "logisticsno",
+        "finconfirmer": "",
+        "status": 0,
+        "finstatus": 0,
+        "creator": "管理员",
+        "modifydate": "2016-10-13T10:18:28",
+        "finconfirmdate": "0001-01-01T00:00:00",
+        "receivedate": "2016-10-12"
+    },
+    "m": ""
+}
