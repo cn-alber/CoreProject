@@ -1,0 +1,17 @@
+{
+    "RecDetail": {
+        "id":2,
+        "recid": 532,
+        "skuid": "NJR201605070011015",
+        "skuname": "南极人羽绒服",
+        "price": 4,
+        "recqty": 4,
+        "planrecqty": 0,
+        "amount": 16,
+        "remark": "remark",
+        "norm":"蓝色;47",
+        "img":"",
+        "goodscode":"NJR20160507",
+        "supplynum":"33333"
+    }
+}

@@ -1,0 +1,41 @@
+{
+    "s": 1,
+    "d": {
+        "Datacnt": 2,
+        "Pagecnt": 1,
+        "enable": true,
+        "PurRecDetail": [
+            {
+                "id": 3,
+                "recid": 52,
+                "img": "",
+                "skuid": "NJR201605070011015",
+                "skuname": "南极人羽绒服",
+                "norm": "蓝色;47",
+                "recqty": 3,
+                "price": 4,
+                "planrecqty": 0,
+                "amount": 12,
+                "remark": "remark",
+                "goodscode": "NJR20160507",
+                "supplynum": "33333"
+            },
+            {
+                "id": 4,
+                "recid": 52,
+                "img": "",
+                "skuid": "test1234560004007",
+                "skuname": "南极人2016男装夹克",
+                "norm": "红色1;43",
+                "recqty": 3,
+                "price": 5,
+                "planrecqty": 0,
+                "amount": 15,
+                "remark": "remark",
+                "goodscode": "NJR20160507",
+                "supplynum": "33333"
+            }
+        ]
+    },
+    "m": ""
+}

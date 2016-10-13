@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using Microsoft.AspNetCore.Authorization;
+// using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyCore;
 using CoreData.CoreCore;
 using System;
@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using CoreModels;
 namespace CoreWebApi
 {
-    [AllowAnonymous]
+    // [AllowAnonymous]
     public class PurchaseController : ControllBase
     {
         [HttpGetAttribute("/Core/Purchase/PurchaseList")]
@@ -205,21 +205,38 @@ namespace CoreWebApi
         }
 
         [HttpGetAttribute("/Core/Purchase/QualityRevList")]
-        public ResponseResult QualityRevList(string Purid)
+        public ResponseResult QualityRevList(string Purid,string PageIndex,string NumPerPage)
         {   
             var data = new DataResult(1,null);
             int CoID = int.Parse(GetCoid());
-            int x;
+            int x,pageindex,numperpage;
             if (int.TryParse(Purid, out x))
             {
                 int id = int.Parse(Purid);
-                data = PurchaseHaddle.QualityRevList(id,CoID);
+                if (int.TryParse(PageIndex, out x))
+                {
+                    pageindex = int.Parse(PageIndex);
+                }
+                else
+                {
+                    pageindex = 1;
+                }
+                if (int.TryParse(NumPerPage, out x))
+                {
+                    numperpage = int.Parse(NumPerPage);
+                }
+                else
+                {
+                    numperpage = 20;
+                }
+                data = PurchaseHaddle.QualityRevList(id,CoID,pageindex,numperpage);
             }
             else
             {
                 data.s = -1;
                 data.d = "参数无效!";
             }
+            
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
