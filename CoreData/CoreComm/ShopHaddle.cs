@@ -94,7 +94,7 @@ namespace CoreData.CoreComm
         {
             var result = new DataResult(1, null);
             var sname = "shop" + coid + shopid;
-            
+                        
             var su = CacheBase.Get<Shop>(sname);
             if (su == null)
             {

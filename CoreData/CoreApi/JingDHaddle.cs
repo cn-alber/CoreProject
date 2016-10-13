@@ -13,8 +13,8 @@ namespace CoreDate.CoreApi
     
     public  class JingDHaddle{
 
-        public static string SERVER_URL = "https://api.jd.com/routerjson";                                                        
-        public static IDictionary<string, string> jdparam = new Dictionary<string, string>{
+        private static string SERVER_URL = "https://api.jd.com/routerjson";                                                        
+        private static IDictionary<string, string> jdparam = new Dictionary<string, string>{
             {"app_key", "7888CE9C0F3AAD424FEE8EEAAC99E10E"},
             {"sign", "123"},
             {"timestamp", System.DateTime.Now.AddMinutes(6).ToString()},
