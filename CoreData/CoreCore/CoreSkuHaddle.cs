@@ -434,7 +434,7 @@ namespace CoreData.CoreCore
             StringBuilder querycount = new StringBuilder();
             var p = new DynamicParameters();
             querycount.Append("SELECT count(GoodsCode) FROM coresku where 1=1");
-            querysql.Append("select ID,GoodsCode,GoodsName,SkuID,SkuName,Norm,GBCode,Brand,CostPrice,SalePrice,Enable,Creator,CreateDate from coresku where 1=1");
+            querysql.Append("select ID,GoodsCode,GoodsName,SkuID,SkuName,Norm,GBCode,Brand,CostPrice,SalePrice,Enable,Img,Creator,CreateDate from coresku where 1=1");
             if (!string.IsNullOrEmpty(IParam.Type))
             {
                 querycount.Append(" AND Type = @Type");

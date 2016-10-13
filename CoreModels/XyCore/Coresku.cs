@@ -73,6 +73,7 @@ namespace CoreModels.XyCore
         public decimal SalePrice { get; set; }
         public bool Enable { get; set; }
         public string Creator { get; set; }
+        public string Img{get;set;}
         public DateTime CreateDate { get; set; }
     }
     #endregion
