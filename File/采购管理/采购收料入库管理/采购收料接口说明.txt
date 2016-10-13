@@ -61,11 +61,11 @@ OutPut: 1 成功  -3003 失败
 参考:input jason 文件:ConfirmPur_input.json
 参考:output jason 文件:ConfirmPur_output.json
 
-***7.PurchaseRecSingle()//查询单笔采购单资料
-路由:http://localhost:5000/Core/Purchase/PurchaseSingle
-input:      ID           string           采购单号
-OutPut:     Pur          Purchase         Purchase 资料
-参考:output jason 文件:PurchaseSingle_output.json
+7.PurReceiveSingle()//查询单笔收料单资料
+路由:http://localhost:5000/Core/PurchaseReceive/PurReceiveSingle
+input:      ID           string           收料单号
+OutPut:     Rec          Purchasereceive  Purchasereceive 资料
+参考:output jason 文件:PurReceiveSingle_output.json
 
 ***8.FinConfirmRec()//采购单完成
 路由:http://localhost:5000/Core/Purchase/CompletePur

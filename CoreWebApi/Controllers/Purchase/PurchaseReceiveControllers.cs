@@ -205,5 +205,25 @@ namespace CoreWebApi
             var data = PurchaseReceiveHaddle.DelRecDetail(detailid);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
+
+        [HttpGetAttribute("/Core/PurchaseReceive/PurReceiveSingle")]
+        public ResponseResult PurReceiveSingle(string ID)
+        {   
+            int x,id = 0;
+            var data = new DataResult(1,null);  
+            int CoID = int.Parse(GetCoid());
+            if (int.TryParse(ID, out x))
+            {
+                id = int.Parse(ID);
+                data = PurchaseReceiveHaddle.PurReceiveSingle(id,CoID);
+            }
+            else
+            {
+                data.s = -1;
+                data.d = "参数无效!";
+            }
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
     }
 }
