@@ -340,5 +340,132 @@ namespace CoreData.CoreCore
             }           
             return result;
         }
+        ///<summary>
+        ///收料单更新备注
+        ///</summary>
+        public static DataResult UpdateRecRemark(List<int> id,string remark)
+        {
+            var result = new DataResult(1,null);  
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{               
+                    string uptsql = @"update purchasereceive set remark=@Remark where id in @ID";
+                    var args = new {Remark = remark,ID = id};
+                    int count = conn.Execute(uptsql,args);
+                    if(count < 0)
+                    {
+                        result.s= -3003;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return  result;
+        }  
+
+        ///<summary>
+        ///采购入库初始资料
+        ///</summary>
+        public static DataResult GetPurchaseRecInit(int CoID)
+        {
+            var result = new DataResult(1,null);   
+            var res = new PurchaseRecInitData();  
+            //采购入库单状态
+            Dictionary<int,string> status = new Dictionary<int,string>();
+            status.Add(0,"待入库");
+            status.Add(1,"已入库");
+            status.Add(2,"归档");
+            res.status = status;
+            //财务状态
+            Dictionary<int,string> finstatus = new Dictionary<int,string>();
+            finstatus.Add(0,"待审核");
+            finstatus.Add(1,"已审核");
+            res.finstatus = finstatus;
+            //采购入库基本资料
+            string wheresql = "select id,scoid,sconame,purchaseid,creator,warehouseid,warehousename,status,finstatus,receivedate,remark,logisticsno,modifydate,finconfirmer,finconfirmdate " + 
+                              "from purchasereceive where 1 = 1"; 
+            if(CoID != 1)//公司编号
+            {
+                wheresql = wheresql + " and coid = " + CoID;
+            }
+            wheresql = wheresql + " order by id desc";
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    var u = conn.Query<PurchaseReceive>(wheresql).AsList();
+                    int count = u.Count;
+                    decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/20);
+
+                    wheresql = wheresql + " limit 0,20";
+                    u = conn.Query<PurchaseReceive>(wheresql).AsList();
+
+                    res.Datacnt = count;
+                    res.Pagecnt = pagecnt;
+                    res.PurRec = u;
+                    result.d = res;              
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }           
+            return result;
+        }
+        ///<summary>
+        ///收料入库审核
+        ///</summary>
+        public static DataResult ConfirmPurRec(List<int> RecidList,int CoID)
+        {
+            var result = new DataResult(1,null);  
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                // var p = new DynamicParameters();
+                // p.Add("@PurID", PuridList);
+                // p.Add("@Coid", CoID);
+                // string wheresql = @"select count(*) from purchase where id in @PurID and coid = @Coid and status <> 0" ;
+                // int u = CoreDBconn.QueryFirst<int>(wheresql,p);
+                // if(u > 0)
+                // {
+                //     result.s = -1;
+                //     result.d = "未审核状态的采购单才可执行审核操作!";
+                // }
+                // else
+                // {
+                //     string delsql = @"update purchase set status = 1 where id in @PurID and coid = @Coid";
+                //     int count = CoreDBconn.Execute(delsql, p, TransCore);
+                //     if (count < 0)
+                //     {
+                //         result.s = -3003;
+                //     }
+                //     else
+                //     {
+                //         delsql = @"update purchasedetail set detailstatus = 1 where purchaseid in @PurID and coid = @Coid";
+                //         count = CoreDBconn.Execute(delsql, p, TransCore);
+                //         if (count < 0)
+                //         {
+                //             result.s = -3003;
+                //         }
+                //     }
+                //     if(result.s == 1)
+                //     {
+                //         TransCore.Commit();
+                //     }
+                // }
+            }
+            catch (Exception e)
+            {
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Close();
+            }
+            return result;
+        }
     }
 }

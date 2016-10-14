@@ -16,7 +16,7 @@ input:      Purid           string          采购单号 default null
             PageIndex       string          资料页数(ex.第一页就给1) default 1
             NumPerPage      string          每页显示资料笔数 default 20
 OutPut:     Datacnt         int             资料总笔数
-            Pagecnt         int             总页数
+            Pagecnt         decimal         总页数
             Com             List<Purchase>  Purchase 资料
 参考:output jason 文件:PurchaseList_output.json
 
@@ -31,8 +31,8 @@ input:      Purid           string                采购单号 必填
             PageIndex       string                资料页数(ex.第一页就给1) default 1
             NumPerPage      string                每页显示资料笔数  default 20
 OutPut:     Datacnt         int                   资料总笔数
-            Pagecnt         int                   总页数
-            enable          bool                  明细是否允许编辑(true允许/false不允许)
+            Pagecnt         decimal               总页数
+            status          int                   采购单状态
             Com             List<PurchaseDetail>  Purchasedetail 资料
 参考:output jason 文件:PurchaseDetailList_output.json
 
@@ -80,7 +80,8 @@ OutPut: 1 成功  -3003 失败
 
 9.InsertPurDetail()//新增采购单明细
 路由:http://localhost:5000/Core/Purchase/InsertPurDetail
-input:  PurDetail   purchasedetail    采购单明细资料
+input:  purchaseid   int        采购单id
+        ids          list<int>  sku autoid
 OutPut: 1 成功  else 失败代号
 参考:input jason 文件:InsertPurDetail_input.json
 参考:output jason 文件:InsertPurDetail_output.json
@@ -152,3 +153,10 @@ input:  ID        int         采购单ID
 OutPut: 1 成功  else 失败代号
 参考:input jason 文件:UpdatePurRemark_input.json
 参考:output jason 文件:UpdatePurRemark_output.json
+
+19.RestorePur()//采购还原
+路由:http://localhost:5000/Core/Purchase/RestorePur
+input:  PurIdList   List<int>    采购单号List
+OutPut: 1 成功  -3003 失败
+参考:input jason 文件:RestorePur_input.json
+参考:output jason 文件:RestorePur_output.json

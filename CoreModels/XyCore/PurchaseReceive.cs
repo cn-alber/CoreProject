@@ -180,4 +180,12 @@ namespace CoreModels.XyCore
         public bool enable {get;set;} //明细是否允许修改
         public List<PurchaseRecDetail> PurRecDetail {get;set;}//收料单明细资料List
     }
+    public class PurchaseRecInitData
+    {
+        public Dictionary<int,string> status{get;set;}//状态
+        public Dictionary<int,string> finstatus{get;set;}//财务状态状态
+        public int Datacnt {get;set;}//总资料笔数
+        public decimal Pagecnt{get;set;}//总页数
+        public List<PurchaseReceive> PurRec {get;set;}//采购入库单资料List
+    }
 }
