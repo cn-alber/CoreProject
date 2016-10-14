@@ -225,5 +225,30 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
+        [HttpPostAttribute("/Core/PurchaseReceive/UpdateRecRemark")]
+        public ResponseResult UpdateRecRemark([FromBodyAttribute]JObject co)
+        {   
+            List<int> id = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["IDList"].ToString());
+            string remark = co["Remark"].ToString();
+            var data = PurchaseReceiveHaddle.UpdateRecRemark(id,remark);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/PurchaseReceive/GetPurchaseRecInit")]
+        public ResponseResult GetPurchaseRecInit()
+        {   
+            int CoID = int.Parse(GetCoid());
+            var data = PurchaseReceiveHaddle.GetPurchaseRecInit(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
+
+        [HttpPostAttribute("/Core/PurchaseReceive/ConfirmPurRec")]
+        public ResponseResult ConfirmPurRec([FromBodyAttribute]JObject co)
+        {   
+            List<int> recidList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["RecIdList"].ToString());
+            int CoId = int.Parse(GetCoid());
+            var data = PurchaseReceiveHaddle.ConfirmPurRec(recidList,CoId);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
     }
 }

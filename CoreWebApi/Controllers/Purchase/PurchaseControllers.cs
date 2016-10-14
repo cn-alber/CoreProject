@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using CoreModels;
 namespace CoreWebApi
 {
-     [AllowAnonymous]
+    [AllowAnonymous]
     public class PurchaseController : ControllBase
     {
         [HttpGetAttribute("/Core/Purchase/PurchaseList")]
@@ -135,7 +135,8 @@ namespace CoreWebApi
         public ResponseResult UpdatePur([FromBodyAttribute]JObject co)
         {   
             var pur = Newtonsoft.Json.JsonConvert.DeserializeObject<Purchase>(co["Pur"].ToString());
-            var data = PurchaseHaddle.UpdatePurchase(pur);
+            int CoID = int.Parse(GetCoid());
+            var data = PurchaseHaddle.UpdatePurchase(pur,CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -178,10 +179,11 @@ namespace CoreWebApi
 
         [HttpPostAttribute("/Core/Purchase/InsertPurDetail")]
         public ResponseResult InsertPurDetail([FromBodyAttribute]JObject co)
-        {   
-            var detail = Newtonsoft.Json.JsonConvert.DeserializeObject<PurchaseDetail>(co["PurDetail"].ToString());
+        { 
+            int id = int.Parse(co["purchaseid"].ToString());
+            List<int> detailid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["ids"].ToString());
             int CoId = int.Parse(GetCoid());
-            var data = PurchaseHaddle.InsertPurDetail(detail,CoId);
+            var data = PurchaseHaddle.InsertPurDetail(id,detailid,CoId);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
@@ -291,5 +293,13 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
+        [HttpPostAttribute("/Core/Purchase/RestorePur")]
+        public ResponseResult RestorePur([FromBodyAttribute]JObject co)
+        {   
+            List<int> puridList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["PurIdList"].ToString());
+            int CoId = int.Parse(GetCoid());
+            var data = PurchaseHaddle.RestorePur(puridList,CoId);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
     }
 }
