@@ -309,7 +309,7 @@ namespace CoreData.CoreCore
                     else
                     {
                         string wheresql = "select id,warehouseid,warehousename,enable,parentid,type,creator,createdate from warehouse where warehouseid =" + pur.warehouseid + " and coid =" + CoID;
-                        var u = conn.Query<Warehouse>(wheresql).AsList();
+                        var u = DbBase.CommDB.Query<Warehouse>(wheresql).AsList();
                         if(u.Count == 0)
                         {
                             result.s = -1;
@@ -445,7 +445,7 @@ namespace CoreData.CoreCore
                     if(pur.warehouseid != 0)
                     {
                         string wheresql = "select id,warehouseid,warehousename,enable,parentid,type,creator,createdate from warehouse where warehouseid =" + pur.warehouseid + " and coid =" + CoID;
-                        var u = conn.Query<Warehouse>(wheresql).AsList();
+                        var u = DbBase.CommDB.Query<Warehouse>(wheresql).AsList();
                         if(u.Count == 0)
                         {
                             result.s = -1;
