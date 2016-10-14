@@ -619,6 +619,7 @@ namespace CoreData.CoreCore
         {
             var result = new DataResult(1,null);  
             var res = new PurchaseDetailInsert();
+            var cc = new InsertFailReason();
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
             var TransCore = CoreDBconn.BeginTransaction();
@@ -643,29 +644,36 @@ namespace CoreData.CoreCore
                 {
                     return result;
                 }
-                Dictionary<int,string> rt = new Dictionary<int,string>();
+                List<InsertFailReason> rt = new List<InsertFailReason>();
                 List<int> rr = new List<int>();
+                InsertFailReason rf = new InsertFailReason();
                 foreach(int a in skuid)
                 {
                     string skusql = "select skuid,skuname,norm,img,goodscode,enable from coresku where id =" + a;
                     var s = CoreDBconn.Query<SkuInsert>(skusql).AsList();
                     if(s.Count == 0)
                     {
-                        rt.Add(a,"此商品不存在!");
+                        rf.id = a;
+                        rf.reason = "此商品不存在!";
+                        rt.Add(rf);
                         continue;
                     }
                     else
                     {
                         if(s[0].enable == false)
                         {
-                            rt.Add(a,"此商品已停用!");
+                            rf.id = a;
+                            rf.reason = "此商品已停用!";
+                            rt.Add(rf);
                             continue;
                         }
                     }
                     int x = CoreDBconn.QueryFirst<int>("select count(*) from purchasedetail where purchaseid = "+ id+" and coid =" + CoID + " and skuautoid = "+a);
                     if( x > 0)
                     {
-                        rt.Add(a,null);
+                        rf.id = a;
+                        rf.reason = null;
+                        rt.Add(rf);
                         continue;
                     }
                     string sqlCommandText = @"INSERT INTO purchasedetail(purchaseid,skuautoid,skuid,skuname,norm,img,goodscode,coid) 
@@ -674,7 +682,9 @@ namespace CoreData.CoreCore
                     int count = CoreDBconn.Execute(sqlCommandText,args,TransCore);
                     if(count <= 0)
                     {
-                        rt.Add(a,"新增明细失败!");
+                        rf.id = a;
+                        rf.reason = "新增明细失败!";
+                        rt.Add(rf);
                     }
                     else
                     {

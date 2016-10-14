@@ -242,10 +242,15 @@ namespace CoreModels.XyCore
         public decimal Pagecnt{get;set;}//总页数
         public List<QualityRev> Qua {get;set;}//资料List
     }
+    public class InsertFailReason
+    {
+        public int id {get;set;}
+        public string reason{get;set;}
+    }
     public class PurchaseDetailInsert
     {
         public List<int> successIDs {get;set;}
-        public Dictionary<int,string> failIDs {get;set;}
+        public List<InsertFailReason> failIDs {get;set;}
     }
     public class SkuInsert
     {
