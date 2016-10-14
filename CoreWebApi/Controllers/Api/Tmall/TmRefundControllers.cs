@@ -11,6 +11,8 @@ namespace CoreWebApi.Api.Tmall{
         public static string REFUND_APPLY_GET = "refund_id, tid, title, buyer_nick, seller_nick, total_fee, status, created, refund_fee";
         public static string REFUND_RECEIVE_GET = "refund_id, tid, title, buyer_nick, seller_nick, total_fee, status, created, refund_fee, oid, good_status, company_name, sid, payment, reason, desc, has_good_return, modified, order_status,refund_phase";
 
+        public static string RFUND_ONE ="refund_id, alipay_no, tid, oid, buyer_nick, seller_nick, total_fee, status, created, refund_fee, good_status, has_good_return, payment, reason, desc, num_iid, title, price, num, good_return_time, company_name, sid, address, shipping_type, refund_remind_timeout, refund_phase, refund_version, operation_contraint, attribute, outer_id, sku"; 
+        
         public static string REFUND_MESSAGE = "id, refund_id,owner_id,owner_nick,content,pic_urls,created,message_type,refund_phase,owner_role";
         #region 查询买家申请的退款列表
         [HttpGetAttribute("/core/Api/TmRefund/ApplyGet")]
@@ -50,14 +52,17 @@ namespace CoreWebApi.Api.Tmall{
 
         #region 获取单笔退款详情
         [HttpGetAttribute("/core/Api/TmRefund/OneGet")]
-        public ResponseResult OneGet(string token,string fields,string refund_ids){
+        public ResponseResult OneGet(string token,string fields,string refund_id){
             var m = new DataResult(1,null);
+            if(string.IsNullOrEmpty(fields)){
+                fields = RFUND_ONE;
+            }
             if(string.IsNullOrEmpty(token)){
                 m.s = -5000;
-            }else if(string.IsNullOrEmpty(refund_ids)){
+            }else if(string.IsNullOrEmpty(refund_id)){  
                 m.s = -5037;
             }else{
-                m = TmallHaddle.refundOneGet(token,fields,refund_ids);
+                m = TmallHaddle.refundOneGet(token,fields,refund_id);
             }
             return CoreResult.NewResponse(m.s, m.d, "Api");
         }

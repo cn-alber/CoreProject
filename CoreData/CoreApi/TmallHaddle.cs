@@ -8,11 +8,14 @@ namespace CoreDate.CoreApi
 {
     public  class TmallHaddle{
         
-        private static string SERVER_URL = "http://gw.api.taobao.com/router/rest";
-        private static string SECRET = "f60e6b4c6565ecc865e7301ad02ef6a4";        
+        //private static string SERVER_URL = "http://gw.api.taobao.com/router/rest";
+        private static string SERVER_URL = "http://gw.api.tbsandbox.com/router/rest";
+        //private static string SECRET ="f60e6b4c6565ecc865e7301ad02ef6a4";
+        private static string SECRET = "sandboxc6565ecc865e7301ad02ef6a4";//沙箱        
 
         private static IDictionary<string, string> Tmparam = new Dictionary<string, string>{
-            {"app_key", "23476390"},            
+            //{"app_key", "23476390"},
+            {"app_key", "1023476390"},//沙箱            
             {"format","json"},
             {"sign_method","md5"},            
             {"timestamp", System.DateTime.Now.AddMinutes(6).ToString()},
@@ -91,7 +94,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res.trades_sold_get_response.trades.trade;
                 }            
@@ -127,12 +130,13 @@ namespace CoreDate.CoreApi
                     var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                     if(response.Result.ToString().IndexOf("error") > 0){
                         result.s = -1;
-                        result.d ="交易单号："+tid+" 获取失败, code:"+res.error_response.code+" "+res.error_response.sub_msg;
+                        result.d ="交易单号："+tid+" 获取失败, code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                         break;
                     }else{
                         orderinfolist.Add(res.trade_get_response.trade);
                     }
                     Tmparam.Remove("tid");
+                    Tmparam.Remove("sign");
                 }
                 
                 if(result.s == 1)
@@ -183,7 +187,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res.shipping.is_success;
                 }            
@@ -215,7 +219,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res;
                 }            
@@ -256,7 +260,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res.shipping.is_success;
                 }            
@@ -307,7 +311,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res.shipping.is_success;
                 }            
@@ -343,7 +347,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res.shipping.is_success;
                 }            
@@ -427,7 +431,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res;
                 }            
@@ -469,9 +473,9 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
-                    result.d = res;
+                    result.d = res.refunds_apply_get_response;
                 }            
             }catch(Exception ex){                
                 result.s = -1;
@@ -515,9 +519,9 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
-                    result.d = res;
+                    result.d = res.refunds_receive_get_response;
                 }            
             }catch(Exception ex){                
                 result.s = -1;
@@ -534,32 +538,28 @@ namespace CoreDate.CoreApi
         ///  获取单笔退款详情 参考网址： http://open.taobao.com/docs/api.htm?scopeId=11850&apiId=53
         /// </summary>
         /// <param name="fields"></param>
-        /// <param name="refund_ids">退款单号，以 , 分割</param>
-        public static DataResult refundOneGet(string token,string fields,string refund_ids){
+        /// <param name="refund_id"> 必选，退款单号</param>
+        public static DataResult refundOneGet(string token,string fields,string refund_id){
             var result = new DataResult(1,null);
             try{                                        
                 Tmparam.Add("method", "taobao.refund.get");
                 Tmparam.Add("session", token);
                 Tmparam.Add("fields", fields);
-                var idArr = refund_ids.Split(',');
-                List<dynamic> refunds = new List<dynamic>();
-                foreach(string refund_id in idArr){
-                    Tmparam.Add("refund_id", refund_id);
-                    string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
-                    Tmparam.Add("sign", sign);//                                      
-                    var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
-                    var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                    if(response.Result.ToString().IndexOf("error") > 0){
-                        result.s = -1;
-                        result.d ="退款单ID： "+refund_id+"获取失败 code:"+res.error_response.code+" "+res.error_response.sub_msg;
-                        break;
-                    }else{
-                        refunds.Add(res.refund);
-                    }    
-                }
-                if(result.s == 1){
-                    result.d = refunds;
-                }                        
+                Tmparam.Add("refund_id", refund_id);
+                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                Tmparam.Add("sign", sign);//                                      
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d ="退款单ID： "+refund_id+"获取失败 code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
+                    
+                }else{
+                    result.d = res.refund_get_response;
+                } 
+           
+                
+                                 
             }catch(Exception ex){                
                 result.s = -1;
                 result.d =  ex.Message;
@@ -596,7 +596,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res;
                 }            
@@ -638,7 +638,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res;
                 }            
@@ -692,7 +692,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res.sku;
                 }            
@@ -729,7 +729,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="Sku ID: "+sku_id+" 信息获取失败 code:"+res.error_response.code+" "+res.error_response.sub_msg;
+                    result.d ="Sku ID: "+sku_id+" 信息获取失败 code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 
                 }else{
                     result.d =res.sku;
@@ -780,7 +780,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res.sku;
                 }            
@@ -815,7 +815,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res.skus;
                 }            
@@ -855,7 +855,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res.sku;
                 }            
@@ -892,7 +892,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res;
                 }            
