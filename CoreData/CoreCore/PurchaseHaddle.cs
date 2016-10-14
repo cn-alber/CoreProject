@@ -662,15 +662,15 @@ namespace CoreData.CoreCore
                             continue;
                         }
                     }
-                    int x = CoreDBconn.QueryFirst<int>("select count(*) from purchasedetail where purchaseid = "+ id+" and coid =" + CoID + " and skuid = '"+s[0].skuid+"'");
+                    int x = CoreDBconn.QueryFirst<int>("select count(*) from purchasedetail where purchaseid = "+ id+" and coid =" + CoID + " and skuautoid = "+a);
                     if( x > 0)
                     {
                         rt.Add(a,null);
                         continue;
                     }
-                    string sqlCommandText = @"INSERT INTO purchasedetail(purchaseid,skuid,skuname,norm,img,goodscode,coid) 
-                                            VALUES(@PurID,@Skuid,@Skuname,@Norm,@Img,@Goodscode,@Coid)";
-                    var args = new {PurID = id,Skuid=s[0].skuid,Skuname = s[0].skuname,Norm = s[0].norm ,Img = s[0].img,Goodscode = s[0].goodscode ,Coid = CoID};
+                    string sqlCommandText = @"INSERT INTO purchasedetail(purchaseid,skuautoid,skuid,skuname,norm,img,goodscode,coid) 
+                                            VALUES(@PurID,@Skuautoid,@Skuid,@Skuname,@Norm,@Img,@Goodscode,@Coid)";
+                    var args = new {PurID = id,Skuautoid = a,Skuid=s[0].skuid,Skuname = s[0].skuname,Norm = s[0].norm ,Img = s[0].img,Goodscode = s[0].goodscode ,Coid = CoID};
                     int count = CoreDBconn.Execute(sqlCommandText,args,TransCore);
                     if(count <= 0)
                     {
@@ -712,7 +712,8 @@ namespace CoreData.CoreCore
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
-                string wheresql = "select id,purchasedate,scoid,sconame,contract,shplogistics,shpcity,shpdistrict,shpaddress,warehouseid,warehousename,status,purtype,buyyer,remark,taxrate from purchase where id =" + detail.purchaseid + " and coid =" + CoID ;
+                string wheresql = "select id,purchasedate,scoid,sconame,contract,shplogistics,shpcity,shpdistrict,shpaddress,warehouseid,warehousename,status,purtype,buyyer,remark,taxrate " + 
+                "from purchase where id =" + detail.purchaseid + " and coid =" + CoID ;
                 var u = CoreDBconn.Query<Purchase>(wheresql).AsList();
                 if(u.Count == 0)
                 {
@@ -731,7 +732,8 @@ namespace CoreData.CoreCore
                 {
                     return result;
                 }
-                wheresql = "select id,purchaseid,img,skuid,skuname,purqty,suggestpurqty,recqty,price,puramt,remark,goodscode,supplynum,supplycode,planqty,planamt,recievedate,norm,packingnum from purchasedetail where id = " + detail.id;
+                wheresql = "select id,purchaseid,img,skuid,skuname,purqty,suggestpurqty,recqty,price,puramt,remark,goodscode,supplynum,supplycode,planqty,planamt,recievedate,norm,packingnum "+
+                "from purchasedetail where purchaseid = " + detail.purchaseid + " and skuautoid =" + detail.id + " and coid =" + CoID;
                 var pur = CoreDBconn.Query<PurchaseDetail>(wheresql).AsList();
                 if (pur.Count == 0)
                 {
@@ -794,8 +796,10 @@ namespace CoreData.CoreCore
                 if(sqlCommandText.Substring(sqlCommandText.Length - 1, 1) == ",")
                 {
                     sqlCommandText = sqlCommandText.Substring(0,sqlCommandText.Length - 1);
-                    sqlCommandText = sqlCommandText + " where id = @ID";
+                    sqlCommandText = sqlCommandText + " where purchaseid = @Purchaseid and skuautoid = @ID and coid = @Coid";
                     p.Add("@ID",detail.id);
+                    p.Add("@Purchaseid",detail.purchaseid);
+                    p.Add("@Coid",CoID);
                 }
                 else
                 {
@@ -865,8 +869,8 @@ namespace CoreData.CoreCore
                 {
                     return result;
                 }
-                wheresql = "select sum(purqty) as purqty,sum(puramt) as puramt from purchasedetail where id in @ID";
-                var argss = new {ID = detailid};
+                wheresql = "select sum(purqty) as purqty,sum(puramt) as puramt from purchasedetail where purchaseid = @Purid and skuautoid in @ID and coid = @Coid";
+                var argss = new {ID = detailid,Purid = id,Coid = CoID};
                 var pur = CoreDBconn.Query<CalPurchase>(wheresql,argss).AsList();
                 if (pur.Count == 0)
                 {
@@ -876,27 +880,18 @@ namespace CoreData.CoreCore
                 {
                     decimal qty = pur[0].purqty;
                     decimal amt = pur[0].puramt;
-                    string sqlCommandText = @"delete from  purchasedetail where id in @ID ";
+                    string sqlCommandText = @"delete from  purchasedetail where purchaseid = @Purid and skuautoid in @ID and coid = @Coid";
                     int count = CoreDBconn.Execute(sqlCommandText,argss,TransCore);
                     if(count <= 0)
                     {
                         result.s = -3004;
                     }
-                    wheresql = "select count(*) from purchase where id = '" + id + "' and coid =" + CoID ;
-                    int cnt = CoreDBconn.QueryFirst<int>(wheresql);
-                    if (cnt == 0)
+                    string uptsql = @"update purchase set purqtytot = purqtytot - @Qty ,puramtnet = puramtnet - @Amt ,puramttot = puramtnet*(1 + taxrate/100) where id = @ID and coid = @Coid";
+                    var upargs = new {Qty = qty,Amt = amt,ID = id,Coid = CoID};
+                    count = CoreDBconn.Execute(uptsql,upargs);
+                    if(count < 0)
                     {
-                        result.s = -3001;
-                    }
-                    else
-                    {
-                        string uptsql = @"update purchase set purqtytot = purqtytot - @Qty ,puramtnet = puramtnet - @Amt ,puramttot = puramtnet*(1 + taxrate/100) where id = @ID and coid = @Coid";
-                        var upargs = new {Qty = qty,Amt = amt,ID = id,Coid = CoID};
-                        count = CoreDBconn.Execute(uptsql,upargs);
-                        if(count < 0)
-                        {
-                            result.s= -3003;
-                        }
+                        result.s= -3003;
                     }
                 } 
                 if(result.s == 1)
