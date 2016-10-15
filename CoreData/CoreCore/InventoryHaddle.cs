@@ -552,7 +552,7 @@ namespace CoreData.CoreCore
         }
         #endregion
 
-        #region 商品库存盘点 - 从EXCEL模板导入(自动保存)
+        #region 商品库存盘点 - 从EXCEL模板导入(自动保存) -Create临时表导入盘点库存
         public static DataResult CreateInvSetTemp(List<SetInvQtyExcel> InvLst, int CoID, string UserName)
         {
             var res = new DataResult(1, null);
@@ -576,9 +576,9 @@ namespace CoreData.CoreCore
                             `SetQty`  decimal(11,2) NULL DEFAULT 0.00 COMMENT '库存' ,
                             `CoID`  int(11) NULL DEFAULT NULL COMMENT '公司ID' 
                             )";
-                    int recount = DbBase.CoreDB.Execute(sql,TransCore);//新建临时表
+                    int recount = DbBase.CoreDB.Execute(sql, TransCore);//新建临时表
                     string trsql = @"truncate TABLE TmpInvTable";
-                    DbBase.CoreDB.Execute(trsql,TransCore);
+                    DbBase.CoreDB.Execute(trsql, TransCore);
                     #endregion
 
                     #region 消除重复项
@@ -747,7 +747,7 @@ namespace CoreData.CoreCore
                                 p.Add("@WarehouseName", m.WarehouseName);
                                 p.Add("@Creator", UserName);
                                 p.Add("@CreateDate", DateTime.Now);
-                                int i = DbBase.CoreDB.Execute(InsertInvSql, p);
+                                int i = DbBase.CoreDB.Execute(InsertInvSql, p, TransCore);
                                 #endregion
                                 if (i > 0)
                                 {
@@ -776,7 +776,7 @@ namespace CoreData.CoreCore
                                     p1.Add("@WarehouseID", m.WarehouseID);
                                     p1.Add("@Creator", UserName);
                                     p1.Add("@CreateDate", DateTime.Now);
-                                    int j = DbBase.CoreDB.Execute(InsertInvItemSql, p1);
+                                    int j = DbBase.CoreDB.Execute(InsertInvItemSql, p1, TransCore);
                                     #endregion
                                 }
                             }
@@ -813,7 +813,7 @@ namespace CoreData.CoreCore
                                 p.Add("@WarehouseName", m.WarehouseName);
                                 p.Add("@Creator", UserName);
                                 p.Add("@CreateDate", DateTime.Now);
-                                int i = DbBase.CoreDB.Execute(InsertInvSql, p);
+                                int i = DbBase.CoreDB.Execute(InsertInvSql, p, TransCore);
                                 #endregion
                                 if (i > 0)
                                 {
@@ -842,7 +842,7 @@ namespace CoreData.CoreCore
                                     p1.Add("@WarehouseID", m.WarehouseID);
                                     p1.Add("@Creator", UserName);
                                     p1.Add("@CreateDate", DateTime.Now);
-                                    int j = DbBase.CoreDB.Execute(InsertInvItemSql, p1);
+                                    int j = DbBase.CoreDB.Execute(InsertInvItemSql, p1, TransCore);
                                     #endregion
                                 }
                             }
@@ -870,7 +870,7 @@ namespace CoreData.CoreCore
 	                                            AND inventory.CoID = @CoID
                                                 AND inventory.WarehouseID IN @WhIDLst";
                             var WhIDLst = DLst.Select(a => a.WarehouseID).Distinct().ToList();
-                            int s = DbBase.CoreDB.Execute(UpdateInvsql, new { CoID = CoID, WhIDLst = WhIDLst });
+                            int s = DbBase.CoreDB.Execute(UpdateInvsql, new { CoID = CoID, WhIDLst = WhIDLst }, TransCore);
                             TransCore.Commit();
                         }
                         #endregion
@@ -892,9 +892,359 @@ namespace CoreData.CoreCore
         }
         #endregion
 
+        #region 商品期初库存 - 从EXCEL模板导入(自动保存) -Create临时表导入期初库存
+        public static DataResult CreateInvInitTemp(string RblType, List<InitInvQtyExcel> InvLst, int WarehouseID, string WarehouseName, int CoID, string UserName)
+        {
+            var res = new DataResult(1, null);
+            var ErLst = new List<InitInvQtyExcel>();
+            Boolean upttype = false;
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                conn.Open();
+                var TransCore = conn.BeginTransaction();
+                try
+                {
+                    #region 新建临时表
+                    string sql = @" CREATE TEMPORARY TABLE IF NOT EXISTS `TmpInvTable` (
+                            `GoodsCode`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '货品编号' ,
+                            `GoodsName`  varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '货品名称' ,
+                            `SkuID`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品编码' ,
+                            `Name`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '商品名称' ,
+                            `ColorName`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '颜色名称' ,
+                            `ParentSize`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '尺码组' ,
+                            `SizeName`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '尺码名称' ,
+                            `Qty`  decimal(11,2) NULL DEFAULT 0.00 COMMENT '库存'  ,
+                            `CoID`  int(11) NULL DEFAULT NULL COMMENT '公司ID' 
+                            )";
+                    int recount = DbBase.CoreDB.Execute(sql, TransCore);//新建临时表
+                    string trsql = @"truncate TABLE TmpInvTable";
+                    DbBase.CoreDB.Execute(trsql, TransCore);
+                    #endregion
+                    #region 消除重复项
+                    //取出重复list
+                    var NKeylst = from l in InvLst
+                                  group l by
+                                  new { l.SkuID }
+                                  into g
+                                  where g.Count() > 1
+                                  select g.Key;
+                    var NLst = InvLst.Where(
+                           a => NKeylst.Select(b => b.SkuID)
+                               .Contains(a.SkuID)
+                               )
+                               .ToList();
+                    //排除重复项
+                    var DLst = InvLst.Where(
+                            a => !NKeylst.Select(b => b.SkuID)
+                                .Contains(a.SkuID)
+                                )
+                                .ToList();
+                    if (NLst.Count > 0)
+                    {
 
+                        var label = new InitInvQtyExcel();
+                        label.GoodsCode = "期初资料重复:";
+                        ErLst.Add(label);
+                        ErLst.AddRange(NLst);
+                    }
+                    #endregion
+                    if (DLst.Count > 0)
+                    {
+                        #region 数据插入临时表
+                        var sqltest = new StringBuilder();
+                        foreach (var inv in DLst)
+                        {
+                            sqltest.Append("('" + inv.GoodsCode + "','" + inv.GoodsName + "','" + inv.SkuID + "','" + inv.SkuName
+                                 + "','" + inv.ColorName + "','" + inv.ParentSize + "','" + inv.SizeName
+                                  + "'," + inv.StockQty + "," + CoID + "),");
+                        }
+                        string insql = @"INSERT INTO TmpInvTable(`GoodsCode`,`GoodsName`,`SkuID`,`Name`,`ColorName`,`ParentSize`,`SizeName`,`Qty`,`CoID`) 
+                                 VALUES"
+                                + sqltest.ToString().Substring(0, sqltest.ToString().Length - 1);
+                        int tcount = DbBase.CoreDB.Execute(insql);//插入临时数据
+                        #endregion
+                        #region 检查商品编码,SKUID 不存在->PASS
+                        string skusql = @"SELECT
+	                                    *
+                                    FROM
+	                                    TmpInvTable
+                                    WHERE
+	                                    TmpInvTable.CoID =@CoID
+                                    AND TmpInvTable.SkuID NOT IN (
+	                                    SELECT
+		                                    coresku.SkuID
+	                                    FROM
+		                                    coresku
+	                                    WHERE
+		                                    coresku.CoID =@CoID
+                                    )";
+                        string skudelsql = @"DELETE
+                                        FROM
+	                                        TmpInvTable
+                                        WHERE
+	                                        TmpInvTable.CoID =@CoID
+                                        AND TmpInvTable.SkuID NOT IN (
+	                                        SELECT
+		                                        coresku.SkuID
+	                                        FROM
+		                                        coresku
+	                                        WHERE
+		                                        coresku.CoID =@CoID)";
+                        //SKUID 不存在->PASS
+                        var SkuLst = DbBase.CoreDB.Query<InitInvQtyExcel>(skusql, new { CoID = CoID }).AsList();
+                        if (SkuLst.Count > 0)
+                        {
+                            var label = new InitInvQtyExcel();
+                            label.GoodsCode = "商品编码不存在:";
+                            ErLst.Add(label);
+                            ErLst.AddRange(SkuLst);
+                            DbBase.CoreDB.Execute(skudelsql, new { CoID = CoID });
+                        }
+                        #endregion
+                        #region 检查颜色表,ColorName不存在->PASS
 
+                        string corsql = @"SELECT
+	                                    *
+                                    FROM
+	                                    TmpInvTable
+                                    WHERE
+	                                    TmpInvTable.CoID =@CoID
+                                    AND TmpInvTable.ColorName NOT IN (
+	                                    SELECT
+		                                    xygoods.corecolor. NAME
+	                                    FROM
+		                                    xygoods.corecolor
+	                                    WHERE
+		                                    xygoods.corecolor.CoID =@CoID
+                                    )";
+                        string cordelsql = @"DELETE
+                                        FROM
+	                                        TmpInvTable
+                                        WHERE
+	                                        TmpInvTable.CoID =@CoID
+                                        AND TmpInvTable.ColorName NOT IN (
+	                                        SELECT
+		                                        xygoods.corecolor. NAME
+	                                        FROM
+		                                        xygoods.corecolor
+	                                        WHERE
+		                                        xygoods.corecolor.CoID =@CoID
+                                        )";
+                        var CorLst = DbBase.CoreDB.Query<InitInvQtyExcel>(corsql, new { CoID = CoID }).AsList();
+                        if (CorLst.Count > 0)//ColorName不存在->PASS
+                        {
+                            var label = new InitInvQtyExcel();
+                            label.GoodsCode = "颜色不存在:";
+                            ErLst.Add(label);
+                            ErLst.AddRange(CorLst);
+                            DbBase.CoreDB.Execute(cordelsql);
+                        }
+                        #endregion
+                        #region 检查尺码表, SizeName不存在->PASS
+                        string szsql = @"SELECT
+	                                *
+                                FROM
+	                                TmpInvTable
+                                WHERE
+	                                TmpInvTable.CoID =@CoID
+                                AND TmpInvTable.SizeName NOT IN (
+	                                SELECT
+		                                xygoods.coresize. NAME
+	                                FROM
+		                                xygoods.coresize
+	                                WHERE
+		                                xygoods.coresize.CoID =@CoID
+                                )";
+                        string szdelsql = @"DELETE
+                                        FROM
+	                                        TmpInvTable
+                                        WHERE
+	                                        TmpInvTable.CoID =@CoID
+                                        AND TmpInvTable.SizeName NOT IN (
+	                                        SELECT
+		                                        xygoods.coresize. NAME
+	                                        FROM
+		                                        xygoods.coresize
+	                                        WHERE
+		                                        xygoods.coresize.CoID =@CoID
+                                        )";
+                        var SzLst = DbBase.CoreDB.Query<InitInvQtyExcel>(szsql, new { CoID = CoID }).AsList();
+                        if (SzLst.Count > 0)//SizeName不存在->PASS
+                        {
+                            var label = new InitInvQtyExcel();
+                            label.GoodsCode = "尺码不存在:";
+                            ErLst.Add(label);
+                            ErLst.AddRange(SzLst);
+                            DbBase.CoreDB.Execute(szdelsql);
+                        }
+                        #endregion
+                        #region 检查期初是否已存在
+                        string invsql = @"SELECT
+	                                    TmpInvTable.*
+                                    FROM
+	                                    invinoutitem,
+	                                    TmpInvTable
+                                    WHERE
+	                                    invinoutitem.SkuID = TmpInvTable.SkuID
+                                    AND invinoutitem.WhID = @WarehouseID
+                                    AND invinoutitem.CoID = TmpInvTable.CoID
+                                    AND TmpInvTable.CoID =@CoID
+                                    AND invinoutitem.CusType = '期初'";
+                        var invLst = DbBase.CoreDB.Query<InitInvQtyExcel>(invsql, new { CoID = CoID, WarehouseID = WarehouseID }).AsList();
+                        if (invLst.Count > 0) //期初已存在-->判断1.覆盖or 0.忽略 & 删除已存在临时数据
+                        {
+                            if (RblType == "1")
+                            {
+                                string oversql = @"UPDATE invinoutitem,
+                                             TmpInvTable
+                                            SET invinoutitem.Qty = TmpInvTable.Qty
+                                            WHERE
+	                                            invinoutitem.SkuID = TmpInvTable.SkuID
+                                            AND invinoutitem.WhID = @WarehouseID
+                                            AND invinoutitem.CoID = TmpInvTable.CoID
+                                            AND TmpInvTable.CoID =@CoID
+                                            AND invinoutitem.CusType = '期初'";
+                                DbBase.CoreDB.Execute(oversql, new { CoID = CoID, WarehouseID = WarehouseID });
+                                upttype = true;
+                            }
+                            var label = new InitInvQtyExcel();
+                            label.GoodsCode = "存在期初的资料已被" + (RblType == "1" ? "覆盖!" : "忽略!");
+                            ErLst.Add(label);
+                            ErLst.AddRange(invLst);
+                            string invdelsql = @"DELETE TmpInvTable.*
+                                            FROM
+	                                            TmpInvTable,
+	                                            invinoutitem
+                                            WHERE
+	                                            invinoutitem.SkuID = TmpInvTable.SkuID
+                                            AND invinoutitem.WhID = @WarehouseID
+                                            AND invinoutitem.CoID = TmpInvTable.CoID
+                                            AND TmpInvTable.CoID =@CoID
+                                            AND invinoutitem.CusType = '期初'";
+                            DbBase.CoreDB.Execute(invdelsql, new { CoID = CoID, WarehouseID = WarehouseID });
+                        }
+                        #endregion
+                        #region 生成期初明细&库存
+                        string selectsql = @"select * from TmpInvTable where CoID=@CoID";
+                        var lst = DbBase.CoreDB.Query<InitInvQtyExcel>(selectsql, new { CoID = CoID }).AsList();
+                        if (lst.Count > 0)
+                        {
+                            #region 期初主表新增
+                            var Rd = CommHaddle.GetRecordID(CoID);
+                            string RecordID = "BIN" + (Convert.ToInt64(Rd)).ToString();//单据编号  
+                            string InsertInvSql = @"insert into invinout(RecordID,Type,CusType,Status,
+                                                                WhID,WhName,IsExport,Creator,
+                                                                CreateDate,CoID)
+                                                         values (@RecordID,1,'期初','审核通过',
+                                                                @WarehouseID,@WarehouseName,0,@Creator,
+                                                                @CreateDate,@CoID)";
+                            var p = new DynamicParameters();
+                            p.Add("@CoID", CoID);
+                            p.Add("@RecordID", RecordID);
+                            p.Add("@WarehouseID", WarehouseID);
+                            p.Add("@WarehouseName", WarehouseName);
+                            p.Add("@Creator", UserName);
+                            p.Add("@CreateDate", DateTime.Now);
+                            int i = DbBase.CoreDB.Execute(InsertInvSql, p, TransCore);
+                            if (i > 0)
+                            {
+                                #region 期初明细新增
+                                string InsertInvItemSql = @"INSERT INTO invinoutitem (
+	                                                                            IoID,CoID,SkuID,SkuName,
+	                                                                            CusType,Norm,WhID,WhName,
+	                                                                            Creator,CreateDate,Qty
+                                                                            )(
+	                                                                            SELECT
+		                                                                            @RecordID,CoID,SkuID,NAME,
+		                                                                            '期初',CONCAT(ColorName,';',SizeName),@WarehouseID,@WarehouseName,
+		                                                                            @Creator ,@CreateDate,Qty
+	                                                                            FROM
+		                                                                            TmpInvTable
+	                                                                            WHERE
+		                                                                            TmpInvTable.CoID =@CoID
+                                                                            )";
+                                int j = DbBase.CoreDB.Execute(InsertInvItemSql, p, TransCore);
+                                #endregion
+                                #region
+                                string InsertInvtorySql = @"INSERT INTO inventory (
+	                                                                        GoodsCode,SkuID,NAME,Norm,
+	                                                                        WarehouseID,WarehouseName,StockQty,CoID
+                                                                        )(
+	                                                                        SELECT
+		                                                                        GoodsCode,SkuID,NAME,CONCAT(ColorName,';',SizeName),
+		                                                                        @WarehouseID,@WarehouseName,Qty,CoID
+	                                                                        FROM
+		                                                                        TmpInvTable
+	                                                                        WHERE
+		                                                                        TmpInvTable.CoID =@CoID
+	                                                                        AND CONCAT(
+		                                                                        TmpInvTable.SkuID,
+		                                                                        ',',
+		                                                                        @WarehouseName
+	                                                                        ) NOT IN (
+		                                                                        SELECT
+			                                                                        CONCAT(
+				                                                                        inventory.SkuID,
+				                                                                        ',',
+				                                                                        inventory.WarehouseName
+			                                                                        )
+		                                                                        FROM
+			                                                                        inventory
+		                                                                        WHERE
+			                                                                        inventory.CoID = @CoID
+	                                                                        )
+                                                                        )";
+                                var p1 = new DynamicParameters();
+                                p1.Add("@CoID", CoID);
+                                p1.Add("@WarehouseID", WarehouseID);
+                                p1.Add("@WarehouseName", WarehouseName);
+                                int k = DbBase.CoreDB.Execute(InsertInvtorySql, p1, TransCore);
+                                #endregion
+                                upttype = true;
+                            }
+                            #endregion
+                            #region 更新庫存
+                            if (upttype)
+                            {
+                                string UpdateInvsql = @"UPDATE inventory
+                                            SET inventory.StockQty = (
+	                                            SELECT
+		                                            sum(Qty)
+	                                            FROM
+		                                            invinoutitem
+	                                            WHERE
+		                                            invinoutitem.SkuID = inventory.SkuID
+	                                            AND invinoutitem.WhID = inventory.WarehouseID
+	                                            AND invinoutitem.CoID = inventory.CoID
+                                                AND invinoutitem.IsUpdate = 1
+                                            )
+                                            WHERE
+	                                            inventory.CoID =@CoID
+                                            AND inventory.WarehouseID = @WarehouseID";
+                                int s = DbBase.CoreDB.Execute(UpdateInvsql, new { CoID = CoID, WarehouseID = WarehouseID }, TransCore);
+                                TransCore.Commit();
+                            }
+                            #endregion
+                        }
+                        #endregion
 
+                    }
+                }
+                catch (Exception e)
+                {
+                    TransCore.Rollback();
+                    res.s = -1;
+                    res.d = e.Message;
+                }
+                finally
+                {
+                    conn.Dispose();
+                    TransCore.Dispose();
+                }
+            }
+            return res;
+        }
+        #endregion
 
 
 

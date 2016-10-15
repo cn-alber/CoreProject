@@ -156,4 +156,16 @@ namespace CoreModels.XyCore
         public decimal SetQty { get; set; }
     }
 
+    public class InitInvQtyExcel
+    {
+        public string GoodsCode { get; set; }
+        public string GoodsName { get; set; }
+        public string SkuID { get; set; }
+        public string SkuName { get; set; }
+        public string ColorName { get; set; }
+        public string ParentSize { get; set; }
+        public string SizeName { get; set; }
+        public decimal StockQty { get; set; }
+    }
+
 }

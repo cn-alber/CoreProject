@@ -239,7 +239,7 @@ namespace CoreWebApi.XyCore
             {
                 int CoID = int.Parse(GetCoid());
                 string UserName = GetUname();
-                res = InventoryHaddle.ClearSku(IDLst,CoID,UserName);
+                res = InventoryHaddle.ClearSku(IDLst, CoID, UserName);
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
@@ -299,10 +299,10 @@ namespace CoreWebApi.XyCore
         }
         #endregion    
 
-        #region 商品库存盘点
+        #region 商品库存盘点----測試
         [HttpPostAttribute("Core/XyCore/Inventory/SetInvQty")]
         public ResponseResult SetInvQty()
-        {   
+        {
             var InvLst = new List<SetInvQtyExcel>();
             var inv = new SetInvQtyExcel();
             inv.WarehouseID = 30;
@@ -310,7 +310,7 @@ namespace CoreWebApi.XyCore
             inv.SkuID = "N9L5F58781052165";
             inv.Name = "南极人男士羊毛衫";
             inv.Norm = "深红;165";
-            inv.StockQty=935;
+            inv.StockQty = 935;
             inv.SetQty = 1000;
             InvLst.Add(inv);
             InvLst.Add(inv);
@@ -329,7 +329,7 @@ namespace CoreWebApi.XyCore
             inv2.SkuID = "N9L5F58781025165";
             inv2.Name = "南极人男士羊毛衫";
             inv2.Norm = "墨绿;165";
-            inv2.StockQty=10459;
+            inv2.StockQty = 10459;
             inv2.SetQty = 900;
             InvLst.Add(inv2);
             // var inv3 = new SetInvQtyExcel();
@@ -343,9 +343,46 @@ namespace CoreWebApi.XyCore
             // InvLst.Add(inv3);
             int CoID = int.Parse(GetCoid());
             string UserName = GetUname();
-            var res = InventoryHaddle.CreateInvSetTemp(InvLst,CoID,UserName);
-            return CoreResult.NewResponse(res.s,res.d,"General");
+            var res = InventoryHaddle.CreateInvSetTemp(InvLst, CoID, UserName);
+            return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion   
+
+        #region  商品期初库存----測試
+        [HttpPostAttribute("Core/XyCore/Inventory/InvInit")]
+        public ResponseResult InvInit()
+        {
+            var InvLst = new List<InitInvQtyExcel>();
+            var inv = new InitInvQtyExcel();
+            inv.SkuID = "N9L5F58781052165";
+            inv.SkuName = "南极人男士羊毛衫";
+            inv.ColorName = "深红";
+            inv.SizeName = "165";
+            inv.StockQty = 1000;
+            InvLst.Add(inv);
+            var inv1 = new InitInvQtyExcel();
+            inv1.SkuID = "N9L5F58781051170";
+            inv1.SkuName = "南极人男士羊毛衫";
+            inv1.ColorName = "兰黑";
+            inv1.SizeName = "170";
+            inv1.StockQty = 1000;
+            InvLst.Add(inv1);
+            var inv2 = new InitInvQtyExcel();
+            inv2.SkuID = "N9L5F58781025165";
+            inv2.SkuName = "南极人男士羊毛衫";
+            inv2.ColorName = "墨绿";
+            inv2.SizeName = "165";
+            inv2.StockQty = 1000;
+            InvLst.Add(inv2);
+
+            string RblType = "0";
+            int WarehouseID=100;
+            string WarehouseName="fdsa存储仓B";
+            int CoID = int.Parse(GetCoid());
+            string UserName = GetUname();
+            var res = InventoryHaddle.CreateInvInitTemp(RblType,InvLst,WarehouseID,WarehouseName,CoID,UserName);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
     }
 }
