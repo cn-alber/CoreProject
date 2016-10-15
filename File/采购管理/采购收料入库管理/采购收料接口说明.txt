@@ -35,7 +35,8 @@ OutPut:     Datacnt         int                     资料总笔数
 
 3.InsertRec()//收料单新增
 http://localhost:5000/Core/PurchaseReceive/InsertRec
-input:Rec           purchasereceive      收料单资料
+input:ID      int      采购单id or  供应商Id
+      Type    string   若是采购入库给 purchase ;若是无采购入库给supply
 output: s=1成功 else 错误代码
 参考:input jason 文件:InsertRec_input.json
 参考:output jason 文件:InsertRec_output.json
@@ -76,7 +77,8 @@ OutPut: 1 成功  -3003 失败
 
 9.InsertRecDetail()//新增收料单明细
 路由:http://localhost:5000/Core/PurchaseReceive/InsertRecDetail
-input:  RecDetail   purchaserecdetail    收料单明细资料
+input:  recid         int        收料单id
+        ids           list<int>  sku autoid
 OutPut: 1 成功  else 失败代号
 参考:input jason 文件:InsertRecDetail_input.json
 参考:output jason 文件:InsertRecDetail_output.json

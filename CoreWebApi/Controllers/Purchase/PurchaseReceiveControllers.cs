@@ -128,10 +128,11 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/PurchaseReceive/InsertRec")]
         public ResponseResult InsertRec([FromBodyAttribute]JObject co)
         {   
-            var pur = Newtonsoft.Json.JsonConvert.DeserializeObject<PurchaseReceive>(co["Rec"].ToString());
+            int id = int.Parse(co["ID"].ToString());
+            string type = co["Type"].ToString();
             string UserName = GetUname(); 
             int CoID = int.Parse(GetCoid());
-            var data = PurchaseReceiveHaddle.InsertReceive(pur,UserName,CoID);
+            var data = PurchaseReceiveHaddle.InsertReceive(id,type,UserName,CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -139,7 +140,8 @@ namespace CoreWebApi
         public ResponseResult UpdateRec([FromBodyAttribute]JObject co)
         {   
             var pur = Newtonsoft.Json.JsonConvert.DeserializeObject<PurchaseReceive>(co["Rec"].ToString());
-            var data = PurchaseReceiveHaddle.UpdateReceive(pur);
+            int CoID = int.Parse(GetCoid());
+            var data = PurchaseReceiveHaddle.UpdateReceive(pur,CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -150,25 +152,6 @@ namespace CoreWebApi
         //     int CoId = int.Parse(GetCoid());
         //     var data = PurchaseHaddle.ConfirmPurchase(puridList,CoId);
         //     return CoreResult.NewResponse(data.s, data.d, "General");
-        // }
-
-        // [HttpGetAttribute("/Core/PurchaseReceive/PurchaseRecSingle")]
-        // public ResponseResult PurchaseRecSingle(string ID)
-        // {   
-        //     int x,id = 0;
-        //     var data = new DataResult(1,null);  
-        //     int CoID = int.Parse(GetCoid());
-        //     if (int.TryParse(ID, out x))
-        //     {
-        //         id = int.Parse(ID);
-        //         data = PurchaseHaddle.GetPurchaseEdit(id,CoID);
-        //     }
-        //     else
-        //     {
-        //         data.s = -1;
-        //         data.d = "参数无效!";
-        //     }
-        //     return CoreResult.NewResponse(data.s, data.d, "General"); 
         // }
 
         // [HttpPostAttribute("/Core/PurchaseReceive/FinConfirmRec")]
@@ -183,9 +166,10 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/PurchaseReceive/InsertRecDetail")]
         public ResponseResult InsertRecDetail([FromBodyAttribute]JObject co)
         {   
-            var detail = Newtonsoft.Json.JsonConvert.DeserializeObject<PurchaseRecDetail>(co["RecDetail"].ToString());
+            int id = int.Parse(co["recid"].ToString());
+            List<int> detailid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["ids"].ToString());
             int CoId = int.Parse(GetCoid());
-            var data = PurchaseReceiveHaddle.InsertRecDetail(detail,CoId);
+            var data = PurchaseReceiveHaddle.InsertRecDetail(id,detailid,CoId);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
@@ -201,8 +185,10 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/PurchaseReceive/DelRecDetail")]
         public ResponseResult DelRecDetail([FromBodyAttribute]JObject co)
         {   
+            int recid = int.Parse(co["Recid"].ToString());
             List<int> detailid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["DetailID"].ToString());
-            var data = PurchaseReceiveHaddle.DelRecDetail(detailid);
+            int CoID = int.Parse(GetCoid());
+            var data = PurchaseReceiveHaddle.DelRecDetail(detailid,recid,CoID);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-// using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyCore;
 using CoreData.CoreCore;
 using System;
@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using CoreModels;
 namespace CoreWebApi
 {
-    // [AllowAnonymous]
+    [AllowAnonymous]
     public class PurchaseController : ControllBase
     {
         [HttpGetAttribute("/Core/Purchase/PurchaseList")]

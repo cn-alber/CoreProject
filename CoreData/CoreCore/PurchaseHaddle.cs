@@ -646,9 +646,9 @@ namespace CoreData.CoreCore
                 }
                 List<InsertFailReason> rt = new List<InsertFailReason>();
                 List<int> rr = new List<int>();
-                InsertFailReason rf = new InsertFailReason();
                 foreach(int a in skuid)
                 {
+                    InsertFailReason rf = new InsertFailReason();
                     string skusql = "select skuid,skuname,norm,img,goodscode,enable from coresku where id =" + a;
                     var s = CoreDBconn.Query<SkuInsert>(skusql).AsList();
                     if(s.Count == 0)
