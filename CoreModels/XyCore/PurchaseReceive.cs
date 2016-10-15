@@ -30,13 +30,14 @@ namespace CoreModels.XyCore
         public int id{get;set;}
         public int recid{get;set;}
         public string img{get;set;}
+        public int skuautoid{get;set;}
         public string skuid{get;set;}
         public string skuname{get;set;}
         public string norm {get;set;}
-        public decimal recqty{get;set;}
-        public decimal price{get;set;}
-        public decimal planrecqty{get;set;}
-        public decimal amount{get;set;}
+        public string recqty{get;set;}
+        public string price{get;set;}
+        public string planrecqty{get;set;}
+        public string amount{get;set;}
         public string remark{get;set;}
         public string goodscode{get;set;}
         public string supplynum{get;set;}
