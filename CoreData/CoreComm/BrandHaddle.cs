@@ -159,7 +159,7 @@ namespace CoreData.CoreComm
                     contents += string.Join(",", IDLst.ToArray());
                     CoreUser.LogComm.InsertUserLogTran(TransUser, "修改品牌状态", "Brand", contents, UserName, CoID, DateTime.Now);
 
-                    if (res.s == 1)
+                    if (res.s > 0)
                     {
                         TransComm.Commit();
                         TransUser.Commit();
@@ -260,7 +260,7 @@ namespace CoreData.CoreComm
         public static DataResult SaveUpdateBrand(Brand brand, int CoID, string UserName)
         {
             string contents = string.Empty;
-            var result = new DataResult(1,null);
+            var result = new DataResult(1, null);
             var res = GetBrandEdit(brand.ID.ToString());
             var brandOld = res.d as Brand;
             if (brandOld.Name != brand.Name)
