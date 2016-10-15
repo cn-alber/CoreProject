@@ -78,3 +78,22 @@ function说明
         失败：返回错误信息
     参考:input json 文件:UptInvSafeQty_input.json
     参考:output json 文件:UptInvSafeQty_output.json
+############################################################
+7.UpdateInvSkuName()//更新商品名称
+    方法：POST
+    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/UpdateInvSkuName
+    InPut:
+        无
+    OutPut:
+        成功：返回请求成功信息(s=1)
+        失败：返回错误信息
+############################################################
+8.ClearInvSku()//批量操作 - 库存清理
+    方法：POST
+    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/ClearInvSku
+    InPut:
+        IDLst           List<int>       商品库存ID(inventory.ID)
+    OutPut:
+        成功：返回请求成功信息(s=1)
+        失败：返回错误信息
+
