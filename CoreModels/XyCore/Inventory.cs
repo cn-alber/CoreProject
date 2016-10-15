@@ -144,4 +144,16 @@ namespace CoreModels.XyCore
         public decimal SafeQty { get; set; }
     }
 
+    //盘点库存导出模板excel,顺序不可调
+    public class SetInvQtyExcel
+    {
+        public int WarehouseID { get; set; }
+        public string WarehouseName { get; set; }
+        public string SkuID { get; set; }
+        public string Name { get; set; }
+        public string Norm { get; set; }
+        public decimal StockQty { get; set; }
+        public decimal SetQty { get; set; }
+    }
+
 }

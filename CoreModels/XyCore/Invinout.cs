@@ -33,13 +33,14 @@ namespace CoreModels.XyCore
 
     public class InvinoutAuto
     {
-        public int CoID{get;set;}
-        public decimal Qty{get;set;}
-        public string UserName{get;set;}
-        public string CusType{get;set;}
-        public int Type{get;set;}
-        public string RecordID{get;set;}
-        public Inventory inv{get;set;}
+        public int CoID { get; set; }
+        public decimal Qty { get; set; }
+        public string UserName { get; set; }
+        public string CusType { get; set; }
+        public int Type { get; set; }
+        public string RecordID { get; set; }
+        public Inventory inv { get; set; }
+        public List<Inventory> InvLst { get; set; }
     }
-   
+
 }

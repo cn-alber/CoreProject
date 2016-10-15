@@ -71,7 +71,7 @@ namespace CoreWebApi.XyCore
         }
         #endregion
 
-        #region 库存管理 - 库存明细查询
+        #region 库存管理-商品库存查询 - 库存明细查询
         [HttpGetAttribute("Core/XyCore/Inventory/InvDetailQuery")]
         public ResponseResult InvDetailQuery(string SkuID, string WarehouseID, string DocType, string DocDateB, string DocDateE, string PageIndex, string PageSize, string SortField, string SortDirection)
         {
@@ -126,7 +126,7 @@ namespace CoreWebApi.XyCore
         }
         #endregion
 
-        #region 修改现有库存-查询单笔库存明细
+        #region 商品库存查询 - 修改现有库存-查询单笔库存明细
         [HttpGetAttribute("Core/XyCore/Inventory/InventorySingle")]
         public ResponseResult InventorySingle(string ID)
         {
@@ -151,7 +151,7 @@ namespace CoreWebApi.XyCore
         }
         #endregion
 
-        #region 修改现有库存 - 产生盘点交易
+        #region 商品库存查询 - 修改现有库存 - 产生盘点交易
         [HttpPostAttribute("Core/XyCore/Inventory/UptStockQtySingle")]
         public ResponseResult UptStockQtySingle([FromBodyAttribute]JObject obj)
         {
@@ -175,7 +175,7 @@ namespace CoreWebApi.XyCore
         }
         #endregion
 
-        #region 修改安全库存 - 查询库存明细
+        #region 商品库存查询 - 修改安全库存 - 查询库存明细
         [HttpGetAttribute("Core/XyCore/Inventory/InvSafeQtyLst")]
         public ResponseResult InvSafeQtyLst(string GoodsCode, string WarehouseID)
         {
@@ -200,16 +200,48 @@ namespace CoreWebApi.XyCore
         }
         #endregion
 
-        #region 修改安全库存 - 保存商品库存
+        #region 商品库存查询 - 修改安全库存 - 保存商品库存
         [HttpPostAttribute("Core/XyCore/Inventory/UptInvSafeQty")]
         public ResponseResult UptInvSafeQty([FromBodyAttribute]JObject obj)
         {
-            var res = new DataResult(1,null);
+            var res = new DataResult(1, null);
             var invLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<InventParams>>(obj["InvLst"].ToString());
             int CoID = int.Parse(GetCoid());
             string UserName = GetUname();
-            res = InventoryHaddle.UptInvSafeQty(invLst,CoID,UserName);
-            return CoreResult.NewResponse(res.s,res.d,"General");
+            res = InventoryHaddle.UptInvSafeQty(invLst, CoID, UserName);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 商品库存查询 - 更新商品名称
+        [HttpPostAttribute("Core/XyCore/Inventory/UpdateInvSkuName")]
+        public ResponseResult UpdateInvSkuName()
+        {
+            int CoID = int.Parse(GetCoid());
+            string UserName = GetUname();
+            var res = InventoryHaddle.UptInvSkuName(CoID, UserName);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 商品库存查询 - 批量操作 - 库存清理
+        [HttpPostAttribute("Core/XyCore/Inventory/ClearInvSku")]
+        public ResponseResult ClearInvSku([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
+            if (IDLst.Count == 0)
+            {
+                res.s = -1;
+                res.d = "请先选中明细";
+            }
+            else
+            {
+                int CoID = int.Parse(GetCoid());
+                string UserName = GetUname();
+                res = InventoryHaddle.ClearSku(IDLst,CoID,UserName);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
 
@@ -265,6 +297,55 @@ namespace CoreWebApi.XyCore
             var Result = InventoryHaddle.GetInvDetailQuery(cp);
             return CoreResult.NewResponse(Result.s, Result.d, "General");
         }
-        #endregion
+        #endregion    
+
+        #region 商品库存盘点
+        [HttpPostAttribute("Core/XyCore/Inventory/SetInvQty")]
+        public ResponseResult SetInvQty()
+        {   
+            var InvLst = new List<SetInvQtyExcel>();
+            var inv = new SetInvQtyExcel();
+            inv.WarehouseID = 30;
+            inv.WarehouseName = "dss";
+            inv.SkuID = "N9L5F58781052165";
+            inv.Name = "南极人男士羊毛衫";
+            inv.Norm = "深红;165";
+            inv.StockQty=935;
+            inv.SetQty = 1000;
+            InvLst.Add(inv);
+            InvLst.Add(inv);
+            // var inv1 = new SetInvQtyExcel();
+            // inv1.WarehouseID = 30;
+            // inv1.WarehouseName = "dss";
+            // inv1.SkuID = "N9L5F58781051170";
+            // inv1.Name = "南极人男士羊毛衫";
+            // inv1.Norm = "兰黑;170";
+            // inv1.StockQty=936;
+            // inv1.SetQty = 900;
+            // InvLst.Add(inv1);
+            var inv2 = new SetInvQtyExcel();
+            inv2.WarehouseID = 30;
+            inv2.WarehouseName = "dss";
+            inv2.SkuID = "N9L5F58781025165";
+            inv2.Name = "南极人男士羊毛衫";
+            inv2.Norm = "墨绿;165";
+            inv2.StockQty=10459;
+            inv2.SetQty = 900;
+            InvLst.Add(inv2);
+            // var inv3 = new SetInvQtyExcel();
+            // inv3.WarehouseID = 30;
+            // inv3.WarehouseName = "dss";
+            // inv3.SkuID = "N9L5F58781025170";
+            // inv3.Name = "南极人男士羊毛衫";
+            // inv3.Norm = "墨绿;170";
+            // inv3.StockQty=937;
+            // inv3.SetQty = 1000;
+            // InvLst.Add(inv3);
+            int CoID = int.Parse(GetCoid());
+            string UserName = GetUname();
+            var res = InventoryHaddle.CreateInvSetTemp(InvLst,CoID,UserName);
+            return CoreResult.NewResponse(res.s,res.d,"General");
+        }
+        #endregion   
     }
 }
