@@ -134,7 +134,7 @@ namespace CoreData.CoreUser
 
                     // var child = conn.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where viewpowerid in (" +
                     //                              r.ViewList + ") order by ParentID,sortindex").AsList();
-                    var child = conn.Query<Refresh>("select id,name,NewIcon, NewIconPre,NewUrl as path,ParentID from menus where NewUrl != '' and viewpowerid in (" +
+                    var child = conn.Query<Refresh>("select id,name,NewIcon, NewIconPre,NewUrl as path,ParentID from menus where NewUrl != '' and viewpowerid in (0," +
                                 r.ViewList + ") order by ParentID,sortindex").AsList();
 
                     foreach (var c in child)
@@ -158,7 +158,7 @@ namespace CoreData.CoreUser
                     var pid = string.Join(",", pidarray);
 
                     //parent = conn.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where id in (" + pid + ") order by sortindex").AsList();
-                    parent = conn.Query<Refresh>("select id,name,NewIcon , NewIconPre ,NewUrl as path,ParentID from menus where id in (" + pid + ") order by sortindex").AsList();
+                    parent = conn.Query<Refresh>("select id,name,NewIcon , NewIconPre ,NewUrl as path,ParentID from menus where id in (0," + pid + ") order by sortindex").AsList();
                     foreach (var p in parent)
                     {
                         p.type = 2;

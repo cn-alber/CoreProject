@@ -89,7 +89,7 @@ namespace CoreData.CoreUser
                     var r = role.d as Role;
                     //"select name,NewIcon,NewIconPre,NavigateUrl,ParentID from menus where viewpowerid in (" + r.ViewList + ") order by ParentID,sortindex"
                     string sql = "select menus.id, menus.`Name` as `name`, NewIcon,NewIconPre,NewUrl as router,SortIndex as `order`, menus.Remark, ParentID ,power.Title as access from menus "+
-                                "LEFT JOIN power on power.ID = menus.ViewPowerID where menus.deleted = FALSE AND viewpowerid in (" + r.ViewList + ") order by ParentID,sortindex"; 
+                                "LEFT JOIN power on power.ID = menus.ViewPowerID where menus.deleted = FALSE AND viewpowerid in (0," + r.ViewList + ") order by ParentID,sortindex"; 
                     Console.WriteLine(sql);
                     var child = conn.Query<Menu>(sql).AsList();
                     if (child.Count == 0){ return null;}
@@ -106,7 +106,7 @@ namespace CoreData.CoreUser
                     var pid = string.Join(",", pidarray);
                     //"select id,name,NewIcon,NewIconPre,NavigateUrl,ParentID from menus where id in (" + pid + ") order by sortindex"
                     sql = "select menus.id, menus.`Name` as `name`,NewIcon,NewIconPre,NewUrl as router,SortIndex as `order`, menus.Remark, ParentID ,power.Title as access from menus "+
-                                "LEFT JOIN power on power.ID = menus.ViewPowerID where menus.deleted = FALSE AND  menus.id in (" + pid + ") order by sortindex"; 
+                                "LEFT JOIN power on power.ID = menus.ViewPowerID where menus.deleted = FALSE AND  menus.id in (0," + pid + ") order by sortindex"; 
                     
                     parent = conn.Query<Menu>(sql).AsList();
 
