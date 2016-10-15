@@ -74,7 +74,7 @@ namespace CoreModels.XyCore
         public bool Enable { get; set; }
         public string Creator { get; set; }
         public string Img{get;set;}
-        public DateTime CreateDate { get; set; }
+        public string CreateDate { get; set; }
     }
     #endregion
 

@@ -1,17 +1,21 @@
 using System;
 using System.Collections.Generic;
 using CoreModels;
+using CoreModels.XyApi.Tmall;
 using Newtonsoft.Json;
 
 namespace CoreDate.CoreApi
 {
     public  class TmallHaddle{
         
-        private static string SERVER_URL = "http://gw.api.taobao.com/router/rest";
-        private static string SECRET = "f60e6b4c6565ecc865e7301ad02ef6a4";        
+        //private static string SERVER_URL = "http://gw.api.taobao.com/router/rest";
+        private static string SERVER_URL = "http://gw.api.tbsandbox.com/router/rest";
+        //private static string SECRET ="f60e6b4c6565ecc865e7301ad02ef6a4";
+        private static string SECRET = "sandboxc6565ecc865e7301ad02ef6a4";//沙箱        
 
         private static IDictionary<string, string> Tmparam = new Dictionary<string, string>{
-            {"app_key", "23476390"},            
+            //{"app_key", "23476390"},
+            {"app_key", "1023476390"},//沙箱            
             {"format","json"},
             {"sign_method","md5"},            
             {"timestamp", System.DateTime.Now.AddMinutes(6).ToString()},
@@ -90,7 +94,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res.trades_sold_get_response.trades.trade;
                 }            
@@ -126,12 +130,13 @@ namespace CoreDate.CoreApi
                     var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                     if(response.Result.ToString().IndexOf("error") > 0){
                         result.s = -1;
-                        result.d ="交易单号："+tid+" 获取失败, code:"+res.error_response.code+" "+res.error_response.msg;
+                        result.d ="交易单号："+tid+" 获取失败, code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                         break;
                     }else{
                         orderinfolist.Add(res.trade_get_response.trade);
                     }
                     Tmparam.Remove("tid");
+                    Tmparam.Remove("sign");
                 }
                 
                 if(result.s == 1)
@@ -182,7 +187,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res.shipping.is_success;
                 }            
@@ -214,7 +219,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res;
                 }            
@@ -233,10 +238,10 @@ namespace CoreDate.CoreApi
         ///  确认发货通知接口 参考网址： http://open.taobao.com/docs/api.htm?apiId=10689
         ///  仅使用taobao.logistics.online.send 发货时，未输入运单号的情况下，需要使用该接口确认发货
         /// </summary>
-        /// <param name="tid">淘宝交易ID</param>
+        /// <param name="tid">必选，淘宝交易ID</param>
         /// <param name="sub_tid">拆单子订单列表</param>
         /// <param name="is_split">	表明是否是拆单，默认值0，1表示拆单</param>
-        /// <param name="out_sid">运单号.具体一个物流公司的真实运单号码。淘宝官方物流会校验，请谨慎传入；</param>
+        /// <param name="out_sid">必选，运单号.具体一个物流公司的真实运单号码。淘宝官方物流会校验，请谨慎传入；</param>
         /// <param name="seller_ip">商家的IP地址</param>
         public static DataResult onlineConfirm(string token,string tid,string sub_tid,string is_split,string out_sid,string seller_ip){
             var result = new DataResult(1,null);
@@ -255,7 +260,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res.shipping.is_success;
                 }            
@@ -306,7 +311,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res.shipping.is_success;
                 }            
@@ -342,7 +347,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res.shipping.is_success;
                 }            
@@ -356,6 +361,513 @@ namespace CoreDate.CoreApi
         }
         #endregion
 
+        #region 
+        /// <summary>
+        ///  创建订单并发货 参考网址： http://open.taobao.com/docs/api.htm?apiId=22172
+        /// </summary>
+        /// <param name="user_id	">必选，	用户ID	</param>
+        /// <param name="order_source	">必选，	订单来源，值选择：30	</param>
+        /// <param name="order_type	">必选，	订单类型，值固定选择：30	</param>
+        /// <param name="logis_type	">必选，	物流订单物流类型，值固定选择：2	</param>
+        /// <param name="company_id	">必选，	物流公司ID	</param>
+        /// <param name="trade_id	">必选，	交易流水号，淘外订单号或者商家内部交易流水号	</param>
+        /// <param name="mail_no	">	运单号	</param>
+        /// <param name="shipping	">	费用承担方式 1买家承担运费 2卖家承担运费	</param>
+        /// <param name="s_name	">必选，	发件人名称	</param>
+        /// <param name="s_area_id	">必选，	发件人区域ID	</param>
+        /// <param name="s_address	">必选，	发件人街道地址	</param>
+        /// <param name="s_zip_code	">必选，	发件人出编	</param>
+        /// <param name="s_mobile_phone	">	手机号码	</param>
+        /// <param name="s_telephone	">	电话号码	</param>
+        /// <param name="s_prov_name	">	省	</param>
+        /// <param name="s_city_name	">	市	</param>
+        /// <param name="s_dist_name	">	区	</param>
+        /// <param name="r_name	">必选，	收件人名称	</param>
+        /// <param name="r_area_id	">必选，	收件人区域ID	</param>
+        /// <param name="r_address	">必选，	收件人街道地址	</param>
+        /// <param name="r_zip_code	">必选，	收件人邮编	</param>
+        /// <param name="r_mobile_phone	">	手机号码	</param>
+        /// <param name="r_telephone	">	电话号码	</param>
+        /// <param name="r_prov_name	">必选，	省	</param>
+        /// <param name="r_city_name	">必选，	市	</param>
+        /// <param name="r_dist_name	">	区	</param>
+        /// <param name="item_json_string	">必选，	物品的json数据。	</param>
+        public static DataResult orderCreateAndSend (orderCreateAndSendRequest order){
+            var result = new DataResult(1,null);
+            try{                                        
+                Tmparam.Add("method", "taobao.logistics.consign.order.createandsend");
+                Tmparam.Add("session", order.token);
+                Tmparam.Add("user_id", order.user_id);
+                Tmparam.Add("order_source", order.order_source);
+                Tmparam.Add("order_type", order.order_type);
+                Tmparam.Add("logis_type", order.logis_type);
+                Tmparam.Add("company_id", order.company_id);
+                Tmparam.Add("trade_id", order.trade_id);
+                Tmparam.Add("mail_no", order.mail_no);
+                Tmparam.Add("shipping", order.shipping);
+                Tmparam.Add("s_name", order.s_name);
+                Tmparam.Add("s_area_id", order.s_area_id);
+                Tmparam.Add("s_address", order.s_address);
+                Tmparam.Add("s_zip_code", order.s_zip_code);
+                Tmparam.Add("s_mobile_phone", order.s_mobile_phone);
+                Tmparam.Add("s_telephone", order.s_telephone);
+                Tmparam.Add("s_prov_name", order.s_prov_name);
+                Tmparam.Add("s_city_name", order.s_city_name);
+                Tmparam.Add("s_dist_name", order.s_dist_name);
+                Tmparam.Add("r_name", order.r_name);
+                Tmparam.Add("r_area_id", order.r_area_id);
+                Tmparam.Add("r_address", order.r_address);
+                Tmparam.Add("r_zip_code", order.r_zip_code);
+                Tmparam.Add("r_mobile_phone", order.r_mobile_phone);
+                Tmparam.Add("r_telephone", order.r_telephone);
+                Tmparam.Add("r_prov_name", order.r_prov_name);
+                Tmparam.Add("r_city_name", order.r_city_name);
+                Tmparam.Add("r_dist_name", order.r_dist_name);
+                Tmparam.Add("item_json_string", Newtonsoft.Json.JsonConvert.SerializeObject(order.item_json_string));
+
+                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                Tmparam.Add("sign", sign);//                                      
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
+                }else{
+                    result.d = res;
+                }            
+            }catch(Exception ex){                
+                result.s = -1;
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+        #endregion
+
+        #region 
+        /// <summary>
+        ///  查询买家申请的退款列表 参考网址： http://open.taobao.com/doc2/apiDetail.htm?apiId=51&scopeId=11850
+        /// </summary>
+        /// <param name="fields"></param>
+        /// <param name="status">退款状态，默认查询所有退款状态的数据，除了默认值外每次只能查询一种状态</param>
+        /// <param name="seller_nick">卖家昵称</param>
+        /// <param name="type">交易类型列表，一次查询多种类型可用半角逗号分隔，默认同时查询guarantee_trade, auto_delivery的2种类型的数据。</param>
+        /// <param name="page_no"></param>
+        /// <param name="page_size">最大值:100</param>
+        public static DataResult refundsApplyGet(string token,string fields,string status,string seller_nick,string type,int page_no,int page_size){
+            var result = new DataResult(1,null);
+            try{                                        
+                Tmparam.Add("method", "taobao.refunds.apply.get");
+                Tmparam.Add("session", token);                
+                Tmparam.Add("fields", fields);
+                Tmparam.Add("status", status);
+                Tmparam.Add("seller_nick", seller_nick);
+                Tmparam.Add("type", type);
+                Tmparam.Add("page_no", page_no.ToString());
+                Tmparam.Add("page_size", page_size.ToString());
+
+                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                Tmparam.Add("sign", sign);//                                      
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
+                }else{
+                    result.d = res.refunds_apply_get_response;
+                }            
+            }catch(Exception ex){                
+                result.s = -1;
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+        #endregion
+
+        #region 
+        /// <summary>
+        ///  查询卖家收到的退款列表 参考网址：http://open.taobao.com/docs/api.htm?scopeId=11850&apiId=52 
+        /// </summary>
+        /// <param name="fields"></param>
+        /// <param name="status">退款状态，默认查询所有退款状态的数据，除了默认值外每次只能查询一种状态</param>
+        /// <param name="buyer_nick">卖家昵称</param>
+        /// <param name="type">交易类型列表，一次查询多种类型可用半角逗号分隔，默认同时查询guarantee_trade, auto_delivery的2种类型的数据。</param>
+        /// <param name="start_modified"></param>
+        /// <param name="end_modified"></param>
+        /// <param name="page_no"></param>
+        /// <param name="page_size">最大值:100</param>
+        public static DataResult refundsReceiveGet(string token,string fields,string status,string buyer_nick,string type,string start_modified,string end_modified,int page_no,int page_size){
+            var result = new DataResult(1,null);
+            try{                                        
+                Tmparam.Add("method", "taobao.refunds.receive.get");
+                Tmparam.Add("session", token);
+                Tmparam.Add("fields", fields);
+                Tmparam.Add("status", status);
+                Tmparam.Add("buyer_nick", buyer_nick);
+                Tmparam.Add("type", type);
+                Tmparam.Add("start_modified", start_modified);
+                Tmparam.Add("end_modified", end_modified);
+                Tmparam.Add("page_no", page_no.ToString());
+                Tmparam.Add("page_size", page_size.ToString());                
+
+                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                Tmparam.Add("sign", sign);//                                      
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
+                }else{
+                    result.d = res.refunds_receive_get_response;
+                }            
+            }catch(Exception ex){                
+                result.s = -1;
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+        #endregion
+
+        #region 
+        /// <summary>
+        ///  获取单笔退款详情 参考网址： http://open.taobao.com/docs/api.htm?scopeId=11850&apiId=53
+        /// </summary>
+        /// <param name="fields"></param>
+        /// <param name="refund_id"> 必选，退款单号</param>
+        public static DataResult refundOneGet(string token,string fields,string refund_id){
+            var result = new DataResult(1,null);
+            try{                                        
+                Tmparam.Add("method", "taobao.refund.get");
+                Tmparam.Add("session", token);
+                Tmparam.Add("fields", fields);
+                Tmparam.Add("refund_id", refund_id);
+                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                Tmparam.Add("sign", sign);//                                      
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d ="退款单ID： "+refund_id+"获取失败 code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
+                    
+                }else{
+                    result.d = res.refund_get_response;
+                } 
+           
+                
+                                 
+            }catch(Exception ex){                
+                result.s = -1;
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+        #endregion
+
+        #region 
+        /// <summary>
+        ///  查询退款留言/凭证列表 参考网址： http://open.taobao.com/docs/api.htm?scopeId=11850&apiId=124
+        /// </summary>
+        /// <param name="fields">必选，</param>
+        /// <param name="refund_id">必选，退款单号</param>
+        /// <param name="page_no"></param>
+        /// <param name="page_size"></param>
+        /// <param name="refund_phase">退款阶段，可选值：onsale（售中），aftersale（售后），天猫退款为必传。</param>
+        public static DataResult refundMessagesGet(string token,string fields ,string refund_id,int page_no,int page_size,string refund_phase){
+            var result = new DataResult(1,null);
+            try{                                        
+                Tmparam.Add("method", "taobao.refund.messages.get");
+                Tmparam.Add("session", token);
+                Tmparam.Add("fields", fields);
+                Tmparam.Add("refund_id",refund_id);
+                Tmparam.Add("page_no", page_no.ToString());
+                Tmparam.Add("page_size", page_size.ToString());
+                Tmparam.Add("refund_phase", refund_phase);
+        
+                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                Tmparam.Add("sign", sign);//                                      
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
+                }else{
+                    result.d = res;
+                }            
+            }catch(Exception ex){                
+                result.s = -1;
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+        #endregion
+
+        #region 
+        /// <summary>
+        ///  卖家拒绝退款 参考网址： http://open.taobao.com/docs/api.htm?scopeId=11850&apiId=10480
+        /// </summary>
+        /// <param name="refund_id">退款单号</param>
+        /// <param name="refuse_message">拒绝退款时的说明信息，长度2-200</param>
+        /// <param name="refuse_proof">拒绝退款时的退款凭证，最大长度130000字节，支持的图片格式：GIF, JPG, PNG。天猫退款为必填项。支持的文件类型：gif,jpg,png</param>
+        /// <param name="refund_phase">可选值为：售中：onsale，售后：aftersale，天猫退款为必填项。</param>
+        /// <param name="refund_version">退款版本号，天猫退款为必填项</param>
+        /// <param name="refuse_reason_id">拒绝原因编号，会提供用户拒绝原因列表供选择</param>        
+        public static DataResult refundRefuse(string token,string refund_id,string refuse_message,string refuse_proof,string refund_phase,string refund_version,string refuse_reason_id ){
+            var result = new DataResult(1,null);
+            try{                                        
+                Tmparam.Add("method", "taobao.refund.refuse");
+                Tmparam.Add("session", token);
+                Tmparam.Add("refund_id", refund_id);
+                Tmparam.Add("refuse_message", refuse_message);
+                Tmparam.Add("refuse_proof", refuse_proof);
+                Tmparam.Add("refund_phase", refund_phase);
+                Tmparam.Add("refund_version", refund_version);
+                Tmparam.Add("refuse_reason_id", refuse_reason_id);
+
+                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                Tmparam.Add("sign", sign);//                                      
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
+                }else{
+                    result.d = res;
+                }            
+            }catch(Exception ex){                
+                result.s = -1;
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+        #endregion
+
+        #region 
+        /// <summary>
+        ///  添加SKU 参考网址： http://open.taobao.com/docs/api.htm?apiId=27
+        /// </summary>
+        ///<param name="num_iid	">必选，	所属商品数字id，可通过 taobao.item.get 获取。必选	</param>
+        ///<param name="properties	">必选，	Sku属性串。格式:pid:vid;pid:vid,如:1627207:3232483;1630696:3284570,表示:机身颜色:军绿色;手机套餐:一电一充。	</param>
+        ///<param name="quantity	">必选，	Sku的库存数量。sku的总数量应该小于等于商品总数量(Item的NUM)。取值范围:大于零的整数	</param>
+        ///<param name="price	">必选，	Sku的销售价格。商品的价格要在商品所有的sku的价格之间。精确到2位小数;单位:元。如:200.07，表示:200元7分	</param>
+        ///<param name="outer_id	">	Sku的商家外部id	</param>
+        ///<param name="item_price	">	sku所属商品的价格。当用户新增sku，使商品价格不属于sku价格之间的时候，用于修改商品的价格，使sku能够添加成功	</param>
+        ///<param name="lang	">	Sku文字的版本。可选值:zh_HK(繁体),zh_CN(简体);默认值:zh_CN	</param>
+        ///<param name="spec_id	">	产品的规格信息	</param>
+        ///<param name="sku_hd_length	">	家装建材类目，商品SKU的长度，正整数，单位为cm，部分类目必选。天猫商家专用。 数据和SKU一一对应，用,分隔，如：20,30,30	</param>
+        ///<param name="sku_hd_height	">	家装建材类目，商品SKU的高度，单位为cm，部分类目必选。	</param>
+        ///<param name="sku_hd_lamp_quantity	">	家装建材类目，商品SKU的灯头数量，正整数，大于等于3，部分类目必选。天猫商家专用。 数据和SKU一一对应，用,分隔，如：3,5,7	</param>
+        ///<param name="ignorewarning	">	忽略警告提示.	</param>
+        public static DataResult itemSkuAdd (skuAddRequest sku){
+            var result = new DataResult(1,null);
+            try{                                        
+                Tmparam.Add("method", "taobao.item.sku.add");
+                Tmparam.Add("session", sku.token);
+                Tmparam.Add("num_iid", sku.num_iid);
+                Tmparam.Add("properties", sku.properties);
+                Tmparam.Add("quantity", sku.quantity);
+                Tmparam.Add("price", sku.price);
+                Tmparam.Add("outer_id", sku.outer_id);
+                Tmparam.Add("item_price", sku.item_price);
+                Tmparam.Add("lang", sku.lang);
+                Tmparam.Add("spec_id", sku.spec_id);
+                Tmparam.Add("sku_hd_length", sku.sku_hd_length);
+                Tmparam.Add("sku_hd_height", sku.sku_hd_height);
+                Tmparam.Add("sku_hd_lamp_quantity", sku.sku_hd_lamp_quantity);
+                Tmparam.Add("ignorewarning", sku.ignorewarning);
+                
+                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                Tmparam.Add("sign", sign);//                                      
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
+                }else{
+                    result.d = res.sku;
+                }            
+            }catch(Exception ex){                
+                result.s = -1;
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+        #endregion
+
+        #region 
+        /// <summary>
+        ///  获取SKU 参考网址： http://open.taobao.com/docs/api.htm?apiId=28 
+        /// </summary>
+        /// <param name="fields">必选</param>
+        /// <param name="sku_id">必选，</param>
+        /// <param name="num_iid">商品的数字IID（num_iid和nick必传一个，推荐用num_iid），传商品的数字id返回的结果里包含cspu（SKu上的产品规格信息）。</param>
+        /// <param name="nick">卖家nick(num_iid和nick必传一个)，只传卖家nick时候，该api返回的结果不包含cspu（SKu上的产品规格信息）。</param>
+        public static DataResult itemSkuGet(string token,string fields, string sku_id,string num_iid,string nick){
+            var result = new DataResult(1,null);
+            try{                                        
+                Tmparam.Add("method", "taobao.item.sku.get");
+                Tmparam.Add("session", token);
+                Tmparam.Add("fields", fields);
+                Tmparam.Add("num_iid", num_iid);
+                Tmparam.Add("nick", nick);
+                    
+                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                Tmparam.Add("sign", sign);//                                      
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d ="Sku ID: "+sku_id+" 信息获取失败 code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
+                
+                }else{
+                    result.d =res.sku;
+                }                                                                      
+            }catch(Exception ex){                
+                result.s = -1;
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+        #endregion
+
+        #region 
+        /// <summary>
+        ///  更新SKU信息 参考网址： http://open.taobao.com/docs/api.htm?apiId=29
+        /// </summary>
+        ///<param name="num_iid	">	最小值：0	所属商品数字id，可通过 taobao.item.get 获取。必选	</param>
+        ///<param name="properties	">	Sku属性串。格式:pid:vid;pid:vid,如:1627207:3232483;1630696:3284570,表示:机身颜色:军绿色;手机套餐:一电一充。	</param>
+        ///<param name="quantity	">	Sku的库存数量。sku的总数量应该小于等于商品总数量(Item的NUM)。取值范围:大于零的整数	</param>
+        ///<param name="price	">	Sku的销售价格。商品的价格要在商品所有的sku的价格之间。精确到2位小数;单位:元。如:200.07，表示:200元7分	</param>
+        ///<param name="outer_id	">	Sku的商家外部id	</param>
+        ///<param name="item_price	">	sku所属商品的价格。当用户新增sku，使商品价格不属于sku价格之间的时候，用于修改商品的价格，使sku能够添加成功	</param>
+        ///<param name="lang	">	Sku文字的版本。可选值:zh_HK(繁体),zh_CN(简体);默认值:zh_CN	</param>
+        ///<param name="spec_id	">	产品的规格信息	</param>
+        ///<param name="barcode	">SKU条形码		</param>
+        ///<param name="ignorewarning	">忽略警告提示.	</param>
+        public static DataResult itemSkuUpdate(skuUpdateRequest sku){
+            var result = new DataResult(1,null);
+            try{                                        
+                Tmparam.Add("method", "taobao.item.sku.update");
+                Tmparam.Add("session", sku.token);
+                Tmparam.Add("num_iid", sku.num_iid);
+                Tmparam.Add("properties", sku.properties);
+                if(string.IsNullOrEmpty(sku.quantity)){ Tmparam.Add("quantity", sku.quantity);}
+                if(string.IsNullOrEmpty(sku.price)){ Tmparam.Add("price", sku.price);}
+                if(string.IsNullOrEmpty(sku.outer_id)){ Tmparam.Add("outer_id", sku.outer_id);}
+                if(string.IsNullOrEmpty(sku.item_price)){ Tmparam.Add("item_price", sku.item_price);}
+                if(string.IsNullOrEmpty(sku.lang)){ Tmparam.Add("lang", sku.lang);}
+                if(string.IsNullOrEmpty(sku.spec_id)){ Tmparam.Add("spec_id", sku.spec_id);}
+                if(string.IsNullOrEmpty(sku.barcode)){ Tmparam.Add("barcode", sku.barcode);}
+                if(string.IsNullOrEmpty(sku.ignorewarning)){ Tmparam.Add("ignorewarning", sku.ignorewarning);}
+
+                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                Tmparam.Add("sign", sign);//                                      
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
+                }else{
+                    result.d = res.sku;
+                }            
+            }catch(Exception ex){                
+                result.s = -1;
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+        #endregion
+
+        #region 
+        /// <summary>
+        ///  根据商品ID列表获取SKU信息 参考网址： http://open.taobao.com/docs/api.htm?apiId=30
+        /// </summary>
+        /// <param name="fields"></param>
+        /// <param name="num_iids">必选，sku所属商品数字id，必选。num_iid个数不能超过40个</param>
+        public static DataResult itemSkusGet(string token,string fields,string num_iids){
+            var result = new DataResult(1,null);
+            try{                                        
+                Tmparam.Add("method", "taobao.item.skus.get");
+                Tmparam.Add("session", token);
+
+                Tmparam.Add("fields", fields);
+                Tmparam.Add("num_iids", num_iids);
+
+                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                Tmparam.Add("sign", sign);//                                      
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
+                }else{
+                    result.d = res.skus;
+                }            
+            }catch(Exception ex){                
+                result.s = -1;
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+        #endregion
+
+
+        #region 
+        /// <summary>
+        ///   参考网址： 
+        /// </summary>
+        /// <param name=""></param>
+        /// <param name=""></param>
+        public static DataResult skuDelete(skuDeleteRequest sku){
+            var result = new DataResult(1,null);
+            try{                                        
+                Tmparam.Add("method", "taobao.item.sku.delete");
+                Tmparam.Add("session", sku.token);
+
+                Tmparam.Add("num_iid", sku.num_iid);
+                Tmparam.Add("properties", sku.properties);
+                Tmparam.Add("item_price", sku.item_price);
+                Tmparam.Add("item_num", sku.item_num);
+                Tmparam.Add("lang", sku.lang);
+                Tmparam.Add("ignorewarning", sku.ignorewarning);
+                
+                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                Tmparam.Add("sign", sign);//                                      
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
+                }else{
+                    result.d = res.sku;
+                }            
+            }catch(Exception ex){                
+                result.s = -1;
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+        #endregion
 
 
 
@@ -380,7 +892,7 @@ namespace CoreDate.CoreApi
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.msg;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res;
                 }            

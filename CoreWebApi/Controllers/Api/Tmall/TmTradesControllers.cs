@@ -1,10 +1,12 @@
 using System;
 using CoreDate.CoreApi;
 using CoreModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoreWebApi.Api.Tmall{    
     //天猫订单（order）名称为交易(trade)
+    [AllowAnonymous]
     public class TmTradesControllers : ControllBase
     {
         //订单需要返回的字段列表

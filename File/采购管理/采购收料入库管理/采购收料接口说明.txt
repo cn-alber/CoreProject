@@ -95,21 +95,21 @@ OutPut: 1 成功  else 失败代号
 参考:input jason 文件:DelRecDetail_input.json
 参考:output jason 文件:DelRecDetail_output.json
 
-***12.GetPurchaseInit()//Pageload
-路由:http://localhost:5000/Core/Purchase/GetPurchaseInit
-input:
+12.GetPurchaseRecInit()//Pageload
+路由:http://localhost:5000/Core/PurchaseReceive/GetPurchaseRecInit
+input:      none
 OutPut:     
             status          Dictionary<int,string>    状态列表
-            warehouse       List<Warehouse>           仓库资料
+            finStatus       Dictionary<int,string>    财务状态
             Datacnt         int                       资料总笔数
             Pagecnt         int                       总页数
-            Pur             List<Purchase>            Purchase 资料
-参考:output jason 文件:GetPurchaseInit_output.json
+            PurRec          List<PurchaseReceive>     PurchaseReceive 资料
+参考:output jason 文件:GetPurchaseRecInit_output.json
 
-***13.UpdatePurRemark()//采购单备注更新
-路由:http://localhost:5000/Core/Purchase/UpdatePurRemark
-input:  ID        int         采购单ID
-        Remark    string      备注说明
+13.UpdateRecRemark()//收料单备注更新
+路由:http://localhost:5000/Core/PurchaseReceive/UpdateRecRemark
+input:  IDList        List<int>   收料单ID list
+        Remark        string      备注说明
 OutPut: 1 成功  else 失败代号
-参考:input jason 文件:UpdatePurRemark_input.json
-参考:output jason 文件:UpdatePurRemark_output.json
+参考:input jason 文件:UpdateRecRemark_input.json
+参考:output jason 文件:UpdateRecRemark_output.json

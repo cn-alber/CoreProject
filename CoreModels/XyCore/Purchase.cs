@@ -45,9 +45,14 @@ namespace CoreModels.XyCore
         public string supplycode{get;set;}
         public string planqty{get;set;}
         public string planamt{get;set;}
-        public string recievedate{get;set;}
+        public string _recievedate;
         public string norm {get;set;}
         public string packingnum {get;set;}
+        public string recievedate
+        {
+            get { return _recievedate; }
+            set { this._recievedate = value.ToString().Substring(0,10);}
+        }
     }
     public class PurchaseParm
     {
@@ -203,7 +208,7 @@ namespace CoreModels.XyCore
     {
         public int Datacnt {get;set;}//总资料笔数
         public decimal Pagecnt{get;set;}//总页数
-        public bool enable {get;set;} //明细是否允许修改
+        public int status {get;set;} //采购单状态
         public List<PurchaseDetail> Pur {get;set;}//采购单明细资料List
     }
     public class QualityRev
@@ -236,5 +241,24 @@ namespace CoreModels.XyCore
         public int Datacnt {get;set;}//总资料笔数
         public decimal Pagecnt{get;set;}//总页数
         public List<QualityRev> Qua {get;set;}//资料List
+    }
+    public class InsertFailReason
+    {
+        public int id {get;set;}
+        public string reason{get;set;}
+    }
+    public class PurchaseDetailInsert
+    {
+        public List<int> successIDs {get;set;}
+        public List<InsertFailReason> failIDs {get;set;}
+    }
+    public class SkuInsert
+    {
+        public string skuid { get; set; }
+        public string skuname { get; set; }
+        public string norm { get; set; }
+        public string img { get; set; }
+        public string goodscode { get; set; }
+        public bool enable{ get; set; }
     }
 }
