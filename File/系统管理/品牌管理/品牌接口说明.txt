@@ -4,7 +4,7 @@ function说明
 #######################################################
 1.BrandLst()//查询table Brand 资料
     方法：GET
-    路由：http://localhost:5000/Core/XyComm/Comm/BrandLst?Filter=&Enable=&PageIndex=1&PageSize=&SortField=&SortDirection=
+    路由：http://192.168.30.29:5000/Core/XyComm/Brand/BrandLst?Filter=&Enable=&PageIndex=1&PageSize=&SortField=&SortDirection=
     参数: CoreModels.XyComm.BrandParam
     InPut:
         Filter          string      模糊查询匹配(品牌名称,default null)
@@ -21,7 +21,7 @@ function说明
 #######################################################
 2.BrandEdit()//编辑单笔品牌资料
     方法：GET
-    路由：http://localhost:5000/Core/XyComm/Comm/BrandEdit?ID=3
+    路由：http://localhost:5000/Core/XyComm/Brand/BrandEdit?ID=3
     参数：
     InPut:
         ID              int             品牌编号ID

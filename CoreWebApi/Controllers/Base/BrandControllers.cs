@@ -11,7 +11,7 @@ using CoreModels;
 namespace CoreWebApi
 {
 
-//  [AllowAnonymous]
+ [AllowAnonymous]
  public class BrandController : ControllBase
     {        
         #region 品牌 - 资料查询
