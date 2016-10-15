@@ -843,13 +843,27 @@ namespace CoreDate.CoreComm
                             }else{//新增                                                                                            
                                 if(type == "0"){
                                     result.s = -4023;
-                                }else{
-                                    Console.WriteLine("---------------------------");
+                                }else{                                    
                                     if(name.Equals("新模板")){
                                         name = name+DateTime.Now.ToString("d");
                                     }
-                                    sql ="INSERT INTO print_uses(print_uses.admin_id,print_uses.mdate,print_uses.`name`,print_uses.print_setting,print_uses.sys_id,print_uses.tpl_data,print_uses.type)"+
-                                        "VALUES("+admin_id+",NOW(),'"+name+"','"+print_setting+"',"+sys_id+",'"+state+"',"+type+");"+
+                                    sql =@"INSERT INTO 
+                                                print_uses(
+                                                    print_uses.admin_id,
+                                                    print_uses.mdate,
+                                                    print_uses.`name`,
+                                                    print_uses.print_setting,
+                                                    print_uses.sys_id,
+                                                    print_uses.tpl_data,
+                                                    print_uses.type)"+
+                                        "VALUES("+
+                                                    admin_id+
+                                                    ",NOW(),'"+
+                                                    name+"','"+
+                                                    print_setting+"',"+
+                                                    sys_id+",'"+
+                                                    state+"',"+
+                                                    type+");"+
                                         "SELECT LAST_INSERT_ID();";
                                     int reqn = conn.Query<int>(sql).AsList()[0];
                                     if (reqn > 0)
@@ -909,7 +923,13 @@ namespace CoreDate.CoreComm
                         wheresql += " ORDER BY "+param.SortField +" "+ param.SortDirection;
                     }
                     if(param.PageIndex == 1){//pageindex 不为 1 时，不再传total 
-                        totalsql = "SELECT a.id, a.`name`,a.mdate FROM print_uses as a WHERE  "+wheresql;                        
+                        totalsql = @"SELECT 
+                                        a.id, 
+                                        a.`name`,
+                                        a.mdate 
+                                    FROM 
+                                        print_uses as a 
+                                    WHERE  "+wheresql;                        
                         totallist = conn.Query<useslist>(totalsql).AsList();
                     }
                                     
@@ -917,14 +937,23 @@ namespace CoreDate.CoreComm
                         wheresql += " limit "+(param.PageIndex -1)*param.PageSize +" ,"+ param.PageIndex*param.PageSize;
                     }
 
-                    wheresql ="SELECT a.id, a.`name`,a.mdate,b.defed_id,if(b.defed_id = a.id ,1,0) as defed "+
-                                "FROM print_uses as a LEFT JOIN print_use_setting as b on a.admin_id = b.admin_id WHERE "+wheresql;
+                    wheresql =@"SELECT 
+                                    a.id, 
+                                    a.`name`,
+                                    a.mdate,
+                                    b.defed_id,
+                                    if(b.defed_id = a.id ,1,0) as defed 
+                                FROM 
+                                    print_uses as a 
+                                LEFT JOIN 
+                                    print_use_setting as b 
+                                on 
+                                    a.admin_id = b.admin_id 
+                                WHERE "+wheresql;
                                         
                     var list = conn.Query<useslist>(wheresql).AsList();
                     if (list != null)
                     {
-
-
                         if(param.PageIndex == 1){
                             result.d = new {
                                 list = list,
@@ -966,13 +995,22 @@ namespace CoreDate.CoreComm
                 try
                 {
                    
-                    List<print_uses> type = conn.Query<print_uses>("SELECT a.id , a.`name` FROM print_uses as a WHERE a.deleted = FALSE AND a.type = "+t).AsList();
+                    List<print_uses> type = conn.Query<print_uses>(@"SELECT 
+                                                                        a.id , 
+                                                                        a.`name` 
+                                                                    FROM 
+                                                                        print_uses as a 
+                                                                    WHERE 
+                                                                        a.deleted = FALSE AND a.type = "+t).AsList();
                     
                     #region 个人模板
                     List<myTplModel> myTpls = new List<myTplModel>();
                     myTplModel mytpl = new myTplModel();
                     if (type != null) {
-                        var res = conn.Query<print_use_setting>("SELECT * FROM print_use_setting WHERE print_use_setting.admin_id = "+admin_id).AsList()[0];
+                        var res = conn.Query<print_use_setting>(@"SELECT * FROM 
+                                                                    print_use_setting 
+                                                                  WHERE 
+                                                                    print_use_setting.admin_id = "+admin_id).AsList()[0];
                         var defed_id = res != null ? res.defed_id : 0;
                         foreach (print_uses pintuse in type) {                      
                             mytpl.id = pintuse.id;
@@ -983,7 +1021,14 @@ namespace CoreDate.CoreComm
                         }                    
                     }
                     #endregion                    
-                    List<print_syses> type_syses = conn.Query<print_syses>("SELECT a.id,a.`name`,a.setting FROM print_syses as a WHERE a.deleted = FALSE AND  a.type = "+t).AsList();
+                    List<print_syses> type_syses = conn.Query<print_syses>(@"SELECT 
+                                                                                a.id,
+                                                                                a.`name`,
+                                                                                a.setting 
+                                                                             FROM 
+                                                                                print_syses as a 
+                                                                             WHERE 
+                                                                                a.deleted = FALSE AND  a.type = "+t).AsList();
                     result.d = new
                     {
                         myTpls = myTpls,    
