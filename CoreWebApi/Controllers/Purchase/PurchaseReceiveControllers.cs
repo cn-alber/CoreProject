@@ -236,5 +236,69 @@ namespace CoreWebApi
             var data = PurchaseReceiveHaddle.ConfirmPurRec(recidList,CoId);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
+
+        [HttpGetAttribute("/Core/PurchaseReceive/PurchaseList")]
+        public ResponseResult PurchaseList(string Purid,string PurdateStart,string PurdateEnd,string Status,string Scoid,string Skuid,string Warehouseid,string Buyyer,string SortField,string SortDirection,string PageIndex,string NumPerPage)
+        {   
+            int x;
+            var cp = new PurchaseParm();
+            cp.CoID = int.Parse(GetCoid());
+            if(!string.IsNullOrEmpty(Purid))
+            {
+                if (int.TryParse(Purid, out x))
+                {
+                    cp.Purid = int.Parse(Purid);
+                }
+                else
+                {
+                    cp.Purid = 0;
+                }
+            }
+            DateTime date;
+            if (DateTime.TryParse(PurdateStart, out date))
+            {
+                cp.PurdateStart = DateTime.Parse(PurdateStart);
+            }
+            if (DateTime.TryParse(PurdateEnd, out date))
+            {
+                cp.PurdateEnd = DateTime.Parse(PurdateEnd);
+            }
+            if (int.TryParse(Status, out x))
+            {
+                cp.Status = int.Parse(Status);
+            }
+            if (int.TryParse(Scoid, out x))
+            {
+                cp.Scoid = int.Parse(Scoid);
+            }
+            cp.Skuid = Skuid;
+            if (int.TryParse(Warehouseid, out x))
+            {
+                cp.Warehouseid = int.Parse(Warehouseid);
+            }
+            cp.Buyyer = Buyyer;
+            if(CommHaddle.SysColumnExists(DbBase.CoreConnectString,"purchase",SortField).s == 1)
+            {
+                cp.SortField = SortField;
+            }
+            if(!string.IsNullOrEmpty(SortDirection))
+            {
+                 if(SortDirection.ToUpper() == "ASC")
+                {
+                    cp.SortDirection = SortDirection;
+                }
+            }
+            if (int.TryParse(NumPerPage, out x))
+            {
+                cp.NumPerPage = int.Parse(NumPerPage);
+            }
+            if (int.TryParse(PageIndex, out x))
+            {
+                cp.PageIndex = int.Parse(PageIndex);
+            }
+            var data = PurchaseHaddle.GetPurchaseList(cp);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
     }
 }

@@ -662,7 +662,6 @@ namespace CoreData.CoreCore
             } 
             return  result;
         }  
-
         ///<summary>
         ///采购入库初始资料
         ///</summary>
@@ -751,7 +750,7 @@ namespace CoreData.CoreCore
                     result.d = "没有符合条件的收料单明细!";
                     return result;
                 }
-                
+
                 // var p = new DynamicParameters();
                 // p.Add("@PurID", PuridList);
                 // p.Add("@Coid", CoID);
