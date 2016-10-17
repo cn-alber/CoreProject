@@ -300,38 +300,38 @@ namespace CoreData.CoreCore
                         result.d = "商品类型必须有值!";
                         return result;
                     }
-                    if ( pur.warehouseid == 0)
-                    {
-                        result.s = -1;
-                        result.d = "仓库编号必须有值!";
-                        return result;
-                    }
-                    else
-                    {
-                        string wheresql = "select id,warehouseid,warehousename,enable,parentid,type,creator,createdate from warehouse where warehouseid =" + pur.warehouseid + " and coid =" + CoID;
-                        var u = DbBase.CommDB.Query<Warehouse>(wheresql).AsList();
-                        if(u.Count == 0)
-                        {
-                            result.s = -1;
-                            result.d = "仓库编号不存在!!";
-                        }
-                        else
-                        {
-                            if(u[0].enable == false)
-                            {
-                                result.s = -1;
-                                result.d = "仓库编号已停用!!";
-                            }
-                            else
-                            {
-                                pur.warehousename = u[0].warehousename;
-                            }
-                        }
-                        if(result.s == -1)
-                        {
-                            return result;
-                        }
-                    }
+                    // if ( pur.warehouseid == 0)
+                    // {
+                    //     result.s = -1;
+                    //     result.d = "仓库编号必须有值!";
+                    //     return result;
+                    // }
+                    // else
+                    // {
+                    //     string wheresql = "select id,warehouseid,warehousename,enable,parentid,type,creator,createdate from warehouse where warehouseid =" + pur.warehouseid + " and coid =" + CoID;
+                    //     var u = DbBase.CommDB.Query<Warehouse>(wheresql).AsList();
+                    //     if(u.Count == 0)
+                    //     {
+                    //         result.s = -1;
+                    //         result.d = "仓库编号不存在!!";
+                    //     }
+                    //     else
+                    //     {
+                    //         if(u[0].enable == false)
+                    //         {
+                    //             result.s = -1;
+                    //             result.d = "仓库编号已停用!!";
+                    //         }
+                    //         else
+                    //         {
+                    //             pur.warehousename = u[0].warehousename;
+                    //         }
+                    //     }
+                    //     if(result.s == -1)
+                    //     {
+                    //         return result;
+                    //     }
+                    // }
                     if ( pur.taxrate == null)
                     {
                         pur.taxrate = "0";
@@ -442,34 +442,34 @@ namespace CoreData.CoreCore
                         uptsql = uptsql + "buyyer=@Buyyer,";
                         p.Add("@Buyyer", pur.buyyer);
                     }
-                    if(pur.warehouseid != 0)
-                    {
-                        string wheresql = "select id,warehouseid,warehousename,enable,parentid,type,creator,createdate from warehouse where warehouseid =" + pur.warehouseid + " and coid =" + CoID;
-                        var u = DbBase.CommDB.Query<Warehouse>(wheresql).AsList();
-                        if(u.Count == 0)
-                        {
-                            result.s = -1;
-                            result.d = "仓库编号不存在!!";
-                        }
-                        else
-                        {
-                            if(u[0].enable == false)
-                            {
-                                result.s = -1;
-                                result.d = "仓库编号已停用!!";
-                            }
-                            else
-                            {
-                                uptsql = uptsql + "warehouseid = @Warehouseid,warehousename = @Warehousename,";
-                                p.Add("@Warehouseid", pur.warehouseid);
-                                p.Add("@Warehousename", pur.warehousename);
-                            }
-                        }
-                        if(result.s == -1)
-                        {
-                            return result;
-                        }
-                    }
+                    // if(pur.warehouseid != 0)
+                    // {
+                    //     string wheresql = "select id,warehouseid,warehousename,enable,parentid,type,creator,createdate from warehouse where warehouseid =" + pur.warehouseid + " and coid =" + CoID;
+                    //     var u = DbBase.CommDB.Query<Warehouse>(wheresql).AsList();
+                    //     if(u.Count == 0)
+                    //     {
+                    //         result.s = -1;
+                    //         result.d = "仓库编号不存在!!";
+                    //     }
+                    //     else
+                    //     {
+                    //         if(u[0].enable == false)
+                    //         {
+                    //             result.s = -1;
+                    //             result.d = "仓库编号已停用!!";
+                    //         }
+                    //         else
+                    //         {
+                    //             uptsql = uptsql + "warehouseid = @Warehouseid,warehousename = @Warehousename,";
+                    //             p.Add("@Warehouseid", pur.warehouseid);
+                    //             p.Add("@Warehousename", pur.warehousename);
+                    //         }
+                    //     }
+                    //     if(result.s == -1)
+                    //     {
+                    //         return result;
+                    //     }
+                    // }
                     if ( pur.taxrate != null)
                     {
                         uptsql = uptsql + "taxrate=@Taxrate,puramttot = puramtnet*(1 + taxrate/100),";
@@ -1175,11 +1175,11 @@ namespace CoreData.CoreCore
             status.Add(5,"作废");
             res.status = status;
             //仓库列表
-            var wh = CoreComm.WarehouseHaddle.GetWarehouseAll(CoID);
-            if(wh.s == 1)
-            {
-                res.warehouse = wh.d as List<Warehouse>;//Newtonsoft.Json.JsonConvert.DeserializeObject<>(wh.d.ToString());
-            }
+            // var wh = CoreComm.WarehouseHaddle.GetWarehouseAll(CoID);
+            // if(wh.s == 1)
+            // {
+            //     res.warehouse = wh.d as List<Warehouse>;//Newtonsoft.Json.JsonConvert.DeserializeObject<>(wh.d.ToString());
+            // }
             //采购单基本资料
             string wheresql = "select id,purchasedate,scoid,sconame,contract,shplogistics,shpcity,shpdistrict,shpaddress,warehouseid,warehousename,status,purtype,buyyer,remark,taxrate " + 
                               "from purchase where 1 = 1"; 
