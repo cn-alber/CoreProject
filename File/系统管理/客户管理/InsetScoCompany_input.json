@@ -1,0 +1,22 @@
+{       
+"Com": {
+        "sconame": "测试1017",
+        "enable": true,
+        "scosimple": "1",
+        "scocode": "2",
+        "address": "3",
+        "country": "4",
+        "contactor": "544444",
+        "tel": "6",
+        "phone": "7",
+        "fax": "8",
+        "url": "9",
+        "email": "10",
+        "typelist": "11",
+        "bank": "12",
+        "bankid": "13",
+        "taxid": "14",
+        "remark": "154444444"
+    },
+"Company":"携云科技"
+}

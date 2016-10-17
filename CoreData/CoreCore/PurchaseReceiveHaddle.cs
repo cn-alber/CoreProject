@@ -722,6 +722,36 @@ namespace CoreData.CoreCore
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
+                var p = new DynamicParameters();
+                p.Add("@RecID", RecidList);
+                p.Add("@Coid", CoID);
+                string wheresql = @"select count(*) from purchasereceive where id in @RecID and coid = @Coid and status <> 0" ;
+                int u = CoreDBconn.QueryFirst<int>(wheresql,p);
+                if(u > 0)
+                {
+                    result.s = -1;
+                    result.d = "未审核状态的收料单才可审核!";
+                    return result;
+                }
+                wheresql = "select id,scoid,sconame,purchaseid,creator,warehouseid,warehousename,status,finstatus,receivedate,remark,logisticsno,modifydate,finconfirmer,finconfirmdate " + 
+                              "from purchasereceive where id in @RecID and coid = @Coid";
+                var rec = CoreDBconn.Query<PurchaseReceive>(wheresql,p).AsList();
+                if(rec.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "收料单号有误!";
+                    return result;
+                }
+                wheresql = "select id,recid,img,skuautoid,skuid,skuname,norm,recqty,planrecqty,price,amount,remark,goodscode,supplynum " + 
+                              "from purchaserecdetail where recid id in @RecID and coid = @Coid";
+                var recdetail = CoreDBconn.Query<PurchaseRecDetail>(wheresql,p).AsList();
+                if(recdetail.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "没有符合条件的收料单明细!";
+                    return result;
+                }
+                
                 // var p = new DynamicParameters();
                 // p.Add("@PurID", PuridList);
                 // p.Add("@Coid", CoID);

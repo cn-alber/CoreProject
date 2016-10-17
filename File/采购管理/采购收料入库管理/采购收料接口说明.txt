@@ -55,7 +55,7 @@ OutPut: 1 成功  -3003 失败
 参考:input jason 文件:CancleReceive_input.json
 参考:output jason 文件:CancleReceive_output.json
 
-***6.ConfirmRec()//审核采购
+***6.ConfirmPurRec()//审核收料
 路由:http://localhost:5000/Core/Purchase/ConfirmPur
 input:  PurIdList   List<int>    采购单号List
 OutPut: 1 成功  -3003 失败

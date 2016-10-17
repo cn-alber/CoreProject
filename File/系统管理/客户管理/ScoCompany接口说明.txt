@@ -16,9 +16,9 @@ OutPut:     Datacnt        int                      资料总笔数
 
 2.ScoCompanyEnable()//批次更新客户资料的状态
 路由:http://localhost:5000/Core/ScoCompany/ScoCompanyEnable
-input： IDsDic          Dictionary<int,string>      <Key:客户ID,Value:客户名称>
-        Company         string                      登录者公司名称(exp:携云科技)
-        Enable          string                      指定状态true|false（启用，停用）
+input： IDList    List<int>      客户ID list
+        Company   string         登录者公司名称(exp:携云科技)
+        Enable    string         指定状态true|false（启用，停用）
 OutPut: 成功：
             1.更新客户状态supplycompany.enable
             2.新增修改记录log
@@ -34,17 +34,18 @@ input：ID   客户资料ID
 OutPut: 单笔 supplycompany 资料
 参考:output jason 文件:ScoCompanySingle_output.json
 
-4.UpdateScoCompany() //保存客户基本资料
+4.InsetScoCompany() //新增客户基本资料
+路由:http://localhost:5000/Core/ScoCompany/InsetScoCompany
+input:Com           supplycompany 客户资料
+      Company       string        登录者公司名称(exp:携云科技)
+output: s=1成功 else 错误代码
+参考:input jason 文件:InsetScoCompany_input.json
+参考:output jason 文件:InsetScoCompany_output.json
+
+5.UpdateScoCompany() //保存客户基本资料
 路由:http://localhost:5000/Core/ScoCompany/UpdateScoCompany
-input:ModifyFlag    string        保存方式(new/edit)
-      Com           supplycompany 客户资料
+input:Com           supplycompany 客户资料
       Company       string        登录者公司名称(exp:携云科技)
 output: s=1成功 else 错误代码
 参考:input jason 文件:UpdateScoCompany_input.json
 参考:output jason 文件:UpdateScoCompany_output.json
-
-5.GetScoCompanyAll() 获取全部的客户资料
-路由:http://localhost:5000/Core/ScoCompany/GetScoCompanyAll
-input:无
-output: s=1成功&客户资料 else 错误代码
-参考:output jason 文件:GetScoCompanyAll_output.json
