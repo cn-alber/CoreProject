@@ -50,11 +50,18 @@ OutPut: List<Brand> 品牌列表资料
 参考:input jason 文件:None
 参考:output jason 文件:CommBrandLst_output.json
 
-5.GetWarehouseAll()//获取仓库列表
-路由：http://localhost:5000/Core/Common/GetWarehouseAll
+5.GetParentWarehouseList()//获取主仓库列表
+路由：http://localhost:5000/Core/Common/GetParentWarehouseList
 input:  None
 OutPut: List<warehouse> 仓库资料
 参考:input jason 文件:None
-参考:output jason 文件:GetWarehouseAll_output.json
+参考:output jason 文件:GetParentWarehouseList_output.json
+
+5.GetChildWarehouseList()//获取主仓库列表
+路由：http://localhost:5000/Core/Common/GetChildWarehouseList
+input:  ID   int  主仓库代号Id
+OutPut: List<warehouse> 仓库资料
+参考:input jason 文件:None
+参考:output jason 文件:GetChildWarehouseList_output.json
 
 

@@ -314,7 +314,7 @@ namespace CoreData.CoreCore
                             else
                             {
                                 uptsql = uptsql + "warehouseid = @Warehouseid,warehousename = @Warehousename,";
-                                p.Add("@Warehouseid", a[0].warehouseid);
+                                // p.Add("@Warehouseid", a[0].warehouseid);
                                 p.Add("@Warehousename", a[0].warehousename);
                             }
                         }

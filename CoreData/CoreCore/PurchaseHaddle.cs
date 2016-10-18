@@ -1191,11 +1191,11 @@ namespace CoreData.CoreCore
             status.Add(5,"作废");
             res.status = status;
             //仓库列表
-            var wh = CoreComm.WarehouseHaddle.GetParentWarehouseList(CoID);
-            if(wh.s == 1)
-            {
-                res.warehouse = wh.d as List<Warehouse>;//Newtonsoft.Json.JsonConvert.DeserializeObject<>(wh.d.ToString());
-            }
+            // var wh = CoreComm.WarehouseHaddle.GetParentWarehouseList(CoID);
+            // if(wh.s == 1)
+            // {
+            //     res.warehouse = wh.d as List<Warehouse>;//Newtonsoft.Json.JsonConvert.DeserializeObject<>(wh.d.ToString());
+            // }
             //采购单基本资料
             string wheresql = "select id,purchasedate,scoid,sconame,contract,shplogistics,shpcity,shpdistrict,shpaddress,warehouseid,warehousename,status,purtype,buyyer,remark,taxrate " + 
                               "from purchase where 1 = 1"; 
