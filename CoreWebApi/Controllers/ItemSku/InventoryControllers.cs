@@ -14,12 +14,17 @@ namespace CoreWebApi.XyCore
     [AllowAnonymous]
     public class InventoryController : ControllBase
     {
-        #region 库存管理 - 获取库存查询
-        [HttpGetAttribute("Core/XyCore/Inventory/InventQuery")]
-        public ResponseResult InventQuery(string SkuID, string SkuName, string StockQtyb, string StockQtye, string WarehouseID, string Status, string PageIndex, string PageSize, string SortField, string SortDirection)
+
+        #region 库存管理 - 获取库存查询(分仓)
+        [HttpGetAttribute("Core/XyCore/Inventory/InventQueryByWh")]
+        public ResponseResult InventQueryByWh(string GoodsCode, string SkuID, string SkuName, string Norm, string StockQtyb, string StockQtye, string WarehouseID, string Status, string PageIndex, string PageSize, string SortField, string SortDirection)
         {
             var cp = new InvQueryParam();
             int x;
+            if (!string.IsNullOrEmpty(GoodsCode))//款式编码
+            {
+                cp.GoodsCode = GoodsCode;
+            }
             if (!string.IsNullOrEmpty(SkuID))//商品编码
             {
                 cp.SkuID = SkuID;
@@ -27,6 +32,10 @@ namespace CoreWebApi.XyCore
             if (!string.IsNullOrEmpty(SkuName))//商品名称
             {
                 cp.SkuName = SkuName;
+            }
+            if (!string.IsNullOrEmpty(Norm))//颜色及规格
+            {
+                cp.Norm = Norm;
             }
             if (!string.IsNullOrEmpty(StockQtyb) && int.TryParse(StockQtyb, out x))//主仓实际库存数量起
             {
@@ -66,11 +75,74 @@ namespace CoreWebApi.XyCore
                 }
             }
             cp.CoID = int.Parse(GetCoid());
+            var Result = InventoryHaddle.GetInvQueryByWh(cp);
+            return CoreResult.NewResponse(Result.s, Result.d, "General");
+        }
+        #endregion
+        #region 库存管理 - 商品库存查询(不分仓)
+        [HttpGetAttribute("Core/XyCore/Inventory/InventQuery")]
+        public ResponseResult InventQuery(string GoodsCode, string SkuID, string SkuName, string Norm, string StockQtyb, string StockQtye, string Status, string PageIndex, string PageSize, string SortField, string SortDirection)
+        {
+            var cp = new InvQueryParam();
+            int x;
+            if (!string.IsNullOrEmpty(GoodsCode))//款式编码
+            {
+                cp.GoodsCode = GoodsCode;
+            }
+            if (!string.IsNullOrEmpty(GoodsCode))//款式编码
+            {
+                cp.GoodsCode = GoodsCode;
+            }
+            if (!string.IsNullOrEmpty(SkuID))//商品编码
+            {
+                cp.SkuID = SkuID;
+            }
+            if (!string.IsNullOrEmpty(SkuName))//商品名称
+            {
+                cp.SkuName = SkuName;
+            }
+            if (!string.IsNullOrEmpty(Norm))//颜色及规格
+            {
+                cp.Norm = Norm;
+            }
+            if (!string.IsNullOrEmpty(StockQtyb) && int.TryParse(StockQtyb, out x))//主仓实际库存数量起
+            {
+                cp.StockQtyb = int.Parse(StockQtyb);
+            }
+            if (!string.IsNullOrEmpty(StockQtye) && int.TryParse(StockQtye, out x))//主仓实际库存数量迄
+            {
+                cp.StockQtye = int.Parse(StockQtye);
+            }
+            if (!string.IsNullOrEmpty(Status) && int.TryParse(Status, out x))//库存状态:0.全部,1.充足,2.预警
+            {
+                cp.Status = int.Parse(Status);
+            }
+            if (int.TryParse(PageIndex, out x))//页码
+            {
+                cp.PageIndex = int.Parse(PageIndex);
+            }
+            if (int.TryParse(PageSize, out x))//每页笔数
+            {
+                cp.PageSize = int.Parse(PageSize);
+            }
+            //排序参数赋值
+            if (!string.IsNullOrEmpty(SortField))
+            {
+                var res = CommHaddle.SysColumnExists(DbBase.CoreConnectString, "inventory", SortField);
+                if (res.s == 1)
+                {
+                    cp.SortField = SortField;
+                    if (!string.IsNullOrEmpty(SortDirection) && (SortDirection.ToUpper() == "DESC" || SortDirection.ToUpper() == "ASC"))
+                    {
+                        cp.SortDirection = SortDirection.ToUpper();
+                    }
+                }
+            }
+            cp.CoID = int.Parse(GetCoid());
             var Result = InventoryHaddle.GetInvQuery(cp);
             return CoreResult.NewResponse(Result.s, Result.d, "General");
         }
         #endregion
-
         #region 库存管理-商品库存查询 - 库存明细查询
         [HttpGetAttribute("Core/XyCore/Inventory/InvDetailQuery")]
         public ResponseResult InvDetailQuery(string SkuID, string WarehouseID, string DocType, string DocDateB, string DocDateE, string PageIndex, string PageSize, string SortField, string SortDirection)
@@ -376,11 +448,11 @@ namespace CoreWebApi.XyCore
             InvLst.Add(inv2);
 
             string RblType = "0";
-            int WarehouseID=100;
-            string WarehouseName="fdsa存储仓B";
+            int WarehouseID = 100;
+            string WarehouseName = "fdsa存储仓B";
             int CoID = int.Parse(GetCoid());
             string UserName = GetUname();
-            var res = InventoryHaddle.CreateInvInitTemp(RblType,InvLst,WarehouseID,WarehouseName,CoID,UserName);
+            var res = InventoryHaddle.CreateInvInitTemp(RblType, InvLst, WarehouseID, WarehouseName, CoID, UserName);
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion

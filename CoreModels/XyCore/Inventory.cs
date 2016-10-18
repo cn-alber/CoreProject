@@ -33,8 +33,10 @@ namespace CoreModels.XyCore
         private int _PageIndex = 1;//页码
         private string _SortField;//排序字段
         private string _SortDirection = "ASC";//DESC,ASC
+        private string _GoodsCode;//商品编号        
         private string _SkuID;//商品编号
         private string _SkuName;//商品名称
+        private string _Norm;//颜色及规格
         private int _StockQtyb = 0;//主仓实际库存数量起
         private int _StockQtye = 999999999;//主仓实际库存数量迄
         private int _WarehouseID = 0;//仓库ID
@@ -78,7 +80,11 @@ namespace CoreModels.XyCore
             get { return _SortDirection; }
             set { this._SortDirection = value; }
         }//DESC,ASC 
-
+        public string GoodsCode
+        {
+            get { return _GoodsCode; }
+            set { this._GoodsCode = value; }
+        }//指定款式编号
         public string SkuID
         {
             get { return _SkuID; }
@@ -89,6 +95,11 @@ namespace CoreModels.XyCore
             get { return _SkuName; }
             set { this._SkuName = value; }
         }//指定商品名称
+        public string Norm
+        {
+            get { return _Norm; }
+            set { this._Norm = value; }
+        }//颜色及规格
         public int StockQtyb
         {
             get { return _StockQtyb; }

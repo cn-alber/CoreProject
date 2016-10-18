@@ -1,16 +1,40 @@
 接口名称：InventoryControllers
 function说明
 ############################################################
-1.InventQuery()//查询商品库存
+1.InventQueryByWh()//查询商品库存(分仓)
     方法：Get
-    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/InventQuery?SkuID=&SkuName=&StockQtyb=&StockQtye=&WarehouseID=&Status=&PageIndex=1&PageSize=&SortField=&SortDirection=
+    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/InventQueryByWh?GoodsCode=&SkuID=&SkuName=&Norm=&StockQtyb=&StockQtye=&WarehouseID=&Status=&PageIndex=1&PageSize=&SortField=&SortDirection=
     参数: CoreModels.XyCore.InvQueryParam
-    InPut:        
+    InPut:  
+        GoodsCode       string      查询匹配(款式编号,Defalt:null)      
         SkuID           string      查询匹配(商品编号,Default:null)
         SkuName         string      查询匹配(商品名称,Default:null)
+        Norm            string      查询匹配(颜色及规格,Default:null)
         StockQtyb       int         主仓实际库存数量起(Default:0)
         StockQtye       int         主仓实际库存数量起(Default:999999999)
         WarehouseID     int         商品仓库ID(Default:0)
+        Status          int         库存状态:0.全部,1.充足,2.预警
+        PageIndex       int         当前页码(ex.第一页就给1)
+        PageSize        int         每页显示资料笔数(Default:20)
+        SortField       string      排序字段(Default:all)
+        SortDirection   string      排序方向(DESC|ASC,Default:ASC)
+    OutPut:       
+        PageCount       int         总页数
+        DataCount       int         资料总笔数
+        InvLst          List<Inventory>  商品库存(Inventory)
+    参考:output json 文件:InventQueryByWh_output.json
+############################################################
+2.InventQuery()//查询商品库存
+    方法：Get
+    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/InventQuery?GoodsCode=&SkuID=&SkuName=&Norm=&StockQtyb=&StockQtye=&Status=&PageIndex=1&PageSize=&SortField=&SortDirection=
+    参数: CoreModels.XyCore.InvQueryParam
+    InPut:  
+        GoodsCode       string      查询匹配(款式编号,Defalt:null)      
+        SkuID           string      查询匹配(商品编号,Default:null)
+        SkuName         string      查询匹配(商品名称,Default:null)
+        Norm            string      查询匹配(颜色及规格,Default:null)
+        StockQtyb       int         主仓实际库存数量起(Default:0)
+        StockQtye       int         主仓实际库存数量起(Default:999999999)
         Status          int         库存状态:0.全部,1.充足,2.预警
         PageIndex       int         当前页码(ex.第一页就给1)
         PageSize        int         每页显示资料笔数(Default:20)
