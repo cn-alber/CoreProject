@@ -642,6 +642,7 @@ namespace CoreData.CoreComm
                         rr.city = a.city;
                         rr.district = a.district;
                         rr.address = a.address;
+                        rr.enable = a.enable;
                         wheresql = "select * from warehouse where parentid = " + a.id + " and coid = " + CoID;
                         var lst = conn.Query<Warehouse>(wheresql).AsList();
                         foreach(var b in lst)

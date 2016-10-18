@@ -16,6 +16,7 @@ namespace CoreModels.XyComm
         public string city {get;set;}
         public string district {get;set;}
         public string address {get;set;}
+        public bool enable{get;set;}
     }
     public class Warehouse
     {
