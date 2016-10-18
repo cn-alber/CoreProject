@@ -329,5 +329,51 @@ namespace CoreData.CoreComm
             }           
             return result;
         }
+        ///<summary>
+        ///查询主仓库List
+        ///</summary>
+        public static DataResult GetParentWarehouseList(int CoID)
+        {
+            var result = new DataResult(1,null);     
+            string wheresql = "select id,warehouseid,warehousename,enable,parentid,type,creator,createdate from warehouse where parentid = 0 and enable = true";
+            if(CoID != 1)//公司编号
+            {
+                wheresql = wheresql + " and coid = " + CoID;
+            }
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{    
+                    var u = conn.Query<Warehouse>(wheresql).AsList();
+                    result.d = u;
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }           
+            return result;
+        }
+        ///<summary>
+        ///根据主仓库代号查询子仓库List
+        ///</summary>
+        public static DataResult GetChildWarehouseList(int CoID,int parentid)
+        {
+            var result = new DataResult(1,null);     
+            string wheresql = "select id,warehouseid,warehousename,enable,parentid,type,creator,createdate from warehouse where parentid = " +parentid + " and enable = true";
+            if(CoID != 1)//公司编号
+            {
+                wheresql = wheresql + " and coid = " + CoID;
+            }
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{    
+                    var u = conn.Query<Warehouse>(wheresql).AsList();
+                    result.d = u;
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }           
+            return result;
+        }
     }
 }
