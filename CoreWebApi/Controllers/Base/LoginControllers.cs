@@ -17,6 +17,18 @@ namespace CoreWebApi
     public class LoginController : ControllBase
     {
         [AllowAnonymous]
+        [HttpGet("/ws")]
+        public void Ws(int id)
+        {
+            var oo = new {action="action", controller="controller", param=new {qq="sdf"}};
+            CoreHelper.Debuger.log(oo);
+            CoreHelper.Debuger.warning(oo);
+            CoreHelper.Debuger.success(oo);
+            CoreHelper.Debuger.error(oo);
+            //CoreHelper.Debuger.success(oo);
+        }
+
+        [AllowAnonymous]
         [HttpGet("/api")]
         public async Task<ResponseResult> Get()
         {
