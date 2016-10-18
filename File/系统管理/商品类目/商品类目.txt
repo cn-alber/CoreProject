@@ -1,0 +1,58 @@
+接口名称:CustomKindController
+
+function说明
+#######################################################
+1.SkuKindLst()//查询商品类目资料(CustomKind)
+    方法：Get
+    路由：http://192.168.30.29:5000/Core/XyComm/Customkind/SkuKindLst?ParentID=0
+    InPut:
+        ParentID            int                 商品类目父级ID
+    OutPut:
+        KindLst             List<CustomKindData>    商品类目列表
+    参考:output json 文件:SkuKindLst_output.json
+#######################################################
+2.SkuKindLst()//查询商品类目资料(CustomKind)
+    方法：Get
+    路由：http://192.168.30.29:5000/Core/XyComm/Customkind/SkuKind?ID=74
+    InPut:
+        ID                  int                 商品类目ID
+    OutPut:
+        Kind                CustomKind          商品类目
+    参考:output json 文件:SkuKind_output.json
+#######################################################
+3.InsertSkuKind()//新增商品类目
+    方法：POST
+    路由：http://192.168.30.29:5000/Core/XyComm/Customkind/InsertSkuKind
+    InPut:
+        KindName            string              商品类目名称 (*必填项*)
+        ParentID            int                 上级类目ID (*必填项*)
+    OutPut:
+        成功：
+            1.新增资料            
+            2.新增操作记录log
+            3.返回请求成功信息(s=1)
+        失败：返回错误信息
+    参考：input json 文件：InsertSkuKind_input.json   
+4. UpdateSkuKind()//修改商品类目
+    方法：POST
+    路由：http://192.168.30.29:5000/Core/XyComm/Customkind/UpdateSkuKind
+    InPut:
+        ID                  int                 商品类目ID (*必填项*)
+        ParentID            int                 上级类目ID (*必填项*)
+        KindName            string              商品类目名称 (*必填项*)
+    OutPut:
+        成功：
+            1.修改资料
+            2.新增操作记录log
+            3.返回请求成功信息(s=1)
+        失败：返回错误信息
+    参考：input json 文件：UpdateSkuKind_input.json
+5.DeleteSkuKind()//删除商品类目
+    方法：POST
+    路由：http://192.168.30.29:5000/Core/XyComm/Customkind/DeleteSkuKind
+    InPut：
+        IDLst               List<int>           商品类目ID (*必填项*)   
+    OutPut:
+         成功：1.删除商品类目资料；2.新增操作记录log；3.返回成功信息
+         失败：返回错误信息
+    参考：input json 文件：DeleteSkuKind_input.json
