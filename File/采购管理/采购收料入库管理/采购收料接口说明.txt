@@ -30,6 +30,7 @@ input:      Recid           string                  收料单号 default null
             NumPerPage      string                  每页显示资料笔数 default 20
 OutPut:     Datacnt         int                     资料总笔数
             Pagecnt         int                     总页数
+            status          int                     收料单状态
             PurRecDetail    List<purchaserecdetail> purchaserecdetail 资料
 参考:output jason 文件:PurchaseRecDetailList_output.json
 
@@ -55,12 +56,12 @@ OutPut: 1 成功  -3003 失败
 参考:input jason 文件:CancleReceive_input.json
 参考:output jason 文件:CancleReceive_output.json
 
-***6.ConfirmPurRec()//审核收料
-路由:http://localhost:5000/Core/Purchase/ConfirmPur
-input:  PurIdList   List<int>    采购单号List
+6.ConfirmPurRec()//审核收料
+路由:http://localhost:5000/Core/PurchaseReceive/ConfirmPurRec
+input:  RecIdList   List<int>    收料单号List
 OutPut: 1 成功  -3003 失败
-参考:input jason 文件:ConfirmPur_input.json
-参考:output jason 文件:ConfirmPur_output.json
+参考:input jason 文件:ConfirmPurRec_input.json
+参考:output jason 文件:ConfirmPurRec_output.json
 
 7.PurReceiveSingle()//查询单笔收料单资料
 路由:http://localhost:5000/Core/PurchaseReceive/PurReceiveSingle
@@ -68,12 +69,12 @@ input:      ID           string           收料单号
 OutPut:     Rec          Purchasereceive  Purchasereceive 资料
 参考:output jason 文件:PurReceiveSingle_output.json
 
-***8.FinConfirmRec()//采购单完成
-路由:http://localhost:5000/Core/Purchase/CompletePur
-input:  PurIdList   List<int>    采购单号List
+8.FinConfirmRec()//财务审核
+路由:http://localhost:5000/Core/PurchaseReceive/FinConfirmRec
+input:  RecIdList   List<int>    收料单号List
 OutPut: 1 成功  -3003 失败
-参考:input jason 文件:CompletePur_input.json
-参考:output jason 文件:CompletePur_output.json
+参考:input jason 文件:FinConfirmRec_input.json
+参考:output jason 文件:FinConfirmRec_output.json
 
 9.InsertRecDetail()//新增收料单明细
 路由:http://localhost:5000/Core/PurchaseReceive/InsertRecDetail

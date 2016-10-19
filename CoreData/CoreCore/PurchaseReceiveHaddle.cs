@@ -15,8 +15,7 @@ namespace CoreData.CoreCore
         public static DataResult GetPurchaseRecList(PurchaseReceiveParm cp)
         {
             var result = new DataResult(1,null);     
-            string wheresql = "select id,scoid,sconame,purchaseid,creator,warehouseid,warehousename,status,finstatus,receivedate,remark,logisticsno,modifydate,finconfirmer,finconfirmdate " + 
-                              "from purchasereceive where receivedate between '" + cp.RecdateStart + "' and '" + cp.RecdateEnd + "'"; //收料日期
+            string wheresql = "select * from purchasereceive where receivedate between '" + cp.RecdateStart + "' and '" + cp.RecdateEnd + "'"; //收料日期
             if(cp.CoID != 1)//公司编号
             {
                 wheresql = wheresql + " and coid = " + cp.CoID;
@@ -82,8 +81,7 @@ namespace CoreData.CoreCore
         public static DataResult GetPurchaseRecDetailList(PurchaseRecDetailParm cp)
         {
             var result = new DataResult(1,null);     
-            string wheresql = "select id,recid,img,skuautoid,skuid,skuname,norm,recqty,planrecqty,price,amount,remark,goodscode,supplynum " + 
-                              "from purchaserecdetail where recid = " + cp.Recid; //收料单号
+            string wheresql = "select * from purchaserecdetail where recid = " + cp.Recid; //收料单号
             if(cp.CoID != 1)//公司编号
             {
                 wheresql = wheresql + " and coid = " + cp.CoID;
@@ -95,23 +93,17 @@ namespace CoreData.CoreCore
             var res = new PurchaseRecDetailData();
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
-                    string pursql = "select id,scoid,sconame,purchaseid,creator,warehouseid,warehousename,status,finstatus,receivedate,remark,logisticsno,modifydate,finconfirmer,finconfirmdate from purchasereceive where id = " + cp.Recid;
+                    string pursql = "select * from purchasereceive where id = " + cp.Recid;
                     var pur = conn.Query<PurchaseReceive>(pursql).AsList();
                     if (pur.Count == 0)
                     {
                         result.s = -1;
                         result.d = "此收料单不存在";
+                        return result;
                     }
                     else
                     {
-                        if(pur[0].status == 0)
-                        {
-                            res.enable = true;
-                        }
-                        else
-                        {
-                            res.enable = false;
-                        }
+                        res.status=pur[0].status ;
                     }           
                     var u = conn.Query<PurchaseRecDetail>(wheresql).AsList();
                     int count = u.Count;
@@ -136,7 +128,7 @@ namespace CoreData.CoreCore
         ///<summary>
         ///收料单作废
         ///</summary>
-        public static DataResult CancleReceive(List<int> RecidList,int CoID)
+        public static DataResult CancleReceive(List<int> RecidList,int CoID,string Username)
         {
             var result = new DataResult(1,null);     
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) )
@@ -152,15 +144,16 @@ namespace CoreData.CoreCore
                     {
                         result.s = -1;
                         result.d = "未审核状态的收料单才可作废!";
+                        return result;
                     }
-                    else
+                    string delsql = @"update purchasereceive set status = 3,modifier=@Modifier,modifydate=@Modifydate where id in @RecID and coid = @Coid";
+                    p.Add("@Modifier", Username);
+                    p.Add("@Modifydate", DateTime.Now);
+                    int count = conn.Execute(delsql, p);
+                    if (count < 0)
                     {
-                        string delsql = @"update purchasereceive set status = 3 where id in @RecID and coid = @Coid";
-                        int count = conn.Execute(delsql, p);
-                        if (count < 0)
-                        {
-                            result.s = -3003;
-                        }
+                        result.s = -3003;
+                        return result;
                     }
                 }
                 catch (Exception e)
@@ -183,12 +176,13 @@ namespace CoreData.CoreCore
                     var p = new DynamicParameters();
                     if(type == "purchase")
                     {
-                        string wheresql = "select id,purchasedate,scoid,sconame,contract,shplogistics,shpcity,shpdistrict,shpaddress,warehouseid,warehousename,status,purtype,buyyer,remark,taxrate from purchase where id =" + id + " and coid =" + CoID ;
+                        string wheresql = "select * from purchase where id =" + id + " and coid =" + CoID ;
                         var u = conn.Query<Purchase>(wheresql).AsList();
                         if(u.Count == 0)
                         {
                             result.s = -1;
                             result.d = "此采购单不存在!";
+                            return result;
                         }
                         else
                         {
@@ -196,14 +190,11 @@ namespace CoreData.CoreCore
                             {
                                 result.s = -1;
                                 result.d = "待审核&已作废&已完成的采购单不可执行此操作!";
+                                return result;
                             }
                         }
-                        if(result.s == -1)
-                        {
-                            return result;
-                        }
-                        sqlCommandText = @"INSERT INTO purchasereceive(scoid,sconame,purchaseid,coid,creator,receivedate) 
-                                            VALUES(@Scoid,@Sconame,@Purchaseid,@Coid,@UName,@Receivedate)";
+                        sqlCommandText = @"INSERT INTO purchasereceive(scoid,sconame,purchaseid,coid,creator,receivedate,modifier) 
+                                            VALUES(@Scoid,@Sconame,@Purchaseid,@Coid,@UName,@Receivedate,@UName)";
                         p.Add("@Scoid",u[0].scoid);
                         p.Add("@Sconame",u[0].sconame);
                         p.Add("@Purchaseid",id);
@@ -219,6 +210,7 @@ namespace CoreData.CoreCore
                         {
                             result.s = -1;
                             result.d = "供应商编号不存在!!";
+                            return result;
                         }
                         else
                         {
@@ -226,14 +218,11 @@ namespace CoreData.CoreCore
                             {
                                 result.s = -1;
                                 result.d = "供应商编号已停用!!";
+                                return result;
                             }
                         }
-                        if(result.s == -1)
-                        {
-                            return result;
-                        }
-                        sqlCommandText = @"INSERT INTO purchasereceive(scoid,sconame,coid,creator,receivedate) 
-                                            VALUES(@Scoid,@Sconame,@Coid,@UName,@Receivedate)";
+                        sqlCommandText = @"INSERT INTO purchasereceive(scoid,sconame,coid,creator,receivedate,modifier) 
+                                            VALUES(@Scoid,@Sconame,@Coid,@UName,@Receivedate,@UName)";
                         p.Add("@Scoid",u[0].id);
                         p.Add("@Sconame",u[0].sconame);
                         p.Add("@Coid",CoID);
@@ -244,6 +233,7 @@ namespace CoreData.CoreCore
                     if(count < 0)
                     {
                         result.s = -3002;
+                        return result;
                     }
                     else
                     {
@@ -261,46 +251,49 @@ namespace CoreData.CoreCore
         ///<summary>
         ///收料单更新
         ///</summary>
-        public static DataResult UpdateReceive(PurchaseReceive rec,int CoID)
+        public static DataResult UpdateReceive(PurchaseReceive rec,int CoID,string UserName)
         {
             var result = new DataResult(1,null);  
+            var p = new DynamicParameters();
+            string uptsql = @"update purchasereceive set ";
+            int status = 0;
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{   
-                    string wheresql = "select id,scoid,sconame,purchaseid,creator,warehouseid,warehousename,status,finstatus,receivedate,remark,logisticsno,modifydate,finconfirmer,finconfirmdate " + 
-                              "from purchasereceive where id =" + rec.id + " and coid =" + CoID ;
+                    string wheresql = "select * from purchasereceive where id =" + rec.id + " and coid =" + CoID ;
                     var u = conn.Query<PurchaseReceive>(wheresql).AsList();
                     if(u.Count == 0)
                     {
                         result.s = -1;
                         result.d = "此收料单不存在!";
+                        return result;
                     }
                     else
                     {
+                        status = u[0].status;
                         if(u[0].status == 3)
                         {
                             result.s = -1;
                             result.d = "已作废的收料单不允许修改!";
+                            return result;
                         }
                     }
-                    if(result.s == -1)
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{
+                    if(rec.warehouseid != 0 && status == 0)
                     {
-                        return result;
-                    }
-                    var p = new DynamicParameters();
-                    string uptsql = @"update purchasereceive set ";
-                    if(rec.remark != null)
-                    {
-                        uptsql = uptsql + "remark = @Remark,";
-                        p.Add("@Remark", rec.remark);
-                    }
-                    if(rec.warehouseid != 0 && u[0].status == 0)
-                    {
-                        wheresql = "select * from warehouse where id =" + rec.warehouseid + " and coid =" + CoID;
-                        var a = DbBase.CommDB.Query<Warehouse>(wheresql).AsList();
+                        string wheresql = "select * from warehouse where id =" + rec.warehouseid + " and coid =" + CoID;
+                        var a = conn.Query<Warehouse>(wheresql).AsList();
                         if(a.Count == 0)
                         {
                             result.s = -1;
                             result.d = "仓库编号不存在!!";
+                            return result;
                         }
                         else
                         {
@@ -308,6 +301,7 @@ namespace CoreData.CoreCore
                             {
                                 result.s = -1;
                                 result.d = "仓库编号已停用!!";
+                                return result;
                             }
                             else
                             {
@@ -315,6 +309,7 @@ namespace CoreData.CoreCore
                                 {
                                     result.s = -1;
                                     result.d = "请选择小仓仓库!!";
+                                    return result;
                                 }
                                 else
                                 {
@@ -324,15 +319,25 @@ namespace CoreData.CoreCore
                                 }
                             }
                         }
-                        if(result.s == -1)
-                        {
-                            return result;
-                        }
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }     
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{   
+                    if(rec.remark != null)
+                    {
+                        uptsql = uptsql + "remark = @Remark,";
+                        p.Add("@Remark", rec.remark);
                     }
                     if(uptsql.Substring(uptsql.Length - 1, 1) == ",")
                     {
-                        uptsql = uptsql + "modifydate = @Modifydate where id = @ID";
+                        uptsql = uptsql + "modifydate = @Modifydate,modifier = @Modifier where id = @ID";
                         p.Add("@Modifydate", DateTime.Now);
+                        p.Add("@Modifier", UserName);
                         p.Add("@ID", rec.id);
                     }
                     else
@@ -345,6 +350,7 @@ namespace CoreData.CoreCore
                     if(count < 0)
                     {
                         result.s= -3003;
+                        return result;
                     }
                 }catch(Exception ex){
                     result.s = -1;
@@ -357,7 +363,7 @@ namespace CoreData.CoreCore
         ///<summary>
         ///收料单明细新增
         ///</summary>
-        public static DataResult InsertRecDetail(int id,List<int> skuid,int CoID)
+        public static DataResult InsertRecDetail(int id,List<int> skuid,int CoID,string Username)
         {
             var result = new DataResult(1,null);  
             var res = new PurchaseDetailInsert();
@@ -367,13 +373,13 @@ namespace CoreData.CoreCore
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
-                string wheresql = "select id,scoid,sconame,purchaseid,creator,warehouseid,warehousename,status,finstatus,receivedate,remark,logisticsno,modifydate,finconfirmer,finconfirmdate "+ 
-                                  "from purchasereceive where id =" + id + " and coid =" + CoID ;
+                string wheresql = "select * from purchasereceive where id =" + id + " and coid =" + CoID ;
                 var u = CoreDBconn.Query<PurchaseReceive>(wheresql).AsList();
                 if(u.Count == 0)
                 {
                     result.s = -1;
                     result.d = "此收料单不存在!";
+                    return result;
                 }
                 else
                 {
@@ -381,11 +387,8 @@ namespace CoreData.CoreCore
                     {
                         result.s = -1;
                         result.d = "只有待入库的收料单才可以新增明细!";
+                        return result;
                     }
-                }
-                if(result.s == -1)
-                {
-                    return result;
                 }
                 List<InsertFailReason> rt = new List<InsertFailReason>();
                 List<int> rr = new List<int>();
@@ -430,9 +433,9 @@ namespace CoreData.CoreCore
                         rt.Add(rf);
                         continue;
                     }
-                    string sqlCommandText = @"INSERT INTO purchaserecdetail(recid,skuautoid,skuid,skuname,norm,img,goodscode,coid) 
-                                            VALUES(@RecID,@Skuautoid,@Skuid,@Skuname,@Norm,@Img,@Goodscode,@Coid)";
-                    var args = new {RecID = id,Skuautoid = a,Skuid=s[0].skuid,Skuname = s[0].skuname,Norm = s[0].norm ,Img = s[0].img,Goodscode = s[0].goodscode ,Coid = CoID};
+                    string sqlCommandText = @"INSERT INTO purchaserecdetail(recid,skuautoid,skuid,skuname,norm,img,goodscode,coid,creator,modifier) 
+                                            VALUES(@RecID,@Skuautoid,@Skuid,@Skuname,@Norm,@Img,@Goodscode,@Coid,@Creator,@Creator)";
+                    var args = new {RecID = id,Skuautoid = a,Skuid=s[0].skuid,Skuname = s[0].skuname,Norm = s[0].norm ,Img = s[0].img,Goodscode = s[0].goodscode ,Coid = CoID,Creator=Username};
                     int count = CoreDBconn.Execute(sqlCommandText,args,TransCore);
                     if(count <= 0)
                     {
@@ -455,20 +458,22 @@ namespace CoreData.CoreCore
             }
             catch (Exception e)
             {
+                TransCore.Rollback();
+                TransCore.Dispose();
                 result.s = -1;
                 result.d = e.Message;
             }
             finally
             {
                 TransCore.Dispose();
-                CoreDBconn.Close();
+                CoreDBconn.Dispose();
             }
             return result;
         }
         ///<summary>
         ///收料单明细更新
         ///</summary>
-        public static DataResult UpdateRecDetail(PurchaseRecDetail detail,int CoID)
+        public static DataResult UpdateRecDetail(PurchaseRecDetail detail,int CoID,string Username)
         {
             var result = new DataResult(1,null);  
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
@@ -476,13 +481,13 @@ namespace CoreData.CoreCore
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
-                string wheresql = "select id,scoid,sconame,purchaseid,creator,warehouseid,warehousename,status,finstatus,receivedate,remark,logisticsno,modifydate,finconfirmer,finconfirmdate " + 
-                              "from purchasereceive where id =" + detail.recid + " and coid =" + CoID ;
+                string wheresql = "select * from purchasereceive where id =" + detail.recid + " and coid =" + CoID ;
                 var u = CoreDBconn.Query<Purchase>(wheresql).AsList();
                 if(u.Count == 0)
                 {
                     result.s = -1;
                     result.d = "此收料单不存在!";
+                     return result;
                 }
                 else
                 {
@@ -490,14 +495,10 @@ namespace CoreData.CoreCore
                     {
                         result.s = -1;
                         result.d = "已作废的收料单不允许修改!";
+                         return result;
                     }
                 }
-                if(result.s == -1)
-                {
-                    return result;
-                }
-                wheresql = "select id,recid,img,skuautoid,skuid,skuname,norm,recqty,planrecqty,price,amount,remark,goodscode,supplynum "+
-                "from purchaserecdetail where recid = " + detail.recid + " and skuautoid =" + detail.id + " and coid =" + CoID;
+                wheresql = "select * from purchaserecdetail where recid = " + detail.recid + " and skuautoid =" + detail.id + " and coid =" + CoID;
                 var pur = CoreDBconn.Query<PurchaseDetail>(wheresql).AsList();
                 if (pur.Count == 0)
                 {
@@ -531,8 +532,9 @@ namespace CoreData.CoreCore
                 }
                 if(sqlCommandText.Substring(sqlCommandText.Length - 1, 1) == ",")
                 {
-                    sqlCommandText = sqlCommandText.Substring(0,sqlCommandText.Length - 1);
-                    sqlCommandText = sqlCommandText + " where recid = @Recid and skuautoid = @ID and coid = @Coid";
+                    sqlCommandText = sqlCommandText + "modifier=@Modifier,modifydate=@Modifydate where recid = @Recid and skuautoid = @ID and coid = @Coid";
+                    p.Add("@Modifier",Username);
+                    p.Add("@Modifydate",DateTime.Now);
                     p.Add("@ID",detail.id);
                     p.Add("@Recid",detail.recid);
                     p.Add("@Coid",CoID);
@@ -547,6 +549,7 @@ namespace CoreData.CoreCore
                 if(count <= 0)
                 {
                     result.s = -3003;
+                    return result;
                 }
                 if(result.s == 1)
                 {
@@ -555,13 +558,15 @@ namespace CoreData.CoreCore
             }
             catch (Exception e)
             {
+                TransCore.Rollback();
+                TransCore.Dispose();
                 result.s = -1;
                 result.d = e.Message;
             }
             finally
             {
                 TransCore.Dispose();
-                CoreDBconn.Close();
+                CoreDBconn.Dispose();
             }
             return result;
         }
@@ -574,13 +579,13 @@ namespace CoreData.CoreCore
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try
                 {         
-                    string wheresql = "select id,scoid,sconame,purchaseid,creator,warehouseid,warehousename,status,finstatus,receivedate,remark,logisticsno,modifydate,finconfirmer,finconfirmdate " + 
-                              "from purchasereceive where id =" + recid + " and coid =" + CoID ;
+                    string wheresql = "select * from purchasereceive where id =" + recid + " and coid =" + CoID ;
                     var u = conn.Query<Purchase>(wheresql).AsList();
                     if(u.Count == 0)
                     {
                         result.s = -1;
                         result.d = "此收料单不存在!";
+                        return result;
                     }
                     else
                     {
@@ -588,18 +593,16 @@ namespace CoreData.CoreCore
                         {
                             result.s = -1;
                             result.d = "待入库的收料单才可删除明细!";
+                            return result;
                         }
-                    }        
-                    if(result.s == -1)
-                    {
-                        return result;
-                    }       
+                    }                              
                     string sqlCommandText = @"delete from  purchaserecdetail where recid = @Recid and skuautoid in @ID and coid = @Coid ";
                     var argss = new {Recid = recid,ID = detailid,Coid = CoID};
                     int count = conn.Execute(sqlCommandText,argss);
                     if(count <= 0)
                     {
                         result.s = -3004;
+                        return result;
                     }                              
                 }
                 catch (Exception e)
@@ -616,8 +619,7 @@ namespace CoreData.CoreCore
         public static DataResult PurReceiveSingle(int id,int CoID)
         {
             var result = new DataResult(1,null);   
-            string wheresql = "select id,scoid,sconame,purchaseid,creator,warehouseid,warehousename,status,finstatus,receivedate,remark,logisticsno,modifydate,finconfirmer,finconfirmdate " + 
-                              "from purchasereceive where id =" + id + " and coid =" + CoID ;
+            string wheresql = "select * from purchasereceive where id =" + id + " and coid =" + CoID ;
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
                     var u = conn.Query<PurchaseReceive>(wheresql).AsList();
@@ -641,7 +643,7 @@ namespace CoreData.CoreCore
         ///<summary>
         ///收料单更新备注
         ///</summary>
-        public static DataResult UpdateRecRemark(List<int> id,string remark)
+        public static DataResult UpdateRecRemark(List<int> id,string remark,string Username)
         {
             var result = new DataResult(1,null);  
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
@@ -653,8 +655,8 @@ namespace CoreData.CoreCore
                         result.d = "作废的收料单不可以更新备注";
                         return  result;
                     }         
-                    string uptsql = @"update purchasereceive set remark=@Remark where id in @ID";
-                    var args = new {Remark = remark,ID = id};
+                    string uptsql = @"update purchasereceive set remark=@Remark,modifier=@Modifier,modifydate=@Modifydate where id in @ID";
+                    var args = new {Remark = remark,ID = id,Modifier=Username,Modifydate = DateTime.Now};
                     int count = conn.Execute(uptsql,args);
                     if(count < 0)
                     {
@@ -688,8 +690,7 @@ namespace CoreData.CoreCore
             finstatus.Add(1,"已审核");
             res.finstatus = finstatus;
             //采购入库基本资料
-            string wheresql = "select id,scoid,sconame,purchaseid,creator,warehouseid,warehousename,status,finstatus,receivedate,remark,logisticsno,modifydate,finconfirmer,finconfirmdate " + 
-                              "from purchasereceive where 1 = 1"; 
+            string wheresql = "select * from purchasereceive where 1 = 1"; 
             if(CoID != 1)//公司编号
             {
                 wheresql = wheresql + " and coid = " + CoID;
@@ -738,8 +739,7 @@ namespace CoreData.CoreCore
                     result.d = "未审核状态的收料单才可审核!";
                     return result;
                 }
-                wheresql = "select id,scoid,sconame,purchaseid,creator,warehouseid,warehousename,status,finstatus,receivedate,remark,logisticsno,modifydate,finconfirmer,finconfirmdate " + 
-                              "from purchasereceive where id in @RecID and coid = @Coid";
+                wheresql = "select * from purchasereceive where id in @RecID and coid = @Coid";
                 var rec = CoreDBconn.Query<PurchaseReceive>(wheresql,p).AsList();
                 if(rec.Count == 0)
                 {
@@ -749,8 +749,7 @@ namespace CoreData.CoreCore
                 }
                 foreach(var x in rec)
                 {
-                    wheresql = "select id,recid,img,skuautoid,skuid,skuname,norm,recqty,planrecqty,price,amount,remark,goodscode,supplynum " + 
-                              "from purchaserecdetail where recid id =" + x.id + " and coid = " + CoID;
+                    wheresql = "select * from purchaserecdetail where recid =" + x.id + " and coid = " + CoID;
                     var recdetail = CoreDBconn.Query<PurchaseRecDetail>(wheresql).AsList();
                     if(recdetail.Count == 0)
                     {
@@ -758,10 +757,15 @@ namespace CoreData.CoreCore
                         result.d = "没有符合条件的收料单明细!";
                         return result;
                     }
+                    string custypenew = "收料入库";
+                    if(x.purchaseid > 0)
+                    {
+                        custypenew = "采购收料";
+                    }
                     //新增出入库记录
-                    string uptsql = @"INSERT INTO invinout(recordid,type,custype,whid,whname,isexport,creator,coid) 
-                                    VALUES(@Recordid,@Type,@Custype,@Whid,@Whname,@Isexport,@Creator,@Coid)";
-                    var args = new {Recordid = x.id,Type = 1,Custype ="采购收料",Whid = x.warehouseid,Whname = x.warehousename,Isexport = false,Creator = UserName,Coid = CoID};
+                    string uptsql = @"INSERT INTO invinout(recordid,type,custype,whid,whname,isexport,creator,coid,modifier) 
+                                    VALUES(@Recordid,@Type,@Custype,@Whid,@Whname,@Isexport,@Creator,@Coid,@Creator)";
+                    var args = new {Recordid = x.id,Type = 1,Custype =custypenew,Whid = x.warehouseid,Whname = x.warehousename,Isexport = false,Creator = UserName,Coid = CoID};
                     int count = CoreDBconn.Execute(uptsql,args,TransCore);
                     if(count < 0)
                     {
@@ -772,9 +776,9 @@ namespace CoreData.CoreCore
                     foreach(var y in recdetail)
                     {
                         //新增出入库明细记录
-                        uptsql = @"INSERT INTO invinoutitem(ioid,coid,img,skuid,skuname,qty,creator,custype,norm,whid,whname) 
-                                        VALUES(@Ioid,@Coid,@Img,@Skuid,@Skuname,@Qty,@Creator,@Custype,@Norm,@Whid,@Whname)";
-                        var argss = new {Ioid = rtn,Coid = CoID,Img = y.img,Skuid = y.skuid,Skuname = y.skuname,Qty = y.recqty,Creator = UserName,Custype ="采购收料",
+                        uptsql = @"INSERT INTO invinoutitem(ioid,coid,img,skuid,skuname,qty,creator,custype,norm,whid,whname,modifier) 
+                                        VALUES(@Ioid,@Coid,@Img,@Skuid,@Skuname,@Qty,@Creator,@Custype,@Norm,@Whid,@Whname,@Creator)";
+                        var argss = new {Ioid = rtn,Coid = CoID,Img = y.img,Skuid = y.skuid,Skuname = y.skuname,Qty = y.recqty,Creator = UserName,Custype =custypenew,
                                             Norm = y.norm,Whid = x.warehouseid,Whname = x.warehousename};
                         count = CoreDBconn.Execute(uptsql,argss,TransCore);
                         if(count < 0)
@@ -786,10 +790,10 @@ namespace CoreData.CoreCore
                         count = CoreDBconn.QueryFirst<int>("select count(*) from inventory where skuid = '" + y.skuid + "' and warehouseid =" + x.warehouseid + " and coid = " + CoID);
                         if(count == 0)
                         {
-                            uptsql = @"INSERT INTO inventory(goodscode,skuid,name,norm,warehouseid,warehousename,stockqty,pic,coid) 
-                                        VALUES(@Goodscode,@Skuid,@Skuname,@Norm,@Whid,@Whname,@Qty,@Img,@Coid)";
+                            uptsql = @"INSERT INTO inventory(goodscode,skuid,name,norm,warehouseid,warehousename,stockqty,pic,coid,modifier,creator) 
+                                        VALUES(@Goodscode,@Skuid,@Skuname,@Norm,@Whid,@Whname,@Qty,@Img,@Coid,@Creator,@Creator)";
                             var argst = new {Goodscode = y.goodscode,Skuid = y.skuid,Skuname = y.skuname,Norm = y.norm,Whid = x.warehouseid,Whname = x.warehousename,
-                                            Qty = y.recqty,Img = y.img,Coid = CoID};
+                                            Qty = y.recqty,Img = y.img,Coid = CoID,Creator=UserName};
                             count = CoreDBconn.Execute(uptsql,argst,TransCore);
                             if(count < 0)
                             {
@@ -799,8 +803,8 @@ namespace CoreData.CoreCore
                         }
                         else
                         {
-                            uptsql = @"update inventory set stockqty = stockqty + @Qty where skuid = @Skuid and warehouseid = @Whid and coid = @Coid)";
-                            var argst = new {Skuid = y.skuid,Whid = x.warehouseid,Qty = y.recqty,Coid = CoID};
+                            uptsql = @"update inventory set stockqty = stockqty + @Qty,modifier=@Modifier,modifydate=@Modifydate where skuid = @Skuid and warehouseid = @Whid and coid = @Coid";
+                            var argst = new {Skuid = y.skuid,Whid = x.warehouseid,Qty = y.recqty,Coid = CoID,Modifier=UserName,Modifydate=DateTime.Now};
                             count = CoreDBconn.Execute(uptsql,argst,TransCore);
                             if(count < 0)
                             {
@@ -811,8 +815,7 @@ namespace CoreData.CoreCore
                         //更新采购单明细资料
                         if(x.purchaseid > 0)
                         {
-                            wheresql = "select id,purchaseid,img,skuid,skuname,purqty,suggestpurqty,recqty,price,puramt,remark,goodscode,supplynum,supplycode,planqty,planamt,recievedate,norm,packingnum " + 
-                                        "from purchasedetail where purchaseid = " + x.purchaseid + " and skuautoid = " + y.skuautoid + " and coid =" + CoID;
+                            wheresql = "select * from purchasedetail where purchaseid = " + x.purchaseid + " and skuautoid = " + y.skuautoid + " and coid =" + CoID;
                             var purdetail = CoreDBconn.Query<PurchaseDetail>(wheresql).AsList();
                             if(purdetail.Count == 0)
                             {
@@ -821,16 +824,16 @@ namespace CoreData.CoreCore
                                 return result;
                             }
                             uptsql = @"update purchasedetail set ";
-                            if(decimal.Parse(purdetail[0].recqty) + decimal.Parse(y.recqty) > decimal.Parse(purdetail[0].purqty))
+                            if(decimal.Parse(purdetail[0].recqty) + decimal.Parse(y.recqty) >= decimal.Parse(purdetail[0].purqty))
                             {
-                                uptsql = uptsql + "stockqty = stockqty + @Qty,detailstatus = 2";
+                                uptsql = uptsql + "recqty = recqty + @Qty,detailstatus = 2,";
                             }
                             else
                             {
-                                uptsql = uptsql + "stockqty = stockqty + @Qty";
+                                uptsql = uptsql + "recqty = recqty + @Qty,";
                             }
-                            uptsql = uptsql + " where skuid = @Skuid and warehouseid = @Whid and coid = @Coid";
-                            var argst = new {Skuid = y.skuid,Whid = x.warehouseid,Qty = y.recqty,Coid = CoID};
+                            uptsql = uptsql + "modifier=@Modifier,modifydate=@Modifydate where purchaseid = @Purid and skuautoid = @Skuid and coid = @Coid";
+                            var argst = new {Skuid = y.skuautoid,Purid = x.purchaseid,Qty = y.recqty,Coid = CoID,Modifier=UserName,Modifydate=DateTime.Now};
                             count = CoreDBconn.Execute(uptsql,argst,TransCore);
                             if(count < 0)
                             {
@@ -842,12 +845,13 @@ namespace CoreData.CoreCore
                     //更新采购单资料
                     if(x.purchaseid > 0)
                     {
-                        wheresql = "select count(*) from purchasedetail purchaseid = " + x.purchaseid + " and coid =" + CoID + " and detailstatus <> 2";
+                        wheresql = "select count(*) from purchasedetail where purchaseid = " + x.purchaseid + " and coid =" + CoID + " and detailstatus <> 2";
                         int i = CoreDBconn.QueryFirst<int>(wheresql);
                         if(i == 0)
                         {
-                            uptsql = @"update purchase set status = 2 where id =" + x.purchaseid;
-                            count = CoreDBconn.Execute(uptsql,TransCore);
+                            uptsql = @"update purchase set status = 2,modifier=@Modifier,modifydate=@Modifydate where id =" + x.purchaseid;
+                            var argst = new {Modifier=UserName,Modifydate=DateTime.Now};
+                            count = CoreDBconn.Execute(uptsql,argst,TransCore);
                             if(count < 0)
                             {
                                 result.s = -3003;
@@ -857,7 +861,9 @@ namespace CoreData.CoreCore
                         
                     }
                 }
-                string uptsqln = @"update purchasereceive set status = 1 where id in @RecID and coid = @Coid" ;
+                string uptsqln = @"update purchasereceive set status = 1,modifier=@Modifier,modifydate=@Modifydate where id in @RecID and coid = @Coid" ;
+                p.Add("@Modifier",UserName);
+                p.Add("@Modifydate",DateTime.Now);
                 int t = CoreDBconn.Execute(uptsqln,p,TransCore);
                 if(t < 0)
                 {
@@ -877,6 +883,45 @@ namespace CoreData.CoreCore
             {
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
+            }
+            return result;
+        }
+        ///<summary>
+        ///财务审核
+        ///</summary>
+        public static DataResult FinConfirmRec(List<int> RecidList,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);  
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) )
+            {
+                try
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@RecID", RecidList);
+                    p.Add("@Coid", CoID);
+                    string wheresql = @"select count(*) from purchasereceive where id in @RecID and coid = @Coid and status <> 1" ;
+                    int u = conn.QueryFirst<int>(wheresql,p);
+                    if(u > 0)
+                    {
+                        result.s = -1;
+                        result.d = "已入库的收料单才可财务审核!";
+                        return result;
+                    }
+                    string delsql = @"update purchasereceive set finstatus = 1,modifier=@Modifier,modifydate=@Modifydate,finconfirmer=@Modifier,finconfirmdate=@Modifydate where id in @RecID and coid = @Coid";
+                    p.Add("@Modifier", UserName);
+                    p.Add("@Modifydate", DateTime.Now);
+                    int count = conn.Execute(delsql, p);
+                    if (count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
             }
             return result;
         }

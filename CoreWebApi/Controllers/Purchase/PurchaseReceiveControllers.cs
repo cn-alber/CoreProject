@@ -121,7 +121,8 @@ namespace CoreWebApi
         {   
             List<int> recidList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["RecIdList"].ToString());
             int CoId = int.Parse(GetCoid());
-            var data = PurchaseReceiveHaddle.CancleReceive(recidList,CoId);
+            string UserName = GetUname(); 
+            var data = PurchaseReceiveHaddle.CancleReceive(recidList,CoId,UserName);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -141,27 +142,10 @@ namespace CoreWebApi
         {   
             var pur = Newtonsoft.Json.JsonConvert.DeserializeObject<PurchaseReceive>(co["Rec"].ToString());
             int CoID = int.Parse(GetCoid());
-            var data = PurchaseReceiveHaddle.UpdateReceive(pur,CoID);
+            string UserName = GetUname(); 
+            var data = PurchaseReceiveHaddle.UpdateReceive(pur,CoID,UserName);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
-
-        // [HttpPostAttribute("/Core/PurchaseReceive/ConfirmRec")]
-        // public ResponseResult ConfirmRec([FromBodyAttribute]JObject co)
-        // {   
-        //     List<int> puridList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["PurIdList"].ToString());
-        //     int CoId = int.Parse(GetCoid());
-        //     var data = PurchaseHaddle.ConfirmPurchase(puridList,CoId);
-        //     return CoreResult.NewResponse(data.s, data.d, "General");
-        // }
-
-        // [HttpPostAttribute("/Core/PurchaseReceive/FinConfirmRec")]
-        // public ResponseResult FinConfirmRec([FromBodyAttribute]JObject co)
-        // {   
-        //     List<int> puridList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["PurIdList"].ToString());
-        //     int CoId = int.Parse(GetCoid());
-        //     var data = PurchaseHaddle.CompletePurchase(puridList,CoId);
-        //     return CoreResult.NewResponse(data.s, data.d, "General");
-        // }
 
         [HttpPostAttribute("/Core/PurchaseReceive/InsertRecDetail")]
         public ResponseResult InsertRecDetail([FromBodyAttribute]JObject co)
@@ -169,7 +153,8 @@ namespace CoreWebApi
             int id = int.Parse(co["recid"].ToString());
             List<int> detailid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["ids"].ToString());
             int CoId = int.Parse(GetCoid());
-            var data = PurchaseReceiveHaddle.InsertRecDetail(id,detailid,CoId);
+            string UserName = GetUname(); 
+            var data = PurchaseReceiveHaddle.InsertRecDetail(id,detailid,CoId,UserName);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
@@ -178,7 +163,8 @@ namespace CoreWebApi
         {   
             var detail = Newtonsoft.Json.JsonConvert.DeserializeObject<PurchaseRecDetail>(co["RecDetail"].ToString());
             int CoId = int.Parse(GetCoid());
-            var data = PurchaseReceiveHaddle.UpdateRecDetail(detail,CoId);
+            string UserName = GetUname(); 
+            var data = PurchaseReceiveHaddle.UpdateRecDetail(detail,CoId,UserName);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
@@ -216,7 +202,8 @@ namespace CoreWebApi
         {   
             List<int> id = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["IDList"].ToString());
             string remark = co["Remark"].ToString();
-            var data = PurchaseReceiveHaddle.UpdateRecRemark(id,remark);
+            string UserName = GetUname(); 
+            var data = PurchaseReceiveHaddle.UpdateRecRemark(id,remark,UserName);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -301,5 +288,14 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
+        [HttpPostAttribute("/Core/PurchaseReceive/FinConfirmRec")]
+        public ResponseResult FinConfirmRec([FromBodyAttribute]JObject co)
+        {   
+            List<int> recidList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["RecIdList"].ToString());
+            int CoId = int.Parse(GetCoid());
+            string UserName = GetUname();
+            var data = PurchaseReceiveHaddle.FinConfirmRec(recidList,CoId,UserName);
+            return CoreResult.NewResponse(data.s, data.d, "General");
+        }
     }
 }
