@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using Microsoft.AspNetCore.Authorization;
+// using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyComm;
 using CoreData.CoreComm;
 namespace CoreWebApi
 {
-    [AllowAnonymous]
+    // [AllowAnonymous]
     public class WarehouseController : ControllBase
     {
         [HttpPostAttribute("/Core/Warehouse/InsertWarehouse")]

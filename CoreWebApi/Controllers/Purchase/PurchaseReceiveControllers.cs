@@ -233,7 +233,8 @@ namespace CoreWebApi
         {   
             List<int> recidList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["RecIdList"].ToString());
             int CoId = int.Parse(GetCoid());
-            var data = PurchaseReceiveHaddle.ConfirmPurRec(recidList,CoId);
+            string UserName = GetUname();
+            var data = PurchaseReceiveHaddle.ConfirmPurRec(recidList,CoId,UserName);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
