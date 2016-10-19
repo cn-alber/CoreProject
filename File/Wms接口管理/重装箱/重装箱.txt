@@ -1,0 +1,17 @@
+接口名称：AWmsBoxControllers
+function说明
+############################################################
+1.SkuByBarCode()
+    方法：POST
+    路由：http://192.168.30.29:5000/Core/Api/ABox/SkuByBarCode
+    参数: ApiBoxParam
+    InPut:
+        CoID        int         公司编号
+        BarCode     string      件码
+        SkuID       string      商品编码
+    OutPut:
+        SkuLst      ACoreSku    商品信息
+ 参考:input json 文件:SkuByBarCode_input.json 
+ 参考:output json 文件:SkuByBarCode_output.json  
+############################################################
+2.  
