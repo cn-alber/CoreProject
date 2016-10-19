@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-// using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyCore;
 using CoreData.CoreCore;
 using System;
@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using CoreModels;
 namespace CoreWebApi
 {
-    // [AllowAnonymous]
+    [AllowAnonymous]
     public class PurchaseController : ControllBase
     {
         [HttpGetAttribute("/Core/Purchase/PurchaseList")]
@@ -117,7 +117,8 @@ namespace CoreWebApi
         {   
             List<int> puridList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["PurIdList"].ToString());
             int CoId = int.Parse(GetCoid());
-            var data = PurchaseHaddle.CanclePurchase(puridList,CoId);
+            string username = GetUname();
+            var data = PurchaseHaddle.CanclePurchase(puridList,CoId,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -136,7 +137,8 @@ namespace CoreWebApi
         {   
             var pur = Newtonsoft.Json.JsonConvert.DeserializeObject<Purchase>(co["Pur"].ToString());
             int CoID = int.Parse(GetCoid());
-            var data = PurchaseHaddle.UpdatePurchase(pur,CoID);
+            string Username = GetUname();
+            var data = PurchaseHaddle.UpdatePurchase(pur,CoID,Username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -145,7 +147,8 @@ namespace CoreWebApi
         {   
             List<int> puridList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["PurIdList"].ToString());
             int CoId = int.Parse(GetCoid());
-            var data = PurchaseHaddle.ConfirmPurchase(puridList,CoId);
+            string Username = GetUname();
+            var data = PurchaseHaddle.ConfirmPurchase(puridList,CoId,Username);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
@@ -173,7 +176,8 @@ namespace CoreWebApi
         {   
             List<int> puridList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["PurIdList"].ToString());
             int CoId = int.Parse(GetCoid());
-            var data = PurchaseHaddle.CompletePurchase(puridList,CoId);
+            string Username = GetUname();
+            var data = PurchaseHaddle.CompletePurchase(puridList,CoId,Username);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
@@ -183,7 +187,8 @@ namespace CoreWebApi
             int id = int.Parse(co["purchaseid"].ToString());
             List<int> detailid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["ids"].ToString());
             int CoId = int.Parse(GetCoid());
-            var data = PurchaseHaddle.InsertPurDetail(id,detailid,CoId);
+            string Username = GetUname();
+            var data = PurchaseHaddle.InsertPurDetail(id,detailid,CoId,Username);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
@@ -192,7 +197,8 @@ namespace CoreWebApi
         {   
             var detail = Newtonsoft.Json.JsonConvert.DeserializeObject<PurchaseDetail>(co["PurDetail"].ToString());
             int CoId = int.Parse(GetCoid());
-            var data = PurchaseHaddle.UpdatePurDetail(detail,CoId);
+            string Username = GetUname();
+            var data = PurchaseHaddle.UpdatePurDetail(detail,CoId,Username);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
@@ -256,7 +262,8 @@ namespace CoreWebApi
         public ResponseResult UpdateQualityRev([FromBodyAttribute]JObject co)
         {   
             var qua = Newtonsoft.Json.JsonConvert.DeserializeObject<QualityRev>(co["Quality"].ToString());
-            var data = PurchaseHaddle.UpdateQualityRev(qua);
+            string Username = GetUname();
+            var data = PurchaseHaddle.UpdateQualityRev(qua,Username);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
@@ -272,7 +279,8 @@ namespace CoreWebApi
         public ResponseResult ConfirmQualityRev([FromBodyAttribute]JObject co)
         {   
             int id = Newtonsoft.Json.JsonConvert.DeserializeObject<int>(co["ID"].ToString());
-            var data = PurchaseHaddle.ConfirmQualityRev(id);
+            string Username = GetUname();
+            var data = PurchaseHaddle.ConfirmQualityRev(id,Username);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
 
@@ -289,7 +297,8 @@ namespace CoreWebApi
         {   
             int id = int.Parse(co["ID"].ToString());
             string remark = co["Remark"].ToString();
-            var data = PurchaseHaddle.UpdatePurRemark(id,remark);
+            string Username = GetUname();
+            var data = PurchaseHaddle.UpdatePurRemark(id,remark,Username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -298,7 +307,8 @@ namespace CoreWebApi
         {   
             List<int> puridList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["PurIdList"].ToString());
             int CoId = int.Parse(GetCoid());
-            var data = PurchaseHaddle.RestorePur(puridList,CoId);
+            string Username = GetUname();
+            var data = PurchaseHaddle.RestorePur(puridList,CoId,Username);
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
     }

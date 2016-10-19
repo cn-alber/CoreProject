@@ -3,133 +3,187 @@
     "d": {
         "Datacnt": 6,
         "Pagecnt": 1,
-        "enable": true,
+        "status": 2,
         "Pur": [
             {
+                "_recievedate": "2016-05-13",
                 "id": 6,//明细id
                 "purchaseid": 5,//采购单号
                 "img": "",//图片地址
+                "skuautoid": 0,//sku auto id
                 "skuid": "test1234560004007",//商品代号
                 "skuname": "南极人2016男装夹克",//商品名称
-                "purqty": 50,//采购数量
-                "suggestpurqty": 0,//建议采购数量
-                "recqty": 81,//已入库数量
-                "price": 3,//单价
-                "puramt": 150,//金额
+                "purqty": "50.00",//采购数量
+                "suggestpurqty": "0.00",//建议采购数量
+                "recqty": "81.00",//已入库数量
+                "price": "3.00",//单价
+                "puramt": "150.00",//金额
+                "returnqty": "31.00",//退回数量
+                "detailstatus": 2,
                 "remark": "5466666",//备注
                 "goodscode": "test123456",//款式编码
                 "supplynum": "22222",//供应商款号
                 "supplycode": "",//供应商编码
-                "planqty": 0,//预计到货数量
-                "planamt": 0,//预计到货金额
-                "recievedate": "2016-05-13T00:00:00",//预计到货日期
+                "planqty": "0.00",//预计到货数量
+                "planamt": "0.00",//预计到货金额
                 "norm": "红色1;43",//规格
-                "packingnum": ""//装箱编号
+                "packingnum": "",//装箱编号
+                "coid": 1,
+                "creator": "",
+                "modifier": "",
+                "createdate": "2016-10-19T11:19:03",
+                "modifydate": "2016-10-19T11:19:03",
+                "recievedate": "2016-05-13"
             },
             {
+                "_recievedate": "2016-05-30",
                 "id": 7,
                 "purchaseid": 5,
                 "img": "",
+                "skuautoid": 0,
                 "skuid": "test2510002007",
                 "skuname": "南极人2016男装夹克休闲版",
-                "purqty": 100,
-                "suggestpurqty": 0,
-                "recqty": 137,
-                "price": 5,
-                "puramt": 500,
+                "purqty": "100.00",
+                "suggestpurqty": "0.00",
+                "recqty": "137.00",
+                "price": "5.00",
+                "puramt": "500.00",
+                "returnqty": "37.00",
+                "detailstatus": 2,
                 "remark": "dd",
                 "goodscode": "test251",
                 "supplynum": "",
                 "supplycode": "",
-                "planqty": 0,
-                "planamt": 0,
-                "recievedate": "2016-05-30T00:00:00",
+                "planqty": "0.00",
+                "planamt": "0.00",
                 "norm": "白色;43",
-                "packingnum": ""
+                "packingnum": "",
+                "coid": 1,
+                "creator": "",
+                "modifier": "",
+                "createdate": "2016-10-19T11:19:03",
+                "modifydate": "2016-10-19T11:19:03",
+                "recievedate": "2016-05-30"
             },
             {
+                "_recievedate": "2016-05-11",
                 "id": 17,
                 "purchaseid": 5,
                 "img": "",
+                "skuautoid": 0,
                 "skuid": "test1234560004007",
                 "skuname": "南极人2016男装夹克",
-                "purqty": 200,
-                "suggestpurqty": 0,
-                "recqty": 0,
-                "price": 32345,
-                "puramt": 6469000,
+                "purqty": "200.00",
+                "suggestpurqty": "0.00",
+                "recqty": "0.00",
+                "price": "32345.00",
+                "puramt": "6469000.00",
+                "returnqty": "0.00",
+                "detailstatus": 2,
                 "remark": "",
                 "goodscode": "test123456",
                 "supplynum": "",
                 "supplycode": "",
-                "planqty": 0,
-                "planamt": 0,
-                "recievedate": "2016-05-11T00:00:00",
+                "planqty": "0.00",
+                "planamt": "0.00",
                 "norm": "红色1;43",
-                "packingnum": ""
+                "packingnum": "",
+                "coid": 1,
+                "creator": "",
+                "modifier": "",
+                "createdate": "2016-10-19T11:19:03",
+                "modifydate": "2016-10-19T11:19:03",
+                "recievedate": "2016-05-11"
             },
             {
+                "_recievedate": "2016-05-11",
                 "id": 18,
                 "purchaseid": 5,
                 "img": "",
+                "skuautoid": 0,
                 "skuid": "test1234560004014",
                 "skuname": "南极人2016男装夹克",
-                "purqty": 600,
-                "suggestpurqty": 0,
-                "recqty": 0,
-                "price": 20,
-                "puramt": 12000,
+                "purqty": "600.00",
+                "suggestpurqty": "0.00",
+                "recqty": "0.00",
+                "price": "20.00",
+                "puramt": "12000.00",
+                "returnqty": "0.00",
+                "detailstatus": 2,
                 "remark": "",
                 "goodscode": "test123456",
                 "supplynum": "",
                 "supplycode": "",
-                "planqty": 0,
-                "planamt": 0,
-                "recievedate": "2016-05-11T00:00:00",
+                "planqty": "0.00",
+                "planamt": "0.00",
                 "norm": "红色1;46",
-                "packingnum": ""
+                "packingnum": "",
+                "coid": 1,
+                "creator": "",
+                "modifier": "",
+                "createdate": "2016-10-19T11:19:03",
+                "modifydate": "2016-10-19T11:19:03",
+                "recievedate": "2016-05-11"
             },
             {
+                "_recievedate": "2016-05-11",
                 "id": 19,
                 "purchaseid": 5,
                 "img": "",
+                "skuautoid": 0,
                 "skuid": "test2510002024",
                 "skuname": "南极人2016男装夹克休闲版",
-                "purqty": 300,
-                "suggestpurqty": 0,
-                "recqty": 0,
-                "price": 100,
-                "puramt": 30000,
+                "purqty": "300.00",
+                "suggestpurqty": "0.00",
+                "recqty": "0.00",
+                "price": "100.00",
+                "puramt": "30000.00",
+                "returnqty": "0.00",
+                "detailstatus": 2,
                 "remark": "",
                 "goodscode": "test251",
                 "supplynum": "",
                 "supplycode": "",
-                "planqty": 0,
-                "planamt": 0,
-                "recievedate": "2016-05-11T00:00:00",
+                "planqty": "0.00",
+                "planamt": "0.00",
                 "norm": "",
-                "packingnum": ""
+                "packingnum": "",
+                "coid": 1,
+                "creator": "",
+                "modifier": "",
+                "createdate": "2016-10-19T11:19:03",
+                "modifydate": "2016-10-19T11:19:03",
+                "recievedate": "2016-05-11"
             },
             {
+                "_recievedate": "2016-05-11",
                 "id": 20,
                 "purchaseid": 5,
                 "img": "",
+                "skuautoid": 0,
                 "skuid": "test2510002014",
                 "skuname": "南极人2016男装夹克休闲版",
-                "purqty": 800,
-                "suggestpurqty": 0,
-                "recqty": 144,
-                "price": 5,
-                "puramt": 4000,
+                "purqty": "800.00",
+                "suggestpurqty": "0.00",
+                "recqty": "144.00",
+                "price": "5.00",
+                "puramt": "4000.00",
+                "returnqty": "35.00",
+                "detailstatus": 2,
                 "remark": "",
                 "goodscode": "test251",
                 "supplynum": "",
                 "supplycode": "",
-                "planqty": 0,
-                "planamt": 0,
-                "recievedate": "2016-05-11T00:00:00",
+                "planqty": "0.00",
+                "planamt": "0.00",
                 "norm": "",
-                "packingnum": ""
+                "packingnum": "",
+                "coid": 1,
+                "creator": "",
+                "modifier": "",
+                "createdate": "2016-10-19T11:19:03",
+                "modifydate": "2016-10-19T11:19:03",
+                "recievedate": "2016-05-11"
             }
         ]
     },

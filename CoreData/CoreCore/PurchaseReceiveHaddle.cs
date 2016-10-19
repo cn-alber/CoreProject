@@ -99,8 +99,8 @@ namespace CoreData.CoreCore
                     var pur = conn.Query<PurchaseReceive>(pursql).AsList();
                     if (pur.Count == 0)
                     {
-                        result.s = -3001;
-                        result.d = null;
+                        result.s = -1;
+                        result.d = "此收料单不存在";
                     }
                     else
                     {
@@ -123,14 +123,14 @@ namespace CoreData.CoreCore
 
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;
-                    res.PurRecDetail = u;
-                    result.d = res;               
+                    res.PurRecDetail = u;   
+                    result.d = res;             
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
                     conn.Dispose();
                 }
-            }           
+            }     
             return result;
         }
         ///<summary>
@@ -202,15 +202,13 @@ namespace CoreData.CoreCore
                         {
                             return result;
                         }
-                        sqlCommandText = @"INSERT INTO purchasereceive(scoid,sconame,purchaseid,coid,creator,warehouseid,warehousename,receivedate) 
-                                            VALUES(@Scoid,@Sconame,@Purchaseid,@Coid,@UName,@Warehouseid,@Warehousename,@Receivedate)";
+                        sqlCommandText = @"INSERT INTO purchasereceive(scoid,sconame,purchaseid,coid,creator,receivedate) 
+                                            VALUES(@Scoid,@Sconame,@Purchaseid,@Coid,@UName,@Receivedate)";
                         p.Add("@Scoid",u[0].scoid);
                         p.Add("@Sconame",u[0].sconame);
                         p.Add("@Purchaseid",id);
                         p.Add("@Coid",CoID);
                         p.Add("@UName",UserName);
-                        p.Add("@Warehouseid",u[0].warehouseid);
-                        p.Add("@Warehousename",u[0].warehousename);
                         p.Add("@Receivedate",DateTime.Now);
                     }
                     if(type == "supply")
@@ -297,7 +295,7 @@ namespace CoreData.CoreCore
                     }
                     if(rec.warehouseid != 0 && u[0].status == 0)
                     {
-                        wheresql = "select id,warehouseid,warehousename,enable,parentid,type,creator,createdate from warehouse where warehouseid =" + rec.warehouseid + " and coid =" + CoID;
+                        wheresql = "select * from warehouse where id =" + rec.warehouseid + " and coid =" + CoID;
                         var a = DbBase.CommDB.Query<Warehouse>(wheresql).AsList();
                         if(a.Count == 0)
                         {
@@ -313,9 +311,17 @@ namespace CoreData.CoreCore
                             }
                             else
                             {
-                                uptsql = uptsql + "warehouseid = @Warehouseid,warehousename = @Warehousename,";
-                                // p.Add("@Warehouseid", a[0].warehouseid);
-                                p.Add("@Warehousename", a[0].warehousename);
+                                if(a[0].parentid == 0)
+                                {
+                                    result.s = -1;
+                                    result.d = "请选择小仓仓库!!";
+                                }
+                                else
+                                {
+                                    uptsql = uptsql + "warehouseid = @Warehouseid,warehousename = @Warehousename,";
+                                    p.Add("@Warehouseid", a[0].id);
+                                    p.Add("@Warehousename", a[0].warehousename);
+                                }
                             }
                         }
                         if(result.s == -1)
@@ -560,7 +566,7 @@ namespace CoreData.CoreCore
             return result;
         }
         ///<summary>
-        ///采购单明细删除
+        ///收料单明细删除
         ///</summary>
         public static DataResult DelRecDetail(List<int> detailid,int recid,int CoID)
         {
@@ -713,7 +719,7 @@ namespace CoreData.CoreCore
         ///<summary>
         ///收料入库审核
         ///</summary>
-        public static DataResult ConfirmPurRec(List<int> RecidList,int CoID)
+        public static DataResult ConfirmPurRec(List<int> RecidList,int CoID,string UserName)
         {
             var result = new DataResult(1,null);  
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
@@ -741,58 +747,136 @@ namespace CoreData.CoreCore
                     result.d = "收料单号有误!";
                     return result;
                 }
-                wheresql = "select id,recid,img,skuautoid,skuid,skuname,norm,recqty,planrecqty,price,amount,remark,goodscode,supplynum " + 
-                              "from purchaserecdetail where recid id in @RecID and coid = @Coid";
-                var recdetail = CoreDBconn.Query<PurchaseRecDetail>(wheresql,p).AsList();
-                if(recdetail.Count == 0)
+                foreach(var x in rec)
                 {
-                    result.s = -1;
-                    result.d = "没有符合条件的收料单明细!";
+                    wheresql = "select id,recid,img,skuautoid,skuid,skuname,norm,recqty,planrecqty,price,amount,remark,goodscode,supplynum " + 
+                              "from purchaserecdetail where recid id =" + x.id + " and coid = " + CoID;
+                    var recdetail = CoreDBconn.Query<PurchaseRecDetail>(wheresql).AsList();
+                    if(recdetail.Count == 0)
+                    {
+                        result.s = -1;
+                        result.d = "没有符合条件的收料单明细!";
+                        return result;
+                    }
+                    //新增出入库记录
+                    string uptsql = @"INSERT INTO invinout(recordid,type,custype,whid,whname,isexport,creator,coid) 
+                                    VALUES(@Recordid,@Type,@Custype,@Whid,@Whname,@Isexport,@Creator,@Coid)";
+                    var args = new {Recordid = x.id,Type = 1,Custype ="采购收料",Whid = x.warehouseid,Whname = x.warehousename,Isexport = false,Creator = UserName,Coid = CoID};
+                    int count = CoreDBconn.Execute(uptsql,args,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3002;
+                        return result;
+                    }
+                    int rtn = CoreDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
+                    foreach(var y in recdetail)
+                    {
+                        //新增出入库明细记录
+                        uptsql = @"INSERT INTO invinoutitem(ioid,coid,img,skuid,skuname,qty,creator,custype,norm,whid,whname) 
+                                        VALUES(@Ioid,@Coid,@Img,@Skuid,@Skuname,@Qty,@Creator,@Custype,@Norm,@Whid,@Whname)";
+                        var argss = new {Ioid = rtn,Coid = CoID,Img = y.img,Skuid = y.skuid,Skuname = y.skuname,Qty = y.recqty,Creator = UserName,Custype ="采购收料",
+                                            Norm = y.norm,Whid = x.warehouseid,Whname = x.warehousename};
+                        count = CoreDBconn.Execute(uptsql,argss,TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3002;
+                            return result;
+                        }
+                        //更新库存资料
+                        count = CoreDBconn.QueryFirst<int>("select count(*) from inventory where skuid = '" + y.skuid + "' and warehouseid =" + x.warehouseid + " and coid = " + CoID);
+                        if(count == 0)
+                        {
+                            uptsql = @"INSERT INTO inventory(goodscode,skuid,name,norm,warehouseid,warehousename,stockqty,pic,coid) 
+                                        VALUES(@Goodscode,@Skuid,@Skuname,@Norm,@Whid,@Whname,@Qty,@Img,@Coid)";
+                            var argst = new {Goodscode = y.goodscode,Skuid = y.skuid,Skuname = y.skuname,Norm = y.norm,Whid = x.warehouseid,Whname = x.warehousename,
+                                            Qty = y.recqty,Img = y.img,Coid = CoID};
+                            count = CoreDBconn.Execute(uptsql,argst,TransCore);
+                            if(count < 0)
+                            {
+                                result.s = -3002;
+                                return result;
+                            }
+                        }
+                        else
+                        {
+                            uptsql = @"update inventory set stockqty = stockqty + @Qty where skuid = @Skuid and warehouseid = @Whid and coid = @Coid)";
+                            var argst = new {Skuid = y.skuid,Whid = x.warehouseid,Qty = y.recqty,Coid = CoID};
+                            count = CoreDBconn.Execute(uptsql,argst,TransCore);
+                            if(count < 0)
+                            {
+                                result.s = -3003;
+                                return result;
+                            }
+                        }
+                        //更新采购单明细资料
+                        if(x.purchaseid > 0)
+                        {
+                            wheresql = "select id,purchaseid,img,skuid,skuname,purqty,suggestpurqty,recqty,price,puramt,remark,goodscode,supplynum,supplycode,planqty,planamt,recievedate,norm,packingnum " + 
+                                        "from purchasedetail where purchaseid = " + x.purchaseid + " and skuautoid = " + y.skuautoid + " and coid =" + CoID;
+                            var purdetail = CoreDBconn.Query<PurchaseDetail>(wheresql).AsList();
+                            if(purdetail.Count == 0)
+                            {
+                                result.s = -1;
+                                result.d = "收料单明细资料异常";
+                                return result;
+                            }
+                            uptsql = @"update purchasedetail set ";
+                            if(decimal.Parse(purdetail[0].recqty) + decimal.Parse(y.recqty) > decimal.Parse(purdetail[0].purqty))
+                            {
+                                uptsql = uptsql + "stockqty = stockqty + @Qty,detailstatus = 2";
+                            }
+                            else
+                            {
+                                uptsql = uptsql + "stockqty = stockqty + @Qty";
+                            }
+                            uptsql = uptsql + " where skuid = @Skuid and warehouseid = @Whid and coid = @Coid";
+                            var argst = new {Skuid = y.skuid,Whid = x.warehouseid,Qty = y.recqty,Coid = CoID};
+                            count = CoreDBconn.Execute(uptsql,argst,TransCore);
+                            if(count < 0)
+                            {
+                                result.s = -3003;
+                                return result;
+                            }
+                        }
+                    }
+                    //更新采购单资料
+                    if(x.purchaseid > 0)
+                    {
+                        wheresql = "select count(*) from purchasedetail purchaseid = " + x.purchaseid + " and coid =" + CoID + " and detailstatus <> 2";
+                        int i = CoreDBconn.QueryFirst<int>(wheresql);
+                        if(i == 0)
+                        {
+                            uptsql = @"update purchase set status = 2 where id =" + x.purchaseid;
+                            count = CoreDBconn.Execute(uptsql,TransCore);
+                            if(count < 0)
+                            {
+                                result.s = -3003;
+                                return result;
+                            }
+                        }
+                        
+                    }
+                }
+                string uptsqln = @"update purchasereceive set status = 1 where id in @RecID and coid = @Coid" ;
+                int t = CoreDBconn.Execute(uptsqln,p,TransCore);
+                if(t < 0)
+                {
+                    result.s = -3003;
                     return result;
                 }
-                
-                // var p = new DynamicParameters();
-                // p.Add("@PurID", PuridList);
-                // p.Add("@Coid", CoID);
-                // string wheresql = @"select count(*) from purchase where id in @PurID and coid = @Coid and status <> 0" ;
-                // int u = CoreDBconn.QueryFirst<int>(wheresql,p);
-                // if(u > 0)
-                // {
-                //     result.s = -1;
-                //     result.d = "未审核状态的采购单才可执行审核操作!";
-                // }
-                // else
-                // {
-                //     string delsql = @"update purchase set status = 1 where id in @PurID and coid = @Coid";
-                //     int count = CoreDBconn.Execute(delsql, p, TransCore);
-                //     if (count < 0)
-                //     {
-                //         result.s = -3003;
-                //     }
-                //     else
-                //     {
-                //         delsql = @"update purchasedetail set detailstatus = 1 where purchaseid in @PurID and coid = @Coid";
-                //         count = CoreDBconn.Execute(delsql, p, TransCore);
-                //         if (count < 0)
-                //         {
-                //             result.s = -3003;
-                //         }
-                //     }
-                //     if(result.s == 1)
-                //     {
-                //         TransCore.Commit();
-                //     }
-                // }
+                TransCore.Commit();
             }
             catch (Exception e)
             {
+                TransCore.Rollback();
+                TransCore.Dispose();
                 result.s = -1;
                 result.d = e.Message;
             }
             finally
             {
                 TransCore.Dispose();
-                CoreDBconn.Close();
+                CoreDBconn.Dispose();
             }
             return result;
         }

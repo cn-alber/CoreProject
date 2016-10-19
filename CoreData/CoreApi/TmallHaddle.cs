@@ -32,6 +32,27 @@ namespace CoreDate.CoreApi
                 Tmparam.Remove(rmkey);
             }        
         }
+        
+        private static void removeEmptyParam(){
+            IEnumerator<KeyValuePair<string, string>> dem = Tmparam.GetEnumerator();
+            List<string> rmlist = new List<string>();
+            while (dem.MoveNext())
+            {
+                string key = dem.Current.Key;
+                string value = dem.Current.Value;
+                if (string.IsNullOrEmpty(value))
+                {
+                     rmlist.Add(key); 
+                     //Tmparam.Remove(key);               
+                }
+            }
+            foreach(var rmkey in rmlist){
+                Tmparam.Remove(rmkey);
+            }  
+
+        }
+
+
 
         public static DataResult GetToken(string url, string grant_type, string code, string redirect_uri, string client_id, string client_secret){
             var result = new DataResult(1,null);            
@@ -171,16 +192,19 @@ namespace CoreDate.CoreApi
             try{                                        
                 Tmparam.Add("method", "taobao.logistics.online.send");
                 Tmparam.Add("session", token);
-                Tmparam.Add("sub_tid",sub_tid);
                 Tmparam.Add("tid", tid);
-                Tmparam.Add("is_split", is_split);
-                Tmparam.Add("out_sid",out_sid);
                 Tmparam.Add("company_code", company_code);
+
+                Tmparam.Add("sub_tid",sub_tid);            
+                Tmparam.Add("is_split", is_split);
+                Tmparam.Add("out_sid",out_sid);                
                 Tmparam.Add("sender_id",sender_id);
                 Tmparam.Add("cancel_id",cancel_id);
                 Tmparam.Add("feature",feature);
                 Tmparam.Add("seller_ip",seller_ip);
 
+                
+                removeEmptyParam();
                 string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
