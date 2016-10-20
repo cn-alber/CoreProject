@@ -65,7 +65,7 @@ namespace CoreWebApi.Cache.Redis
         private readonly IDataSerializer<AuthenticationTicket> _ticketSerializer = TicketSerializer.Default;
         public Task Set(string key, AuthenticationTicket value, TimeSpan expiresIn)
         {
-            string vv = "";
+            // string vv = "";
             return Cache.StringSetAsync(key, _ticketSerializer.Serialize(value), expiresIn);
             // return Cache.KeyRestoreAsync(key, _ticketSerializer.Serialize(value), expiresIn);
         }
