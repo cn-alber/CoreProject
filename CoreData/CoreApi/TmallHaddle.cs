@@ -667,7 +667,7 @@ namespace CoreDate.CoreApi
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
-                    result.d = res;
+                    result.d = res.rp_returngoods_refuse_response;
                 }            
             }catch(Exception ex){                
                 result.s = -1;
@@ -722,7 +722,7 @@ namespace CoreDate.CoreApi
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
-                    result.d = res.sku;
+                    result.d = res;
                 }            
             }catch(Exception ex){                
                 result.s = -1;
@@ -748,6 +748,7 @@ namespace CoreDate.CoreApi
                 Tmparam.Add("method", "taobao.item.sku.get");
                 Tmparam.Add("session", token);
                 Tmparam.Add("fields", fields);
+                Tmparam.Add("sku_id", sku_id);
                 Tmparam.Add("num_iid", num_iid);
                 Tmparam.Add("nick", nick);
                     
@@ -761,7 +762,7 @@ namespace CoreDate.CoreApi
                     result.d ="Sku ID: "+sku_id+" 信息获取失败 code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 
                 }else{
-                    result.d =res.sku;
+                    result.d =res.item_sku_get_response.sku;
                 }                                                                      
             }catch(Exception ex){                
                 result.s = -1;
@@ -811,7 +812,7 @@ namespace CoreDate.CoreApi
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
-                    result.d = res.sku;
+                    result.d = res.item_sku_update_response.sku;
                 }            
             }catch(Exception ex){                
                 result.s = -1;
@@ -846,7 +847,7 @@ namespace CoreDate.CoreApi
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
-                    result.d = res.skus;
+                    result.d = res.item_skus_get_response.skus;
                 }            
             }catch(Exception ex){                
                 result.s = -1;
@@ -887,7 +888,7 @@ namespace CoreDate.CoreApi
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
-                    result.d = res.sku;
+                    result.d = res.item_sku_delete_response.sku;
                 }            
             }catch(Exception ex){                
                 result.s = -1;

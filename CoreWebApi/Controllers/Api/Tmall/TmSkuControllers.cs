@@ -1,11 +1,14 @@
+using System;
 using CoreDate.CoreApi;
 using CoreModels;
 using CoreModels.XyApi.Tmall;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
 namespace CoreWebApi.Api.Tmall{    
     //天猫发货
+    [AllowAnonymous]
     public class TmSkuControllers : ControllBase
     {
         public static string SKU_GET = "sku_id ,iid,num_iid ,properties ,quantity ,price,created ,modified ,status,extra_id,memo,properties_name,sku_spec_id,with_hold_quantity	,sku_delivery_time,change_prop,outer_id ,barcode";
@@ -15,6 +18,7 @@ namespace CoreWebApi.Api.Tmall{
         public ResponseResult add([FromBodyAttribute]JObject obj){
             var m = new DataResult(1,null);
             var sku = Newtonsoft.Json.JsonConvert.DeserializeObject<skuAddRequest>(obj.ToString());
+            
             if(string.IsNullOrEmpty(sku.token)){
                 m.s = -5000;
             }else if(string.IsNullOrEmpty(sku.num_iid)){
@@ -55,14 +59,22 @@ namespace CoreWebApi.Api.Tmall{
         #region
         [HttpPostAttribute("/core/Api/TmSku/Update")]
         public ResponseResult Update([FromBodyAttribute]JObject obj){
-            var m = new DataResult(1,null);
+            var m = new DataResult(1,null);            
             var sku = Newtonsoft.Json.JsonConvert.DeserializeObject<skuUpdateRequest>(obj.ToString());
+            // sku.token = "6200e00ceg17e711799e3192f113658cf22b6a4361815a72074082786";
+            // sku.num_iid = "2100713359442";
+            // sku.properties = "21684:6536025";
+            // sku.quantity ="100";
+            // sku.price = "100";
+
             if(string.IsNullOrEmpty(sku.token)){
                 m.s = -5000;
             }else if(string.IsNullOrEmpty(sku.num_iid)){
                 m.s = -5045;
             }else if(string.IsNullOrEmpty(sku.properties)){
                 m.s = -5046;
+            }else if(string.IsNullOrEmpty(sku.price)){
+                m.s = -5042;
             }else{
                 m = TmallHaddle.itemSkuUpdate(sku);
             }
@@ -81,7 +93,10 @@ namespace CoreWebApi.Api.Tmall{
                 m.s = -5000;
             }else if(string.IsNullOrEmpty(num_iids)){
                 m.s = -5047;
+            }else{
+                m = TmallHaddle.itemSkusGet( token, fields, num_iids);
             }
+
             return CoreResult.NewResponse(m.s, m.d, "Api");
         }
         #endregion
