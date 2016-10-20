@@ -1,0 +1,211 @@
+{
+    "s": 1,
+    "d": [
+        {
+            "ID": 47,
+            "Type": "商品类目",
+            "KindName": "男装",
+            "FullName": "商品类目 => 男装",
+            "ParentID": 0,
+            "CoID": 1,
+            "Creator": "",
+            "CreateDate": "2016/10/17 14:39:03",
+            "Children": [
+                {
+                    "ID": 62,
+                    "Type": "商品类目",
+                    "KindName": "裤装",
+                    "FullName": "商品类目 => 1 => 裤装",
+                    "ParentID": 47,
+                    "CoID": 1,
+                    "Creator": "",
+                    "CreateDate": "2016/10/17 14:39:03",
+                    "Children": [
+                        {
+                            "ID": 74,
+                            "Type": "商品类目",
+                            "KindName": "123",
+                            "FullName": "商品类目 => 1 => 裤装=>123",
+                            "ParentID": 62,
+                            "CoID": 1,
+                            "Creator": "",
+                            "CreateDate": "2016/10/17 14:39:03",
+                            "Children": [
+                                
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "ID": 72,
+                    "Type": "商品类目",
+                    "KindName": "夹克",
+                    "FullName": "商品类目 => 男装=>夹克",
+                    "ParentID": 47,
+                    "CoID": 1,
+                    "Creator": "",
+                    "CreateDate": "2016/10/17 14:39:03",
+                    "Children": [
+                        
+                    ]
+                }
+            ]
+        },
+        {
+            "ID": 73,
+            "Type": "商品类目",
+            "KindName": "女装",
+            "FullName": "商品类目=>女装",
+            "ParentID": 0,
+            "CoID": 1,
+            "Creator": "",
+            "CreateDate": "2016/10/17 14:39:03",
+            "Children": [
+                
+            ]
+        },
+        {
+            "ID": 85,
+            "Type": "商品类目",
+            "KindName": "ceshi3",
+            "FullName": "商品类目=>ceshi3",
+            "ParentID": 0,
+            "CoID": 1,
+            "Creator": "",
+            "CreateDate": "2016/10/17 14:39:03",
+            "Children": [
+                
+            ]
+        },
+        {
+            "ID": 86,
+            "Type": "商品类目",
+            "KindName": "ceshi6",
+            "FullName": "商品类目=>ceshi6",
+            "ParentID": 0,
+            "CoID": 1,
+            "Creator": "",
+            "CreateDate": "2016/10/17 14:39:03",
+            "Children": [
+                
+            ]
+        },
+        {
+            "ID": 87,
+            "Type": "商品类目",
+            "KindName": "cestefff",
+            "FullName": "商品类目=>cestefff",
+            "ParentID": 0,
+            "CoID": 1,
+            "Creator": "",
+            "CreateDate": "2016/10/17 14:39:03",
+            "Children": [
+                
+            ]
+        },
+        {
+            "ID": 88,
+            "Type": "商品类目",
+            "KindName": "fffff",
+            "FullName": "商品类目=>fffff",
+            "ParentID": 0,
+            "CoID": 1,
+            "Creator": "",
+            "CreateDate": "2016/10/17 14:39:03",
+            "Children": [
+                {
+                    "ID": 98,
+                    "Type": "商品类目",
+                    "KindName": "rerfsfdsfdsf",
+                    "FullName": "商品类目 => 男装=>rerfsfdsfdsf",
+                    "ParentID": 88,
+                    "CoID": 1,
+                    "Creator": "",
+                    "CreateDate": "2016/10/17 14:39:03",
+                    "Children": [
+                        
+                    ]
+                }
+            ]
+        },
+        {
+            "ID": 89,
+            "Type": "商品类目",
+            "KindName": "测试111",
+            "FullName": "商品类目=>测试111",
+            "ParentID": 0,
+            "CoID": 1,
+            "Creator": "",
+            "CreateDate": "2016/10/17 14:39:03",
+            "Children": [
+                
+            ]
+        },
+        {
+            "ID": 90,
+            "Type": "商品类目",
+            "KindName": "铁素体222",
+            "FullName": "商品类目=>铁素体222",
+            "ParentID": 0,
+            "CoID": 1,
+            "Creator": "",
+            "CreateDate": "2016/10/17 14:39:03",
+            "Children": [
+                
+            ]
+        },
+        {
+            "ID": 91,
+            "Type": "商品类目",
+            "KindName": "点的说法",
+            "FullName": "商品类目=>点的说法",
+            "ParentID": 0,
+            "CoID": 1,
+            "Creator": "",
+            "CreateDate": "2016/10/17 14:39:03",
+            "Children": [
+                
+            ]
+        },
+        {
+            "ID": 92,
+            "Type": "商品类目",
+            "KindName": "特萨法",
+            "FullName": "商品类目=>特萨法",
+            "ParentID": 0,
+            "CoID": 1,
+            "Creator": "",
+            "CreateDate": "2016/10/17 14:39:03",
+            "Children": [
+                
+            ]
+        },
+        {
+            "ID": 93,
+            "Type": "商品类目",
+            "KindName": "点点点点",
+            "FullName": "商品类目=>点点点点",
+            "ParentID": 0,
+            "CoID": 1,
+            "Creator": "",
+            "CreateDate": "2016/10/17 14:39:03",
+            "Children": [
+                
+            ]
+        },
+        {
+            "ID": 97,
+            "Type": "商品类目",
+            "KindName": "sssssssddddd",
+            "FullName": "商品类目=>点点点点=>sssssssddddd",
+            "ParentID": 0,
+            "CoID": 1,
+            "Creator": "",
+            "CreateDate": "2016/10/17 14:39:03",
+            "Children": [
+                
+            ]
+        }
+    ],
+    "m": ""
+}

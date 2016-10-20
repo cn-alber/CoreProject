@@ -50,12 +50,11 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/ScoCompany/ScoCompanyEnable")]
         public ResponseResult CompanyEnable([FromBodyAttribute]JObject co)
         {   
-            Dictionary<int,string> IDsDic = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<int,string>>(co["IDsDic"].ToString());
+            List<int> id = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["IDList"].ToString());
             string Company = co["Company"].ToString();
             string UserName = GetUname(); 
             bool Enable = co["Enable"].ToString().ToUpper()=="TRUE"?true:false;
-            
-            var data = ScoCompanyHaddle.UpdateScoComEnable(IDsDic,Company,UserName,Enable);
+            var data = ScoCompanyHaddle.UpdateScoComEnable(id,Company,UserName,Enable);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -77,23 +76,30 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-        [HttpPostAttribute("/Core/ScoCompany/UpdateScoCompany")]
-        public ResponseResult UpdateScoCompany([FromBodyAttribute]JObject co)
+        [HttpPostAttribute("/Core/ScoCompany/InsetScoCompany")]
+        public ResponseResult InsetScoCompany([FromBodyAttribute]JObject co)
         {   
-            string modifyFlag = co["ModifyFlag"].ToString();
             string CoID = GetCoid();
             var com = Newtonsoft.Json.JsonConvert.DeserializeObject<ScoCompanySingle>(co["Com"].ToString());
             string UserName = GetUname(); 
             string Company = co["Company"].ToString();
-            if(modifyFlag == "new")
+            var res = ScoCompanyHaddle.IsScoComExist(com.sconame,int.Parse(CoID));
+            if (bool.Parse(res.d.ToString()) == true)
             {
-                var res = ScoCompanyHaddle.IsScoComExist(com.sconame,int.Parse(CoID));
-                if (bool.Parse(res.d.ToString()) == true)
-                {
-                    return CoreResult.NewResponse(-1, "客户已存在,不允许新增", "General"); 
-                }
+                return CoreResult.NewResponse(-1, "客户已存在,不允许新增", "General"); 
             }
-            var data = ScoCompanyHaddle.SaveScoCompany(modifyFlag,com,UserName,Company,int.Parse(CoID));
+            var data = ScoCompanyHaddle.InsertScoCompany(int.Parse(CoID),com,UserName,Company);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/ScoCompany/UpdateScoCompany")]
+        public ResponseResult UpdateScoCompany([FromBodyAttribute]JObject co)
+        {   
+            string CoID = GetCoid();
+            var com = Newtonsoft.Json.JsonConvert.DeserializeObject<ScoCompanySingle>(co["Com"].ToString());
+            string UserName = GetUname(); 
+            string Company = co["Company"].ToString();
+            var data = ScoCompanyHaddle.UpdateScoCompany(int.Parse(CoID),com,UserName,Company);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     }

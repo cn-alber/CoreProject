@@ -1,8 +1,5 @@
 {        
-"IDsDic":  {
-        "6": "test0006",
-        "132": "测试1010"
-    },     
+"ID":  133,
 "Company":  "携云科技",     
-"Enable": "false"
+"Enable": "TRUE"
 }

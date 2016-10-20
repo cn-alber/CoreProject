@@ -1,0 +1,24 @@
+{
+    "s": 1,
+    "d": [
+        {
+            "id": 133,
+            "parentid": 0,
+            "warehousename": "南极云商",
+            "type": 0,
+            "contract": "耿东明",
+            "phone": "13322255666",
+            "logistics": "江苏省",
+            "city": "苏州市",
+            "district": "常熟市",
+            "address": "莫城管理区苏常公路戴家滨桥南携云华东仓",
+            "enable": true,
+            "creator": "管理员",
+            "createdate": "2016-10-17T17:01:19",
+            "modifier": "管理员",
+            "modifydate": "2016-10-18T10:05:10",
+            "coid": 1
+        }
+    ],
+    "m": ""
+}

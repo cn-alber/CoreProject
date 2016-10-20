@@ -3,48 +3,54 @@
 function说明
 1.InsertWarehouse() //新增仓库基本资料
 路由:http://localhost:5000/Core/Warehouse/InsertWarehouse
-input:Warehouse     Warehouse 仓库基本资料
-      Company       string    登录者公司名称(exp:携云科技)
+input:Warehouse    
+        warehousename0  string  大仓仓库名称(必须有值)
+        warehousename1  string  销售主仓库(零数)名称(必须有值)
+        warehousename2  string  销售主仓库(整数)名称
+        warehousename3  string  销售退货仓库名称(必须有值)
+        warehousename4  string  进货仓库名称(必须有值)
+        warehousename5  string  次品仓库名称(必须有值)
+        contract        string  联络人
+        phone           string  电话
+        logistics       string  省(必须有值)
+        city            string  市(必须有值)
+        district        string  区(必须有值)
+        address         string  详细地址(必须有值)
+      Company           string  登录者公司名称(exp:携云科技)(必须有值)
 output: s=1成功 else 错误代码
 参考:input jason 文件:InsertWarehouse_input.json
 参考:output jason 文件:InsertWarehouse_output.json
 
 2.UpdateWarehouse() //更新仓库基本资料
 路由:http://localhost:5000/Core/Warehouse/UpdateWarehouse
-input:Warehouse     Warehouse 仓库基本资料
+input:Warehouse    
+        id              int     主仓库id
+        warehousename0  string  大仓仓库名称
+        warehousename1  string  销售主仓库(零数)名称
+        warehousename2  string  销售主仓库(整数)名称
+        warehousename3  string  销售退货仓库名称
+        warehousename4  string  进货仓库名称
+        warehousename5  string  次品仓库名称
+        contract        string  联络人
+        phone           string  电话
+        logistics       string  省
+        city            string  市
+        district        string  区
+        address         string  详细地址
       Company       string    登录者公司名称(exp:携云科技)
 output: s=1成功 else 错误代码
 参考:input jason 文件:UpdateWarehouse_input.json
 参考:output jason 文件:UpdateWarehouse_output.json
 
-3.GetWarehouseSingle() //查询单笔warehouse资料
-  路由:http://localhost:5000/Core/Warehouse/GetWarehouseSingle
-input：ID  string  id
-OutPut: 单笔warehouse资料
-参考:output jason 文件:GetWarehouseSingle_output.json
-
-4.IsWarehouseEnable() //查询单笔warehouse资料
-  路由:http://localhost:5000/Core/Warehouse/IsWarehouseEnable
-input：warehouseid   string 仓库代号
-OutPut: true 可停用/false 不可停用
-参考:output jason 文件:IsWarehouseEnable_output.json
-
-5.GetWarehouseList() //查询table warehouse 资料
+3.GetWarehouseList() //查询table warehouse 资料
   路由:http://localhost:5000/Core/Warehouse/GetWarehouseList
-input：     Enable         string            启用状态(all/false/true) default all
-            Filter         string           仓库名称匹配值(模糊查询)default null
-            SortField      string           排序字段 default id
-            SortDirection  string           排序方式(ASC|DESC) default DESC
-            PageIndex      string           资料页数(ex.第一页就给1) default 1
-            NumPerPage     string           每页显示资料笔数 default 20
-OutPut:     Datacnt        int              资料总笔数
-            Pagecnt        int              总页数
-            Warehouse      List<Warehouse>  Warehouse 资料
+input：    None
+OutPut:    Warehouse
 参考:output jason 文件:GetWarehouseList_output.json
 
-6.UpdateWarehouseEnable()//批次更新公仓库资料的状态
+4.UpdateWarehouseEnable()//批次更新公仓库资料的状态
 路由:http://localhost:5000/Core/Warehouse/UpdateWarehouseEnable
-input： IDsDic          Dictionary<int,string>      <Key:仓库ID,Value:仓库名称>
+input： id              int                         主仓库ID
         Company         string                      登录者公司名称(exp:携云科技)
         Enable          string                      指定状态true|false（启用，停用）
 OutPut: 成功：

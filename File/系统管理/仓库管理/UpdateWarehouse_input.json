@@ -1,13 +1,14 @@
-{       
-"Warehouse": {
-        "id": 132,
-        "warehouseid":120,
-        "warehousename": "测试1010",
-        "enable": false,
-        "parentid": 0,
-        "type": 0,
-        "creator": "",
-        "createdate": "2015-10-10"
+{
+    "Warehouse": {
+        "id":133,
+        "warehousename0": "南极云商",
+        "warehousename1": "南极云商常熟配送1仓",
+        "warehousename2": "南极云商常熟配送2仓",
+        "warehousename3": "南极云商常熟销退1仓",
+        "warehousename4": "南极云商常熟进货1仓",
+        "warehousename5": "南极云商常熟次品1仓",
+        "contract": "耿东明",
+        "phone": "13322255666"
     },
-"Company":"携云科技"
+   "Company":"携云科技"
 }

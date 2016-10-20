@@ -66,14 +66,14 @@ namespace CoreData.CoreCore
         ///<summary>
         ///公司启用停用设置
         ///</summary>
-        public static DataResult UpdateScoComEnable(Dictionary<int,string> IDsDic,string Company,string UserName,bool Enable)
+        public static DataResult UpdateScoComEnable(List<int> id,string Company,string UserName,bool Enable)
         {
             var result = new DataResult(1,null);   
             string contents = string.Empty;
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{
                     string uptsql = @"update supplycompany set enable = @Enable where id in @ID";
-                    var args = new {ID = IDsDic.Keys.AsList(),Enable = Enable};          
+                    var args = new {ID = id,Enable = Enable};          
                     int count = conn.Execute(uptsql,args);
                     if(count < 0)
                     {
@@ -83,13 +83,13 @@ namespace CoreData.CoreCore
                     {
                         if(Enable)
                         {
-                            contents = "客户状态启用：";
+                            contents = "客户状态启用";
                         }
                         else
                         {
-                            contents = "客户状态停用：";
+                            contents = "客户状态停用";
                         }
-                        contents+= string.Join(",", IDsDic.Values.AsList().ToArray());
+                        // contents+= string.Join(",", IDsDic.Values.AsList().ToArray());
                         CoreUser.LogComm.InsertUserLog("修改客户资料", "supplycompany", contents, UserName, Company, DateTime.Now);
                     }
                     result.d = contents;           
@@ -166,25 +166,8 @@ namespace CoreData.CoreCore
             return  result;
         }
         ///<summary>
-        ///客户基本资料保存
+        ///客户基本资料新增
         ///</summary>
-        public static DataResult SaveScoCompany(string modifyFlag,ScoCompanySingle com,string UserName,string Company,int CoID)
-        {
-            var result = new DataResult(1,null);        
-            if (modifyFlag == "new")
-            {
-                var iresult = InsertScoCompany(CoID,com,UserName,Company);
-                result.s = iresult.s;
-                result.d = iresult.d;
-            }
-            else
-            {
-                var mresult = UpdateScoCompany(CoID,com,UserName,Company);
-                result.s = mresult.s;
-                result.d = mresult.d;
-            }
-            return result;
-        }      
         public static DataResult InsertScoCompany(int CoID,ScoCompanySingle com,string UserName,string Company)
         {
             var result = new DataResult(1,null);   
@@ -239,6 +222,9 @@ namespace CoreData.CoreCore
             } 
             return  result;
         }
+        ///<summary>
+        ///客户基本资料更新
+        ///</summary>
         public static DataResult UpdateScoCompany(int CoID,ScoCompanySingle com,string UserName,string Company)
         {
             var result = new DataResult(1,null);  
@@ -247,6 +233,8 @@ namespace CoreData.CoreCore
                 try{
                     string wheresql = "select id,sconame,scosimple,enable,scocode,address,country,contactor,tel,phone,fax,url,email,typelist,bank,bankid,taxid,remark from supplycompany where id =" + com.id;
                     var u = conn.Query<ScoCompanySingle>(wheresql).AsList();
+                    var p = new DynamicParameters();
+                    string uptsql = @"update supplycompany set ";
                     if(com.sconame != u[0].sconame)
                     {
                         contents = contents + "客户名称" + ":" +u[0].sconame + "=>" + com.sconame + ";";
@@ -315,13 +303,104 @@ namespace CoreData.CoreCore
                     {
                         contents = contents + "备注" + ":" +u[0].remark + "=>" + com.remark + ";";
                     }
-                    string uptsql = @"update supplycompany set sconame = @Sconame,enable = @Enable,scosimple = @Scosimple,scocode=@Scocode,address=@Address,country=@Country,
-                                        contactor=@Contactor,tel=@Tel,phone=@Phone,fax = @Fax,url = @Url,email = @Email,typelist = @Typelist,bank = @Bank,bankid = @Bankid,
-                                        taxid = @Taxid,remark = @Remark where id = @ID";
-                    var args = new {Sconame = com.sconame,Scosimple = com.scosimple,Enable=com.enable,Scocode = com.scocode,Address = com.address,Country = com.country,
-                                    Contactor = com.contactor,Tel = com.tel,Phone = com.phone,Fax = com.fax,Url = com.url,Email = com.email,Typelist = com.typelist,
-                                    Bank = com.bank,Bankid = com.bankid,Taxid = com.taxid,Remark = com.remark,ID = com.id};
-                    int count = conn.Execute(uptsql,args);
+                    if(com.sconame != null)
+                    {
+                        uptsql = uptsql + "sconame = @Sconame,";
+                        p.Add("@Sconame", com.sconame);
+                    }
+                    // if(com.enable != u[0].enable)
+                    // {
+                    //     uptsql = uptsql + "enable = @Enable,";
+                    //     p.Add("@Enable", com.enable);
+                    // }
+                    if(com.scosimple != null)
+                    {
+                        uptsql = uptsql + "scosimple = @Scosimple,";
+                        p.Add("@Scosimple", com.scosimple);
+                    }
+                    if(com.scocode != null)
+                    {
+                        uptsql = uptsql + "scocode = @Scocode,";
+                        p.Add("@Scocode", com.scocode);
+                    }
+                    if(com.address != null)
+                    {
+                        uptsql = uptsql + "address = @Address,";
+                        p.Add("@Address", com.address);
+                    }
+                    if(com.country != null)
+                    {
+                        uptsql = uptsql + "country = @Country,";
+                        p.Add("@Country", com.country);
+                    }
+                    if(com.contactor != null)
+                    {
+                        uptsql = uptsql + "contactor = @Contactor,";
+                        p.Add("@Contactor", com.contactor);
+                    }
+                    if(com.tel != null)
+                    {
+                        uptsql = uptsql + "tel = @Tel,";
+                        p.Add("@Tel", com.tel);
+                    }
+                    if(com.phone != null)
+                    {
+                        uptsql = uptsql + "phone = @Phone,";
+                        p.Add("@Phone", com.phone);
+                    }
+                    if(com.fax != null)
+                    {
+                        uptsql = uptsql + "fax = @Fax,";
+                        p.Add("@Fax", com.fax);
+                    }
+                    if(com.url != null)
+                    {
+                        uptsql = uptsql + "url = @Url,";
+                        p.Add("@Url", com.url);
+                    }
+                    if(com.bank != null)
+                    {
+                        uptsql = uptsql + "bank = @Bank,";
+                        p.Add("@Bank", com.bank);
+                    }
+                    if(com.email != null)
+                    {
+                        uptsql = uptsql + "email = @Email,";
+                        p.Add("@Email", com.email);
+                    }
+                    if(com.typelist != null)
+                    {
+                        uptsql = uptsql + "typelist = @Typelist,";
+                        p.Add("@Typelist", com.typelist);
+                    }
+                    if(com.bankid != null)
+                    {
+                        uptsql = uptsql + "bankid = @Bankid,";
+                        p.Add("@Bankid", com.bankid);
+                    }
+                    if(com.taxid != null)
+                    {
+                        uptsql = uptsql + "taxid = @Taxid,";
+                        p.Add("@Taxid", com.taxid);
+                    }
+                    if(com.remark != null)
+                    {
+                        uptsql = uptsql + "remark = @Remark,";
+                        p.Add("@Remark", com.remark);
+                    }
+                    if(uptsql.Substring(uptsql.Length - 1, 1) == ",")
+                    {
+                        uptsql = uptsql.Substring(0,uptsql.Length - 1);
+                        uptsql = uptsql + " where id = @ID";
+                        p.Add("@ID",com.id);
+                    }
+                    else
+                    {
+                        result.s = 1;
+                        result.d = null;
+                        return result;
+                    }
+                    int count = conn.Execute(uptsql,p);
                     if(count < 0)
                     {
                         result.s= -3003;

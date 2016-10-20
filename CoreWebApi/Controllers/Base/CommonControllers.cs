@@ -135,12 +135,32 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General");
         }
         #endregion
-        #region 获取仓库列表
-        [HttpGetAttribute("/Core/Common/GetWarehouseAll")]
-        public ResponseResult GetWarehouseAll()
+        #region 获取主仓库列表
+        [HttpGetAttribute("/Core/Common/GetParentWarehouseList")]
+        public ResponseResult GetParentWarehouseList()
         {   
             int CoID = int.Parse(GetCoid());
-            var data = WarehouseHaddle.GetWarehouseAll(CoID);
+            var data = WarehouseHaddle.GetParentWarehouseList(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+        #endregion
+        #region 获取子仓库列表
+        [HttpGetAttribute("/Core/Common/GetChildWarehouseList")]
+        public ResponseResult GetChildWarehouseList(string ID)
+        {   
+            var data = new DataResult(1,null);  
+            int CoID = int.Parse(GetCoid());
+            int id,x;
+            if (int.TryParse(ID, out x))
+            {
+                id = int.Parse(ID);
+                data = WarehouseHaddle.GetChildWarehouseList(CoID,id);
+            }
+            else
+            {
+                data.s = -1;
+                data.d = "参数无效!";
+            }
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
         #endregion

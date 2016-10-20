@@ -712,12 +712,8 @@ namespace CoreData.CoreUser
         #region 删除用户
         public static DataResult DeleteUserAccount(List<int> IDLst, int IsDelete, int CoID, string UserName)
         {
-            var result = new DataResult(1, null);           
-            foreach (var u in IDLst)
-            {
-                var sname = "user" + CoID + u;
-                CacheBase.Remove(sname);
-            }
+            var result = new DataResult(1, null);
+
             var UserDBconn = new MySqlConnection(DbBase.UserConnectString);
             UserDBconn.Open();
             var TransUser = UserDBconn.BeginTransaction();
@@ -743,6 +739,11 @@ namespace CoreData.CoreUser
                 int count = DbBase.UserDB.Execute(sql, p, TransUser);
                 if (count > 0)
                 {
+                    foreach (var u in IDLst)
+                    {
+                        var sname = "user" + CoID + u;
+                        CacheBase.Remove(sname);
+                    }
                     string contents = "删除用户=>" + string.Join(",", IDLst);
                     LogComm.InsertUserLogTran(TransUser, "删除用户资料", "User", contents, UserName, CoID.ToString(), DateTime.Now);
                 }

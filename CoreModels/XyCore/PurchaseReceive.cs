@@ -17,8 +17,11 @@ namespace CoreModels.XyCore
         public int status{get;set;}
         public int finstatus{get;set;}
         public string creator{get;set;}
+        public DateTime createdate{get;set;}
+        public string modifier{get;set;}
         public DateTime modifydate{get;set;}
         public DateTime finconfirmdate{get;set;}
+        public int coid{get;set;}
         public string receivedate
         {
             get { return _receivedate; }
@@ -41,6 +44,11 @@ namespace CoreModels.XyCore
         public string remark{get;set;}
         public string goodscode{get;set;}
         public string supplynum{get;set;}
+        public int coid{get;set;}
+        public string creator{get;set;}
+        public string modifier{get;set;}
+        public DateTime createdate{get;set;}
+        public DateTime modifydate{get;set;}
     }
     public class PurchaseReceiveParm
     {
@@ -178,7 +186,7 @@ namespace CoreModels.XyCore
     {
         public int Datacnt {get;set;}//总资料笔数
         public decimal Pagecnt{get;set;}//总页数
-        public bool enable {get;set;} //明细是否允许修改
+        public int status {get;set;} //收料单状态
         public List<PurchaseRecDetail> PurRecDetail {get;set;}//收料单明细资料List
     }
     public class PurchaseRecInitData

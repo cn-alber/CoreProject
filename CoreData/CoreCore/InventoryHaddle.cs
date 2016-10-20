@@ -24,6 +24,138 @@ namespace CoreData.CoreCore
                     StringBuilder querycount = new StringBuilder();
                     StringBuilder querysql = new StringBuilder();
                     var p = new DynamicParameters();
+                    string countsql = @"SELECT
+                                            GoodsCode
+                                        FROM
+                                            inventory
+                                        WHERE
+                                            CoID = @CoID";
+                    string sql = @"SELECT
+                                inventory.GoodsCode,
+                                inventory.SkuID,
+                                inventory.`Name`,
+                                inventory.Norm,
+                                inventory.Pic,
+                                SUM(inventory.StockQty) AS StockQty,
+                                SUM(inventory.LockQty) AS LockQty,
+                                SUM(inventory.PickQty) AS PickQty,
+                                SUM(inventory.WaitInQty) AS WaitInQty,
+                                SUM(inventory.ReturnQty) AS ReturnQty,
+                                SUM(inventory.SafeQty) AS SafeQty,
+                                SUM(inventory.DefectiveQty) AS DefectiveQty,
+                                SUM(inventory.VirtualQty) AS VirtualQty,
+                                SUM(inventory.PurchaseQty) AS PurchaseQty
+                            FROM
+                                inventory
+                            WHERE
+                                CoID = @CoID";
+                    querycount.Append(countsql);
+                    querysql.Append(sql);
+                    p.Add("@CoID", IParam.CoID);
+                    if (!string.IsNullOrEmpty(IParam.GoodsCode))//款式编号
+                    {
+                        querycount.Append(" AND inventory.GoodsCode like @GoodsCode");
+                        querysql.Append(" AND inventory.GoodsCode like @GoodsCode");
+                        p.Add("@GoodsCode", "%" + IParam.GoodsCode + "%");
+                    }
+                    if (!string.IsNullOrEmpty(IParam.SkuID))//商品编号
+                    {
+                        querycount.Append(" AND inventory.SkuID like @SkuID");
+                        querysql.Append(" AND inventory.SkuID like @SkuID");
+                        p.Add("@SkuID", "%" + IParam.SkuID + "%");
+                    }
+                    if (!string.IsNullOrEmpty(IParam.SkuName))//商品名称
+                    {
+                        querycount.Append(" AND inventory.SkuName like @SkuName");
+                        querysql.Append(" AND inventory.SkuName like @SkuName");
+                        p.Add("@SkuName", "%" + IParam.SkuName + "%");
+                    }
+                    if (!string.IsNullOrEmpty(IParam.Norm))//商品名称
+                    {
+                        querycount.Append(" AND inventory.Norm like @Norm");
+                        querysql.Append(" AND inventory.Norm like @Norm");
+                        p.Add("@Norm", "%" + IParam.Norm + "%");
+                    }
+                    if (IParam.StockQtyb < IParam.StockQtye && IParam.StockQtyb > 0)
+                    {
+                        querycount.Append(" AND inventory.StockQty > @StockQtyb AND inventory.StockQty < @StockQtye");
+                        querysql.Append(" AND inventory.StockQty > @StockQtyb AND inventory.StockQty < @StockQtye");
+                        p.Add("@StockQtyb", IParam.StockQtyb);
+                        p.Add("@StockQtye", IParam.StockQtye);
+                    }
+                    if (IParam.Status > 0)//库存状态:0.全部,1.充足,2.预警
+                    {
+                        if (IParam.Status == 1)
+                        {
+                            querycount.Append(" AND inventory.StockQty>=inventory.SafeQty");
+                            querysql.Append(" AND inventory.StockQty>=inventory.SafeQty");
+                        }
+                        else
+                        {
+                            querycount.Append(" AND inventory.StockQty<inventory.SafeQty");
+                            querysql.Append(" AND inventory.StockQty<inventory.SafeQty");
+                        }
+                    } 
+                    #region 分组
+                    string groupsql = @" GROUP BY
+                                inventory.GoodsCode,
+                                inventory.SkuID,
+                                inventory.`Name`,
+                                inventory.Norm,
+                                inventory.Pic";
+                    string querycountsql = (@"SELECT COUNT(A.GoodsCode)
+                                        FROM("+querycount.ToString()+groupsql+") AS A");
+                    querysql.Append(groupsql);
+                    #endregion
+                    //排序
+                    if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
+                    {                    
+                        querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
+                    }
+                    var DataCount = CoreData.DbBase.CoreDB.QueryFirst<int>(querycountsql, p);
+                    if (DataCount < 0)
+                    {
+                        res.s = -3001;
+                    }
+                    else
+                    {
+                        inv.DataCount = DataCount;
+                        decimal pagecnt = Math.Ceiling(decimal.Parse(inv.DataCount.ToString()) / decimal.Parse(IParam.PageSize.ToString()));
+                        inv.PageCount = Convert.ToInt32(pagecnt);
+                        int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
+                        querysql.Append(" LIMIT @ls , @le");
+                        p.Add("@ls", dataindex);
+                        p.Add("@le", IParam.PageSize);
+                        var InvLst = CoreData.DbBase.CoreDB.Query<Inventory>(querysql.ToString(), p).AsList();
+                        inv.InvLst = InvLst;
+                        res.d = inv;
+                    }
+                }
+                catch (Exception e)
+                {
+                    res.s = -1;
+                    res.d = e.Message;
+                }
+                finally
+                {
+                    conn.Dispose();
+                }
+            }
+            return res;
+        }
+        #endregion
+        #region 商品库存查询(分仓)
+        public static DataResult GetInvQueryByWh(InvQueryParam IParam)
+        {
+            var inv = new InventoryData();
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                try
+                {
+                    StringBuilder querycount = new StringBuilder();
+                    StringBuilder querysql = new StringBuilder();
+                    var p = new DynamicParameters();
                     string countsql = @"SELECT count(ID) FROM inventory WHERE CoID = @CoID";
                     string sql = @"SELECT
                                     inventory.ID,
@@ -50,6 +182,12 @@ namespace CoreData.CoreCore
                     querycount.Append(countsql);
                     querysql.Append(sql);
                     p.Add("@CoID", IParam.CoID);
+                    if (!string.IsNullOrEmpty(IParam.GoodsCode))//款式编号
+                    {
+                        querycount.Append(" AND inventory.GoodsCode like @GoodsCode");
+                        querysql.Append(" AND inventory.GoodsCode like @GoodsCode");
+                        p.Add("@GoodsCode", "%" + IParam.GoodsCode + "%");
+                    }
                     if (!string.IsNullOrEmpty(IParam.SkuID))//商品编号
                     {
                         querycount.Append(" AND inventory.SkuID like @SkuID");
@@ -61,6 +199,12 @@ namespace CoreData.CoreCore
                         querycount.Append(" AND inventory.SkuName like @SkuName");
                         querysql.Append(" AND inventory.SkuName like @SkuName");
                         p.Add("@SkuName", "%" + IParam.SkuName + "%");
+                    }
+                    if (!string.IsNullOrEmpty(IParam.Norm))//商品名称
+                    {
+                        querycount.Append(" AND inventory.Norm like @Norm");
+                        querysql.Append(" AND inventory.Norm like @Norm");
+                        p.Add("@Norm", "%" + IParam.Norm + "%");
                     }
                     if (IParam.StockQtyb < IParam.StockQtye && IParam.StockQtyb > 0)
                     {
@@ -75,14 +219,19 @@ namespace CoreData.CoreCore
                         querysql.Append(" AND inventory.WarehouseID = @WarehouseID");
                         p.Add("@WarehouseID", IParam.WarehouseID);
                     }
-                    if (IParam.Status == 1)
+                    if (IParam.Status > 0)//库存状态:0.全部,1.充足,2.预警
                     {
-                        querycount.Append(" AND inventory.StockQty >= inventory.SafeQty");
-                    }
-                    else if (IParam.Status == 2)
-                    {
-                        querycount.Append(" AND inventory.StockQty < inventory.SafeQty");
-                    }
+                        if (IParam.Status == 1)
+                        {
+                            querycount.Append(" AND inventory.StockQty>=inventory.SafeQty");
+                            querysql.Append(" AND inventory.StockQty>=inventory.SafeQty");
+                        }
+                        else
+                        {
+                            querycount.Append(" AND inventory.StockQty<inventory.SafeQty");
+                            querysql.Append(" AND inventory.StockQty<inventory.SafeQty");
+                        }
+                    } 
                     if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
                     {
                         querycount.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);

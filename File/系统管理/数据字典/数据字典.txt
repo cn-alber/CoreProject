@@ -92,6 +92,8 @@ function说明
     InPut:
           IDLst        List<int>      数据字典ID
     OutPut:
-         成功：1.数据字典资料；2.新增操作记录log；3.返回成功信息
+         成功：1.删除数据字典资料；2.新增操作记录log；3.返回成功信息
          失败：返回错误信息
+    参考：input json 文件：DeleteBaseinfo_input.json
+    参考：output json 文件：DeleteBaseinfo_output.json
     

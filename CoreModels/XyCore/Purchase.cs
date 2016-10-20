@@ -17,10 +17,15 @@ namespace CoreModels.XyCore
         public int warehouseid{get;set;}
         public string warehousename{get;set;}
         public int status{get;set;}
-        public int purtype{get;set;}
+        public string purtype{get;set;}
         public string buyyer{get;set;}
         public string remark{get;set;}
         public string taxrate{get;set;}
+        public int coid{get;set;}
+        public string creator{get;set;}
+        public string modifier{get;set;}
+        public DateTime createdate{get;set;}
+        public DateTime modifydate{get;set;}
         public string purchasedate
         {
             get { return _purchasedate; }
@@ -32,6 +37,7 @@ namespace CoreModels.XyCore
         public int id {get;set;}
         public int purchaseid{get;set;}
         public string img{get;set;}
+        public int skuautoid{get;set;}
         public string skuid{get;set;}
         public string skuname{get;set;}
         public string purqty{get;set;}
@@ -39,6 +45,8 @@ namespace CoreModels.XyCore
         public string recqty{get;set;}
         public string price{get;set;}
         public string puramt{get;set;}
+        public string returnqty{get;set;}
+        public int detailstatus{get;set;}
         public string remark{get;set;}
         public string goodscode{get;set;}
         public string supplynum{get;set;}
@@ -48,6 +56,11 @@ namespace CoreModels.XyCore
         public string _recievedate;
         public string norm {get;set;}
         public string packingnum {get;set;}
+        public int coid{get;set;}
+        public string creator{get;set;}
+        public string modifier{get;set;}
+        public DateTime createdate{get;set;}
+        public DateTime modifydate{get;set;}
         public string recievedate
         {
             get { return _recievedate; }
@@ -222,6 +235,11 @@ namespace CoreModels.XyCore
         public string  conclusion {get;set;}
         public string remark {get;set;}
         public int status {get;set;}
+        public int coid{get;set;}
+        public string creator{get;set;}
+        public string modifier{get;set;}
+        public DateTime createdate{get;set;}
+        public DateTime modifydate{get;set;}
         public string recorddate
         {
             get { return _recorddate; }
