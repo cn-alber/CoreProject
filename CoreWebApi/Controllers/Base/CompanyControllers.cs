@@ -74,7 +74,7 @@ namespace CoreWebApi
         public ResponseResult CompanyEnable([FromBodyAttribute]JObject co)
         {   
             List<int> IDsDic = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["IDList"].ToString());
-            string Company = co["Company"].ToString();
+            string Company = "";//co["Company"].ToString();
             string UserName = GetUname(); 
             bool Enable = co["Enable"].ToString().ToUpper()=="TRUE"?true:false;
             
@@ -87,7 +87,7 @@ namespace CoreWebApi
         {   
             var com = Newtonsoft.Json.JsonConvert.DeserializeObject<Company>(co["Com"].ToString());
             string UserName = GetUname(); 
-            string Company = co["Company"].ToString();
+            string Company = "";//co["Company"].ToString();
             var data = CompanyHaddle.UpdateCompany(com,UserName,Company);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -98,7 +98,7 @@ namespace CoreWebApi
             var data = new DataResult(1,null);  
             var com = Newtonsoft.Json.JsonConvert.DeserializeObject<Company>(co["Com"].ToString());
             string UserName = GetUname(); 
-            string Company = co["Company"].ToString();
+            string Company = "";//co["Company"].ToString();
             string account = co["Account"].ToString();
             if(string.IsNullOrEmpty(account))
             {
