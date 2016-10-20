@@ -277,7 +277,7 @@ namespace CoreDate.CoreApi
                 Tmparam.Add("is_split", is_split);
                 Tmparam.Add("out_sid", out_sid);
                 Tmparam.Add("seller_ip", seller_ip);
-
+                removeEmptyParam();
                 string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
@@ -328,7 +328,7 @@ namespace CoreDate.CoreApi
                 Tmparam.Add("feature",feature);
                 Tmparam.Add("seller_ip",seller_ip);
 
-
+                removeEmptyParam();
                 string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
@@ -365,6 +365,7 @@ namespace CoreDate.CoreApi
                 Tmparam.Add("feature",feature);
                 Tmparam.Add("seller_ip",seller_ip);
 
+                removeEmptyParam();
                 string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
@@ -449,6 +450,7 @@ namespace CoreDate.CoreApi
                 Tmparam.Add("r_dist_name", order.r_dist_name);
                 Tmparam.Add("item_json_string", Newtonsoft.Json.JsonConvert.SerializeObject(order.item_json_string));
 
+                removeEmptyParam();
                 string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
@@ -491,6 +493,7 @@ namespace CoreDate.CoreApi
                 Tmparam.Add("page_no", page_no.ToString());
                 Tmparam.Add("page_size", page_size.ToString());
 
+                removeEmptyParam();
                 string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
@@ -535,8 +538,9 @@ namespace CoreDate.CoreApi
                 Tmparam.Add("start_modified", start_modified);
                 Tmparam.Add("end_modified", end_modified);
                 Tmparam.Add("page_no", page_no.ToString());
-                Tmparam.Add("page_size", page_size.ToString());                
+                Tmparam.Add("page_size", page_size.ToString());             
 
+                removeEmptyParam();
                 string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
@@ -580,10 +584,7 @@ namespace CoreDate.CoreApi
                     
                 }else{
                     result.d = res.refund_get_response;
-                } 
-           
-                
-                                 
+                }                                                        
             }catch(Exception ex){                
                 result.s = -1;
                 result.d =  ex.Message;
@@ -614,6 +615,7 @@ namespace CoreDate.CoreApi
                 Tmparam.Add("page_size", page_size.ToString());
                 Tmparam.Add("refund_phase", refund_phase);
         
+                removeEmptyParam();
                 string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
@@ -656,6 +658,7 @@ namespace CoreDate.CoreApi
                 Tmparam.Add("refund_version", refund_version);
                 Tmparam.Add("refuse_reason_id", refuse_reason_id);
 
+                removeEmptyParam();
                 string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
@@ -710,6 +713,7 @@ namespace CoreDate.CoreApi
                 Tmparam.Add("sku_hd_lamp_quantity", sku.sku_hd_lamp_quantity);
                 Tmparam.Add("ignorewarning", sku.ignorewarning);
                 
+                removeEmptyParam();
                 string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
@@ -747,6 +751,7 @@ namespace CoreDate.CoreApi
                 Tmparam.Add("num_iid", num_iid);
                 Tmparam.Add("nick", nick);
                     
+                removeEmptyParam();    
                 string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
@@ -873,6 +878,7 @@ namespace CoreDate.CoreApi
                 Tmparam.Add("lang", sku.lang);
                 Tmparam.Add("ignorewarning", sku.ignorewarning);
                 
+                removeEmptyParam();
                 string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
