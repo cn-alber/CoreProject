@@ -34,5 +34,7 @@ namespace CoreData.Redis
         /// <param name="key"></param>
         /// <returns></returns>
         T Get<T>(string key);
+
+        long Increment(string key);
     }
 }

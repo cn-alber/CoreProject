@@ -24,5 +24,10 @@ namespace CoreData
         {
             return noSql.Get<T>(key);
         }
+
+        public static long Increment(string key)
+        {
+            return noSql.Increment(key);
+        }
     }
 }

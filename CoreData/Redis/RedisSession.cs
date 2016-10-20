@@ -60,5 +60,10 @@ namespace CoreData.Redis
         {
             return Cache.Get<T>(key);
         }
+
+        public long Increment(string key)
+        {
+            return Cache.Increment(key);
+        }
     }
 }

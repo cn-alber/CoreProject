@@ -99,5 +99,10 @@ namespace CoreData.Redis
             }
             return default(T);
         }
+
+        public long Increment(string key)
+        {
+            return Cache.StringIncrement(key);
+        }
     }
 }

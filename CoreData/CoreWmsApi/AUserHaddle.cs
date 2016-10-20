@@ -7,7 +7,6 @@ using CoreModels.WmsApi;
 using Dapper;
 using MySql.Data.MySqlClient;
 using System;
-using System.Text;
 
 namespace CoreData.CoreWmsApi
 {

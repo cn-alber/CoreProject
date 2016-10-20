@@ -5,8 +5,6 @@ using System.Text;
 using System.Collections.Generic;
 using CoreModels.XyComm;
 using MySql.Data.MySqlClient;
-using System.Linq;
-using Newtonsoft.Json;
 
 
 namespace CoreData.CoreComm
