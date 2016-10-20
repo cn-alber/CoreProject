@@ -105,7 +105,7 @@ namespace CoreWebApi
             app.UseCusCookieAuthentication(new CusCookieAuthenticationOptions()
             {
                 AuthenticationScheme = "CoreInstance",
-                AutomaticAuthenticate = false,
+                AutomaticAuthenticate = true,
                 AutomaticChallenge = false,
                 SessionStore = new RedisCacheTicketStore()
             });
