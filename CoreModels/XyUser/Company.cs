@@ -2,17 +2,7 @@ using System;
 using System.Collections.Generic;
 namespace CoreModels.XyUser
 {
-    public class CompanyMulti
-    {
-        public int id {get;set;}
-        public string name {get;set;}
-        public bool enable {get;set;}
-        public string address {get;set;}
-        public string remark {get;set;}
-        public string creator {get;set;}
-        public DateTime createdate {get;set;}
-    }
-    public class CompanySingle
+    public class Company
     {
         public int id {get;set;}
         public string name {get;set;}
@@ -23,6 +13,10 @@ namespace CoreModels.XyUser
         public string telphone {get;set;}
         public string mobile {get;set;}
         public string remark {get;set;}
+        public string creator {get;set;}
+        public DateTime createdate {get;set;}
+        public string modifier {get;set;}
+        public DateTime modifydate {get;set;}
     }
     public class CompanyParm
     {
@@ -73,6 +67,6 @@ namespace CoreModels.XyUser
     {
         public int Datacnt {get;set;}//总资料笔数
         public decimal Pagecnt {get;set;}//总页数
-        public List<CompanyMulti> Com {get;set;}//公司资料List
+        public List<Company> Com {get;set;}//公司资料List
     }
 }

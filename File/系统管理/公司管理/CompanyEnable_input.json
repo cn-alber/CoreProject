@@ -1,8 +1,5 @@
 {        
-"IDsDic":  {
-        "3": "公司名称test2",
-        "4": "公司test3"
-    },     
+"IDList":  [3,4],     
 "Company":  "携云科技",     
-"Enable": "true"
+"Enable": "false"
 }

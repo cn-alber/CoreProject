@@ -1,0 +1,21 @@
+接口名称:OrderControllers
+
+function说明
+1.PurchaseList() //查询table purchase 资料
+  路由:http://localhost:5000/Core/Purchase/PurchaseList
+input:      Purid           string          采购单号 default null
+            PurdateStart    string          采购时间起 default null
+            PurdateEnd      string          采购时间迄 default null
+            Status          string          状态 default null
+            Scoid           string          供应商 default null
+            Skuid           string          商品编码 default null
+            Warehouseid     string          仓库代号 default null
+            Buyyer          string          采购员 default null
+            SortField       string          排序栏位名称 default id
+            SortDirection   string          排序方式 default DESC
+            PageIndex       string          资料页数(ex.第一页就给1) default 1
+            NumPerPage      string          每页显示资料笔数 default 20
+OutPut:     Datacnt         int             资料总笔数
+            Pagecnt         decimal         总页数
+            Com             List<Purchase>  Purchase 资料
+参考:output jason 文件:PurchaseList_output.json

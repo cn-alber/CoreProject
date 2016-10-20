@@ -17,14 +17,20 @@ namespace CoreWebApi
         {   
             var cp = new CompanyParm();
             cp.CoID = int.Parse(GetCoid());
-            if(Enable.ToUpper() == "TRUE" || Enable.ToUpper() == "FALSE")
+            if(!string.IsNullOrEmpty(Enable))
             {
-                cp.Enable = Enable;
+               if(Enable.ToUpper() == "TRUE" || Enable.ToUpper() == "FALSE")
+                {
+                    cp.Enable = Enable;
+                }
             }
             cp.Filter = Filter;
-            if(CommHaddle.SysColumnExists(DbBase.CoreConnectString,"company",SortField).s == 1)
+            if(!string.IsNullOrEmpty(SortField))
             {
-                cp.SortField = SortField;
+                if(CommHaddle.SysColumnExists(DbBase.CoreConnectString,"company",SortField).s == 1)
+                {
+                    cp.SortField = SortField;
+                }
             }
             if(!string.IsNullOrEmpty(SortDirection))
             {
@@ -67,7 +73,7 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Company/CompanyEnable")]
         public ResponseResult CompanyEnable([FromBodyAttribute]JObject co)
         {   
-            Dictionary<int,string> IDsDic = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<int,string>>(co["IDsDic"].ToString());
+            List<int> IDsDic = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["IDList"].ToString());
             string Company = co["Company"].ToString();
             string UserName = GetUname(); 
             bool Enable = co["Enable"].ToString().ToUpper()=="TRUE"?true:false;
@@ -79,19 +85,51 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Company/UpdateCompany")]
         public ResponseResult UpdateCompamy([FromBodyAttribute]JObject co)
         {   
-            string modifyFlag = co["ModifyFlag"].ToString();
-            var com = Newtonsoft.Json.JsonConvert.DeserializeObject<CompanySingle>(co["Com"].ToString());
+            var com = Newtonsoft.Json.JsonConvert.DeserializeObject<Company>(co["Com"].ToString());
             string UserName = GetUname(); 
             string Company = co["Company"].ToString();
-            if(modifyFlag == "new")
+            var data = CompanyHaddle.UpdateCompany(com,UserName,Company);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Company/InsertCompany")]
+        public ResponseResult InsertCompany([FromBodyAttribute]JObject co)
+        {   
+            var data = new DataResult(1,null);  
+            var com = Newtonsoft.Json.JsonConvert.DeserializeObject<Company>(co["Com"].ToString());
+            string UserName = GetUname(); 
+            string Company = co["Company"].ToString();
+            string account = co["Account"].ToString();
+            if(string.IsNullOrEmpty(account))
             {
-                var res = CompanyHaddle.IsComExist(com.name);
-                if (bool.Parse(res.d.ToString()) == true)
-                {
-                    return CoreResult.NewResponse(-1, "公司已存在,不允许新增", "General"); 
-                }
+                data.s = -1;
+                data.d = "Account不能为空!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
             }
-            var data = CompanyHaddle.SaveCompany(modifyFlag,com,UserName,Company);
+            string Name = co["Name"].ToString();
+            if(string.IsNullOrEmpty(Name))
+            {
+                data.s = -1;
+                data.d = "Name不能为空!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            string Password = co["Password"].ToString();
+            if(string.IsNullOrEmpty(Password))
+            {
+                data.s = -1;
+                data.d = "Password不能为空!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            string Email = co["Email"].ToString();
+            string Gender = co["Gender"].ToString();
+            string Mobile = co["Mobile"].ToString();
+            string QQ = co["QQ"].ToString();
+            var res = CompanyHaddle.IsComExist(com.name);
+            if (bool.Parse(res.d.ToString()) == true)
+            {
+                return CoreResult.NewResponse(-1, "公司已存在,不允许新增", "General"); 
+            }
+            data = CompanyHaddle.InsertCompany(com,UserName,Company,account,Name,Password,Email,Gender,Mobile,QQ);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     }

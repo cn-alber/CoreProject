@@ -17,7 +17,7 @@ namespace CoreData.CoreUser
         public static DataResult GetCompanyList(CompanyParm cp)
         {
             var result = new DataResult(1,null);     
-            string wheresql = "select id,name,enable,address,remark,creator,createdate from company where 1 = 1";
+            string wheresql = "select * from company where 1 = 1";
             if(cp.CoID != 1)//公司编号
             {
                 wheresql = wheresql + " and id = " + cp.CoID;
@@ -37,26 +37,18 @@ namespace CoreData.CoreUser
             var res = new CompanyData();
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{    
-                    var u = conn.Query<CompanyMulti>(wheresql).AsList();
+                    var u = conn.Query<Company>(wheresql).AsList();
                     int count = u.Count;
                     decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
 
                     int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
-                    u = conn.Query<CompanyMulti>(wheresql).AsList();
+                    u = conn.Query<Company>(wheresql).AsList();
 
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;
                     res.Com = u;
-                    if (count == 0)
-                    {
-                        result.s = -3001;
-                        result.d = null;
-                    }
-                    else
-                    {
-                        result.d = res;
-                    }               
+                    result.d = res;              
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
@@ -71,21 +63,16 @@ namespace CoreData.CoreUser
         public static DataResult GetCompanyEdit(int ID)
         {
             var result = new DataResult(1,null);        
-            var parent = CacheBase.Get<CompanySingle>("company" + ID.ToString());  
+            var parent = CacheBase.Get<Company>("company" + ID.ToString());  
             if (parent == null)
             {
                 using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                     try{
-                        string wheresql = "select id,name,enable,address,email,contacts,telphone,mobile,remark from company where id ='" + ID.ToString() + "'" ;
-                        var u = conn.Query<CompanySingle>(wheresql).AsList();
-                        if (u.Count == 0)
+                        string wheresql = "select * from company where id ='" + ID.ToString() + "'" ;
+                        var u = conn.Query<Company>(wheresql).AsList();
+                        if (u.Count > 0)
                         {
-                            result.s = -3001;
-                            result.d = null;
-                        }
-                        else
-                        {
-                            CacheBase.Set<CompanySingle>("company" + ID.ToString(), u[0]);
+                            CacheBase.Set<Company>("company" + ID.ToString(), u[0]);
                             result.d = u;
                         }
                     }catch(Exception ex){
@@ -109,8 +96,8 @@ namespace CoreData.CoreUser
             var result = new DataResult(1,null);   
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{
-                    string wheresql = "select id,name,enable,address,email,contacts,telphone,mobile,remark from company where name ='" + name + "'" ;
-                    var u = conn.Query<CompanySingle>(wheresql).AsList();            
+                    string wheresql = "select * from company where name ='" + name + "'" ;
+                    var u = conn.Query<Company>(wheresql).AsList();            
                     if (u.Count > 0)
                     {
                         result.d = true;                 
@@ -131,14 +118,14 @@ namespace CoreData.CoreUser
         ///<summary>
         ///公司启用停用设置
         ///</summary>
-        public static DataResult UpdateComEnable(Dictionary<int,string> IDsDic,string Company,string UserName,bool Enable)
+        public static DataResult UpdateComEnable(List<int> id,string Company,string UserName,bool Enable)
         {
             var result = new DataResult(1,null);   
             string contents = string.Empty;
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{
                     string uptsql = @"update company set enable = @Enable where id in @ID";
-                    var args = new {ID = IDsDic.Keys.AsList(),Enable = Enable};          
+                    var args = new {ID = id,Enable = Enable};          
                     int count = conn.Execute(uptsql,args);
                     if(count < 0)
                     {
@@ -148,13 +135,12 @@ namespace CoreData.CoreUser
                     {
                         if(Enable)
                         {
-                            contents = "公司状态启用：";
+                            contents = "公司状态启用";
                         }
                         else
                         {
-                            contents = "公司状态停用：";
+                            contents = "公司状态停用";
                         }
-                        contents+= string.Join(",", IDsDic.Values.AsList().ToArray());
                         LogComm.InsertUserLog("修改公司资料", "company", contents, UserName, Company, DateTime.Now);
                     }
                     result.d = contents;           
@@ -167,50 +153,45 @@ namespace CoreData.CoreUser
             return  result;
         }
         ///<summary>
-        ///公司基本资料保存
-        ///</summary>
-        public static DataResult SaveCompany(string modifyFlag,CompanySingle com,string UserName,string Company)
-        {
-            var result = new DataResult(1,null);        
-            if (modifyFlag == "new")
-            {
-                var iresult = InsertCompany(com,UserName,Company);
-                result.s = iresult.s;
-                result.d = iresult.d;
-            }
-            else
-            {
-                var mresult = UpdateCompany(com,UserName,Company);
-                result.s = mresult.s;
-                result.d = mresult.d;
-            }
-            return result;
-        }      
-        public static DataResult InsertCompany(CompanySingle com,string UserName,string Company)
+        ///公司基本资料新增
+        ///</summary>   
+        public static DataResult InsertCompany(Company com,string UserName,string Company,string account,string name,string ps,string email,string gender,string mobile,string qq)
         {
             var result = new DataResult(1,null);   
+            if(com.name == null)
+            {
+                result.s = -1;
+                result.d = "公司名称必须有值!";
+                return result;
+            }
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{
-                    string sqlCommandText = @"INSERT INTO company(name,enable,address,email,contacts,telphone,mobile,remark,creator) VALUES(
-                            @Name,@Enable,@Address,@Email,@Contacts,@Telphone,@Mobile,@Remark,@UName)";
-                    var args = new {Name = com.name,Enable=com.enable,Address = com.address,Email = com.email,Contacts = com.contacts,
-                                    Telphone = com.telphone,Mobile = com.mobile,Remark = com.remark,UName = UserName};
-                    int count =conn.Execute(sqlCommandText,args);
+                    string sqlCommandText = @"INSERT INTO company(name,address,email,contacts,telphone,mobile,remark,creator,modifier) VALUES(
+                            @Name,@Address,@Email,@Contacts,@Telphone,@Mobile,@Remark,@Creator,@Modifier)";
+                    com.creator = UserName;
+                    com.createdate = DateTime.Now;
+                    com.modifier = UserName;
+                    com.modifydate = DateTime.Now;
+                    int count =conn.Execute(sqlCommandText,com);
                     if(count < 0)
                     {
-                        result.s = -3003;
+                        result.s = -3002;
                     }
                     else
                     {
                         int rtn = conn.QueryFirst<int>("select LAST_INSERT_ID()");
+                        sqlCommandText = @"INSERT INTO user(account,name,password,email,gender,mobile,qq,companyid,creator) VALUES(
+                            @Account,@Name,@Password,@Email,@Gender,@Mobile,@Qq,@Companyid,@Creator)";
+                        var args = new {Account = account,Name = name,Password=ps,Email=email,Gender=gender,Mobile=mobile,Qq=qq,Companyid=rtn,Creator = UserName};
+                        count =conn.Execute(sqlCommandText,args);
+                        if(count < 0)
+                        {
+                            result.s = -3002;
+                            return result;
+                        }
                         result.d = rtn;
                         LogComm.InsertUserLog("新增公司资料", "company", "新增公司" + com.name ,UserName, Company, DateTime.Now);
-                        string wheresql = "select id,name,enable,address,email,contacts,telphone,mobile,remark from company where name ='" + com.name + "'" ;
-                        var u = conn.Query<CompanySingle>(wheresql).AsList();
-                        if (u.Count > 0)
-                        {
-                            CacheBase.Set<CompanySingle>("company" + u[0].id.ToString(), u[0]);
-                        }
+                        CacheBase.Set<Company>("company" + rtn.ToString(), com);
                     }        
                 }catch(Exception ex){
                     result.s = -1;
@@ -220,50 +201,79 @@ namespace CoreData.CoreUser
             } 
             return  result;
         }
-        public static DataResult UpdateCompany(CompanySingle com,string UserName,string Company)
+        ///<summary>
+        ///公司基本资料保存
+        ///</summary> 
+        public static DataResult UpdateCompany(Company com,string UserName,string Company)
         {
             var result = new DataResult(1,null);  
             string contents = string.Empty; 
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{
-                    string wheresql = "select id,name,enable,address,email,contacts,telphone,mobile,remark from company where id =" + com.id;
-                    var u = conn.Query<CompanySingle>(wheresql).AsList();
-                    if(com.name != u[0].name)
+                    string wheresql = "select * from company where id =" + com.id;
+                    var u = conn.Query<Company>(wheresql).AsList();
+                    Company comupdate = u[0] as Company;
+                    if(com.name != null)
                     {
-                        contents = contents + "公司名称" + ":" +u[0].name + "=>" + com.name + ";";
+                        if(com.name != u[0].name)
+                        {
+                            contents = contents + "公司名称" + ":" +u[0].name + "=>" + com.name + ";";
+                            comupdate.name = com.name;
+                        }
                     }
-                    if(com.enable != u[0].enable)
+                    if(com.address != null)
                     {
-                        contents = contents + "启用状态" + ":" +u[0].enable + "=>" + com.enable + ";";
+                        if(com.address != u[0].address)
+                        {
+                            contents = contents + "公司地址" + ":" +u[0].address + "=>" + com.address + ";";
+                            comupdate.address = com.address;
+                        }
                     }
-                    if(com.address != u[0].address)
+                    if(com.email != null)
                     {
-                        contents = contents + "公司地址" + ":" +u[0].address + "=>" + com.address + ";";
+                        if(com.email != u[0].email)
+                        {
+                            contents = contents + "公司邮箱" + ":" +u[0].email + "=>" + com.email + ";";
+                            comupdate.email = com.email;
+                        }
                     }
-                    if(com.email != u[0].email)
+                    if(com.contacts != null)
                     {
-                        contents = contents + "公司邮箱" + ":" +u[0].email + "=>" + com.email + ";";
+                        if(com.contacts != u[0].contacts)
+                        {
+                            contents = contents + "公司联络人" + ":" +u[0].contacts + "=>" + com.contacts + ";";
+                            comupdate.contacts = com.contacts;
+                        }
                     }
-                    if(com.contacts != u[0].contacts)
+                    if(com.telphone != null)
                     {
-                        contents = contents + "公司联络人" + ":" +u[0].contacts + "=>" + com.contacts + ";";
+                        if(com.telphone != u[0].telphone)
+                        {
+                            contents = contents + "固定电话" + ":" +u[0].telphone + "=>" + com.telphone + ";";
+                            comupdate.telphone = com.telphone;
+                        }
                     }
-                    if(com.telphone != u[0].telphone)
+                    if(com.mobile != null)
                     {
-                        contents = contents + "固定电话" + ":" +u[0].telphone + "=>" + com.telphone + ";";
+                        if(com.mobile != u[0].mobile)
+                        {
+                            contents = contents + "移动电话" + ":" +u[0].mobile + "=>" + com.mobile + ";";
+                            comupdate.mobile = com.mobile;
+                        }
                     }
-                    if(com.mobile != u[0].mobile)
+                    if(com.remark != null)
                     {
-                        contents = contents + "移动电话" + ":" +u[0].mobile + "=>" + com.mobile + ";";
+                        if(com.remark != u[0].remark)
+                        {
+                            contents = contents + "备注" + ":" +u[0].remark + "=>" + com.remark + ";";
+                            comupdate.remark = com.remark;
+                        }
                     }
-                    if(com.remark != u[0].remark)
-                    {
-                        contents = contents + "备注" + ":" +u[0].remark + "=>" + com.remark + ";";
-                    }
-                    string uptsql = @"update company set name = @Name,enable = @Enable,address = @Address,email=@Email,contacts=@Contacts,telphone=@Telphone,mobile=@Mobile,remark=@Remark where id = @ID";
-                    var args = new {Name = com.name,Enable=com.enable,Address = com.address,Email = com.email,Contacts = com.contacts,
-                                    Telphone = com.telphone,Mobile = com.mobile,Remark = com.remark,ID = com.id};
-                    int count = conn.Execute(uptsql,args);
+                    comupdate.modifier = UserName;
+                    comupdate.modifydate = DateTime.Now;
+                    string uptsql = @"update company set name = @Name,address = @Address,email=@Email,contacts=@Contacts,telphone=@Telphone,
+                                        mobile=@Mobile,remark=@Remark,modifier = @Modifier,modifydate = @Modifydate where id = @ID";
+                    int count = conn.Execute(uptsql,comupdate);
                     if(count < 0)
                     {
                         result.s= -3003;
@@ -271,7 +281,7 @@ namespace CoreData.CoreUser
                     else
                     {
                         LogComm.InsertUserLog("修改公司资料", "company", contents, UserName, Company, DateTime.Now);               
-                        CacheBase.Set<CompanySingle>("company" + com.id.ToString(), com);
+                        CacheBase.Set<Company>("company" + com.id.ToString(), comupdate);
                     }
                 }catch(Exception ex){
                     result.s = -1;
