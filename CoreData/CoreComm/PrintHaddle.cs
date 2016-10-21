@@ -22,7 +22,7 @@ namespace CoreDate.CoreComm
                     var list = conn.Query<print_sys_types>(@"SELECT * FROM
                                                                 print_sys_types as a 
                                                             WHERE 
-                                                                 a.deleted = FALSE AND a.id = "+id).AsList();  
+                                                                 a.deleted = FALSE AND a.id = @id",new {id = id}).AsList();  
                     if(list.Count>0){
                         result.d = list[0];
                     }else{
@@ -44,7 +44,7 @@ namespace CoreDate.CoreComm
                 try{
                     var list = conn.Query<print_syses>(@"SELECT * FROM
                                                              print_syses as a 
-                                                        WHERE   a.id = "+id).AsList();   
+                                                        WHERE   a.id = @id",new {id = id}).AsList();   
                     if(list.Count>0){
                         result.d = list[0];
                     }else{
@@ -70,9 +70,9 @@ namespace CoreDate.CoreComm
                     string sql = @"SELECT * FROM 
                                         print_uses AS a 
                                    WHERE 
-                                        a.deleted = FALSE AND a.id = "+id;
+                                        a.deleted = FALSE AND a.id = @id";
                     
-                    var list = conn.Query<print_uses>(sql).AsList();   
+                    var list = conn.Query<print_uses>(sql,new {id = id}).AsList();   
                     if(list.Count>0){
                         result.d = list[0];
                     }else{
@@ -105,7 +105,7 @@ namespace CoreDate.CoreComm
                                                             FROM 
                                                                 print_sys_types 
                                                             WHERE  
-                                                                print_sys_types.deleted =FALSE AND  print_sys_types.type ="+type).AsList();
+                                                                print_sys_types.deleted =FALSE AND  print_sys_types.type =@type",new {type = type}).AsList();
                     if (list.Count >0)
                     {                   
                         result.d = new{ emu_data = JsonConvert.DeserializeObject<dynamic>(list[0].emu_data) };                                  
@@ -136,7 +136,7 @@ namespace CoreDate.CoreComm
                     var my = conn.Query<print_uses>(@"SELECT * FROM 
                                                             print_uses as a
                                                       WHERE 
-                                                            a.id = "+my_id+" AND a.admin_id ="+admin_id).AsList();
+                                                            a.id = @my_id AND a.admin_id =@admin_id",new {my_id = my_id ,admin_id=admin_id}).AsList();
                     if (my.Count >0 ) {  
                         result.d = new{
                             currentTplID = int.Parse(my_id),
@@ -173,7 +173,7 @@ namespace CoreDate.CoreComm
          /// <summary>
 		/// 设定，更新默认模板
 		/// </summary>
-        public static DataResult sideSetdefed(string admin_id,string my_tpl_id){
+        public static DataResult sideSetdefed(string admin_id,string my_tpl_id,string coid){
             var result = new DataResult(1,null); 
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
@@ -185,9 +185,12 @@ namespace CoreDate.CoreComm
                     int rnt = 0;
                     if (oldmodel.Count > 0){                   
                         rnt = conn.Execute(@"UPDATE print_use_setting SET 
-                                                print_use_setting.admin_id = "+admin_id+
-                                                " ,print_use_setting.defed_id = "+my_tpl_id+
-                                                " WHERE print_use_setting.id = "+oldmodel[0].id);
+                                                print_use_setting.admin_id = @admin_id ,
+                                                print_use_setting.defed_id = @defed_id  
+                                            WHERE 
+                                                print_use_setting.id = @id 
+                                            AND 
+                                                print_use_setting.coid = @coid ;",new {admin_id=admin_id,defed_id =my_tpl_id,id = oldmodel[0].id,coid = coid});
                         if (rnt > 0){
                         result.s = 1;
                         }else{
@@ -195,8 +198,11 @@ namespace CoreDate.CoreComm
                         }
                     }else {
                         rnt = conn.Execute(@"INSERT INTO 
-                                                print_use_setting(print_use_setting.admin_id,print_use_setting.defed_id) 
-                                            VALUES("+admin_id+","+my_tpl_id+")");
+                                                print_use_setting(
+                                                    print_use_setting.admin_id,
+                                                    print_use_setting.defed_id,
+                                                    print_use_setting.coid) 
+                                            VALUES(@admin_id,@my_tpl_id,@coid)",new {admin_id = admin_id,my_tpl_id=my_tpl_id,coid = coid});
                         if (rnt > 0){
                             result.s = 1;
                         }else{
@@ -232,8 +238,7 @@ namespace CoreDate.CoreComm
                         sql = @"UPDATE print_use_setting SET 
                                     print_use_setting.admin_id = "+admin_id+
                                     " ,print_use_setting.lodop_target = '"+lodop_target+
-                                    "' WHERE print_use_setting.id = "+oldmodel[0].id;
-                        Console.WriteLine(sql);      
+                                    "' WHERE print_use_setting.id = "+oldmodel[0].id;      
                         rnt = conn.Execute(sql);
                         if (rnt > 0){
                         result.s = 1;
@@ -268,7 +273,7 @@ namespace CoreDate.CoreComm
         /// <summary>
 		/// 移除用户模板
 		/// </summary>
-        public static DataResult sideRemove(string ids){
+        public static DataResult sideRemove(string ids,string coid){
             var result = new DataResult(1,null); 
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
@@ -284,7 +289,7 @@ namespace CoreDate.CoreComm
                     foreach(string my_tpl_id in idsArr){
                         sql += @"UPDATE print_uses SET 
                                     print_uses.deleted = TRUE 
-                                WHERE print_uses.id = "+my_tpl_id+";";
+                                WHERE print_uses.id = "+my_tpl_id+" AND print_uses.coid="+coid;
                     } 
                     int rnt = conn.Execute(sql);
                     if (rnt > 0)
@@ -555,7 +560,7 @@ namespace CoreDate.CoreComm
         }
 
         
-        public static DataResult DelSysesTypeByID(string ids){
+        public static DataResult DelSysesTypeByID(string ids,string coid){
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
@@ -583,9 +588,8 @@ namespace CoreDate.CoreComm
                                 SET 
                                     print_sys_types.deleted = TRUE 
                                 WHERE 
-                                    print_sys_types.id="+id+" AND print_sys_types.deleted=FALSE;";
+                                    print_sys_types.id="+id+" AND print_sys_types.deleted=FALSE AND print_sys_types.coid = "+coid+";";
                     }
-
 
                     int rnt = DbBase.CommDB.Execute(sql);
                     if (rnt > 0)
@@ -610,7 +614,7 @@ namespace CoreDate.CoreComm
         /// <summary>
 		/// 
 		/// </summary>
-        public static DataResult DelSysesByID(string ids){
+        public static DataResult DelSysesByID(string ids,string coid){
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
@@ -624,7 +628,7 @@ namespace CoreDate.CoreComm
                                 SET 
                                     print_syses.deleted = TRUE 
                                 WHERE 
-                                    print_syses.id="+id+" AND print_syses.deleted=FALSE;";
+                                    print_syses.id="+id+" AND print_syses.deleted=FALSE AND print_syses.coid="+coid+";";
                     }
 
 
@@ -653,7 +657,7 @@ namespace CoreDate.CoreComm
         /// <summary>
 		/// 保存预设系统模板
 		/// </summary>
-        public static DataResult saveSysesType(int id,string name,dynamic presets,dynamic emu_data,dynamic setting){
+        public static DataResult saveSysesType(int id,string name,dynamic presets,dynamic emu_data,dynamic setting,string coid){
 
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
@@ -663,12 +667,21 @@ namespace CoreDate.CoreComm
                     string sql = "";
                     int rnt =0;
                     if(current!=null){ //更新
-                        sql = "UPDATE print_sys_types SET "+
-                                "print_sys_types.emu_data = '"+emu_data.ToString()+"',"+
-                                "print_sys_types.`name` = '"+name+"',"+
-                                "print_sys_types.presets = '"+presets.ToString()+"',"+
-                                "print_sys_types.setting = '"+setting.ToString()+"' WHERE print_sys_types.id = "+id.ToString();
-                        rnt = conn.Execute(sql);
+                        sql = @"UPDATE print_sys_types SET 
+                                    print_sys_types.emu_data = @emu_data,
+                                    print_sys_types.`name` = @name,
+                                    print_sys_types.presets = @presets,
+                                    print_sys_types.setting = @setting 
+                                WHERE 
+                                    print_sys_types.id = @id AND print_sys_types.coid=@coid";
+                        rnt = conn.Execute(sql,new { 
+                                     emu_data = emu_data.ToString(),
+                                     name = name,
+                                     presets = presets.ToString(),
+                                     setting = setting.ToString(),
+                                     id = id.ToString(),
+                                     coid = coid
+                                });
                         if(rnt>0){
                             result.s= 4006;
                             result.d = new {
@@ -688,16 +701,19 @@ namespace CoreDate.CoreComm
                                         print_sys_types.emu_data,
                                         print_sys_types.`name`,
                                         print_sys_types.presets,
-                                        print_sys_types.setting)"+
-                                "VALUES("+
-                                        type.ToString()+",'"+
-                                        emu_data.ToString()+"','"+
-                                        name+"','"+
-                                        presets.ToString()+"','"+
-                                        setting.ToString()+"');"+
+                                        print_sys_types.setting,
+                                        print_sys_types.coid)"+
+                                "VALUES(@type,@emu_data,@name,@presets,@setting,@coid);"+
                                 "SELECT LAST_INSERT_ID() as lastid;";
-                        rnt = conn.Query<int>(sql).AsList()[0];                                               
-                        conn.Execute("UPDATE print_sys_types SET print_sys_types.type = "+type+" WHERE print_sys_types.id = "+rnt.ToString());                        
+                        rnt = conn.Query<int>(sql,new { 
+                                     type = type.ToString(),
+                                     emu_data = emu_data.ToString(),
+                                     name = name,
+                                     presets = presets.ToString(),
+                                     setting = setting.ToString(),
+                                     coid = coid
+                                }).AsList()[0];                                               
+                        conn.Execute("UPDATE print_sys_types SET print_sys_types.type = "+type+" WHERE print_sys_types.id = "+rnt.ToString()+" AND print_sys_types.coid="+coid);                        
                         
                         if(rnt>0){
                             result.s= 4005;
@@ -724,7 +740,7 @@ namespace CoreDate.CoreComm
         /// <summary>
 		/// 保存系统模板 print_syses
 		/// </summary>
-        public static DataResult saveSyses(int sys_id, string type,dynamic state, string name){
+        public static DataResult saveSyses(int sys_id, string type,dynamic state, string name,string coid){
             
             var result = new DataResult(1,null);            
             if(GetSysesType(type).d == null){ result.s=-4001;  return result;}            
@@ -741,13 +757,21 @@ namespace CoreDate.CoreComm
                     int rnt = 0;                    
                     string sql = "";
                     if (sys_id > 0){//更新
-                        sql = "UPDATE print_syses SET print_syses.`name` = '"+name+"' ,"+
-                                     "print_syses.setting = '"+setting.ToString()+"',"+
-                                     "print_syses.tpl_data = '"+tpl.ToString()+"',"+
-                                     "print_syses.type = "+type+","+
-                                     "print_syses.mtime = NOW() "+
-                                     "WHERE print_syses.id = "+sys_id+";";
-                        rnt = conn.Execute(sql);
+                        sql = @"UPDATE print_syses SET print_syses.`name` = @name,
+                                    print_syses.setting = @setting,
+                                    print_syses.tpl_data = @tpl_data,
+                                    print_syses.type = @type,
+                                    print_syses.mtime = NOW() 
+                                WHERE 
+                                    print_syses.id =@id AND print_syses.coid=@coid;";
+                        rnt = conn.Execute(sql,new { 
+                                name = name,
+                                setting = setting.ToString(),
+                                tpl_data = tpl.ToString(),
+                                type = type,
+                                id = sys_id,
+                                coid = coid
+                        });
                         if (rnt>0) {
                             result.d = new 
                             {
@@ -763,10 +787,16 @@ namespace CoreDate.CoreComm
                         if(name.Equals("新模板")){
                              name = name+DateTime.Now.ToString("d");
                         }
-                         sql="INSERT INTO print_syses(print_syses.type,print_syses.`name`,print_syses.setting,print_syses.tpl_data,print_syses.mtime)"+
-                             "VALUES("+type+",'"+name+"','"+setting.ToString()+"','"+tpl.ToString()+"',NOW());"+
-                             "SELECT LAST_INSERT_ID() as lastid;";            
-                        rnt = conn.Query<int>(sql).AsList()[0];   
+                         sql=@"INSERT INTO print_syses(print_syses.type,print_syses.`name`,print_syses.setting,print_syses.tpl_data,print_syses.mtime,print_syses.coid) 
+                              VALUES(@type,@name,@setting,@tpl_data,NOW(),@coid);
+                              SELECT LAST_INSERT_ID() as lastid;";            
+                        rnt = conn.Query<int>(sql,new {
+                                type = type,
+                                name = name,
+                                setting = setting.ToString(),
+                                tpl_data = tpl.ToString(),
+                                coid = coid
+                        }).AsList()[0];   
                   
 
                         if (rnt>0) {
@@ -795,7 +825,7 @@ namespace CoreDate.CoreComm
         /// <summary>
 		/// 保存个人模板
 		/// </summary>
-        public static DataResult postSaveMy(string admin_id,string my_id, string sys_id, string type, string name, dynamic print_setting, dynamic state,string lodop_target){
+        public static DataResult postSaveMy(string admin_id,string my_id, string sys_id, string type, string name, dynamic print_setting, dynamic state,string lodop_target,string coid){
 
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
@@ -815,19 +845,26 @@ namespace CoreDate.CoreComm
                                 if (GetUses(my_id).d as print_uses == null){
                                     result.s = -4015;
                                 }else{                                          
-                                    sql = "UPDATE print_uses SET "+                                            
-                                            "print_uses.mdate = NOW(),"+
-                                            "print_uses.`name` = '"+name+"',"+
-                                            "print_uses.print_setting = '"+print_setting+"',"+
-                                            "print_uses.tpl_data = '"+state+"' "+
-                                        "WHERE print_uses.id =  "+my_id;
+                                    sql = @"UPDATE print_uses SET 
+                                                print_uses.mdate = NOW(),
+                                                print_uses.`name` = @name,
+                                                print_uses.print_setting = @setting,print_uses.tpl_data = tpl_data 
+                                            WHERE print_uses.id = @id AND print_uses.coid = @coid";
 
-                                    int rnt = conn.Execute(sql);
+                                    int rnt = conn.Execute(sql ,new {
+                                                name = name,
+                                                print_setting = print_setting,
+                                                tpl_data = state,
+                                                id = my_id,
+                                                coid = coid
+                                            });
                                     if (rnt > 0){
                                         result.d = new {
                                             my_id = int.Parse(my_id),
                                             name = name,
-                                            type = type
+                                            type = type,
+                                            id = my_id,
+                                            coid = coid
                                         };
                                         //保存 lodop_target
                                         if(setLodop(admin_id,lodop_target).s == -4025){
@@ -855,17 +892,27 @@ namespace CoreDate.CoreComm
                                                     print_uses.print_setting,
                                                     print_uses.sys_id,
                                                     print_uses.tpl_data,
-                                                    print_uses.type)"+
-                                        "VALUES("+
-                                                    admin_id+
-                                                    ",NOW(),'"+
-                                                    name+"','"+
-                                                    print_setting+"',"+
-                                                    sys_id+",'"+
-                                                    state+"',"+
-                                                    type+");"+
-                                        "SELECT LAST_INSERT_ID();";
-                                    int reqn = conn.Query<int>(sql).AsList()[0];
+                                                    print_uses.type,
+                                                    print_uses.coid)
+                                         VALUES(
+                                                    @admin_id,
+                                                    NOW(),
+                                                    @name,
+                                                    @print_setting,
+                                                    @sys_id,
+                                                    @state,
+                                                    @type,
+                                                    @coid);
+                                        SELECT LAST_INSERT_ID();";
+                                    int reqn = conn.Query<int>(sql,new {
+                                                admin_id = admin_id,
+                                                name = name,
+                                                print_setting = print_setting,
+                                                sys_id = sys_id,
+                                                state = state,
+                                                type = type,
+                                                coid = coid
+                                            }).AsList()[0];
                                     if (reqn > 0)
                                     {                                           
                                         result.d = new

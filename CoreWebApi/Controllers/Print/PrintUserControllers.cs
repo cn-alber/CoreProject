@@ -51,7 +51,8 @@ namespace CoreWebApi.Print
             var print_setting = lo["print_setting"];
             var state = lo["state"];
             var lodop_target = lo["lodop_target"].ToString();
-            var m = PrintHaddle.postSaveMy(admin_id, my_id, sys_id, type, name, print_setting, state,lodop_target); 
+            string coid = GetCoid();
+            var m = PrintHaddle.postSaveMy(admin_id, my_id, sys_id, type, name, print_setting, state,lodop_target,coid); 
             return CoreResult.NewResponse(m.s, m.d, "Print");           
         }
         #endregion
@@ -73,7 +74,8 @@ namespace CoreWebApi.Print
             var print_setting = lo["print_setting"];
             var state = lo["state"];
             var lodop_target = lo["lodop_target"].ToString();
-            var m = PrintHaddle.postSaveMy(admin_id, my_id, sys_id, type, name, print_setting, state,lodop_target); 
+            string coid = GetCoid();
+            var m = PrintHaddle.postSaveMy(admin_id, my_id, sys_id, type, name, print_setting, state,lodop_target,coid); 
             return CoreResult.NewResponse(m.s, m.d, "Print");           
         }
         #endregion
@@ -85,7 +87,8 @@ namespace CoreWebApi.Print
         public ResponseResult delMyTpl([FromBodyAttribute]JObject lo){
             string ids =String.Join(",",lo["ids"]); 
             if(!checkInt(ids)) return CoreResult.NewResponse(-4023, null, "Print");
-            var m = PrintHaddle.sideRemove(ids);
+            string coid = GetCoid();
+            var m = PrintHaddle.sideRemove(ids,coid);
             return CoreResult.NewResponse(1,null,"Print");
         }
         #endregion
