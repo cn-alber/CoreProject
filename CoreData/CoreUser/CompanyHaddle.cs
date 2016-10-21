@@ -37,14 +37,7 @@ namespace CoreData.CoreUser
             var res = new CompanyData();
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{    
-                    // var u = conn.Query<Company>( sqlCount + wheresql).AsList();
-                    // int count = u.Count;
-                    // decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
-
-                    // int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
-                    // wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
-                    // u = conn.Query<Company>( sqlCount + wheresql).AsList();
-                    int count = conn.QueryFirst<int>("select count(1) from company " + wheresql);
+                    int count = conn.QueryFirst<int>(sqlCount + wheresql);
                     decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
 
                     int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
