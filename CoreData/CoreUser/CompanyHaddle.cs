@@ -17,7 +17,9 @@ namespace CoreData.CoreUser
         public static DataResult GetCompanyList(CompanyParm cp)
         {
             var result = new DataResult(1,null);     
-            string wheresql = "select * from company where 1 = 1";
+            string sqlCount = "select count(id) from company where 1 = 1";
+            string sqlCommand = "select * from company where 1 = 1";
+            string wheresql = string.Empty;
             if(cp.CoID != 1)//公司编号
             {
                 wheresql = wheresql + " and id = " + cp.CoID;
@@ -37,13 +39,13 @@ namespace CoreData.CoreUser
             var res = new CompanyData();
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{    
-                    var u = conn.Query<Company>(wheresql).AsList();
+                    var u = conn.Query<Company>( sqlCount + wheresql).AsList();
                     int count = u.Count;
                     decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
 
                     int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
-                    u = conn.Query<Company>(wheresql).AsList();
+                    u = conn.Query<Company>( sqlCommand + wheresql).AsList();
 
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;
