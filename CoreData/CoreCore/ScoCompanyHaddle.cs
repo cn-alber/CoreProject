@@ -89,8 +89,9 @@ namespace CoreData.CoreCore
                         {
                             contents = "客户状态停用";
                         }
+                        int CoID = 1;
                         // contents+= string.Join(",", IDsDic.Values.AsList().ToArray());
-                        CoreUser.LogComm.InsertUserLog("修改客户资料", "supplycompany", contents, UserName, Company, DateTime.Now);
+                        CoreUser.LogComm.InsertUserLog("修改客户资料", "supplycompany", contents, UserName, CoID, DateTime.Now);
                     }
                     result.d = contents;           
                 }catch(Exception ex){
@@ -206,7 +207,7 @@ namespace CoreData.CoreCore
                     {
                         int rtn = conn.QueryFirst<int>("select LAST_INSERT_ID()");
                         result.d = rtn;
-                        CoreUser.LogComm.InsertUserLog("新增客户资料", "supplycompany", "新增客户" + com.sconame ,UserName, Company, DateTime.Now);
+                        CoreUser.LogComm.InsertUserLog("新增客户资料", "supplycompany", "新增客户" + com.sconame ,UserName, CoID, DateTime.Now);
                         string wheresql = "select id,sconame,scosimple,enable,scocode,address,country,contactor,tel,phone,fax,url,email,typelist,bank,bankid,taxid,remark from supplycompany where sconame ='" + com.sconame + "' and coid =" + CoID ;
                         var u = conn.Query<ScoCompanySingle>(wheresql).AsList();
                         if (u.Count > 0)
@@ -407,7 +408,7 @@ namespace CoreData.CoreCore
                     }
                     else
                     {
-                        CoreUser.LogComm.InsertUserLog("修改客户资料", "supplycompany", contents, UserName, Company, DateTime.Now);               
+                        CoreUser.LogComm.InsertUserLog("修改客户资料", "supplycompany", contents, UserName, CoID, DateTime.Now);               
                         CacheBase.Set<ScoCompanySingle>("scocompany" + com.id.ToString(), com);
                     }
                 }catch(Exception ex){

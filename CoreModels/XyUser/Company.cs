@@ -23,8 +23,8 @@ namespace CoreModels.XyUser
         public int _CoID ;//公司id
         public string _Enable = "all" ;//启用状态
         public string _Filter;//名称过滤条件
-        public string _SortField = "id";//排序栏位
-        public string _SortDirection = "desc";//排序方式
+        public string _SortField ;//排序栏位
+        public string _SortDirection;//排序方式
         public int _NumPerPage = 20;//每页显示资料笔数
         public int _PageIndex = 1;//页码
         public int CoID

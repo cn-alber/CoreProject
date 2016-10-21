@@ -133,7 +133,7 @@ namespace CoreData.CoreComm
                 else
                 {
                     rtn = CommDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
-                    CoreUser.LogComm.InsertUserLogTran(TransUser,"新增仓库资料", "warehouse", wh.warehousename0 ,UserName, Company, DateTime.Now);
+                    CoreUser.LogComm.InsertUserLogTran(TransUser,"新增仓库资料", "warehouse", wh.warehousename0 ,UserName, CoID, DateTime.Now);
                     CacheBase.Set<Warehouse>("warehouse" + CoID + rtn, warehouse);
                 }    
                 //新增销售主仓库(零数)资料
@@ -149,7 +149,7 @@ namespace CoreData.CoreComm
                 else
                 {
                     int a = CommDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
-                    CoreUser.LogComm.InsertUserLogTran(TransUser,"新增仓库资料", "warehouse", wh.warehousename1 ,UserName, Company, DateTime.Now);
+                    CoreUser.LogComm.InsertUserLogTran(TransUser,"新增仓库资料", "warehouse", wh.warehousename1 ,UserName, CoID, DateTime.Now);
                     CacheBase.Set<Warehouse>("warehouse"  +CoID + a, warehouse);
                 }   
                 //新增销售主仓库(整数)资料
@@ -167,7 +167,7 @@ namespace CoreData.CoreComm
                     else
                     {
                         int a = CommDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
-                        CoreUser.LogComm.InsertUserLogTran(TransUser,"新增仓库资料", "warehouse", wh.warehousename2 ,UserName, Company, DateTime.Now);
+                        CoreUser.LogComm.InsertUserLogTran(TransUser,"新增仓库资料", "warehouse", wh.warehousename2 ,UserName, CoID, DateTime.Now);
                         CacheBase.Set<Warehouse>("warehouse"  +CoID + a, warehouse);
                     }        
                 }
@@ -184,7 +184,7 @@ namespace CoreData.CoreComm
                 else
                 {
                     int a = CommDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
-                    CoreUser.LogComm.InsertUserLogTran(TransUser,"新增仓库资料", "warehouse", wh.warehousename3 ,UserName, Company, DateTime.Now);
+                    CoreUser.LogComm.InsertUserLogTran(TransUser,"新增仓库资料", "warehouse", wh.warehousename3 ,UserName, CoID, DateTime.Now);
                     CacheBase.Set<Warehouse>("warehouse"  +CoID + a, warehouse);
                 }   
                 //新增销进货仓库资料
@@ -200,7 +200,7 @@ namespace CoreData.CoreComm
                 else
                 {
                     int a = CommDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
-                    CoreUser.LogComm.InsertUserLogTran(TransUser,"新增仓库资料", "warehouse", wh.warehousename4 ,UserName, Company, DateTime.Now);
+                    CoreUser.LogComm.InsertUserLogTran(TransUser,"新增仓库资料", "warehouse", wh.warehousename4 ,UserName, CoID, DateTime.Now);
                     CacheBase.Set<Warehouse>("warehouse"  +CoID + a, warehouse);
                 }   
                 //新增次品仓库资料
@@ -216,7 +216,7 @@ namespace CoreData.CoreComm
                 else
                 {
                     int a = CommDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
-                    CoreUser.LogComm.InsertUserLogTran(TransUser,"新增仓库资料", "warehouse", wh.warehousename5 ,UserName, Company, DateTime.Now);
+                    CoreUser.LogComm.InsertUserLogTran(TransUser,"新增仓库资料", "warehouse", wh.warehousename5 ,UserName, CoID, DateTime.Now);
                     CacheBase.Set<Warehouse>("warehouse"  +CoID + a, warehouse);
                 }        
                 TransComm.Commit();
@@ -361,7 +361,7 @@ namespace CoreData.CoreComm
                     }
                     else
                     {
-                        CoreUser.LogComm.InsertUserLogTran(TransUser,"修改仓库资料", "warehouse", contents_new,UserName, Company, DateTime.Now);        
+                        CoreUser.LogComm.InsertUserLogTran(TransUser,"修改仓库资料", "warehouse", contents_new,UserName, CoID, DateTime.Now);        
                         CacheBase.Set<Warehouse>("warehouse"  + CoID + warehouse_new.id, warehouse_new);
                     }
                 }
@@ -399,7 +399,7 @@ namespace CoreData.CoreComm
                     }
                     else
                     {
-                        CoreUser.LogComm.InsertUserLogTran(TransUser,"修改仓库资料", "warehouse", contents_new,UserName, Company, DateTime.Now);        
+                        CoreUser.LogComm.InsertUserLogTran(TransUser,"修改仓库资料", "warehouse", contents_new,UserName, CoID, DateTime.Now);        
                         CacheBase.Set<Warehouse>("warehouse"  + CoID + warehouse_new.id, warehouse_new);
                     }
                 }
@@ -433,7 +433,7 @@ namespace CoreData.CoreComm
                         }
                         else
                         {
-                            CoreUser.LogComm.InsertUserLogTran(TransUser,"修改仓库资料", "warehouse", contents_new,UserName, Company, DateTime.Now);        
+                            CoreUser.LogComm.InsertUserLogTran(TransUser,"修改仓库资料", "warehouse", contents_new,UserName, CoID, DateTime.Now);        
                             CacheBase.Set<Warehouse>("warehouse"  + CoID + warehouse_new.id, warehouse_new);
                         }
                     }
@@ -473,7 +473,7 @@ namespace CoreData.CoreComm
                     }
                     else
                     {
-                        CoreUser.LogComm.InsertUserLogTran(TransUser,"修改仓库资料", "warehouse", contents_new,UserName, Company, DateTime.Now);        
+                        CoreUser.LogComm.InsertUserLogTran(TransUser,"修改仓库资料", "warehouse", contents_new,UserName, CoID, DateTime.Now);        
                         CacheBase.Set<Warehouse>("warehouse"  + CoID + warehouse_new.id, warehouse_new);
                     }
                 }
@@ -511,7 +511,7 @@ namespace CoreData.CoreComm
                     }
                     else
                     {
-                        CoreUser.LogComm.InsertUserLogTran(TransUser,"修改仓库资料", "warehouse", contents_new,UserName, Company, DateTime.Now);        
+                        CoreUser.LogComm.InsertUserLogTran(TransUser,"修改仓库资料", "warehouse", contents_new,UserName, CoID, DateTime.Now);        
                         CacheBase.Set<Warehouse>("warehouse"  + CoID + warehouse_new.id, warehouse_new);
                     }
                 }
@@ -549,7 +549,7 @@ namespace CoreData.CoreComm
                     }
                     else
                     {
-                        CoreUser.LogComm.InsertUserLogTran(TransUser,"修改仓库资料", "warehouse", contents_new,UserName, Company, DateTime.Now);        
+                        CoreUser.LogComm.InsertUserLogTran(TransUser,"修改仓库资料", "warehouse", contents_new,UserName, CoID, DateTime.Now);        
                         CacheBase.Set<Warehouse>("warehouse"  + CoID + warehouse_new.id, warehouse_new);
                     }
                 }
@@ -716,7 +716,7 @@ namespace CoreData.CoreComm
                         {
                             contents = "仓库状态停用";
                         }
-                        CoreUser.LogComm.InsertUserLog("修改仓库资料", "warehouse", contents, UserName, Company, DateTime.Now);
+                        CoreUser.LogComm.InsertUserLog("修改仓库资料", "warehouse", contents, UserName, CoID, DateTime.Now);
                     }
                     result.d = contents;           
                 }catch(Exception ex){

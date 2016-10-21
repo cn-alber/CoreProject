@@ -17,7 +17,7 @@ namespace CoreData.CoreUser
         public static DataResult GetCompanyList(CompanyParm cp)
         {
             var result = new DataResult(1,null);     
-            string wheresql = "select * from company where 1 = 1";
+            string wheresql = "where 1 = 1";
             if(cp.CoID != 1)//公司编号
             {
                 wheresql = wheresql + " and id = " + cp.CoID;
@@ -37,13 +37,12 @@ namespace CoreData.CoreUser
             var res = new CompanyData();
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{    
-                    var u = conn.Query<Company>(wheresql).AsList();
-                    int count = u.Count;
+                    int count = conn.QueryFirst<int>("select count(1) from company " + wheresql);
                     decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
 
                     int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
-                    wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
-                    u = conn.Query<Company>(wheresql).AsList();
+                    wheresql = "select * from company " + wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
+                    var u = conn.Query<Company>(wheresql).AsList();
 
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;
@@ -141,7 +140,7 @@ namespace CoreData.CoreUser
                         {
                             contents = "公司状态停用";
                         }
-                        LogComm.InsertUserLog("修改公司资料", "company", contents, UserName, Company, DateTime.Now);
+                        // LogComm.InsertUserLog("修改公司资料", "company", contents, UserName, CoID, DateTime.Now);
                     }
                     result.d = contents;           
                 }catch(Exception ex){
@@ -190,7 +189,7 @@ namespace CoreData.CoreUser
                             return result;
                         }
                         result.d = rtn;
-                        LogComm.InsertUserLog("新增公司资料", "company", "新增公司" + com.name ,UserName, Company, DateTime.Now);
+                        // LogComm.InsertUserLog("新增公司资料", "company", "新增公司" + com.name ,UserName, CoID, DateTime.Now);
                         CacheBase.Set<Company>("company" + rtn.ToString(), com);
                     }        
                 }catch(Exception ex){
@@ -280,7 +279,7 @@ namespace CoreData.CoreUser
                     }
                     else
                     {
-                        LogComm.InsertUserLog("修改公司资料", "company", contents, UserName, Company, DateTime.Now);               
+                        // LogComm.InsertUserLog("修改公司资料", "company", contents, UserName, Company, DateTime.Now);               
                         CacheBase.Set<Company>("company" + com.id.ToString(), comupdate);
                     }
                 }catch(Exception ex){

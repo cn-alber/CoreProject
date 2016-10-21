@@ -56,7 +56,7 @@ namespace CoreData.CoreUser
                     }
                     else
                     {
-                        LogComm.InsertUserLog("新增业务流程资料", "business", "新增业务流程",UserName, Company, DateTime.Now);
+                        LogComm.InsertUserLog("新增业务流程资料", "business", "新增业务流程",UserName, CoID, DateTime.Now);
                     }        
                 }catch(Exception ex){
                     result.s = -1;
@@ -189,7 +189,8 @@ namespace CoreData.CoreUser
                     }
                     else
                     {
-                        LogComm.InsertUserLog("修改业务流程资料", "business", contents, UserName, Company, DateTime.Now);               
+                        int CoID = 1;
+                        LogComm.InsertUserLog("修改业务流程资料", "business", contents, UserName, CoID, DateTime.Now);               
                     }
                 }catch(Exception ex){
                     result.s = -1;
