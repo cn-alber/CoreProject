@@ -105,8 +105,12 @@ namespace CoreWebApi
             var password = GetMD5(lo["password"].ToString(), "Xy@.");
             var data = UserHaddle.GetUserInfo(lo["account"].ToString(), password);
             var user = data.d as User;
-            //记录登录日志
-            UserHaddle.loginLog(user.ID, Request.Headers["User-Agent"], Request.HttpContext.Connection.RemoteIpAddress.ToString());
+           
+           if(user != null){
+                //记录登录日志
+                UserHaddle.loginLog(user.ID, Request.Headers["User-Agent"], Request.HttpContext.Connection.RemoteIpAddress.ToString());
+           }
+           
 
             if (data.s < 0)
             {
