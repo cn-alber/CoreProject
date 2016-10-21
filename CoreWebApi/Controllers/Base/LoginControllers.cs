@@ -30,6 +30,14 @@ namespace CoreWebApi
         }
 
         [AllowAnonymous]
+        [HttpGet("/apirun")]
+        public void apiRun(){
+            //CoreWebApi.ApiTask.ApiContext.Run();
+
+        }
+
+
+        [AllowAnonymous]
         [HttpGet("/api")]
         public async Task<ResponseResult> Get()
         {
