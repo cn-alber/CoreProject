@@ -466,7 +466,7 @@ namespace CoreData.CoreCore
                         else
                         {
                             TransCore.Commit();
-                            CoreUser.LogComm.InsertUserLog("新增交易", "invinout", inoutAuto.CusType + inoutAuto.inv.SkuID + " " + inoutAuto.Qty.ToString(), UserName, CoID.ToString(), DateTime.Now);
+                            CoreUser.LogComm.InsertUserLog("新增交易", "invinout", inoutAuto.CusType + inoutAuto.inv.SkuID + " " + inoutAuto.Qty.ToString(), UserName, CoID, DateTime.Now);
                         }
                     }
 
@@ -553,7 +553,7 @@ namespace CoreData.CoreCore
                     else
                     {
                         TransCore.Commit();
-                        CoreUser.LogComm.InsertUserLog("更新安全库存", "Inventory", "", UserName, CoID.ToString(), DateTime.Now);
+                        CoreUser.LogComm.InsertUserLog("更新安全库存", "Inventory", "", UserName, CoID, DateTime.Now);
                     }
                 }
                 catch (Exception e)
@@ -597,7 +597,7 @@ namespace CoreData.CoreCore
                     else
                     {
                         TransCore.Commit();
-                        CoreUser.LogComm.InsertUserLog("更新商品名称", "Inventory", "更新商品名称", UserName, CoID.ToString(), DateTime.Now);
+                        CoreUser.LogComm.InsertUserLog("更新商品名称", "Inventory", "更新商品名称", UserName, CoID, DateTime.Now);
                     }
                 }
                 catch (Exception e)
@@ -684,7 +684,7 @@ namespace CoreData.CoreCore
                     else
                     {
                         TransCore.Commit();
-                        CoreUser.LogComm.InsertUserLog("新增库存清零交易", "invinout", "单据编号:" + string.Join(",", RecIDLst.ToArray()), UserName, CoID.ToString(), DateTime.Now);
+                        CoreUser.LogComm.InsertUserLog("新增库存清零交易", "invinout", "单据编号:" + string.Join(",", RecIDLst.ToArray()), UserName, CoID, DateTime.Now);
                     }
                 }
                 catch (Exception e)

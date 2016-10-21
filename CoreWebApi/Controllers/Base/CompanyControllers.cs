@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using CoreData.CoreUser;
-// using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyUser;
 using System.Collections.Generic;
 using CoreData.CoreComm;
@@ -9,7 +9,7 @@ using CoreData;
 using CoreModels;
 namespace CoreWebApi
 {
-    // [AllowAnonymous]
+    [AllowAnonymous]
     public class CompanyController : ControllBase
     {
         [HttpGetAttribute("/Core/Company/CompanyList")]
@@ -34,7 +34,7 @@ namespace CoreWebApi
             }
             if(!string.IsNullOrEmpty(SortDirection))
             {
-                 if(SortDirection.ToUpper() == "ASC")
+                 if(SortDirection.ToUpper() == "ASC" || SortDirection.ToUpper() == "DESC")
                 {
                     cp.SortDirection = SortDirection;
                 }

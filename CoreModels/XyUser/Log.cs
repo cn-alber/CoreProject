@@ -9,7 +9,7 @@ namespace CoreModels.XyUser
         private string _LogType;
         private string _Contents;
         private string _UserName;
-        private string _Compnay;
+        private int _CoID;
         private DateTime _LogDate = DateTime.Now;
         /// <summary>
         /// 
@@ -67,14 +67,14 @@ namespace CoreModels.XyUser
             }
         }
         /// <summary>
-        /// 公司名称
+        /// 公司编号
         /// </summary>
-        public string Compnay
+        public int CoID
         {
-            get { return _Compnay; }
+            get { return _CoID; }
             set
             {
-                _Compnay = value;
+                _CoID = value;
             }
         }
         /// <summary>

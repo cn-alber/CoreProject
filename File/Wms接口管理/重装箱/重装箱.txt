@@ -1,7 +1,7 @@
 接口名称：AWmsBoxControllers
 function说明
 ############################################################
-1.SkuByBarCode()
+1.SkuByBarCode()//重装箱作业-根据件码获取SKU
     方法：POST
     路由：http://192.168.30.29:5000/Core/Api/ABox/SkuByBarCode
     参数: ApiBoxParam
@@ -14,4 +14,19 @@ function说明
  参考:input json 文件:SkuByBarCode_input.json 
  参考:output json 文件:SkuByBarCode_output.json  
 ############################################################
-2.  
+2.SetBoxCode()//重装箱作业-产生装箱资料WmsBox
+    方法：POST
+    路由：http://192.168.30.29:5000/Core/Api/ABox/SetBoxCode
+    参数: ApiBoxParam
+    InPut:
+        CoID        int         公司编号
+        Creator     string      操作者
+        SkuID       string      商品编码
+        ABarCodeLst List<string> 件码列表
+    OutPut:
+       成功：
+            1.新增资料(Wmsbox)            
+            2.新增操作记录log
+            3.返回请求成功信息(s=1)
+        失败：返回错误信息
+ 参考:input json 文件:SetBoxCode_input.json 
