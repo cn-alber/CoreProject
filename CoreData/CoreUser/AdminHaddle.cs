@@ -132,12 +132,32 @@ namespace CoreData.CoreUser
             }else{
                 using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                     try
-                    {                                        
-                        string iconfont = !string.IsNullOrEmpty(iconArr[1]) ? "menus.NewIcon='"+iconArr[0]+"',menus.NewIconPre='"+iconArr[1]+"'": "menus.NewIcon='"+iconArr[0]+"',menus.NewIconPre=''";
-                        string sql = "INSERT menus SET menus.`Name`='"+name+"',menus.NewUrl='"+router+"',"+iconfont+","+
-                                    "menus.SortIndex='"+order+"',menus.Remark='"+remark+"',menus.ParentID="+parentid+",menus.ViewPowerID="+accessid;
+                    {       
+                        Menus menus = new Menus();
+                        menus.Name = name;
+                        menus.SortIndex = int.Parse(router);
+                        menus.NewUrl = router;
+                        menus.Remark = remark;
+                        menus.ParentID = int.Parse(parentid);
+                        menus.ViewPowerID = int.Parse(accessid);
+                        menus.NewIcon = iconArr[0];
+                        if(!string.IsNullOrEmpty(iconArr[1])){
+                            menus.NewIconPre = iconArr[1];
+                        }else{
+                            menus.NewIconPre = "";
+                        }                        
+                        string sql = @"INSERT menus SET 
+                                            menus.`Name`=@Name,
+                                            menus.NewUrl=@NewUrl,
+                                            menus.NewIcon=@NewIcon,
+                                            menus.NewIconPre=@NewIconPre,
+                                            menus.SortIndex=@SortIndex,
+                                            menus.Remark=@Remark,
+                                            menus.ParentID=@ParentID,
+                                            menus.ViewPowerID=@ViewPowerID
+                                            menus.CoID = @CoID";
                         Console.WriteLine(sql);                                    
-                        int rnt = conn.Execute(sql);
+                        int rnt = conn.Execute(sql,menus);
                         if(rnt > 0){
                             result.s = 1;
                         }else{
@@ -162,13 +182,43 @@ namespace CoreData.CoreUser
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try
-                {
-                    
+                {                    
+                    Menus menus = GetOneMenu(id);
+                    if(menus.Name != name)
+                        menus.Name = name;
+                    if(menus.SortIndex != int.Parse(router))    
+                        menus.SortIndex = int.Parse(router);
+                    if(menus.NewUrl != router)    
+                        menus.NewUrl = router;
+                    if(menus.Remark != remark)    
+                        menus.Remark = remark;
+                    if(menus.ParentID != int.Parse(parentid))    
+                        menus.ParentID = int.Parse(parentid);
+                    if(menus.ViewPowerID != int.Parse(accessid))    
+                        menus.ViewPowerID = int.Parse(accessid);
+                    if(menus.NewIcon != iconArr[0])    
+                        menus.NewIcon = iconArr[0];
+                    if(!string.IsNullOrEmpty(iconArr[1])){
+                        if(menus.NewIconPre != iconArr[1])
+                            menus.NewIconPre = iconArr[1];
+                    }else{
+                        if(menus.NewIconPre != iconArr[1])
+                            menus.NewIconPre = "";
+                    }                        
                     string iconfont = !string.IsNullOrEmpty(iconArr[1]) ? "menus.NewIcon='"+iconArr[0]+"',menus.NewIconPre='"+iconArr[1]+"'": "menus.NewIcon='"+iconArr[0]+"',menus.NewIconPre=''";                    
-                    string sql = "Update menus SET menus.`Name`='"+name+"',menus.NewUrl='"+router+"',"+iconfont+","+
-                                 "menus.SortIndex='"+order+"',menus.Remark='"+remark+"',menus.ParentID="+parentid+" WHERE menus.id="+id;//,menus.ViewPowerID="+accessid+"
-                    Console.WriteLine(sql);             
-                    int rnt = conn.Execute(sql);
+                    string sql = @"Update menus SET 
+                                            menus.`Name`=@Name,
+                                            menus.NewUrl=@NewUrl,
+                                            menus.NewIcon=@NewIcon,
+                                            menus.NewIconPre=@NewIconPre,
+                                            menus.SortIndex=@SortIndex,
+                                            menus.Remark=@Remark,
+                                            menus.ParentID=@ParentID,
+                                            menus.ViewPowerID=@ViewPowerID
+                                         WHERE 
+                                            menus.id=@ID AND menus.CoID = @CoID";//,menus.ViewPowerID="+accessid+"
+                        
+                    int rnt = conn.Execute(sql,menus);
                     if(rnt > 0){
                         result.s = 1;
                     }else{
@@ -186,14 +236,29 @@ namespace CoreData.CoreUser
             return result;
         }
 
+        public static Menus GetOneMenu(string id){
+            Menus menus = null;
+            using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
+                try
+                {
+                   string sql = "select * from menus  where menus.ID ="+id;                                
+                   menus = conn.Query<Menus>(sql).AsList()[0];                                                                                                            
+                }
+                catch
+                {
+                    conn.Dispose();
+                }
+            }
+            return menus;
+        }
+
         public static DataResult GetMenuById(int id){
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try
                 {
                    string sql = "select menus.id, menus.`Name` as `name`,NewIcon,NewIconPre,NewUrl as router,SortIndex as `order`, menus.Remark, ParentID ,power.Title as access from menus "+ 
-                                "LEFT JOIN power on power.ID = menus.ViewPowerID where menus.ID ="+id;
-                                Console.WriteLine(sql);
+                                "LEFT JOIN power on power.ID = menus.ViewPowerID where menus.ID ="+id;                                
                    var res = conn.Query<Menu>(sql).AsList();                                      
                    if(res.Count!=0){                                              
                        result.d = new {
@@ -219,7 +284,7 @@ namespace CoreData.CoreUser
             }
             return result;
          }
-         public static DataResult DelMenuById(string ids){
+         public static DataResult DelMenuById(string ids,string coid){
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try
@@ -227,7 +292,7 @@ namespace CoreData.CoreUser
                    string sql = "";
                    var idArr = ids.Split(',');
                    foreach(string id in idArr){
-                       sql += "UPDATE menus SET menus.deleted = TRUE WHERE menus.ID ="+id+";";
+                       sql += "UPDATE menus SET menus.deleted = TRUE WHERE menus.ID ="+id+" AND menus.CoID = "+coid+" ;";
                    }
 
                    int rnt = conn.Execute(sql);

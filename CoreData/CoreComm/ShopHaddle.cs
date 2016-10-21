@@ -25,11 +25,7 @@ namespace CoreData.CoreComm
                 try
                 {
                     string wheresql = "where Deleted=FALSE ";
-                    if (IParam.CoID != 1)
-                    {
-
-                        wheresql = wheresql + " AND CoID=" + IParam.CoID;
-                    }
+                    wheresql = wheresql + " AND CoID=" + IParam.CoID;                  
                     if (!string.IsNullOrEmpty(IParam.Enable) && IParam.Enable.ToUpper() != "ALL")//是否启用
                     {
                         wheresql = wheresql + " AND Enable = " + (IParam.Enable.ToUpper() == "TRUE" ? true : false);
@@ -145,7 +141,7 @@ namespace CoreData.CoreComm
                         CacheBase.Remove("shop" + Coid + item);
                     }
                     string contents = string.Empty;
-                    string uptsql = @"update Shop set Enable = @Enable where ID in @ID";
+                    string uptsql = @"update Shop set Enable = @Enable where ID in @ID AND CoID ="+Coid;
                     var args = new { ID = IDsDic, Enable = Enable };
 
                     int count = conn.Execute(uptsql, args);
@@ -202,7 +198,7 @@ namespace CoreData.CoreComm
                         api += " shop.Updatewaybill = "+shopapi.enable+",";
                     }
                     api=api.Substring(0,api.Length-1);
-                    string sql = "update shop set "+api+" WHERE shop.ID in ("+shopapi.sid+") ";
+                    string sql = "update shop set "+api+" WHERE shop.ID in ("+shopapi.sid+") AND shop.CoID ="+Coid;
                     Console.WriteLine(sql);
                     int count = conn.Execute(sql);
                     if(count>0){
@@ -350,31 +346,33 @@ namespace CoreData.CoreComm
                 try
                 {
                     string str = @"update Shop
-                                    Set ShopName = @ShopName,
-                                    SitType = @SitType,
-                                    ShopSite = @ShopSite,
-                                    ShopType = @ShopType,
-                                    ShopUrl = @ShopUrl,
-                                    ShopSetting = @ShopSetting,
-                                    Enable = @Enable,
-                                    ShortName = @ShortName,
-                                    Shopkeeper = @Shopkeeper,
-                                    SendAddress = @SendAddress,
-                                    TelPhone = @TelPhone,
-                                    IDcard = @IDcard,
-                                    ContactName = @ContactName,
-                                    ReturnAddress = @ReturnAddress,
-                                    ReturnMobile = @ReturnMobile,
-                                    ReturnPhone = @ReturnPhone,
-                                    Postcode = @Postcode,
-                                    UpdateSku = @UpdateSku,
-                                    DownGoods = @DownGoods,
-                                    UpdateWayBill = @UpdateWayBill,
-                                    ShopBegin = @ShopBegin,
-                                    Istoken = @Istoken,
-                                    Token = @Token
+                                        Set ShopName = @ShopName,
+                                        SitType = @SitType,
+                                        ShopSite = @ShopSite,
+                                        ShopType = @ShopType,
+                                        ShopUrl = @ShopUrl,
+                                        ShopSetting = @ShopSetting,
+                                        Enable = @Enable,
+                                        ShortName = @ShortName,
+                                        Shopkeeper = @Shopkeeper,
+                                        SendAddress = @SendAddress,
+                                        TelPhone = @TelPhone,
+                                        IDcard = @IDcard,
+                                        ContactName = @ContactName,
+                                        ReturnAddress = @ReturnAddress,
+                                        ReturnMobile = @ReturnMobile,
+                                        ReturnPhone = @ReturnPhone,
+                                        Postcode = @Postcode,
+                                        UpdateSku = @UpdateSku,
+                                        DownGoods = @DownGoods,
+                                        UpdateWayBill = @UpdateWayBill,
+                                        ShopBegin = @ShopBegin,
+                                        Istoken = @Istoken,
+                                        Token = @Token
                                     where
-                                    ID = @ID
+                                        ID = @ID
+                                    and 
+                                        CoID = @CoID    
                                     ";
                     int count = CommDBconn.Execute(str, shop, TransComm);
                     if (count <= 0)
@@ -697,7 +695,7 @@ namespace CoreData.CoreComm
             {
                 try
                 {
-                    var rnt = conn.Execute("UPDATE shop SET shop.Token = 2 WHERE shop.ID = " + shopid);
+                    var rnt = conn.Execute("UPDATE shop SET shop.Token = 2 WHERE shop.ID = @id AND shop.CoID = @coid",new {id = shopid,coid = coid});
                     if (rnt > 0)
                     {
                         CacheBase.Remove("shop" + coid + shopid);
@@ -728,7 +726,7 @@ namespace CoreData.CoreComm
                     string sql = "";
                     foreach(string shopid in ids){
                         CacheBase.Remove("shop" + coid + shopid);
-                        sql += "UPDATE shop SET shop.Deleted = TRUE WHERE shop.ID = " + shopid +";";
+                        sql += "UPDATE shop SET shop.Deleted = TRUE WHERE shop.ID = " + shopid +" AND shop.CoID = "+coid+" ;";
                     }
                     Console.WriteLine(sql);
                     var rnt = conn.Execute(sql);

@@ -1,3 +1,4 @@
+物理路径: CoreWebApi/Controllers/Base/AdminControllers.cs
 接口名称：AdminControllers
 
 function说明
