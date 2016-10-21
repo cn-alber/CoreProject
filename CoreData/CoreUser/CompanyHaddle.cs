@@ -15,7 +15,9 @@ namespace CoreData.CoreUser
         public static DataResult GetCompanyList(CompanyParm cp)
         {
             var result = new DataResult(1,null);     
-            string wheresql = "where 1 = 1";
+            string sqlCount = "select count(id) from company where 1 = 1";
+            string sqlCommand = "select * from company where 1 = 1";
+            string wheresql = string.Empty;
             if(cp.CoID != 1)//公司编号
             {
                 wheresql = wheresql + " and id = " + cp.CoID;
@@ -35,12 +37,19 @@ namespace CoreData.CoreUser
             var res = new CompanyData();
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{    
+                    var u = conn.Query<Company>( sqlCount + wheresql).AsList();
+                    int count = u.Count;
+                    decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
+
+                    int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
+                    wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
+                    u = conn.Query<Company>( sqlCommand + wheresql).AsList();
                     int count = conn.QueryFirst<int>("select count(1) from company " + wheresql);
                     decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
 
                     int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
-                    wheresql = "select * from company " + wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
-                    var u = conn.Query<Company>(wheresql).AsList();
+                    wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
+                    var u = conn.Query<Company>(sqlCommand + wheresql).AsList();
 
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;

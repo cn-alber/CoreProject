@@ -69,4 +69,16 @@ namespace CoreModels.XyUser
         public decimal Pagecnt {get;set;}//总页数
         public List<Company> Com {get;set;}//公司资料List
     }
+    public class CompanyMulti
+    {
+        public int id {get;set;}
+        public string name {get;set;}
+        public bool enable {get;set;}
+        public string address {get;set;}
+        public string remark {get;set;}
+        public string creator {get;set;}
+        public DateTime createdate {get;set;}
+    }
+
+
 }
