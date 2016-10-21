@@ -1,0 +1,18 @@
+{
+    "s": 1,
+    "d": {
+        "ID": 27,
+        "SkuID": "NJR201605070007043",
+        "GoodsCode": "NJR20160507",
+        "ColorName": "棕色",
+        "SizeName": "11",
+        "Qty": 3,
+        "PCode": null,
+        "MaxQty": 0,
+        "IsBox": true,
+        "PCodeID": 0,
+        "SortCode": null,
+        "Type": 0
+    },
+    "m": ""
+}

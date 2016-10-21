@@ -6,7 +6,7 @@ using CoreModels.XyCore;
 
 namespace CoreWebApi.XyCore
 {
-    [AllowAnonymous]
+    // [AllowAnonymous]
     public class CoreSkuMatControllers : ControllBase
     {
         #region 物料管理-获取物料资料

@@ -1,0 +1,13 @@
+接口名称：AWmsBoxControllers
+function说明
+############################################################
+1.GetBox()//收货作业-根据箱码or件码_获取SKU
+    方法：GET
+    路由：http://192.168.30.29:5000/Core/Api/ABox/GetBox?CoID=&BoxCode=    
+    InPut:
+        CoID        int         公司编号
+        BoxCode     string      箱/件码
+    OutPut：
+        ACore       ACoreSku    箱/件码Sku
+    参考:output json 文件:GetBox_output.json  
+2.
