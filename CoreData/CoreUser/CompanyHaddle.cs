@@ -4,8 +4,6 @@ using Dapper;
 using System;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
-// using System.Data;
-
 
 namespace CoreData.CoreUser
 {
@@ -72,7 +70,7 @@ namespace CoreData.CoreUser
                         if (u.Count > 0)
                         {
                             CacheBase.Set<Company>("company" + ID.ToString(), u[0]);
-                            result.d = u;
+                            result.d = u[0];
                         }
                     }catch(Exception ex){
                         result.s = -1;
@@ -95,9 +93,9 @@ namespace CoreData.CoreUser
             var result = new DataResult(1,null);   
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{
-                    string wheresql = "select * from company where name ='" + name + "'" ;
-                    var u = conn.Query<Company>(wheresql).AsList();            
-                    if (u.Count > 0)
+                    string wheresql = "select count(1) from company where name ='" + name + "'" ;
+                    int u = conn.QueryFirst<int>(wheresql);            
+                    if (u > 0)
                     {
                         result.d = true;                 
                     }
@@ -117,7 +115,7 @@ namespace CoreData.CoreUser
         ///<summary>
         ///公司启用停用设置
         ///</summary>
-        public static DataResult UpdateComEnable(List<int> id,string Company,string UserName,bool Enable)
+        public static DataResult UpdateComEnable(List<int> id,int CoID,string UserName,bool Enable)
         {
             var result = new DataResult(1,null);   
             string contents = string.Empty;
@@ -129,19 +127,17 @@ namespace CoreData.CoreUser
                     if(count < 0)
                     {
                         result.s= -3003;
+                        return  result;
+                    }
+                    if(Enable == true)
+                    {
+                        contents = "公司状态启用";
                     }
                     else
                     {
-                        if(Enable)
-                        {
-                            contents = "公司状态启用";
-                        }
-                        else
-                        {
-                            contents = "公司状态停用";
-                        }
-                        // LogComm.InsertUserLog("修改公司资料", "company", contents, UserName, CoID, DateTime.Now);
+                        contents = "公司状态停用";
                     }
+                    LogComm.InsertUserLog("修改公司资料", "company", contents, UserName, CoID, DateTime.Now);
                     result.d = contents;           
                 }catch(Exception ex){
                     result.s = -1;
@@ -154,15 +150,9 @@ namespace CoreData.CoreUser
         ///<summary>
         ///公司基本资料新增
         ///</summary>   
-        public static DataResult InsertCompany(Company com,string UserName,string Company,string account,string name,string ps,string email,string gender,string mobile,string qq)
+        public static DataResult InsertCompany(Company com,string UserName,int CoID,UserEdit user)
         {
             var result = new DataResult(1,null);   
-            if(com.name == null)
-            {
-                result.s = -1;
-                result.d = "公司名称必须有值!";
-                return result;
-            }
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{
                     string sqlCommandText = @"INSERT INTO company(name,address,email,contacts,telphone,mobile,remark,creator,modifier) VALUES(
@@ -175,23 +165,23 @@ namespace CoreData.CoreUser
                     if(count < 0)
                     {
                         result.s = -3002;
+                        return  result;
                     }
-                    else
+                    int rtn = conn.QueryFirst<int>("select LAST_INSERT_ID()");
+                    sqlCommandText = @"INSERT INTO user(account,name,password,email,gender,mobile,qq,companyid,creator) VALUES(
+                        @Account,@Name,@Password,@Email,@Gender,@Mobile,@Qq,@Companyid,@Creator)";
+                    user.CompanyID = rtn;
+                    user.Creator = UserName;
+                    count =conn.Execute(sqlCommandText,user);
+                    if(count < 0)
                     {
-                        int rtn = conn.QueryFirst<int>("select LAST_INSERT_ID()");
-                        sqlCommandText = @"INSERT INTO user(account,name,password,email,gender,mobile,qq,companyid,creator) VALUES(
-                            @Account,@Name,@Password,@Email,@Gender,@Mobile,@Qq,@Companyid,@Creator)";
-                        var args = new {Account = account,Name = name,Password=ps,Email=email,Gender=gender,Mobile=mobile,Qq=qq,Companyid=rtn,Creator = UserName};
-                        count =conn.Execute(sqlCommandText,args);
-                        if(count < 0)
-                        {
-                            result.s = -3002;
-                            return result;
-                        }
-                        result.d = rtn;
-                        // LogComm.InsertUserLog("新增公司资料", "company", "新增公司" + com.name ,UserName, CoID, DateTime.Now);
-                        CacheBase.Set<Company>("company" + rtn.ToString(), com);
-                    }        
+                        result.s = -3002;
+                        return result;
+                    }
+                    result.d = rtn;
+                    LogComm.InsertUserLog("新增公司资料", "company", "新增公司" + com.name ,UserName, CoID, DateTime.Now);
+                    com.id = rtn;
+                    CacheBase.Set<Company>("company" + rtn.ToString(), com);   
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
@@ -203,7 +193,7 @@ namespace CoreData.CoreUser
         ///<summary>
         ///公司基本资料保存
         ///</summary> 
-        public static DataResult UpdateCompany(Company com,string UserName,string Company)
+        public static DataResult UpdateCompany(Company com,string UserName,int CoID)
         {
             var result = new DataResult(1,null);  
             string contents = string.Empty; 
@@ -279,7 +269,7 @@ namespace CoreData.CoreUser
                     }
                     else
                     {
-                        // LogComm.InsertUserLog("修改公司资料", "company", contents, UserName, Company, DateTime.Now);               
+                        LogComm.InsertUserLog("修改公司资料", "company", contents, UserName, CoID, DateTime.Now);               
                         CacheBase.Set<Company>("company" + com.id.ToString(), comupdate);
                     }
                 }catch(Exception ex){

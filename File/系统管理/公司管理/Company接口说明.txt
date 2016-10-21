@@ -5,8 +5,8 @@ function说明
   路由:http://localhost:5000/Core/Company/CompanyList
 input：     Enable         string         启用状态(all/false/true) default all
             Filter         string         公司名称匹配值(模糊查询)default null
-            SortField      string         排序字段 default id
-            SortDirection  string         排序方式(ASC|DESC) default DESC
+            SortField      string         排序字段 default null
+            SortDirection  string         排序方式(ASC|DESC) default null
             PageIndex      string         资料页数(ex.第一页就给1) default 1
             NumPerPage     string         每页显示资料笔数 default 20
 OutPut:     Datacnt        int            资料总笔数
@@ -17,14 +17,13 @@ OutPut:     Datacnt        int            资料总笔数
 
 2.CompanySingle() //查询单笔company资料
   路由:http://localhost:5000/Core/Company/GetCompanySingle
-input：ID   公司资料ID
+input：ID   string  公司资料ID
 OutPut: 单笔company 资料
 参考:output jason 文件:CompanySingle_output.json
 
 3.CompanyEnable()//批次更新公司资料的状态
 路由:http://localhost:5000/Core/Company/CompanyEnable
 input： IDList          List<int>      公司ID
-        Company         string         登录者公司名称(exp:携云科技)
         Enable          string         指定状态true|false（启用，停用）
 OutPut: 成功：
             1.更新公司状态Company.enable
@@ -38,7 +37,6 @@ OutPut: 成功：
 4.UpdateCompamy() //更新公司基本资料
 路由:http://localhost:5000/Core/Company/UpdateCompany
 input:Com           Company   公司资料
-      Company       string    登录者公司名称(exp:携云科技)
 output: s=1成功 else 错误代码
 参考:input jason 文件:UpdateCompamy_input.json
 参考:output jason 文件:UpdateCompamy_output.json
@@ -46,14 +44,7 @@ output: s=1成功 else 错误代码
 5.InsertCompany() //新增公司基本资料
 路由:http://localhost:5000/Core/Company/InsertCompany
 input:Com           Company   公司资料
-      Company       string    登录者公司名称(exp:携云科技)
-      Account       string    账号
-      Name          string    用户名
-      Password      string    密码
-      Email         string    邮箱
-      Gender        string    性别
-      Mobile        string    手机
-      QQ            string    QQ
+      User          User      用户资料
 output: s=1成功 else 错误代码
 参考:input jason 文件:InsertCompamy_input.json
 参考:output jason 文件:InsertCompamy_output.json

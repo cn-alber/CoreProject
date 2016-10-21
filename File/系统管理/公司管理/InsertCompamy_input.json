@@ -1,13 +1,10 @@
-{        
-"Com": {
-        "name": "测试1021"
+{
+    "Com": {
+        "name": "测试1021222"
     },
-"Company":"携云科技",
-"Account":"TEST",
-"Name":"XXX",
-"Password":"TEST",
-"Email":"",
-"Gender":"",
-"Mobile":"",
-"QQ":""
+    "User": {
+        "Account": "111",
+        "Name": "222",
+        "PassWord": "33"
+    }
 }
