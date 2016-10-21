@@ -157,7 +157,7 @@ namespace CoreData.CoreUser
                 }
                 else
                 {
-                    CoreUser.LogComm.InsertUserLogTran(TransUser, "新增通知", "Notice", n.Title, UserName, CoID.ToString(), DateTime.Now);
+                    CoreUser.LogComm.InsertUserLogTran(TransUser, "新增通知", "Notice", n.Title, UserName, CoID, DateTime.Now);
                 }
                 if (result.s == 1)
                 {
@@ -218,7 +218,7 @@ namespace CoreData.CoreUser
                     }
                     else
                     {
-                        CoreUser.LogComm.InsertUserLogTran(TransUser, "修改系统通知", "Notice", contents, UserName, CoID.ToString(), DateTime.Now);
+                        CoreUser.LogComm.InsertUserLogTran(TransUser, "修改系统通知", "Notice", contents, UserName, CoID, DateTime.Now);
                         TransUser.Commit();
                     }
 
@@ -261,7 +261,7 @@ namespace CoreData.CoreUser
                     if (count > 0)
                     {
                         string contents = "删除通知=>" + string.Join(",", IDLst);
-                        LogComm.InsertUserLogTran(TransUser, "删除通知", "Notice", contents, UserName, CoID.ToString(), DateTime.Now);
+                        LogComm.InsertUserLogTran(TransUser, "删除通知", "Notice", contents, UserName, CoID, DateTime.Now);
                     }
                     TransUser.Commit();
                 }

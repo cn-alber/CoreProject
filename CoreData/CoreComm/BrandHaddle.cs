@@ -157,7 +157,7 @@ namespace CoreData.CoreComm
                         res.s = 3002;
                     }
                     contents += string.Join(",", IDLst.ToArray());
-                    CoreUser.LogComm.InsertUserLogTran(TransUser, "修改品牌状态", "Brand", contents, UserName, CoID, DateTime.Now);
+                    CoreUser.LogComm.InsertUserLogTran(TransUser, "修改品牌状态", "Brand", contents, UserName, int.Parse(CoID), DateTime.Now);
 
                     if (res.s > 0)
                     {
@@ -229,7 +229,7 @@ namespace CoreData.CoreComm
                 }
                 else
                 {
-                    CoreUser.LogComm.InsertUserLogTran(TransUser, "新增品牌", "Brand", b.Name, UserName, CoID.ToString(), DateTime.Now);
+                    CoreUser.LogComm.InsertUserLogTran(TransUser, "新增品牌", "Brand", b.Name, UserName, CoID, DateTime.Now);
                 }
                 if (res.s == 1)
                 {
@@ -296,7 +296,7 @@ namespace CoreData.CoreComm
                 }
                 else
                 {
-                    CoreUser.LogComm.InsertUserLogTran(TransUser, "修改品牌资料", "Brand", contents, UserName, CoID.ToString(), DateTime.Now);
+                    CoreUser.LogComm.InsertUserLogTran(TransUser, "修改品牌资料", "Brand", contents, UserName, CoID, DateTime.Now);
                     TransUser.Commit();
                     TransComm.Commit();
                 }
@@ -343,7 +343,7 @@ namespace CoreData.CoreComm
                 if (count > 0)
                 {
                     string contents = "删除品牌=>" + string.Join(",", IDLst);
-                    CoreUser.LogComm.InsertUserLogTran(TransUser, "删除品牌资料", "Brand", contents, UserName, CoID.ToString(), DateTime.Now);
+                    CoreUser.LogComm.InsertUserLogTran(TransUser, "删除品牌资料", "Brand", contents, UserName, CoID, DateTime.Now);
                     TransComm.Commit();
                     TransUser.Commit();
                 }

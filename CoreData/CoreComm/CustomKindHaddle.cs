@@ -140,7 +140,7 @@ namespace CoreData.CoreComm
                         var Kind = conn.QueryFirst<CustomKind>("SELECT * FROM customkind WHERE CoID=@CoID AND KindName=@KindName AND IsDelete=0", new { CoID = CoID, KindName = KindName });
                         string cname = "customkind" + CoID + Kind.ID;
                         CacheBase.Set(cname, ck);//新增缓存
-                        CoreUser.LogComm.InsertUserLog("新增" + Type, "CustomKind", ck.FullName, UserName, CoID, DateTime.Now);
+                        CoreUser.LogComm.InsertUserLog("新增" + Type, "CustomKind", ck.FullName, UserName, int.Parse(CoID), DateTime.Now);
                     }
                 }
                 catch (Exception e)
@@ -202,7 +202,7 @@ namespace CoreData.CoreComm
                                 CacheBase.Remove(cname);//清除缓存
                                 var kind = conn.QueryFirst<CustomKind>("select * from customkind WHERE ID=@ID", new { ID = Kind.ID });
                                 CacheBase.Set(cname, kind);//添加缓存
-                                CoreUser.LogComm.InsertUserLog("修改" + OldKind.Type, "CustomKind", contents, UserName, CoID, DateTime.Now);//操作记录
+                                CoreUser.LogComm.InsertUserLog("修改" + OldKind.Type, "CustomKind", contents, UserName, int.Parse(CoID), DateTime.Now);//操作记录
                             }
                         }
                     }
@@ -277,7 +277,7 @@ namespace CoreData.CoreComm
                             CacheBase.Remove(cname);
                         }
                         string contents = "删除类目=>" + string.Join(",", IDLst);
-                        CoreUser.LogComm.InsertUserLog("删除类目资料", "User", contents, UserName, CoID.ToString(), DateTime.Now);
+                        CoreUser.LogComm.InsertUserLog("删除类目资料", "User", contents, UserName, CoID, DateTime.Now);
                     }
                 }
                 catch (Exception e)

@@ -436,7 +436,7 @@ namespace CoreData.CoreUser
                     res.s = 3002;
                 }
                 contents += string.Join(",", IDLst.ToArray());
-                CoreUser.LogComm.InsertUserLog("修改用户状态", "User", contents, UserName, CoID, DateTime.Now);
+                CoreUser.LogComm.InsertUserLog("修改用户状态", "User", contents, UserName, int.Parse(CoID), DateTime.Now);
                 string querysql = @"SELECT
                                             u.*, b. NAME AS CompanyName,
                                             r. NAME AS RoleName
@@ -590,7 +590,7 @@ namespace CoreData.CoreUser
                 }
                 else
                 {
-                    CoreUser.LogComm.InsertUserLogTran(TransUser, "新增用户资料", "User", user.Name, UserName, CoID.ToString(), DateTime.Now);
+                    CoreUser.LogComm.InsertUserLogTran(TransUser, "新增用户资料", "User", user.Name, UserName, CoID, DateTime.Now);
                     CacheBase.Set<UserEdit>(usname, user);//缓存
                 }
                 if (result.s == 1)
@@ -687,7 +687,7 @@ namespace CoreData.CoreUser
                     }
                     else
                     {
-                        CoreUser.LogComm.InsertUserLogTran(TransUser, "修改用户资料", "User", contents, UserName, CoID.ToString(), DateTime.Now);
+                        CoreUser.LogComm.InsertUserLogTran(TransUser, "修改用户资料", "User", contents, UserName, CoID, DateTime.Now);
                         CacheBase.Set<UserEdit>(sname, user);//缓存
                         TransUser.Commit();
                     }
@@ -745,7 +745,7 @@ namespace CoreData.CoreUser
                         CacheBase.Remove(sname);
                     }
                     string contents = "删除用户=>" + string.Join(",", IDLst);
-                    LogComm.InsertUserLogTran(TransUser, "删除用户资料", "User", contents, UserName, CoID.ToString(), DateTime.Now);
+                    LogComm.InsertUserLogTran(TransUser, "删除用户资料", "User", contents, UserName, CoID, DateTime.Now);
                 }
                 TransUser.Commit();
             }

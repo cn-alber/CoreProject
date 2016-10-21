@@ -166,7 +166,7 @@ namespace CoreData.CoreComm
                             result.s = 3002;
                         }
                         contents += string.Join(",", IDsDic.ToArray());
-                        CoreUser.LogComm.InsertUserLog("修改店铺资料", "Shop", contents, UserName, Coid, DateTime.Now);
+                        CoreUser.LogComm.InsertUserLog("修改店铺资料", "Shop", contents, UserName, int.Parse(Coid), DateTime.Now);
                         
                     }
                 }
@@ -383,7 +383,7 @@ namespace CoreData.CoreComm
                     }
                     else
                     {
-                        CoreUser.LogComm.InsertUserLogTran(TransUser, "修改店铺资料", "Shop", contents, UserName, CoID.ToString(), DateTime.Now);
+                        CoreUser.LogComm.InsertUserLogTran(TransUser, "修改店铺资料", "Shop", contents, UserName, CoID, DateTime.Now);
                         CacheBase.Set<Shop>(sname, shop);//缓存
                         TransComm.Commit();
                         TransUser.Commit();
@@ -573,7 +573,7 @@ namespace CoreData.CoreComm
                 }
                 else
                 {
-                    CoreUser.LogComm.InsertUserLogTran(TransUser, "新增店铺资料", "Shop", shop.ShopName, UserName, CoID.ToString(), DateTime.Now);
+                    CoreUser.LogComm.InsertUserLogTran(TransUser, "新增店铺资料", "Shop", shop.ShopName, UserName, CoID, DateTime.Now);
                     CacheBase.Set<Shop>(sname, shop);//缓存
                 }
                 TransComm.Commit();

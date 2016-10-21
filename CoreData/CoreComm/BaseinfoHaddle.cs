@@ -184,7 +184,7 @@ namespace CoreData.CoreComm
                 }
                 else
                 {
-                    CoreUser.LogComm.InsertUserLogTran(TransUser, "新增数据字典", "Baseinfo", n.Kind + ' ' + n.Name, UserName, CoID.ToString(), DateTime.Now);
+                    CoreUser.LogComm.InsertUserLogTran(TransUser, "新增数据字典", "Baseinfo", n.Kind + ' ' + n.Name, UserName, CoID, DateTime.Now);
                 }
                 if (result.s == 1)
                 {
@@ -267,7 +267,7 @@ namespace CoreData.CoreComm
                 }
                 else
                 {
-                    CoreUser.LogComm.InsertUserLogTran(TransUser, "修改数据字典", "Baseinfo", contents, UserName, CoID.ToString(), DateTime.Now);
+                    CoreUser.LogComm.InsertUserLogTran(TransUser, "修改数据字典", "Baseinfo", contents, UserName, CoID, DateTime.Now);
                     TransComm.Commit();
                     TransUser.Commit();
                 }
@@ -315,7 +315,7 @@ namespace CoreData.CoreComm
                     if (count > 0)
                     {
                         string contents = "删除数据字典=>" + string.Join(",", IDLst);
-                        CoreUser.LogComm.InsertUserLogTran(TransUser, "删除通知", "Baseinfo", contents, UserName, CoID.ToString(), DateTime.Now);
+                        CoreUser.LogComm.InsertUserLogTran(TransUser, "删除通知", "Baseinfo", contents, UserName, CoID, DateTime.Now);
                     }
                     TransUser.Commit();
                     TransComm.Commit();
