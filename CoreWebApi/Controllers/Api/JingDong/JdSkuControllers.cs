@@ -1,9 +1,11 @@
 using System;
 using CoreDate.CoreApi;
 using CoreModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoreWebApi.Api.JingDong{    
+    [AllowAnonymous]
     public class JdSkuControllers : ControllBase
     {
         #region  增加SKU信息（与正式环境相连，未做测试）
@@ -87,7 +89,7 @@ namespace CoreWebApi.Api.JingDong{
         }
         #endregion
 
-        #region
+        #region 获取单个Sku信息
         [HttpGetAttribute("/core/Api/JdSku/SkuGet")]
         public ResponseResult SkuGet(string sku_id,string token){
             var m = new DataResult(1,null);

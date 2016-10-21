@@ -7,7 +7,7 @@ namespace CoreWebApi.Api.JingDong{
     public class JdSupplierControllers : ControllBase
     {
         #region 厂商直送出库
-        [HttpGetAttribute("/core/Api/JdOrder/DpsOutbound")]
+        [HttpGetAttribute("/core/Api/JdSupplier/DpsOutbound")]
         public ResponseResult DpsOutbound(string token,string customOrderId,string memoByVendor="",string isJdexpress=""){
             var m = new DataResult(1,null);
             if(string.IsNullOrEmpty(token)){
@@ -23,7 +23,7 @@ namespace CoreWebApi.Api.JingDong{
         #endregion
 
         #region 厂商直送发货
-        [HttpGetAttribute("/core/Api/JdOrder/DpsDelivery")]
+        [HttpGetAttribute("/core/Api/JdSupplier/DpsDelivery")]
         public ResponseResult DpsDelivery(string token,string customOrderId,string carrierId,string carrierBusinessName,string shipNo,string estimateDate){
             var m = new DataResult(1,null);
             if(string.IsNullOrEmpty(token)){
@@ -36,7 +36,7 @@ namespace CoreWebApi.Api.JingDong{
         #endregion
 
         #region 订单发货
-        [HttpGetAttribute("/core/Api/JdOrder/EptDeliveryOrder")]
+        [HttpGetAttribute("/core/Api/JdSupplier/EptDeliveryOrder")]
         public ResponseResult EptDeliveryOrder(string orderId,string expressNo,string token){
             var m = new DataResult(1,null);
             if(string.IsNullOrEmpty(token)){

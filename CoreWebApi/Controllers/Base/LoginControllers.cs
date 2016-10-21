@@ -152,6 +152,7 @@ namespace CoreWebApi
         //     await HttpContext.Authentication.SignOutAsync("CoreInstance");
         // }
 
+        [AllowAnonymous]
         [HttpPostAttribute("/Core/sign/out")]
         public ResponseResult loginout()
         {

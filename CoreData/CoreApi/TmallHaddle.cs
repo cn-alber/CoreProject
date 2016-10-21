@@ -108,7 +108,9 @@ namespace CoreDate.CoreApi
                 Tmparam.Add("status",status);
                 Tmparam.Add("tag", tag);
                 Tmparam.Add("type", type);
-                //Tmparam.Add("use_has_next", use_has_next.ToString());     
+            
+                //Tmparam.Add("use_has_next", use_has_next.ToString()); 
+                removeEmptyParam();    
                 string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            

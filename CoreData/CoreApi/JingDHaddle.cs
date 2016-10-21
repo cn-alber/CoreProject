@@ -13,7 +13,8 @@ namespace CoreDate.CoreApi
     
     public  class JingDHaddle{
 
-        private static string SERVER_URL = "https://api.jd.com/routerjson";                                                        
+        private static string SERVER_URL = "https://api.jd.com/routerjson";
+        public  static string ORDER_STATE = "WAIT_SELLER_STOCK_OUT,WAIT_GOODS_RECEIVE_CONFIRM,WAIT_SELLER_DELIVERY,FINISHED_L,TRADE_CANCELED,LOCKED,PAUSE";                                                        
         private static IDictionary<string, string> jdparam = new Dictionary<string, string>{
             {"app_key", "7888CE9C0F3AAD424FEE8EEAAC99E10E"},
             {"sign", "123"},
@@ -76,8 +77,10 @@ namespace CoreDate.CoreApi
         }
         
         #region Order 订单
-        public static DataResult jdOrderDownload(string start_date, string end_date, string order_state, int page, int page_size, string token){
+        public static DataResult jdOrderDownload(string start_date, string end_date, int page, int page_size, string token, string order_state=""){
             var result = new DataResult(1,null);
+            if(string.IsNullOrEmpty(order_state))
+                order_state = ORDER_STATE; 
             try{              
                 jdparam.Add("method", "360buy.order.search");
                 jdparam.Add("access_token", token);
@@ -89,7 +92,7 @@ namespace CoreDate.CoreApi
                     result.s = -1;
                     result.d = res.error_response.code+" : "+res.error_response.zh_desc;
                 }else{
-                    result.d = res.order_search_response.order_search.order_info_list;
+                    result.d = res.order_search_response.order_search;
                 }
             }catch(Exception ex){
                 result.d =  ex.Message;
@@ -99,8 +102,10 @@ namespace CoreDate.CoreApi
             return result;
         }
 
-        public static DataResult orderDownByIds(List<string> order_ids,string optional_fields,string order_state,string token){
+        public static DataResult orderDownByIds(List<string> order_ids,string optional_fields,string token,string order_state=""){
             var result = new DataResult(1,null);
+            if(string.IsNullOrEmpty(order_state))
+                order_state = ORDER_STATE;
             try{
                 List<dynamic> orderinfolist = new List<dynamic>();                
                 jdparam.Add("method", "360buy.order.get");
@@ -120,7 +125,10 @@ namespace CoreDate.CoreApi
                     jdparam.Remove("360buy_param_json");
                 }
                 if(result.s == 1)
-                    result.d = orderinfolist;
+                    result.d = new {
+                        order_info_list = orderinfolist,
+                        order_total = orderinfolist.Count
+                    };
                 
             }catch(Exception ex){                
                 result.d =  ex.Message;
@@ -136,8 +144,7 @@ namespace CoreDate.CoreApi
         ///  退款审核单列表查询
         /// </summary>
         /// <param name="ids">可为空，批量传入退款单id，格式为'id,id'，传入id数不能超过pageSize </param>
-        /// <param name="status">可为空，退款申请单状态 0、未审核 1、审核通过2、审核不通过 3、京东财务审核通过
-        /// 4、京东财务审核不通过 5、人工审核通过 6、拦截并退款 7、青龙拦截成功 8、青龙拦截失败 9、强制关单并退款。不传是查询全部状态 </param>
+        /// <param name="status">可为空，退款申请单状态 0、未审核 1、审核通过2、审核不通过 3、京东财务审核通过 4、京东财务审核不通过 5、人工审核通过 6、拦截并退款 7、青龙拦截成功 8、青龙拦截失败 9、强制关单并退款。不传是查询全部状态 </param>
         /// <param name="orderId">可为空，订单id </param>
         /// <param name="buyerId">可为空，客户帐号 </param>
         /// <param name="buyerName">可为空，	客户姓名 </param>
@@ -159,7 +166,7 @@ namespace CoreDate.CoreApi
                     result.s = -1;
                     result.d = res.error_response.code+" : "+res.error_response.zh_desc;
                 }else{
-                    result.d = res;
+                    result.d = res.jingdong_pop_afs_soa_refundapply_queryPageList_responce.queryResult;
                 }
                 
             }catch(Exception ex){
@@ -170,7 +177,7 @@ namespace CoreDate.CoreApi
             return result;
         }
                     
-        public static DataResult jdRefundById(int id,string token){
+        public static DataResult jdRefundById(long id,string token){
             var result = new DataResult(1,null);
             try{                             
                 jdparam.Add("method", "jingdong.pop.afs.soa.refundapply.queryById");  
@@ -181,8 +188,8 @@ namespace CoreDate.CoreApi
                 if(response.Result.ToString().IndexOf("error") > 0){
                     result.s = -1;
                     result.d = res.error_response.code+" : "+res.error_response.zh_desc;
-                }else{
-                    result.d = res.jingdong_pop_afs_soa_refundapply_queryById_responce.queryResult.result[0].refundApplyVo;
+                }else{                    
+                    result.d = res.jingdong_pop_afs_soa_refundapply_queryById_responce.queryResult.result;
                 }
             }catch(Exception ex){
                 result.d =  ex.Message;
@@ -761,7 +768,7 @@ namespace CoreDate.CoreApi
 /// <summary>
         /// 查询京东快递物流跟踪信息
         /// </summary>
-        /// <param name="waybillCode"></param>
+        /// <param name="waybillCode">订单号</param>
         public static DataResult jdTraceGet(string waybillCode,string token){
             var result = new DataResult(1,null);
             try{                             

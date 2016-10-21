@@ -33,15 +33,17 @@ namespace CoreWebApi.Api.Tmall{
 
         #region
         [HttpGetAttribute("/core/Api/TmTrades/oneget")]
-        public ResponseResult oneget(string fields="",string tid="",string token=""){                    
+        public ResponseResult oneget(string fields="",string tids="",string token=""){                    
             var m = new DataResult(1,null);
             if(string.IsNullOrEmpty(fields)){
                 fields = OREDER_FIELDS;
             }
             if(string.IsNullOrEmpty(token)){
                 m.s = -5000;
+            }if(string.IsNullOrEmpty(tids)){
+                m.s = -5022;
             }else{
-                m = TmallHaddle.getbytid(fields,tid,token);
+                m = TmallHaddle.getbytid(fields,tids,token);
             }
             return CoreResult.NewResponse(m.s, m.d, "Api");
         }

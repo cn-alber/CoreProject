@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using CoreDate.CoreApi;
 using CoreModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoreWebApi.Api.JingDong{    
+    [AllowAnonymous]
     public class JdOrderControllers : ControllBase
     {
         #region 
@@ -20,22 +22,22 @@ namespace CoreWebApi.Api.JingDong{
             page = Math.Max(page,1);
             pageSize = Math.Min(pageSize,100);
 
-            var m = JingDHaddle.jdOrderDownload(start_date, end_date, order_state, page, pageSize, token);
+            var m = JingDHaddle.jdOrderDownload(start_date, end_date, page, pageSize, token,order_state);
             return CoreResult.NewResponse(m.s, m.d, "Api");
         }
         #endregion
 
         #region 
         [HttpGetAttribute("/core/Api/JdOrder/downByIds")]
-        public ResponseResult downByIds(List<string> order_id,string token="",string optional_fields = "",string order_state="")
+        public ResponseResult downByIds(List<string> order_ids,string token="",string optional_fields = "",string order_state="")
         {                  
             var m = new DataResult(1,null);
             if(string.IsNullOrEmpty(token)){
                 m.s = -5000;
-            }else if(order_id.Count == 0){
+            }else if(order_ids.Count == 0){
                 m.s = -5004;
             }else{
-                m = JingDHaddle.orderDownByIds(order_id, optional_fields, order_state, token);
+                m = JingDHaddle.orderDownByIds(order_ids, optional_fields, token,order_state);
             }
             return CoreResult.NewResponse(m.s, m.d, "Api");
         }
