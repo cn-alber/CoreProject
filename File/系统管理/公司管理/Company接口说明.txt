@@ -1,4 +1,4 @@
-接口名称:CompanyControllers
+接口名称:CoreWebApi/Controllers/Base/CompanyControllers
 
 function说明
 1.CompanyList() //查询table company 资料

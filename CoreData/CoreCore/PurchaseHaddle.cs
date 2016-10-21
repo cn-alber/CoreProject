@@ -284,7 +284,7 @@ namespace CoreData.CoreCore
                     else
                     {
                         string wheresql = "select id,sconame,scosimple,enable,scocode,address,country,contactor,tel,phone,fax,url,email,typelist,bank,bankid,taxid,remark from supplycompany where id =" + pur.scoid;
-                        var u = conn.Query<ScoCompanySingle>(wheresql).AsList();
+                        var u = conn.Query<ScoCompany>(wheresql).AsList();
                         if(u.Count == 0)
                         {
                             result.s = -1;
@@ -411,7 +411,7 @@ namespace CoreData.CoreCore
                     if ( pur.scoid != 0)
                     {
                         string wheresql = "select id,sconame,scosimple,enable,scocode,address,country,contactor,tel,phone,fax,url,email,typelist,bank,bankid,taxid,remark from supplycompany where id =" + pur.scoid;
-                        var u = conn.Query<ScoCompanySingle>(wheresql).AsList();
+                        var u = conn.Query<ScoCompany>(wheresql).AsList();
                         if(u.Count == 0)
                         {
                             result.s = -1;

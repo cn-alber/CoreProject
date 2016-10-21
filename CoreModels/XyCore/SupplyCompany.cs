@@ -3,19 +3,7 @@ using System.Collections.Generic;
 
 namespace CoreModels.XyCore
 {
-    public class ScoCompanyMulti
-    {
-        public int id {get;set;}
-        public string scocode {get;set;}
-        public bool enable {get;set;}
-        public string sconame {get;set;}
-        public string scosimple {get;set;}
-        public string typelist {get;set;}
-        public string remark {get;set;}
-        public string creator {get;set;}
-        public DateTime createdate {get;set;}
-    }
-    public class ScoCompanySingle
+    public class ScoCompany
     {
         public int id {get;set;}
         public string sconame {get;set;}
@@ -35,14 +23,19 @@ namespace CoreModels.XyCore
         public string bankid {get;set;}
         public string taxid {get;set;}
         public string remark {get;set;}
+        public int coid{get;set;}
+        public string creator {get;set;}
+        public DateTime createdate {get;set;}
+        public string modifier {get;set;}
+        public DateTime modifydate {get;set;}
     }
     public class ScoCompanyParm
     {
         public int _CoID ;//公司id
         public string _Enable = "all" ;//启用状态
         public string _Filter = null;//名称过滤条件
-        public string _SortField = "id";//排序栏位
-        public string _SortDirection = "desc";//排序方式
+        public string _SortField ;//排序栏位
+        public string _SortDirection ;//排序方式
         public int _NumPerPage = 20 ;//每页显示资料笔数
         public int _PageIndex = 1;//页码
         public int CoID
@@ -85,6 +78,6 @@ namespace CoreModels.XyCore
     {
         public int Datacnt {get;set;}//总资料笔数
         public decimal Pagecnt {get;set;}//总页数
-        public List<ScoCompanyMulti> Com {get;set;}//公司资料List
+        public List<ScoCompany> Com {get;set;}//公司资料List
     }
 }

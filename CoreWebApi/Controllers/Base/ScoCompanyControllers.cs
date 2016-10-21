@@ -18,18 +18,24 @@ namespace CoreWebApi
         {   
             var cp = new ScoCompanyParm();
             cp.CoID = int.Parse(GetCoid());
-            if(Enable.ToUpper() == "TRUE" || Enable.ToUpper() == "FALSE")
+            if(!string.IsNullOrEmpty(Enable))
             {
-                cp.Enable = Enable;
+                if(Enable.ToUpper() == "TRUE" || Enable.ToUpper() == "FALSE")
+                {
+                    cp.Enable = Enable;
+                }
             }
             cp.Filter = Filter;
-            if(CommHaddle.SysColumnExists(DbBase.CoreConnectString,"supplycompany",SortField).s == 1)
+            if(!string.IsNullOrEmpty(SortField))
             {
-                cp.SortField = SortField;
+                if(CommHaddle.SysColumnExists(DbBase.CoreConnectString,"supplycompany",SortField).s == 1)
+                {
+                    cp.SortField = SortField;
+                }
             }
             if(!string.IsNullOrEmpty(SortDirection))
             {
-                 if(SortDirection.ToUpper() == "ASC")
+                 if(SortDirection.ToUpper() == "ASC" || SortDirection.ToUpper() == "DESC")
                 {
                     cp.SortDirection = SortDirection;
                 }
@@ -51,10 +57,10 @@ namespace CoreWebApi
         public ResponseResult CompanyEnable([FromBodyAttribute]JObject co)
         {   
             List<int> id = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["IDList"].ToString());
-            string Company = co["Company"].ToString();
+            int CoID = int.Parse(GetCoid());
             string UserName = GetUname(); 
             bool Enable = co["Enable"].ToString().ToUpper()=="TRUE"?true:false;
-            var data = ScoCompanyHaddle.UpdateScoComEnable(id,Company,UserName,Enable);
+            var data = ScoCompanyHaddle.UpdateScoComEnable(id,CoID,UserName,Enable);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -62,11 +68,12 @@ namespace CoreWebApi
         public ResponseResult ScoCompanySingle(string ID)
         {   
             int x,id;
+            int CoID = int.Parse(GetCoid());
             var data = new DataResult(1,null);  
             if (int.TryParse(ID, out x))
             {
                 id = int.Parse(ID);
-                data = ScoCompanyHaddle.GetScoCompanyEdit(id);
+                data = ScoCompanyHaddle.GetScoCompanyEdit(id,CoID);
             }
             else
             {
@@ -80,15 +87,14 @@ namespace CoreWebApi
         public ResponseResult InsetScoCompany([FromBodyAttribute]JObject co)
         {   
             string CoID = GetCoid();
-            var com = Newtonsoft.Json.JsonConvert.DeserializeObject<ScoCompanySingle>(co["Com"].ToString());
+            var com = Newtonsoft.Json.JsonConvert.DeserializeObject<ScoCompany>(co["Com"].ToString());
             string UserName = GetUname(); 
-            string Company = co["Company"].ToString();
             var res = ScoCompanyHaddle.IsScoComExist(com.sconame,int.Parse(CoID));
             if (bool.Parse(res.d.ToString()) == true)
             {
                 return CoreResult.NewResponse(-1, "客户已存在,不允许新增", "General"); 
             }
-            var data = ScoCompanyHaddle.InsertScoCompany(int.Parse(CoID),com,UserName,Company);
+            var data = ScoCompanyHaddle.InsertScoCompany(int.Parse(CoID),com,UserName);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -96,10 +102,9 @@ namespace CoreWebApi
         public ResponseResult UpdateScoCompany([FromBodyAttribute]JObject co)
         {   
             string CoID = GetCoid();
-            var com = Newtonsoft.Json.JsonConvert.DeserializeObject<ScoCompanySingle>(co["Com"].ToString());
+            var com = Newtonsoft.Json.JsonConvert.DeserializeObject<ScoCompany>(co["Com"].ToString());
             string UserName = GetUname(); 
-            string Company = co["Company"].ToString();
-            var data = ScoCompanyHaddle.UpdateScoCompany(int.Parse(CoID),com,UserName,Company);
+            var data = ScoCompanyHaddle.UpdateScoCompany(int.Parse(CoID),com,UserName);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     }

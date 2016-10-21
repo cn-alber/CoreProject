@@ -15,7 +15,9 @@ namespace CoreData.CoreCore
         public static DataResult GetScoCompanyList(ScoCompanyParm cp)
         {
             var result = new DataResult(1,null);     
-            string wheresql = "select id,scocode,enable,sconame,scosimple,typelist,remark,creator,createdate from supplycompany where 1 = 1";
+            string sqlCount = "select count(id) from supplycompany where 1 = 1";
+            string sqlCommand = "select * from supplycompany where 1 = 1";
+            string wheresql = string.Empty;
             if(cp.CoID != 1)//公司编号
             {
                 wheresql = wheresql + " and coid = " + cp.CoID;
@@ -35,26 +37,17 @@ namespace CoreData.CoreCore
             var res = new ScoCompanyData();
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
-                    var u = conn.Query<ScoCompanyMulti>(wheresql).AsList();
-                    int count = u.Count;
+                    int count = conn.QueryFirst<int>(sqlCount + wheresql);
                     decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
 
                     int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
-                    u = conn.Query<ScoCompanyMulti>(wheresql).AsList();
+                    var u = conn.Query<ScoCompany>(sqlCommand + wheresql).AsList();
 
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;
                     res.Com = u;
-                    if (count == 0)
-                    {
-                        result.s = -3001;
-                        result.d = null;
-                    }
-                    else
-                    {
-                        result.d = res;
-                    }               
+                    result.d = res;        
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
@@ -66,33 +59,29 @@ namespace CoreData.CoreCore
         ///<summary>
         ///公司启用停用设置
         ///</summary>
-        public static DataResult UpdateScoComEnable(List<int> id,string Company,string UserName,bool Enable)
+        public static DataResult UpdateScoComEnable(List<int> id,int CoID,string UserName,bool Enable)
         {
             var result = new DataResult(1,null);   
             string contents = string.Empty;
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{
-                    string uptsql = @"update supplycompany set enable = @Enable where id in @ID";
-                    var args = new {ID = id,Enable = Enable};          
+                    string uptsql = @"update supplycompany set enable = @Enable where id in @ID and coid = @Coid";
+                    var args = new {ID = id,Enable = Enable,Coid = CoID};          
                     int count = conn.Execute(uptsql,args);
                     if(count < 0)
                     {
                         result.s= -3003;
+                        return  result;
+                    }
+                    if(Enable)
+                    {
+                        contents = "客户状态启用";
                     }
                     else
                     {
-                        if(Enable)
-                        {
-                            contents = "客户状态启用";
-                        }
-                        else
-                        {
-                            contents = "客户状态停用";
-                        }
-                        int CoID = 1;
-                        // contents+= string.Join(",", IDsDic.Values.AsList().ToArray());
-                        CoreUser.LogComm.InsertUserLog("修改客户资料", "supplycompany", contents, UserName, CoID, DateTime.Now);
+                        contents = "客户状态停用";
                     }
+                    CoreUser.LogComm.InsertUserLog("修改客户资料", "supplycompany", contents, UserName, CoID, DateTime.Now);
                     result.d = contents;           
                 }catch(Exception ex){
                     result.s = -1;
@@ -105,17 +94,17 @@ namespace CoreData.CoreCore
         ///<summary>
         ///查询单笔公司资料
         ///</summary>
-        public static DataResult GetScoCompanyEdit(int ID)
+        public static DataResult GetScoCompanyEdit(int ID,int CoID)
         {
             var result = new DataResult(1,null);   
             string scoName = "scocompany" + ID.ToString();     
-            var parent = CacheBase.Get<ScoCompanySingle>(scoName);  
+            var parent = CacheBase.Get<ScoCompany>(scoName);  
             if (parent == null)
             {
                 using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                     try{
-                        string wheresql = "select id,sconame,scosimple,enable,scocode,address,country,contactor,tel,phone,fax,url,email,typelist,bank,bankid,taxid,remark from supplycompany where id ='" + ID.ToString() + "'" ;
-                        var u = conn.Query<ScoCompanySingle>(wheresql).AsList();
+                        string wheresql = "select * from supplycompany where id =" + ID + " and coid =" + CoID;
+                        var u = conn.Query<ScoCompany>(wheresql).AsList();
                         if (u.Count == 0)
                         {
                             result.s = -3001;
@@ -123,8 +112,8 @@ namespace CoreData.CoreCore
                         }
                         else
                         {
-                            CacheBase.Set<ScoCompanySingle>(scoName, u[0]);
-                            result.d = u;
+                            CacheBase.Set<ScoCompany>(scoName, u[0]);
+                            result.d = u[0];
                         }
                     }catch(Exception ex){
                         result.s = -1;
@@ -147,9 +136,9 @@ namespace CoreData.CoreCore
             var result = new DataResult(1,null);   
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{
-                    string wheresql = "select id,sconame,scosimple,enable,scocode,address,country,contactor,tel,phone,fax,url,email,typelist,bank,bankid,taxid,remark from supplycompany where sconame ='" + name + "' and coid =" + coid ;
-                    var u = conn.Query<ScoCompanySingle>(wheresql).AsList();            
-                    if (u.Count > 0)
+                    string wheresql = "select count(1) from supplycompany where sconame ='" + name + "' and coid =" + coid ;
+                    int u = conn.QueryFirst<int>(wheresql);            
+                    if (u > 0)
                     {
                         result.d = true;                 
                     }
@@ -169,15 +158,20 @@ namespace CoreData.CoreCore
         ///<summary>
         ///客户基本资料新增
         ///</summary>
-        public static DataResult InsertScoCompany(int CoID,ScoCompanySingle com,string UserName,string Company)
+        public static DataResult InsertScoCompany(int CoID,ScoCompany com,string UserName)
         {
             var result = new DataResult(1,null);   
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{
-                    string sqlCommandText = @"INSERT INTO supplycompany(sconame,scosimple,enable,scocode,address,country,contactor,tel,phone,fax,url,email,typelist,bank,bankid,taxid,remark,creator,coid) VALUES(
+                    if(com.sconame == null)
+                    {
+                        result.s = -1;
+                        result.d = "名称必须有值!";
+                        return  result;
+                    }
+                    string sqlCommandText = @"INSERT INTO supplycompany(sconame,scosimple,scocode,address,country,contactor,tel,phone,fax,url,email,typelist,bank,bankid,taxid,remark,coid,creator,modifier) VALUES(
                             @Sconame,
                             @Scosimple,
-                            @Enable,
                             @Scocode,
                             @Address,
                             @Country,
@@ -192,29 +186,26 @@ namespace CoreData.CoreCore
                             @Bankid,
                             @Taxid,
                             @Remark,
-                            @UName,
-                            @Coid
+                            @Coid,
+                            @Creator,
+                            @Modifier
                         )";
-                    var args = new {Sconame = com.sconame,Scosimple = com.scosimple,Enable=com.enable,Scocode = com.scocode,Address = com.address,Country = com.country,
-                                    Contactor = com.contactor,Tel = com.tel,Phone = com.phone,Fax = com.fax,Url = com.url,Email = com.email,Typelist = com.typelist,
-                                    Bank = com.bank,Bankid = com.bankid,Taxid = com.taxid,Remark = com.remark,UName = UserName,Coid = CoID};
-                    int count =conn.Execute(sqlCommandText,args);
+                    com.coid = CoID;
+                    com.createdate = DateTime.Now;
+                    com.creator = UserName;
+                    com.modifier = UserName;
+                    com.modifydate = DateTime.Now;
+                    int count =conn.Execute(sqlCommandText,com);
                     if(count < 0)
                     {
                         result.s = -3003;
+                        return  result;
                     }
-                    else
-                    {
-                        int rtn = conn.QueryFirst<int>("select LAST_INSERT_ID()");
-                        result.d = rtn;
-                        CoreUser.LogComm.InsertUserLog("新增客户资料", "supplycompany", "新增客户" + com.sconame ,UserName, CoID, DateTime.Now);
-                        string wheresql = "select id,sconame,scosimple,enable,scocode,address,country,contactor,tel,phone,fax,url,email,typelist,bank,bankid,taxid,remark from supplycompany where sconame ='" + com.sconame + "' and coid =" + CoID ;
-                        var u = conn.Query<ScoCompanySingle>(wheresql).AsList();
-                        if (u.Count > 0)
-                        {
-                            CacheBase.Set<ScoCompanySingle>("scocompany" + u[0].id.ToString(), u[0]);
-                        }
-                    }        
+                    int rtn = conn.QueryFirst<int>("select LAST_INSERT_ID()");
+                    result.d = rtn;
+                    CoreUser.LogComm.InsertUserLog("新增客户资料", "supplycompany", "新增客户" + com.sconame ,UserName, CoID, DateTime.Now);
+                    com.id = rtn;
+                    CacheBase.Set<ScoCompany>("scocompany" + rtn, com);  
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
@@ -226,182 +217,149 @@ namespace CoreData.CoreCore
         ///<summary>
         ///客户基本资料更新
         ///</summary>
-        public static DataResult UpdateScoCompany(int CoID,ScoCompanySingle com,string UserName,string Company)
+        public static DataResult UpdateScoCompany(int CoID,ScoCompany com,string UserName)
         {
             var result = new DataResult(1,null);  
             string contents = string.Empty; 
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{
-                    string wheresql = "select id,sconame,scosimple,enable,scocode,address,country,contactor,tel,phone,fax,url,email,typelist,bank,bankid,taxid,remark from supplycompany where id =" + com.id;
-                    var u = conn.Query<ScoCompanySingle>(wheresql).AsList();
-                    var p = new DynamicParameters();
-                    string uptsql = @"update supplycompany set ";
-                    if(com.sconame != u[0].sconame)
-                    {
-                        contents = contents + "客户名称" + ":" +u[0].sconame + "=>" + com.sconame + ";";
-                    }
-                    if(com.enable != u[0].enable)
-                    {
-                        contents = contents + "启用状态" + ":" +u[0].enable + "=>" + com.enable + ";";
-                    }
-                    if(com.scosimple != u[0].scosimple)
-                    {
-                        contents = contents + "客户简称" + ":" +u[0].scosimple + "=>" + com.scosimple + ";";
-                    }
-                    if(com.scocode != u[0].scocode)
-                    {
-                        contents = contents + "客户编号" + ":" +u[0].scocode + "=>" + com.scocode + ";";
-                    }
-                    if(com.address != u[0].address)
-                    {
-                        contents = contents + "客户地址" + ":" +u[0].address + "=>" + com.address + ";";
-                    }
-                    if(com.country != u[0].country)
-                    {
-                        contents = contents + "国家" + ":" +u[0].country + "=>" + com.country + ";";
-                    }
-                    if(com.contactor != u[0].contactor)
-                    {
-                        contents = contents + "联系人" + ":" +u[0].contactor + "=>" + com.contactor + ";";
-                    }
-                    if(com.tel != u[0].tel)
-                    {
-                        contents = contents + "固定电话" + ":" +u[0].tel + "=>" + com.tel + ";";
-                    }
-                    if(com.phone != u[0].phone)
-                    {
-                        contents = contents + "移动电话" + ":" +u[0].phone + "=>" + com.phone + ";";
-                    }
-                    if(com.fax != u[0].fax)
-                    {
-                        contents = contents + "传真" + ":" +u[0].fax + "=>" + com.fax + ";";
-                    }
-                    if(com.url != u[0].url)
-                    {
-                        contents = contents + "主页" + ":" +u[0].url + "=>" + com.url + ";";
-                    }
-                    if(com.bank != u[0].bank)
-                    {
-                        contents = contents + "开户银行" + ":" +u[0].bank + "=>" + com.bank + ";";
-                    }
-                    if(com.email != u[0].email)
-                    {
-                        contents = contents + "客户邮箱" + ":" +u[0].email + "=>" + com.email + ";";
-                    }
-                    if(com.typelist != u[0].typelist)
-                    {
-                        contents = contents + "公司类型" + ":" +u[0].typelist + "=>" + com.typelist + ";";
-                    }
-                    if(com.bankid != u[0].bankid)
-                    {
-                        contents = contents + "开户账号" + ":" +u[0].bankid + "=>" + com.bankid + ";";
-                    }
-                    if(com.taxid != u[0].taxid)
-                    {
-                        contents = contents + "税号" + ":" +u[0].taxid + "=>" + com.taxid + ";";
-                    }
-                    if(com.remark != u[0].remark)
-                    {
-                        contents = contents + "备注" + ":" +u[0].remark + "=>" + com.remark + ";";
-                    }
+                    string wheresql = "select * from supplycompany where id =" + com.id + " and coid = " + CoID;
+                    var u = conn.Query<ScoCompany>(wheresql).AsList();
+                    var supply = u[0] as ScoCompany;
                     if(com.sconame != null)
                     {
-                        uptsql = uptsql + "sconame = @Sconame,";
-                        p.Add("@Sconame", com.sconame);
+                        if(com.sconame != u[0].sconame)
+                        {
+                            contents = contents + "客户名称" + ":" +u[0].sconame + "=>" + com.sconame + ";";
+                            supply.sconame = com.sconame;
+                        }
                     }
-                    // if(com.enable != u[0].enable)
-                    // {
-                    //     uptsql = uptsql + "enable = @Enable,";
-                    //     p.Add("@Enable", com.enable);
-                    // }
                     if(com.scosimple != null)
                     {
-                        uptsql = uptsql + "scosimple = @Scosimple,";
-                        p.Add("@Scosimple", com.scosimple);
+                        if(com.scosimple != u[0].scosimple)
+                        {
+                            contents = contents + "客户简称" + ":" +u[0].scosimple + "=>" + com.scosimple + ";";
+                            supply.scosimple = com.scosimple;
+                        }
                     }
                     if(com.scocode != null)
                     {
-                        uptsql = uptsql + "scocode = @Scocode,";
-                        p.Add("@Scocode", com.scocode);
+                        if(com.scocode != u[0].scocode)
+                        {
+                            contents = contents + "客户编号" + ":" +u[0].scocode + "=>" + com.scocode + ";";
+                            supply.scocode = com.scocode;
+                        }
                     }
                     if(com.address != null)
                     {
-                        uptsql = uptsql + "address = @Address,";
-                        p.Add("@Address", com.address);
+                        if(com.address != u[0].address)
+                        {
+                            contents = contents + "客户地址" + ":" +u[0].address + "=>" + com.address + ";";
+                            supply.address = com.address;
+                        }
                     }
                     if(com.country != null)
                     {
-                        uptsql = uptsql + "country = @Country,";
-                        p.Add("@Country", com.country);
+                        if(com.country != u[0].country)
+                        {
+                            contents = contents + "国家" + ":" +u[0].country + "=>" + com.country + ";";
+                            supply.country = com.country;
+                        }
                     }
                     if(com.contactor != null)
                     {
-                        uptsql = uptsql + "contactor = @Contactor,";
-                        p.Add("@Contactor", com.contactor);
+                        if(com.contactor != u[0].contactor)
+                        {
+                            contents = contents + "联系人" + ":" +u[0].contactor + "=>" + com.contactor + ";";
+                            supply.contactor = com.contactor;
+                        }
                     }
                     if(com.tel != null)
                     {
-                        uptsql = uptsql + "tel = @Tel,";
-                        p.Add("@Tel", com.tel);
+                        if(com.tel != u[0].tel)
+                        {
+                            contents = contents + "固定电话" + ":" +u[0].tel + "=>" + com.tel + ";";
+                            supply.tel = com.tel;
+                        }
                     }
                     if(com.phone != null)
                     {
-                        uptsql = uptsql + "phone = @Phone,";
-                        p.Add("@Phone", com.phone);
+                        if(com.phone != u[0].phone)
+                        {
+                            contents = contents + "移动电话" + ":" +u[0].phone + "=>" + com.phone + ";";
+                            supply.phone = com.phone;
+                        }
                     }
                     if(com.fax != null)
                     {
-                        uptsql = uptsql + "fax = @Fax,";
-                        p.Add("@Fax", com.fax);
+                        if(com.fax != u[0].fax)
+                        {
+                            contents = contents + "传真" + ":" +u[0].fax + "=>" + com.fax + ";";
+                            supply.fax = com.fax;
+                        }
                     }
                     if(com.url != null)
                     {
-                        uptsql = uptsql + "url = @Url,";
-                        p.Add("@Url", com.url);
+                        if(com.url != u[0].url)
+                        {
+                            contents = contents + "主页" + ":" +u[0].url + "=>" + com.url + ";";
+                            supply.url = com.url;
+                        }
                     }
                     if(com.bank != null)
                     {
-                        uptsql = uptsql + "bank = @Bank,";
-                        p.Add("@Bank", com.bank);
+                        if(com.bank != u[0].bank)
+                        {
+                            contents = contents + "开户银行" + ":" +u[0].bank + "=>" + com.bank + ";";
+                            supply.bank = com.bank;
+                        }
                     }
                     if(com.email != null)
                     {
-                        uptsql = uptsql + "email = @Email,";
-                        p.Add("@Email", com.email);
+                        if(com.email != u[0].email)
+                        {
+                            contents = contents + "客户邮箱" + ":" +u[0].email + "=>" + com.email + ";";
+                            supply.email = com.email;
+                        }
                     }
                     if(com.typelist != null)
                     {
-                        uptsql = uptsql + "typelist = @Typelist,";
-                        p.Add("@Typelist", com.typelist);
+                        if(com.typelist != u[0].typelist)
+                        {
+                            contents = contents + "公司类型" + ":" +u[0].typelist + "=>" + com.typelist + ";";
+                            supply.typelist = com.typelist;
+                        }
                     }
                     if(com.bankid != null)
                     {
-                        uptsql = uptsql + "bankid = @Bankid,";
-                        p.Add("@Bankid", com.bankid);
+                        if(com.bankid != u[0].bankid)
+                        {
+                            contents = contents + "开户账号" + ":" +u[0].bankid + "=>" + com.bankid + ";";
+                            supply.bankid = com.bankid;
+                        }
                     }
                     if(com.taxid != null)
                     {
-                        uptsql = uptsql + "taxid = @Taxid,";
-                        p.Add("@Taxid", com.taxid);
+                        if(com.taxid != u[0].taxid)
+                        {
+                            contents = contents + "税号" + ":" +u[0].taxid + "=>" + com.taxid + ";";
+                            supply.taxid = com.taxid;
+                        }
                     }
                     if(com.remark != null)
                     {
-                        uptsql = uptsql + "remark = @Remark,";
-                        p.Add("@Remark", com.remark);
+                        if(com.remark != u[0].remark)
+                        {
+                            contents = contents + "备注" + ":" +u[0].remark + "=>" + com.remark + ";";
+                            supply.remark = com.remark;
+                        }
                     }
-                    if(uptsql.Substring(uptsql.Length - 1, 1) == ",")
-                    {
-                        uptsql = uptsql.Substring(0,uptsql.Length - 1);
-                        uptsql = uptsql + " where id = @ID";
-                        p.Add("@ID",com.id);
-                    }
-                    else
-                    {
-                        result.s = 1;
-                        result.d = null;
-                        return result;
-                    }
-                    int count = conn.Execute(uptsql,p);
+                    supply.modifier = UserName;
+                    supply.modifydate = DateTime.Now;
+                    string uptsql = @"update supplycompany set sconame = @Sconame,scosimple = @Scosimple,scocode = @Scocode,address = @Address,country = @Country,contactor = @Contactor,
+                                        tel = @Tel,phone = @Phone,fax = @Fax,url = @Url,bank = @Bank,email = @Email,typelist = @Typelist,bankid = @Bankid,taxid = @Taxid,remark = @Remark,
+                                        modifier = @Modifier,modifydate = @Modifydate where id = @ID and coid = @Coid";
+                    int count = conn.Execute(uptsql,supply);
                     if(count < 0)
                     {
                         result.s= -3003;
@@ -409,7 +367,7 @@ namespace CoreData.CoreCore
                     else
                     {
                         CoreUser.LogComm.InsertUserLog("修改客户资料", "supplycompany", contents, UserName, CoID, DateTime.Now);               
-                        CacheBase.Set<ScoCompanySingle>("scocompany" + com.id.ToString(), com);
+                        CacheBase.Set<ScoCompany>("scocompany" + supply.id.ToString(), supply);
                     }
                 }catch(Exception ex){
                     result.s = -1;
@@ -430,19 +388,11 @@ namespace CoreData.CoreCore
             {
                 wheresql = wheresql + " and coid = " + CoID;
             }
-            wheresql = "select id,scocode,enable,sconame,scosimple,typelist,remark,creator,createdate from supplycompany " + wheresql ;
+            wheresql = "select * from supplycompany " + wheresql ;
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
-                    var u = conn.Query<ScoCompanyMulti>(wheresql).AsList();
-                    if (u.Count == 0)
-                    {
-                        result.s = -3001;
-                        result.d = null;
-                    }
-                    else
-                    {
-                        result.d = u;
-                    }               
+                    var u = conn.Query<ScoCompany>(wheresql).AsList();
+                    result.d = u;       
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
