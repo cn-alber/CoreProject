@@ -56,3 +56,11 @@ function说明
          成功：1.删除商品类目资料；2.新增操作记录log；3.返回成功信息
          失败：返回错误信息
     参考：input json 文件：DeleteSkuKind_input.json
+6.ItemStdKindLst()//获取标准类目列表(item_cates_standard)
+    方法：Get
+    路由：http://192.168.30.29:5000/Core/XyComm/ItemCateStd/ItemStdKindLst?ParentID=18
+    InPut:
+        ParentID            int                     标准类目父级ID
+    OutPut:
+        StdKindLst          List<ItemCateStdData>    标准类目列表
+    参考:output json 文件:ItemStdKindLst_output.json

@@ -35,6 +35,26 @@ namespace CoreWebApi
         }
         #endregion
 
+        #region 获取商品标准类目列表
+        [HttpGetAttribute("/Core/XyComm/ItemCateStd/ItemStdKindLst")]
+        public ResponseResult ItemStdKindLst(string ParentID)
+        {
+            var res = new DataResult(1, null);
+            int PID = 0;
+            if (int.TryParse(ParentID, out PID))
+            {
+                PID = int.Parse(ParentID);
+                res = CustomKindHaddle.GetStdKindLst(PID);
+            }
+            else
+            {
+                res.s = -1;
+                res.d = "无效参数ParentID";
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
         #region 获取单笔商品类目资料
         [HttpGetAttribute("/Core/XyComm/Customkind/SkuKind")]
         public ResponseResult SkuKind(string ID)

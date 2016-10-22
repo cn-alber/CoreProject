@@ -290,7 +290,7 @@ namespace CoreData.CoreUser
                         querycount.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                         querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                     }
-                    var DataCount = CoreData.DbBase.UserDB.QueryFirst<int>(querycount.ToString(), p);
+                    var DataCount = conn.QueryFirst<int>(querycount.ToString(), p);
                     if (DataCount < 0)
                     {
                         res.s = -3001;
@@ -304,7 +304,7 @@ namespace CoreData.CoreUser
                         querysql.Append(" LIMIT @ls , @le");
                         p.Add("@ls", dataindex);
                         p.Add("@le", IParam.PageSize);
-                        var UserLst = CoreData.DbBase.UserDB.Query<UserQuery>(querysql.ToString(), p).AsList();
+                        var UserLst = conn.Query<UserQuery>(querysql.ToString(), p).AsList();
                         us.UserLst = UserLst;
                         res.d = us;
                     }
@@ -313,11 +313,7 @@ namespace CoreData.CoreUser
                 {
                     res.s = -1;
                     res.d = e.Message;
-                }
-                finally
-                {
-                    conn.Dispose();
-                }
+                }               
             }
             return res;
         }

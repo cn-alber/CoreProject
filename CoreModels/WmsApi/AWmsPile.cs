@@ -6,6 +6,7 @@ namespace CoreModels.WmsApi
     {
         public int ID { get; set; }
         public string PCode { get; set; }
+        public int Skuautoid{get;set;}
         public string SkuID { get; set; }
         public int WarehouseID { get; set; }
         public string WarehouseName { get; set; }
@@ -29,6 +30,7 @@ namespace CoreModels.WmsApi
     {
         public int CoID { get; set; }
         public string GoodsCode { get; set; }
+        public int Skuautoid{get;set;}
         public string SkuID { get; set; }
         public string SkuName { get; set; }
         public string Norm { get; set; }

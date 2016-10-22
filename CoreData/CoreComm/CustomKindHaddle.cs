@@ -47,6 +47,41 @@ namespace CoreData.CoreComm
         }
         #endregion
 
+           #region 获取标准类目列表
+        public static DataResult GetStdKindLst(int ParentID)
+        {
+            var result = new DataResult(1,null);
+            var KindLst = new List<ItemCateStdData>();
+            string sql = @"SELECT * FROM Item_cates_standard WHERE parent_id=@ParentID";
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    var ParentLst = conn.Query<ItemCateStdData>(sql, new {ParentID = ParentID}).AsList();
+                    KindLst.AddRange(ParentLst);
+                    // foreach (var p in ParentLst)
+                    // {
+                    //     var res = GetStdKindLst(p.id);
+                    //     if (res.s == 1)
+                    //     {
+                    //         p.Children = res.d as List<ItemCateStdData>;
+                    //     }
+                    //     else
+                    //         break;
+                    // }
+                    result.d = ParentLst;
+                    conn.Close();
+                }
+                 catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+        #endregion 
+
         #region 获取单笔类目资料
         public static DataResult GetKind(int KindID, string CoID)
         {
@@ -168,11 +203,11 @@ namespace CoreData.CoreComm
                         var res = GetKind(Kind.ID, CoID);//原类目资料
                         var OldKind = res.d as CustomKind;
                         res = GetKind(Kind.ParentID, CoID);//上级类目资料
-                        var pkind = res.d as CustomKind;     
-                        string fullname = pkind.FullName+"=>"+Kind.KindName;
+                        var pkind = res.d as CustomKind;
+                        string fullname = pkind.FullName + "=>" + Kind.KindName;
                         if (OldKind.KindName != Kind.KindName)
                         {
-                            contents = contents + "类目名称:" + OldKind.KindName + "=>" + Kind.KindName + ";";                            
+                            contents = contents + "类目名称:" + OldKind.KindName + "=>" + Kind.KindName + ";";
                         }
                         // if (OldKind.FullName != Kind.FullName)
                         // {
@@ -180,10 +215,10 @@ namespace CoreData.CoreComm
                         // }
                         if (OldKind.ParentID != Kind.ParentID)
                         {
-                            contents = contents + OldKind.ParentID.ToString()+"("+OldKind.FullName + ")=>" + Kind.ParentID.ToString()+"("+fullname+ ");";                            
+                            contents = contents + OldKind.ParentID.ToString() + "(" + OldKind.FullName + ")=>" + Kind.ParentID.ToString() + "(" + fullname + ");";
                         }
                         if (!string.IsNullOrEmpty(contents))
-                        {   
+                        {
                             string sql = "update customkind Set KindName=@KindName,FullName=@FullName,ParentID=@ParentID,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE ID=@ID";
                             var p = new DynamicParameters();
                             p.Add("@KindName", Kind.KindName);
@@ -288,6 +323,6 @@ namespace CoreData.CoreComm
             }
             return result;
         }
-        #endregion
+        #endregion     
     }
 }

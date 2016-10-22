@@ -49,7 +49,7 @@ namespace CoreData.CoreComm
                     {
                         querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                     }
-                    var BrandLst = DbBase.CommDB.Query<Brand>(querysql.ToString(), p).AsList();
+                    var BrandLst = conn.Query<Brand>(querysql.ToString(), p).AsList();
                     if (BrandLst.Count == 0)
                     {
                         res.s = -3001;
@@ -63,7 +63,7 @@ namespace CoreData.CoreComm
                         querysql.Append(" LIMIT @ls , @le");
                         p.Add("@ls", dataindex);
                         p.Add("@le", IParam.PageSize);
-                        BrandLst = CoreData.DbBase.CommDB.Query<Brand>(querysql.ToString(), p).AsList();
+                        BrandLst = conn.Query<Brand>(querysql.ToString(), p).AsList();
                         info.BrandLst = BrandLst;
                         res.d = info;
                     }
