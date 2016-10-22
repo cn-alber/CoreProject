@@ -903,6 +903,43 @@ namespace CoreDate.CoreApi
         #endregion
 
 
+        #region  获取类目属性
+        /// <summary>
+        ///   参考网址： 
+        /// </summary>
+        /// <param name=""></param>
+        /// <param name=""></param>
+        public static DataResult demo(string token,string fields,string cid){
+            var result = new DataResult(1,null);
+            try{                                        
+                Tmparam.Add("method", "");
+                Tmparam.Add("session", token);
+
+                Tmparam.Add("fields", fields);
+                Tmparam.Add("cid", cid);
+            
+                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                Tmparam.Add("sign", sign);//                                      
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
+                }else{
+                    result.d = res.itemprops_get_response.item_props.item_prop;
+                }            
+            }catch(Exception ex){                
+                result.s = -1;
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+        #endregion
+
+
+
 
 
 

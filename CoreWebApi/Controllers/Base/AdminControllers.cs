@@ -43,10 +43,9 @@ namespace CoreWebApi
          [HttpPostAttribute("/core/admin/modifymenus")]
          public ResponseResult modifymenus([FromBodyAttribute]JObject lo)
          {
-             
-             if(!checkInt(lo["id"].ToString())) return CoreResult.NewResponse(-2016, null, "Indentity");
+             //Menus menus = Newtonsoft.Json.JsonConvert.DeserializeObject<Menus>(lo.ToString());
              var id = lo["id"].ToString();
-             var name = lo["router"]!= null ? lo["name"].ToString():"";
+             var name = lo["name"]!= null ? lo["name"].ToString():"";
              var router = lo["router"]!= null ? lo["router"].ToString():"";
              string iconName = lo["iconName"]!=null ? lo["iconName"].ToString():"";
              string iconPrefix = lo["iconPrefix"]!=null ? lo["iconPrefix"].ToString():"";

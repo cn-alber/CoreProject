@@ -185,17 +185,17 @@ namespace CoreData.CoreUser
                 {                    
                     Menus menus = GetOneMenu(id);
                     if(menus.Name != name)
-                        menus.Name = name;
-                    if(menus.SortIndex != int.Parse(router))    
-                        menus.SortIndex = int.Parse(router);
+                        menus.Name = name; 
+                    if(menus.SortIndex != Convert.ToInt16(order))    
+                        menus.SortIndex = Convert.ToInt16(order);
                     if(menus.NewUrl != router)    
                         menus.NewUrl = router;
                     if(menus.Remark != remark)    
                         menus.Remark = remark;
-                    if(menus.ParentID != int.Parse(parentid))    
-                        menus.ParentID = int.Parse(parentid);
-                    if(menus.ViewPowerID != int.Parse(accessid))    
-                        menus.ViewPowerID = int.Parse(accessid);
+                    if(menus.ParentID != Convert.ToInt16(parentid))    
+                        menus.ParentID = Convert.ToInt16(parentid);
+                    if(menus.ViewPowerID != Convert.ToInt16(accessid))    
+                        menus.ViewPowerID = Convert.ToInt16(accessid);
                     if(menus.NewIcon != iconArr[0])    
                         menus.NewIcon = iconArr[0];
                     if(!string.IsNullOrEmpty(iconArr[1])){
@@ -217,6 +217,8 @@ namespace CoreData.CoreUser
                                             menus.ViewPowerID=@ViewPowerID
                                          WHERE 
                                             menus.id=@ID AND menus.CoID = @CoID";//,menus.ViewPowerID="+accessid+"
+
+
                         
                     int rnt = conn.Execute(sql,menus);
                     if(rnt > 0){

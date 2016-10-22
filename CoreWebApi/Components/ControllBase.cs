@@ -105,8 +105,6 @@ namespace CoreWebApi
           }
  
          public bool checkInt(string strs){
-             Console.WriteLine("-------------");
-             Console.WriteLine(strs);
              bool flag =true;            
              try{
                 foreach (string item in strs.Split(','))
