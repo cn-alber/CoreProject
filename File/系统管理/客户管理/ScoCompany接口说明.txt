@@ -1,23 +1,22 @@
-接口名称:ScoCompanyControllers
+接口名称:CoreWebApi/Controllers/Base/ScoCompanyControllers
 
 function说明
 1.ScoCompanyList() //查询table supplycompany 资料
   路由:http://localhost:5000/Core/ScoCompany/ScoCompanyList
 input：     Enable         string                   启用状态(all/false/true)default null
             Filter         string                   公司名称匹配值(模糊查询)default null
-            SortField      string                   排序字段 default id
-            SortDirection  string                   排序方式(ASC|DESC) default DESC
+            SortField      string                   排序字段 default null
+            SortDirection  string                   排序方式(ASC|DESC) default null
             PageIndex      string                   资料页数(ex.第一页就给1) default 1
             NumPerPage     string                   每页显示资料笔数 default 20
 OutPut:     Datacnt        int                      资料总笔数
             Pagecnt        int                      总页数
-            Com            List<ScoCompanyMulti>    supplycompany 资料
+            Com            List<ScoCompany>         supplycompany 资料
 参考:output jason 文件:ScoCompanyList_output.json
 
 2.ScoCompanyEnable()//批次更新客户资料的状态
 路由:http://localhost:5000/Core/ScoCompany/ScoCompanyEnable
 input： IDList    List<int>      客户ID list
-        Company   string         登录者公司名称(exp:携云科技)
         Enable    string         指定状态true|false（启用，停用）
 OutPut: 成功：
             1.更新客户状态supplycompany.enable
@@ -37,7 +36,6 @@ OutPut: 单笔 supplycompany 资料
 4.InsetScoCompany() //新增客户基本资料
 路由:http://localhost:5000/Core/ScoCompany/InsetScoCompany
 input:Com           supplycompany 客户资料
-      Company       string        登录者公司名称(exp:携云科技)
 output: s=1成功 else 错误代码
 参考:input jason 文件:InsetScoCompany_input.json
 参考:output jason 文件:InsetScoCompany_output.json
@@ -45,7 +43,6 @@ output: s=1成功 else 错误代码
 5.UpdateScoCompany() //保存客户基本资料
 路由:http://localhost:5000/Core/ScoCompany/UpdateScoCompany
 input:Com           supplycompany 客户资料
-      Company       string        登录者公司名称(exp:携云科技)
 output: s=1成功 else 错误代码
 参考:input jason 文件:UpdateScoCompany_input.json
 参考:output jason 文件:UpdateScoCompany_output.json

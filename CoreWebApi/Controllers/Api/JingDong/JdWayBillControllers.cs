@@ -2,15 +2,17 @@ using System;
 using CoreDate.CoreApi;
 using CoreModels;
 using CoreModels.XyApi.JingDong;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
-namespace CoreWebApi.Api.JingDong{    
+namespace CoreWebApi.Api.JingDong{  
+    [AllowAnonymous]  
     public class JdWayBillControllers : ControllBase
     {
         #region
         [HttpGetAttribute("/core/Api/JdWayBill/WayBillCodeget")]
-        public ResponseResult WayBillCodeget(string customerCode ,string orderType,string token,int preNum=1){
+        public ResponseResult WayBillCodeget(string customerCode ,string token,int preNum=2,int orderType=0){
             var m = new DataResult(1,null);
             if(string.IsNullOrEmpty(token)){
                 m.s = -5000;
@@ -19,7 +21,7 @@ namespace CoreWebApi.Api.JingDong{
             }else{
                 preNum = preNum>100 ? 100 : preNum;
                 preNum = preNum<0? 1: preNum;
-                m = JingDHaddle.jdWayBillCodeget(preNum,customerCode , orderType, token);
+                m = JingDHaddle.jdWayBillCodeget(preNum,customerCode , orderType.ToString(), token);
             }
 
             return CoreResult.NewResponse(m.s, m.d, "Api");

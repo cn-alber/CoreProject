@@ -73,7 +73,8 @@ namespace CoreWebApi
          [HttpPostAttribute("/core/admin/delmenus")]
          public ResponseResult delmenu([FromBodyAttribute]JObject lo){
             string ids = String.Join(",",lo["ids"]); 
-            var m = AdminHaddle.DelMenuById(ids);
+            string coid = GetCoid();
+            var m = AdminHaddle.DelMenuById(ids,coid);
             return CoreResult.NewResponse(m.s, m.d, "Indentity");  
          }
 

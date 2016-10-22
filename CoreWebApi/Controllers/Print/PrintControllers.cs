@@ -111,8 +111,9 @@ namespace CoreWebApi.Print
             var presets = lo["presets"] !=null ? JsonEscape(lo["presets"].ToString()):"";
             var emu_data = lo["emu_data"] !=null ? JsonEscape(lo["emu_data"].ToString()):"";
             var setting = lo["setting"] !=null ? JsonEscape(lo["setting"].ToString()) :""; 
+            string coid = GetCoid();
 
-            var m = PrintHaddle.saveSysesType(0,name,presets,emu_data,setting); 
+            var m = PrintHaddle.saveSysesType(0,name,presets,emu_data,setting,coid); 
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
@@ -134,8 +135,8 @@ namespace CoreWebApi.Print
             var presets = lo["presets"] !=null ? JsonEscape(lo["presets"].ToString()):"";
             var emu_data = lo["emu_data"] !=null ? JsonEscape(lo["emu_data"].ToString()):"";
             var setting = lo["setting"] !=null ? JsonEscape(lo["setting"].ToString()) :""; 
-            
-            var m = PrintHaddle.saveSysesType(id,name,presets,emu_data,setting); 
+            string coid = GetCoid();
+            var m = PrintHaddle.saveSysesType(id,name,presets,emu_data,setting,coid); 
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
@@ -145,8 +146,9 @@ namespace CoreWebApi.Print
         public ResponseResult deleteSysesType([FromBodyAttribute]JObject lo)
         {   
             string ids =lo["id"].ToString();                  
-            if(!checkInt(ids)) return CoreResult.NewResponse(-4023, null, "Print"); 
-            var m = PrintHaddle.DelSysesTypeByID(ids); 
+            if(!checkInt(ids)) return CoreResult.NewResponse(-4023, null, "Print");
+            string coid = GetCoid(); 
+            var m = PrintHaddle.DelSysesTypeByID(ids,coid); 
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
@@ -162,8 +164,8 @@ namespace CoreWebApi.Print
             string name = lo["name"].ToString();            
             int  sys_id = 0;
             var state = JsonEscape(lo["state"].ToString());
-              
-            var m = PrintHaddle.saveSyses(sys_id, type,state,name );
+            string coid = GetCoid();  
+            var m = PrintHaddle.saveSyses(sys_id, type,state,name,coid);
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
@@ -178,8 +180,8 @@ namespace CoreWebApi.Print
             string name = lo["name"].ToString();            
             int  sys_id = string.IsNullOrEmpty(lo["sys_id"].ToString())?0 :int.Parse(lo["sys_id"].ToString());
             var state = JsonEscape(lo["state"].ToString());
-              
-            var m = PrintHaddle.saveSyses(sys_id, type,state,name );
+              string coid = GetCoid();
+            var m = PrintHaddle.saveSyses(sys_id, type,state,name,coid);
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
@@ -189,7 +191,8 @@ namespace CoreWebApi.Print
         public ResponseResult delsyses([FromBodyAttribute]JObject lo)
         {   
             string ids =String.Join(",",lo["ids"]); 
-            var m = PrintHaddle.DelSysesByID(ids); 
+            string coid = GetCoid();
+            var m = PrintHaddle.DelSysesByID(ids,coid); 
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion

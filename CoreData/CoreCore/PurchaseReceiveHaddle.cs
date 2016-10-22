@@ -205,7 +205,7 @@ namespace CoreData.CoreCore
                     if(type == "supply")
                     {
                         string wheresql = "select id,sconame,scosimple,enable,scocode,address,country,contactor,tel,phone,fax,url,email,typelist,bank,bankid,taxid,remark from supplycompany where id =" + id;
-                        var u = conn.Query<ScoCompanySingle>(wheresql).AsList();
+                        var u = conn.Query<ScoCompany>(wheresql).AsList();
                         if(u.Count == 0)
                         {
                             result.s = -1;

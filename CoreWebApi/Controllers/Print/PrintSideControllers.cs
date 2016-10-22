@@ -16,7 +16,8 @@ namespace CoreWebApi.Print
         {
             if(!checkInt(lo["my_tpl_id"].ToString())) return CoreResult.NewResponse(-4023, null, "Print");
             var admin_id = GetUid();
-            var m = PrintHaddle.sideSetdefed(admin_id,lo["my_tpl_id"].ToString());
+            string coid = GetCoid();
+            var m = PrintHaddle.sideSetdefed(admin_id,lo["my_tpl_id"].ToString(),coid);
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
@@ -27,7 +28,8 @@ namespace CoreWebApi.Print
         {
             if(!checkInt(my_tpl_id)) return CoreResult.NewResponse(-4023, null, "Print");
             var admin_id = GetUid();
-            var m = PrintHaddle.sideRemove(my_tpl_id.ToString());
+            string coid = GetCoid();
+            var m = PrintHaddle.sideRemove(my_tpl_id.ToString(),coid);
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion

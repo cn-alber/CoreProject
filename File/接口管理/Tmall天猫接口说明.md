@@ -1,94 +1,587 @@
-接口文件：CoreWebApi/Controllers/Api/JingDong/JdOrderControllers.cs
+接口文件：CoreWebApi/Controllers/Api/Tmall/TmTtradesControllers.cs
 
 function说明
 ==============
-1.orderDownload()            下载订单
+1.soldget()            下载订单
 
- 路由:`/core/Api/JdOrder/download`
+ 路由:`/core/Api/TmTrades/soldget`
  
  参数：
 ```sh
     input: 
             {
-                token           授权码
-                fields          需要返回的字段列表，多个字段用半角逗号分隔，可选值为返回示例中能看到的所有字段
-                start_created   查询三个月内交易创建时间开始。格式:yyyy-MM-dd HH:mm:ss
-                end_created     查询交易创建时间结束。格式:yyyy-MM-dd HH:mm:ss
-                status          交易状态
-                buyer_nick      买家昵称
-                type            交易类型列表
-                ext_type        扩展类型
-                rate_status     评价状态
-                tag             卖家对交易的自定义分组标签
-                page            页码
-                pageSize        每页的条数（最大page_size 100条）
-                use_has_next    默认 false
+                fields					 空即使用默认						
+                start_created	         查询三个月内交易创建时间开始。格式:yyyy-MM-dd HH:mm:ss													
+                end_created	             查询交易创建时间结束。格式:yyyy-MM-dd HH:mm:ss															
+                status			         交易状态																									
+                buyer_nick		         买家昵称																									
+                type			         交易类型列表																								
+                ext_type		         扩展类型																									
+                rate_status	             评价状态 																									
+                tag			             卖家对交易的自定义分组标签																				
+                page		             页码																										
+                pageSize		         每页条数																									
+                use_has_next	         是否启用has_next的分页方式，如果指定true,则返回的结果中不包含总记录数，但是会新增一个是否存在下一页的的字段
             }
     output:
             s: 1 || error_code
-            d:[{
-                "adjust_fee": "0.00",
-                "buyer_nick": "花有重开时人无长少年",
-                "buyer_obtain_point_fee": 0,
-                "buyer_rate": false,
-                "cod_fee": "0.00",
-                "cod_status": "NEW_CREATED",
-                "created": "2016-10-13 14:46:35",
-                "discount_fee": "0.00",
-                "modified": "2016-10-13 14:50:42",
-                "num": 1,
-                "num_iid": 523042653121,
-                "orders": {
-                    "order": [
+            d:[   {
+                    "trades_sold_get_response": {
+                    "total_results": 43,
+                    "trades": {
+                    "trade": [
+                        {
+                        "adjust_fee": "0.00",
+                        "buyer_nick": "sandbox_cilai_c",
+                        "buyer_obtain_point_fee": 0,
+                        "buyer_rate": false,
+                        "cod_fee": "0.00",
+                        "cod_status": "NEW_CREATED",
+                        "created": "2016-10-20 13:27:13",
+                        "discount_fee": "0.00",
+                        "modified": "2016-10-20 13:27:49",
+                        "num": 5,
+                        "num_iid": 2100710399384,
+                        "orders": {
+                            "order": [
                             {
                             "adjust_fee": "0.00",
                             "buyer_rate": false,
-                            "discount_fee": "868.00",
-                            "num": 1,
-                            "num_iid": 523042653121,
-                            "oid": 2429042494356176,
-                            "outer_iid": "N3L4F58351",
-                            "outer_sku_id": "N3L4F58351001175",
-                            "payment": "320.00",
-                            "pic_path": "http://img02.taobaocdn.com/bao/uploaded/i2/2058964557/TB2IN76gXXXXXX1XXXXXXXXXXXX_!!2058964557.jpg",
-                            "price": "1188.00",
+                            "discount_fee": "0.00",
+                            "num": 5,
+                            "num_iid": 2100710399384,
+                            "oid": 194145147111084,
+                            "payment": "510.00",
+                            "pic_path": "http://img03.daily.taobao.net/bao/uploaded/i3/TB10dTHXXXXXXawXXXXXXXXXXXX_!!0-item_pic.jpg",
+                            "price": "100.00",
                             "refund_status": "NO_REFUND",
                             "seller_rate": false,
-                            "seller_type": "B",
-                            "sku_id": "3125450559380",
-                            "sku_properties_name": "颜色:夜宴黑;尺码:175",
+                            "seller_type": "C",
+                            "sku_id": "31122967183",     // sku_Id 订单列表有时不会被显示
+                            "sku_properties_name": "套餐种类:官方标配",
                             "status": "WAIT_SELLER_SEND_GOODS",
-                            "title": "南极人冬季新款男士加厚羽绒服中年男装短款连帽外套休闲爸爸装潮",
-                            "total_fee": "320.00"
+                            "title": "沙箱测试20150915001",
+                            "total_fee": "500.00"
                             }
                         ]
                     },
-                "pay_time": "2016-10-13 14:49:11",
-                "payment": "320.00",
-                "pic_path": "http://img02.taobaocdn.com/bao/uploaded/i2/2058964557/TB2IN76gXXXXXX1XXXXXXXXXXXX_!!2058964557.jpg",
-                "point_fee": 0,
-                "post_fee": "0.00",
-                "price": "1188.00",
-                "real_point_fee": 0,
-                "received_payment": "0.00",
-                "receiver_address": "小**街道上海市黄浦区陆**路1**号",
-                "receiver_city": "上海市",
-                "receiver_district": "黄浦区",
-                "receiver_mobile": "135********",
-                "receiver_name": "李**",
-                "receiver_state": "上海",
-                "receiver_zip": "200010",
-                "seller_nick": "南极人羽绒旗舰店",
-                "seller_rate": false,
-                "shipping_type": "express",
-                "sid": "2429042494356176",
-                "status": "WAIT_SELLER_SEND_GOODS",
-                "tid": 2429042494356176,
-                "title": "南极人羽绒旗舰店",
-                "total_fee": "1188.00",
-                "type": "fixed"
+                    "pay_time": "2016-10-20 13:27:49",
+                    "payment": "510.00",
+                    "pic_path": "http://img03.daily.taobao.net/bao/uploaded/i3/TB10dTHXXXXXXawXXXXXXXXXXXX_!!0-item_pic.jpg",
+                    "point_fee": 0,
+                    "post_fee": "10.00",
+                    "price": "100.00",
+                    "real_point_fee": 0,
+                    "received_payment": "0.00",
+                    "receiver_address": "大张楼镇淘宝测试发货",
+                    "receiver_city": "济宁市",
+                    "receiver_district": "嘉祥县",
+                    "receiver_mobile": "12345678990",
+                    "receiver_name": "淘宝测试发货",
+                    "receiver_state": "山东省",
+                    "receiver_zip": "272000",
+                    "seller_nick": "sandbox_c_1",
+                    "seller_rate": false,
+                    "shipping_type": "express",
+                    "sid": "194145147111084",
+                    "status": "WAIT_SELLER_SEND_GOODS",
+                    "tid": 194145147111084,
+                    "title": "d[s50339501]",
+                    "total_fee": "500.00",
+                    "type": "fixed"
+                    },
+                    { },
+                    { },
+                ]
                 },
-            ]
+                "request_id": "118g8gffrwskl"
+                }
+            }  ]
             m: 
     
 ```
+
+2.oneget()            获取单笔交易的部分信息(性能高)
+
+ 路由:`/core/Api/TmTrades/oneget`
+ 
+ 参数：
+```sh
+    input: 
+            {
+                fields					 必选，需要返回的字段列表，多个字段用半角逗号分隔，可选值为返回示例中能看到的所有字段						
+                tids                     必选， 交易ids,多条id 以 , 结尾
+                token                    授权码
+            }
+    output:
+                {
+                    "s": 1,
+                    "d": [
+                        {
+                        "adjust_fee": "0.00",
+                        "buyer_nick": "sandbox_cilai_c",
+                        "buyer_obtain_point_fee": 0,
+                        "buyer_rate": false,
+                        "cod_fee": "0.00",
+                        "cod_status": "NEW_CREATED",
+                        "commission_fee": "0.00",
+                        "created": "2016-10-20 13:27:13",
+                        "discount_fee": "0.00",
+                        "modified": "2016-10-20 13:27:49",
+                        "num": 5,
+                        "num_iid": 2100710399384,
+                        "orders": {
+                            "order": [
+                            {
+                                "adjust_fee": "0.00",
+                                "buyer_rate": false,
+                                "discount_fee": "0.00",
+                                "num": 5,
+                                "num_iid": 2100710399384,
+                                "oid": 194145147111084,
+                                "payment": "510.00",
+                                "pic_path": "http://img03.daily.taobao.net/bao/uploaded/i3/TB10dTHXXXXXXawXXXXXXXXXXXX_!!0-item_pic.jpg",
+                                "price": "100.00",
+                                "refund_status": "NO_REFUND",
+                                "seller_rate": false,
+                                "seller_type": "C",
+                                "status": "WAIT_SELLER_SEND_GOODS",
+                                "title": "沙箱测试20150915001",
+                                "total_fee": "500.00"
+                            }
+                            ]
+                        },
+                        "pay_time": "2016-10-20 13:27:49",
+                        "payment": "510.00",
+                        "pic_path": "http://img03.daily.taobao.net/bao/uploaded/i3/TB10dTHXXXXXXawXXXXXXXXXXXX_!!0-item_pic.jpg",
+                        "point_fee": 0,
+                        "post_fee": "10.00",
+                        "price": "100.00",
+                        "real_point_fee": 0,
+                        "received_payment": "0.00",
+                        "seller_nick": "sandbox_c_1",
+                        "seller_rate": false,
+                        "shipping_type": "express",
+                        "sid": "194145147111084",
+                        "status": "WAIT_SELLER_SEND_GOODS",
+                        "tid": 194145147111084,
+                        "title": "d[s50339501]",
+                        "total_fee": "500.00",
+                        "type": "fixed"
+                        }
+                    ],
+                    "m": ""
+                    }
+    
+```
+3.onlineSend()            在线订单发货处理（支持货到付款）
+
+ 路由:`/core/Api/TmSend/onlineSend`
+ 
+ 参数：
+```sh
+    input: 
+            {
+                token                    授权码
+            }
+```
+
+
+4.onlineCancel()            取消物流订单接口
+
+ 路由:`/core/Api/TmSend/onlineCancel`
+ 
+ 参数：
+```sh
+    input: 
+            {
+                token                    授权码
+            }
+```
+
+5.onlineConfirm()            确认发货通知接口
+
+ 路由:`/core/Api/TmSend/onlineConfirm`
+ 
+ 参数：
+```sh
+    input: 
+            {
+                token                    授权码
+            }
+```
+
+
+6.offlineSend()            自己联系物流（线下物流）发货
+
+ 路由:`/core/Api/TmSend/offlineSend`
+ 
+ 参数：
+```sh
+    input: 
+            {
+                offlineSend offlinesend         线下发货Model
+            }
+```
+
+7.dummySend()            虚拟发货
+
+ 路由:`/core/Api/TmSend/dummySend`
+ 
+ 参数：
+```sh
+    input: 
+            {
+                dummySend dummysend         虚拟发货Model
+            }
+```
+
+8.orderCreateAndSend()            创建订单并发货
+
+ 路由:`/core/Api/TmSend/orderCreateAndSend`
+ 
+ 参数：
+```sh
+    input: 
+            {
+               
+            }
+```
+
+
+9.ApplyGet()            查询买家申请的退款列表
+
+ 路由:`/core/Api/TmRefund/ApplyGet`
+ 
+ 参数：
+```sh
+    input: 
+            {
+                token
+                fields
+                status                  退款状态，默认查询所有退款状态的数据，除了默认值外每次只能查询一种状态
+                seller_nick             卖家昵称
+                type                    交易类型列表，一次查询多种类型可用半角逗号分隔，默认同时查询guarantee_trade, auto_delivery的2种类型的数据。
+                page
+                pageSize
+            }
+    output：
+        {
+        "s": 1,
+        "d": {
+            "refunds": {
+            "refund": [
+                {
+                "buyer_nick": "sandbox_c_1",
+                "created": "2016-09-23 14:13:28",
+                "refund_fee": "99.00",
+                "refund_id": 147802226992786,
+                "seller_nick": "sandbox_cilai_c",
+                "status": "WAIT_SELLER_CONFIRM_GOODS",
+                "tid": 194164230048627,
+                "title": "沙箱测试:自动添加商品9",
+                "total_fee": "99.00"
+                },
+                {
+                "buyer_nick": "sandbox_c_1",
+                "created": "2016-08-04 12:00:25",
+                "refund_fee": "1008.72",
+                "refund_id": 147749821182786,
+                "seller_nick": "sandbox_c_6",
+                "status": "WAIT_SELLER_AGREE",
+                "tid": 194336200338627,
+                "title": "沙箱测试 zzz 2014品牌夏季韩版新款修身显瘦雪纺连衣裙",
+                "total_fee": "1008.72"
+                }]
+            },
+            "total_results": 460,
+            "request_id": "118g8gg8w0z50"
+        },
+        "m": ""
+        }
+
+```
+10.ReceiveGet()            查询卖家收到的退款列表
+
+ 路由:`/core/Api/TmRefund/ReceiveGet`
+ 
+ 参数：
+```sh
+    input: 
+            {
+                token
+                fields
+                status                  退款状态，默认查询所有退款状态的数据，除了默认值外每次只能查询一种状态
+                buyer_nick              买家昵称
+                type                    交易类型列表，一次查询多种类型可用半角逗号分隔，默认同时查询guarantee_trade, auto_delivery的2种类型的数据。
+                page
+                pageSize
+            }
+     output: 
+            {
+                "s": 1,
+                "d": {
+                    "refunds": {
+                    "refund": [
+                        {
+                        "buyer_nick": "sandbox_cilai_c",
+                        "created": "2016-08-03 11:52:22",
+                        "good_status": "BUYER_NOT_RECEIVED",
+                        "has_good_return": false,
+                        "modified": "2016-08-03 11:52:22",
+                        "oid": 194174063521084,
+                        "order_status": "WAIT_SELLER_SEND_GOODS",
+                        "payment": "0.00",
+                        "reason": "缺货",
+                        "refund_fee": "110.00",
+                        "refund_id": 40594600198410,
+                        "refund_phase": "onsale",
+                        "seller_nick": "sandbox_c_1",
+                        "status": "WAIT_SELLER_AGREE",
+                        "tid": 194174063521084,
+                        "title": "沙箱测试20150915001",
+                        "total_fee": "110.00"
+                        },
+                        {
+                        "buyer_nick": "sandbox_c_12",
+                        "created": "2016-06-01 15:09:40",
+                        "desc": "部分退款2",
+                        "good_status": "BUYER_NOT_RECEIVED",
+                        "has_good_return": false,
+                        "modified": "2016-06-01 15:09:40",
+                        "oid": 194174061976510,
+                        "order_status": "WAIT_SELLER_SEND_GOODS",
+                        "payment": "0.00",
+                        "reason": "协商一致退款",
+                        "refund_fee": "252.77",
+                        "refund_id": 146535512261065,
+                        "refund_phase": "onsale",
+                        "seller_nick": "sandbox_c_1",
+                        "status": "WAIT_SELLER_AGREE",
+                        "tid": 194174061956510,
+                        "title": "沙箱测试商品by2048",
+                        "total_fee": "252.77"
+                        },]
+                    },
+                    "total_results": 608,
+                    "request_id": "118g8ggcuahwt"
+                },
+                "m": ""
+                }       
+```
+
+11.ReceiveGet()            获取单笔退款详情
+
+ 路由:`/core/Api/TmRefund/OneGet`
+ 
+ 参数：
+```sh
+        input:c
+            fields
+            token
+            refund_id       退款I单D
+        
+        output:
+            {
+            "s": 1,
+            "d": {
+                "refund": {
+                "alipay_no": "2016060147475178",
+                "attribute": ";refundFrom:2;a_n_c:serviceone;payMode:alipay;gaia:1;7d:1;a_i_c:10.189.224.91;reason:5;rootCat:50067548;newRefund:1;closeHint:1;returnFeeTo:1;lastOrder:0;shop_name:sandbox_c_1;",
+                "buyer_nick": "sandbox_c_12",
+                "created": "2016-06-01 15:09:40",
+                "desc": "部分退款2",
+                "good_status": "BUYER_NOT_RECEIVED",
+                "has_good_return": false,
+                "num": 3,
+                "num_iid": 2100663189060,
+                "oid": 194174061976510,
+                "operation_contraint": "null",
+                "payment": "0.00",
+                "price": "90.60",
+                "reason": "协商一致退款",
+                "refund_fee": "252.77",
+                "refund_id": 146535512261065,
+                "refund_phase": "onsale",
+                "refund_remind_timeout": {
+                    "exist_timeout": true,
+                    "remind_type": 1,
+                    "timeout": "2016-06-03 15:09:40"
+                },
+                "refund_version": 1464764980000,
+                "seller_nick": "sandbox_c_1",
+                "status": "WAIT_SELLER_AGREE",
+                "tid": 194174061956510,
+                "title": "沙箱测试商品by2048",
+                "total_fee": "252.77"
+                },
+                "request_id": "16ecr2nklz7h4"
+            },
+            "m": ""
+            }
+
+```
+
+12.MessagesGet()            查询退款留言/凭证列表
+
+ 路由:`/core/Api/TmRefund/MessagesGet`
+ 
+ 参数：
+```sh
+        input:
+            fields
+            token
+            refund_id       退款I单D
+            refund_phase    退款阶段，天猫退款为必传。可选值：onsale（售中），aftersale（售后）
+            page
+            pageSize
+        output:
+            {
+            "s": 1,
+            "d": {
+                "refund_messages_get_response": {
+                "refund_messages": {
+                "refund_message": [
+                {
+                "id": 5199969975,
+                "message_type": "NORMAL"
+                },
+                {
+                "id": 5200029393,
+                "message_type": "NORMAL"
+                },
+                {
+                "id": 5199643867,
+                "message_type": "NORMAL"
+                }
+                ]
+                },
+                "total_results": 3,
+                "request_id": "rxn9f5pq29oo"
+                }
+            },
+            "m": ""
+            }            
+
+
+```
+
+13.add()            创建订单并发货
+
+ 路由:`/core/Api/TmSku/Add`
+ 
+ 参数：
+```sh
+    input: 
+        skuAddRequest{
+                num_iid :               必选， 所属商品数字id，可通过 taobao.item.get 获取。必选
+                properties :            必选， Sku属性串。格式:pid:vid;pid:vid,如:1627207:3232483;1630696:3284570,表示:机身颜色:军绿色;手机套餐:一电一充。
+                quantity :              必选， Sku的库存数量。sku的总数量应该小于等于商品总数量(Item的NUM)。取值范围:大于零的整数
+                price :                 必选， Sku的销售价格。商品的价格要在商品所有的sku的价格之间。精确到2位小数;单位:元。如:200.07，表示:200元7分
+                outer_id :              Sku的商家外部id
+                item_price :            sku所属商品的价格。当用户新增sku，使商品价格不属于sku价格之间的时候，用于修改商品的价格，使sku能够添加成功
+                lang :                  Sku文字的版本。可选值:zh_HK(繁体),zh_CN(简体);默认值:zh_CN
+                spec_id :               产品的规格信息
+                sku_hd_length :         家装建材类目，商品SKU的长度，正整数，单位为cm，部分类目必选。天猫商家专用。 数据和SKU一一对应，用,分隔，如：20,30,30
+                sku_hd_height :         家装建材类目，商品SKU的高度，单位为cm，部分类目必选。
+                sku_hd_lamp_quantity :  家装建材类目，商品SKU的灯头数量，正整数，大于等于3，部分类目必选。天猫商家专用。 数据和SKU一一对应，用,分隔，如：3,5,7
+                ignorewarning :         忽略警告提示.
+        }
+    output:
+
+```
+
+
+14.SkuGet()            获取SKU
+
+ 路由:`/core/Api/TmSku/Get`
+ 
+ 参数：
+```sh
+    input: 
+        fields: 必选 
+        sku_id: 必选， 
+        num_iid: 商品的数字IID（num_iid和nick必传一个，推荐用num_iid），传商品的数字id返回的结果里包含cspu（SKu上的产品规格信息）。 nick: 卖家nick(num_iid和nick必传一个)，只传卖家nick时候，该api返回的结果不包含cspu（SKu上的产品规格信息）。
+    output:
+        {
+        "s": 1,
+        "d": {
+            "created": "2015-09-20 10:29:23",
+            "iid": "2100713359442",
+            "modified": "2016-07-18 15:20:09",
+            "num_iid": 2100713359442,
+            "outer_id": "",
+            "price": "999.00",
+            "properties": "21684:6536025",
+            "properties_name": "21684:6536025:套餐种类:官方标配",
+            "quantity": 0,
+            "sku_id": 31122967183,
+            "status": "normal",
+            "with_hold_quantity": 0
+        },
+        "m": ""
+        }
+
+```
+
+15.Update()            更新SKU
+
+ 路由:`/core/Api/TmSku/Update`
+ 
+ 参数：
+```sh
+    input: 
+        skuUpdateRequest
+            {
+                num_iid : 最小值：0 所属商品数字id，可通过 taobao.item.get 获取。必选
+                properties : Sku属性串。格式:pid:vid;pid:vid,如:1627207:3232483;1630696:3284570,表示:机身颜色:军绿色;手机套餐:一电一充。
+                quantity : Sku的库存数量。sku的总数量应该小于等于商品总数量(Item的NUM)。取值范围:大于零的整数
+                price : Sku的销售价格。商品的价格要在商品所有的sku的价格之间。精确到2位小数;单位:元。如:200.07，表示:200元7分
+                outer_id : Sku的商家外部id
+                item_price : sku所属商品的价格。当用户新增sku，使商品价格不属于sku价格之间的时候，用于修改商品的价格，使sku能够添加成功
+                lang : Sku文字的版本。可选值:zh_HK(繁体),zh_CN(简体);默认值:zh_CN
+                spec_id : 产品的规格信息
+                barcode : SKU条形码
+                ignorewarning : 忽略警告提示.
+            }
+    output:
+
+```
+15.Update()            更新SKU
+
+ 路由:`/core/Api/TmSku/SkusGet`
+ 
+ 参数：
+```sh
+    input: 
+        token
+        fields
+        num_iids      必选，sku所属商品数字id，必选。num_iid个数不能超过40个
+    output:
+        {
+  "s": 1,
+  "d": {
+    "sku": [
+      {
+        "created": "2015-09-20 10:29:23",
+        "iid": "2100713359442",
+        "modified": "2016-07-18 15:20:09",
+        "num_iid": 2100713359442,
+        "outer_id": "",
+        "price": "999.00",
+        "properties": "21684:6536025",
+        "properties_name": "21684:6536025:套餐种类:官方标配",
+        "quantity": 0,
+        "sku_id": 31122967183,
+        "status": "normal"
+      },
+      { },
+      { }
+    ]
+  },
+  "m": ""
+}
+```
+
+
+
