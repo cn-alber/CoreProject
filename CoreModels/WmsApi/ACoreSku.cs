@@ -6,9 +6,11 @@ namespace CoreModels.WmsApi
     {
         public int ID { get; set; }
         public string SkuID { get; set; }
+        public string SkuName { get; set; }
         public string GoodsCode { get; set; }
         public string ColorName { get; set; }
         public string SizeName { get; set; }
+        public string Norm { get; set; }
         public int Qty { get; set; }//装箱件数
         public string PCode { get; set; }//货位
         public int MaxQty { get; set; }//货位最大库存

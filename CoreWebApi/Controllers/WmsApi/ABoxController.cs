@@ -35,19 +35,6 @@ namespace CoreWebApi
             var res = AWmsBoxHaddle.AddWmsBox(cp);
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
-        #endregion
-        #region 收货作业-根据箱码or件码_获取SKU
-        [HttpGetAttribute("Core/Api/ABox/GetBox")]
-        public ResponseResult GetBox(int CoID, string BoxCode)
-        {
-            var cp =new WmsBoxParams();
-            cp.CoID=CoID;
-            cp.BoxCode=BoxCode;
-            cp.Type=4;//进货仓;
-            cp.SkuID = (BoxCode.Length - 6)>0?BoxCode.Substring(0, BoxCode.Length - 6):BoxCode;//假设sku,检查条码为件码or箱码
-            var res = AWmsBoxHaddle.GetBoxSku(cp);
-            return CoreResult.NewResponse(res.s,res.d,"General");
-        }
-        #endregion
+        #endregion        
     }
 }
