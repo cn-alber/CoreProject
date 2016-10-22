@@ -10,7 +10,7 @@ function说明
 ```sh
     input: 
             {
-                fields					 必选，需要返回的字段列表，多个字段用半角逗号分隔，可选值为返回示例中能看到的所有字段						
+                fields					 空即使用默认						
                 start_created	         查询三个月内交易创建时间开始。格式:yyyy-MM-dd HH:mm:ss													
                 end_created	             查询交易创建时间结束。格式:yyyy-MM-dd HH:mm:ss															
                 status			         交易状态																									
@@ -57,6 +57,8 @@ function说明
                             "refund_status": "NO_REFUND",
                             "seller_rate": false,
                             "seller_type": "C",
+                            "sku_id": "31122967183",     // sku_Id 订单列表有时不会被显示
+                            "sku_properties_name": "套餐种类:官方标配",
                             "status": "WAIT_SELLER_SEND_GOODS",
                             "title": "沙箱测试20150915001",
                             "total_fee": "500.00"
@@ -315,7 +317,7 @@ function说明
                 page
                 pageSize
             }
-     output:
+     output: 
             {
                 "s": 1,
                 "d": {
@@ -367,4 +369,219 @@ function说明
                 "m": ""
                 }       
 ```
+
+11.ReceiveGet()            获取单笔退款详情
+
+ 路由:`/core/Api/TmRefund/OneGet`
+ 
+ 参数：
+```sh
+        input:c
+            fields
+            token
+            refund_id       退款I单D
+        
+        output:
+            {
+            "s": 1,
+            "d": {
+                "refund": {
+                "alipay_no": "2016060147475178",
+                "attribute": ";refundFrom:2;a_n_c:serviceone;payMode:alipay;gaia:1;7d:1;a_i_c:10.189.224.91;reason:5;rootCat:50067548;newRefund:1;closeHint:1;returnFeeTo:1;lastOrder:0;shop_name:sandbox_c_1;",
+                "buyer_nick": "sandbox_c_12",
+                "created": "2016-06-01 15:09:40",
+                "desc": "部分退款2",
+                "good_status": "BUYER_NOT_RECEIVED",
+                "has_good_return": false,
+                "num": 3,
+                "num_iid": 2100663189060,
+                "oid": 194174061976510,
+                "operation_contraint": "null",
+                "payment": "0.00",
+                "price": "90.60",
+                "reason": "协商一致退款",
+                "refund_fee": "252.77",
+                "refund_id": 146535512261065,
+                "refund_phase": "onsale",
+                "refund_remind_timeout": {
+                    "exist_timeout": true,
+                    "remind_type": 1,
+                    "timeout": "2016-06-03 15:09:40"
+                },
+                "refund_version": 1464764980000,
+                "seller_nick": "sandbox_c_1",
+                "status": "WAIT_SELLER_AGREE",
+                "tid": 194174061956510,
+                "title": "沙箱测试商品by2048",
+                "total_fee": "252.77"
+                },
+                "request_id": "16ecr2nklz7h4"
+            },
+            "m": ""
+            }
+
+```
+
+12.MessagesGet()            查询退款留言/凭证列表
+
+ 路由:`/core/Api/TmRefund/MessagesGet`
+ 
+ 参数：
+```sh
+        input:
+            fields
+            token
+            refund_id       退款I单D
+            refund_phase    退款阶段，天猫退款为必传。可选值：onsale（售中），aftersale（售后）
+            page
+            pageSize
+        output:
+            {
+            "s": 1,
+            "d": {
+                "refund_messages_get_response": {
+                "refund_messages": {
+                "refund_message": [
+                {
+                "id": 5199969975,
+                "message_type": "NORMAL"
+                },
+                {
+                "id": 5200029393,
+                "message_type": "NORMAL"
+                },
+                {
+                "id": 5199643867,
+                "message_type": "NORMAL"
+                }
+                ]
+                },
+                "total_results": 3,
+                "request_id": "rxn9f5pq29oo"
+                }
+            },
+            "m": ""
+            }            
+
+
+```
+
+13.add()            创建订单并发货
+
+ 路由:`/core/Api/TmSku/Add`
+ 
+ 参数：
+```sh
+    input: 
+        skuAddRequest{
+                num_iid :               必选， 所属商品数字id，可通过 taobao.item.get 获取。必选
+                properties :            必选， Sku属性串。格式:pid:vid;pid:vid,如:1627207:3232483;1630696:3284570,表示:机身颜色:军绿色;手机套餐:一电一充。
+                quantity :              必选， Sku的库存数量。sku的总数量应该小于等于商品总数量(Item的NUM)。取值范围:大于零的整数
+                price :                 必选， Sku的销售价格。商品的价格要在商品所有的sku的价格之间。精确到2位小数;单位:元。如:200.07，表示:200元7分
+                outer_id :              Sku的商家外部id
+                item_price :            sku所属商品的价格。当用户新增sku，使商品价格不属于sku价格之间的时候，用于修改商品的价格，使sku能够添加成功
+                lang :                  Sku文字的版本。可选值:zh_HK(繁体),zh_CN(简体);默认值:zh_CN
+                spec_id :               产品的规格信息
+                sku_hd_length :         家装建材类目，商品SKU的长度，正整数，单位为cm，部分类目必选。天猫商家专用。 数据和SKU一一对应，用,分隔，如：20,30,30
+                sku_hd_height :         家装建材类目，商品SKU的高度，单位为cm，部分类目必选。
+                sku_hd_lamp_quantity :  家装建材类目，商品SKU的灯头数量，正整数，大于等于3，部分类目必选。天猫商家专用。 数据和SKU一一对应，用,分隔，如：3,5,7
+                ignorewarning :         忽略警告提示.
+        }
+    output:
+
+```
+
+
+14.SkuGet()            获取SKU
+
+ 路由:`/core/Api/TmSku/Get`
+ 
+ 参数：
+```sh
+    input: 
+        fields: 必选 
+        sku_id: 必选， 
+        num_iid: 商品的数字IID（num_iid和nick必传一个，推荐用num_iid），传商品的数字id返回的结果里包含cspu（SKu上的产品规格信息）。 nick: 卖家nick(num_iid和nick必传一个)，只传卖家nick时候，该api返回的结果不包含cspu（SKu上的产品规格信息）。
+    output:
+        {
+        "s": 1,
+        "d": {
+            "created": "2015-09-20 10:29:23",
+            "iid": "2100713359442",
+            "modified": "2016-07-18 15:20:09",
+            "num_iid": 2100713359442,
+            "outer_id": "",
+            "price": "999.00",
+            "properties": "21684:6536025",
+            "properties_name": "21684:6536025:套餐种类:官方标配",
+            "quantity": 0,
+            "sku_id": 31122967183,
+            "status": "normal",
+            "with_hold_quantity": 0
+        },
+        "m": ""
+        }
+
+```
+
+15.Update()            更新SKU
+
+ 路由:`/core/Api/TmSku/Update`
+ 
+ 参数：
+```sh
+    input: 
+        skuUpdateRequest
+            {
+                num_iid : 最小值：0 所属商品数字id，可通过 taobao.item.get 获取。必选
+                properties : Sku属性串。格式:pid:vid;pid:vid,如:1627207:3232483;1630696:3284570,表示:机身颜色:军绿色;手机套餐:一电一充。
+                quantity : Sku的库存数量。sku的总数量应该小于等于商品总数量(Item的NUM)。取值范围:大于零的整数
+                price : Sku的销售价格。商品的价格要在商品所有的sku的价格之间。精确到2位小数;单位:元。如:200.07，表示:200元7分
+                outer_id : Sku的商家外部id
+                item_price : sku所属商品的价格。当用户新增sku，使商品价格不属于sku价格之间的时候，用于修改商品的价格，使sku能够添加成功
+                lang : Sku文字的版本。可选值:zh_HK(繁体),zh_CN(简体);默认值:zh_CN
+                spec_id : 产品的规格信息
+                barcode : SKU条形码
+                ignorewarning : 忽略警告提示.
+            }
+    output:
+
+```
+15.Update()            更新SKU
+
+ 路由:`/core/Api/TmSku/SkusGet`
+ 
+ 参数：
+```sh
+    input: 
+        token
+        fields
+        num_iids      必选，sku所属商品数字id，必选。num_iid个数不能超过40个
+    output:
+        {
+  "s": 1,
+  "d": {
+    "sku": [
+      {
+        "created": "2015-09-20 10:29:23",
+        "iid": "2100713359442",
+        "modified": "2016-07-18 15:20:09",
+        "num_iid": 2100713359442,
+        "outer_id": "",
+        "price": "999.00",
+        "properties": "21684:6536025",
+        "properties_name": "21684:6536025:套餐种类:官方标配",
+        "quantity": 0,
+        "sku_id": 31122967183,
+        "status": "normal"
+      },
+      { },
+      { }
+    ]
+  },
+  "m": ""
+}
+```
+
+
 

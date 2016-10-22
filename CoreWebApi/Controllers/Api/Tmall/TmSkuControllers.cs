@@ -84,7 +84,7 @@ namespace CoreWebApi.Api.Tmall{
         
         #region
         [HttpGetAttribute("/core/Api/TmSku/SkusGet")]
-        public ResponseResult SkusGet(string token,string fields,string num_iids){
+        public ResponseResult SkusGet(string token="",string fields="",string num_iids=""){
             var m = new DataResult(1,null);
             if(string.IsNullOrEmpty(fields)){
                 fields = SKU_GET;
