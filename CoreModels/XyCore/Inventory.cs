@@ -6,6 +6,7 @@ namespace CoreModels.XyCore
     {
         public int ID { get; set; }
         public string GoodsCode { get; set; }
+        public int Skuautoid { get; set; }
         public string SkuID { get; set; }
         public string Name { get; set; }
         public string Norm { get; set; }

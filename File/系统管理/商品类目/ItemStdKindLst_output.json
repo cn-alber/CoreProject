@@ -1,0 +1,138 @@
+{
+    "s": 1,
+    "d": [
+        {
+            "id": 325,
+            "name": "背心/马甲",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 326,
+            "name": "T恤",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 327,
+            "name": "Polo衫",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 328,
+            "name": "衬衫",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 329,
+            "name": "针织衫/毛衣",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 330,
+            "name": "牛仔裤",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 331,
+            "name": "休闲裤",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 332,
+            "name": "棉裤",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 333,
+            "name": "羽绒裤",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 334,
+            "name": "皮裤",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 335,
+            "name": "夹克",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 336,
+            "name": "卫衣",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 337,
+            "name": "风衣",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 338,
+            "name": "毛呢大衣",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 339,
+            "name": "棉衣",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 340,
+            "name": "皮衣",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 341,
+            "name": "羽绒服",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 342,
+            "name": "西服",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 343,
+            "name": "西裤",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 344,
+            "name": "西服套装",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 345,
+            "name": "民族服装",
+            "parentid": 0,
+            "is_tb_parent": false
+        },
+        {
+            "id": 346,
+            "name": "套装",
+            "parentid": 0,
+            "is_tb_parent": true
+        }
+    ],
+    "m": ""
+}
