@@ -1,11 +1,9 @@
 using System;
 using CoreDate.CoreApi;
 using CoreModels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoreWebApi.Api.Tmall{    
-    [AllowAnonymous]
     //天猫退款
     public class TmRefundControllers : ControllBase
     {

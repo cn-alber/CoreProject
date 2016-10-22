@@ -1,13 +1,11 @@
 using CoreDate.CoreApi;
 using CoreModels;
 using CoreModels.XyApi.Tmall;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
 namespace CoreWebApi.Api.Tmall{    
     //天猫发货
-    [AllowAnonymous]
     public class TmSendControllers : ControllBase
     {
 

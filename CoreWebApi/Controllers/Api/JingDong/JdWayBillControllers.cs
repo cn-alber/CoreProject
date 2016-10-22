@@ -2,12 +2,10 @@ using System;
 using CoreDate.CoreApi;
 using CoreModels;
 using CoreModels.XyApi.JingDong;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
 namespace CoreWebApi.Api.JingDong{  
-    [AllowAnonymous]  
     public class JdWayBillControllers : ControllBase
     {
         #region

@@ -1,11 +1,9 @@
 using System;
 using CoreDate.CoreApi;
 using CoreModels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoreWebApi.Api.JingDong{    
-    [AllowAnonymous]
     public class JdRefundControllers : ControllBase
     {
         #region 退款审核单列表查询

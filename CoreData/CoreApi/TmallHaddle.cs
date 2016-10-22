@@ -1,21 +1,25 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
+using CoreData;
 using CoreModels;
 using CoreModels.XyApi.Tmall;
+using Dapper;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 
 namespace CoreDate.CoreApi
 {
     public  class TmallHaddle{
         
-        //private static string SERVER_URL = "http://gw.api.taobao.com/router/rest";
-        private static string SERVER_URL = "http://gw.api.tbsandbox.com/router/rest";
-        //private static string SECRET ="f60e6b4c6565ecc865e7301ad02ef6a4";
-        private static string SECRET = "sandboxc6565ecc865e7301ad02ef6a4";//沙箱        
+        private static string SERVER_URL = "http://gw.api.taobao.com/router/rest";
+        //private static string SERVER_URL = "http://gw.api.tbsandbox.com/router/rest";
+        private static string SECRET ="f60e6b4c6565ecc865e7301ad02ef6a4";
+        //private static string SECRET = "sandboxc6565ecc865e7301ad02ef6a4";//沙箱        
 
         private static IDictionary<string, string> Tmparam = new Dictionary<string, string>{
-            //{"app_key", "23476390"},
-            {"app_key", "1023476390"},//沙箱            
+            {"app_key", "23476390"},
+            //{"app_key", "1023476390"},//沙箱            
             {"format","json"},
             {"sign_method","md5"},            
             {"timestamp", System.DateTime.Now.AddMinutes(6).ToString()},
@@ -905,29 +909,116 @@ namespace CoreDate.CoreApi
 
         #region  获取类目属性
         /// <summary>
-        ///   参考网址： 
+        ///  获取标准商品类目属性 参考网址：http://open.taobao.com/docs/api.htm?apiId=121 
         /// </summary>
         /// <param name=""></param>
         /// <param name=""></param>
-        public static DataResult demo(string token,string fields,string cid){
+        public static DataResult itempropsGet (string token,string fields){
             var result = new DataResult(1,null);
             try{                                        
-                Tmparam.Add("method", "");
+                Tmparam.Add("method", "taobao.itemprops.get");
                 Tmparam.Add("session", token);
-
                 Tmparam.Add("fields", fields);
-                Tmparam.Add("cid", cid);
-            
-                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
-                Tmparam.Add("sign", sign);//                                      
-                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
-                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
-                    result.s = -1;
-                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
-                }else{
-                    result.d = res.itemprops_get_response.item_props.item_prop;
-                }            
+
+                List<itemprops> itemp = new List<itemprops>(); 
+
+                List<cateStandard> cids = getItemCates();
+                long beforeID = CacheBase.Get<long>("itemcatecid");
+                string sql = "";
+                foreach(cateStandard standard in cids){
+                    if(standard.cid < beforeID || standard.cid == beforeID){//
+                        continue;
+                    }
+
+                    Tmparam.Add("cid", standard.cid.ToString());            
+                    string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                    Tmparam.Add("sign", sign);//                                      
+                    var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);                             
+                    var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");  
+                     result.d = res;
+                         break;                                                               
+                    if(response.Result.ToString().IndexOf("error") > 0){
+                        result.s = -1;
+                        result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
+                        break;
+                    }else{
+
+                        Tmparam.Remove("cid");
+                        Tmparam.Remove("sign");
+                                                                  
+                        Console.OutputEncoding = Encoding.UTF8;
+                        Console.WriteLine("-----------------     "+standard.cid+"    -----------------");                         
+                        if(response.Result.ToString().IndexOf("item_props") == -1){
+                            continue;
+                        }
+                        
+                        foreach(var  item in  res.itemprops_get_response.item_props.item_prop){                             
+                        sql +=@"INSERT INTO item_cates_standard_props(
+                                                                item_cates_standard_props.`name`,
+                                                                item_cates_standard_props.pid,
+                                                                item_cates_standard_props.must,
+                                                                item_cates_standard_props.multi,
+                                                                item_cates_standard_props.tb_cid,
+                                                                item_cates_standard_props.`values`) 
+                                VALUES('"+item.name+"','"+item.pid+"' ,"+item.must+","+item.multi+","+standard.cid+",'"+JsonConvert.SerializeObject(item.prop_values)+"');";
+                            
+                                // try{                                    
+                                //     sql = "SELECT i.id FROM item_cates_standard_props as i WHERE i.pid ="+item.pid;
+                                //     long props_id = conn.Query<long>(sql).AsList()[0];
+                                //     sql =@"INSERT item_cates_realationship SET 
+                                //                 item_cates_realationship.pid = @pid,
+                                //                 item_cates_realationship.prop_id= @prop_id, 
+                                //                 item_cates_realationship.standard_id = @standard_id,
+                                //                 item_cates_realationship.tb_cid = @tb_cid";
+                                //     var resnt = conn.Execute(sql,new {
+                                //                     pid = item.pid,
+                                //                     prop_id = props_id,
+                                //                     standard_id = standard.id,
+                                //                     tb_cid = standard.cid
+                                //                 });            
+                                //     if(resnt == 0){
+                                //         result.s = -1;
+                                //         result.d = standard.cid +" 导入失败";
+                                //         break;
+                                //     }
+                                // }catch(Exception ex){
+                                //         // conn.Dispose();
+                                //         // result.s = -1;
+                                //         // result.d = standard.cid +" 导入失败 "+ex.Message;
+                                //         // break;
+                                // }
+                                Console.WriteLine(standard.id+" --- "+item.name+"-----"+item.pid);
+                            }
+                                using (var conn = new MySqlConnection(DbBase.CommConnectString)){
+                                try{
+                                    
+                                    var rnt = conn.Execute(sql);
+                                    
+                                    
+                                    if(rnt == 0){
+                                        result.s = -1;
+                                        result.d = standard.cid +" 导入失败";
+                                        break;
+                                    }
+                                    
+                                }catch(Exception ex){ 
+                                    Console.WriteLine(sql);
+                                    result.s = -1;
+                                    result.d = ex.Message; 
+                                }
+                            }
+                            sql = "";                         
+                }                                  
+                CacheBase.Remove("itemcatecid");
+                CacheBase.Set<long>("itemcatecid", standard.cid);
+                //break;
+                }
+                
+
+
+
+
+
             }catch(Exception ex){                
                 result.s = -1;
                 result.d =  ex.Message;
@@ -938,7 +1029,15 @@ namespace CoreDate.CoreApi
         }
         #endregion
 
-
+        public static List<cateStandard> getItemCates(){
+            List<cateStandard> cates = new List<cateStandard>();
+            using (var conn = new MySqlConnection(DbBase.CommConnectString)){
+                string sql = "SELECT i.id,i.tb_cid as cid FROM item_cates_standard as i WHERE i.parent_id != 0 AND i.tb_cid >1100 ORDER BY i.tb_cid ASC;";
+                cates = conn.Query<cateStandard>(sql).AsList();
+            }
+            
+            return cates;
+        }
 
 
 

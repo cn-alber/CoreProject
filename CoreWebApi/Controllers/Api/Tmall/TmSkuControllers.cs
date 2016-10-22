@@ -1,14 +1,12 @@
-using System;
+
 using CoreDate.CoreApi;
 using CoreModels;
 using CoreModels.XyApi.Tmall;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
 namespace CoreWebApi.Api.Tmall{    
     //天猫发货
-    [AllowAnonymous]
     public class TmSkuControllers : ControllBase
     {
         public static string SKU_GET = "sku_id ,iid,num_iid ,properties ,quantity ,price,created ,modified ,status,extra_id,memo,properties_name,sku_spec_id,with_hold_quantity	,sku_delivery_time,change_prop,outer_id ,barcode";
