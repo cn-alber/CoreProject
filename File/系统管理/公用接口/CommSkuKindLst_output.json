@@ -1,0 +1,36 @@
+{
+    "s": 1,
+    "d": [
+        {
+            "ID": 105,
+            "KindName": "风衣",
+            "Enable": true,
+            "ParentID": 100,
+            "CoID": 1,
+            "Creator": "管理员",
+            "CreateDate": "2016/10/18 15:12:57",
+            "Children": null
+        },
+        {
+            "ID": 106,
+            "KindName": "呢大衣",
+            "Enable": true,
+            "ParentID": 100,
+            "CoID": 1,
+            "Creator": "管理员",
+            "CreateDate": "2016/10/18 15:13:11",
+            "Children": null
+        },
+        {
+            "ID": 107,
+            "KindName": "夹克/皮衣",
+            "Enable": true,
+            "ParentID": 100,
+            "CoID": 1,
+            "Creator": "管理员",
+            "CreateDate": "2016/10/18 15:13:29",
+            "Children": null
+        }
+    ],
+    "m": ""
+}

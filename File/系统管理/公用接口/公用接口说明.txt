@@ -64,4 +64,13 @@ OutPut: List<warehouse> 仓库资料
 参考:input jason 文件:None
 参考:output jason 文件:GetChildWarehouseList_output.json
 
+6.CommSkuKindLst()//获取所有启用状态的商品类目
+接口路径：CoreProject\CoreWebApi\Controllers\Base\CommonControllers.cs
+路由：http://localhost:5000/Core/XyComm/Customkind/CommSkuKindLst?ParentID=100
+InPut:
+    ParentID            int                     商品类目父级ID      
+OutPut:
+    KindLst             List<CustomKindData>    商品类目列表
+参考:output json 文件:CommSkuKindLst_output.json
+
 

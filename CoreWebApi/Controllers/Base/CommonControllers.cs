@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using CoreData.CoreCore;
 // using Newtonsoft.Json.Linq;
-// using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 // using CoreData.CoreCore;
 using CoreModels.XyCore;
+using CoreModels.XyComm;
 using CoreData.CoreComm;
 using CoreData;
 using CoreModels;
@@ -11,7 +12,7 @@ using CoreModels;
 
 namespace CoreWebApi
 {
-    // [AllowAnonymous]
+    [AllowAnonymous]
     public class CommonController : ControllBase
     {
         [HttpGetAttribute("/Core/Common/ScoCompanySimple")]
@@ -123,9 +124,6 @@ namespace CoreWebApi
         }
         #endregion
 
-
-
-
         #region 获取品牌列表
         [HttpGetAttribute("/Core/Common/CommBrandLst")]
         public ResponseResult CommBrandLst()
@@ -162,6 +160,28 @@ namespace CoreWebApi
                 data.d = "参数无效!";
             }
             return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+        #endregion
+
+        #region 获取商品类目列表
+        [HttpGetAttribute("/Core/XyComm/Customkind/CommSkuKindLst")]
+        public ResponseResult CommSkuKindLst(string ParentID)
+        {
+            var res = new DataResult(1, null);
+            var cp = new CusKindParam();
+            cp.CoID = int.Parse(GetCoid());
+            int PID = 0;
+            if (!int.TryParse(ParentID, out PID))
+            {
+                res.s = -1;
+                res.d = "无效参数ParentID";
+            }
+            else
+            {
+                cp.ParentID = int.Parse(ParentID);
+                res = CustomKindHaddle.GetCommKindLst(cp);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
     }

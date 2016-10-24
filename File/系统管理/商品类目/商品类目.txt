@@ -4,16 +4,17 @@ function说明
 #######################################################
 1.SkuKindLst()//查询商品类目资料(CustomKind)
     方法：Get
-    路由：http://192.168.30.29:5000/Core/XyComm/Customkind/SkuKindLst?ParentID=0
+    路由：http://192.168.30.29:5000/Core/XyComm/Customkind/SkuKindLst?ParentID=0&Enable=
     InPut:
         ParentID            int                 商品类目父级ID
+        Enable              string              启用状态(all/false/true,default：all)             
     OutPut:
         KindLst             List<CustomKindData>    商品类目列表
     参考:output json 文件:SkuKindLst_output.json
 #######################################################
-2.SkuKindLst()//查询商品类目资料(CustomKind)
+2.SkuKind()//查询商品类目资料(CustomKind)
     方法：Get
-    路由：http://192.168.30.29:5000/Core/XyComm/Customkind/SkuKind?ID=74
+    路由：http://192.168.30.29:5000/Core/XyComm/Customkind/SkuKind?ID=100
     InPut:
         ID                  int                 商品类目ID
     OutPut:
@@ -64,3 +65,14 @@ function说明
     OutPut:
         StdKindLst          List<ItemCateStdData>    标准类目列表
     参考:output json 文件:ItemStdKindLst_output.json
+7.SkuKindEnable()//批次更新客户资料的状态
+路由:http://localhost:5000/Core/XyComm/Customkind/SkuKindEnable
+input： IDList    List<int>      客户ID list
+        Enable    string         指定状态true|false（启用，停用）
+OutPut: 成功：
+            1.更新类目状态customkind.enable
+            2.新增修改记录log
+            3.返回成功信息
+        失败：
+            1.返回错误信息
+参考:input json 文件:SkuKindEnable_input.json

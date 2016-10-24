@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyUser;
 using CoreModels.XyComm;
 using System.Collections.Generic;
+using System;
 using CoreData.CoreComm;
 using CoreData;
 using CoreModels;
@@ -16,20 +17,23 @@ namespace CoreWebApi
     {
         #region 获取商品类目列表
         [HttpGetAttribute("/Core/XyComm/Customkind/SkuKindLst")]
-        public ResponseResult SkuKindLst(string ParentID)
+        public ResponseResult SkuKindLst(string ParentID, string Enable)
         {
             var res = new DataResult(1, null);
-            string CoID = GetCoid();
+            var cp = new CusKindParam();
+            cp.CoID = int.Parse(GetCoid());
             int PID = 0;
-            if (int.TryParse(ParentID, out PID))
-            {
-                PID = int.Parse(ParentID);
-                res = CustomKindHaddle.GetKindLst("商品类目", PID, CoID);
-            }
-            else
+            if (!int.TryParse(ParentID, out PID))
             {
                 res.s = -1;
                 res.d = "无效参数ParentID";
+            }
+            else
+            {
+                cp.Enable = Enable;
+                cp.ParentID = int.Parse(ParentID);
+
+                res = CustomKindHaddle.GetKindLst(cp);
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
@@ -81,14 +85,19 @@ namespace CoreWebApi
         public ResponseResult InsertSkuKind([FromBodyAttribute]JObject obj)
         {
             var res = new DataResult(1, null);
-            string Type = "商品类目";
-            string KindName = obj["KindName"].ToString();
-            string ParentID = obj["ParentID"].ToString();
-            int PID = 0;
-            if (int.TryParse(ParentID, out PID))
+            var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<CustomKind>(obj.ToString());
+            // var cp = new CustomKind();
+            cp.Type = "商品类目";
+            // cp.KindName = obj["KindName"].ToString();
+            string PID = obj["ParentID"].ToString();
+            int x = 0;
+            if (int.TryParse(PID, out x))
             {
-                PID = int.Parse(ParentID);
-                res = CustomKindHaddle.InsertKind(Type, KindName, PID, GetCoid(), GetUname());
+                cp.ParentID = int.Parse(PID);
+                cp.CoID = int.Parse(GetCoid());
+                cp.Creator = GetUname();
+                cp.CreateDate = DateTime.Now.ToString();
+                res = CustomKindHaddle.InsertKind(cp);
             }
             else
             {
@@ -117,7 +126,7 @@ namespace CoreWebApi
             var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
             int CoID = int.Parse(GetCoid());
             string UserName = GetUname();
-            if (IDLst.Count>0)
+            if (IDLst.Count > 0)
             {
                 res = CustomKindHaddle.DelKind(IDLst, CoID, UserName);
             }
@@ -125,6 +134,28 @@ namespace CoreWebApi
             {
                 res.s = -1;
                 res.d = "请选中要删除的资料";
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 商品类目启用|停用
+        [HttpPostAttribute("/Core/XyComm/Customkind/SkuKindEnable")]
+        public ResponseResult SkuKindEnable([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
+            if (IDLst.Count == 0)
+            {
+                res.s = -1;
+                res.d = "请先选中操作明细";
+            }
+            else
+            {
+                bool Enable = obj["Enable"].ToString().ToUpper() == "TRUE" ? true : false;
+                string CoID = GetCoid();
+                string UserName = GetUname();
+                res = CustomKindHaddle.UptKindEnable(IDLst, CoID, UserName, Enable);
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
