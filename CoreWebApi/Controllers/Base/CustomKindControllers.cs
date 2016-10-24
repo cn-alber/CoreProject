@@ -85,24 +85,24 @@ namespace CoreWebApi
         public ResponseResult InsertSkuKind([FromBodyAttribute]JObject obj)
         {
             var res = new DataResult(1, null);
-            var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<CustomKind>(obj.ToString());
             // var cp = new CustomKind();
-            cp.Type = "商品类目";
             // cp.KindName = obj["KindName"].ToString();
             string PID = obj["ParentID"].ToString();
             int x = 0;
-            if (int.TryParse(PID, out x))
+            if (!int.TryParse(PID, out x))
             {
+                res.s = -1;
+                res.d = "无效参数ParentID";
+            }
+            else
+            {
+                var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<CustomKind>(obj.ToString());
+                cp.Type = "商品类目";
                 cp.ParentID = int.Parse(PID);
                 cp.CoID = int.Parse(GetCoid());
                 cp.Creator = GetUname();
                 cp.CreateDate = DateTime.Now.ToString();
                 res = CustomKindHaddle.InsertKind(cp);
-            }
-            else
-            {
-                res.s = -1;
-                res.d = "无效参数ParentID";
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }

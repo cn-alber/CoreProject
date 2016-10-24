@@ -67,7 +67,12 @@ namespace CoreData.CoreComm
         {
             var result = new DataResult(1, null);
             var KindLst = new List<ItemCateStdData>();
-            string sql = @"SELECT * FROM Item_cates_standard WHERE parent_id=@ParentID";
+            string sql = @"SELECT id,
+                                `name`,
+                                parent_id,
+                                is_tb_parent AS is_parent
+                            FROM Item_cates_standard
+                            WHERE parent_id=@ParentID";
             using (var conn = new MySqlConnection(DbBase.CommConnectString))
             {
                 try
@@ -161,6 +166,7 @@ namespace CoreData.CoreComm
                                         KindName,
                                         FullName,
                                         Enable,
+                                        `Order`,
                                         ParentID,
                                         CoID,
                                         Creator,
@@ -170,6 +176,7 @@ namespace CoreData.CoreComm
                                         @KindName,
                                         @FullName,
                                         @Enable,
+                                        @Order,
                                         @ParentID,
                                         @CoID,
                                         @Creator,
@@ -220,6 +227,10 @@ namespace CoreData.CoreComm
                         {
                             contents = contents + "类目名称:" + OldKind.KindName + "=>" + Kind.KindName + ";";
                         }
+                        if (OldKind.Order != Kind.Order)
+                        {
+                            contents = contents + "类目排序:" + OldKind.Order + "=>" + Kind.Order + ";";
+                        }
                         // if (OldKind.FullName != Kind.FullName)
                         // {
                         //     contents = contents + "类目全名:" + OldKind.FullName + "=>" + Kind.FullName + ";";
@@ -230,10 +241,11 @@ namespace CoreData.CoreComm
                         }
                         if (!string.IsNullOrEmpty(contents))
                         {
-                            string sql = "update customkind Set KindName=@KindName,ParentID=@ParentID,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE ID=@ID";
+                            string sql = "update customkind Set KindName=@KindName,`Order`=@Order,ParentID=@ParentID,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE ID=@ID";
                             var p = new DynamicParameters();
                             p.Add("@KindName", Kind.KindName);
                             // p.Add("@FullName", fullname);
+                            p.Add("@Order",Kind.Order);
                             p.Add("@ParentID", Kind.ParentID);
                             p.Add("@Modifier", UserName);
                             p.Add("@ModifyDate", DateTime.Now);
