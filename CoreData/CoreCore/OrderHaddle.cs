@@ -14,8 +14,10 @@ namespace CoreData.CoreCore
         ///</summary>
         public static DataResult GetOrderList(OrderParm cp)
         {
-            var result = new DataResult(1,null);     
-            string wheresql = "select * from order where 1=1";
+            var result = new DataResult(1,null);    
+            string sqlcount = "select count(id) from `order` where 1=1";
+            string sqlcommand = "select * from `order` where 1=1"; 
+            string wheresql = string.Empty;
             if(cp.CoID != 1)//公司编号
             {
                 wheresql = wheresql + " and coid = " + cp.CoID;
@@ -72,41 +74,157 @@ namespace CoreData.CoreCore
             {
                 wheresql = wheresql + " AND status in ("+ string.Join(",", cp.StatusList) + ")" ;
             }
-            // if(cp.Status >= 0)//状态
-            // {
-            //    wheresql = wheresql + " and status = " + cp.Status;
-            // }
-            // if(cp.Scoid > 0)//供应商
-            // {
-            //    wheresql = wheresql + " and scoid = " + cp.Scoid;
-            // }
-            // if (cp.Warehouseid > 0)//仓库代号
-            // {
-            //     wheresql = wheresql + " AND warehouseid = "+ cp.Warehouseid ;
-            // }
-            // if(!string.IsNullOrEmpty(cp.Buyyer))//采购员
-            // {
-            //    wheresql = wheresql + " and buyyer = '" + cp.Buyyer + "'";
-            // }
-            // if(!string.IsNullOrEmpty(cp.Skuid))//商品编码
-            // {
-            //    wheresql = wheresql + " and exists(select skuid from purchasedetail where purchaseid = purchase.id and skuid = '" + cp.Skuid + "')";
-            // }
-            // if(!string.IsNullOrEmpty(cp.SortField)&& !string.IsNullOrEmpty(cp.SortDirection))//排序
-            // {
-            //     wheresql = wheresql + " ORDER BY "+cp.SortField +" "+ cp.SortDirection;
-            // }
+            if (cp.AbnormalStatusList != null)//异常状态List
+            {
+                wheresql = wheresql + " AND abnormalstatus in (0,"+ string.Join(",", cp.StatusList) + ")" ;
+            }
+            if(cp.IsRecMsgYN.ToUpper() == "Y")
+            {
+                if(cp.RecMessage == null)
+                {
+                    wheresql = wheresql + " AND recmessage != '' and status in (0,1,2,7)" ;
+                }
+                else
+                {
+                    wheresql = wheresql + " AND recmessage like '%" + cp.RecMessage + "%' and status in (0,1,2,7)" ;
+                }
+            }
+            if(cp.IsRecMsgYN.ToUpper() == "N")
+            {
+                wheresql = wheresql + " AND recmessage = '' and status in (0,1,2,7)" ;
+            }
+            if(cp.IsSendMsgYN.ToUpper() == "Y")
+            {
+                if(cp.SendMessage == null)
+                {
+                    wheresql = wheresql + " AND sendmessage != '' and status in (0,1,2,7)" ;
+                }
+                else 
+                {
+                    wheresql = wheresql + " AND sendmessage like '%" + cp.SendMessage + "%' and status in (0,1,2,7)" ;
+                }
+            }
+            if(cp.IsSendMsgYN.ToUpper() == "N")
+            {
+                wheresql = wheresql + " AND sendmessage = '' and status in (0,1,2,7)" ;
+            }
+            if(cp.Datetype.ToUpper() == "ODATE")
+            {
+                wheresql = wheresql + " AND odate between '" + cp.DateStart + "' and '" + cp.DateEnd + "'" ;
+            }
+            if(cp.Datetype.ToUpper() == "SENDDATE")
+            {
+                wheresql = wheresql + " AND senddate between '" + cp.DateStart + "' and '" + cp.DateEnd + "'" ;
+            }
+            if(cp.Datetype.ToUpper() == "PAYDATE")
+            {
+                wheresql = wheresql + " AND paydate between '" + cp.DateStart + "' and '" + cp.DateEnd + "'" ;
+            }
+            if(cp.Datetype.ToUpper() == "PLANDATE")
+            {
+                wheresql = wheresql + " AND plandate between '" + cp.DateStart + "' and '" + cp.DateEnd + "'" ;
+            }
+            if(!string.IsNullOrEmpty(cp.Skuid))
+            {
+               wheresql = wheresql + " and exists(select id from orditem where oid = order.id and skuid = '" + cp.Skuid + "')";
+            }
+            if(cp.Ordqtystart > 0)
+            {
+                wheresql = wheresql + " AND ordqty >= " +  cp.Ordqtystart + " and status in (0,1,2,7)";
+            }
+            if(cp.Ordqtyend > 0)
+            {
+                wheresql = wheresql + " AND ordqty <= " +  cp.Ordqtyend + " and status in (0,1,2,7)";
+            }
+            if(cp.Ordamtstart > 0)
+            {
+                wheresql = wheresql + " AND amount >= " +  cp.Ordamtstart + " and status in (0,1,2,7)";
+            }
+            if(cp.Ordamtend > 0)
+            {
+                wheresql = wheresql + " AND amount <= " +  cp.Ordamtend + " and status in (0,1,2,7)";
+            }
+            if(!string.IsNullOrEmpty(cp.Skuname))
+            {
+               wheresql = wheresql + " and exists(select id from orditem where oid = order.id and skuname like '%" + cp.Skuname + "%') and status in (0,1,2,7)";
+            }
+            if(!string.IsNullOrEmpty(cp.Norm))
+            {
+               wheresql = wheresql + " and exists(select id from orditem where oid = order.id and norm like '%" + cp.Norm + "%') and status in (0,1,2,7)";
+            }
+            if(cp.ShopStatus != null)
+            {
+                string shopstatus = string.Empty;
+                foreach(var x in cp.ShopStatus)
+                {
+                    shopstatus = shopstatus + "'" + x + "',";
+                }
+                shopstatus = shopstatus.Substring(0,shopstatus.Length - 1);
+                wheresql = wheresql + " AND shopstatus in (" +  shopstatus + ")";
+            }
+            if(cp.OSource > -1)
+            {
+                wheresql = wheresql + " AND osource = " +  cp.OSource;
+            }
+            if (cp.Type != null)
+            {
+                wheresql = wheresql + " AND type in ("+ string.Join(",", cp.Type) + ")" ;
+            }
+            if(cp.IsCOD.ToUpper() == "Y")
+            {
+                wheresql = wheresql + " AND iscod = true" ;
+            }
+            if(cp.IsCOD.ToUpper() == "N")
+            {
+                wheresql = wheresql + " AND iscod = false" ;
+            }
+            if (cp.ShopID != null)
+            {
+                wheresql = wheresql + " AND shopid in ("+ string.Join(",", cp.ShopID) + ")" ;
+            }
+            if(cp.IsDisSelectAll == true)
+            {
+                wheresql = wheresql + " AND dealertype = 2" ;
+            }
+            else
+            {
+                if(cp.Distributor != null)
+                {
+                    string distributor = string.Empty;
+                    foreach(var x in cp.Distributor)
+                    {
+                        distributor = distributor + "'" + x + "',";
+                    }
+                    distributor = distributor.Substring(0,distributor.Length - 1);
+                    wheresql = wheresql + " AND dealertype = 2 AND distributor in (" +  distributor + ")";
+                }
+            }
+            if(cp.ExID != null)
+            {
+                wheresql = wheresql + " AND exid in ("+ string.Join(",", cp.ExID) + ")" ;
+            }
+            if(cp.SendWarehouse != null)
+            {
+                string sendwarehouse = string.Empty;
+                foreach(var x in cp.SendWarehouse)
+                {
+                    sendwarehouse = sendwarehouse + "'" + x + "',";
+                }
+                sendwarehouse = sendwarehouse.Substring(0,sendwarehouse.Length - 1);
+                wheresql = wheresql + " AND sendwarehouse in (" +  sendwarehouse + ")";
+            }
+            if(!string.IsNullOrEmpty(cp.SortField) && !string.IsNullOrEmpty(cp.SortDirection))//排序
+            {
+                wheresql = wheresql + " ORDER BY "+cp.SortField +" "+ cp.SortDirection;
+            }
             var res = new OrderData();
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
-                    var u = conn.Query<Order>(wheresql).AsList();
-                    int count = u.Count;
+                    int count = conn.QueryFirst<int>(sqlcount + wheresql);
                     decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
-
                     int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
-                    u = conn.Query<Order>(wheresql).AsList();
-
+                    var u = conn.Query<Order>(sqlcommand + wheresql).AsList();
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;
                     res.Ord = u;

@@ -53,13 +53,16 @@ namespace CoreWebApi
                 cp.Warehouseid = int.Parse(Warehouseid);
             }
             cp.Buyyer = Buyyer;
-            if(CommHaddle.SysColumnExists(DbBase.CoreConnectString,"purchase",SortField).s == 1)
+            if(!string.IsNullOrEmpty(SortField))
             {
-                cp.SortField = SortField;
+                if(CommHaddle.SysColumnExists(DbBase.CoreConnectString,"purchase",SortField).s == 1)
+                {
+                    cp.SortField = SortField;
+                }
             }
             if(!string.IsNullOrEmpty(SortDirection))
             {
-                 if(SortDirection.ToUpper() == "ASC")
+                 if(SortDirection.ToUpper() == "ASC" || SortDirection.ToUpper() == "DESC")
                 {
                     cp.SortDirection = SortDirection;
                 }
@@ -89,13 +92,16 @@ namespace CoreWebApi
             cp.Skuid = Skuid;
             cp.SkuName = SkuName;
             cp.GoodsCode = GoodsCode;
-            if(CommHaddle.SysColumnExists(DbBase.CoreConnectString,"purchasedetail",SortField).s == 1)
+            if(!string.IsNullOrEmpty(SortField))
             {
-                cp.SortField = SortField;
+                if(CommHaddle.SysColumnExists(DbBase.CoreConnectString,"purchasedetail",SortField).s == 1)
+                {
+                    cp.SortField = SortField;
+                }
             }
             if(!string.IsNullOrEmpty(SortDirection))
             {
-                 if(SortDirection.ToUpper() == "ASC")
+                if(SortDirection.ToUpper() == "ASC" || SortDirection.ToUpper() == "DESC")
                 {
                     cp.SortDirection = SortDirection;
                 }

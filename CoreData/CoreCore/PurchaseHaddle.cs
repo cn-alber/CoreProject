@@ -14,8 +14,10 @@ namespace CoreData.CoreCore
         ///</summary>
         public static DataResult GetPurchaseList(PurchaseParm cp)
         {
-            var result = new DataResult(1,null);     
-            string wheresql = "select * from purchase where purchasedate between '" + cp.PurdateStart + "' and '" + cp.PurdateEnd + "'"; //采购日期;
+            var result = new DataResult(1,null);    
+            string sqlcount =  "select count(id) from purchase where purchasedate between '" + cp.PurdateStart + "' and '" + cp.PurdateEnd + "'"; //采购日期;
+            string sqlCommand = "select * from purchase where purchasedate between '" + cp.PurdateStart + "' and '" + cp.PurdateEnd + "'"; //采购日期;
+            string wheresql = string.Empty;
             if(cp.CoID != 1)//公司编号
             {
                 wheresql = wheresql + " and coid = " + cp.CoID;
@@ -51,13 +53,12 @@ namespace CoreData.CoreCore
             var res = new PurchaseData();
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
-                    var u = conn.Query<Purchase>(wheresql).AsList();
-                    int count = u.Count;
+                    int count = conn.QueryFirst<int>(sqlcount + wheresql);
                     decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
 
                     int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
-                    u = conn.Query<Purchase>(wheresql).AsList();
+                    var u = conn.Query<Purchase>(sqlCommand + wheresql).AsList();
 
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;
@@ -76,8 +77,10 @@ namespace CoreData.CoreCore
         ///</summary>
         public static DataResult GetPurchaseDetailList(PurchaseDetailParm cp)
         {
-            var result = new DataResult(1,null);     
-            string wheresql = "select * from purchasedetail where purchaseid = " + cp.Purid; //采购单号
+            var result = new DataResult(1,null);   
+            string sqlcount =  "select count(id) from purchasedetail where purchaseid = " + cp.Purid; //采购单号
+            string sqlCommand = "select * from purchasedetail where purchaseid = " + cp.Purid; //采购单号
+            string wheresql = string.Empty;
             if(cp.CoID != 1)//公司编号
             {
                 wheresql = wheresql + " and coid = " + cp.CoID;
@@ -101,24 +104,24 @@ namespace CoreData.CoreCore
             var res = new PurchaseDetailData();
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
-                    string pursql = "select * from purchase where id = " + cp.Purid;
+                    string pursql = "select * from purchase where id = " + cp.Purid + " and coid =" + cp.CoID;
                     var pur = conn.Query<Purchase>(pursql).AsList();
                     if (pur.Count == 0)
                     {
                         result.s = -3001;
                         result.d = null;
+                        return result;
                     }
                     else
                     {
                         res.status = pur[0].status;
                     }           
-                    var u = conn.Query<PurchaseDetail>(wheresql).AsList();
-                    int count = u.Count;
+                    int count = conn.QueryFirst<int>(sqlcount + wheresql);
                     decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
 
                     int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
-                    u = conn.Query<PurchaseDetail>(wheresql).AsList();
+                    var u = conn.Query<PurchaseDetail>(sqlCommand + wheresql).AsList();
 
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;
@@ -146,7 +149,7 @@ namespace CoreData.CoreCore
                 var p = new DynamicParameters();
                 p.Add("@PurID", PuridList);
                 p.Add("@Coid", CoID);
-                string wheresql = @"select count(*) from purchase where id in @PurID and coid = @Coid and status <> 0" ;
+                string wheresql = @"select count(id) from purchase where id in @PurID and coid = @Coid and status <> 0" ;
                 int u = CoreDBconn.QueryFirst<int>(wheresql,p);
                 if(u > 0)
                 {
@@ -196,12 +199,7 @@ namespace CoreData.CoreCore
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
                     var u = conn.Query<Purchase>(wheresql).AsList();
-                    if (u.Count == 0)
-                    {
-                        result.s = -3001;
-                        result.d = null;
-                    }
-                    else
+                    if (u.Count > 0)
                     {
                         result.d = u[0];
                     }               
@@ -283,7 +281,7 @@ namespace CoreData.CoreCore
                     }
                     else
                     {
-                        string wheresql = "select id,sconame,scosimple,enable,scocode,address,country,contactor,tel,phone,fax,url,email,typelist,bank,bankid,taxid,remark from supplycompany where id =" + pur.scoid;
+                        string wheresql = "select * from supplycompany where id =" + pur.scoid + " and coid =" + CoID;
                         var u = conn.Query<ScoCompany>(wheresql).AsList();
                         if(u.Count == 0)
                         {
@@ -410,7 +408,7 @@ namespace CoreData.CoreCore
                     }
                     if ( pur.scoid != 0)
                     {
-                        string wheresql = "select id,sconame,scosimple,enable,scocode,address,country,contactor,tel,phone,fax,url,email,typelist,bank,bankid,taxid,remark from supplycompany where id =" + pur.scoid;
+                        string wheresql = "select * from supplycompany where id =" + pur.scoid + " and coid = " + CoID;
                         var u = conn.Query<ScoCompany>(wheresql).AsList();
                         if(u.Count == 0)
                         {
@@ -520,7 +518,7 @@ namespace CoreData.CoreCore
                 var p = new DynamicParameters();
                 p.Add("@PurID", PuridList);
                 p.Add("@Coid", CoID);
-                string wheresql = @"select count(*) from purchase where id in @PurID and coid = @Coid and status <> 0" ;
+                string wheresql = @"select count(id) from purchase where id in @PurID and coid = @Coid and status <> 0" ;
                 int u = CoreDBconn.QueryFirst<int>(wheresql,p);
                 if(u > 0)
                 {
@@ -575,7 +573,7 @@ namespace CoreData.CoreCore
                 var p = new DynamicParameters();
                 p.Add("@PurID", PuridList);
                 p.Add("@Coid", CoID);
-                string wheresql = @"select count(*) from purchase where id in @PurID and coid = @Coid and status not in (1,3,4)" ;
+                string wheresql = @"select count(id) from purchase where id in @PurID and coid = @Coid and status not in (1,3,4)" ;
                 var u = CoreDBconn.QueryFirst<int>(wheresql,p);
                 if(u > 0)
                 {
@@ -648,7 +646,7 @@ namespace CoreData.CoreCore
                 foreach(int a in skuid)
                 {
                     InsertFailReason rf = new InsertFailReason();
-                    string skusql = "select skuid,skuname,norm,img,goodscode,enable from coresku where id =" + a;
+                    string skusql = "select skuid,skuname,norm,img,goodscode,enable from coresku where id =" + a + " and coid =" + CoID;
                     var s = CoreDBconn.Query<SkuInsert>(skusql).AsList();
                     if(s.Count == 0)
                     {
@@ -667,7 +665,7 @@ namespace CoreData.CoreCore
                             continue;
                         }
                     }
-                    int x = CoreDBconn.QueryFirst<int>("select count(*) from purchasedetail where purchaseid = "+ id+" and coid =" + CoID + " and skuautoid = "+a);
+                    int x = CoreDBconn.QueryFirst<int>("select count(id) from purchasedetail where purchaseid = "+ id+" and coid =" + CoID + " and skuautoid = "+a);
                     if( x > 0)
                     {
                         rf.id = a;
@@ -895,17 +893,16 @@ namespace CoreData.CoreCore
         public static DataResult QualityRevList(int purid,int CoID,int PageIndex,int NumPerPage)
         {
             var result = new DataResult(1,null);
+            string sqlcount = "select count(id) from qualityrev where purchaseid = " + purid + " and coid = " + CoID + " order by id asc";
             string wheresql = "select * from qualityrev where purchaseid = " + purid + " and coid = " + CoID + " order by id asc";
             var res =new QualityRevData();
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
-                    var u = conn.Query<QualityRev>(wheresql).AsList();
-                    int count = u.Count;
+                    int count = conn.QueryFirst<int>(sqlcount);
                     decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(NumPerPage.ToString()));
-
                     int dataindex = (PageIndex - 1)* NumPerPage;
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + NumPerPage.ToString();
-                    u = conn.Query<QualityRev>(wheresql).AsList();
+                    var u = conn.Query<QualityRev>(wheresql).AsList();
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;
                     res.Qua = u;
@@ -927,7 +924,7 @@ namespace CoreData.CoreCore
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try
                 {
-                    string wheresql = @"select count(*) from purchase where id = " + qua.purchaseid + " and status in (0,1)";
+                    string wheresql = @"select count(id) from purchase where id = " + qua.purchaseid + " and status in (0,1)";
                     int u = conn.QueryFirst<int>(wheresql);
                     if(u == 0)
                     {
@@ -991,7 +988,7 @@ namespace CoreData.CoreCore
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try
                 {
-                    string wheresql = @"select count(*) from purchase where id = " + qua.purchaseid + " and status in (0,1)";
+                    string wheresql = @"select count(id) from purchase where id = " + qua.purchaseid + " and status in (0,1)";
                     int u = conn.QueryFirst<int>(wheresql);
                     if(u == 0)
                     {
@@ -1068,7 +1065,7 @@ namespace CoreData.CoreCore
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try
                 {
-                    int u = conn.QueryFirst<int>("select count(*) from qualityrev where id in @ID and status <> 0",new {ID = id});
+                    int u = conn.QueryFirst<int>("select count(id) from qualityrev where id in @ID and status <> 0",new {ID = id});
                     if (u > 0)
                     {
                         result.s = -1;
@@ -1102,7 +1099,7 @@ namespace CoreData.CoreCore
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try
                 {
-                    int u = conn.QueryFirst<int>("select count(*) from qualityrev where id = @ID and status <> 0",new {ID = id});
+                    int u = conn.QueryFirst<int>("select count(id) from qualityrev where id = @ID and status <> 0",new {ID = id});
                     if (u > 0)
                     {
                         result.s = -1;
@@ -1150,7 +1147,9 @@ namespace CoreData.CoreCore
                 res.warehouse = wh.d as List<Warehouse>;//Newtonsoft.Json.JsonConvert.DeserializeObject<>(wh.d.ToString());
             }
             //采购单基本资料
-            string wheresql = "select * from purchase where 1 = 1"; 
+            string sqlcount = "select count(id) from purchase where 1 = 1"; 
+            string sqlCommand = "select * from purchase where 1 = 1"; 
+            string wheresql = string.Empty;
             if(CoID != 1)//公司编号
             {
                 wheresql = wheresql + " and coid = " + CoID;
@@ -1158,12 +1157,11 @@ namespace CoreData.CoreCore
             wheresql = wheresql + " order by id desc";
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
-                    var u = conn.Query<Purchase>(wheresql).AsList();
-                    int count = u.Count;
+                    int count = conn.QueryFirst<int>(sqlcount + wheresql);
                     decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/20);
 
                     wheresql = wheresql + " limit 0,20";
-                    u = conn.Query<Purchase>(wheresql).AsList();
+                    var u = conn.Query<Purchase>(sqlCommand + wheresql).AsList();
 
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;
@@ -1186,7 +1184,7 @@ namespace CoreData.CoreCore
             string contents = string.Empty; 
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{      
-                    int cnt = conn.QueryFirst<int>("select count(*) from purchase where id = @ID and status in (2,5)",new {ID = id});
+                    int cnt = conn.QueryFirst<int>("select count(id) from purchase where id = @ID and status in (2,5)",new {ID = id});
                     if(cnt > 0)
                     {
                         result.s = -1;
@@ -1223,7 +1221,7 @@ namespace CoreData.CoreCore
                 var p = new DynamicParameters();
                 p.Add("@PurID", PuridList);
                 p.Add("@Coid", CoID);
-                string wheresql = @"select count(*) from purchase where id in @PurID and coid = @Coid and status <> 1" ;
+                string wheresql = @"select count(id) from purchase where id in @PurID and coid = @Coid and status <> 1" ;
                 int u = CoreDBconn.QueryFirst<int>(wheresql,p);
                 if(u > 0)
                 {

@@ -78,8 +78,8 @@ namespace CoreModels.XyCore
         public string _Skuid = null;//商品编码
         public int _Warehouseid = 0;//仓库代号
         public string _Buyyer = null;//采购员
-        public string _SortField = "id";//排序栏位
-        public string _SortDirection= "desc";//排序方式
+        public string _SortField;//排序栏位
+        public string _SortDirection;//排序方式
         public int _NumPerPage = 20;//每页显示资料笔数
         public int _PageIndex = 1;//页码
         public int CoID
@@ -155,8 +155,8 @@ namespace CoreModels.XyCore
         public string _Skuid;//商品编码
         public string _SkuName;//商品名称
         public string _GoodsCode;//款式编号
-        public string _SortField = "id";//排序栏位
-        public string _SortDirection = "ASC";//排序方式
+        public string _SortField ;//排序栏位
+        public string _SortDirection;//排序方式
         public int _NumPerPage = 20;//每页显示资料笔数
         public int _PageIndex = 1;//页码
         public int CoID
