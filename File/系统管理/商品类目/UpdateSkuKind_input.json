@@ -1,5 +1,6 @@
 {
     "ID": 109,
     "KindName": "普通外套test",
-    "ParentID": 99
+    "ParentID": 99,
+    "Order":3
 }

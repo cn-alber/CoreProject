@@ -1,13 +1,15 @@
 {
     "s": 1,
     "d": {
-        "ID": 0,
+        "ID": 100,
         "KindName": "外套/夹克/大衣",
-        "Enable": false,
+        "Enable": true,
+        "Order": 0,
         "ParentID": 99,
         "CoID": 1,
         "Creator": "管理员",
-        "CreateDate": "2016/10/18 14:57:02"
+        "CreateDate": "2016/10/18 14:57:02",
+        "Children": null
     },
     "m": ""
 }

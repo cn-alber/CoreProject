@@ -2,136 +2,70 @@
     "s": 1,
     "d": [
         {
-            "id": 325,
-            "name": "背心/马甲",
-            "parentid": 0,
-            "is_tb_parent": false
+            "id": 981,
+            "name": "服装服饰",
+            "parent_id": 64,
+            "is_parent": false
         },
         {
-            "id": 326,
-            "name": "T恤",
-            "parentid": 0,
-            "is_tb_parent": false
+            "id": 982,
+            "name": "时尚鞋履",
+            "parent_id": 64,
+            "is_parent": false
         },
         {
-            "id": 327,
-            "name": "Polo衫",
-            "parentid": 0,
-            "is_tb_parent": false
+            "id": 983,
+            "name": "箱包手袋",
+            "parent_id": 64,
+            "is_parent": false
         },
         {
-            "id": 328,
-            "name": "衬衫",
-            "parentid": 0,
-            "is_tb_parent": false
+            "id": 984,
+            "name": "美妆护肤",
+            "parent_id": 64,
+            "is_parent": false
         },
         {
-            "id": 329,
-            "name": "针织衫/毛衣",
-            "parentid": 0,
-            "is_tb_parent": false
+            "id": 985,
+            "name": "保健品",
+            "parent_id": 64,
+            "is_parent": false
         },
         {
-            "id": 330,
-            "name": "牛仔裤",
-            "parentid": 0,
-            "is_tb_parent": false
+            "id": 986,
+            "name": "珠宝手表",
+            "parent_id": 64,
+            "is_parent": false
         },
         {
-            "id": 331,
-            "name": "休闲裤",
-            "parentid": 0,
-            "is_tb_parent": false
+            "id": 987,
+            "name": "母婴家居",
+            "parent_id": 64,
+            "is_parent": false
         },
         {
-            "id": 332,
-            "name": "棉裤",
-            "parentid": 0,
-            "is_tb_parent": false
+            "id": 988,
+            "name": "食品",
+            "parent_id": 64,
+            "is_parent": false
         },
         {
-            "id": 333,
-            "name": "羽绒裤",
-            "parentid": 0,
-            "is_tb_parent": false
+            "id": 989,
+            "name": "手机数码",
+            "parent_id": 64,
+            "is_parent": false
         },
         {
-            "id": 334,
-            "name": "皮裤",
-            "parentid": 0,
-            "is_tb_parent": false
+            "id": 990,
+            "name": "其他洋货",
+            "parent_id": 64,
+            "is_parent": false
         },
         {
-            "id": 335,
-            "name": "夹克",
-            "parentid": 0,
-            "is_tb_parent": false
-        },
-        {
-            "id": 336,
-            "name": "卫衣",
-            "parentid": 0,
-            "is_tb_parent": false
-        },
-        {
-            "id": 337,
-            "name": "风衣",
-            "parentid": 0,
-            "is_tb_parent": false
-        },
-        {
-            "id": 338,
-            "name": "毛呢大衣",
-            "parentid": 0,
-            "is_tb_parent": false
-        },
-        {
-            "id": 339,
-            "name": "棉衣",
-            "parentid": 0,
-            "is_tb_parent": false
-        },
-        {
-            "id": 340,
-            "name": "皮衣",
-            "parentid": 0,
-            "is_tb_parent": false
-        },
-        {
-            "id": 341,
-            "name": "羽绒服",
-            "parentid": 0,
-            "is_tb_parent": false
-        },
-        {
-            "id": 342,
-            "name": "西服",
-            "parentid": 0,
-            "is_tb_parent": false
-        },
-        {
-            "id": 343,
-            "name": "西裤",
-            "parentid": 0,
-            "is_tb_parent": false
-        },
-        {
-            "id": 344,
-            "name": "西服套装",
-            "parentid": 0,
-            "is_tb_parent": false
-        },
-        {
-            "id": 345,
-            "name": "民族服装",
-            "parentid": 0,
-            "is_tb_parent": false
-        },
-        {
-            "id": 346,
-            "name": "套装",
-            "parentid": 0,
-            "is_tb_parent": true
+            "id": 991,
+            "name": "C2B",
+            "parent_id": 64,
+            "is_parent": true
         }
     ],
     "m": ""

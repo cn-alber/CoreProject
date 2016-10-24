@@ -5,7 +5,7 @@ namespace CoreModels.XyComm
     {
         private int _CoID;//公司编号
         private string _Enable = "all";//是否启用
-        private string _Type = "商品类目";        
+        private string _Type = "商品类目";
         public int CoID
         {
             get { return _CoID; }
@@ -17,7 +17,7 @@ namespace CoreModels.XyComm
             get { return _Enable; }
             set { this._Enable = value; }
         }//是否启用
-        
+
         public string Type
         {
             get { return _Type; }
@@ -34,13 +34,13 @@ namespace CoreModels.XyComm
         public int ID { get; set; }
         public string Type { get; set; }
         public string KindName { get; set; }
-        public string FullName { get; set; }        
+        public string FullName { get; set; }
         public bool Enable
         {
             get { return _Enable; }
             set { this._Enable = value; }
         }//是否启用
-        
+        public int Order { get; set; }
         public int ParentID { get; set; }
         public int CoID { get; set; }
         public string Creator { get; set; }
@@ -53,6 +53,7 @@ namespace CoreModels.XyComm
         // public string Type { get; set; }
         public string KindName { get; set; }
         public bool Enable { get; set; }
+        public int Order { get; set; }
         // public string FullName { get; set; }
         public int ParentID { get; set; }
         public int CoID { get; set; }
