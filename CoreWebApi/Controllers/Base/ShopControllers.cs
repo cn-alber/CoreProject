@@ -15,14 +15,9 @@ namespace CoreWebApi.Base
         [HttpPostAttribute("/Core/Shop/ShopQueryLst")]
         public ResponseResult ShopQueryLst([FromBodyAttribute]JObject obj)
         {
-            var cp = new ShopParam();
+            
+            var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<ShopParam>(obj.ToString());
             cp.CoID = int.Parse(GetCoid());
-            cp.Enable = obj["Enable"]!=null?obj["Enable"].ToString():""; 
-            cp.Filter = obj["Filter"]!=null?obj["Filter"].ToString():"";
-            cp.PageSize = int.Parse(obj["PageSize"].ToString());
-            cp.PageIndex = int.Parse(obj["PageIndex"].ToString());
-            cp.SortField = obj["SortField"].ToString();
-            cp.SortDirection = obj["SortDirection"].ToString();
             var res = ShopHaddle.GetShopAll(cp);
             var Result = CoreResult.NewResponse(res.s,res.d,"Basic");
             return Result;             

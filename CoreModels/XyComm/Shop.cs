@@ -64,6 +64,7 @@ namespace CoreModels.XyComm
      public class ShopParam
     {
         public int CoID {get;set;}//公司编号
+        public int FilterType{get;set;}//搜索标识
         public string Enable {get;set;}//是否启用
         public string Filter {get;set;}//过滤条件
         public int PageSize {get;set;}//每页笔数
@@ -71,7 +72,7 @@ namespace CoreModels.XyComm
         public int PageCount {get;set;}//总页数
         public int DataCount {get;set;} //总行数
         public string SortField {get; set;}//排序字段
-        public string SortDirection {get;set;}//DESC,ASC
+        public string SortDirection {get;set;}//DESC,ASC        
         public List<ShopQuery> ShopLst {get; set;}//返回资料        
     }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 using CoreData;
 using CoreModels;
@@ -913,112 +914,40 @@ namespace CoreDate.CoreApi
         /// </summary>
         /// <param name=""></param>
         /// <param name=""></param>
-        public static DataResult itempropsGet (string token,string fields){
+        public static DataResult itempropsGet (string token,string fields,string cid){
             var result = new DataResult(1,null);
-            try{                                        
+            try{                                     
                 Tmparam.Add("method", "taobao.itemprops.get");
                 Tmparam.Add("session", token);
                 Tmparam.Add("fields", fields);
+                Tmparam.Add("cid", cid);            
+                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                Tmparam.Add("sign", sign);
 
-                List<itemprops> itemp = new List<itemprops>(); 
-
-                List<cateStandard> cids = getItemCates();
-                long beforeID = CacheBase.Get<long>("itemcatecid");
-                string sql = "";
-                foreach(cateStandard standard in cids){
-                    if(standard.cid < beforeID || standard.cid == beforeID){//
-                        continue;
-                    }
-
-                    Tmparam.Add("cid", standard.cid.ToString());            
-                    string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
-                    Tmparam.Add("sign", sign);//                                      
-                    var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);                             
-                    var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");  
-                     result.d = res;
-                         break;                                                               
-                    if(response.Result.ToString().IndexOf("error") > 0){
-                        result.s = -1;
-                        result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
-                        break;
-                    }else{
-
-                        Tmparam.Remove("cid");
-                        Tmparam.Remove("sign");
-                                                                  
-                        Console.OutputEncoding = Encoding.UTF8;
-                        Console.WriteLine("-----------------     "+standard.cid+"    -----------------");                         
-                        if(response.Result.ToString().IndexOf("item_props") == -1){
-                            continue;
+                //Console.OutputEncoding = Encoding.UTF8;                                      
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);                            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\'"," ").Replace("\"","\'")+"}");  
+                                                                                                        
+                if(response.Result.ToString().IndexOf("error_response") > 0){
+                    result.s = -1;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;                    
+                }else{
+                    if(response.Result.ToString().IndexOf("item_props") > -1){
+                        var sku_props = new List<dynamic>();
+                        var item_props = new List<dynamic>();
+                        foreach(var item in res.itemprops_get_response.item_props.item_prop){
+                            if(!Convert.ToBoolean(JsonConvert.SerializeObject(item.is_item_prop)) && Convert.ToBoolean(JsonConvert.SerializeObject(item.is_sale_prop))){ 
+                                sku_props.Add(item);
+                            }else{
+                                item_props.Add(item);
+                            }
                         }
-                        
-                        foreach(var  item in  res.itemprops_get_response.item_props.item_prop){                             
-                        sql +=@"INSERT INTO item_cates_standard_props(
-                                                                item_cates_standard_props.`name`,
-                                                                item_cates_standard_props.pid,
-                                                                item_cates_standard_props.must,
-                                                                item_cates_standard_props.multi,
-                                                                item_cates_standard_props.tb_cid,
-                                                                item_cates_standard_props.`values`) 
-                                VALUES('"+item.name+"','"+item.pid+"' ,"+item.must+","+item.multi+","+standard.cid+",'"+JsonConvert.SerializeObject(item.prop_values)+"');";
-                            
-                                // try{                                    
-                                //     sql = "SELECT i.id FROM item_cates_standard_props as i WHERE i.pid ="+item.pid;
-                                //     long props_id = conn.Query<long>(sql).AsList()[0];
-                                //     sql =@"INSERT item_cates_realationship SET 
-                                //                 item_cates_realationship.pid = @pid,
-                                //                 item_cates_realationship.prop_id= @prop_id, 
-                                //                 item_cates_realationship.standard_id = @standard_id,
-                                //                 item_cates_realationship.tb_cid = @tb_cid";
-                                //     var resnt = conn.Execute(sql,new {
-                                //                     pid = item.pid,
-                                //                     prop_id = props_id,
-                                //                     standard_id = standard.id,
-                                //                     tb_cid = standard.cid
-                                //                 });            
-                                //     if(resnt == 0){
-                                //         result.s = -1;
-                                //         result.d = standard.cid +" 导入失败";
-                                //         break;
-                                //     }
-                                // }catch(Exception ex){
-                                //         // conn.Dispose();
-                                //         // result.s = -1;
-                                //         // result.d = standard.cid +" 导入失败 "+ex.Message;
-                                //         // break;
-                                // }
-                                Console.WriteLine(standard.id+" --- "+item.name+"-----"+item.pid);
-                            }
-                                using (var conn = new MySqlConnection(DbBase.CommConnectString)){
-                                try{
-                                    
-                                    var rnt = conn.Execute(sql);
-                                    
-                                    
-                                    if(rnt == 0){
-                                        result.s = -1;
-                                        result.d = standard.cid +" 导入失败";
-                                        break;
-                                    }
-                                    
-                                }catch(Exception ex){ 
-                                    Console.WriteLine(sql);
-                                    result.s = -1;
-                                    result.d = ex.Message; 
-                                }
-                            }
-                            sql = "";                         
-                }                                  
-                CacheBase.Remove("itemcatecid");
-                CacheBase.Set<long>("itemcatecid", standard.cid);
-                //break;
-                }
-                
-
-
-
-
-
+                        result.d = new {
+                            sku_props = sku_props,
+                            item_props = item_props
+                        };
+                    }                                                
+                }                                                  
             }catch(Exception ex){                
                 result.s = -1;
                 result.d =  ex.Message;

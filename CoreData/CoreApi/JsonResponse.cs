@@ -21,9 +21,9 @@ namespace CoreDate.CoreApi
                 new HttpClientHandler {              
                       AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate 
                     })
-            ){      
+            ){                                                   
                 try{                            
-                    httpClient.MaxResponseContentBufferSize = 300000;                                                                    
+                    httpClient.MaxResponseContentBufferSize = 9999999;                                                                    
                     httpClient.DefaultRequestHeaders.Add("user-agent", DefaultUserAgent);//                    
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-www-form-urlencoded"));
                     httpClient.DefaultRequestHeaders.Add("Accept-Charset", "gb2312");                     

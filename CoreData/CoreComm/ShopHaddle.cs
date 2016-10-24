@@ -32,17 +32,32 @@ namespace CoreData.CoreComm
                     }
                     if (!string.IsNullOrEmpty(IParam.Filter))//过滤条件
                     {
-                        wheresql = wheresql +
-                        " AND ( ShopName LIKE '%" + IParam.Filter +
-                        "%' OR ShopSite LIKE '%" + IParam.Filter +
-                        "%' OR Shopkeeper LIKE '%" + IParam.Filter +
-                        "%' OR Creator LIKE '%" + IParam.Filter + "%')";
+
+                        wheresql = wheresql + " AND ( 1 != 1 ";
+                        switch (IParam.FilterType)
+                        {
+                            case 1: 
+                                wheresql += " OR ShopName LIKE '%" + IParam.Filter+"%' "; 
+                                break;
+                            case 2:    
+                                wheresql += " OR ShopSite LIKE '%" + IParam.Filter+"%' "; 
+                                break;
+                            case 3:    
+                                wheresql += " OR Shopkeeper LIKE '%" + IParam.Filter+"%' "; 
+                                break;
+                            case 4:    
+                                wheresql += " OR Creator LIKE '%" + IParam.Filter+"%' "; 
+                                break;
+                            default: break;
+                        }
+                        wheresql +=  " ) ";
                     }
                     if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
                     {
                         wheresql = wheresql + " ORDER BY " + IParam.SortField + " " + IParam.SortDirection;
                     }
                     wheresql = "select ID,ShopName,Enable,ShopSite,ShopUrl,Shopkeeper,UpdateSku,DownGoods,UpdateWayBill,TelPhone,SendAddress,ShopBegin,ReturnAddress,Istoken from Shop " + wheresql;
+                    
                     var ShopLst = conn.Query<ShopQuery>(wheresql).AsList();
                     IParam.DataCount = ShopLst.Count;
                     decimal pagecnt = Math.Ceiling(decimal.Parse(IParam.DataCount.ToString()) / decimal.Parse(IParam.PageSize.ToString()));
@@ -50,7 +65,7 @@ namespace CoreData.CoreComm
                     int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + IParam.PageSize;//分页            
                     IParam.ShopLst = conn.Query<ShopQuery>(wheresql).AsList();
-                    //result.d = IParam;  
+
                     if (IParam.PageIndex == 1)
                     {
                         var shopsit = ShopHaddle.GetShopSite();

@@ -174,6 +174,158 @@ function说明
                     }
     
 ```
+
+3.onlineSend()            在线订单发货处理（支持货到付款）
+
+ 路由:`/core/Api/TmTrades/itempropsGet`
+ 
+ 参数：
+```sh
+    input: 
+            {
+                token                    授权码
+                cid                      子类目ID
+            }
+     output：
+            {
+            "s": 1,
+            "d": {
+                "sku_props": [
+                    {
+                        "is_allow_alias": true,                 //是否允许别名
+                        "is_color_prop": true,                  //是否颜色属性
+                        "is_enum_prop": true,                   //是否枚举
+                        "is_input_prop": true,                  //在is_enum_prop是true的前提下，是否是卖家可以自行输入
+                        "is_item_prop": false,                  //是否商品属性
+                        "is_key_prop": false,                   //是否关键属性
+                        "is_material": false,                   //是否材质属性
+                        "is_sale_prop": true,                   //是否销售属性
+                        "material_do": {                        //材质详细
+                            "materials": {}
+                        },
+                        "multi": true,                          //是否多选
+                        "must": false,                          //是否必选
+                        "name": "主要颜色",                      //属性名
+                        "pid": 1627207,                         //属性ID
+                        "prop_values": {
+                            "prop_value": [
+                                {
+                                    "name": "乳白色",
+                                    "vid": 28321                //属性值ID
+                                },
+                                {
+                                    "name": "军绿色",
+                                    "vid": 3232483
+                                },
+                                {
+                                    "name": "卡其色",
+                                    "vid": 28331
+                                }                       
+                            ]
+                        },
+                        "sort_order": 38,
+                        "status": "normal",
+                        "taosir_do": {
+                                expr_el_list:{}                 //表达式元素list
+                        }                         
+                    },
+                    {
+                        "is_allow_alias": true,
+                        "is_color_prop": false,
+                        "is_enum_prop": true,
+                        "is_input_prop": true,
+                        "is_item_prop": false,
+                        "is_key_prop": false,
+                        "is_material": false,
+                        "is_sale_prop": true,
+                        "material_do": {
+                            "materials": {}
+                        },
+                        "multi": true,
+                        "must": false,
+                        "name": "尺码",
+                        "pid": 20509,
+                        "prop_values": {
+                            "prop_value": [
+                                {
+                                    "name": "145/80A",
+                                    "vid": 649458002
+                                },
+                                {
+                                    "name": "XXS",
+                                    "vid": 28381
+                                },
+                                {
+                                    "name": "150/80A",
+                                    "vid": 66579689
+                                },
+                                {
+                                    "name": "XS",
+                                    "vid": 28313
+                                }
+                            ]
+                        },
+                        "sort_order": 40,
+                        "status": "normal",
+                        "taosir_do": {}
+                    }
+                ],
+                "item_props": [            
+                    {
+                        "is_allow_alias": false,
+                        "is_color_prop": false,
+                        "is_enum_prop": true,
+                        "is_input_prop": false,
+                        "is_item_prop": true,
+                        "is_key_prop": false,
+                        "is_material": false,
+                        "is_sale_prop": false,
+                        "material_do": {
+                            "materials": {}
+                        },
+                        "multi": false,
+                        "must": false,
+                        "name": "袖长",
+                        "pid": 122216348,
+                        "prop_values": {
+                            "prop_value": [
+                                {
+                                    "name": "七分袖",
+                                    "vid": 3216779
+                                },
+                                {
+                                    "name": "九分袖",
+                                    "vid": 11162412
+                                },
+                                {
+                                    "name": "五分袖",
+                                    "vid": 14587965
+                                },
+                                {
+                                    "name": "无袖",
+                                    "vid": 29446
+                                },
+                                {
+                                    "name": "短袖",
+                                    "vid": 29445
+                                },
+                                {
+                                    "name": "长袖",
+                                    "vid": 29444
+                                }
+                            ]
+                        },
+                        "sort_order": 0,
+                        "status": "normal",
+                        "taosir_do": {}
+                    }
+                ]
+            },
+            "m": ""
+        }
+```
+
+
 3.onlineSend()            在线订单发货处理（支持货到付款）
 
  路由:`/core/Api/TmSend/onlineSend`
