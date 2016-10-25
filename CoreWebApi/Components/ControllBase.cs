@@ -1,5 +1,6 @@
 using System;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -134,7 +135,13 @@ namespace CoreWebApi
              return flag;
          }
 
+        public bool checkTel(string tel){            
+            return Regex.IsMatch(tel, @"^1[3|4|5|7|8][0-9]\d{8}$");
+        }
 
+        public bool checkPhone(string phone){            
+            return Regex.IsMatch(phone, @"(\(\d{3,4}\)|\d{3,4}-|\s)?\d{8}");
+        }
 
 
         #region MD5
