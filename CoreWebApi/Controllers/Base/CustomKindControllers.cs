@@ -163,9 +163,21 @@ namespace CoreWebApi
 
         #region 商品类目属性
         [HttpGetAttribute("/Core/XyComm/Customkind/Getskuprop")]
-        public ResponseResult Getskuprop(string Cid)
+        public ResponseResult Getskuprop(string ID)
         {
-            var res = CoreData.CoreApi.TmallHaddle.itemProps(Cid);
+            int StID;            
+            var res = new DataResult(1, null);
+            if (!int.TryParse(ID, out StID))
+            {
+                res.s = -1;
+                res.d = "无效参数ID";
+            }
+            else
+            {               
+                string CoID = GetCoid();
+                string UserName = GetUname();
+                res = CustomKindHaddle.InsertKindProps(int.Parse(ID),CoID,UserName);
+            }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
 
