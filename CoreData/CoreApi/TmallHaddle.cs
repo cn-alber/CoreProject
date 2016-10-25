@@ -954,15 +954,15 @@ namespace CoreData.CoreApi
                                 item_props.Add(item);
                             }
                         }
-                        result.d = new {
-                            sku_props = sku_props,
-                            item_props = item_props
-                        };
+                        var d = new System.Collections.Generic.Dictionary<string, object>();
+                        d.Add("sku_props", sku_props);
+                        d.Add("item_props", item_props);
+                        result.d = d;
                     }else{
-                        result.d = new {
-                            sku_props = sku_props,
-                            item_props = item_props
-                        };
+                        var d = new System.Collections.Generic.Dictionary<string, object>();
+                        d.Add("sku_props", sku_props);
+                        d.Add("item_props", item_props);
+                        result.d = d;
                     }                                                
                 }                                                  
             }catch(Exception ex){                

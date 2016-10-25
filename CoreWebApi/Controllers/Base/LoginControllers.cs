@@ -12,6 +12,7 @@ using CoreModels.XyUser;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using CoreData.CoreApi;
 
 namespace CoreWebApi
 {
@@ -21,12 +22,10 @@ namespace CoreWebApi
         [HttpGet("/ws")]
         public void Ws(int id)
         {
-            var oo = new {action="action", controller="controller", param=new {qq="sdf"}};
-            CoreHelper.Debuger.log(oo);
-            CoreHelper.Debuger.warning(oo);
-            CoreHelper.Debuger.success(oo);
-            CoreHelper.Debuger.error(oo);
-            //CoreHelper.Debuger.success(oo);
+            string cid = "1104";
+            dynamic obj = TmallHaddle.itemProps(cid);
+            dynamic data = obj.d;
+            CoreHelper.Debuger.success(data["sku_props"]);
         }
 
         [AllowAnonymous]
