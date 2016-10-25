@@ -24,8 +24,8 @@ namespace CoreData.CoreApi
             {"app_key", "23476390"},
             //{"app_key", "1023476390"},//沙箱            
             {"format","json"},
-            {"sign_method","md5"},            
-            {"timestamp", System.DateTime.Now.AddMinutes(6).ToString()},
+            {"sign_method","md5"},
+            {"timestamp", System.DateTime.Now.AddMinutes(6).ToString("yyyy-MM-dd HH:mm:ss")},
             {"v", "2.0"},            
         }; 
         private static void cleanParam(){
@@ -924,7 +924,10 @@ namespace CoreData.CoreApi
         /// <param name=""></param>
         public static DataResult itempropsGet (string token,string fields,string cid){
             var result = new DataResult(1,null);
-            try{                                     
+            try{          
+                 string timestamp = "";
+                Tmparam.TryGetValue("timestamp",out timestamp); 
+                Console.WriteLine(timestamp);                            
                 Tmparam.Add("method", "taobao.itemprops.get");
                 Tmparam.Add("session", token);
                 Tmparam.Add("fields", fields);
