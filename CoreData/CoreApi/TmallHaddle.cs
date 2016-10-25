@@ -986,6 +986,70 @@ namespace CoreData.CoreApi
         }
 
 
+         #region 
+        /// <summary>
+        ///  获取前台展示的店铺内卖家自定义商品类目 参考网址： https://open.taobao.com/docs/api.htm?spm=a219a.7629065.0.0.K97zD7&apiId=65
+        /// </summary>
+        /// <param name=""></param>
+        /// <param name=""></param>
+        public static DataResult sellercatsListGet (string token,string nick){
+            var result = new DataResult(1,null);
+            try{                                        
+                Tmparam.Add("method", "taobao.sellercats.list.get");
+                Tmparam.Add("session", token);
+
+                Tmparam.Add("nick", nick);
+
+                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                Tmparam.Add("sign", sign);//                                      
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
+                }else{
+                    if(response.Result.ToString().IndexOf("sellercats_list_get_response")>-1){
+                        //var seller_cats = res.sellercats_list_get_response.seller_cats.seller_cat;
+                        var seller_cats = JsonConvert.DeserializeObject<sellercats_list_get_response_re>(response.Result.ToString().Replace("\"","\'")+"}").sellercats_list_get_response.seller_cats.seller_cat;       
+                        var parent = new List<cat_item>(); 
+                        
+
+                        foreach (var item in seller_cats)
+                        {
+                            Console.WriteLine(item.parent_cid);
+                            if(item.parent_cid == 0){
+                                parent.Add(item);                                
+                            }                            
+                        }
+                        // foreach(var p in parent){
+                        //     p.children = new List<cat_item>();
+                        //     foreach(var item in seller_cats){
+                        //         if(p.cid == item.parent_cid){
+                        //             p.children.Add(item);
+                        //             seller_cats.Remove(item);
+                        //         }
+                        //     }
+                        // }
+
+                        result.d  = new {
+                              p =   parent,
+                              seller_cats = seller_cats
+                        };                                
+  
+              
+                    }
+                    
+                }            
+            }catch(Exception ex){                
+                result.s = -1;
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+        #endregion
+
 
 
         #region 
