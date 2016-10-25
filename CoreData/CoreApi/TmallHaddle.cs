@@ -943,9 +943,10 @@ namespace CoreData.CoreApi
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;                    
                 }else{
+                    var sku_props = new List<dynamic>();
+                    var item_props = new List<dynamic>();
                     if(response.Result.ToString().IndexOf("item_props") > -1){
-                        var sku_props = new List<dynamic>();
-                        var item_props = new List<dynamic>();
+              
                         foreach(var item in res.itemprops_get_response.item_props.item_prop){
                             if(!Convert.ToBoolean(JsonConvert.SerializeObject(item.is_item_prop)) && Convert.ToBoolean(JsonConvert.SerializeObject(item.is_sale_prop))){ 
                                 sku_props.Add(item);
@@ -953,6 +954,11 @@ namespace CoreData.CoreApi
                                 item_props.Add(item);
                             }
                         }
+                        result.d = new {
+                            sku_props = sku_props,
+                            item_props = item_props
+                        };
+                    }else{
                         result.d = new {
                             sku_props = sku_props,
                             item_props = item_props
