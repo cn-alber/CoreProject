@@ -8,7 +8,7 @@ using Dapper;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 
-namespace CoreDate.CoreApi
+namespace CoreData.CoreApi
 {
     
     public  class JingDHaddle{

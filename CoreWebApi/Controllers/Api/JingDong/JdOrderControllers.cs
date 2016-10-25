@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using CoreDate.CoreApi;
+using CoreData.CoreApi;
 using CoreModels;
 using Microsoft.AspNetCore.Mvc;
 

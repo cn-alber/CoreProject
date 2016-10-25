@@ -1,4 +1,5 @@
-using CoreDate.CoreApi;
+
+using CoreData.CoreApi;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoreWebApi.Api.JingDong{

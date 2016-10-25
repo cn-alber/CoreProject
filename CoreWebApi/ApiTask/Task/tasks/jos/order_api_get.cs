@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CoreData;
 using CoreData.CoreComm;
-using CoreDate.CoreApi;
+using CoreData.CoreApi;
 using CoreModels;
 using CoreModels.XyApi.JingDong;
 using CoreWebApi.ApiTask;

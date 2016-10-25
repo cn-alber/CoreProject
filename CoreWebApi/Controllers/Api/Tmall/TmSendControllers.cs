@@ -1,4 +1,4 @@
-using CoreDate.CoreApi;
+using CoreData.CoreApi;
 using CoreModels;
 using CoreModels.XyApi.Tmall;
 using Microsoft.AspNetCore.Mvc;

@@ -160,6 +160,16 @@ namespace CoreWebApi
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
+
+        #region 商品类目属性
+        [HttpGetAttribute("/Core/XyComm/Customkind/Getskuprop")]
+        public ResponseResult Getskuprop(string Cid)
+        {
+            var res = CoreData.CoreApi.TmallHaddle.itemProps(Cid);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+
+        #endregion
     }
 }
 
