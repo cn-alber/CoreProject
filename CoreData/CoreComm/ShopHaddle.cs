@@ -8,6 +8,7 @@ using System.Text;
 using CoreModels.XyComm;
 using MySql.Data.MySqlClient;
 using static CoreModels.Enum.OrderE;
+using System.Threading.Tasks;
 
 namespace CoreData.CoreComm
 {
@@ -266,16 +267,19 @@ namespace CoreData.CoreComm
             else
             {
 
-                var res = ShopQuery(shop.CoID.ToString(), shop.ID.ToString());
+                var res = ShopQuery(CoID.ToString(), shop.ID.ToString());
                 var shopOld = res.d as Shop;
                 //删除原有缓存
                 CacheBase.Remove(sname);
-
+                            
                 if(!string.IsNullOrEmpty(shop.Token)){
                     shop.Istoken = 1;
                 }else{
                     shop.Istoken = 0;
                 }
+                
+                shop.ShopBegin = Convert.ToDateTime(shop.ShopBegin).ToString("yyyy-MM-dd HH:mm:ss");
+                contents = contents + "Shop ID: " + shop.ID + " ;";
                 if (shopOld.ShopName != shop.ShopName)
                 {
                     contents = contents + "店铺名称:" + shopOld.ShopName + "=>" + shop.ShopName + ";";
@@ -336,15 +340,15 @@ namespace CoreData.CoreComm
                 {
                     contents = contents + "接口授权:" + shopOld.Istoken + "=>" + shop.Istoken + ";";
                 }
-                if (shopOld.Istoken != shop.Istoken)
+                if (shopOld.UpdateSku != shop.UpdateSku)
                 {
                     contents = contents + "上传库存（自动同步）:" + shopOld.UpdateSku + "=>" + shop.UpdateSku + ";";
                 }
-                if (shopOld.Istoken != shop.Istoken)
+                if (shopOld.DownGoods != shop.DownGoods)
                 {
                     contents = contents + "下载商品（自动同步）:" + shopOld.DownGoods + "=>" + shop.DownGoods + ";";
                 }
-                if (shopOld.Istoken != shop.Istoken)
+                if (shopOld.UpdateWayBill != shop.UpdateWayBill)
                 {
                     contents = contents + "上传快递单（发货信息）:" + shopOld.UpdateWayBill + "=>" + shop.UpdateWayBill + ";";
                 }
@@ -360,7 +364,7 @@ namespace CoreData.CoreComm
                 var TransUser = UserDBconn.BeginTransaction();
                 try
                 {
-                    string str = @"update Shop
+                    string str = @"UPDATE shop
                                         Set ShopName = @ShopName,
                                         SitType = @SitType,
                                         ShopSite = @ShopSite,
@@ -384,11 +388,9 @@ namespace CoreData.CoreComm
                                         ShopBegin = @ShopBegin,
                                         Istoken = @Istoken,
                                         Token = @Token
-                                    where
-                                        ID = @ID
-                                    and 
-                                        CoID = @CoID    
-                                    ";
+                                    WHERE
+                                        ID = @ID 
+                                    AND CoID = "+ CoID;
                     int count = CommDBconn.Execute(str, shop, TransComm);
                     if (count <= 0)
                     {
@@ -396,7 +398,11 @@ namespace CoreData.CoreComm
                     }
                     else
                     {
-                        CoreUser.LogComm.InsertUserLogTran(TransUser, "修改店铺资料", "Shop", contents, UserName, CoID, DateTime.Now);
+                        var task = Task.Factory.StartNew(() =>
+                        {
+                            CoreUser.LogComm.InsertUserLogTran(TransUser, "修改店铺资料", "Shop", contents, UserName, CoID, DateTime.Now);
+                        });
+                        
                         CacheBase.Set<Shop>(sname, shop);//缓存
                         TransComm.Commit();
                         TransUser.Commit();
@@ -586,7 +592,7 @@ namespace CoreData.CoreComm
                 }
                 else
                 {
-                    CoreUser.LogComm.InsertUserLogTran(TransUser, "新增店铺资料", "Shop", shop.ShopName, UserName, CoID, DateTime.Now);
+                    CoreUser.LogComm.InsertUserLogTran(TransUser, "新增店铺资料", "Shop", "店铺名："+shop.ShopName, UserName, CoID, DateTime.Now);
                     CacheBase.Set<Shop>(sname, shop);//缓存
                 }
                 TransComm.Commit();

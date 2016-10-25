@@ -163,7 +163,7 @@ namespace CoreData.CoreUser
                         }else{
                             result.s = -2014;
                         }
-                        //LogComm.InsertUserLog("新增菜单", "menu", "菜单名"+name ,uname, coid, DateTime.Now);
+                        LogComm.InsertLog("新增菜单", "menu", "菜单名"+name ,uname,Convert.ToInt16(coid), DateTime.Now);
                     }
                     catch (Exception e)
                     {
@@ -184,26 +184,55 @@ namespace CoreData.CoreUser
                 try
                 {                    
                     Menus menus = GetOneMenu(id);
-                    if(menus.Name != name)
-                        menus.Name = name; 
-                    if(menus.SortIndex != Convert.ToInt16(order))    
+                    string contents = "Menu ID : "+ menus.ID+"  ";
+                    
+                    if(menus.Name != name){
+                        contents += "菜单名称: "+menus.Name + " => "+name;
+                        menus.Name = name;                        
+                    }
+                    
+                    if(menus.SortIndex != Convert.ToInt16(order)){
+                        contents += "菜单排序: "+menus.SortIndex + " => "+Convert.ToInt16(order);
                         menus.SortIndex = Convert.ToInt16(order);
-                    if(menus.NewUrl != router)    
+                    }    
+                        
+                    if(menus.NewUrl != router){
+                        contents += "菜单路径: "+menus.NewUrl + " => "+router;
                         menus.NewUrl = router;
-                    if(menus.Remark != remark)    
+                    }    
+                        
+                    if(menus.Remark != remark){
+                        contents += "菜单备注: "+menus.Remark + " => "+remark;
                         menus.Remark = remark;
-                    if(menus.ParentID != Convert.ToInt16(parentid))    
+                    }    
+                        
+                    if(menus.ParentID != Convert.ToInt16(parentid)){
+                        contents += "菜单父ID: "+menus.ParentID + " => "+Convert.ToInt16(parentid);
                         menus.ParentID = Convert.ToInt16(parentid);
-                    if(menus.ViewPowerID != Convert.ToInt16(accessid))    
+                    }    
+                        
+                    if(menus.ViewPowerID != Convert.ToInt16(accessid)){
+                        contents += "菜单权限ID: "+menus.ViewPowerID + " => "+Convert.ToInt16(accessid);
                         menus.ViewPowerID = Convert.ToInt16(accessid);
-                    if(menus.NewIcon != iconArr[0])    
+                    }    
+                        
+                    if(menus.NewIcon != iconArr[0]){
+                        contents += "菜单图标: "+menus.NewIcon + " => "+iconArr[0];
                         menus.NewIcon = iconArr[0];
+                    }    
+                        
                     if(!string.IsNullOrEmpty(iconArr[1])){
-                        if(menus.NewIconPre != iconArr[1])
+                        if(menus.NewIconPre != iconArr[1]){
+                            contents += "菜单图标前缀: "+menus.NewIconPre + " => "+iconArr[1];
                             menus.NewIconPre = iconArr[1];
+                        }
+                            
                     }else{
-                        if(menus.NewIconPre != iconArr[1])
+                        if(menus.NewIconPre != iconArr[1]){
+                            contents += "菜单图标前缀: "+menus.NewIconPre + " => "+iconArr[1];
                             menus.NewIconPre = "";
+                        }
+                            
                     }                        
                     string iconfont = !string.IsNullOrEmpty(iconArr[1]) ? "menus.NewIcon='"+iconArr[0]+"',menus.NewIconPre='"+iconArr[1]+"'": "menus.NewIcon='"+iconArr[0]+"',menus.NewIconPre=''";                    
                     string sql = @"Update menus SET 
@@ -226,7 +255,7 @@ namespace CoreData.CoreUser
                     }else{
                         result.s = -2016;
                     }
-                    //LogComm.InsertUserLog("编辑菜单", "menu", "菜单名"+name ,uname, coid, DateTime.Now);
+                    LogComm.InsertLog("编辑菜单", "menu", contents ,uname, Convert.ToInt16(coid), DateTime.Now);
                 }
                 catch (Exception e)
                 {

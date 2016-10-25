@@ -55,12 +55,12 @@ namespace CoreWebApi.Base
             var shop = Newtonsoft.Json.JsonConvert.DeserializeObject<Shop>(obj.ToString());
             var Res = new DataResult(1,null);
             if(!string.IsNullOrEmpty(shop.TelPhone)){
-                if(checkTel(shop.TelPhone)){
+                if(!checkTel(shop.TelPhone)){
                     Res.s = -3006;
                 }
             }
             if(!string.IsNullOrEmpty(shop.ReturnPhone)){
-                if(checkTel(shop.ReturnPhone)){
+                if(!checkPhone(shop.ReturnPhone)){
                     Res.s = -3007;
                 }
             }           
@@ -79,11 +79,20 @@ namespace CoreWebApi.Base
         {
             var shop = Newtonsoft.Json.JsonConvert.DeserializeObject<Shop>(obj.ToString());
             var Res = new DataResult(1,null);
+            if(!string.IsNullOrEmpty(shop.TelPhone)){
+                if(!checkTel(shop.TelPhone)){
+                    Res.s = -3006;
+                }
+            }
+            if(!string.IsNullOrEmpty(shop.ReturnPhone)){
+                if(!checkPhone(shop.ReturnPhone)){
+                    Res.s = -3007;
+                }
+            }    
             int CoID = int.Parse(GetCoid());
             string UserName = GetUname();            
-            // int CoID=1;
-            // string UserName = "携云科技";
-            Res = ShopHaddle.UpdateShop(shop, CoID, UserName);            
+            if(Res.s == 1)
+                Res = ShopHaddle.UpdateShop(shop, CoID, UserName);            
             return CoreResult.NewResponse(Res.s,Res.d,"General");
         }
 
