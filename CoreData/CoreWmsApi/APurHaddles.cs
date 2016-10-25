@@ -14,7 +14,7 @@ using System.Text;
 
 namespace CoreData.CoreWmsApi
 {
-    public static class APurHaddle
+    public static class APurHaddles
     {
         #region 普通收货作业-获取Sku详情
         public static DataResult GetBoxSku(WmsBoxParams IParam)
@@ -83,7 +83,9 @@ namespace CoreData.CoreWmsApi
                         }
                         if (UptLst.Count > 0)
                         {
-                            int count = CoreConn.Execute("UPDATE wmspile SET qty=qty+@RecQty WHERE CoID=@CoID AND ");
+                            string uptpilesql = "UPDATE wmspile SET qty=qty+@RecQty WHERE CoID=@CoID AND Type=@Type AND skuautoid=@Skuautoid";
+                            var args = new{RecQty=UptLst[0].Qty,CoID=IParam.CoID,Type=IParam.Type,Skuautoid=IParam.Skuautoid};
+                            int count = CoreConn.Execute(uptpilesql,args,CoreTrans);
                         }
                         IParam.invType = 1;
                         IParam.Status = "审核通过";

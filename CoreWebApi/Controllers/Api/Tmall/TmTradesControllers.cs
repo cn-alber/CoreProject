@@ -1,5 +1,5 @@
 using System;
-using CoreDate.CoreApi;
+using CoreData.CoreApi;
 using CoreModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
