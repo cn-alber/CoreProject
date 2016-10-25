@@ -8,6 +8,7 @@ using System.Text;
 using CoreModels.XyComm;
 using MySql.Data.MySqlClient;
 using static CoreModels.Enum.OrderE;
+using System.Threading.Tasks;
 
 namespace CoreData.CoreComm
 {
@@ -270,105 +271,89 @@ namespace CoreData.CoreComm
                 var shopOld = res.d as Shop;
                 //删除原有缓存
                 CacheBase.Remove(sname);
-
+                            
                 if(!string.IsNullOrEmpty(shop.Token)){
                     shop.Istoken = 1;
                 }else{
                     shop.Istoken = 0;
                 }
+                
+                shop.ShopBegin = Convert.ToDateTime(shop.ShopBegin).ToString("yyyy-MM-dd HH:mm:ss");
+                contents = contents + "Shop ID: " + shop.ID + " ;";
                 if (shopOld.ShopName != shop.ShopName)
                 {
-                    shopOld.ShopName = shop.ShopName;
                     contents = contents + "店铺名称:" + shopOld.ShopName + "=>" + shop.ShopName + ";";
                 }
                 if (shopOld.ShortName != shop.ShortName)
                 {
-                    shopOld.ShortName = shop.ShortName;
                     contents = contents + "店铺简称:" + shopOld.ShortName + "=>" + shop.ShortName + ";";
                 }
                 if (shopOld.SitType != shop.SitType)
                 {
-                    shopOld.SitType = shop.SitType;
                     contents = contents + "归属平台:" + shopOld.SitType + "." + shopOld.ShopSite + "=>" + shopOld.SitType + "." + shop.ShopSite + ";";
                 }
                 if (shopOld.Shopkeeper != shop.Shopkeeper)
                 {
-                    shopOld.Shopkeeper = shop.Shopkeeper;
                     contents = contents + "掌柜昵称:" + shopOld.Shopkeeper + "=>" + shop.Shopkeeper + ";";
                 }
                 if (shopOld.SendAddress != shop.SendAddress)
                 {
-                    shopOld.SendAddress = shop.SendAddress;
                     contents = contents + "发货地址:" + shopOld.SendAddress + "=>" + shop.SendAddress + ";";
                 }
                 if (shopOld.ShopUrl != shop.ShopUrl)
                 {
-                    shopOld.ShopUrl = shop.ShopUrl;
                     contents = contents + "店铺网址:" + shopOld.ShopUrl + "=>" + shop.ShopUrl + ";";
                 }
                 if (shopOld.TelPhone != shop.TelPhone)
                 {
-                    shopOld.TelPhone = shop.TelPhone;
                     contents = contents + "联系电话:" + shopOld.TelPhone + "=>" + shop.TelPhone + ";";
                 }
                 if (shopOld.IDcard != shop.IDcard)
                 {
-                    shopOld.IDcard = shop.IDcard;
                     contents = contents + "身份证号:" + shopOld.IDcard + "=>" + shop.IDcard + ";";
                 }
                 if (shopOld.ContactName != shop.ContactName)
                 {
-                    shopOld.ContactName = shop.ContactName;
                     contents = contents + "退货联系人:" + shopOld.ContactName + "=>" + shop.ContactName + ";";
                 }
                 if (shopOld.ReturnAddress != shop.ReturnAddress)
                 {
-                    shopOld.ReturnAddress = shop.ReturnAddress;
                     contents = contents + "退货地址:" + shopOld.ReturnAddress + "=>" + shop.ReturnAddress + ";";
                 }
                 if (shopOld.ReturnMobile != shop.ReturnMobile)
                 {
-                    shopOld.ReturnMobile = shop.ReturnMobile;
                     contents = contents + "退货手机:" + shopOld.ReturnMobile + "=>" + shop.ReturnMobile + ";";
                 }
                 if (shopOld.ReturnPhone != shop.ReturnPhone)
                 {
-                    shopOld.ReturnPhone = shop.ReturnPhone;
                     contents = contents + "退货固话:" + shopOld.ReturnPhone + "=>" + shop.ReturnPhone + ";";
                 }
                 if (shopOld.Postcode != shop.Postcode)
                 {
-                    shopOld.Postcode = shop.Postcode;
                     contents = contents + "退货邮编:" + shopOld.Postcode + "=>" + shop.Postcode + ";";
                 }
                 if (shopOld.Enable != shop.Enable)
                 {
-                    shopOld.Enable = shop.Enable;
                     contents = contents + "店铺状态:" + shopOld.Enable + "=>" + shop.Enable + ";";
                 }
                 if (shopOld.Istoken != shop.Istoken)
                 {
-                    shopOld.Istoken = shop.Istoken;
                     contents = contents + "接口授权:" + shopOld.Istoken + "=>" + shop.Istoken + ";";
                 }
                 if (shopOld.UpdateSku != shop.UpdateSku)
                 {
-                    shopOld.UpdateSku = shop.UpdateSku;
                     contents = contents + "上传库存（自动同步）:" + shopOld.UpdateSku + "=>" + shop.UpdateSku + ";";
                 }
                 if (shopOld.DownGoods != shop.DownGoods)
                 {
-                    shopOld.DownGoods = shop.DownGoods;
                     contents = contents + "下载商品（自动同步）:" + shopOld.DownGoods + "=>" + shop.DownGoods + ";";
                 }
                 if (shopOld.UpdateWayBill != shop.UpdateWayBill)
                 {
-                    shopOld.UpdateWayBill = shop.UpdateWayBill;
                     contents = contents + "上传快递单（发货信息）:" + shopOld.UpdateWayBill + "=>" + shop.UpdateWayBill + ";";
                 }
                 if (shopOld.ShopBegin != shop.ShopBegin)
                 {
-                    shopOld.ShopBegin = shop.ShopBegin;
                     contents = contents + "创店时间:" + shopOld.ShopBegin + "=>" + shop.ShopBegin + ";";
                 }
                 var CommDBconn = new MySqlConnection(DbBase.CommConnectString);
@@ -379,7 +364,7 @@ namespace CoreData.CoreComm
                 var TransUser = UserDBconn.BeginTransaction();
                 try
                 {
-                    string str = @"update Shop
+                    string str = @"UPDATE shop
                                         Set ShopName = @ShopName,
                                         SitType = @SitType,
                                         ShopSite = @ShopSite,
@@ -403,9 +388,9 @@ namespace CoreData.CoreComm
                                         ShopBegin = @ShopBegin,
                                         Istoken = @Istoken,
                                         Token = @Token
-                                    where
-                                        ID = @ID
-                                    ";
+                                    WHERE
+                                        ID = @ID 
+                                    AND CoID = "+ CoID;
                     int count = CommDBconn.Execute(str, shop, TransComm);
                     if (count <= 0)
                     {
@@ -413,7 +398,11 @@ namespace CoreData.CoreComm
                     }
                     else
                     {
-                        CoreUser.LogComm.InsertUserLogTran(TransUser, "修改店铺资料", "Shop", contents, UserName, CoID, DateTime.Now);
+                        var task = Task.Factory.StartNew(() =>
+                        {
+                            CoreUser.LogComm.InsertUserLogTran(TransUser, "修改店铺资料", "Shop", contents, UserName, CoID, DateTime.Now);
+                        });
+                        
                         CacheBase.Set<Shop>(sname, shop);//缓存
                         TransComm.Commit();
                         TransUser.Commit();
@@ -603,7 +592,7 @@ namespace CoreData.CoreComm
                 }
                 else
                 {
-                    CoreUser.LogComm.InsertUserLogTran(TransUser, "新增店铺资料", "Shop", shop.ShopName, UserName, CoID, DateTime.Now);
+                    CoreUser.LogComm.InsertUserLogTran(TransUser, "新增店铺资料", "Shop", "店铺名："+shop.ShopName, UserName, CoID, DateTime.Now);
                     CacheBase.Set<Shop>(sname, shop);//缓存
                 }
                 TransComm.Commit();
