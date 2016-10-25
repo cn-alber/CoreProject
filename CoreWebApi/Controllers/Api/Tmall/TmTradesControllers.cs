@@ -70,6 +70,19 @@ namespace CoreWebApi.Api.Tmall{
         #endregion
 
         #region
+        [HttpGetAttribute("/core/Api/TmTrades/sellercatsListGet")]
+        public ResponseResult sellercatsListGet(string token,string nick){
+            var m = new DataResult(1,null);
+            if(string.IsNullOrEmpty(token)){
+                m.s = -5000;
+            }else{
+                m = TmallHaddle.sellercatsListGet(token,nick);
+            }
+            return CoreResult.NewResponse(m.s, m.d, "Api");
+        }
+        #endregion
+
+        #region
         [HttpGetAttribute("/core/Api/TmTrades/")]
         public ResponseResult demo(string token){
             var m = new DataResult(1,null);
