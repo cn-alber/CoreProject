@@ -2,6 +2,7 @@ using CoreModels;
 using Dapper;
 using System;
 using System.Text;
+using System.Data;
 using System.Collections.Generic;
 using CoreModels.XyComm;
 using MySql.Data.MySqlClient;
@@ -245,7 +246,7 @@ namespace CoreData.CoreComm
                             var p = new DynamicParameters();
                             p.Add("@KindName", Kind.KindName);
                             // p.Add("@FullName", fullname);
-                            p.Add("@Order",Kind.Order);
+                            p.Add("@Order", Kind.Order);
                             p.Add("@ParentID", Kind.ParentID);
                             p.Add("@Modifier", UserName);
                             p.Add("@ModifyDate", DateTime.Now);
@@ -422,13 +423,58 @@ namespace CoreData.CoreComm
                 try
                 {
                     var Children = conn.Query<CustomKindData>(sql, p).AsList();
-                    result.d=Children;
+                    result.d = Children;
                 }
                 catch (Exception e)
                 {
                     result.s = -1;
                     result.d = e.Message;
                 }
+            }
+            return result;
+        }
+        #endregion
+
+        #region 新增商品类目属性
+        public static DataResult InsertKindProps(int ID, string CoID, string UserName)
+        {
+            var result = new DataResult(1, null);
+            string sql = "SELECT tb_cid FROM item_cates_standard WHERE id=@ID";
+            var conn = new MySqlConnection(DbBase.CommConnectString);
+            conn.Open();
+            var Trans = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
+            try
+            {
+                int cid = conn.QueryFirst<int>(sql, new { ID = ID });
+                if (cid > 0)
+                {
+                    result = CoreData.CoreApi.TmallHaddle.itemProps(cid.ToString());                    
+                    // var sku_props = new List<dynamic>();
+                    // var item_props = new List<dynamic>();
+                    var item_sku_props = result.d;
+                    var is_props = result.d as item_sku_props;
+                    // var is_props = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Newtonsoft.Json.JsonConvert.SerializeObject(result.d).Replace("\"","\'"));
+                   
+                        // foreach(var item in is_props.item_props)
+                        // {
+                        //     var prop = Newtonsoft.Json.JsonConvert.DeserializeObject<Customkind_props>(item);
+                        // }
+                    // if(is_props.ToString().IndexOf("item_props") > -1)
+                    // {
+                    //     // foreach(var item in item_props_str.)
+                    // }
+                }
+            }
+            catch (Exception e)
+            {
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                Trans.Dispose();
+                conn.Dispose();
+                conn.Close();
             }
             return result;
         }
