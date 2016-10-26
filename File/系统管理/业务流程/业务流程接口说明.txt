@@ -4,7 +4,8 @@ function说明
 1.GetBusiness() //查询table business 资料
   路由:http://localhost:5000/Core/Business/GetBusiness
 input：     none
-OutPut:     List<business>  business 资料
+OutPut:     business  business资料
+            business  business初始资料
 参考:output jason 文件:GetBusiness_output.json
 
 2.UpdateBusiness() //更新资料

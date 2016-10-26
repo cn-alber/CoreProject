@@ -347,8 +347,16 @@ namespace CoreModels.XyCore
         public string Creator{get;set;}
         public string ShopSit{get;set;}
     }
-    public class Logistics
+    public class Log
     {
-
+        public int ID{get;set;}
+        public int OID{get;set;}
+        public long SoID{get;set;}
+        public int Type{get;set;}
+        public DateTime LogDate{get;set;}
+        public string UserName{get;set;}
+        public string Title{get;set;}
+        public string Remark{get;set;}
+        public int CoID{get;set;}
     }
 }

@@ -13,14 +13,37 @@ namespace CoreData.CoreUser
         ///</summary>
         public static DataResult GetBusiness(int CoID)
         {
-            var result = new DataResult(1,null);        
+            var result = new DataResult(1,null);   
+            var res = new BusinessData();
+            var bu = new Business();
+            bu.ismergeorder = true;
+            bu.isautosetexpress = true;
+            bu.isignoresku = false;
+            bu.isautogoodsreviewed = false;
+            bu.isupdateskuall = false;
+            bu.isupdatepresalesku = false;
+            bu.isskulock = 1;
+            bu.ispresaleskulock = true;
+            bu.ischeckfirst = false;
+            bu.isjustcheckex = true;
+            bu.isautosendafftercheck = true;
+            bu.isneedkg = false;
+            bu.isautoremarks = true;
+            bu.isexceptions = true;
+            bu.ispositionaccurate = true;
+            bu.goodsuniquecode = true;
+            bu.isgoodsrule = 1;;
+            bu.isbeyondcount = 1;
+            bu.pickingmethod = 1;
+            bu.tempnominus = false;
+            bu.mixedpicking = false; 
+            res.businessInitData = bu;
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{
-                    string wheresql = "select id,ismergeorder,isautosetexpress,isignoresku,isautogoodsreviewed,isupdateskuall,isupdatepresalesku,isskulock,ispresaleskulock,ischeckfirst,"+
-                                       "isjustcheckex,isautosendafftercheck,isneedkg,isautoremarks,isexceptions,cabinetheight,cabinetnumber,ispositionaccurate,goodsuniquecode,"+
-                                       "isgoodsrule,isbeyondcount,pickingmethod,tempnominus,mixedpicking from business where coid = " + CoID;
+                    string wheresql = "select * from business where coid = " + CoID;
                     var u = conn.Query<Business>(wheresql).AsList();
-                    result.d = u;
+                    res.businessData = u[0] as Business;
+                    result.d = res;
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
@@ -38,9 +61,7 @@ namespace CoreData.CoreUser
             string contents = string.Empty; 
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{
-                    string wheresql = "select id,ismergeorder,isautosetexpress,isignoresku,isautogoodsreviewed,isupdateskuall,isupdatepresalesku,isskulock,ispresaleskulock,ischeckfirst,"+
-                                       "isjustcheckex,isautosendafftercheck,isneedkg,isautoremarks,isexceptions,cabinetheight,cabinetnumber,ispositionaccurate,goodsuniquecode,"+
-                                       "isgoodsrule,isbeyondcount,pickingmethod,tempnominus,mixedpicking from business where coid = " + CoID;
+                    string wheresql = "select * from business where coid = " + CoID;
                     var u = conn.Query<Business>(wheresql).AsList();
                     if(bu.ismergeorder != u[0].ismergeorder)
                     {
@@ -138,13 +159,13 @@ namespace CoreData.CoreUser
                                         isupdateskuall = @Isupdateskuall,isupdatepresalesku = @Isupdatepresalesku,isskulock= @Isskulock,ispresaleskulock = @Ispresaleskulock,ischeckfirst = @Ischeckfirst,
                                         isjustcheckex = @Isjustcheckex,isautosendafftercheck = @Isautosendafftercheck,isneedkg = @Isneedkg,isautoremarks = @Isautoremarks,isexceptions = @Isexceptions,
                                         cabinetheight = @Cabinetheight,cabinetnumber = @Cabinetnumber,ispositionaccurate = @Ispositionaccurate,goodsuniquecode = @Goodsuniquecode,isgoodsrule = @Isgoodsrule,
-                                        isbeyondcount = @Isbeyondcount,pickingmethod = @Pickingmethod,tempnominus = @Tempnominus,mixedpicking = @Mixedpicking where id = @ID";
+                                        isbeyondcount = @Isbeyondcount,pickingmethod = @Pickingmethod,tempnominus = @Tempnominus,mixedpicking = @Mixedpicking where coid = @CoID";
                     var args = new {Ismergeorder = bu.ismergeorder,Isautosetexpress = bu.isautosetexpress,Isignoresku = bu.isignoresku,Isautogoodsreviewed = bu.isautogoodsreviewed,
                                     Isupdateskuall = bu.isupdateskuall,Isupdatepresalesku = bu.isupdatepresalesku,Isskulock = bu.isskulock,Ispresaleskulock = bu.ispresaleskulock,
                                     Ischeckfirst = bu.ischeckfirst,Isjustcheckex = bu.isjustcheckex,Isautosendafftercheck = bu.isautosendafftercheck,Isneedkg = bu.isneedkg,
                                     Isautoremarks = bu.isautoremarks,Isexceptions = bu.isexceptions,Cabinetheight = bu.cabinetheight,Cabinetnumber = bu.cabinetnumber,
                                     Ispositionaccurate = bu.ispositionaccurate,Goodsuniquecode = bu.goodsuniquecode,Isgoodsrule = bu.isgoodsrule,Isbeyondcount = bu.isbeyondcount,
-                                    Pickingmethod = bu.pickingmethod,Tempnominus = bu.tempnominus,Mixedpicking = bu.mixedpicking,ID = bu.id};
+                                    Pickingmethod = bu.pickingmethod,Tempnominus = bu.tempnominus,Mixedpicking = bu.mixedpicking,CoID = CoID};
                     int count = conn.Execute(uptsql,args);
                     if(count < 0)
                     {
