@@ -10,7 +10,7 @@ namespace CoreModels.XyUser
         public bool isautogoodsreviewed {get;set;}
         public bool isupdateskuall {get;set;}
         public bool isupdatepresalesku {get;set;}
-        public bool isskulock {get;set;}
+        public int isskulock {get;set;}
         public bool ispresaleskulock {get;set;}
         public bool ischeckfirst {get;set;}
         public bool isjustcheckex {get;set;}
@@ -22,9 +22,9 @@ namespace CoreModels.XyUser
         public int cabinetnumber {get;set;}
         public bool ispositionaccurate {get;set;}
         public bool goodsuniquecode {get;set;}
-        public bool isgoodsrule {get;set;}
-        public bool isbeyondcount {get;set;}
-        public bool pickingmethod {get;set;}
+        public int isgoodsrule {get;set;}
+        public int isbeyondcount {get;set;}
+        public int pickingmethod {get;set;}
         public bool tempnominus {get;set;}
         public bool mixedpicking {get;set;}
     }
