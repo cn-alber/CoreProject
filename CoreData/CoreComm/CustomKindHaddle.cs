@@ -3,8 +3,10 @@ using Dapper;
 using System;
 using System.Text;
 using System.Data;
+using System.Linq;
 using System.Collections.Generic;
 using CoreModels.XyComm;
+using CoreModels.XyApi.Tmall;
 using MySql.Data.MySqlClient;
 using CoreData.CoreApi;
 
@@ -343,7 +345,7 @@ namespace CoreData.CoreComm
                             CacheBase.Remove(cname);
                         }
                         string contents = "删除类目=>" + string.Join(",", IDLst);
-                        CoreUser.LogComm.InsertUserLog("删除类目资料", "User", contents, UserName, CoID, DateTime.Now);
+                        CoreUser.LogComm.InsertUserLog("删除类目资料", "CustomKind", contents, UserName, CoID, DateTime.Now);
                     }
                 }
                 catch (Exception e)
@@ -392,7 +394,7 @@ namespace CoreData.CoreComm
                             res.s = 3002;
                         }
                         contents += string.Join(",", IDLst.ToArray());
-                        CoreUser.LogComm.InsertUserLog("修改类目状态", "Brand", contents, UserName, int.Parse(CoID), DateTime.Now);
+                        CoreUser.LogComm.InsertUserLog("修改类目状态", "CustomKind", contents, UserName, int.Parse(CoID), DateTime.Now);
                         if (res.s > 0)
                         {
                             Trans.Commit();
@@ -456,7 +458,7 @@ namespace CoreData.CoreComm
                 if (Kind_standard != null)
                 {
                     string querysql = "SELECT count(ID) FROM customkind WHERE KindName=@name and CoID=@CoID and ParentID=@ParentID";
-                    int count = conn.QueryFirst<int>(querysql, new { name = Kind_standard.name, CoID = IParam.CoID, ParentID=IParam.ParentID});
+                    int count = conn.QueryFirst<int>(querysql, new { name = Kind_standard.name, CoID = IParam.CoID, ParentID = IParam.ParentID });
                     if (count > 0)
                     {
                         result.s = -1;
@@ -582,6 +584,7 @@ namespace CoreData.CoreComm
                                 conn.Execute(AddSizeSql(), SizeLst, Trans);
                             }
                             Trans.Commit();
+                            CoreUser.LogComm.InsertUserLog("新增商品类目", "Customkind", "新增标准类目" + Kind_standard.name, IParam.Creator, IParam.CoID, DateTime.Now);
                             result.d = "";
                         }
                     }
@@ -603,6 +606,134 @@ namespace CoreData.CoreComm
         }
         #endregion
 
+        #region 导入淘宝自定义类目
+        public static DataResult InsertTmaoKind(int CoID, string UserName)
+        {
+            var result = new DataResult(1, null);
+            var conn = new MySqlConnection(DbBase.CommConnectString);
+            conn.Open();
+            var Trans = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
+            try
+            {
+                //获取用户自定义类目
+                var NewKindLst = new List<CustomKind>();
+                var UptKindLst = new List<CustomKind>();
+                result = CoreData.CoreApi.TmallHaddle.GetSellercatsList("南极人羽绒旗舰店");
+                var TmaoDataLst = result.d as List<cat_item>;
+                //转译成待新增商品类目
+                var res = AddTmaoKind(TmaoDataLst, CoID, UserName);
+                var KindLst = res.d as List<CustomKind>;
+                //判断类目是否已存在
+                var CidLst = KindLst.Select(a => a.cid).AsList();
+                var OldLst = conn.Query<CustomKind>("SELECT * FROM customkind WHERE CoID=@CoID AND cid in @CidLst", new { CoID = CoID, CidLst = CidLst }).AsList();
+                //已存在的类目更新
+                if (OldLst.Count > 0)
+                {
+                    foreach (var Old in OldLst)
+                    {
+                        CustomKind uptkind = KindLst.First(a => a.cid == Old.cid);
+                        if (uptkind != null)
+                        {
+                            uptkind.ID = Old.ID;
+                            uptkind.Modifier = UserName;
+                            uptkind.ModifyDate = DateTime.Now.ToString();
+                        }
+                    }
+                }
+
+                NewKindLst = KindLst.Where(a => a.ID == 0).AsList();
+                UptKindLst = KindLst.Where(a => a.ID > 0).AsList();
+                if (NewKindLst.Count > 0)
+                {
+                    conn.Execute(AddKindSql(), NewKindLst);
+                }
+
+                if (UptKindLst.Count > 0)
+                {
+                    string uptsql = @"UPDATE customkind
+                                SET KindName =@KindName,
+                                    `Order` =@Order,
+                                    cid =@cid,
+                                    parent_cid =@parent_cid,
+                                    Modifier =@Modifier,
+                                    ModifyDate =@ModifyDate
+                                WHERE
+                                    ID =@ID";
+                    conn.Execute(uptsql, UptKindLst);
+                }
+
+                string uptsql2 = @"UPDATE customkind,
+                                    customkind AS m
+                                    SET customkind.ParentID = m.ID
+                                    WHERE
+                                        customkind.parent_cid = m.cid
+                                    AND m.cid > 0
+                                    AND customkind.parent_cid > 0
+                                    AND m.cid in @CidLst";
+                conn.Execute(uptsql2,new{CidLst=KindLst.Select(a=>a.cid).AsList()});
+                Trans.Commit();
+                CoreUser.LogComm.InsertUserLog("新增商品类目", "Customkind", "导入淘宝商品自定义类目", UserName, CoID, DateTime.Now);
+                result.d="";
+
+            }
+            catch (Exception e)
+            {
+                Trans.Rollback();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                Trans.Dispose();
+                conn.Dispose();
+                conn.Close();
+            }
+            return result;
+        }
+        #endregion
+
+        #region 
+        public static DataResult AddTmaoKind(List<cat_item> TmaoDataLst, int CoID, string UserName)
+        {
+            var result = new DataResult(1, null);
+            var KindLst = new List<CustomKind>();
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    foreach (var Tmao in TmaoDataLst)
+                    {
+                        var kind = new CustomKind();
+                        kind.CoID = CoID;
+                        kind.KindName = Tmao.name;
+                        kind.cid = Tmao.cid;
+                        kind.parent_cid = Tmao.parent_cid;
+                        kind.Order = Tmao.sort_order;
+                        kind.Creator = UserName;
+                        kind.CreateDate = DateTime.Now.ToString();
+                        KindLst.Add(kind);
+                        if (Tmao.children!=null && Tmao.children.Count > 0)
+                        {
+                            var res = AddTmaoKind(Tmao.children, CoID, UserName);
+                            var ChildLst = res.d as List<CustomKind>;
+                            KindLst.AddRange(ChildLst);
+                        }
+                        result.d = KindLst;
+                    }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+
+
+            }
+            return result;
+        }
+        #endregion
+
+
         #region 新增商品类目
         public static string AddKindSql()
         {
@@ -614,6 +745,10 @@ namespace CoreData.CoreComm
                                         `Order`,
                                         ParentID,
                                         CoID,
+                                        tb_cid,
+                                        cid,
+                                        parent_cid,
+                                        pic_url,
                                         Creator,
                                         CreateDate
                                         ) VALUES(
@@ -624,6 +759,10 @@ namespace CoreData.CoreComm
                                         @Order,
                                         @ParentID,
                                         @CoID,
+                                        @tb_cid,
+                                        @cid,
+                                        @parent_cid,
+                                        @pic_url,
                                         @Creator,
                                         @CreateDate
                                         ) ";

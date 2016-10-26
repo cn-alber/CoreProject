@@ -74,36 +74,51 @@ function说明
     参考:output json 文件:ItemStdKindLst_output.json
 #######################################################
 7.SkuKindEnable()//批次更新客户资料的状态
-路由:http://localhost:5000/Core/XyComm/Customkind/SkuKindEnable
-input： IDList    List<int>      客户ID list
-        Enable    string         指定状态true|false（启用，停用）
-OutPut: 成功：
-            1.更新类目状态customkind.enable
-            2.新增修改记录log
+    方法：POST
+    路由:http://localhost:5000/Core/XyComm/Customkind/SkuKindEnable
+    input： IDList    List<int>      客户ID list
+            Enable    string         指定状态true|false（启用，停用）
+    OutPut: 成功：
+                1.更新类目状态customkind.enable
+                2.新增修改记录log
+                3.返回成功信息
+            失败：
+                1.返回错误信息
+    参考:input json 文件:SkuKindEnable_input.json
+#######################################################
+8.InsertStdKind()//添加标准类目
+    方法：POST
+    路由:http://192.168.30.211:5000/Core/XyComm/Customkind/InsertStandardKind
+    input： ID           int            标准类目ID
+            ParentID     int            父级ID
+    OutPut: 成功：
+                1.添加商品类目customkind
+                2.添加商品类目属性customkind_props
+                3.添加颜色信息corecolor
+                4.添加尺码信息coresize
+                5.添加操作记录
+                6.返回成功信息
+            失败：
+                1.返回错误信息
+    参考:input json 文件:InsertStandardKind_input.json
+
+9.SkuKindProps()//获取商品属性
+    方法：Get
+    路由:http://192.168.30.211:5000/Core/XyComm/Customkind/SkuKindProps?ID=131
+    input： 
+            ID           int            商品类目ID
+    OutPut: 
+            PropLst      List<customkind_props> 商品类目属性
+    参考:output json 文件:SkuKindProps_output.json
+10.InsertTmaoKind()
+    方法：POST
+    路由:http://192.168.30.211:5000/Core/XyComm/Customkind/InsertTmaoKind
+    Input: Null
+    OutPut:
+        成功：
+            1.添加商品类目customkind
+            2.添加操作记录
             3.返回成功信息
         失败：
             1.返回错误信息
-参考:input json 文件:SkuKindEnable_input.json
-#######################################################
-8.InsertStdKind()//添加标准类目
-路由:http://192.168.30.211:5000/Core/XyComm/Customkind/InsertStandardKind
-input： ID           int            标准类目ID
-        ParentID     int            父级ID
-OutPut: 成功：
-            1.添加商品类目customkind
-            2.添加商品类目属性customkind_props
-            3.添加颜色信息corecolor
-            4.添加尺码信息coresize
-            5.添加操作记录
-            6.返回成功信息
-        失败：
-            1.返回错误信息
-参考:input json 文件:InsertStandardKind_input.json
 
-9.SkuKindProps()//获取商品属性
-路由:http://192.168.30.211:5000/Core/XyComm/Customkind/SkuKindProps?ID=131
-input： 
-        ID           int            商品类目ID
-OutPut: 
-        PropLst      List<customkind_props> 商品类目属性
-参考:output json 文件:SkuKindProps_output.json

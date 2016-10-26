@@ -206,11 +206,23 @@ namespace CoreWebApi
 
         #endregion
 
+        #region 导入淘宝商品类目
+        [HttpPostAttribute("/Core/XyComm/Customkind/InsertTmaoKind")]
+        public ResponseResult InsertTmaoKind()
+        {
+            int CoID = int.Parse(GetCoid());
+            string UserName = GetUname();
+            var res = CustomKindHaddle.InsertTmaoKind(CoID,UserName);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
         #region
         [HttpGetAttribute("/Core/XyComm/Customkind/GetSkuProps")]
-        public ResponseResult GetSkuProps(string Cid)
+        public ResponseResult GetSkuProps()
         {
-            var res= CoreData.CoreApi.TmallHaddle.itemProps(Cid);
+            var res= CoreData.CoreApi.TmallHaddle.GetSellercatsList("南极人羽绒旗舰店");
+            //TmallHaddle.itemProps(Cid);
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
