@@ -455,7 +455,8 @@ namespace CoreData.CoreComm
                 var Kind_standard = conn.QueryFirst<Item_cates_standard>(sql, new { ID = IParam.ID });
                 if (Kind_standard != null)
                 {
-                    int count = conn.QueryFirst<int>("SELECT count(ID) FROM customkind WHERE KindName=@name and CoID=@CoID", new { name = Kind_standard.name, CoID = IParam.CoID });
+                    string querysql = "SELECT count(ID) FROM customkind WHERE KindName=@name and CoID=@CoID and ParentID=@ParentID";
+                    int count = conn.QueryFirst<int>(querysql, new { name = Kind_standard.name, CoID = IParam.CoID, ParentID=IParam.ParentID});
                     if (count > 0)
                     {
                         result.s = -1;
@@ -581,6 +582,7 @@ namespace CoreData.CoreComm
                                 conn.Execute(AddSizeSql(), SizeLst, Trans);
                             }
                             Trans.Commit();
+                            result.d = "";
                         }
                     }
                 }
