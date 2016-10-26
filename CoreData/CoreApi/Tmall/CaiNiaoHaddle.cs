@@ -86,7 +86,7 @@ namespace CoreData.CoreApi
                                 
                 content.order_source = "TB";
                 content.solutions_code="DM092876";
-                content.trade_id = "2605837640524916";
+                content.trade_id = "58021";
                 
                 Console.WriteLine("-----------------");
                 Console.WriteLine(JsonConvert.SerializeObject(content));
