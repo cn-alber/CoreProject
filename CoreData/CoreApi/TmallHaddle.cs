@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using CoreData;
@@ -986,20 +987,23 @@ namespace CoreData.CoreApi
         }
 
 
+        
+        public static DataResult GetSellercatsList(string nick){
+            string token = "6202620e6f344bc7a7adb2886ba4ZZ9bd8442fbe60465632058964557";            
+            return sellercatsListGet (token,nick);
+        }
+
          #region 
         /// <summary>
         ///  获取前台展示的店铺内卖家自定义商品类目 参考网址： https://open.taobao.com/docs/api.htm?spm=a219a.7629065.0.0.K97zD7&apiId=65
         /// </summary>
-        /// <param name=""></param>
-        /// <param name=""></param>
+        /// <param name="nick">店铺昵称</param>
         public static DataResult sellercatsListGet (string token,string nick){
             var result = new DataResult(1,null);
             try{                                        
                 Tmparam.Add("method", "taobao.sellercats.list.get");
                 Tmparam.Add("session", token);
-
                 Tmparam.Add("nick", nick);
-
                 string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
@@ -1009,32 +1013,20 @@ namespace CoreData.CoreApi
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     if(response.Result.ToString().IndexOf("sellercats_list_get_response")>-1){
-                        //var seller_cats = res.sellercats_list_get_response.seller_cats.seller_cat;
                         var seller_cats = JsonConvert.DeserializeObject<sellercats_list_get_response_re>(response.Result.ToString().Replace("\"","\'")+"}").sellercats_list_get_response.seller_cats.seller_cat;       
-                        var parent = new List<cat_item>(); 
-                        
-
+                        var parent = new List<cat_item>();                     
                         foreach (var item in seller_cats)
-                        {
-                            Console.WriteLine(item.parent_cid);
+                        {                     
                             if(item.parent_cid == 0){
                                 parent.Add(item);                                
                             }                            
                         }
-                        // foreach(var p in parent){
-                        //     p.children = new List<cat_item>();
-                        //     foreach(var item in seller_cats){
-                        //         if(p.cid == item.parent_cid){
-                        //             p.children.Add(item);
-                        //             seller_cats.Remove(item);
-                        //         }
-                        //     }
-                        // }
+                         foreach (var p in parent)
+                        {
 
-                        result.d  = new {
-                              p =   parent,
-                              seller_cats = seller_cats
-                        };                                
+                            p.children = (from c in seller_cats where c.parent_cid == p.cid select c).ToList();
+                        }
+                        result.d  = parent;                                
   
               
                     }

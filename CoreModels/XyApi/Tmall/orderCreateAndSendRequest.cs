@@ -42,38 +42,10 @@ namespace CoreModels.XyApi.Tmall
 
     }
 
-    public class itemprops_get_response{
-        public item_props item_props{set;get;}
-        
-    }
-    public class item_props{
-        public List<itemprops> item_prop{set;get;}
-    }
-
-    public class itemprops{
-        public long  pid{get;set;}
-        public string  name{get;set;}
-        public bool must{get;set;}
-        public bool multi{get;set;}
-        public prop_values prop_values{get;set;}
-
-    }
-
-    public class prop_values{
-        public List<prop_value> prop_value{get;set;}
-    }
-    public class prop_value{
-        //public string name{get;set;}
-        public string vid{get;set;}
-    }
-
     public class cateStandard{
         public long id{get;set;}
         public long cid{get;set;}
     }
-
-
-
 
 
 }

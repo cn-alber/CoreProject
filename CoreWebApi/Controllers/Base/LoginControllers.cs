@@ -25,7 +25,8 @@ namespace CoreWebApi
             string cid = "1104";
             dynamic obj = TmallHaddle.itemProps(cid);
             dynamic data = obj.d;
-            CoreHelper.Debuger.success(data["sku_props"]);
+ 
+            Console.WriteLine(data["sku_props"]);
         }
 
         [AllowAnonymous]
