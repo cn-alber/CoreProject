@@ -455,124 +455,135 @@ namespace CoreData.CoreComm
                 var Kind_standard = conn.QueryFirst<Item_cates_standard>(sql, new { ID = IParam.ID });
                 if (Kind_standard != null)
                 {
-                    var NewKind = new CustomKind();
-                    NewKind.CoID = IParam.CoID;
-                    NewKind.KindName = Kind_standard.name;
-                    NewKind.Type = IParam.Type;
-                    NewKind.ParentID = IParam.ParentID;
-                    NewKind.Enable = IParam.Enable;
-                    NewKind.Creator = IParam.Creator;
-                    NewKind.CreateDate = IParam.CreateDate;
-                    NewKind.tb_cid = Kind_standard.tb_cid;
-                    conn.Execute(AddKindSql(), NewKind, Trans);
-                    int kindid = conn.QueryFirst<int>("select LAST_INSERT_ID()", Trans);//新增商品类目
-                    //新增商品类目属性
-                    result = TmallHaddle.itemProps(Kind_standard.tb_cid.ToString());
-                    if (result.s == 1)
+                    string querysql = "SELECT count(ID) FROM customkind WHERE KindName=@name and CoID=@CoID and ParentID=@ParentID";
+                    int count = conn.QueryFirst<int>(querysql, new { name = Kind_standard.name, CoID = IParam.CoID, ParentID=IParam.ParentID});
+                    if (count > 0)
                     {
-                        dynamic item_sku_props = result.d;
-                        var ItemPropLst = new List<Customkind_props>();//商品类目属性
-                        var ColorLst = new List<CoreColor>();//颜色属性
-                        var SizeLst = new List<CoreSize>();//尺码熟悉
-                        foreach (var item in item_sku_props["item_props"])
+                        result.s = -1;
+                        result.d = "商品类目已存在！";
+                    }
+                    else
+                    {
+                        var NewKind = new CustomKind();
+                        NewKind.CoID = IParam.CoID;
+                        NewKind.KindName = Kind_standard.name;
+                        NewKind.Type = IParam.Type;
+                        NewKind.ParentID = IParam.ParentID;
+                        NewKind.Enable = IParam.Enable;
+                        NewKind.Creator = IParam.Creator;
+                        NewKind.CreateDate = IParam.CreateDate;
+                        NewKind.tb_cid = Kind_standard.tb_cid;
+                        conn.Execute(AddKindSql(), NewKind, Trans);
+                        int kindid = conn.QueryFirst<int>("select LAST_INSERT_ID()", Trans);//新增商品类目
+                                                                                            //新增商品类目属性
+                        result = TmallHaddle.itemProps(Kind_standard.tb_cid.ToString());
+                        if (result.s == 1)
                         {
-                            var prop = new Customkind_props();
-                            if (item["is_allow_alias"] != null)
+                            dynamic item_sku_props = result.d;
+                            var ItemPropLst = new List<Customkind_props>();//商品类目属性
+                            var ColorLst = new List<CoreColor>();//颜色属性
+                            var SizeLst = new List<CoreSize>();//尺码熟悉
+                            foreach (var item in item_sku_props["item_props"])
                             {
-                                prop.is_allow_alias = item["is_allow_alias"];
+                                var prop = new Customkind_props();
+                                if (item["is_allow_alias"] != null)
+                                {
+                                    prop.is_allow_alias = item["is_allow_alias"];
+                                }
+                                if (item["is_enum_prop"] != null)
+                                {
+                                    prop.is_enum_prop = item["is_enum_prop"];
+                                }
+                                if (item["is_input_prop"] != null)
+                                {
+                                    prop.is_input_prop = item["is_input_prop"];
+                                }
+                                if (item["is_key_prop"] != null)
+                                {
+                                    prop.is_key_prop = item["is_key_prop"];
+                                }
+                                if (item["is_sale_prop"] != null)
+                                {
+                                    prop.is_sale_prop = item["is_sale_prop"];
+                                }
+                                if (item["must"] != null)
+                                {
+                                    prop.must = item["must"];
+                                }
+                                if (item["multi"] != null)
+                                {
+                                    prop.multi = item["multi"];
+                                }
+                                if (item["prop_values"] != null)
+                                {
+                                    prop.values = Newtonsoft.Json.JsonConvert.SerializeObject(item["prop_values"]);
+                                }
+                                if (item["pid"] != null)
+                                {
+                                    prop.pid = item["pid"];
+                                }
+                                prop.name = item["name"];
+                                prop.kindid = kindid;
+                                prop.tb_cid = Kind_standard.tb_cid;
+                                prop.Creator = IParam.Creator;
+                                prop.CreateDate = IParam.CreateDate;
+                                prop.CoID = IParam.CoID;
+                                ItemPropLst.Add(prop);
                             }
-                            if (item["is_enum_prop"] != null)
-                            {
-                                prop.is_enum_prop = item["is_enum_prop"];
-                            }
-                            if (item["is_input_prop"] != null)
-                            {
-                                prop.is_input_prop = item["is_input_prop"];
-                            }
-                            if (item["is_key_prop"] != null)
-                            {
-                                prop.is_key_prop = item["is_key_prop"];
-                            }
-                            if (item["is_sale_prop"] != null)
-                            {
-                                prop.is_sale_prop = item["is_sale_prop"];
-                            }
-                            if (item["must"] != null)
-                            {
-                                prop.must = item["must"];
-                            }
-                            if (item["multi"] != null)
-                            {
-                                prop.multi = item["multi"];
-                            }
-                            if (item["prop_values"] != null)
-                            {
-                                prop.values = Newtonsoft.Json.JsonConvert.SerializeObject(item["prop_values"]);
-                            }
-                            if (item["pid"] != null)
-                            {
-                                prop.pid = item["pid"];
-                            }
-                            prop.name = item["name"];
-                            prop.kindid = kindid;
-                            prop.tb_cid = Kind_standard.tb_cid;
-                            prop.Creator = IParam.Creator;
-                            prop.CreateDate = IParam.CreateDate;
-                            prop.CoID = IParam.CoID;
-                            ItemPropLst.Add(prop);
-                        }
 
-                        foreach (var item in item_sku_props["sku_props"])
-                        {
-                            var skupid = item["pid"];
-                            if (item["is_color_prop"] != null && item["is_color_prop"] == true)//新增颜色属性
+                            foreach (var item in item_sku_props["sku_props"])
                             {
-                                foreach (var col in item["prop_values"]["prop_value"])
+                                var skupid = item["pid"];
+                                if (item["is_color_prop"] != null && item["is_color_prop"] == true)//新增颜色属性
                                 {
-                                    var color = new CoreColor();
-                                    color.colorid = col["vid"];
-                                    color.vid = col["vid"];
-                                    color.name = col["name"];
-                                    color.CoID = IParam.CoID;
-                                    color.Creator = IParam.Creator;
-                                    color.CreateDate = IParam.CreateDate;
-                                    color.pid = skupid;
-                                    color.tb_cid = Kind_standard.tb_cid;
-                                    color.kindid = kindid;
-                                    ColorLst.Add(color);
+                                    foreach (var col in item["prop_values"]["prop_value"])
+                                    {
+                                        var color = new CoreColor();
+                                        color.colorid = col["vid"];
+                                        color.vid = col["vid"];
+                                        color.name = col["name"];
+                                        color.CoID = IParam.CoID;
+                                        color.Creator = IParam.Creator;
+                                        color.CreateDate = IParam.CreateDate;
+                                        color.pid = skupid;
+                                        color.tb_cid = Kind_standard.tb_cid;
+                                        color.kindid = kindid;
+                                        ColorLst.Add(color);
+                                    }
+                                }
+                                else
+                                {
+                                    foreach (var col in item["prop_values"]["prop_value"])
+                                    {
+                                        var size = new CoreSize();
+                                        size.sizeid = col["vid"];
+                                        size.vid = col["vid"];
+                                        size.name = col["name"];
+                                        size.CoID = IParam.CoID;
+                                        size.Creator = IParam.Creator;
+                                        size.CreateDate = IParam.CreateDate;
+                                        size.pid = skupid;
+                                        size.tb_cid = Kind_standard.tb_cid;
+                                        size.kindid = kindid;
+                                        SizeLst.Add(size);
+                                    }
                                 }
                             }
-                            else
+                            if (ItemPropLst.Count > 0)
                             {
-                                foreach (var col in item["prop_values"]["prop_value"])
-                                {
-                                    var size = new CoreSize();
-                                    size.sizeid = col["vid"];
-                                    size.vid = col["vid"];
-                                    size.name = col["name"];
-                                    size.CoID = IParam.CoID;
-                                    size.Creator = IParam.Creator;
-                                    size.CreateDate = IParam.CreateDate;
-                                    size.pid = skupid;
-                                    size.tb_cid = Kind_standard.tb_cid;
-                                    size.kindid = kindid;
-                                    SizeLst.Add(size);
-                                }
+                                conn.Execute(AddKindPorpSql(), ItemPropLst, Trans);
                             }
+                            if (ColorLst.Count > 0)
+                            {
+                                conn.Execute(AddColorSql(), ColorLst, Trans);
+                            }
+                            if (SizeLst.Count > 0)
+                            {
+                                conn.Execute(AddSizeSql(), SizeLst, Trans);
+                            }
+                            Trans.Commit();
+                            result.d = "";
                         }
-                        if (ItemPropLst.Count > 0)
-                        {
-                            conn.Execute(AddKindPorpSql(), ItemPropLst, Trans);
-                        }
-                        if (ColorLst.Count > 0)
-                        {
-                            conn.Execute(AddColorSql(), ColorLst, Trans);
-                        }
-                        if (SizeLst.Count > 0)
-                        {
-                            conn.Execute(AddSizeSql(), SizeLst, Trans);
-                        }
-                        Trans.Commit();
                     }
                 }
             }

@@ -1,11 +1,12 @@
 {
     "s": 1,
-    "d": [
-        {
+    "d": {
+        "businessData": {
             "id": 1,
+            "coid": 1,
             "ismergeorder": true,
-            "isautosetexpress": false,
-            "isignoresku": false,
+            "isautosetexpress": true,
+            "isignoresku": true,
             "isautogoodsreviewed": true,
             "isupdateskuall": false,
             "isupdatepresalesku": false,
@@ -17,8 +18,8 @@
             "isneedkg": false,
             "isautoremarks": false,
             "isexceptions": true,
-            "cabinetheight": true,
-            "cabinetnumber": true,
+            "cabinetheight": 1,
+            "cabinetnumber": 1,
             "ispositionaccurate": false,
             "goodsuniquecode": false,
             "isgoodsrule": true,
@@ -26,7 +27,34 @@
             "pickingmethod": false,
             "tempnominus": false,
             "mixedpicking": false
+        },
+        "businessInitData": {
+            "id": 0,
+            "coid": 0,
+            "ismergeorder": true,
+            "isautosetexpress": true,
+            "isignoresku": false,
+            "isautogoodsreviewed": false,
+            "isupdateskuall": false,
+            "isupdatepresalesku": false,
+            "isskulock": true,
+            "ispresaleskulock": true,
+            "ischeckfirst": false,
+            "isjustcheckex": true,
+            "isautosendafftercheck": true,
+            "isneedkg": false,
+            "isautoremarks": true,
+            "isexceptions": true,
+            "cabinetheight": 0,
+            "cabinetnumber": 0,
+            "ispositionaccurate": true,
+            "goodsuniquecode": true,
+            "isgoodsrule": true,
+            "isbeyondcount": true,
+            "pickingmethod": true,
+            "tempnominus": false,
+            "mixedpicking": false
         }
-    ],
+    },
     "m": ""
 }

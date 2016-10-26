@@ -244,6 +244,7 @@ namespace CoreData.CoreCore
         {
             var result = new DataResult(1,null);   
             var rec = new RecInfo();
+            var log = new Log();
             ord.CoID = CoID;
             ord.Creator = UserName;
             ord.Modifier = UserName;
