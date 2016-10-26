@@ -6,7 +6,7 @@ using System.Data;
 using System.Collections.Generic;
 using CoreModels.XyComm;
 using MySql.Data.MySqlClient;
-
+using CoreData.CoreApi;
 
 namespace CoreData.CoreComm
 {
@@ -131,6 +131,33 @@ namespace CoreData.CoreComm
         }
         #endregion
 
+        #region 获取单笔类目属性资料
+        public static DataResult GetSkuKindProps(int KindID, string CoID)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    string cname = "customkindProps" + CoID + KindID;
+                    var props = CacheBase.Get<List<Customkind_props>>(cname);//读取缓存
+                    if (props == null)
+                    {
+                        props = conn.Query<Customkind_props>("SELECT * FROM customkind_props WHERE kindid=@ID", new { ID = KindID }).AsList();
+                        CacheBase.Set(cname, props);//新增缓存
+                    }
+                    result.d = props;
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+                return result;
+            }
+        }
+        #endregion
+
         #region 新增类目资料
         public static DataResult InsertKind(CustomKind kind)
         {
@@ -162,28 +189,8 @@ namespace CoreData.CoreComm
                     // {
                     //     ck.FullName = kind.KindName;
                     // }
-                    string sql = @"INSERT INTO customkind(
-                                        Type,
-                                        KindName,
-                                        FullName,
-                                        Enable,
-                                        `Order`,
-                                        ParentID,
-                                        CoID,
-                                        Creator,
-                                        CreateDate
-                                        ) VALUES(
-                                        @Type,
-                                        @KindName,
-                                        @FullName,
-                                        @Enable,
-                                        @Order,
-                                        @ParentID,
-                                        @CoID,
-                                        @Creator,
-                                        @CreateDate
-                                        ) ";
-                    int count = conn.Execute(sql, kind);
+
+                    int count = conn.Execute(AddKindSql(), kind);
                     kind.ID = conn.QueryFirst<int>("select LAST_INSERT_ID()");
                     if (count < 0)
                     {
@@ -436,37 +443,142 @@ namespace CoreData.CoreComm
         #endregion
 
         #region 新增商品类目属性
-        public static DataResult InsertKindProps(int ID, string CoID, string UserName)
+        public static DataResult InsertKindProps(CustomKind IParam)
         {
             var result = new DataResult(1, null);
-            string sql = "SELECT tb_cid FROM item_cates_standard WHERE id=@ID";
+            string sql = "SELECT * FROM item_cates_standard WHERE id=@ID";
             var conn = new MySqlConnection(DbBase.CommConnectString);
             conn.Open();
             var Trans = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
             try
             {
-                int cid = conn.QueryFirst<int>(sql, new { ID = ID });
-                if (cid > 0)
+                var Kind_standard = conn.QueryFirst<Item_cates_standard>(sql, new { ID = IParam.ID });
+                if (Kind_standard != null)
                 {
-                    result = CoreData.CoreApi.TmallHaddle.itemProps(cid.ToString());                    
-                    // var sku_props = new List<dynamic>();
-                    // var item_props = new List<dynamic>();
-                    var item_sku_props = result.d;
-                    var is_props = result.d as item_sku_props;
-                    // var is_props = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Newtonsoft.Json.JsonConvert.SerializeObject(result.d).Replace("\"","\'"));
-                   
-                        // foreach(var item in is_props.item_props)
-                        // {
-                        //     var prop = Newtonsoft.Json.JsonConvert.DeserializeObject<Customkind_props>(item);
-                        // }
-                    // if(is_props.ToString().IndexOf("item_props") > -1)
-                    // {
-                    //     // foreach(var item in item_props_str.)
-                    // }
+                    var NewKind = new CustomKind();
+                    NewKind.CoID = IParam.CoID;
+                    NewKind.KindName = Kind_standard.name;
+                    NewKind.Type = IParam.Type;
+                    NewKind.ParentID = IParam.ParentID;
+                    NewKind.Enable = IParam.Enable;
+                    NewKind.Creator = IParam.Creator;
+                    NewKind.CreateDate = IParam.CreateDate;
+                    NewKind.tb_cid = Kind_standard.tb_cid;
+                    conn.Execute(AddKindSql(), NewKind, Trans);
+                    int kindid = conn.QueryFirst<int>("select LAST_INSERT_ID()", Trans);//新增商品类目
+                    //新增商品类目属性
+                    result = TmallHaddle.itemProps(Kind_standard.tb_cid.ToString());
+                    if (result.s == 1)
+                    {
+                        dynamic item_sku_props = result.d;
+                        var ItemPropLst = new List<Customkind_props>();//商品类目属性
+                        var ColorLst = new List<CoreColor>();//颜色属性
+                        var SizeLst = new List<CoreSize>();//尺码熟悉
+                        foreach (var item in item_sku_props["item_props"])
+                        {
+                            var prop = new Customkind_props();
+                            if (item["is_allow_alias"] != null)
+                            {
+                                prop.is_allow_alias = item["is_allow_alias"];
+                            }
+                            if (item["is_enum_prop"] != null)
+                            {
+                                prop.is_enum_prop = item["is_enum_prop"];
+                            }
+                            if (item["is_input_prop"] != null)
+                            {
+                                prop.is_input_prop = item["is_input_prop"];
+                            }
+                            if (item["is_key_prop"] != null)
+                            {
+                                prop.is_key_prop = item["is_key_prop"];
+                            }
+                            if (item["is_sale_prop"] != null)
+                            {
+                                prop.is_sale_prop = item["is_sale_prop"];
+                            }
+                            if (item["must"] != null)
+                            {
+                                prop.must = item["must"];
+                            }
+                            if (item["multi"] != null)
+                            {
+                                prop.multi = item["multi"];
+                            }
+                            if (item["prop_values"] != null)
+                            {
+                                prop.values = Newtonsoft.Json.JsonConvert.SerializeObject(item["prop_values"]);
+                            }
+                            if (item["pid"] != null)
+                            {
+                                prop.pid = item["pid"];
+                            }
+                            prop.name = item["name"];
+                            prop.kindid = kindid;
+                            prop.tb_cid = Kind_standard.tb_cid;
+                            prop.Creator = IParam.Creator;
+                            prop.CreateDate = IParam.CreateDate;
+                            prop.CoID = IParam.CoID;
+                            ItemPropLst.Add(prop);
+                        }
+
+                        foreach (var item in item_sku_props["sku_props"])
+                        {
+                            var skupid = item["pid"];
+                            if (item["is_color_prop"] != null && item["is_color_prop"] == true)//新增颜色属性
+                            {
+                                foreach (var col in item["prop_values"]["prop_value"])
+                                {
+                                    var color = new CoreColor();
+                                    color.colorid = col["vid"];
+                                    color.vid = col["vid"];
+                                    color.name = col["name"];
+                                    color.CoID = IParam.CoID;
+                                    color.Creator = IParam.Creator;
+                                    color.CreateDate = IParam.CreateDate;
+                                    color.pid = skupid;
+                                    color.tb_cid = Kind_standard.tb_cid;
+                                    color.kindid = kindid;
+                                    ColorLst.Add(color);
+                                }
+                            }
+                            else
+                            {
+                                foreach (var col in item["prop_values"]["prop_value"])
+                                {
+                                    var size = new CoreSize();
+                                    size.sizeid = col["vid"];
+                                    size.vid = col["vid"];
+                                    size.name = col["name"];
+                                    size.CoID = IParam.CoID;
+                                    size.Creator = IParam.Creator;
+                                    size.CreateDate = IParam.CreateDate;
+                                    size.pid = skupid;
+                                    size.tb_cid = Kind_standard.tb_cid;
+                                    size.kindid = kindid;
+                                    SizeLst.Add(size);
+                                }
+                            }
+                        }
+                        if (ItemPropLst.Count > 0)
+                        {
+                            conn.Execute(AddKindPorpSql(), ItemPropLst, Trans);
+                        }
+                        if (ColorLst.Count > 0)
+                        {
+                            conn.Execute(AddColorSql(), ColorLst, Trans);
+                        }
+                        if (SizeLst.Count > 0)
+                        {
+                            conn.Execute(AddSizeSql(), SizeLst, Trans);
+                        }
+                        Trans.Commit();
+                    }
                 }
             }
             catch (Exception e)
             {
+                Trans.Rollback();
                 result.s = -1;
                 result.d = e.Message;
             }
@@ -477,6 +589,127 @@ namespace CoreData.CoreComm
                 conn.Close();
             }
             return result;
+        }
+        #endregion
+
+        #region 新增商品类目
+        public static string AddKindSql()
+        {
+            string sql = @"INSERT INTO customkind(
+                                        Type,
+                                        KindName,
+                                        FullName,
+                                        Enable,
+                                        `Order`,
+                                        ParentID,
+                                        CoID,
+                                        Creator,
+                                        CreateDate
+                                        ) VALUES(
+                                        @Type,
+                                        @KindName,
+                                        @FullName,
+                                        @Enable,
+                                        @Order,
+                                        @ParentID,
+                                        @CoID,
+                                        @Creator,
+                                        @CreateDate
+                                        ) ";
+            return sql;
+        }
+        #endregion
+
+        #region 新增商品属性
+        public static string AddKindPorpSql()
+        {
+            string sql = @" INSERT INTO customkind_props(
+                                    `name`,
+                                    kindid,
+                                    pid,
+                                    is_allow_alias,
+                                    is_enum_prop,
+                                    is_input_prop,
+                                    is_key_prop,
+                                    is_sale_prop,
+                                    must,
+                                    multi,
+                                    tb_cid,
+                                    `values`,
+                                    Creator,
+                                    CreateDate,
+                                    CoID ) 
+                            VALUES (
+                                    @name,
+                                    @kindid,
+                                    @pid,
+                                    @is_allow_alias,
+                                    @is_enum_prop,
+                                    @is_input_prop,
+                                    @is_key_prop,
+                                    @is_sale_prop,
+                                    @must,
+                                    @multi,
+                                    @tb_cid,
+                                    @values,
+                                    @Creator,
+                                    @CreateDate,
+                                    @CoID ) ";
+            return sql;
+        }
+        #endregion
+        #region 新增商品类目颜色
+        public static string AddColorSql()
+        {
+            string sql = @" INSERT INTO corecolor(
+                                        colorid,
+                                        vid,
+                                        `name`,
+                                        kindid,
+                                        pid,
+                                        tb_cid,
+                                        CoID,
+                                        Creator,
+                                        CreateDate)
+                                    VALUES (
+                                        @colorid,
+                                        @vid,
+                                        @name,
+                                        @kindid,
+                                        @pid,
+                                        @tb_cid,
+                                        @CoID,
+                                        @Creator,
+                                        @CreateDate
+                                        )";
+            return sql;
+        }
+        #endregion
+        #region 新增商品类目尺寸
+        public static string AddSizeSql()
+        {
+            string sql = @" INSERT INTO coresize(
+                                        sizeid,
+                                        `name`,
+                                        kindid,
+                                        pid,
+                                        tb_cid,
+                                        vid,
+                                        CoID,
+                                        Creator,
+                                        CreateDate)
+                                    VALUES (
+                                        @sizeid,
+                                        @name,
+                                        @kindid,
+                                        @pid,
+                                        @tb_cid,
+                                        @vid,
+                                        @CoID,
+                                        @Creator,
+                                        @CreateDate
+                                        )";
+            return sql;
         }
         #endregion
     }

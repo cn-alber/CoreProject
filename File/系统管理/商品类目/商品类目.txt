@@ -1,4 +1,5 @@
 接口名称:CustomKindController
+路径：\CoreProject\CoreWebApi\Controllers\Base
 
 function说明
 #######################################################
@@ -36,6 +37,7 @@ function说明
             3.返回请求成功信息(s=1)
         失败：返回错误信息
     参考：input json 文件：InsertSkuKind_input.json   
+#######################################################
 4. UpdateSkuKind()//修改商品类目
     方法：POST
     路由：http://192.168.30.29:5000/Core/XyComm/Customkind/UpdateSkuKind
@@ -51,6 +53,7 @@ function说明
             3.返回请求成功信息(s=1)
         失败：返回错误信息
     参考：input json 文件：UpdateSkuKind_input.json
+#######################################################
 5.DeleteSkuKind()//删除商品类目
     方法：POST
     路由：http://192.168.30.29:5000/Core/XyComm/Customkind/DeleteSkuKind
@@ -60,6 +63,7 @@ function说明
          成功：1.删除商品类目资料；2.新增操作记录log；3.返回成功信息
          失败：返回错误信息
     参考：input json 文件：DeleteSkuKind_input.json
+#######################################################
 6.ItemStdKindLst()//获取标准类目列表(item_cates_standard)
     方法：Get
     路由：http://192.168.30.29:5000/Core/XyComm/ItemCateStd/ItemStdKindLst?ParentID=18
@@ -68,6 +72,7 @@ function说明
     OutPut:
         StdKindLst          List<ItemCateStdData>    标准类目列表
     参考:output json 文件:ItemStdKindLst_output.json
+#######################################################
 7.SkuKindEnable()//批次更新客户资料的状态
 路由:http://localhost:5000/Core/XyComm/Customkind/SkuKindEnable
 input： IDList    List<int>      客户ID list
@@ -79,3 +84,26 @@ OutPut: 成功：
         失败：
             1.返回错误信息
 参考:input json 文件:SkuKindEnable_input.json
+#######################################################
+8.InsertStdKind()//添加标准类目
+路由:http://192.168.30.211:5000/Core/XyComm/Customkind/InsertStandardKind
+input： ID           int            标准类目ID
+        ParentID     int            父级ID
+OutPut: 成功：
+            1.添加商品类目customkind
+            2.添加商品类目属性customkind_props
+            3.添加颜色信息corecolor
+            4.添加尺码信息coresize
+            5.添加操作记录
+            6.返回成功信息
+        失败：
+            1.返回错误信息
+参考:input json 文件:InsertStandardKind_input.json
+
+9.SkuKindProps()//获取商品属性
+路由:http://192.168.30.211:5000/Core/XyComm/Customkind/SkuKindProps?ID=131
+input： 
+        ID           int            商品类目ID
+OutPut: 
+        PropLst      List<customkind_props> 商品类目属性
+参考:output json 文件:SkuKindProps_output.json

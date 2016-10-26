@@ -237,5 +237,302 @@ namespace CoreData.CoreCore
             }           
             return result;
         }
+        ///<summary>
+        ///新增订单
+        ///</summary>
+        public static DataResult InsertOrder(Order ord,string UserName,int CoID,bool isFaceToFace)
+        {
+            var result = new DataResult(1,null);   
+            var rec = new RecInfo();
+            ord.CoID = CoID;
+            ord.Creator = UserName;
+            ord.Modifier = UserName;
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{
+                    if ( ord.ShopID == 0)
+                    {
+                        result.s = -1;
+                        result.d = "店铺必须有值!";
+                        return result;
+                    }
+                    else
+                    {
+                        string wheresql = "select * from Shop where id =" + ord.ShopID + " and coid =" + CoID;
+                        var u = conn.Query<Shop>(wheresql).AsList();
+                        if(u.Count == 0)
+                        {
+                            result.s = -1;
+                            result.d = "此店铺不存在!!";
+                            return result;
+                        }
+                        else
+                        {
+                            if(u[0].Enable == false || u[0].Deleted == true)
+                            {
+                                result.s = -1;
+                                result.d = "此店铺已停用或已删除!!";
+                                return result;
+                            }
+                            else
+                            {
+                                ord.ShopName = u[0].ShopName;
+                                ord.ShopSit = u[0].ShopSite;
+                            }
+                        }
+                    }
+                    if(isFaceToFace == true)
+                    {
+                        ord.Express = "现场取货";
+                        ord.ExID = 1;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+            //检查必输栏位是否都有值
+            if ( ord.ODate == null)
+            {
+                result.s = -1;
+                result.d = "订单日期必须有值!";
+                return result;
+            }
+            if(isFaceToFace == false)
+            {
+                if ( ord.RecLogistics == null || ord.RecCity == null || ord.RecDistrict == null || ord.RecAddress == null)
+                {
+                    result.s = -1;
+                    result.d = "收货地址必须有值!";
+                    return result;
+                }
+                if ( ord.RecName == null)
+                {
+                    result.s = -1;
+                    result.d = "收货人必须有值!";
+                    return result;
+                }
+            }
+            bool isRecExsit = true;
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    //检查平台编号是否重复
+                    if(ord.SoID > 0)
+                    {
+                        string wheresql = "select count(id) from `order` where soid = " + ord.SoID + " and coid = " + CoID;
+                        int u = conn.QueryFirst<int>(wheresql);
+                        if(u > 0)
+                        {
+                            result.s = -1;
+                            result.d = "线上订单号已经存在,请重新输入!";
+                            return result;
+                        }
+                    }
+                    else
+                    {
+                        string rand = DateTime.Now.Ticks.ToString();
+                        ord.SoID = long.Parse(rand.Substring(0, 11));
+                    }
+                    //检查收货人是否存在
+                    if(ord.BuyerShopID == null)
+                    {
+                        ord.BuyerShopID = ord.RecName;
+                    }
+                    if(ord.BuyerShopID != null && ord.RecName != null && ord.RecLogistics != null && ord.RecCity != null && ord.RecDistrict != null && ord.RecAddress != null)
+                    {
+                        string wheresql = "select id from recinfo where coid = " + CoID + " and buyerid = '" + ord.BuyerShopID + "' and receiver = '" + ord.RecName + 
+                                           "' and address = '" + ord.RecAddress + "' and logistics = '" + ord.RecLogistics + "' and city = '" + ord.RecCity + 
+                                           "' and district = '" + ord.RecDistrict + "'";
+                        var u = conn.Query<RecInfo>(wheresql).AsList();
+                        if(u.Count > 0)
+                        {
+                            ord.BuyerID = u[0].ID;
+                        }
+                        else
+                        {
+                            isRecExsit = false;
+                            rec.BuyerId = ord.BuyerShopID;
+                            rec.Receiver = ord.RecName;
+                            rec.Tel = ord.RecTel;
+                            rec.Phone = ord.RecPhone;
+                            rec.Logistics = ord.RecLogistics;
+                            rec.City = ord.RecCity;
+                            rec.District = ord.RecDistrict;
+                            rec.Address = ord.RecAddress;
+                            rec.ZipCode = ord.RecZip;
+                            rec.Express = ord.Express;
+                            rec.ExID = ord.ExID;
+                            rec.CoID = CoID;
+                            rec.Creator = UserName;
+                            rec.ShopSit = ord.ShopSit;
+                        }
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            //检查订单是否符合合并的条件
+            var res = isCheckMerge(ord);
+            int reasonid = 0;
+            if(res.s == 1)
+            {
+                reasonid = GetReasonID("等待订单合并",CoID).s;
+                if(reasonid == -1)
+                {
+                    result.s = -1;
+                    result.d = "请先设定【等待订单合并】的异常";
+                    return result;
+                }
+            }
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlCommandText = string.Empty;
+                int count =0;
+                if(isRecExsit == false)
+                {
+                    sqlCommandText = @"INSERT INTO recinfo(BuyerId,Receiver,Tel,Phone,Logistics,City,District,Address,ZipCode,Express,ExID,CoID,Creator,ShopSit) VALUES(
+                            @BuyerId,@Receiver,@Tel,@Phone,@Logistics,@City,@District,@Address,@ZipCode,@Express,@ExID,@CoID,@Creator,@ShopSit)";
+                    count =CoreDBconn.Execute(sqlCommandText,rec,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3002;
+                        return result;
+                    }
+                    else
+                    {
+                        int rtn = CoreDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
+                        ord.BuyerID = rtn;
+                        rec.ID = rtn;
+                    }
+                }
+                if(res.s == 1)
+                {
+                    ord.Status = 7;
+                    ord.AbnormalStatus = reasonid;
+                    ord.StatusDec = "等待订单合并";
+                }
+                else
+                {
+                    ord.Status = 0;
+                    ord.AbnormalStatus = 0;
+                    ord.StatusDec = "";
+                }
+                sqlCommandText = @"INSERT INTO `order`(ODate,CoID,BuyerID,BuyerShopID,ShopID,ShopName,ShopSit,SoID,RecName,RecLogistics,RecCity,RecDistrict,RecAddress,RecZip,
+                                                            RecTel,RecPhone,RecMessage,SendMessage,Express,ExID,Creator,Modifier,Status,AbnormalStatus,StatusDec) VALUES(
+                                        @ODate,@CoID,@BuyerID,@BuyerShopID,@ShopID,@ShopName,@ShopSit,@SoID,@RecName,@RecLogistics,@RecCity,@RecDistrict,@RecAddress,@RecZip,
+                                                            @RecTel,@RecPhone,@RecMessage,@SendMessage,@Express,@ExID,@Creator,@Modifier,@Status,@AbnormalStatus,@StatusDec)";
+                count =CoreDBconn.Execute(sqlCommandText,ord,TransCore);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                else
+                {
+                    int rtn = CoreDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
+                    result.d = rtn;
+                    rec.OID=rtn;
+                }
+                if(isRecExsit == false)
+                {
+                    sqlCommandText = @"update recinfo set OID = @OID where id = @ID and coid = @Coid";
+                    count =CoreDBconn.Execute(sqlCommandText,rec,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                }
+                if(res.s == 1)
+                {
+                    List<int> idlist = res.d as List<int>;
+                    sqlCommandText = @"update `order` set status = 7,abnormalstatus = @Abnormalstatus,statusdec = '等待订单合并' where id in @ID and coid = @Coid";
+                    count =CoreDBconn.Execute(sqlCommandText,new {Abnormalstatus = reasonid,ID = idlist,Coid = CoID},TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                }
+                TransCore.Commit();
+            }catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            return  result;
+        }
+        ///<summary>
+        ///检查订单是否符合合并的条件
+        ///</summary>
+        public static DataResult isCheckMerge(Order ord)
+        {
+            var result = new DataResult(1,null);   
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string wheresql = "select id from `order` where coid = " + ord.CoID + " and buyershopid = '" + ord.BuyerShopID + "' and recname = '" + ord.RecName + 
+                                      "' and reclogistics = '" + ord.RecLogistics + "' and reccity = '" + ord.RecCity + "' and recdistrict = '" + ord.RecDistrict + 
+                                      "' and recaddress = '" + ord.RecAddress + "' and status in (0,1,7)";
+                    var u = conn.Query<Order>(wheresql).AsList();
+                    if(u.Count > 0)
+                    {
+                        List<int> id = new List<int>();
+                        foreach(var a in u)
+                        {
+                            id.Add(a.ID);
+                        }
+                        result.s = 1;
+                        result.d = id;
+                    }
+                    else
+                    {
+                        result.s = 0;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return result;
+        }
+        ///<summary>
+        ///根据异常原因获取id
+        ///</summary>
+        public static DataResult GetReasonID(string ReasonName,int CoID)
+        {
+            var result = new DataResult(1,null);   
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string wheresql = "select id from orderabnormal where coid = " + CoID + " and name = '" + ReasonName + "' and iscustom = false";
+                    int u = conn.QueryFirst<int>(wheresql);
+                    if(u > 0)
+                    {
+                        result.s = u;
+                    }
+                    else
+                    {
+                        result.s = -1;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return result;
+        }
     }
 }
