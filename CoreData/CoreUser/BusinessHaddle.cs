@@ -13,14 +13,37 @@ namespace CoreData.CoreUser
         ///</summary>
         public static DataResult GetBusiness(int CoID)
         {
-            var result = new DataResult(1,null);        
+            var result = new DataResult(1,null);   
+            var res = new BusinessData();
+            var bu = new Business();
+            bu.ismergeorder = true;
+            bu.isautosetexpress = true;
+            bu.isignoresku = false;
+            bu.isautogoodsreviewed = false;
+            bu.isupdateskuall = false;
+            bu.isupdatepresalesku = false;
+            bu.isskulock = true;
+            bu.ispresaleskulock = true;
+            bu.ischeckfirst = false;
+            bu.isjustcheckex = true;
+            bu.isautosendafftercheck = true;
+            bu.isneedkg = false;
+            bu.isautoremarks = true;
+            bu.isexceptions = true;
+            bu.ispositionaccurate = true;
+            bu.goodsuniquecode = true;
+            bu.isgoodsrule = true;;
+            bu.isbeyondcount = true;
+            bu.pickingmethod = true;
+            bu.tempnominus = false;
+            bu.mixedpicking = false; 
+            res.businessInitData = bu;
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try{
-                    string wheresql = "select id,ismergeorder,isautosetexpress,isignoresku,isautogoodsreviewed,isupdateskuall,isupdatepresalesku,isskulock,ispresaleskulock,ischeckfirst,"+
-                                       "isjustcheckex,isautosendafftercheck,isneedkg,isautoremarks,isexceptions,cabinetheight,cabinetnumber,ispositionaccurate,goodsuniquecode,"+
-                                       "isgoodsrule,isbeyondcount,pickingmethod,tempnominus,mixedpicking from business where coid = " + CoID;
+                    string wheresql = "select * from business where coid = " + CoID;
                     var u = conn.Query<Business>(wheresql).AsList();
-                    result.d = u[0];
+                    res.businessData = u[0] as Business;
+                    result.d = res;
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;

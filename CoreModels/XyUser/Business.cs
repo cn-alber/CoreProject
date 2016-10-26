@@ -28,4 +28,9 @@ namespace CoreModels.XyUser
         public bool tempnominus {get;set;}
         public bool mixedpicking {get;set;}
     }
+    public class BusinessData
+    {
+        public Business businessData{get;set;}
+        public Business businessInitData{get;set;}
+    }
 }
