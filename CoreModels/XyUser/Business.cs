@@ -3,6 +3,7 @@ namespace CoreModels.XyUser
     public class Business
     {
         public int id {get;set;}
+        public int coid {get;set;}
         public bool ismergeorder {get;set;}
         public bool isautosetexpress {get;set;}
         public bool isignoresku {get;set;}
@@ -17,8 +18,8 @@ namespace CoreModels.XyUser
         public bool isneedkg {get;set;}
         public bool isautoremarks {get;set;}
         public bool isexceptions {get;set;}
-        public bool cabinetheight {get;set;}
-        public bool cabinetnumber {get;set;}
+        public int cabinetheight {get;set;}
+        public int cabinetnumber {get;set;}
         public bool ispositionaccurate {get;set;}
         public bool goodsuniquecode {get;set;}
         public bool isgoodsrule {get;set;}

@@ -30,46 +30,9 @@ namespace CoreData.CoreUser
             return result;
         }
         ///<summary>
-        ///新增资料
-        ///</summary>
-        public static DataResult InsertBusiness(Business bu,string UserName,string Company,int CoID)
-        {
-            var result = new DataResult(1,"资料新增成功!");   
-            using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
-                try{
-                    string sqlCommandText = @"INSERT INTO business(ismergeorder,isautosetexpress,isignoresku,isautogoodsreviewed,isupdateskuall,isupdatepresalesku,isskulock,ispresaleskulock,
-                                                ischeckfirst,isjustcheckex,isautosendafftercheck,isneedkg,isautoremarks,isexceptions,cabinetheight,cabinetnumber,ispositionaccurate,goodsuniquecode,
-                                                isgoodsrule,isbeyondcount,pickingmethod,tempnominus,mixedpicking,coid) 
-                                            VALUES(@Ismergeorder,@Isautosetexpress,@Isignoresku,@Isautogoodsreviewed,@Isupdateskuall,@Isupdatepresalesku,@Isskulock,@Ispresaleskulock,
-                                                @Ischeckfirst,@Isjustcheckex,@Isautosendafftercheck,@Isneedkg,@Isautoremarks,@Isexceptions,@Cabinetheight,@Cabinetnumber,@Ispositionaccurate,
-                                                @Goodsuniquecode,@Isgoodsrule,@Isbeyondcount,@Pickingmethod,@Tempnominus,@Mixedpicking,@Coid)";
-                    var args = new {Ismergeorder = bu.ismergeorder,Isautosetexpress = bu.isautosetexpress,Isignoresku = bu.isignoresku,Isautogoodsreviewed = bu.isautogoodsreviewed,
-                                    Isupdateskuall = bu.isupdateskuall,Isupdatepresalesku = bu.isupdatepresalesku,Isskulock = bu.isskulock,Ispresaleskulock = bu.ispresaleskulock,
-                                    Ischeckfirst = bu.ischeckfirst,Isjustcheckex = bu.isjustcheckex,Isautosendafftercheck = bu.isautosendafftercheck,Isneedkg = bu.isneedkg,
-                                    Isautoremarks = bu.isautoremarks,Isexceptions = bu.isexceptions,Cabinetheight = bu.cabinetheight,Cabinetnumber = bu.cabinetnumber,
-                                    Ispositionaccurate = bu.ispositionaccurate,Goodsuniquecode = bu.goodsuniquecode,Isgoodsrule = bu.isgoodsrule,Isbeyondcount = bu.isbeyondcount,
-                                    Pickingmethod = bu.pickingmethod,Tempnominus = bu.tempnominus,Mixedpicking = bu.mixedpicking,Coid = CoID};
-                    int count =conn.Execute(sqlCommandText,args);
-                    if(count < 0)
-                    {
-                        result.s = -3003;
-                    }
-                    else
-                    {
-                        LogComm.InsertUserLog("新增业务流程资料", "business", "新增业务流程",UserName, CoID, DateTime.Now);
-                    }        
-                }catch(Exception ex){
-                    result.s = -1;
-                    result.d = ex.Message;
-                    conn.Dispose();
-                }
-            } 
-            return  result;
-        }
-        ///<summary>
         ///更新资料
         ///</summary>
-        public static DataResult UpdateBusiness(Business bu,string UserName,string Company)
+        public static DataResult UpdateBusiness(Business bu,string UserName,int CoID)
         {
             var result = new DataResult(1,"资料更新成功!");  
             string contents = string.Empty; 
@@ -77,7 +40,7 @@ namespace CoreData.CoreUser
                 try{
                     string wheresql = "select id,ismergeorder,isautosetexpress,isignoresku,isautogoodsreviewed,isupdateskuall,isupdatepresalesku,isskulock,ispresaleskulock,ischeckfirst,"+
                                        "isjustcheckex,isautosendafftercheck,isneedkg,isautoremarks,isexceptions,cabinetheight,cabinetnumber,ispositionaccurate,goodsuniquecode,"+
-                                       "isgoodsrule,isbeyondcount,pickingmethod,tempnominus,mixedpicking from business where id = " + bu.id;
+                                       "isgoodsrule,isbeyondcount,pickingmethod,tempnominus,mixedpicking from business where coid = " + CoID;
                     var u = conn.Query<Business>(wheresql).AsList();
                     if(bu.ismergeorder != u[0].ismergeorder)
                     {
@@ -189,7 +152,6 @@ namespace CoreData.CoreUser
                     }
                     else
                     {
-                        int CoID = 1;
                         LogComm.InsertUserLog("修改业务流程资料", "business", contents, UserName, CoID, DateTime.Now);               
                     }
                 }catch(Exception ex){

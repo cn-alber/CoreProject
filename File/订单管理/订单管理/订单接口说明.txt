@@ -19,3 +19,21 @@ OutPut:     Datacnt         int             资料总笔数
             Pagecnt         decimal         总页数
             Com             List<Purchase>  Purchase 资料
 参考:output jason 文件:PurchaseList_output.json
+
+2.InsertOrder()
+{
+    "Ord": {
+        "ODate": "2016-10-26",
+        "BuyerShopID": "测试1026",
+        "ShopID": 2,
+        "RecName": "测试1026name",
+        "RecLogistics": "江苏省",
+        "RecCity": "苏州市",
+        "RecDistrict": "常熟市",
+        "RecAddress": "可美国际大厦",
+        "RecPhone": "123456789",
+        "RecMessage": "RecMessage1026",
+        "SendMessage": "SendMessage"
+    },
+    "IsFaceToFace": "false"
+}

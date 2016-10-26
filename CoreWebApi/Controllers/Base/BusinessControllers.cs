@@ -5,6 +5,7 @@ using CoreData.CoreUser;
 using CoreModels.XyUser;
 namespace CoreWebApi
 {
+    // [AllowAnonymous]
     public class BusinessController : ControllBase
     {
         [HttpGetAttribute("/Core/Business/GetBusiness")]
@@ -14,25 +15,13 @@ namespace CoreWebApi
             var data = BusinessHaddle.GetBusiness(CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
-
-        [HttpPostAttribute("/Core/Business/InsertBusiness")]
-        public ResponseResult InsertBusiness([FromBodyAttribute]JObject co)
-        {   
-            var business = Newtonsoft.Json.JsonConvert.DeserializeObject<Business>(co["Business"].ToString());
-            string UserName = GetUname(); 
-            string Company = co["Company"].ToString();
-            int CoID = int.Parse(GetCoid());
-            var data = BusinessHaddle.InsertBusiness(business,UserName,Company,CoID);
-            return CoreResult.NewResponse(data.s, data.d, "General"); 
-        }
-
         [HttpPostAttribute("/Core/Business/UpdateBusiness")]
         public ResponseResult UpdateBusiness([FromBodyAttribute]JObject co)
         {   
             var business = Newtonsoft.Json.JsonConvert.DeserializeObject<Business>(co["Business"].ToString());
             string UserName = GetUname(); 
-            string Company = co["Company"].ToString();
-            var data = BusinessHaddle.UpdateBusiness(business,UserName,Company);
+            int CoID = int.Parse(GetCoid());
+            var data = BusinessHaddle.UpdateBusiness(business,UserName,CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     }
