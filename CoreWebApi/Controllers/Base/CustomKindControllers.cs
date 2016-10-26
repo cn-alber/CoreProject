@@ -79,6 +79,27 @@ namespace CoreWebApi
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
+        #region 获取商品属性        
+        [HttpGetAttribute("/Core/XyComm/Customkind/SkuKindProps")]
+        public ResponseResult SkuKindProps(string ID)
+        {
+            var res = new DataResult(1,null);
+             string CoID = GetCoid();
+            int PID = 0;
+            if (int.TryParse(ID, out PID))
+            {
+                PID = int.Parse(ID);
+                res = CustomKindHaddle.GetSkuKindProps(PID, CoID);
+            }
+            else
+            {
+                res.s = -1;
+                res.d = "无效参数ParentID";
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+        
 
         #region 新增商品类目
         [HttpPostAttribute("/Core/XyComm/Customkind/InsertSkuKind")]
@@ -162,25 +183,36 @@ namespace CoreWebApi
         #endregion
 
         #region 商品类目属性
-        [HttpGetAttribute("/Core/XyComm/Customkind/Getskuprop")]
-        public ResponseResult Getskuprop(string ID)
+        [HttpPostAttribute("/Core/XyComm/Customkind/InsertStandardKind")]
+        public ResponseResult InsertStandardKind([FromBodyAttribute]JObject obj)
         {
             int StID;            
-            var res = new DataResult(1, null);
-            if (!int.TryParse(ID, out StID))
+            var res = new DataResult(1, null);            
+            if (!int.TryParse(obj["ID"].ToString(), out StID))
             {
                 res.s = -1;
                 res.d = "无效参数ID";
             }
             else
-            {               
-                string CoID = GetCoid();
-                string UserName = GetUname();
-                res = CustomKindHaddle.InsertKindProps(int.Parse(ID),CoID,UserName);
+            {      
+                var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<CustomKind>(obj.ToString());  
+                cp.Creator = GetUname();       
+                cp.CoID = int.Parse(GetCoid());
+                cp.CreateDate = DateTime.Now.ToString();
+                res = CustomKindHaddle.InsertKindProps(cp);
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
 
+        #endregion
+
+        #region
+        [HttpGetAttribute("/Core/XyComm/Customkind/GetSkuProps")]
+        public ResponseResult GetSkuProps(string Cid)
+        {
+            var res= CoreData.CoreApi.TmallHaddle.itemProps(Cid);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
         #endregion
     }
 }

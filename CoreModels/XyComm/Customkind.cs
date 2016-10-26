@@ -31,8 +31,15 @@ namespace CoreModels.XyComm
     {
 
         private bool _Enable = true;//是否启用
+        private string _Type = "商品类目";
+        private int _ParentID = 0;
+        private long _tb_cid = 0;
         public int ID { get; set; }
-        public string Type { get; set; }
+        public string Type
+        {
+            get { return _Type; }
+            set { this._Type = value; }
+        }
         public string KindName { get; set; }
         public string FullName { get; set; }
         public bool Enable
@@ -41,7 +48,16 @@ namespace CoreModels.XyComm
             set { this._Enable = value; }
         }//是否启用
         public int Order { get; set; }
-        public int ParentID { get; set; }
+        public int ParentID
+        {
+            get { return _ParentID; }
+            set { this._ParentID = value; }
+        }
+        public long tb_cid
+        {
+            get { return _tb_cid; }
+            set { this._tb_cid = value; }
+        }
         public int CoID { get; set; }
         public string Creator { get; set; }
         public string CreateDate { get; set; }
