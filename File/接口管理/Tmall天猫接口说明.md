@@ -175,7 +175,7 @@ function说明
     
 ```
 
-3.onlineSend()            在线订单发货处理（支持货到付款）
+3.itempropsGet()            获取类目属性
 
  路由:`/core/Api/TmTrades/itempropsGet`
  
@@ -324,7 +324,52 @@ function说明
             "m": ""
         }
 ```
+3.sellercatsListGet()            获取自定义类目
 
+ 路由:`/core/Api/TmTrades/sellercatsListGet`
+ 
+ 参数：
+```sh
+    input: 
+            {
+                nick                     店铺昵称
+                token                    授权码
+            }
+     output：
+            {                
+            "s": 1,
+            "d": [
+                {
+                "cid": 1257873181,                  //卖家自定义类目编号
+                "name": "2016秋季热卖",              //卖家自定义类目名称
+                "parent_cid": 0,                    //父类目编号，值等于0：表示此类目为店铺下的一级类目，值不等于0：表示此类目有父类目
+                "pic_url": "",                      //链接图片地址
+                "sort_order": 1,                    //该类目在页面上的排序位置
+                "type": "manual_type",              //店铺类目类型:可选值：manual_type：手动分类，new_type：新品上价， tree_type：二三级类目树 ，property_type：属性叶子类目树， brand_type：品牌推广
+                "children": [
+                    {
+                    "cid": 1266533340,
+                    "name": "秋羽绒",
+                    "parent_cid": 1257873181,
+                    "pic_url": "",
+                    "sort_order": 1,
+                    "type": "manual_type",
+                    "children": null
+                    },
+                    {
+                    "cid": 1266533341,
+                    "name": "夹克",
+                    "parent_cid": 1257873181,
+                    "pic_url": "",
+                    "sort_order": 2,
+                    "type": "manual_type",
+                    "children": null
+                    }]
+                    }],
+            "m": ""            
+            }       
+
+```
 
 3.onlineSend()            在线订单发货处理（支持货到付款）
 

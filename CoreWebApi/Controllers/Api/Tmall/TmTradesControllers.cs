@@ -1,6 +1,7 @@
 using System;
 using CoreData.CoreApi;
 using CoreModels;
+using CoreModels.XyApi.Tmall;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
