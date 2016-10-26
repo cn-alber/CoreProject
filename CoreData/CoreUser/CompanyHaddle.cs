@@ -155,41 +155,84 @@ namespace CoreData.CoreUser
         public static DataResult InsertCompany(Company com,string UserName,int CoID,UserEdit user)
         {
             var result = new DataResult(1,null);   
-            using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
-                try{
-                    string sqlCommandText = @"INSERT INTO company(name,address,email,contacts,telphone,mobile,remark,creator,modifier) VALUES(
-                            @Name,@Address,@Email,@Contacts,@Telphone,@Mobile,@Remark,@Creator,@Modifier)";
-                    com.creator = UserName;
-                    com.createdate = DateTime.Now;
-                    com.modifier = UserName;
-                    com.modifydate = DateTime.Now;
-                    int count =conn.Execute(sqlCommandText,com);
-                    if(count < 0)
-                    {
-                        result.s = -3002;
-                        return  result;
-                    }
-                    int rtn = conn.QueryFirst<int>("select LAST_INSERT_ID()");
-                    sqlCommandText = @"INSERT INTO user(account,name,password,email,gender,mobile,qq,companyid,creator) VALUES(
-                        @Account,@Name,@Password,@Email,@Gender,@Mobile,@Qq,@Companyid,@Creator)";
-                    user.CompanyID = rtn;
-                    user.Creator = UserName;
-                    count =conn.Execute(sqlCommandText,user);
-                    if(count < 0)
-                    {
-                        result.s = -3002;
-                        return result;
-                    }
-                    result.d = rtn;
-                    LogComm.InsertUserLog("新增公司资料", "company", "新增公司" + com.name ,UserName, CoID, DateTime.Now);
-                    com.id = rtn;
-                    CacheBase.Set<Company>("company" + rtn.ToString(), com);   
-                }catch(Exception ex){
-                    result.s = -1;
-                    result.d = ex.Message;
-                    conn.Dispose();
+            var UserDBconn = new MySqlConnection(DbBase.UserConnectString);
+            UserDBconn.Open();
+            var TransUser = UserDBconn.BeginTransaction();
+            try{
+                string sqlCommandText = @"INSERT INTO company(name,address,email,contacts,telphone,mobile,remark,creator,modifier) VALUES(
+                        @Name,@Address,@Email,@Contacts,@Telphone,@Mobile,@Remark,@Creator,@Modifier)";
+                com.creator = UserName;
+                com.createdate = DateTime.Now;
+                com.modifier = UserName;
+                com.modifydate = DateTime.Now;
+                int count =UserDBconn.Execute(sqlCommandText,com,TransUser);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return  result;
                 }
-            } 
+                int rtn = UserDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
+                sqlCommandText = @"INSERT INTO user(account,name,password,email,gender,mobile,qq,companyid,creator) VALUES(
+                    @Account,@Name,@Password,@Email,@Gender,@Mobile,@Qq,@Companyid,@Creator)";
+                user.CompanyID = rtn;
+                user.Creator = UserName;
+                count =UserDBconn.Execute(sqlCommandText,user,TransUser);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                sqlCommandText = @"INSERT INTO business(Coid,IsMergeOrder,IsAutoSetExpress,IsIgnoreSku,IsAutoGoodsReviewed,IsUpdateSkuAll,IsUpdatePreSaleSku,IsSkuLock,
+                                                        IsPreSaleSkuLock,IsCheckFirst,IsJustCheckEX,IsAutoSendAffterCheck,IsNeedKg,IsAutoRemarks,IsExceptions,CabinetHeight,
+                                                        CabinetNumber,IsPositionAccurate,GoodsUniqueCode,IsGoodsRule,IsBeyondCount,PickingMethod,TempNoMinus,MixedPicking) 
+                                                VALUES(@Coid,@IsMergeOrder,@IsAutoSetExpress,@IsIgnoreSku,@IsAutoGoodsReviewed,@IsUpdateSkuAll,@IsUpdatePreSaleSku,@IsSkuLock,
+                                                        @IsPreSaleSkuLock,@IsCheckFirst,@IsJustCheckEX,@IsAutoSendAffterCheck,@IsNeedKg,@IsAutoRemarks,@IsExceptions,@CabinetHeight,
+                                                        @CabinetNumber,@IsPositionAccurate,@GoodsUniqueCode,@IsGoodsRule,@IsBeyondCount,@PickingMethod,@TempNoMinus,@MixedPicking)";
+                var bu = new Business();
+                bu.coid = rtn;
+                bu.ismergeorder = true;
+                bu.isautosetexpress = true;
+                bu.isignoresku = false;
+                bu.isautogoodsreviewed = false;
+                bu.isupdateskuall = false;
+                bu.isupdatepresalesku = false;
+                bu.isskulock = true;
+                bu.ispresaleskulock = true;
+                bu.ischeckfirst = false;
+                bu.isjustcheckex = true;
+                bu.isautosendafftercheck = true;
+                bu.isneedkg = false;
+                bu.isautoremarks = true;
+                bu.isexceptions = true;
+                bu.ispositionaccurate = true;
+                bu.goodsuniquecode = true;
+                bu.isgoodsrule = true;;
+                bu.isbeyondcount = true;
+                bu.pickingmethod = true;
+                bu.tempnominus = false;
+                bu.mixedpicking = false;
+                count =UserDBconn.Execute(sqlCommandText,bu,TransUser);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                result.d = rtn;
+                LogComm.InsertUserLog("新增公司资料", "company", "新增公司" + com.name ,UserName, CoID, DateTime.Now);
+                com.id = rtn;
+                CacheBase.Set<Company>("company" + rtn.ToString(), com);      
+                TransUser.Commit();
+            }catch(Exception ex){
+                TransUser.Rollback();
+                TransUser.Dispose();
+                result.s = -1;
+                result.d = ex.Message;
+            }
+            finally
+            {
+                TransUser.Dispose();
+                UserDBconn.Dispose();
+            }
             return  result;
         }
         ///<summary>

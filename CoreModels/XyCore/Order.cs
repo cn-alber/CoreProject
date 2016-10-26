@@ -260,69 +260,95 @@ namespace CoreModels.XyCore
     }
     public class Order
     {
-        public int id {get;set;}
-        public int mergeoid{get;set;}
-        public int type{get;set;}
-        public int dealertype{get;set;}
-        public bool ismerge{get;set;}
-        public bool issplit{get;set;}
-        public int osource{get;set;}
-        public DateTime odate{get;set;}
-        public int coid{get;set;}
-        public int buyerid{get;set;}
-        public string buyershopid{get;set;}
-        public int shopid{get;set;}
-        public string shopname{get;set;}
-        public string shopsit{get;set;}
-        public long soid{get;set;}
-        public long mergesoid{get;set;}
-        public int ordqty{get;set;}
-        public string amount{get;set;}
-        public string skuamount{get;set;}
-        public string paidamount{get;set;}
-        public string payamount{get;set;}
-        public string examount{get;set;}
-        public bool isinvoice{get;set;}
-        public string invoicetype{get;set;}
-        public string invoicetitle{get;set;}
-        public DateTime invoicedate{get;set;}
-        public bool ispaid{get;set;}
-        public DateTime paydate{get;set;}
-        public string paynbr{get;set;}
-        public bool iscod{get;set;}
-        public int status{get;set;}
-        public int abnormalstatus{get;set;}
-        public string statusdec{get;set;}
-        public string shopstatus{get;set;}
-        public string recname{get;set;}
-        public string reclogistics{get;set;}
-        public string reccity{get;set;}
-        public string recdistrict{get;set;}
-        public string recaddress{get;set;}
-        public string reczip{get;set;}
-        public string rectel{get;set;}
-        public string recphone{get;set;}
-        public string recmessage{get;set;}
-        public string sendmessage{get;set;}
-        public string express{get;set;}
-        public int exid{get;set;}
-        public string excode{get;set;}
-        public string excost{get;set;}
-        public string exweight{get;set;}
-        public string distributor{get;set;}
-        public string supdistributor{get;set;}
-        public DateTime plandate{get;set;}
-        public string sendwarehouse{get;set;}
-        public DateTime senddate{get;set;}
-        public string creator{get;set;}
-        public DateTime createdate{get;set;}
-        public string modifier{get;set;}
-        public DateTime modifydate{get;set;}
+        public int ID {get;set;}
+        public int MergeOID{get;set;}
+        public int Type{get;set;}
+        public int DealerType{get;set;}
+        public bool IsMerge{get;set;}
+        public bool IsSplit{get;set;}
+        public int OSource{get;set;}
+        public DateTime ODate{get;set;}
+        public int CoID{get;set;}
+        public int BuyerID{get;set;}
+        public string BuyerShopID{get;set;}
+        public int ShopID{get;set;}
+        public string ShopName{get;set;}
+        public string ShopSit{get;set;}
+        public long SoID{get;set;}
+        public long MergeSoID{get;set;}
+        public int OrdQty{get;set;}
+        public string Amount{get;set;}
+        public string SkuAmount{get;set;}
+        public string PaidAmount{get;set;}
+        public string PayAmount{get;set;}
+        public string ExAmount{get;set;}
+        public bool IsInvoice{get;set;}
+        public string InvoiceType{get;set;}
+        public string InvoiceTitle{get;set;}
+        public DateTime InvoiceDate{get;set;}
+        public bool IsPaid{get;set;}
+        public DateTime PayDate{get;set;}
+        public string PayNbr{get;set;}
+        public bool IsCOD{get;set;}
+        public int Status{get;set;}
+        public int AbnormalStatus{get;set;}
+        public string StatusDec{get;set;}
+        public string ShopStatus{get;set;}
+        public string RecName{get;set;}
+        public string RecLogistics{get;set;}
+        public string RecCity{get;set;}
+        public string RecDistrict{get;set;}
+        public string RecAddress{get;set;}
+        public string RecZip{get;set;}
+        public string RecTel{get;set;}
+        public string RecPhone{get;set;}
+        public string RecMessage{get;set;}
+        public string SendMessage{get;set;}
+        public string Express{get;set;}
+        public int ExID{get;set;}
+        public string ExCode{get;set;}
+        public string ExCost{get;set;}
+        public string ExWeight{get;set;}
+        public string Distributor{get;set;}
+        public string SupDistributor{get;set;}
+        public DateTime PlanDate{get;set;}
+        public string SendWarehouse{get;set;}
+        public DateTime SendDate{get;set;}
+        public string Creator{get;set;}
+        public DateTime CreateDate{get;set;}
+        public string Modifier{get;set;}
+        public DateTime ModifyDate{get;set;}
     }
     public class OrderData
     {
         public int Datacnt {get;set;}//总资料笔数
         public decimal Pagecnt{get;set;}//总页数
         public List<Order> Ord {get;set;}//订单资料List
+    }
+    public class RecInfo
+    {
+        public int ID{get;set;}
+        public string BuyerId{get;set;}
+        public string Receiver{get;set;}
+        public string Tel{get;set;}
+        public string Phone{get;set;}
+        public string Address{get;set;}
+        public string Logistics{get;set;}
+        public string City{get;set;}
+        public string District{get;set;}
+        public string ZipCode{get;set;}
+        public string Express{get;set;}
+        public int ExID{get;set;}
+        public string ExCode{get;set;}
+        public decimal ExCost{get;set;}
+        public decimal Weight{get;set;}
+        public int OID{get;set;}
+        public int CoID{get;set;}
+        public string Creator{get;set;}
+        public string ShopSit{get;set;}
+    }
+    public class Logistics
+    {
+
     }
 }

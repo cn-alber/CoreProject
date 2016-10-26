@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Text;
-using CoreData;
 using CoreModels;
 using CoreModels.XyApi.Tmall;
 using Dapper;
@@ -12,15 +9,8 @@ using Newtonsoft.Json;
 
 namespace CoreData.CoreApi
 {
-    public  class TmallHaddle{
-        
-        private static string SERVER_URL = "http://gw.api.taobao.com/router/rest";
-        //private static string SERVER_URL = "http://gw.api.tbsandbox.com/router/rest";
-        private static string SECRET ="f60e6b4c6565ecc865e7301ad02ef6a4";
-        //private static string SECRET = "sandboxc6565ecc865e7301ad02ef6a4";//沙箱        
-
-        public static string ITEM_PROPS = @"pid,name,must,multi,prop_values,features,is_color_prop,is_sale_prop,is_key_prop,is_enum_prop,is_item_prop, features,status,sort_order,
-                                            is_allow_alias,is_input_prop,taosir_do,is_material,material_do,expr_el_list";
+    public  class TmallHaddle:TmallBase
+    {     
         private static IDictionary<string, string> Tmparam = new Dictionary<string, string>{
             {"app_key", "23476390"},
             //{"app_key", "1023476390"},//沙箱            

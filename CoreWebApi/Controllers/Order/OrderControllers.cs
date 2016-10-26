@@ -222,5 +222,21 @@ namespace CoreWebApi
             var data = OrderHaddle.GetOrderList(cp);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Order/InsertOrder")]
+        public ResponseResult InsertOrd([FromBodyAttribute]JObject co)
+        {   
+            var ord = Newtonsoft.Json.JsonConvert.DeserializeObject<Order>(co["Ord"].ToString());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            string FaceToFace = co["IsFaceToFace"].ToString();
+            bool IsFaceToFace = false;
+            if(FaceToFace.ToUpper() == "TRUE")
+            {
+                IsFaceToFace = true;
+            }
+            var data = OrderHaddle.InsertOrder(ord,username,CoID,IsFaceToFace);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }
