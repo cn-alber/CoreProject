@@ -20,7 +20,7 @@ namespace CoreData.CoreUser
                                        "isjustcheckex,isautosendafftercheck,isneedkg,isautoremarks,isexceptions,cabinetheight,cabinetnumber,ispositionaccurate,goodsuniquecode,"+
                                        "isgoodsrule,isbeyondcount,pickingmethod,tempnominus,mixedpicking from business where coid = " + CoID;
                     var u = conn.Query<Business>(wheresql).AsList();
-                    result.d = u;
+                    result.d = u[0];
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
@@ -138,13 +138,13 @@ namespace CoreData.CoreUser
                                         isupdateskuall = @Isupdateskuall,isupdatepresalesku = @Isupdatepresalesku,isskulock= @Isskulock,ispresaleskulock = @Ispresaleskulock,ischeckfirst = @Ischeckfirst,
                                         isjustcheckex = @Isjustcheckex,isautosendafftercheck = @Isautosendafftercheck,isneedkg = @Isneedkg,isautoremarks = @Isautoremarks,isexceptions = @Isexceptions,
                                         cabinetheight = @Cabinetheight,cabinetnumber = @Cabinetnumber,ispositionaccurate = @Ispositionaccurate,goodsuniquecode = @Goodsuniquecode,isgoodsrule = @Isgoodsrule,
-                                        isbeyondcount = @Isbeyondcount,pickingmethod = @Pickingmethod,tempnominus = @Tempnominus,mixedpicking = @Mixedpicking where id = @ID";
+                                        isbeyondcount = @Isbeyondcount,pickingmethod = @Pickingmethod,tempnominus = @Tempnominus,mixedpicking = @Mixedpicking where coid = @CoID";
                     var args = new {Ismergeorder = bu.ismergeorder,Isautosetexpress = bu.isautosetexpress,Isignoresku = bu.isignoresku,Isautogoodsreviewed = bu.isautogoodsreviewed,
                                     Isupdateskuall = bu.isupdateskuall,Isupdatepresalesku = bu.isupdatepresalesku,Isskulock = bu.isskulock,Ispresaleskulock = bu.ispresaleskulock,
                                     Ischeckfirst = bu.ischeckfirst,Isjustcheckex = bu.isjustcheckex,Isautosendafftercheck = bu.isautosendafftercheck,Isneedkg = bu.isneedkg,
                                     Isautoremarks = bu.isautoremarks,Isexceptions = bu.isexceptions,Cabinetheight = bu.cabinetheight,Cabinetnumber = bu.cabinetnumber,
                                     Ispositionaccurate = bu.ispositionaccurate,Goodsuniquecode = bu.goodsuniquecode,Isgoodsrule = bu.isgoodsrule,Isbeyondcount = bu.isbeyondcount,
-                                    Pickingmethod = bu.pickingmethod,Tempnominus = bu.tempnominus,Mixedpicking = bu.mixedpicking,ID = bu.id};
+                                    Pickingmethod = bu.pickingmethod,Tempnominus = bu.tempnominus,Mixedpicking = bu.mixedpicking,CoID = CoID};
                     int count = conn.Execute(uptsql,args);
                     if(count < 0)
                     {
