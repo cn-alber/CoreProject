@@ -66,15 +66,15 @@ namespace CoreData.CoreApi
                 content.receiver_info = new CnTmsMailnoReceiverinfoDomain();
                 content.receiver_info.receiver_province="江苏省";
                 content.receiver_info.receiver_city="苏州市";
-                content.receiver_info.receiver_address = "江苏省苏州市常熟市梅李镇将泾村33号（226村道西150米瑞益纺织旁）";
+                content.receiver_info.receiver_address = "江苏省 苏州市 常熟市 梅李镇将泾村33号（226村道西150米瑞益纺织旁）";
                 content.receiver_info.receiver_mobile = "13776218043";
 
                 content.sender_info = new CnTmsMailnoSenderinfoDomain();
                 content.sender_info.sender_province="江苏省";
                 content.sender_info.sender_city = "苏州市";
-                content.sender_info.sender_address = "江苏省苏州市常熟市虞山镇莫城管理区可美大厦七楼";
-                content.sender_info.sender_name = "南极云商";
-                content.sender_info.sender_mobile = "13776218043";
+                content.sender_info.sender_address = "江苏省 苏州市 常熟市 莫城管理区苏常公路戴家滨桥南，携云华东仓";
+                content.sender_info.sender_name = "南极人";
+                content.sender_info.sender_mobile = "15151434621";
 
 
                 var item = new CnTmsMailnoItemDomain();
@@ -84,9 +84,9 @@ namespace CoreData.CoreApi
                 Console.OutputEncoding = System.Text.Encoding.UTF8;
                 content.items.Add(item);
                                 
-                content.order_source = "TB";
+                content.order_source = "TM";
                 content.solutions_code="DM092876";
-                content.trade_id = "58021";
+                content.trade_id = "2605837640524916";
                 
                 Console.WriteLine("-----------------");
                 Console.WriteLine(JsonConvert.SerializeObject(content));
