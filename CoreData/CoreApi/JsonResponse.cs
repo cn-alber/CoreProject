@@ -26,13 +26,14 @@ namespace CoreData.CoreApi
                     httpClient.MaxResponseContentBufferSize = 9999999;                                                                    
                     httpClient.DefaultRequestHeaders.Add("user-agent", DefaultUserAgent);//                    
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-www-form-urlencoded"));
-                    httpClient.DefaultRequestHeaders.Add("Accept-Charset", "gb2312");                     
+                    //httpClient.DefaultRequestHeaders.Add("Accept-Charset", "gb2312");                     
                 
                     List<KeyValuePair<String, String>> paramList = new List<KeyValuePair<String, String>>();
                     foreach( KeyValuePair<string, string> kvp in parameters)
                     {
                         paramList.Add(kvp); 
                     }
+                   
                     // var request = new StringContent(JsonConvert.SerializeObject(obj),
                     //         Encoding.UTF8, "application/x-www-form-urlencoded");
                     // Console.WriteLine(request.ToString());
