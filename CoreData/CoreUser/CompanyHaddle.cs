@@ -196,7 +196,7 @@ namespace CoreData.CoreUser
                 bu.isautogoodsreviewed = false;
                 bu.isupdateskuall = false;
                 bu.isupdatepresalesku = false;
-                bu.isskulock = true;
+                bu.isskulock = 1;
                 bu.ispresaleskulock = true;
                 bu.ischeckfirst = false;
                 bu.isjustcheckex = true;
@@ -206,9 +206,9 @@ namespace CoreData.CoreUser
                 bu.isexceptions = true;
                 bu.ispositionaccurate = true;
                 bu.goodsuniquecode = true;
-                bu.isgoodsrule = true;;
-                bu.isbeyondcount = true;
-                bu.pickingmethod = true;
+                bu.isgoodsrule = 1;;
+                bu.isbeyondcount = 1;
+                bu.pickingmethod = 1;
                 bu.tempnominus = false;
                 bu.mixedpicking = false;
                 count =UserDBconn.Execute(sqlCommandText,bu,TransUser);

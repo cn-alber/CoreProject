@@ -53,14 +53,19 @@ namespace CoreModels.XyComm
             get { return _ParentID; }
             set { this._ParentID = value; }
         }
-        public long tb_cid
+        public long tb_cid 
         {
             get { return _tb_cid; }
             set { this._tb_cid = value; }
         }
+        public long cid { get; set; }//卖家自定义类目编号
+        public long parent_cid { get; set; } //卖家自定义父类目编号，
+        public string pic_url { get; set; }//链接图片地址
         public int CoID { get; set; }
         public string Creator { get; set; }
         public string CreateDate { get; set; }
+        public string Modifier { get; set; }
+        public string ModifyDate { get; set; }
     }
 
     public class CustomKindData
@@ -76,5 +81,16 @@ namespace CoreModels.XyComm
         public string Creator { get; set; }
         public string CreateDate { get; set; }
         public List<CustomKindData> Children { get; set; }
+    }
+
+    public class TmaoData
+    {
+        public long cid { get; set; }
+        public string name { get; set; }
+        public string pic_url { get; set; }
+        public long parent_cid { get; set; }
+        public int sort_order { get; set; }
+        public string type { get; set; }
+        public List<TmaoData> children { get; set; }
     }
 }
