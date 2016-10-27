@@ -83,8 +83,8 @@ namespace CoreWebApi
         [HttpGetAttribute("/Core/XyComm/Customkind/SkuKindProps")]
         public ResponseResult SkuKindProps(string ID)
         {
-            var res = new DataResult(1,null);
-             string CoID = GetCoid();
+            var res = new DataResult(1, null);
+            string CoID = GetCoid();
             int PID = 0;
             if (int.TryParse(ID, out PID))
             {
@@ -99,7 +99,7 @@ namespace CoreWebApi
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
-        
+
 
         #region 新增商品类目
         [HttpPostAttribute("/Core/XyComm/Customkind/InsertSkuKind")]
@@ -182,21 +182,21 @@ namespace CoreWebApi
         }
         #endregion
 
-        #region 商品类目属性
+        #region 导入标准商品类目
         [HttpPostAttribute("/Core/XyComm/Customkind/InsertStandardKind")]
         public ResponseResult InsertStandardKind([FromBodyAttribute]JObject obj)
         {
-            int StID;            
-            var res = new DataResult(1, null);            
+            int StID;
+            var res = new DataResult(1, null);
             if (!int.TryParse(obj["ID"].ToString(), out StID))
             {
                 res.s = -1;
                 res.d = "无效参数ID";
             }
             else
-            {      
-                var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<CustomKind>(obj.ToString());  
-                cp.Creator = GetUname();       
+            {
+                var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<CustomKind>(obj.ToString());
+                cp.Creator = GetUname();
                 cp.CoID = int.Parse(GetCoid());
                 cp.CreateDate = DateTime.Now.ToString();
                 res = CustomKindHaddle.InsertKindProps(cp);
@@ -212,20 +212,44 @@ namespace CoreWebApi
         {
             int CoID = int.Parse(GetCoid());
             string UserName = GetUname();
-            var res = CustomKindHaddle.InsertTmaoKind(CoID,UserName);
+            var res = CustomKindHaddle.InsertTmaoKind(CoID, UserName);
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
+
+
+        #region 新增商品属性值
+        [HttpPostAttribute("/Core/XyComm/Customkind/")]
+        public ResponseResult InsertSkuProps([FromBodyAttribute]JObject obj)
+        {
+            var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<Customkind_props>(obj.ToString());
+            cp.CoID = int.Parse(GetCoid());
+            cp.Creator = GetUname();
+            cp.CreateDate = DateTime.Now.ToString();
+            var res = CustomKindPropsHaddle.InsertProps(cp);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+
+
+
+
+
+
+
 
         #region
         [HttpGetAttribute("/Core/XyComm/Customkind/GetSkuProps")]
         public ResponseResult GetSkuProps()
         {
-            var res= CoreData.CoreApi.TmallHaddle.GetSellercatsList("南极人羽绒旗舰店");
-            //TmallHaddle.itemProps(Cid);
+            // var res = CoreData.CoreApi.TmallHaddle.GetSellercatsList("南极人羽绒旗舰店");
+            var res = CoreData.CoreApi.TmallHaddle.itemProps("3035");
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
+
+
     }
 }
 
