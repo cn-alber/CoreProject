@@ -11,44 +11,44 @@ namespace CoreData.CoreApi
 {
     public  class TmallHaddle:TmallBase
     {     
-        private static IDictionary<string, string> Tmparam = new Dictionary<string, string>{
-            {"app_key", "23476390"},
-            //{"app_key", "1023476390"},//沙箱            
-            {"format","json"},
-            {"sign_method","md5"},
-            {"timestamp", System.DateTime.Now.AddMinutes(6).ToString("yyyy-MM-dd HH:mm:ss")},
-            {"v", "2.0"},            
-        }; 
-        private static void cleanParam(){
-            List<string> rmlist = new List<string>();
-            foreach (var item in Tmparam)
-            {                
-                if(item.Key !="app_key"&&item.Key !="format"&&item.Key !="sign_method"&&item.Key !="timestamp"&&item.Key !="v")                        
-                    rmlist.Add(item.Key);                    
-            }
-            foreach(var rmkey in rmlist){
-                Tmparam.Remove(rmkey);
-            }        
-        }
+        // private static IDictionary<string, string> Tmparam = new Dictionary<string, string>{
+        //     {"app_key", "23476390"},
+        //     //{"app_key", "1023476390"},//沙箱            
+        //     {"format","json"},
+        //     {"sign_method","md5"},
+        //     {"timestamp", System.DateTime.Now.AddMinutes(6).ToString("yyyy-MM-dd HH:mm:ss")},
+        //     {"v", "2.0"},            
+        // }; 
+        // private static void cleanParam(){
+        //     List<string> rmlist = new List<string>();
+        //     foreach (var item in Tmparam)
+        //     {                
+        //         if(item.Key !="app_key"&&item.Key !="format"&&item.Key !="sign_method"&&item.Key !="timestamp"&&item.Key !="v")                        
+        //             rmlist.Add(item.Key);                    
+        //     }
+        //     foreach(var rmkey in rmlist){
+        //         Tmparam.Remove(rmkey);
+        //     }        
+        // }
         
-        private static void removeEmptyParam(){
-            IEnumerator<KeyValuePair<string, string>> dem = Tmparam.GetEnumerator();
-            List<string> rmlist = new List<string>();
-            while (dem.MoveNext())
-            {
-                string key = dem.Current.Key;
-                string value = dem.Current.Value;
-                if (string.IsNullOrEmpty(value))
-                {
-                     rmlist.Add(key); 
-                     //Tmparam.Remove(key);               
-                }
-            }
-            foreach(var rmkey in rmlist){
-                Tmparam.Remove(rmkey);
-            }  
+        // private static void removeEmptyParam(){
+        //     IEnumerator<KeyValuePair<string, string>> dem = Tmparam.GetEnumerator();
+        //     List<string> rmlist = new List<string>();
+        //     while (dem.MoveNext())
+        //     {
+        //         string key = dem.Current.Key;
+        //         string value = dem.Current.Value;
+        //         if (string.IsNullOrEmpty(value))
+        //         {
+        //              rmlist.Add(key); 
+        //              //Tmparam.Remove(key);               
+        //         }
+        //     }
+        //     foreach(var rmkey in rmlist){
+        //         Tmparam.Remove(rmkey);
+        //     }  
 
-        }
+        // }
 
 
 
