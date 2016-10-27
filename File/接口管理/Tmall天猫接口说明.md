@@ -780,5 +780,10 @@ function说明
 }
 ```
 
+15.WaybillIIGet()            菜鸟电子面单的云打印申请电子面单号
 
+ 路由:`/core/Api/TmCaiNiao/WaybillIIGet`
+
+ 参数 参考地址：： http://open.taobao.com/docs/doc.htm?spm=a219a.7629140.0.0.WkHGkn&treeId=17&articleId=26869&docType=2
+ 
 
