@@ -483,8 +483,10 @@ namespace CoreData.CoreComm
                         {
                             dynamic item_sku_props = result.d;
                             var ItemPropLst = new List<Customkind_props>();//商品类目属性
+                            var ItemPropValLst = new List<Customkind_props_value>();//商品类目属性之可选属性值
                             var ColorLst = new List<CoreColor>();//颜色属性
                             var SizeLst = new List<CoreSize>();//尺码熟悉
+                            int order = 1;
                             foreach (var item in item_sku_props["item_props"])
                             {
                                 var prop = new Customkind_props();
@@ -516,20 +518,35 @@ namespace CoreData.CoreComm
                                 {
                                     prop.multi = item["multi"];
                                 }
-                                if (item["prop_values"] != null)
+                                int ValOrder = 1;
+                                if (item["prop_values"]!=null&&item["prop_values"]["prop_value"] != null)
                                 {
-                                    prop.values = Newtonsoft.Json.JsonConvert.SerializeObject(item["prop_values"]);
+                                    foreach(var v in item["prop_values"]["prop_value"])
+                                    {
+                                        var PropVal = new Customkind_props_value();
+                                        PropVal.vid = v["vid"];
+                                        PropVal.name = v["name"];
+                                        PropVal.kindid = kindid;
+                                        PropVal.pid =item["pid"];
+                                        PropVal.tb_cid = Kind_standard.tb_cid;
+                                        PropVal.Creator = IParam.Creator;
+                                        PropVal.CreateDate = IParam.CreateDate;
+                                        PropVal.CoID = IParam.CoID;
+                                        PropVal.Order = ValOrder;
+                                        ValOrder++;
+                                        ItemPropValLst.Add(PropVal);
+                                    }
+                                    // prop.values = Newtonsoft.Json.JsonConvert.SerializeObject(item["prop_values"]);
                                 }
-                                if (item["pid"] != null)
-                                {
-                                    prop.pid = item["pid"];
-                                }
+                                prop.pid = item["pid"];
                                 prop.name = item["name"];
                                 prop.kindid = kindid;
                                 prop.tb_cid = Kind_standard.tb_cid;
                                 prop.Creator = IParam.Creator;
                                 prop.CreateDate = IParam.CreateDate;
                                 prop.CoID = IParam.CoID;
+                                prop.Order = order;
+                                order++;
                                 ItemPropLst.Add(prop);
                             }
 
@@ -583,6 +600,18 @@ namespace CoreData.CoreComm
                             {
                                 conn.Execute(AddSizeSql(), SizeLst, Trans);
                             }
+                            if(ItemPropValLst.Count>0)
+                            {
+                                conn.Execute(AddKindPropValueSql(),ItemPropValLst,Trans);
+                                string uptvalsql=@"UPDATE customkind_props_value,
+                                                    customkind_props
+                                                    SET customkind_props_value.propid = customkind_props.id
+                                                    WHERE
+                                                        customkind_props_value.kindid = customkind_props.kindid
+                                                    AND customkind_props_value.pid = customkind_props.pid
+                                                    AND customkind_props_value.kindid = @kindid";
+                                conn.Execute(uptvalsql,new{kindid=kindid},Trans);
+                            }                            
                             Trans.Commit();
                             CoreUser.LogComm.InsertUserLog("新增商品类目", "Customkind", "新增标准类目" + Kind_standard.name, IParam.Creator, IParam.CoID, DateTime.Now);
                             result.d = "";
@@ -730,36 +759,7 @@ namespace CoreData.CoreComm
             return result;
         }
         #endregion
-
-        #region 商品类目属性增删改
-        public static DataResult InsertItemProps()
-        {
-            var result = new DataResult(1, null);
-            var conn = new MySqlConnection(DbBase.CommConnectString);
-            conn.Open();
-            var Trans = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
-            try
-            { 
-
-            }
-            catch (Exception e)
-            {
-                Trans.Rollback();
-                result.s = -1;
-                result.d = e.Message;
-            }
-            finally
-            {
-                Trans.Dispose();
-                conn.Dispose();
-                conn.Close();
-            }
-            return result;
-        }
-
-
-        #endregion
-
+       
         #region 新增商品类目
         public static string AddKindSql()
         {
@@ -812,6 +812,7 @@ namespace CoreData.CoreComm
                                     multi,
                                     tb_cid,
                                     `values`,
+                                    Enable,
                                     Creator,
                                     CreateDate,
                                     CoID ) 
@@ -828,9 +829,49 @@ namespace CoreData.CoreComm
                                     @multi,
                                     @tb_cid,
                                     @values,
+                                    @Enable,
                                     @Creator,
                                     @CreateDate,
                                     @CoID ) ";
+            return sql;
+        }
+        #endregion
+        #region 新增类目属性可选值
+        public static string AddKindPropValueSql()
+        {
+            string sql = @"INSERT INTO customkind_props_value (
+                                        `name`,
+                                        propid,
+                                        kindid,
+                                        vid,
+                                        pid,
+                                        tb_cid,
+                                        `Order`,
+                                        `Enable`,
+                                        ParentID,
+                                        Creator,
+                                        CreateDate,
+                                        Modifier,
+                                        ModifyDate,
+                                        CoID
+                                    )
+                                    VALUES
+                                        (
+                                            @name,
+                                            @propid,
+                                            @kindid,
+                                            @vid,
+                                            @pid,
+                                            @tb_cid,
+                                            @ORDER,
+                                            @ENABLE,
+                                            @ParentID,
+                                            @Creator,
+                                            @CreateDate,
+                                            @Modifier,
+                                            @ModifyDate,
+                                            @CoID
+                                        ) ";
             return sql;
         }
         #endregion
@@ -888,5 +929,6 @@ namespace CoreData.CoreComm
             return sql;
         }
         #endregion
+    
     }
 }
