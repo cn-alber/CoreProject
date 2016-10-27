@@ -444,7 +444,7 @@ namespace CoreData.CoreComm
         }
         #endregion
 
-        #region 新增商品类目属性
+        #region 新增标准商品类目属性
         public static DataResult InsertKindProps(CustomKind IParam)
         {
             var result = new DataResult(1, null);
@@ -656,7 +656,8 @@ namespace CoreData.CoreComm
                                     cid =@cid,
                                     parent_cid =@parent_cid,
                                     Modifier =@Modifier,
-                                    ModifyDate =@ModifyDate
+                                    ModifyDate =@ModifyDate,
+                                    IsDelete=0
                                 WHERE
                                     ID =@ID";
                     conn.Execute(uptsql, UptKindLst);
@@ -690,9 +691,6 @@ namespace CoreData.CoreComm
             }
             return result;
         }
-        #endregion
-
-        #region 
         public static DataResult AddTmaoKind(List<cat_item> TmaoDataLst, int CoID, string UserName)
         {
             var result = new DataResult(1, null);
@@ -733,6 +731,34 @@ namespace CoreData.CoreComm
         }
         #endregion
 
+        #region 商品类目属性增删改
+        public static DataResult InsertItemProps()
+        {
+            var result = new DataResult(1, null);
+            var conn = new MySqlConnection(DbBase.CommConnectString);
+            conn.Open();
+            var Trans = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
+            try
+            { 
+
+            }
+            catch (Exception e)
+            {
+                Trans.Rollback();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                Trans.Dispose();
+                conn.Dispose();
+                conn.Close();
+            }
+            return result;
+        }
+
+
+        #endregion
 
         #region 新增商品类目
         public static string AddKindSql()
