@@ -12,7 +12,7 @@ namespace CoreData.CoreApi
         public readonly static string ITEM_PROPS = @"pid,name,must,multi,prop_values,features,is_color_prop,is_sale_prop,is_key_prop,is_enum_prop,is_item_prop, features,status,sort_order,
                                             is_allow_alias,is_input_prop,taosir_do,is_material,material_do,expr_el_list";
 
-        public readonly static string TOKEN = "6202620e6f344bc7a7adb2886ba4ZZ9bd8442fbe60465632058964557";                                            
+        public readonly static string TOKEN = "6201025aabf03fc7e2a6e8c4587cd5096ZZa6f4d579d8302058964557";                                            
 
         
 

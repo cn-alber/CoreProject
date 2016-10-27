@@ -780,10 +780,64 @@ function说明
 }
 ```
 
-15.WaybillIIGet()            菜鸟电子面单的云打印申请电子面单号
+16.WaybillIIGet()            菜鸟电子面单的云打印申请电子面单号
 
  路由:`/core/Api/TmCaiNiao/WaybillIIGet`
 
- 参数 参考地址：： http://open.taobao.com/docs/doc.htm?spm=a219a.7629140.0.0.WkHGkn&treeId=17&articleId=26869&docType=2
- 
+ input：
+     参考地址：： http://open.taobao.com/docs/doc.htm?spm=a219a.7629140.0.0.WkHGkn&treeId=17&articleId=26869&docType=2
+ output：
+ ```sh
+    {
+    "s": 1,
+    "d": {
+         [{
+            "object_id": "1",
+            "print_data": "{'data':{'cpCode':'YTO','recipient':{'address':{'city':'苏州市','detail':'梅李镇将泾村33号（226村道西150米瑞益纺织旁）','district':'常熟市','province':'江苏省'},'mobile':'13776218043','name':'陈杰'},
+                            'routingInfo':{'consolidation':{'code':'512102'},'origin':{'code':'512102','name':'江苏省苏州市常熟市'},'routeCode':'413-820 011','sortation':{'name':'常熟'}},
+                            'sender':{'address':{'city':'苏州市','detail':'莫城环来泾路南极云商仓库部','district':'常熟市','province':'江苏省'},'mobile':'15151434621','name':'南极人'},
+                            'shippingOption':{'code':'STANDARD_EXPRESS','title':'标准快递'},'waybillCode':'883190525934835804'},'signature':'MD:ACs6iwf4KHLCtd8ohW3lyg==','templateURL':'http://cloudprint.cainiao.com/template/standard/101/524'}",
+            "waybill_code": "883190525934835804"
+        },
+        {},
+        {}]    
+    },
+    "m": ""
+    }
+
+ ```
+
+17.waybillIIQueryByCode()            通过面单号查询电子面单信息
+
+ 路由:`/core/Api/TmCaiNiao/waybillIIQueryByCode`
+
+ input:
+    参考网址： http://open.taobao.com/docs/doc.htm?spm=a219a.7629140.0.0.gSnxce&treeId=17&articleId=104859&docType=1
+ output
+```sh
+{
+  "s": 1,
+  "d": {
+         [
+          {
+            "success": true,
+            "waybill_cloud_print_response": {
+              "print_data": "{'data':{'cpCode':'YTO','recipient':{'address':{'city':'苏州市','detail':'梅李镇将泾村33号（226村道西150米瑞益纺织旁）','district':'常熟市','province':'江苏省'},'name':'陈杰','phone':'13776218043'},'routingInfo':{'consolidation':{'code':'512102','name':''},'origin':{'code':'512102','name':'江苏省苏州市常熟市'},'routeCode':'413-820 011','sortation':{'name':'常熟'}},'sender':{'address':{'city':'苏州市','detail':'莫城管理区苏常公路戴家滨桥南，携云华东仓，收件人：南极人  电话：18913668709','district':'常熟市','province':'江苏省'}},'shippingOption':{'code':'STANDARD_EXPRESS','title':'标准快递'},'waybillCode':'883162716003542975'},'signature':'MD:5thtqgb33Limln2kEl5O4A=='}",
+              "waybill_code": "883162716003542975"
+            }
+          },
+          { },
+          { }
+        ]
+  },
+  "m": ""
+}
+
+```
+
+
+
+
+
+
 

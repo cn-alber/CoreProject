@@ -940,9 +940,13 @@ namespace CoreData.CoreApi
               
                         foreach(var item in res.itemprops_get_response.item_props.item_prop){
                             if(!Convert.ToBoolean(JsonConvert.SerializeObject(item.is_item_prop)) && Convert.ToBoolean(JsonConvert.SerializeObject(item.is_sale_prop))){ 
-                                sku_props.Add(item);
+                                if(item.prop_values!=null && Convert.ToString(item.prop_values.pid) != "42860829"){
+                                    sku_props.Add(item);
+                                }                                
                             }else{
-                                item_props.Add(item);
+                                if(item.prop_values!=null && Convert.ToString(item.prop_values.pid) != "42860829"){
+                                    item_props.Add(item);
+                                }
                             }
                         }
                         var d = new System.Collections.Generic.Dictionary<string, object>();

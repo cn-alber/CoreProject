@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CoreData.CoreApi;
 using CoreModels;
 using CoreModels.XyApi.Tmall;
@@ -19,11 +20,12 @@ namespace CoreWebApi.Api.Tmall{
         }
         #endregion
 
-        #region
-        [HttpGetAttribute("/core/Api/TmCaiNiao/waybillIIQueryByCode")]
-        public ResponseResult waybillIIQueryByCode(){
+        #region 通过面单号查询电子面单信息
+        [HttpPostAttribute("/core/Api/TmCaiNiao/waybillIIQueryByCode")]
+        public ResponseResult waybillIIQueryByCode([FromBodyAttribute]JObject obj){
             var m = new DataResult(1,null);            
-            m = CaiNiaoHaddle.waybillIIQueryByCode();            
+            var waybill = Newtonsoft.Json.JsonConvert.DeserializeObject<List<WaybillDetailQueryByWaybillCodeRequest>>(obj.ToString());
+            m = CaiNiaoHaddle.waybillIIQueryByCode(waybill);            
             return CoreResult.NewResponse(m.s, m.d, "Api");
         }
         #endregion

@@ -73,7 +73,7 @@ namespace CoreData.CoreApi
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;                     
                 }else{
-                    result.d = res;
+                    result.d = res.cainiao_waybill_ii_get_response.modules.waybill_cloud_print_response;
                 }            
             }catch(Exception ex){                
                 result.s = -1;
@@ -88,21 +88,13 @@ namespace CoreData.CoreApi
 
          #region 
         /// <summary>
-        ///   参考网址： 
+        ///  通过面单号查询电子面单信息  参考网址： http://open.taobao.com/docs/doc.htm?spm=a219a.7629140.0.0.gSnxce&treeId=17&articleId=104859&docType=1
         /// </summary>
-        /// <param name=""></param>
-        /// <param name=""></param>
-        public static DataResult waybillIIQueryByCode (){
+        public static DataResult waybillIIQueryByCode (List<WaybillDetailQueryByWaybillCodeRequest> waybill){
             var result = new DataResult(1,null);
             try{                                        
                 Tmparam.Add("method", "cainiao.waybill.ii.query.by.waybillcode");
                 Tmparam.Add("session", TOKEN);
-                var waybill = new List<WaybillDetailQueryByWaybillCodeRequest>();
-                var w1 = new WaybillDetailQueryByWaybillCodeRequest();
-                w1.cp_code = "YTO";
-                w1.object_id = "1";
-                w1.waybill_code = "883162716003542975";
-                waybill.Add(w1);
 
                 Tmparam.Add("param_list",JsonConvert.SerializeObject(waybill).Replace("\"","\'"));
                 string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
@@ -110,9 +102,41 @@ namespace CoreData.CoreApi
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
                 if(response.Result.ToString().IndexOf("error") > 0){
-                    result.s = -10;
-                    //result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
-                    result.d = new  {res = res,c =JsonConvert.SerializeObject(waybill).Replace("\"","\'") }; 
+                    result.s = -1;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;                    
+                }else{
+                    result.d = res.cainiao_waybill_ii_query_by_waybillcode_response.modules.waybill_cloud_print_with_result_desc_response;
+                }            
+            }catch(Exception ex){                
+                result.s = -1;
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+        #endregion
+
+        #region 
+        /// <summary>
+        ///   电子面单云打印更新接口 参考网址： http://open.taobao.com/docs/doc.htm?spm=a219a.7629140.0.0.XVv8Co&treeId=17&articleId=26870&docType=2
+        /// </summary>
+        /// <param name=""></param>
+        /// <param name=""></param>
+        public static DataResult waybillIIUpdate(WaybillCloudPrintUpdateRequest waybill){
+            var result = new DataResult(1,null);
+            try{                                        
+                Tmparam.Add("method", "cainiao.waybill.ii.update");
+                Tmparam.Add("session", TOKEN);
+
+                Tmparam.Add("param_list",JsonConvert.SerializeObject(waybill).Replace("\"","\'"));
+                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                Tmparam.Add("sign", sign);//                                      
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
                     result.d = res;
                 }            
@@ -128,6 +152,38 @@ namespace CoreData.CoreApi
 
 
 
+        #region 
+        /// <summary>
+        ///   参考网址： 
+        /// </summary>
+        /// <param name=""></param>
+        /// <param name=""></param>
+        public static DataResult demo(string token){
+            var result = new DataResult(1,null);
+            try{                                        
+                Tmparam.Add("method", "");
+                Tmparam.Add("session", TOKEN);
+
+
+                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                Tmparam.Add("sign", sign);//                                      
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
+                }else{
+                    result.d = res;
+                }            
+            }catch(Exception ex){                
+                result.s = -1;
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+        #endregion
 
 
 
