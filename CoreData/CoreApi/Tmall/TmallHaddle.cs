@@ -901,7 +901,7 @@ namespace CoreData.CoreApi
         #endregion
 
         public static DataResult itemProps(string cid){
-            string token = "6202620e6f344bc7a7adb2886ba4ZZ9bd8442fbe60465632058964557";
+            string token = TOKEN;
             string fields = ITEM_PROPS;
             return itempropsGet (token,fields, cid);
         }
@@ -939,12 +939,11 @@ namespace CoreData.CoreApi
                     if(response.Result.ToString().IndexOf("item_props") > -1){
               
                         foreach(var item in res.itemprops_get_response.item_props.item_prop){
+                            
                             if(!Convert.ToBoolean(JsonConvert.SerializeObject(item.is_item_prop)) && Convert.ToBoolean(JsonConvert.SerializeObject(item.is_sale_prop))){ 
-                                if(item.prop_values!=null && Convert.ToString(item.prop_values.pid) != "20000"){
-                                    sku_props.Add(item);
-                                }                                
-                            }else{
-                                if(item.prop_values!=null && Convert.ToString(item.prop_values.pid) != "20000"){
+                                    sku_props.Add(item);                                                              
+                            }else{                                                                              
+                                if(Convert.ToString(item.pid) != "20000"){
                                     item_props.Add(item);
                                 }
                             }
@@ -983,7 +982,7 @@ namespace CoreData.CoreApi
 
         
         public static DataResult GetSellercatsList(string nick){
-            string token = "6202620e6f344bc7a7adb2886ba4ZZ9bd8442fbe60465632058964557";            
+            string token = TOKEN;            
             return sellercatsListGet (token,nick);
         }
 

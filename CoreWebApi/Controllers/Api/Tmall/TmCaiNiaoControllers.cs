@@ -14,7 +14,7 @@ namespace CoreWebApi.Api.Tmall{
         [HttpPostAttribute("/core/Api/TmCaiNiao/WaybillIIGet")]
         public ResponseResult WaybillIIGet([FromBodyAttribute]JObject obj){
             var m = new DataResult(1,null);
-            var waybill = Newtonsoft.Json.JsonConvert.DeserializeObject<WaybillCloudPrintApplyNewRequest>(obj.ToString());
+            var waybill = Newtonsoft.Json.JsonConvert.DeserializeObject<WaybillCloudPrintApplyNewRequest>(obj["ApplyNew"].ToString());            
             m = CaiNiaoHaddle.WaybillIIGet(waybill);            
             return CoreResult.NewResponse(m.s, m.d, "Api");
         }
@@ -24,11 +24,23 @@ namespace CoreWebApi.Api.Tmall{
         [HttpPostAttribute("/core/Api/TmCaiNiao/waybillIIQueryByCode")]
         public ResponseResult waybillIIQueryByCode([FromBodyAttribute]JObject obj){
             var m = new DataResult(1,null);            
-            var waybill = Newtonsoft.Json.JsonConvert.DeserializeObject<List<WaybillDetailQueryByWaybillCodeRequest>>(obj.ToString());
+            var waybill = Newtonsoft.Json.JsonConvert.DeserializeObject<List<WaybillDetailQueryByWaybillCodeRequest>>(obj["DetailList"].ToString());
             m = CaiNiaoHaddle.waybillIIQueryByCode(waybill);            
             return CoreResult.NewResponse(m.s, m.d, "Api");
         }
         #endregion
+
+        #region 更新电子面单
+        [HttpPostAttribute("/core/Api/TmCaiNiao/waybillIIUpdate")]
+        public ResponseResult waybillIIUpdate([FromBodyAttribute]JObject obj){
+            var m = new DataResult(1,null);            
+            var waybill = Newtonsoft.Json.JsonConvert.DeserializeObject<WaybillCloudPrintUpdateRequest>(obj["Update"].ToString());
+            m = CaiNiaoHaddle.waybillIIUpdate(waybill);            
+            return CoreResult.NewResponse(m.s, m.d, "Api");
+        }
+        #endregion 
+
+
 
         
     }

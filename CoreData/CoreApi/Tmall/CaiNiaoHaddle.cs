@@ -150,6 +150,40 @@ namespace CoreData.CoreApi
         }
         #endregion
 
+        #region 
+        /// <summary>
+        ///  商家查询物流商产品类型接口 参考网址： http://open.taobao.com/docs/doc.htm?spm=a219a.7629140.0.0.HRph85&treeId=17&articleId=26765&docType=2
+        /// </summary>
+        /// <param name=""></param>
+        /// <param name=""></param>
+        public static DataResult waybillIIProduct(string cp_code,string token){
+            var result = new DataResult(1,null);
+            try{                                        
+                Tmparam.Add("method", "cainiao.waybill.ii.product");
+                Tmparam.Add("session", token);
+                Tmparam.Add("cp_code", cp_code);
+
+                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                Tmparam.Add("sign", sign);//                                      
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
+                if(response.Result.ToString().IndexOf("error") > 0){
+                    result.s = -1;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
+                }else{
+                    result.d = res;
+                }            
+            }catch(Exception ex){                
+                result.s = -1;
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+        #endregion
+
+
 
 
         #region 

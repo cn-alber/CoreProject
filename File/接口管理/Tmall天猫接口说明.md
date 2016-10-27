@@ -835,6 +835,16 @@ function说明
 
 ```
 
+18.waybillIIUpdate()            更新电子面单
+
+ 路由:`/core/Api/TmCaiNiao/waybillIIUpdate`
+
+ input:
+    参考网址： http://open.taobao.com/docs/doc.htm?spm=a219a.7629140.0.0.gSnxce&treeId=17&articleId=104859&docType=1
+ output：  
+```sh
+
+```
 
 
 
