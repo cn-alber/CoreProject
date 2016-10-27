@@ -940,11 +940,11 @@ namespace CoreData.CoreApi
               
                         foreach(var item in res.itemprops_get_response.item_props.item_prop){
                             if(!Convert.ToBoolean(JsonConvert.SerializeObject(item.is_item_prop)) && Convert.ToBoolean(JsonConvert.SerializeObject(item.is_sale_prop))){ 
-                                if(item.prop_values!=null && Convert.ToString(item.prop_values.pid) != "42860829"){
+                                if(item.prop_values!=null && Convert.ToString(item.prop_values.pid) != "20000"){
                                     sku_props.Add(item);
                                 }                                
                             }else{
-                                if(item.prop_values!=null && Convert.ToString(item.prop_values.pid) != "42860829"){
+                                if(item.prop_values!=null && Convert.ToString(item.prop_values.pid) != "20000"){
                                     item_props.Add(item);
                                 }
                             }
