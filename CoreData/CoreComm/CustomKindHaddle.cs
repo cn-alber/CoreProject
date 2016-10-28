@@ -183,6 +183,10 @@ namespace CoreData.CoreComm
             var result = ExistKind(kind.KindName, kind.ParentID, 0, kind.CoID);//判断类目名称是否已存在
             if (result.s == 1)
             {
+                if(kind.mode==2)
+                {                       
+                    kind.norm = string.Join(",",kind.NormLst.ToArray());
+                }
                 result = AddKind(kind);
             }
             return result;
@@ -195,20 +199,6 @@ namespace CoreData.CoreComm
             {
                 try
                 {
-                    // if (kind.ParentID > 0)
-                    // {
-                    //     var res = GetKind(kind.ParentID, CoID);
-                    //     if (res.s == 1)
-                    //     {
-                    //         var PKind = res.d as CustomKindData;
-                    //         // ck.FullName = PKind.FullName + "=>" + kind.KindName;
-                    //     }
-                    // }
-                    // else
-                    // {
-                    //     ck.FullName = kind.KindName;
-                    // }
-
                     int count = conn.Execute(AddKindSql(), kind);
                     kind.ID = conn.QueryFirst<int>("select LAST_INSERT_ID()");
                     if (count < 0)
@@ -792,6 +782,8 @@ namespace CoreData.CoreComm
                                         cid,
                                         parent_cid,
                                         pic_url,
+                                        mode,
+                                        norm,
                                         Creator,
                                         CreateDate
                                         ) VALUES(
@@ -806,6 +798,8 @@ namespace CoreData.CoreComm
                                         @cid,
                                         @parent_cid,
                                         @pic_url,
+                                        @mode,
+                                        @norm,
                                         @Creator,
                                         @CreateDate
                                         ) ";

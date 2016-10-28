@@ -30,6 +30,8 @@ function说明
         ParentID            int                 上级类目ID (*必填项*)
         Order               int                 排序
         Enable              bool                启用状态(true/false,default：true)
+        mode                int                 选择自定义商品规则(1.单个商品，2.一个商品有多个单品，通过规则来区分)
+        NormLst             List<string>        选择商品区分规则，如["颜色","尺码"]
     OutPut:
         成功：
             1.新增资料            

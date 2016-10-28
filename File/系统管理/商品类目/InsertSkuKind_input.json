@@ -1,5 +1,7 @@
 {
-    "KindName": "棉袄/棉服",
-    "ParentID": 99,
-    "Order":2
+    "KindName": "自定义类目ttnsssn",
+    "ParentID": 0,
+    "Order":10003,
+    "mode":2,
+    "NormLst":["颜色","尺码"]
 }
