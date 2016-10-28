@@ -79,7 +79,7 @@ namespace CoreWebApi
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
-        #region 获取商品属性        
+        #region 获取商品属性
         [HttpGetAttribute("/Core/XyComm/Customkind/SkuKindProps")]
         public ResponseResult SkuKindProps(string ID,string Enable)
         {
