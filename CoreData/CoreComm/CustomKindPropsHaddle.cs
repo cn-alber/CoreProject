@@ -256,7 +256,7 @@ namespace CoreData.CoreComm
             {
                 string sql = @"SELECT * FROM customkind_props WHERE id in @IDLst AND CoID=@CoID";
                 var Props = conn.Query(sql, new { CoID = CoID, IDLst = IDLst }).AsList();
-
+                
 
             }
             catch (Exception e)

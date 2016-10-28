@@ -804,7 +804,7 @@ namespace CoreData.CoreComm
 
 
         #region 获取复制目标类目
-        public static DataResult GetCopyToKindLst(string CoID,string Enable)
+        public static DataResult GetCopyToKindLst(string CoID, string Enable)
         {
             var res = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CommConnectString))
@@ -812,7 +812,7 @@ namespace CoreData.CoreComm
                 try
                 {
                     string sql = @"SELECT ID,KindName FROM customkind WHERE CoID=@CoID AND IsDelete=0";
-                    var p=new DynamicParameters();                   
+                    var p = new DynamicParameters();
                     p.Add("@CoID", CoID);
                     if (!string.IsNullOrEmpty(Enable) && Enable.ToUpper() != "ALL")
                     {
@@ -831,7 +831,55 @@ namespace CoreData.CoreComm
             }
             return res;
         }
-        #endregion        
+        #endregion
+
+
+
+        #region 获取标准类目列表
+        public static DataResult GetKindNameLst(string CoID, int ParentID, string Enable)
+        {
+            var result = new DataResult(1, null);
+            var KindLst = new List<CustomKindname>();
+            // string sql = @"SELECT ID,KindName FROM customkind WHERE CoID=@CoID AND IsDelete=0 AND ParentID=@ParentID";           
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    string sql = @"SELECT ID,KindName,Enable FROM customkind WHERE CoID=@CoID AND IsDelete=0 AND ParentID=@ParentID";
+                    var p = new DynamicParameters();
+                    p.Add("@CoID", CoID);
+                    p.Add("@ParentID", ParentID);
+                    if (!string.IsNullOrEmpty(Enable) && Enable.ToUpper() != "ALL")
+                    {
+                        sql = sql + " AND Enable=@Enable";
+                        p.Add("@Enable", Enable.ToUpper() == "TRUE" ? true : false);
+                    }
+                    var ParentLst = conn.Query<CustomKindname>(sql, p).AsList();
+
+                    // var ParentLst = conn.Query<CustomKindname>(sql, new { ParentID = ParentID, CoID = CoID }).AsList();
+                    KindLst.AddRange(ParentLst);
+                    foreach (var kind in ParentLst)
+                    {
+                        var res = GetKindNameLst(CoID, kind.ID,Enable);
+                        if (res.s == 1)
+                        {
+                            kind.Children = res.d as List<CustomKindname>;
+                        }
+                        else
+                            break;
+                    }
+                    result.d = ParentLst;
+                    conn.Close();
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+        #endregion     
 
         #region 新增商品类目
         public static string AddKindSql()
