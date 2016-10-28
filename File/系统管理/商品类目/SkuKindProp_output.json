@@ -1,0 +1,33 @@
+{
+"s": 1,
+"d": {
+"id": 141,
+"kindid": 227,
+"name": "属性测试4",
+"values": null,
+"must": false,
+"multi": false,
+"is_allow_alias": false,
+"is_enum_prop": false,
+"is_input_prop": false,
+"is_key_prop": false,
+"is_sale_prop": false,
+"Enable": false,
+"ParentID": 0,
+"pid": 10002016102846864,
+"tb_cid": 0,
+"Order": 4,
+"Creator": "管理员",
+"CreateDate": "2016/10/28 10:53:37",
+"Modifier": "管理员",
+"ModifyDate": "2016/10/28 14:42:32",
+"CoID": 1,
+"PropValues": null,
+"ValLst": [
+"可选test1",
+"可选test2",
+"可选test3"
+]
+},
+"m": ""
+}

@@ -30,6 +30,8 @@ function说明
         ParentID            int                 上级类目ID (*必填项*)
         Order               int                 排序
         Enable              bool                启用状态(true/false,default：true)
+        mode                int                 选择自定义商品规则(1.单个商品，2.一个商品有多个单品，通过规则来区分)
+        NormLst             List<string>        选择商品区分规则，如["颜色","尺码"]
     OutPut:
         成功：
             1.新增资料            
@@ -43,7 +45,7 @@ function说明
     路由：http://192.168.30.29:5000/Core/XyComm/Customkind/UpdateSkuKind
     InPut:
         ID                  int                 商品类目ID (*必填项*)
-        ParentID            int                 上级类目ID (*必填项*)
+        Enable              bool                类目状态启用|禁用(true|false *必填项*)
         KindName            string              商品类目名称 (*必填项*)
         Order               int                 排序(*必填项*)
     OutPut:
@@ -157,6 +159,7 @@ function说明
 
 
 13.UpdateSkuPropsEnable()//商品类目属性- 停用|启用
+    方法：POST
     路由：http://192.168.30.211:5000/Core/XyComm/CustomKindProps/UpdateSkuPropsEnable
     参数：
     InPut:
@@ -170,6 +173,25 @@ function说明
         失败：
             1.返回错误信息：s=3003.资料更新失败
     参考：input json 文件：UpdateSkuPropsEnable_input.json
+14.SkuKindProp()//获取单个属性内容
+    方法：Get
+    路由：http://192.168.30.211:5000/Core/XyComm/CustomKindProps/SkuKindProp?ID=141    
+    参数：
+    InPut:
+        ID          int                 商品属性ID(customkind_props.id)
+    OutPut:
+        Prop        Customkind_props    单笔商品属性资料
+    参考：output json 文件：SkuKindProp_output.json
+15.CopyToKindLst()//获取所有商品类目名称
+    方法：POST
+    路由：http://192.168.30.211:5000/Core/XyComm/CustomKindProps/CopyToKindLst
+    参数：
+        InPut: null
+        OutPut: 
+            KindNameLst         List<CustomKindname>   商品ID,KindName 列表
+    参考：output json 文件：CopyToKindLst_output.json
+
+
 
 
 
