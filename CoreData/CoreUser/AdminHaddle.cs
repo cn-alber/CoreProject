@@ -102,12 +102,12 @@ namespace CoreData.CoreUser
                     {
                         return null;
                     }
-                    var pidarray = (from c in child select c.parentid).Distinct().ToArray();
+                    var pidarray = (from c in child  where c.parentid == 0 select c.id).Distinct().ToArray();
                     var pid = string.Join(",", pidarray);
                     //"select id,name,NewIcon,NewIconPre,NavigateUrl,ParentID from menus where id in (" + pid + ") order by sortindex"
                     sql = "select menus.id, menus.`Name` as `name`,NewIcon,NewIconPre,NewUrl as router,SortIndex as `order`, menus.Remark, ParentID ,power.Title as access from menus "+
-                                "LEFT JOIN power on power.ID = menus.ViewPowerID where menus.deleted = FALSE AND  menus.id in (0," + pid + ") order by sortindex"; 
-                    
+                                "LEFT JOIN power on power.ID = menus.ViewPowerID where menus.deleted = FALSE AND  menus.id in (" + pid + ") order by sortindex"; 
+                    Console.WriteLine(sql);
                     parent = conn.Query<Menu>(sql).AsList();
 
                     foreach (var p in parent)
@@ -136,17 +136,17 @@ namespace CoreData.CoreUser
                     {       
                         Menus menus = new Menus();
                         menus.Name = name;
-                        menus.SortIndex = int.Parse(order);
+                        menus.SortIndex = Convert.ToInt16(order);
                         menus.NewUrl = router;
                         menus.Remark = remark;
-                        menus.ParentID = int.Parse(parentid);
-                        menus.ViewPowerID = int.Parse(accessid);
-                        menus.NewIcon = iconArr[0];
-                        if(!string.IsNullOrEmpty(iconArr[1])){
-                            menus.NewIconPre = iconArr[1];
-                        }else{
-                            menus.NewIconPre = "";
-                        }                        
+                        //menus.ParentID = Convert.ToInt16(parentid);
+                        //menus.ViewPowerID = Convert.ToInt16(accessid);
+                        // menus.NewIcon = iconArr[0];
+                        // if(!string.IsNullOrEmpty(iconArr[1])){
+                        //     menus.NewIconPre = iconArr[1];
+                        // }else{
+                        //     menus.NewIconPre = "";
+                        // }                        
                         string sql = @"INSERT menus SET 
                                             menus.`Name`=@Name,
                                             menus.NewUrl=@NewUrl,
@@ -155,7 +155,7 @@ namespace CoreData.CoreUser
                                             menus.SortIndex=@SortIndex,
                                             menus.Remark=@Remark,
                                             menus.ParentID=@ParentID,
-                                            menus.ViewPowerID=@ViewPowerID
+                                            menus.ViewPowerID=@ViewPowerID,
                                             menus.CoID = @CoID";
                         Console.WriteLine(sql);                                    
                         int rnt = conn.Execute(sql,menus);

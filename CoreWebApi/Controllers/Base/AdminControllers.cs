@@ -24,6 +24,7 @@ namespace CoreWebApi
          public ResponseResult createmenus([FromBodyAttribute]JObject lo)
          {
 
+             //Menus menus = Newtonsoft.Json.JsonConvert.DeserializeObject<Menus>(lo.ToString());
              var name = lo["router"]!= null ? lo["name"].ToString():"";
              var router = lo["router"]!= null ? lo["router"].ToString():"";
              string iconName = lo["iconName"]!=null ? lo["iconName"].ToString():"";
@@ -31,7 +32,7 @@ namespace CoreWebApi
              var icon = new string[]{iconName,iconPrefix};
              var order = lo["order"]!= null ? lo["order"].ToString():"";
              var remark = lo["remark"]!= null ?lo["remark"].ToString():"";
-             var parentid = lo["pid"]!= null ? lo["pid"].ToString():"";
+             var parentid = lo["pid"]!= null ? lo["pid"].ToString():"0";
              var accessid = lo["accessid"]!= null ? lo["accessid"].ToString():"0";
 
              var uname = GetUname();
