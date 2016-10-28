@@ -156,6 +156,12 @@ namespace CoreData.CoreComm
                     var props = conn.Query<Customkind_props>(sql, p).AsList();
                     // CacheBase.Set(cname, props);//新增缓存
                     // }
+                    if(props.Count>0)
+                    {
+                        string ValSql=@"SELECT id,name from Customkind_props_value WHERE CoID=@CoID AND kindid = @KindID";
+                        var ValLst = conn.Query<Customkind_props_value>(ValSql,new{CoID=CoID,KindID=KindID});
+                        // props.ValLst = ValLst.Select(a=>a.);
+                    }
                     result.d = props;
                 }
                 catch (Exception e)
@@ -452,7 +458,7 @@ namespace CoreData.CoreComm
         }
         #endregion
 
-        #region 新增标准商品类目属性
+        #region 新增标准商品类目
         public static DataResult InsertKindProps(CustomKind IParam)
         {
             var result = new DataResult(1, null);
@@ -465,7 +471,7 @@ namespace CoreData.CoreComm
                 var Kind_standard = conn.QueryFirst<Item_cates_standard>(sql, new { ID = IParam.ID });
                 if (Kind_standard != null)
                 {
-                    string querysql = "SELECT count(ID) FROM customkind WHERE KindName=@name and CoID=@CoID and ParentID=@ParentID";
+                    string querysql = "SELECT count(ID) FROM customkind WHERE KindName=@name and CoID=@CoID and ParentID=@ParentID and IsDelete=0";
                     int count = conn.QueryFirst<int>(querysql, new { name = Kind_standard.name, CoID = IParam.CoID, ParentID = IParam.ParentID });
                     if (count > 0)
                     {
