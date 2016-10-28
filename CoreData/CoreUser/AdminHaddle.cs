@@ -11,15 +11,13 @@ namespace CoreData.CoreUser
 {
     public static class AdminHaddle
     {
-  
-      
-
-        public static bool isMenuExist(string name){
+        public static bool isMenuExist(string router){
             bool flag = true;
+            if(router == "*") return false;
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try
                 {
-                    string sql = "SELECT ID FROM menus WHERE menus.deleted = FALSE AND menus.`Name` = '"+name+"'; ";
+                    string sql = "SELECT ID FROM menus WHERE menus.deleted = FALSE AND menus.`NewUrl` = '"+router+"'; ";
                     var rnt = conn.Query<int>(sql).AsList();
                     if(rnt.Count > 0){
                         flag = true;
@@ -125,10 +123,10 @@ namespace CoreData.CoreUser
             return parent ;
         }
 
-        public static DataResult CreatMenu(string name,string router,string[] iconArr,string order,string remark,string parentid,string accessid,string uname,string coid){            
+        public static DataResult CreatMenu(string name,string router,string[] iconArr,int order,string remark,int parentid,int accessid,string uname,string coid){            
             var result = new DataResult(1,null);
-            if(false){
-                isMenuExist(name);
+            if(isMenuExist(router)){
+                
                 result.s = -2017;
             }else{
                 using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
@@ -136,17 +134,17 @@ namespace CoreData.CoreUser
                     {       
                         Menus menus = new Menus();
                         menus.Name = name;
-                        menus.SortIndex = Convert.ToInt16(order);
+                        menus.SortIndex = order;
                         menus.NewUrl = router;
                         menus.Remark = remark;
-                        //menus.ParentID = Convert.ToInt16(parentid);
-                        //menus.ViewPowerID = Convert.ToInt16(accessid);
-                        // menus.NewIcon = iconArr[0];
-                        // if(!string.IsNullOrEmpty(iconArr[1])){
-                        //     menus.NewIconPre = iconArr[1];
-                        // }else{
-                        //     menus.NewIconPre = "";
-                        // }                        
+                        menus.ParentID = parentid;
+                        menus.ViewPowerID = accessid;
+                        menus.NewIcon = iconArr[0];
+                        if(!string.IsNullOrEmpty(iconArr[1])){
+                            menus.NewIconPre = iconArr[1];
+                        }else{
+                            menus.NewIconPre = "";
+                        }                        
                         string sql = @"INSERT menus SET 
                                             menus.`Name`=@Name,
                                             menus.NewUrl=@NewUrl,
@@ -179,7 +177,7 @@ namespace CoreData.CoreUser
         }
 
   
-        public static DataResult modifyMenu(string id,string name,string router,string[] iconArr,string order,string remark,string parentid,string accessid,string uname,string coid){
+        public static DataResult modifyMenu(string id,string name,string router,string[] iconArr,int order,string remark,int parentid,int accessid,string uname,string coid){
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try

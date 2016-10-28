@@ -174,6 +174,29 @@ namespace CoreModels.XyUser
         public List<MenuSimple> children { get; set; }
     }
 
+	public class MenuCreateRequest{
+		public string name{get;set;}
+		public string router{get;set;}
+		public string iconName{get;set;}
+		public string iconPrefix{get;set;}
+		public int order{get;set;}
+		public string remark{get;set;}
+		public int pid{get;set;}
+		public int accessid{get;set;}
+	}
+
+	public class MenuModifyRequest{
+		public string id{get;set;}
+		public string name{get;set;}
+		public string router{get;set;}
+		public string iconName{get;set;}
+		public string iconPrefix{get;set;}
+		public int order{get;set;}
+		public string remark{get;set;}
+		public int pid{get;set;}
+		public int accessid{get;set;}
+	}
+
 
     public class Refresh
     {
