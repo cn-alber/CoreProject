@@ -24,41 +24,22 @@ namespace CoreWebApi
          public ResponseResult createmenus([FromBodyAttribute]JObject lo)
          {
 
-             //Menus menus = Newtonsoft.Json.JsonConvert.DeserializeObject<Menus>(lo.ToString());
-             var name = lo["router"]!= null ? lo["name"].ToString():"";
-             var router = lo["router"]!= null ? lo["router"].ToString():"";
-             string iconName = lo["iconName"]!=null ? lo["iconName"].ToString():"";
-             string iconPrefix = lo["iconPrefix"]!=null ? lo["iconPrefix"].ToString():"";
-             var icon = new string[]{iconName,iconPrefix};
-             var order = lo["order"]!= null ? lo["order"].ToString():"";
-             var remark = lo["remark"]!= null ?lo["remark"].ToString():"";
-             var parentid = lo["pid"]!= null ? lo["pid"].ToString():"0";
-             var accessid = lo["accessid"]!= null ? lo["accessid"].ToString():"0";
-
+             var  menus = Newtonsoft.Json.JsonConvert.DeserializeObject<MenuCreateRequest>(lo.ToString());
+             var icon = new string[]{menus.iconName,menus.iconPrefix};
              var uname = GetUname();
              var coid = GetCoid();        
-             var m = AdminHaddle.CreatMenu(name,router,icon,order,remark,parentid,accessid,uname,coid);
+             var m = AdminHaddle.CreatMenu(menus.name,menus.router,icon,menus.order,menus.remark,menus.pid,menus.accessid,uname,coid);
              return CoreResult.NewResponse(m.s, m.d, "Indentity");           
          }
          //编辑菜单
          [HttpPostAttribute("/core/admin/modifymenus")]
          public ResponseResult modifymenus([FromBodyAttribute]JObject lo)
          {
-             //Menus menus = Newtonsoft.Json.JsonConvert.DeserializeObject<Menus>(lo.ToString());
-             var id = lo["id"].ToString();
-             var name = lo["name"]!= null ? lo["name"].ToString():"";
-             var router = lo["router"]!= null ? lo["router"].ToString():"";
-             string iconName = lo["iconName"]!=null ? lo["iconName"].ToString():"";
-             string iconPrefix = lo["iconPrefix"]!=null ? lo["iconPrefix"].ToString():"";
-             var icon = new string[]{iconName,iconPrefix};
-             var order = lo["order"]!= null ? lo["order"].ToString():"";
-             var remark = lo["remark"]!= null ?lo["remark"].ToString():"";
-             var parentid = lo["pid"]!= null ? lo["pid"].ToString():"";
-             var accessid = lo["accessid"]!= null ? lo["accessid"].ToString():"0";
-
+             var menus = Newtonsoft.Json.JsonConvert.DeserializeObject<MenuModifyRequest>(lo.ToString());
+             var icon = new string[]{menus.iconName,menus.iconPrefix};
              var uname = GetUname();
              var coid = GetCoid();        
-             var m = AdminHaddle.modifyMenu(id,name,router,icon,order,remark,parentid,accessid,uname,coid);
+             var m = AdminHaddle.modifyMenu(menus.id,menus.name,menus.router,icon,menus.order,menus.remark,menus.pid,menus.accessid,uname,coid);
             return CoreResult.NewResponse(m.s, m.d, "Indentity");           
          }
 
