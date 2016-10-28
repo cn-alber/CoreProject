@@ -811,7 +811,7 @@ namespace CoreData.CoreComm
             {
                 try
                 {
-                    string sql = @"SELECT ID,KindName FROM customkind WHERE CoID=@CoID AND IsDelete=0";
+                    string sql = @"SELECT ID,KindName,ParentID FROM customkind WHERE CoID=@CoID AND IsDelete=0";
                     var p = new DynamicParameters();
                     p.Add("@CoID", CoID);
                     if (!string.IsNullOrEmpty(Enable) && Enable.ToUpper() != "ALL")
@@ -839,8 +839,7 @@ namespace CoreData.CoreComm
         public static DataResult GetKindNameLst(string CoID, int ParentID, string Enable)
         {
             var result = new DataResult(1, null);
-            var KindLst = new List<CustomKindname>();
-            // string sql = @"SELECT ID,KindName FROM customkind WHERE CoID=@CoID AND IsDelete=0 AND ParentID=@ParentID";           
+            var KindLst = new List<CustomKindname>();        
             using (var conn = new MySqlConnection(DbBase.CommConnectString))
             {
                 try
@@ -849,14 +848,12 @@ namespace CoreData.CoreComm
                     var p = new DynamicParameters();
                     p.Add("@CoID", CoID);
                     p.Add("@ParentID", ParentID);
-                    if (!string.IsNullOrEmpty(Enable) && Enable.ToUpper() != "ALL")
-                    {
-                        sql = sql + " AND Enable=@Enable";
-                        p.Add("@Enable", Enable.ToUpper() == "TRUE" ? true : false);
-                    }
+                    // if (!string.IsNullOrEmpty(Enable) && Enable.ToUpper() != "ALL")
+                    // {
+                    //     sql = sql + " AND Enable=@Enable";
+                    //     p.Add("@Enable", Enable.ToUpper() == "TRUE" ? true : false);
+                    // }
                     var ParentLst = conn.Query<CustomKindname>(sql, p).AsList();
-
-                    // var ParentLst = conn.Query<CustomKindname>(sql, new { ParentID = ParentID, CoID = CoID }).AsList();
                     KindLst.AddRange(ParentLst);
                     foreach (var kind in ParentLst)
                     {

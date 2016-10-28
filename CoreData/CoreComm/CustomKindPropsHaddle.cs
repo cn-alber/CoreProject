@@ -255,8 +255,13 @@ namespace CoreData.CoreComm
             try
             {
                 string sql = @"SELECT * FROM customkind_props WHERE id in @IDLst AND CoID=@CoID";
-                var Props = conn.Query(sql, new { CoID = CoID, IDLst = IDLst }).AsList();
-                
+                var Props = conn.Query<Customkind_props>(sql, new { CoID = CoID, IDLst = IDLst }).AsList();
+                var PToLst = conn.Query<Customkind_props>("SELECT * FROM customkind_props WHERE kindid in @kindid AND CoID=@CoID",new {kindid=kindid,CoID=CoID}).AsList();
+                var NewPropLst = new List<Customkind_props>();
+                if(PToLst.Count>0)
+                {
+                    // NewPropLst
+                }
 
             }
             catch (Exception e)

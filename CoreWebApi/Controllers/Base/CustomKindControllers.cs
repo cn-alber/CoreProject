@@ -303,7 +303,7 @@ namespace CoreWebApi
         [HttpGetAttribute("/Core/XyComm/CustomKindProps/CopyToKindLst")]
         public ResponseResult CopyToKindLst()
         {
-            var res = CustomKindHaddle.GetKindNameLst(GetCoid(),0,"");
+            var res = CustomKindHaddle.GetCopyToKindLst(GetCoid(),"");
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         

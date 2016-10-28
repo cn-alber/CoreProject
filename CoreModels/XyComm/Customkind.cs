@@ -76,6 +76,7 @@ namespace CoreModels.XyComm
         public int ID { get; set; }
         public string KindName { get; set; }
         public bool Enable { get; set; }
+        public int ParentID { get; set; }
         public List<CustomKindname> Children { get; set; }
     }
     public class CustomKindData
