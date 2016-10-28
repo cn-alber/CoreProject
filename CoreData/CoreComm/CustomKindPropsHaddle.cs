@@ -25,6 +25,7 @@ namespace CoreData.CoreComm
             {
                 //类目属性
                 string sql = CustomKindHaddle.AddKindPorpSql();
+                IParam.pid = long.Parse(CommHaddle.GetRecordID(IParam.CoID));
                 conn.Execute(sql, IParam, Trans);
                 var propid = conn.QueryFirst<long>("select LAST_INSERT_ID()", Trans);//新增商品类目
 
