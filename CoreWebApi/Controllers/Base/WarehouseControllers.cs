@@ -49,5 +49,11 @@ namespace CoreWebApi
             var data = WarehouseHaddle.UpdateWarehouseEnable(id,Company,UserName,CoID,Enable);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+
+
+
+
+
     }
 }
