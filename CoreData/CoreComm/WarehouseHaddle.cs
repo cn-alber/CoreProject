@@ -14,82 +14,77 @@ namespace CoreData.CoreComm
         public static DataResult InsertWarehouse(WarehouseInsert wh,string UserName,string Company,int CoID)
         {
             var result = new DataResult(1,null);   
-            //检查相关必输栏位
-            if(wh.name0 == null)        
-                result.s = -3101;            
-            if(wh.name1 == null)            
-                result.s = -3102;    
-            if(wh.name3 == null)
-            {
-                result.s = -1;
-                result.d = "请输入销售退货仓库名称!";
-                return result;
-            }
-            if(wh.name4 == null)
-            {
-                result.s = -1;
-                result.d = "请输入进货仓库名称!";
-                return result;
-            }
-            if(wh.name5 == null)
-            {
-                result.s = -1;
-                result.d = "请输入次品仓库名称!";
-                return result;
-            }
-            if(wh.area.Count< 3 || string.IsNullOrEmpty(wh.address))
-            {
-                result.s = -1;
-                result.d = "请输入完整的仓库地址!";
-                return result;
-            }
-            //检查仓库名称是否重复
-            var res = WarehouseHaddle.IsWarehouseExist(wh.name0,CoID);
-            if (bool.Parse(res.d.ToString()) == true)
-            {
-                result.s = -1;
-                result.d = "仓库已存在,不允许新增!";
-                return result;
-            }
-            res = WarehouseHaddle.IsWarehouseExist(wh.name1,CoID);
-            if (bool.Parse(res.d.ToString()) == true)
-            {
-                result.s = -1;
-                result.d = "仓库已存在,不允许新增!";
-                return result;
-            }
-            if(wh.name2 != null)
-            {
-                res = WarehouseHaddle.IsWarehouseExist(wh.name2,CoID);
-                if (bool.Parse(res.d.ToString()) == true)
-                {
-                    result.s = -1;
-                    result.d = "仓库已存在,不允许新增!";
-                    return result;
-                }
-            }
-            res = WarehouseHaddle.IsWarehouseExist(wh.name3,CoID);
-            if (bool.Parse(res.d.ToString()) == true)
-            {
-                result.s = -1;
-                result.d = "仓库已存在,不允许新增!";
-                return result;
-            }
-            res = WarehouseHaddle.IsWarehouseExist(wh.name4,CoID);
-            if (bool.Parse(res.d.ToString()) == true)
-            {
-                result.s = -1;
-                result.d = "仓库已存在,不允许新增!";
-                return result;
-            }
-            res = WarehouseHaddle.IsWarehouseExist(wh.name5,CoID);
-            if (bool.Parse(res.d.ToString()) == true)
-            {
-                result.s = -1;
-                result.d = "仓库已存在,不允许新增!";
-                return result;
-            }
-            if(result.s != 1)   return result;  //格式验证
+            // //检查相关必输栏位
+            // if(wh.name0 == null)        
+            //     result.s = -3101;            
+            // if(wh.name1 == null)            
+            //     result.s = -3102;    
+            // if(wh.name3 == null)
+            // {
+            //     result.s = -1;
+            //     result.d = "请输入销售退货仓库名称!";
+            //     return result;
+            // }
+            // if(wh.name4 == null)
+            // {
+            //     result.s = -1;
+            //     result.d = "请输入进货仓库名称!";
+            //     return result;
+            // }
+            // if(wh.name5 == null)
+            // {
+            //     result.s = -1;
+            //     result.d = "请输入次品仓库名称!";
+            //     return result;
+            // }
+
+            // //检查仓库名称是否重复
+            // var res = WarehouseHaddle.IsWarehouseExist(wh.name0,CoID);
+            // if (bool.Parse(res.d.ToString()) == true)
+            // {
+            //     result.s = -1;
+            //     result.d = "仓库已存在,不允许新增!";
+            //     return result;
+            // }
+            // res = WarehouseHaddle.IsWarehouseExist(wh.name1,CoID);
+            // if (bool.Parse(res.d.ToString()) == true)
+            // {
+            //     result.s = -1;
+            //     result.d = "仓库已存在,不允许新增!";
+            //     return result;
+            // }
+            // if(wh.name2 != null)
+            // {
+            //     res = WarehouseHaddle.IsWarehouseExist(wh.name2,CoID);
+            //     if (bool.Parse(res.d.ToString()) == true)
+            //     {
+            //         result.s = -1;
+            //         result.d = "仓库已存在,不允许新增!";
+            //         return result;
+            //     }
+            // }
+            // res = WarehouseHaddle.IsWarehouseExist(wh.name3,CoID);
+            // if (bool.Parse(res.d.ToString()) == true)
+            // {
+            //     result.s = -1;
+            //     result.d = "仓库已存在,不允许新增!";
+            //     return result;
+            // }
+            // res = WarehouseHaddle.IsWarehouseExist(wh.name4,CoID);
+            // if (bool.Parse(res.d.ToString()) == true)
+            // {
+            //     result.s = -1;
+            //     result.d = "仓库已存在,不允许新增!";
+            //     return result;
+            // }
+            // res = WarehouseHaddle.IsWarehouseExist(wh.name5,CoID);
+            // if (bool.Parse(res.d.ToString()) == true)
+            // {
+            //     result.s = -1;
+            //     result.d = "仓库已存在,不允许新增!";
+            //     return result;
+            // }
+            // if(result.s != 1)   return result;  //格式验证
 
 
             var warehouse = new Warehouse();
@@ -752,6 +747,199 @@ namespace CoreData.CoreComm
             }           
             return result;
         }
+
+        ///<summary>
+        ///生成第三方物流服务号
+        ///</summary>
+         public static DataResult serviceCode (string CoID,string ComName){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    string code =  DateTime.Now.ToString("yyMMddHHmmss")+CoID;                    
+                    string sql = "INSERT ware_third_party SET ware_third_party.CoID = @CoID,ware_third_party.`Code` =@Code,ware_third_party.WareName = @name;";
+                    var rnt = conn.Execute(sql,new {
+                        CoID = CoID,
+                        Code = code,
+                        name = ComName
+                    });
+                    if(rnt>0){
+                        result.s = 1;
+                        result.d = new {
+                            code = code
+                        };
+                    }else{
+                        result.s = -3103;
+                    }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
+        ///<summary>
+        ///重新生成第三方物流服务号
+        ///</summary>
+         public static DataResult serviceCodeRebuild (string CoID){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    string code =  DateTime.Now.ToString("yyMMddHHmmss")+CoID;                    
+                    string sql = "UPDATE ware_third_party SET ware_third_party.`Code` =@Code WHERE ware_third_party.CoID = @CoID";
+                    var rnt = conn.Execute(sql,new {
+                        CoID = CoID,
+                        Code = code
+                    });
+                    if(rnt>0){
+                        result.s = 1;
+                        result.d = new {
+                            code = code
+                        };
+                    }else{
+                        result.s = -3103;
+                    }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
+        ///<summary>
+        /// 申请加入仓储服务
+        ///</summary>
+         public static DataResult askFor(string CoID,string code,string otherRemark){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    string sql = "SELECT ware_third_party.`Code` FROM ware_third_party WHERE ware_third_party.`Code` = "+code;
+                    var res = conn.Query<long>(sql).AsList();
+                    if(res.Count == 0){
+                        result.s = -3104;
+                    }else{
+                        var mycode = res[0];
+                        sql = @"UPDATE ware_third_party SET 
+                                    ware_third_party.ThirdCode = CONCAT(ware_third_party.ThirdCode,',',@ThirdCode)
+                                WHERE 
+                                    ware_third_party.CoID = @CoID AND ware_third_party.pid = 0;
+                                UPDATE ware_third_party SET 
+                                    ware_third_party.OtherRemark =@OtherRemark,
+                                    ware_third_party.Enabel = TRUE,  
+                                    ware_third_party.Soure = 1,
+                                WHERE 
+                                    ware_third_party.`Code` =@Code ;    
+                                    ";
+                        var rnt = conn.Execute(sql,new {
+                            Code = code,
+                            OtherRemark = otherRemark,
+                            CoID = CoID,
+                            ThirdCode = code
+                        });
+                    }                                        
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
+        ///<summary>
+        /// 
+        ///</summary>
+         public static DataResult storageLst(string CoID){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {                    
+                    string sql =@"SELECT 
+                                    w.ID,w.WareName,w.OurRemark,w.OtherRemark,w.Enabel,w.Soure 
+                                  FROM 
+                                    ware_third_party as w WHERE w.CoID="+CoID+" AND w.Pid !=0 ;";
+                    var list = conn.Query<wareThirdParty>(sql).AsList();
+                    
+                    sql = @"SELECT w.ThirdCode FROM ware_third_party as w 
+                                WHERE 
+                            w.CoID="+CoID+" AND w.Pid =0 ;";
+                    string thirdcode = conn.Query<string>(sql).AsList()[0];
+                    sql =@"SELECT 
+                                w.ID,w.WareName,w.OurRemark as otherremark,w.OtherRemark as ourremark,w.Enabel,w.Soure 
+                           FROM 
+                                ware_third_party as w WHERE w.`Code` in("+thirdcode+");";
+                    list.AddRange(conn.Query<wareThirdParty>(sql).AsList());
+                    result.d = list;
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
+        ///<summary>
+        /// 商家仓储列表
+        ///</summary>
+         public static DataResult selfLest(){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+        
+
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
+
+
+        ///<summary>
+        /// 
+        ///</summary>
+         public static DataResult demo(){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+        
+
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
+
+
+
 
 
 

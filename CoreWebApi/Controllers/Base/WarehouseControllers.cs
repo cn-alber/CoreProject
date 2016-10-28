@@ -38,7 +38,7 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-        [HttpPostAttribute("/Core/Warehouse/UpdateWarehouseEnable")]
+        [HttpPostAttribute("/Core/Warehouse/UpdateEnable")]
         public ResponseResult UpdateWarehouseEnable([FromBodyAttribute]JObject co)
         {   
             int id = int.Parse(co["ID"].ToString());
@@ -49,7 +49,40 @@ namespace CoreWebApi
             var data = WarehouseHaddle.UpdateWarehouseEnable(id,Company,UserName,CoID,Enable);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+        
+        [HttpGetAttribute("/Core/Warehouse/serviceCode")]
+        public ResponseResult serviceCode(string cname)
+        {   
+            string CoID = GetCoid();
+            var data = WarehouseHaddle.serviceCode(CoID,cname);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
 
+        [HttpGetAttribute("/Core/Warehouse/serviceCodeRebuild")]
+        public ResponseResult serviceCodeRebuild()
+        {   
+            string CoID = GetCoid();
+            var data = WarehouseHaddle.serviceCodeRebuild(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Warehouse/askFor")]
+        public ResponseResult askFor([FromBodyAttribute]JObject co)
+        {   
+            string code = co["code"]!=null?co["code"].ToString():"0";
+            string otherRemark = co["otherRemark"]!=null?co["otherRemark"].ToString():"";
+            string CoID = GetCoid();
+            var data = WarehouseHaddle.askFor(CoID,code,otherRemark);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Warehouse/storageLst")]
+        public ResponseResult storageLst()
+        {   
+            string CoID = GetCoid();
+            var data = WarehouseHaddle.storageLst(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
 
 
 
