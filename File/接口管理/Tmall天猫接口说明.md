@@ -785,7 +785,8 @@ function说明
  路由:`/core/Api/TmCaiNiao/WaybillIIGet`
 
  input：
-     参考地址：： http://open.taobao.com/docs/doc.htm?spm=a219a.7629140.0.0.WkHGkn&treeId=17&articleId=26869&docType=2
+    token                  授权码           
+    其余参考： http://open.taobao.com/docs/doc.htm?spm=a219a.7629140.0.0.WkHGkn&treeId=17&articleId=26869&docType=2
  output：
  ```sh
     {
@@ -812,7 +813,8 @@ function说明
  路由:`/core/Api/TmCaiNiao/waybillIIQueryByCode`
 
  input:
-    参考网址： http://open.taobao.com/docs/doc.htm?spm=a219a.7629140.0.0.gSnxce&treeId=17&articleId=104859&docType=1
+    token                  授权码           
+    其余参考： http://open.taobao.com/docs/doc.htm?spm=a219a.7629140.0.0.gSnxce&treeId=17&articleId=104859&docType=1
  output
 ```sh
 {
@@ -840,11 +842,254 @@ function说明
  路由:`/core/Api/TmCaiNiao/waybillIIUpdate`
 
  input:
-    参考网址： http://open.taobao.com/docs/doc.htm?spm=a219a.7629140.0.0.gSnxce&treeId=17&articleId=104859&docType=1
+    token                  授权码           
+    其余参考： http://open.taobao.com/docs/doc.htm?spm=a219a.7629140.0.0.gSnxce&treeId=17&articleId=104859&docType=1
  output：  
 ```sh
 
 ```
+
+19.waybillIIProduct()            商家查询物流商产品类型接口
+
+ 路由:`/core/Api/TmCaiNiao/waybillIIProduct`
+
+ input:
+    token                  授权码           
+    cp_code                快递公司CODE
+ output：  
+```sh
+    s:
+    d:[
+        {
+            "code": "CAINIAO_4PL",
+            "name": "圆通B网4PL",
+            "service_types": {
+            "waybill_service_type": [
+                {
+                "code": "YTO_B",
+                "name": "同城配送"
+                }
+                ]
+            }
+        },
+        {
+            "code": "COD",
+            "name": "代收货款",
+            "service_types": {
+            "waybill_service_type": [
+                {
+                "code": "SVC-COD",
+                "name": "代收货款"
+                }
+                ]
+            }
+        },
+            {
+            "code": "STANDARD_EXPRESS",
+            "name": "标准快递",
+            "service_types": {}
+            }
+        ]
+
+    m:
+
+
+```
+
+20.waybillIISearch()            查询面单服务订购及面单使用情况
+
+ 路由:`/core/Api/TmCaiNiao/waybillIISearch`
+
+ input:
+    token                  授权码           
+    cp_code                快递公司CODE
+ output：  
+```sh
+    s:
+    d:[
+    {
+        "allocated_quantity": 137207,
+        "branch_code": "512102",
+        "branch_name": "江苏省苏州市常熟市",
+        "cancel_quantity": 283,
+        "print_quantity": 0,
+        "quantity": 2816,
+        "shipp_address_cols": {
+        "address_dto": [{
+                "city": "苏州市",
+                "detail": "莫城管理区苏常公路戴家滨桥南，携云华东仓，收件人：南极人 电话：18913668709",
+                "district": "常熟市",
+                "province": "江苏省"
+            },
+            {
+                "city": "苏州市",
+                "detail": "莫城环来泾路南极云商仓储物流中心",
+                "district": "常熟市",
+                "province": "江苏省"
+            },
+            {
+                "city": "苏州市",
+                "detail": "莫城环来泾路南极云商仓库部",
+                "district": "常熟市",
+                "province": "江苏省"
+            }
+        ]}
+    }
+    ]
+
+    m:
+```
+
+21.waybillIICancel()            商家取消获取的电子面单号
+
+ 路由:`/core/Api/TmCaiNiao/waybillIICancel`
+
+ input:
+    token                  授权码           
+    cp_code                快递公司CODE
+    waybill_code           电子面单号
+ output：  
+```sh
+
+```
+
+
+22.cloudTempGet()            获取云打印标准模板
+
+ 路由:`/core/Api/TmCaiNiao/cloudTempGet`
+
+ input:
+    token                  授权码           
+ output：  
+```sh
+{
+  "s": 1,
+  "d": {
+    "cainiao_cloudprint_stdtemplates_get_response": {
+      "result": {
+        "datas": {
+          "standard_template_result": [
+            {
+              "cp_code": "ZJS",
+              "standard_templates": {
+                "standard_template_do": [
+                  {
+                    "standard_template_id": 901,
+                    "standard_template_name": "宅急送标准模板",
+                    "standard_template_url": "http://cloudprint.cainiao.com/template/standard/901/98"
+                  },
+                  {
+                    "standard_template_id": 75104,
+                    "standard_template_name": "宅急送标准三联模板",
+                    "standard_template_url": "http://cloudprint.cainiao.com/template/standard/75104/3"
+                  }
+                ]
+              }
+            },
+            {
+              "cp_code": "YUNDA",
+              "standard_templates": {
+                "standard_template_do": [
+                  {
+                    "standard_template_id": 401,
+                    "standard_template_name": "韵达快递标准模板",
+                    "standard_template_url": "http://cloudprint.cainiao.com/template/standard/401/122"
+                  },
+                  {
+                    "standard_template_id": 76303,
+                    "standard_template_name": "韵达快递标准三联模板",
+                    "standard_template_url": "http://cloudprint.cainiao.com/template/standard/76303/3"
+                  }
+                ]
+              }
+            }    
+          ]
+        },
+        "error_code": "0",
+        "success": true
+      },
+      "request_id": "uv7e5qn8pnp"
+    }
+  },
+  "m": ""
+}
+```
+
+23.cloudMyTempGet()            获取用户使用的菜鸟电子面单模板信息
+
+ 路由:`/core/Api/TmCaiNiao/cloudMyTempGet`
+
+ input:
+    token                  授权码           
+ output：  
+```sh
+
+```
+
+
+24.cloudCustomGet()            获取商家的自定义区模板信息
+
+ 路由:`/core/Api/TmCaiNiao/cloudCustomGet`
+
+ input:
+    token                  授权码      
+    template_id            用户使用的标准模板ID     
+ output：  
+```sh
+
+```
+
+25.cloudTempMigrate()            获取商家的自定义区模板信息
+
+ 路由:`/core/Api/TmCaiNiao/cloudTempMigrate`
+
+ input:
+    token                  授权码      
+    template_id            用户使用的标准模板ID
+    custom_area_name       自定义区名称
+    custom_area_content    自定义区内容     
+ output：  
+```sh
+    {
+    "s": 1,
+    "d": {       
+            "custom_area_id": 504108,
+            "custom_area_url": "http://cloudprint.cainiao.com/template/customArea/504108",
+            "keys": {},
+            "standard_template_id": 101,
+            "standard_template_url": "http://cloudprint.cainiao.com/template/standard/101",
+            "user_template_id": 186601           
+        },
+    "m": ""
+    }
+```
+
+26.clientUpdate()            客户端更新回调
+
+ 路由:`/core/Api/TmCaiNiao/clientUpdate`
+
+ input:
+    token                  授权码      
+    mac                    客户端mac
+    version                最新的、需要更新的版本
+    update_typa_name       更新类型     
+ output：  
+```sh
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
