@@ -287,18 +287,18 @@ namespace CoreData.CoreComm
                         // {
                         //     contents = contents + "类目全名:" + OldKind.FullName + "=>" + Kind.FullName + ";";
                         // }
-                        if (OldKind.ParentID != Kind.ParentID)
+                        if (OldKind.Enable != Kind.Enable)
                         {
-                            contents = contents + OldKind.ParentID.ToString() + "=>" + Kind.ParentID.ToString();
+                            contents = contents +"类目状态"+ OldKind.Enable.ToString() + "=>" + Kind.Enable.ToString();
                         }
                         if (!string.IsNullOrEmpty(contents))
                         {
-                            string sql = "update customkind Set KindName=@KindName,`Order`=@Order,ParentID=@ParentID,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE ID=@ID";
+                            string sql = "update customkind Set KindName=@KindName,`Order`=@Order,Enable=@Enable,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE ID=@ID";
                             var p = new DynamicParameters();
                             p.Add("@KindName", Kind.KindName);
                             // p.Add("@FullName", fullname);
                             p.Add("@Order", Kind.Order);
-                            p.Add("@ParentID", Kind.ParentID);
+                            p.Add("@Enable", Kind.Enable);
                             p.Add("@Modifier", UserName);
                             p.Add("@ModifyDate", DateTime.Now);
                             p.Add("@ID", Kind.ID);

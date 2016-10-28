@@ -1,6 +1,6 @@
 {
     "ID": 109,
     "KindName": "普通外套test",
-    "ParentID": 99,
+    "Enable": false,
     "Order":3
 }

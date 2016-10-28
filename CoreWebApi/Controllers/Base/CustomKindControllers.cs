@@ -155,8 +155,18 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/XyComm/Customkind/UpdateSkuKind")]
         public ResponseResult UpdateSkuKind([FromBodyAttribute]JObject obj)
         {
-            CustomKind Kind = Newtonsoft.Json.JsonConvert.DeserializeObject<CustomKind>(obj.ToString());
-            var res = CustomKindHaddle.UptKind(Kind, GetCoid(), GetUname());
+            var res = new DataResult(1, null);
+            bool eb = true;
+            if (obj["Enable"]==null || !bool.TryParse(obj["Enable"].ToString(), out eb))
+            {
+                res.s = -1;
+                res.d = "无效参数Enable";
+            }
+            else
+            {
+                CustomKind Kind = Newtonsoft.Json.JsonConvert.DeserializeObject<CustomKind>(obj.ToString());
+                res = CustomKindHaddle.UptKind(Kind, GetCoid(), GetUname());
+            }            
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion

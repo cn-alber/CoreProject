@@ -45,7 +45,7 @@ function说明
     路由：http://192.168.30.29:5000/Core/XyComm/Customkind/UpdateSkuKind
     InPut:
         ID                  int                 商品类目ID (*必填项*)
-        ParentID            int                 上级类目ID (*必填项*)
+        Enable              bool                类目状态启用|禁用(true|false *必填项*)
         KindName            string              商品类目名称 (*必填项*)
         Order               int                 排序(*必填项*)
     OutPut:
