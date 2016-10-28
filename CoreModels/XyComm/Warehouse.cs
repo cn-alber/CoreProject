@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+
 namespace CoreModels.XyComm
 {
     public class WarehouseInsert
@@ -12,9 +14,7 @@ namespace CoreModels.XyComm
         public string warehousename5 {get;set;}
         public string contract {get;set;}
         public string phone {get;set;}
-        public int logistics {get;set;}
-        public int city {get;set;}
-        public int district {get;set;}
+        public List<int> area{get;set;}
         public string address {get;set;}
         public bool enable{get;set;}
     }

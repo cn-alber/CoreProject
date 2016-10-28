@@ -12,9 +12,7 @@ input:Warehouse
         warehousename5  string  次品仓库名称(必须有值)
         contract        string  联络人
         phone           string  电话
-        logistics       int     省(必须有值)
-        city            int     市(必须有值)
-        district        int     区(必须有值)
+        area            List<int> 省，市，区       
         address         string  详细地址(必须有值)
       Company           string  登录者公司名称(exp:携云科技)(必须有值)
 output: s=1成功 else 错误代码
@@ -33,9 +31,7 @@ input:Warehouse
         warehousename5  string  次品仓库名称
         contract        string  联络人
         phone           string  电话
-        logistics       int     省
-        city            int     市
-        district        int     区
+        area            List<int> 省，市，区  
         address         string  详细地址
       Company       string    登录者公司名称(exp:携云科技)
 output: s=1成功 else 错误代码

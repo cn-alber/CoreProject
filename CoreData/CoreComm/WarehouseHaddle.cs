@@ -37,7 +37,7 @@ namespace CoreData.CoreComm
                 result.d = "请输入次品仓库名称!";
                 return result;
             }
-            if(wh.logistics == 0 || wh.city == 0 || wh.district == 0 || string.IsNullOrEmpty(wh.address))
+            if(wh.area.Count< 3 || string.IsNullOrEmpty(wh.address))
             {
                 result.s = -1;
                 result.d = "请输入完整的仓库地址!";
@@ -98,9 +98,9 @@ namespace CoreData.CoreComm
             warehouse.type = 0;
             warehouse.contract = wh.contract;
             warehouse.phone = wh.phone;
-            warehouse.logistics = wh.logistics;
-            warehouse.city = wh.city;
-            warehouse.district = wh.district;
+            warehouse.logistics = wh.area[0];
+            warehouse.city = wh.area[1];
+            warehouse.district = wh.area[2];
             warehouse.address = wh.address;
             warehouse.enable = true;
             warehouse.creator = UserName;
@@ -292,21 +292,21 @@ namespace CoreData.CoreComm
                     warehouse.contract = wh.contract;
                 }
                    
-                if(wh.logistics != u[0].logistics)
+                if(wh.area[0] != u[0].logistics)
                 {
-                    contents = contents + "省" + ":" +u[0].logistics + "=>" + wh.logistics + ";";
-                    warehouse.logistics = wh.logistics;
+                    contents = contents + "省" + ":" +u[0].logistics + "=>" + wh.area[0] + ";";
+                    warehouse.logistics = wh.area[0];
                 }
-                if(wh.city != u[0].city)
+                if(wh.area[1] != u[0].city)
                 {
-                    contents = contents + "市" + ":" +u[0].city + "=>" + wh.city + ";";
-                    warehouse.city = wh.city;
+                    contents = contents + "市" + ":" +u[0].city + "=>" + wh.area[1] + ";";
+                    warehouse.city = wh.area[1];
                 }
 
-                if(wh.district != u[0].district)
+                if(wh.area[2] != u[0].district)
                 {
-                    contents = contents + "区" + ":" +u[0].district + "=>" + wh.district + ";";
-                    warehouse.district = wh.district;
+                    contents = contents + "区" + ":" +u[0].district + "=>" + wh.area[2] + ";";
+                    warehouse.district = wh.area[2];
                 }
                 
                 if(wh.address != null)
@@ -624,9 +624,9 @@ namespace CoreData.CoreComm
                         rr.warehousename0 = a.warehousename;
                         rr.contract = a.contract;
                         rr.phone = a.phone;
-                        rr.logistics = a.logistics;
-                        rr.city = a.city;
-                        rr.district = a.district;
+                        rr.area[0] = a.logistics;
+                        rr.area[1] = a.city;
+                        rr.area[2] = a.district;
                         rr.address = a.address;
                         rr.enable = a.enable;
                         wheresql = "select * from warehouse where parentid = " + a.id + " and coid = " + CoID;
@@ -756,6 +756,6 @@ namespace CoreData.CoreComm
 
 
 
-        
+
     }
 }
