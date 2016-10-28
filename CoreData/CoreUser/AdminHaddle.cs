@@ -127,7 +127,8 @@ namespace CoreData.CoreUser
 
         public static DataResult CreatMenu(string name,string router,string[] iconArr,string order,string remark,string parentid,string accessid,string uname,string coid){            
             var result = new DataResult(1,null);
-            if(isMenuExist(name)){
+            if(false){
+                isMenuExist(name);
                 result.s = -2017;
             }else{
                 using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
@@ -135,7 +136,7 @@ namespace CoreData.CoreUser
                     {       
                         Menus menus = new Menus();
                         menus.Name = name;
-                        menus.SortIndex = int.Parse(router);
+                        menus.SortIndex = int.Parse(order);
                         menus.NewUrl = router;
                         menus.Remark = remark;
                         menus.ParentID = int.Parse(parentid);

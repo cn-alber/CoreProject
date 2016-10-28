@@ -15,18 +15,10 @@ namespace CoreData.CoreComm
         {
             var result = new DataResult(1,null);   
             //检查相关必输栏位
-            if(wh.warehousename0 == null)
-            {
-                result.s = -1;
-                result.d = "请输入大仓仓库名称!";
-                return result;
-            }
-            if(wh.warehousename1 == null)
-            {
-                result.s = -1;
-                result.d = "请输入销售主仓库(零数)名称!";
-                return result;
-            }
+            if(wh.warehousename0 == null)        
+                result.s = -3101;            
+            if(wh.warehousename1 == null)            
+                result.s = -3102;    
             if(wh.warehousename3 == null)
             {
                 result.s = -1;
@@ -45,7 +37,7 @@ namespace CoreData.CoreComm
                 result.d = "请输入次品仓库名称!";
                 return result;
             }
-            if(wh.logistics == null || wh.city == null || wh.district == null || wh.address == null)
+            if(wh.logistics == 0 || wh.city == 0 || wh.district == 0 || string.IsNullOrEmpty(wh.address))
             {
                 result.s = -1;
                 result.d = "请输入完整的仓库地址!";
@@ -97,6 +89,9 @@ namespace CoreData.CoreComm
                 result.d = "仓库已存在,不允许新增!";
                 return result;
             }
+            if(result.s != 1)   return result;  //格式验证
+
+
             var warehouse = new Warehouse();
             warehouse.parentid = 0;
             warehouse.warehousename = wh.warehousename0;
@@ -290,39 +285,30 @@ namespace CoreData.CoreComm
                     result.d = "此仓库不存在!";
                     return result;
                 }
-                var warehouse = u[0] as Warehouse;
-                if(wh.contract != null)
+                var warehouse = u[0] as Warehouse;                
+                if(wh.contract != null && wh.contract != u[0].contract)
                 {
-                    if(wh.contract != u[0].contract)
-                    {
-                        contents = contents + "联络人" + ":" +u[0].contract + "=>" + wh.contract + ";";
-                        warehouse.contract = wh.contract;
-                    }
+                    contents = contents + "联络人" + ":" +u[0].contract + "=>" + wh.contract + ";";
+                    warehouse.contract = wh.contract;
                 }
-                if(wh.logistics != null)
+                   
+                if(wh.logistics != u[0].logistics)
                 {
-                    if(wh.logistics != u[0].logistics)
-                    {
-                        contents = contents + "省" + ":" +u[0].logistics + "=>" + wh.logistics + ";";
-                        warehouse.logistics = wh.logistics;
-                    }
-                } 
-                if(wh.city != null)
-                {
-                    if(wh.city != u[0].city)
-                    {
-                        contents = contents + "市" + ":" +u[0].city + "=>" + wh.city + ";";
-                        warehouse.city = wh.city;
-                    }
+                    contents = contents + "省" + ":" +u[0].logistics + "=>" + wh.logistics + ";";
+                    warehouse.logistics = wh.logistics;
                 }
-                if(wh.district != null)
+                if(wh.city != u[0].city)
                 {
-                    if(wh.district != u[0].district)
-                    {
-                        contents = contents + "区" + ":" +u[0].district + "=>" + wh.district + ";";
-                        warehouse.district = wh.district;
-                    }
+                    contents = contents + "市" + ":" +u[0].city + "=>" + wh.city + ";";
+                    warehouse.city = wh.city;
                 }
+
+                if(wh.district != u[0].district)
+                {
+                    contents = contents + "区" + ":" +u[0].district + "=>" + wh.district + ";";
+                    warehouse.district = wh.district;
+                }
+                
                 if(wh.address != null)
                 {
                     if(wh.address != u[0].address)
@@ -765,5 +751,11 @@ namespace CoreData.CoreComm
             }           
             return result;
         }
+
+
+
+
+
+        
     }
 }

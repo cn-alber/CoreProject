@@ -113,7 +113,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
+                if(response.Result.ToString().IndexOf("error_response") > 0){
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
@@ -149,7 +149,7 @@ namespace CoreData.CoreApi
                     Tmparam.Add("sign", sign);//                                      
                     var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                     var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                    if(response.Result.ToString().IndexOf("error") > 0){
+                    if(response.Result.ToString().IndexOf("error_response") > 0){
                         result.s = -1;
                         result.d ="交易单号："+tid+" 获取失败, code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                         break;
@@ -209,7 +209,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
+                if(response.Result.ToString().IndexOf("error_response") > 0){
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
@@ -241,7 +241,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
+                if(response.Result.ToString().IndexOf("error_response") > 0){
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
@@ -282,7 +282,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
+                if(response.Result.ToString().IndexOf("error_response") > 0){
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
@@ -333,7 +333,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
+                if(response.Result.ToString().IndexOf("error_response") > 0){
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
@@ -370,7 +370,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
+                if(response.Result.ToString().IndexOf("error_response") > 0){
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
@@ -455,7 +455,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
+                if(response.Result.ToString().IndexOf("error_response") > 0){
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
@@ -498,7 +498,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
+                if(response.Result.ToString().IndexOf("error_response") > 0){
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
@@ -545,7 +545,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
+                if(response.Result.ToString().IndexOf("error_response") > 0){
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
@@ -578,7 +578,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
+                if(response.Result.ToString().IndexOf("error_response") > 0){
                     result.s = -1;
                     result.d ="退款单ID： "+refund_id+"获取失败 code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                     
@@ -620,7 +620,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
+                if(response.Result.ToString().IndexOf("error_response") > 0){
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
@@ -663,7 +663,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
+                if(response.Result.ToString().IndexOf("error_response") > 0){
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
@@ -718,7 +718,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
+                if(response.Result.ToString().IndexOf("error_response") > 0){
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
@@ -757,7 +757,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
+                if(response.Result.ToString().IndexOf("error_response") > 0){
                     result.s = -1;
                     result.d ="Sku ID: "+sku_id+" 信息获取失败 code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 
@@ -808,7 +808,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
+                if(response.Result.ToString().IndexOf("error_response") > 0){
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
@@ -843,7 +843,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
+                if(response.Result.ToString().IndexOf("error_response") > 0){
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
@@ -884,7 +884,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
+                if(response.Result.ToString().IndexOf("error_response") > 0){
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
@@ -1001,7 +1001,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
+                if(response.Result.ToString().IndexOf("error_response") > 0){
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
@@ -1054,7 +1054,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
                 var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
-                if(response.Result.ToString().IndexOf("error") > 0){
+                if(response.Result.ToString().IndexOf("error_response") > 0){
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{

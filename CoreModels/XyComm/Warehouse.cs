@@ -12,9 +12,9 @@ namespace CoreModels.XyComm
         public string warehousename5 {get;set;}
         public string contract {get;set;}
         public string phone {get;set;}
-        public string logistics {get;set;}
-        public string city {get;set;}
-        public string district {get;set;}
+        public int logistics {get;set;}
+        public int city {get;set;}
+        public int district {get;set;}
         public string address {get;set;}
         public bool enable{get;set;}
     }
@@ -26,9 +26,9 @@ namespace CoreModels.XyComm
         public int type {get;set;}
         public string contract {get;set;}
         public string phone {get;set;}
-        public string logistics {get;set;}
-        public string city {get;set;}
-        public string district {get;set;}
+        public int logistics {get;set;}
+        public int city {get;set;}
+        public int district {get;set;}
         public string address {get;set;}
         public bool enable {get;set;}  
         public string creator {get;set;}
