@@ -102,7 +102,7 @@ namespace CoreWebApi
 
 
          #region 获取商品单个属性
-        [HttpGetAttribute("/Core/XyComm/Customkind/SkuKindProp")]
+        [HttpGetAttribute("/Core/XyComm/CustomKindProps/SkuKindProp")]
         public ResponseResult SkuKindProp(string ID)
         {
             var res = new DataResult(1, null);
