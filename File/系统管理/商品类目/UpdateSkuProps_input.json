@@ -1,0 +1,11 @@
+{
+    "kindid": 227,
+    "id":140,
+    "name": "属性测试3ss",
+    "is_input_prop":true,
+    "Order":3,   
+    "ValLst": [
+            "可选test1",
+            "可选test3ss"
+        ]
+}

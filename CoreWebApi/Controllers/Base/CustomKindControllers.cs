@@ -81,7 +81,7 @@ namespace CoreWebApi
         #endregion
         #region 获取商品属性        
         [HttpGetAttribute("/Core/XyComm/Customkind/SkuKindProps")]
-        public ResponseResult SkuKindProps(string ID)
+        public ResponseResult SkuKindProps(string ID,string Enable)
         {
             var res = new DataResult(1, null);
             string CoID = GetCoid();
@@ -89,7 +89,7 @@ namespace CoreWebApi
             if (int.TryParse(ID, out PID))
             {
                 PID = int.Parse(ID);
-                res = CustomKindHaddle.GetSkuKindProps(PID, CoID);
+                res = CustomKindHaddle.GetSkuKindProps(PID,Enable, CoID);
             }
             else
             {
@@ -217,9 +217,8 @@ namespace CoreWebApi
         }
         #endregion
 
-
         #region 新增商品属性值
-        [HttpPostAttribute("/Core/XyComm/Customkind/")]
+        [HttpPostAttribute("/Core/XyComm/CustomKindProps/InsertSkuProps")]
         public ResponseResult InsertSkuProps([FromBodyAttribute]JObject obj)
         {
             var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<Customkind_props>(obj.ToString());
@@ -229,6 +228,43 @@ namespace CoreWebApi
             var res = CustomKindPropsHaddle.InsertProps(cp);
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
+        #endregion 
+
+
+        #region 修改商品类目属性
+        [HttpPostAttribute("/Core/XyComm/CustomKindProps/UpdateSkuProps")]
+        public ResponseResult UpdateSkuProps([FromBodyAttribute]JObject obj)
+        {
+            var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<Customkind_props>(obj.ToString());
+            cp.CoID = int.Parse(GetCoid());
+            cp.Creator = GetUname();
+            cp.CreateDate = DateTime.Now.ToString();
+            var res = CustomKindPropsHaddle.UpdateProps(cp);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 商品类目属性- 停用|启用
+        [HttpPostAttribute("/Core/XyComm/CustomKindProps/UpdateSkuPropsEnable")]
+        public ResponseResult UpdateSkuPropsEnable([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
+            if (IDLst.Count == 0)
+            {
+                res.s = -1;
+                res.d = "请先选中操作明细";
+            }
+            else
+            {
+                bool Enable = obj["Enable"].ToString().ToUpper() == "TRUE" ? true : false;
+                string CoID = GetCoid();
+                string UserName = GetUname();
+                res = CustomKindPropsHaddle.UptPropsEnable(IDLst, CoID, UserName, Enable);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+
         #endregion
 
 
