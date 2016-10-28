@@ -22,32 +22,32 @@ namespace CoreModels.XyComm
             get { return _must; }
             set { this._must = value; }
         }
-        public bool multi 
+        public bool multi
         {
             get { return _multi; }
             set { this._multi = value; }
         }
-        public bool is_allow_alias 
+        public bool is_allow_alias
         {
             get { return _is_allow_alias; }
             set { this._is_allow_alias = value; }
         }
-        public bool is_enum_prop 
+        public bool is_enum_prop
         {
             get { return _is_enum_prop; }
             set { this._is_enum_prop = value; }
         }
-        public bool is_input_prop 
+        public bool is_input_prop
         {
             get { return _is_input_prop; }
             set { this._is_input_prop = value; }
         }
-        public bool is_key_prop 
+        public bool is_key_prop
         {
             get { return _is_key_prop; }
             set { this._is_key_prop = value; }
         }
-        public bool is_sale_prop 
+        public bool is_sale_prop
         {
             get { return _is_sale_prop; }
             set { this._is_sale_prop = value; }
@@ -62,7 +62,6 @@ namespace CoreModels.XyComm
             get { return _ParentID; }
             set { this._ParentID = value; }
         }
-
         public long pid { get; set; }
         public long tb_cid { get; set; }
         public int Order { get; set; }
@@ -71,6 +70,8 @@ namespace CoreModels.XyComm
         public string Modifier { get; set; }
         public string ModifyDate { get; set; }
         public int CoID { get; set; }
+        public string PropValues { get; set; }
+        public List<string> ValLst { get; set; }
     }
 
 

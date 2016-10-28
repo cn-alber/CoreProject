@@ -107,6 +107,7 @@ function说明
     路由:http://192.168.30.211:5000/Core/XyComm/Customkind/SkuKindProps?ID=131
     input： 
             ID           int            商品类目ID
+            Enable       string         指定状态true|false|all(启用，停用,所有)
     OutPut: 
             PropLst      List<customkind_props> 商品类目属性
     参考:output json 文件:SkuKindProps_output.json
@@ -121,4 +122,53 @@ function说明
             3.返回成功信息
         失败：
             1.返回错误信息
+11.InsertSkuProps()//新增商品属性值
+    方法：POST
+    路由：http://192.168.30.211:5000/Core/XyComm/CustomKindProps/InsertSkuProps
+    InPut:
+            kindid      string          商品类目ID
+            name        string          属性name         
+            Order       int             排序
+            ValLst      List<string>    属性可选值
+    OutPut:
+            成功： 
+                1.新增商品属性customkind_props
+                2.新增商品可选属性customkind_props_value
+                3.新增修改记录log
+    参考：input json 文件：InsertSkuProps_input.json
+
+12.UpdateSkuProps()//修改商品属性值
+    方法：POST
+    路由：http://192.168.30.211:5000/Core/XyComm/CustomKindProps/UpdateSkuProps
+    InPut:
+            kindid          int             商品类目ID (*必填项*)
+            id              int             商品类目属性id (*必填项*)
+            name            string          属性name (*必填项*)          
+            Order           int             排序 (*必填项*)
+            is_input_prop   bool            可输入 （==选填项，默认false）
+            ValLst      List<string>    属性可选值 (*必填项*)
+    OutPut:
+            成功： 
+                1.修改商品属性customkind_props
+                2.修改商品可选属性customkind_props_value
+                3.新增修改记录log
+    参考：input json 文件：UpdateSkuProps_input.json
+
+
+13.UpdateSkuPropsEnable()//商品类目属性- 停用|启用
+    路由：http://192.168.30.211:5000/Core/XyComm/CustomKindProps/UpdateSkuPropsEnable
+    参数：
+    InPut:
+        IDLst         List<int>      商品属性ID
+        Enable        string         指定商品属性状态true|false（启用，停用）
+    OutPut:
+        成功：
+            1.更新商品属性状态brand.enable
+            2.新增修改记录log
+            3.返回成功信息：s=1,d=商品属性状态启用(停用)
+        失败：
+            1.返回错误信息：s=3003.资料更新失败
+    参考：input json 文件：UpdateSkuPropsEnable_input.json
+
+
 
