@@ -104,14 +104,14 @@ function说明
 
 9.SkuKindProps()//获取商品属性
     方法：Get
-    路由:http://192.168.30.211:5000/Core/XyComm/Customkind/SkuKindProps?ID=131
+    路由:http://192.168.30.211:5000/Core/XyComm/Customkind/SkuKindProps?ID=131&Enable=true
     input： 
             ID           int            商品类目ID
             Enable       string         指定状态true|false|all(启用，停用,所有)
     OutPut: 
             PropLst      List<customkind_props> 商品类目属性
     参考:output json 文件:SkuKindProps_output.json
-10.InsertTmaoKind()
+10.InsertTmaoKind()//导入淘宝自定义类目
     方法：POST
     路由:http://192.168.30.211:5000/Core/XyComm/Customkind/InsertTmaoKind
     Input: Null
@@ -126,10 +126,11 @@ function说明
     方法：POST
     路由：http://192.168.30.211:5000/Core/XyComm/CustomKindProps/InsertSkuProps
     InPut:
-            kindid      string          商品类目ID
-            name        string          属性name         
-            Order       int             排序
-            ValLst      List<string>    属性可选值
+            kindid          string          商品类目ID
+            name            string          属性name         
+            Order           int             排序
+            is_input_prop   bool            可输入 （true|false,默认false）
+            ValLst          List<string>    属性可选值
     OutPut:
             成功： 
                 1.新增商品属性customkind_props

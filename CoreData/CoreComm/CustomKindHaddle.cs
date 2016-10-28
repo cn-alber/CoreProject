@@ -158,9 +158,12 @@ namespace CoreData.CoreComm
                     // }
                     if(props.Count>0)
                     {
-                        string ValSql=@"SELECT id,name from Customkind_props_value WHERE CoID=@CoID AND kindid = @KindID";
+                        string ValSql=@"SELECT propid,name from Customkind_props_value WHERE CoID=@CoID AND kindid = @KindID AND Enable=1 AND IsDelete=0";
                         var ValLst = conn.Query<Customkind_props_value>(ValSql,new{CoID=CoID,KindID=KindID});
-                        // props.ValLst = ValLst.Select(a=>a.);
+                        foreach(var prop in props)
+                        {
+                            prop.ValLst = ValLst.Where(a=>a.propid==prop.id).OrderBy(b=>b.Order).AsList().Select(c=>c.name).AsList();
+                        }
                     }
                     result.d = props;
                 }
