@@ -6,18 +6,19 @@ namespace CoreModels.XyComm
     public class WarehouseInsert
     {
         public int id{get;set;}
-        public string warehousename0 {get;set;}
-        public string warehousename1 {get;set;}
-        public string warehousename2 {get;set;}
-        public string warehousename3 {get;set;}
-        public string warehousename4 {get;set;}
-        public string warehousename5 {get;set;}
+        public string name0 {get;set;}
+        public string name1 {get;set;}
+        public string name2 {get;set;}
+        public string name3 {get;set;}
+        public string name4 {get;set;}
+        public string name5 {get;set;}
         public string contract {get;set;}
         public string phone {get;set;}
         public List<int> area{get;set;}
         public string address {get;set;}
         public bool enable{get;set;}
     }
+
     public class Warehouse
     {
         public int id{get;set;}
