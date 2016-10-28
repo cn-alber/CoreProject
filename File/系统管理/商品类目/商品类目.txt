@@ -172,6 +172,15 @@ function说明
         失败：
             1.返回错误信息：s=3003.资料更新失败
     参考：input json 文件：UpdateSkuPropsEnable_input.json
+14.SkuKindProp()//获取单个属性内容
+    路由：http://192.168.30.211:5000/Core/XyComm/CustomKindProps/SkuKindProp?ID=141    
+    参数：
+    InPut:
+        ID          int                 商品属性ID(customkind_props.id)
+    OutPut:
+        Prop        Customkind_props    单笔商品属性资料
+    参考：output json 文件：SkuKindProp_output.json
+
 
 
 

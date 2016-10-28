@@ -74,7 +74,7 @@ namespace CoreWebApi
             else
             {
                 res.s = -1;
-                res.d = "无效参数ParentID";
+                res.d = "无效参数ID";
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
@@ -94,7 +94,29 @@ namespace CoreWebApi
             else
             {
                 res.s = -1;
-                res.d = "无效参数ParentID";
+                res.d = "无效参数ID";
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+
+         #region 获取商品单个属性
+        [HttpGetAttribute("/Core/XyComm/Customkind/SkuKindProp")]
+        public ResponseResult SkuKindProp(string ID)
+        {
+            var res = new DataResult(1, null);
+            string CoID = GetCoid();
+            int PID = 0;
+            if (int.TryParse(ID, out PID))
+            {
+                PID = int.Parse(ID);
+                res = CustomKindHaddle.GetSkuKindProp(PID,CoID);
+            }
+            else
+            {
+                res.s = -1;
+                res.d = "无效参数ID";
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }

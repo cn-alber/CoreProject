@@ -175,6 +175,41 @@ namespace CoreData.CoreComm
                 return result;
             }
         }
+
+         public static DataResult GetSkuKindProp(int PorpID, string CoID)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    // string cname = "customkindProps" + CoID + KindID;
+                    // var props = CacheBase.Get<List<Customkind_props>>(cname);//读取缓存
+                    // if (props == null)
+                    // {
+                    string sql = "SELECT * FROM customkind_props WHERE id=@ID AND CoID=@CoID";
+                    var p = new DynamicParameters();
+                    p.Add("@ID", PorpID);
+                    p.Add("@CoID", CoID);                   
+                    var prop = conn.QueryFirst<Customkind_props>(sql, p);
+                    // CacheBase.Set(cname, props);//新增缓存
+                    // }
+                    if(prop!=null)
+                    {
+                        string ValSql=@"SELECT propid,name from Customkind_props_value WHERE CoID=@CoID AND propid = @propid AND Enable=1 AND IsDelete=0";
+                        var ValLst = conn.Query<Customkind_props_value>(ValSql,new{CoID=CoID,propid=PorpID});
+                        prop.ValLst = ValLst.Where(a=>a.propid==prop.id).OrderBy(b=>b.Order).AsList().Select(c=>c.name).AsList();
+                    }
+                    result.d = prop;
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+                return result;
+            }
+        }
         #endregion
 
         #region 新增类目资料
