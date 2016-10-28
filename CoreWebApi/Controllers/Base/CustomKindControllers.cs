@@ -299,7 +299,15 @@ namespace CoreWebApi
 
         #endregion
 
-
+        #region 拷贝商品类目属性--来源类目列表
+        [HttpGetAttribute("/Core/XyComm/CustomKindProps/CopyToKindLst")]
+        public ResponseResult CopyToKindLst()
+        {
+            var res = CustomKindHaddle.GetCopyToKindLst(GetCoid(),"");
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        
+        #endregion
 
 
 

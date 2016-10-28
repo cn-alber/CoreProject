@@ -71,6 +71,11 @@ namespace CoreModels.XyComm
         public string ModifyDate { get; set; }
     }
 
+    public class CustomKindname
+    {
+        public int ID { get; set; }
+        public string KindName { get; set; }
+    }
     public class CustomKindData
     {
         public int ID { get; set; }

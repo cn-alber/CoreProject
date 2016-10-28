@@ -74,7 +74,6 @@ namespace CoreModels.XyComm
         public List<string> ValLst { get; set; }
     }
 
-
     public class item_props
     {
         public object item_prop { get; set; }

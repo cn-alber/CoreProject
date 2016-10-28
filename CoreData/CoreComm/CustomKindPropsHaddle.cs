@@ -107,7 +107,7 @@ namespace CoreData.CoreComm
                     p.Add("@Modifier", IParam.Creator);
                     p.Add("@ModifyDate", DateTime.Now);
                     p.Add("@ID", IParam.id);
-                    int count = conn.Execute(propsql, p,Trans);
+                    int count = conn.Execute(propsql, p, Trans);
                 }
 
                 //属性可选值增删
@@ -139,7 +139,7 @@ namespace CoreData.CoreComm
                     contents = contents + "可选值新增:(" + string.Join(",", NewNameLst.ToArray()) + ")";
                 }
                 //更新属性可选值
-                var DelIDLst = OldLst.Where(a => !a.IsDelete&&!IParam.ValLst.Contains(a.name)).AsList().Select(b => b.id).AsList();
+                var DelIDLst = OldLst.Where(a => !a.IsDelete && !IParam.ValLst.Contains(a.name)).AsList().Select(b => b.id).AsList();
                 if (DelIDLst.Count > 0)
                 {
                     string DelSql = @"UPDATE customkind_props_value
@@ -153,7 +153,7 @@ namespace CoreData.CoreComm
                     conn.Execute(DelSql, new { CoID = IParam.CoID, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate, propid = IParam.id, DelIDLst = DelIDLst }, Trans);
                     contents = contents + "可选值移除:(" + string.Join(",", NewNameLst.ToArray()) + ")";
                 }
-                var UptIDLst = OldLst.Where(a => a.IsDelete&&IParam.ValLst.Contains(a.name)).AsList().Select(b => b.id).AsList();
+                var UptIDLst = OldLst.Where(a => a.IsDelete && IParam.ValLst.Contains(a.name)).AsList().Select(b => b.id).AsList();
                 if (UptIDLst.Count > 0)
                 {
                     string UptSql = @"UPDATE customkind_props_value
@@ -203,7 +203,7 @@ namespace CoreData.CoreComm
                                         Modifier =@Modifier,
                                         ModifyDate =@ModifyDate
                                   where ID in @ID";
-                var args = new { ID = IDLst, Enable = Enable,Modifier=UserName,ModifyDate=DateTime.Now.ToString()};
+                var args = new { ID = IDLst, Enable = Enable, Modifier = UserName, ModifyDate = DateTime.Now.ToString() };
                 int count = conn.Execute(uptsql, args, Trans);
                 if (count < 0)
                 {
@@ -243,7 +243,36 @@ namespace CoreData.CoreComm
 
         #endregion
 
+      
+
         #region 商品类目属性可选值复制
+        public static DataResult CopyProps(List<int> IDLst, int kindid, int Type, string CoID, string UserName)
+        {
+            var res = new DataResult(1, null);
+            var conn = new MySqlConnection(DbBase.CommConnectString);
+            conn.Open();
+            var Trans = conn.BeginTransaction();
+            try
+            {
+                string sql = @"SELECT * FROM customkind_props WHERE id in @IDLst AND CoID=@CoID";
+                var Props = conn.Query(sql, new { CoID = CoID, IDLst = IDLst }).AsList();
+
+
+            }
+            catch (Exception e)
+            {
+                Trans.Rollback();
+                res.s = -1;
+                res.d = e.Message;
+            }
+            finally
+            {
+                Trans.Dispose();
+                conn.Dispose();
+                conn.Close();
+            }
+            return res;
+        }
 
         #endregion
 
