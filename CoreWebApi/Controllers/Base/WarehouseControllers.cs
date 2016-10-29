@@ -73,13 +73,13 @@ namespace CoreWebApi
         public ResponseResult askFor([FromBodyAttribute]JObject co)
         {   
             string code = co["code"]!=null?co["code"].ToString():"0";
-            string otherRemark = co["otherRemark"]!=null?co["otherRemark"].ToString():"";
+            string otherRemark = co["otherRemark"]!=null?co["otherRemark"].ToString():"";            
             string CoID = GetCoid();
             var data = WarehouseHaddle.askFor(CoID,code,otherRemark);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-        [HttpGetAttribute("/Core/Warehouse/storageLst")]
+        [HttpGetAttribute("/Core/Warehouse/Lst")]
         public ResponseResult storageLst()
         {   
             string CoID = GetCoid();
@@ -102,22 +102,33 @@ namespace CoreWebApi
             var owr = Newtonsoft.Json.JsonConvert.DeserializeObject<openWareRequset>(co.ToString());
             if(string.IsNullOrEmpty(owr.pwd)|| owr.pwd.Length<6||owr.pwd.Length>18){
                 data.s = -3107;
-            } 
-            if(string.IsNullOrEmpty(owr.username)){
+            }else if(string.IsNullOrEmpty(owr.username)){
                 data.s = -3108;
+            }else if(string.IsNullOrEmpty(owr.warename)||string.IsNullOrEmpty(owr.wareadmin)){
+                data.s = -3110;
+            }else{
+                var uname = GetUname();
+                string CoID = GetCoid();                
+                var user = new UserEdit();
+                user.Enable = true;
+                user.Account = owr.username;
+                user.PassWord =GetMD5(owr.pwd, "Xy@.");   
+                data = WarehouseHaddle.openOtherWare(user,Convert.ToInt16(CoID),uname,owr.warename,owr.wareadmin);
             }        
-            
-        
-
-            var uname = GetUname();
-            string CoID = GetCoid();
-            var user = new UserEdit();
-            user.Enable = true;
-            user.Account = owr.username;
-            user.PassWord =owr.pwd;   
-            data = WarehouseHaddle.openOtherWare(user,Convert.ToInt16(CoID),uname,owr.warename,owr.wareadmin);
+                            
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Warehouse/editRemark")]
+        public ResponseResult editRemark(string id,int type,string remark)
+        {   
+            string CoID = GetCoid();
+            string uname = GetUname();
+            var data = WarehouseHaddle.editRemark(CoID,uname,id,type,remark);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+
 
 
 
