@@ -347,6 +347,63 @@ namespace CoreModels.XyCore
         public string Creator{get;set;}
         public string ShopSit{get;set;}
     }
+    public class RecInfoParm
+    {
+        public int _CoID ;//公司id
+        public string _BuyerId = null;//买家账号
+        public string _Receiver = null;//收货人
+        public string _ShopSit = null;//来源平台
+        public string _SortField;//排序栏位
+        public string _SortDirection;//排序方式
+        public int _NumPerPage = 20;//每页显示资料笔数
+        public int _PageIndex = 1;//页码
+        public int CoID
+        {
+            get { return _CoID; }
+            set { this._CoID = value;}
+        }
+        public string BuyerId
+        {
+            get { return _BuyerId; }
+            set { this._BuyerId = value;}
+        }
+        public string Receiver
+        {
+            get { return _Receiver; }
+            set { this._Receiver = value;}
+        }
+        public string ShopSit
+        {
+            get { return _ShopSit; }
+            set { this._ShopSit = value;}
+        }
+        public string SortField
+        {
+            get { return _SortField; }
+            set { this._SortField = value;}
+        }
+        public string SortDirection
+        {
+            get { return _SortDirection; }
+            set { this._SortDirection = value;}
+        }
+        public int NumPerPage
+        {
+            get { return _NumPerPage; }
+            set { this._NumPerPage = value;}
+        }
+        public int PageIndex
+        {
+            get { return _PageIndex; }
+            set { this._PageIndex = value;}
+        }
+    }
+    public class RecInfoData
+    {
+        public int Datacnt {get;set;}//总资料笔数
+        public decimal Pagecnt{get;set;}//总页数
+        public List<RecInfo> Recinfo {get;set;}
+    }
     public class Log
     {
         public int ID{get;set;}
@@ -358,5 +415,35 @@ namespace CoreModels.XyCore
         public string Title{get;set;}
         public string Remark{get;set;}
         public int CoID{get;set;}
+    }
+    public class OrderDetailInsert
+    {
+        public List<int> successIDs {get;set;}
+        public List<InsertFailReason> failIDs {get;set;}
+    }
+    public class OrderItem
+    {
+        public int ID{get;set;}
+        public int OID{get;set;}
+        public long SoID{get;set;}
+        public int CoID{get;set;}
+        public int SkuAutoID{get;set;}
+        public string SkuID{get;set;}
+        public string SkuName{get;set;}
+        public string Norm{get;set;}
+        public int Qty{get;set;}
+        public string SalePrice{get;set;}
+        public string RealPrice{get;set;}
+        public string Amount{get;set;}
+        public string DiscountRate{get;set;}
+        public string img{get;set;}
+        public string Weight{get;set;}
+        public string TotalWeight{get;set;}
+        public bool IsGift{get;set;}
+        public string Remark{get;set;}
+        public string Creator{get;set;}
+        public DateTime CreateDate{get;set;}
+        public string Modifier{get;set;}
+        public DateTime ModifyDate{get;set;}
     }
 }

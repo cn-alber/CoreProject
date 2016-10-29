@@ -1,39 +1,80 @@
 接口名称:OrderControllers
 
 function说明
-1.PurchaseList() //查询table purchase 资料
-  路由:http://localhost:5000/Core/Purchase/PurchaseList
-input:      Purid           string          采购单号 default null
-            PurdateStart    string          采购时间起 default null
-            PurdateEnd      string          采购时间迄 default null
-            Status          string          状态 default null
-            Scoid           string          供应商 default null
-            Skuid           string          商品编码 default null
-            Warehouseid     string          仓库代号 default null
-            Buyyer          string          采购员 default null
-            SortField       string          排序栏位名称 default id
-            SortDirection   string          排序方式 default DESC
-            PageIndex       string          资料页数(ex.第一页就给1) default 1
-            NumPerPage      string          每页显示资料笔数 default 20
-OutPut:     Datacnt         int             资料总笔数
-            Pagecnt         decimal         总页数
-            Com             List<Purchase>  Purchase 资料
-参考:output jason 文件:PurchaseList_output.json
+1.OrderList() //查询table order 资料(效能待测试)
+  路由:http://localhost:5000/Core/Order/OrderList
+input:      ID                  string          内部订单单号 default null
+            SoID                string          外部订单单号 default null
+            PayNbr              string          付款单号 default null
+            BuyerShopID         string          买家账号 default null
+            ExCode              string          快递单号 default null
+            RecName             string          收货人 default null
+            RecPhone            string          手机 default null
+            RecTel              string          电话 default null
+            RecLogistics        string          省 default null
+            RecCity             string          市 default null
+            RecDistrict         string          区 default null
+            RecAddress          string          详细地址 default null
+            StatusList          string          状态 default null,List 用逗号隔开
+            AbnormalStatusList  string          异常状态 default null,List 用逗号隔开
+            IsRecMsgYN          string          是否过滤买家留言 default A
+            RecMessage          string          买家留言 default null
+            IsSendMsgYN         string          是否过滤卖家留言 default null
+            SendMessage         string          卖家留言 default null
+            Datetype            string          日期选项 default ODate
+            DateStart           string          日期起 default null
+            Dateend             string          日期迄 default null
+            Skuid               string          商品编码 default null
+            Ordqtystart         string          数量起 default null
+            Ordqtyend           string          数量迄 default null
+            Ordamtstart         string          金额起 default null
+            Ordamtend           string          金额迄 default null
+            Skuname             string          商品名称 default null
+            Norm                string          规格 default null
+            ShopStatus          string          淘宝店铺状态 default null,List 用逗号隔开
+            Osource             string          订单来源 default null
+            Type                string          订单类型 default null,List 用逗号隔开
+            IsCOD               string          贷款方式 default A
+            ShopID              string          店铺 default null,List 用逗号隔开
+            IsDisSelectAll      string          分销商是否全选 default false
+            Distributor         string          分销商 default null,List 用逗号隔开
+            ExID                string          快递公司 default null,List 用逗号隔开
+            SendWarehouse       string          发货仓库 default null,List 用逗号隔开
+            SortField           string          排序栏位名称 default null
+            SortDirection       string          排序方式 default null
+            PageIndex           string          资料页数(ex.第一页就给1) default 1
+            NumPerPage          string          每页显示资料笔数 default 20
+OutPut:     Datacnt             int             资料总笔数
+            Pagecnt             decimal         总页数
+            Ord                 List<Order>     Order 资料
+参考:output jason 文件:OrderList_output.json
 
-2.InsertOrder()
-{
-    "Ord": {
-        "ODate": "2016-10-26",
-        "BuyerShopID": "测试1026",
-        "ShopID": 2,
-        "RecName": "测试1026name",
-        "RecLogistics": "江苏省",
-        "RecCity": "苏州市",
-        "RecDistrict": "常熟市",
-        "RecAddress": "可美国际大厦",
-        "RecPhone": "123456789",
-        "RecMessage": "RecMessage1026",
-        "SendMessage": "SendMessage"
-    },
-    "IsFaceToFace": "false"
-}
+2.InsertOrder()订单新增
+路由:http://localhost:5000/Core/Order/InsertOrder
+input:Ord           Order      订单资料
+      IsFaceToFace  string     是否现场取货true/false    
+output: s=1成功 else 错误代码
+参考:input jason 文件:InsertOrder_input.json
+参考:output jason 文件:InsertOrder_output.json
+
+3.UpdateOrder()订单新增
+路由:http://localhost:5000/Core/Order/UpdateOrder
+input:Ord           Order      订单资料    
+output: s=1成功 else 错误代码
+参考:input jason 文件:UpdateOrder_input.json
+参考:output jason 文件:UpdateOrder_output.json
+
+4.RecInfoList() //查询table recinfo 资料
+  路由:http://localhost:5000/Core/Order/RecInfoList
+input:      BuyerId             string          买家账号 default null
+            Receiver            string          收货人 default null
+            ShopSit             string          来源平台 default null
+            SortField           string          排序栏位名称 default null
+            SortDirection       string          排序方式 default null
+            PageIndex           string          资料页数(ex.第一页就给1) default 1
+            NumPerPage          string          每页显示资料笔数 default 20
+OutPut:     Datacnt             int             资料总笔数
+            Pagecnt             decimal         总页数
+            Recinfo             List<Recinfo>   RecInfo 资料
+参考:output jason 文件:RecInfoList_output.json
+
