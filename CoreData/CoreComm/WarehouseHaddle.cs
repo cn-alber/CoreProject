@@ -942,7 +942,7 @@ namespace CoreData.CoreComm
                                     w.ID,w.WareName,w.myremark,w.itremark,w.Enable,w.Source ,w.ItName,w.Mdate
                                   FROM 
                                     ware_third_party as w 
-                                  WHERE w.CoID="+CoID+c+s;
+                                  WHERE w.ItCoid = "+CoID+" OR w.CoID="+CoID+c+s;
                     Console.WriteLine(sql);                                  
                     var storageLst = conn.Query<wareThirdParty>(sql).AsList();
                     string code = conn.Query<string>(@"SELECT  w.Code FROM  ware_third_party as w WHERE w.CoID="+CoID+" AND w.Pid =0").AsList()[0];
