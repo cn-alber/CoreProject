@@ -278,5 +278,7 @@ namespace CoreModels.XyCore
         public string img { get; set; }
         public string goodscode { get; set; }
         public bool enable{ get; set; }
+        public string saleprice{ get; set; }
+        public string weight{ get; set; }
     }
 }
