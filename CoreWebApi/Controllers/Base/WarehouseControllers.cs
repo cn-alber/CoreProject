@@ -80,20 +80,13 @@ namespace CoreWebApi
         }
 
         [HttpGetAttribute("/Core/Warehouse/Lst")]
-        public ResponseResult storageLst()
+        public ResponseResult storageLst(string[] contains ,string[] status)
         {   
             string CoID = GetCoid();
-            var data = WarehouseHaddle.storageLst(CoID);
+            var data = WarehouseHaddle.storageLst(CoID,contains,status);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-        [HttpGetAttribute("/Core/Warehouse/selfList")]
-        public ResponseResult selfList()
-        {   
-            string CoID = GetCoid();
-            var data = WarehouseHaddle.selfList(CoID);
-            return CoreResult.NewResponse(data.s, data.d, "General"); 
-        }
 
         [HttpPostAttribute("/Core/Warehouse/openOtherWare")]
         public ResponseResult openOtherWare([FromBodyAttribute]JObject co)

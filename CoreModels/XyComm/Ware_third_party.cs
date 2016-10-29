@@ -3,15 +3,16 @@ namespace CoreModels.XyComm
     public class wareThirdParty{
         public int id{get;set;}
         public string warename{get;set;}
-        public string ourremark{get;set;}
-        public string otherremark{get;set;}
+        public string thirdname{get;set;}
+        public string myremark{get;set;}
+        public string yetremark{get;set;}
         public int enabel{get;set;}
-        public int  soure{get;set;} 
-        public string cdate{get;set;}
+        public int  source{get;set;} 
+        //public string cdate{get;set;}
         public string mdate{get;set;}
-        public string pdate{get;set;}
-        public string enddate{get;set;}
-        public string endman{get;set;}
+        // public string pdate{get;set;}
+        // public string enddate{get;set;}
+        // public string endman{get;set;}
         
 
     }

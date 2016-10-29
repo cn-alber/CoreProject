@@ -822,13 +822,13 @@ namespace CoreData.CoreComm
         ///<summary>
         /// 申请加入仓储服务
         ///</summary>
-         public static DataResult askFor(string CoID,string code,string otherRemark){
+         public static DataResult askFor(string CoID,string code,string yetremark){
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
                     string sql = @"SELECT 
-                                    w.ID,w.WareName,w.OurRemark,w.OtherRemark,w.Enable,w.Soure ,w.Cdate
+                                    w.ID,w.WareName,w.myremark,w.yetremark,w.Enable,w.Soure ,w.Cdate
                                   FROM 
                                     ware_third_party as w WHERE  w.`Code` = "+code;
                     var res = conn.Query<wareThirdParty>(sql).AsList();
@@ -838,29 +838,30 @@ namespace CoreData.CoreComm
                         var thirdWare = res[0];                        
                         sql = @"UPDATE ware_third_party SET 
                                     ware_third_party.Enable = 2,
-                                    ware_third_party.OtherRemark = @OtherRemark
+                                    ware_third_party.yetremark = @yetremark,
+                                    ware_third_party.Enable = 2,  
+                                    ware_third_party.Soure = 1,
+                                    ware_third_party.CoID = @CoID,                                 
+                                    ware_third_party.ThirdCode =@otherCoid, 
+                                    ware_third_party.Cdate = @Cdate,
+                                    ware_third_party.Pdate = Now(),
                                 WHERE 
                                     ware_third_party.`Code` = @Code;
                                 INSERT ware_third_party SET 
                                     ware_third_party.WareName = @WareName,
-                                    ware_third_party.OurRemark =@OtherRemark,
-                                    ware_third_party.OtherRemark =@OurRemark,
-                                    ware_third_party.Enable = 2,  
-                                    ware_third_party.Soure = 1,
-                                    ware_third_party.CoID = @CoID,                                 
-                                    ware_third_party.ThirdCode =@Code, 
-                                    ware_third_party.Cdate = @Cdate,
-                                    ware_third_party.Pdate = Now(),
+                                    ware_third_party.myremark =@yetremark,
+                                    ware_third_party.yetremark =@myremark,
+                                    
                                     ware_third_party.Pid=@Pid;
                                     ";
                         var rnt = conn.Execute(sql,new {
                             WareName = thirdWare.warename,
                             Code = code,
-                            OtherRemark = otherRemark,
-                            OurRemark = thirdWare.ourremark, // 第三方物流的'我方备注' 即为 我方公司的'对方备注'
+                            yetremark = yetremark,
+                            myremark = thirdWare.myremark, // 第三方物流的'我方备注' 即为 我方公司的'对方备注'
                             CoID = CoID,
                             Pid = thirdWare.id,
-                            Cdate = thirdWare.cdate,
+                            //Cdate = thirdWare.cdate,
                             ThirdCode = code
                         });
                     }                                        
@@ -929,28 +930,25 @@ namespace CoreData.CoreComm
         ///<summary>
         /// 获取仓储列表
         ///</summary>
-         public static DataResult storageLst(string CoID){
+         public static DataResult storageLst(string CoID,string[] contains,string[] status){
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {                    
-                    string sql =@"SELECT 
-                                    w.ID,w.WareName,w.OurRemark,w.OtherRemark,w.Enable,w.Soure 
-                                  FROM 
-                                    ware_third_party as w WHERE w.CoID="+CoID+" AND w.Pid !=0 ;";
-                    var storageLst = conn.Query<wareThirdParty>(sql).AsList();
-                    
-                         sql =@"SELECT 
-                                    w.ID,w.WareName,w.OurRemark,w.OtherRemark,w.Enable,w.Soure 
-                                  FROM 
-                                    ware_third_party as w WHERE w.CoID="+CoID+" AND w.Pid =0 AND (w.Enable=1 OR w.Enable=2);";
-                    var selfList = conn.Query<wareThirdParty>(sql).AsList();    
+                    string c = contains.Length> 0 ?" AND w.Source in('"+string.Join(",", contains)+"')" :"";
+                    string s = status.Length> 0 ? " AND w.Enable in ('"+string.Join(",", status)+"')":"";
 
+                    string sql =@"SELECT 
+                                    w.ID,w.WareName,w.myremark,w.yetremark,w.Enable,w.Source ,w.ThirdName,w.Mdate
+                                  FROM 
+                                    ware_third_party as w 
+                                  WHERE w.CoID="+CoID+c+s+"   ;";
+                    Console.WriteLine(sql);                                  
+                    var storageLst = conn.Query<wareThirdParty>(sql).AsList();
                     string code = conn.Query<string>(@"SELECT  w.Code FROM  ware_third_party as w WHERE w.CoID="+CoID+" AND w.Pid =0").AsList()[0];
 
                     result.d = new {
-                        storageLst = storageLst,
-                        selfList = selfList,
+                        Lst = storageLst,
                         code = code
                     };
                 }
@@ -973,7 +971,7 @@ namespace CoreData.CoreComm
                 try
                 {
                     string sql =@"SELECT 
-                                    w.ID,w.WareName,w.OurRemark,w.OtherRemark,w.Enable,w.Soure 
+                                    w.ID,w.WareName,w.myremark,w.yetremark,w.Enable,w.Soure 
                                   FROM 
                                     ware_third_party as w WHERE w.CoID="+CoID+" AND w.Pid =0 ;";
                     var list = conn.Query<wareThirdParty>(sql).AsList();
@@ -1003,7 +1001,7 @@ namespace CoreData.CoreComm
                     var res = conn.Query<remarkSqlRes>(sql).AsList();
                     if(res.Count>0){
                         sql = @"UPDATE ware_third_party SET
-                                        ware_third_party.OurRemark = @remark,
+                                        ware_third_party.myremark = @remark,
                                         ware_third_party.Log = @log,
                                         ware_third_party.EndMan = @endman,
                                         ware_third_party.Mdate = Now()
@@ -1012,7 +1010,7 @@ namespace CoreData.CoreComm
                         if(type == 1){ //我方 仓储列表界面
                             var a = res[0];
                             sql += @"UPDATE ware_third_party SET
-                                        ware_third_party.OtherRemark = @remark,
+                                        ware_third_party.yetremark = @remark,
                                         ware_third_party.Log = @log,
                                         ware_third_party.EndMan = @endman,
                                         ware_third_party.Mdate = Now()
@@ -1029,7 +1027,7 @@ namespace CoreData.CoreComm
                         }else{  //第三方仓储列表界面
                             var a = res[0];
                             sql += @"UPDATE ware_third_party SET
-                                        ware_third_party.OtherRemark = @remark,
+                                        ware_third_party.yetremark = @remark,
                                         ware_third_party.Log = @log,
                                         ware_third_party.EndMan = @endman,
                                         ware_third_party.Mdate = Now()
@@ -1065,16 +1063,16 @@ namespace CoreData.CoreComm
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    // string sql = "SELECT ware_third_party.`Code` FROM ware_third_party WHERE ware_third_party.ID = "+id;
-                    // string code = conn.Execute
-                    // sql =@"UPDATE ware_third_party SET
-                    //                     ware_third_party.Enable = 1,
-                    //                     ware_third_party.Log =CONCAT(ware_third_party.Log,' ',@log) ,
-                    //                     ware_third_party.EndMan = @endman,
-                    //                     ware_third_party.Pdate = Now()
-                    //                     ware_third_party.Mdate = Now()
-                    //                 WHERE 
-                    //                     ware_third_party.ID = @id OR (ware_third_party.`Code` = @code AND ware_third_party.ThirdCode =@coid);";
+                    string sql = "SELECT ware_third_party.`Code` FROM ware_third_party WHERE ware_third_party.ID = "+id;
+                    long code = conn.Query<long>(sql).AsList()[0];
+                    sql =@"UPDATE ware_third_party SET
+                                        ware_third_party.Enable = 1,
+                                        ware_third_party.Log =CONCAT(ware_third_party.Log,' ',@log) ,
+                                        ware_third_party.EndMan = @endman,
+                                        ware_third_party.Pdate = Now()
+                                        ware_third_party.Mdate = Now()
+                                    WHERE 
+                                        ware_third_party.ID = @id OR (ware_third_party.`Code` = @code AND ware_third_party.ThirdCode =@coid);";
                     
 
                 }
