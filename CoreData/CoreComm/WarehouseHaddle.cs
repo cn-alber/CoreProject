@@ -615,8 +615,10 @@ namespace CoreData.CoreComm
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try{    
                     var u = conn.Query<Warehouse>(wheresql).AsList();
-                    foreach(var a in u)
-                    {
+
+                    if(u.Count>0)
+                    { 
+                        var a = u[0];
                         var rr = new WarehouseResponse();
                         rr.area = new List<int>(){0,0,0};                        
                         rr.name0 = a.warehousename;
@@ -627,7 +629,7 @@ namespace CoreData.CoreComm
                         rr.area[2] = a.district;
                         rr.address = a.address;
                         rr.enable = a.enable;
-                        wheresql = "select * from warehouse where parentid = " + a.id + " and coid = " + CoID;
+                        wheresql = "select * from warehouse where coid = " + CoID;
                         var lst = conn.Query<Warehouse>(wheresql).AsList();
                         foreach(var b in lst)
                         {
