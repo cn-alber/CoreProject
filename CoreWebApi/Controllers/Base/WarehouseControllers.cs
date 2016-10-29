@@ -84,7 +84,13 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-
+        [HttpGetAttribute("/Core/Warehouse/selfList")]
+        public ResponseResult selfList()
+        {   
+            string CoID = GetCoid();
+            var data = WarehouseHaddle.selfList(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
 
 
 

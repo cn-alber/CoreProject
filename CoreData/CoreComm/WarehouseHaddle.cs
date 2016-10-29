@@ -652,7 +652,7 @@ namespace CoreData.CoreComm
                         }
                         res.Add(rr);
                     }
-                    result.d = res;              
+                    result.d = res[0];              
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
@@ -823,27 +823,37 @@ namespace CoreData.CoreComm
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    string sql = "SELECT ware_third_party.`Code` FROM ware_third_party WHERE ware_third_party.`Code` = "+code;
-                    var res = conn.Query<long>(sql).AsList();
+                    string sql = @"SELECT 
+                                    w.ID,w.WareName,w.OurRemark,w.OtherRemark,w.Enabel,w.Soure 
+                                  FROM 
+                                    ware_third_party as w WHERE  w.`Code` = "+code;
+                    var res = conn.Query<wareThirdParty>(sql).AsList();
                     if(res.Count == 0){
                         result.s = -3104;
                     }else{
-                        var mycode = res[0];
+                        var thirdWare = res[0];                        
                         sql = @"UPDATE ware_third_party SET 
-                                    ware_third_party.ThirdCode = CONCAT(ware_third_party.ThirdCode,',',@ThirdCode)
-                                WHERE 
-                                    ware_third_party.CoID = @CoID AND ware_third_party.pid = 0;
-                                UPDATE ware_third_party SET 
+                                    ware_third_party.Enabel = TRUE,
                                     ware_third_party.OtherRemark =@OtherRemark,
+                                WHERE 
+                                    ware_third_party.`Code` =@Code;
+                                INSERT ware_third_party SET 
+                                    ware_third_party.WareName = @WareName,
+                                    ware_third_party.OurRemark =@OtherRemark,
+                                    ware_third_party.OtherRemark =@OurRemark,
                                     ware_third_party.Enabel = TRUE,  
                                     ware_third_party.Soure = 1,
-                                WHERE 
-                                    ware_third_party.`Code` =@Code ;    
+                                    ware_third_party.CoID = @CoID                                 
+                                    ware_third_party.ThirdCode =@Code ;  
+                                    ware_third_party.Pid=@Pid
                                     ";
                         var rnt = conn.Execute(sql,new {
+                            WareName = thirdWare.warename,
                             Code = code,
                             OtherRemark = otherRemark,
+                            OurRemark = thirdWare.ourremark, // 第三方物流的'我方备注' 即为 我方公司的'对方备注'
                             CoID = CoID,
+                            Pid = thirdWare.id,
                             ThirdCode = code
                         });
                     }                                        
@@ -859,7 +869,7 @@ namespace CoreData.CoreComm
         }
 
         ///<summary>
-        /// 
+        /// 获取仓储列表
         ///</summary>
          public static DataResult storageLst(string CoID){
             var result = new DataResult(1,null);
@@ -872,15 +882,15 @@ namespace CoreData.CoreComm
                                     ware_third_party as w WHERE w.CoID="+CoID+" AND w.Pid !=0 ;";
                     var list = conn.Query<wareThirdParty>(sql).AsList();
                     
-                    sql = @"SELECT w.ThirdCode FROM ware_third_party as w 
-                                WHERE 
-                            w.CoID="+CoID+" AND w.Pid =0 ;";
-                    string thirdcode = conn.Query<string>(sql).AsList()[0];
-                    sql =@"SELECT 
-                                w.ID,w.WareName,w.OurRemark as otherremark,w.OtherRemark as ourremark,w.Enabel,w.Soure 
-                           FROM 
-                                ware_third_party as w WHERE w.`Code` in("+thirdcode+");";
-                    list.AddRange(conn.Query<wareThirdParty>(sql).AsList());
+                    // sql = @"SELECT w.ThirdCode FROM ware_third_party as w 
+                    //             WHERE 
+                    //         w.CoID="+CoID+" AND w.Pid =0 ;";
+                    // string thirdcode = conn.Query<string>(sql).AsList()[0];
+                    // sql =@"SELECT 
+                    //             w.ID,w.WareName,w.OurRemark as otherremark,w.OtherRemark as ourremark,w.Enabel,w.Soure 
+                    //        FROM 
+                    //             ware_third_party as w WHERE w.`Code` in("+thirdcode+");";
+                    // list.AddRange(conn.Query<wareThirdParty>(sql).AsList());
                     result.d = list;
                 }
                 catch (Exception e)
@@ -894,9 +904,35 @@ namespace CoreData.CoreComm
         }
 
         ///<summary>
-        /// 商家仓储列表
+        /// 商家提供第三发仓储列表
         ///</summary>
-         public static DataResult selfLest(){
+         public static DataResult selfList(string CoID){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    string sql =@"SELECT 
+                                    w.ID,w.WareName,w.OurRemark,w.OtherRemark,w.Enabel,w.Soure 
+                                  FROM 
+                                    ware_third_party as w WHERE w.CoID="+CoID+" AND w.Pid =0 ;";
+                    var list = conn.Query<wareThirdParty>(sql).AsList();
+                    result.d = list;
+
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
+        ///<summary>
+        /// 开通分仓
+        ///</summary>
+         public static DataResult openOtherWare(){
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
