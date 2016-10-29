@@ -238,5 +238,50 @@ namespace CoreWebApi
             var data = OrderHaddle.InsertOrder(ord,username,CoID,IsFaceToFace);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Order/UpdateOrder")]
+        public ResponseResult UpdateOrder([FromBodyAttribute]JObject co)
+        {   
+            var ord = Newtonsoft.Json.JsonConvert.DeserializeObject<Order>(co["Ord"].ToString());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.UpdateOrder(ord,username,CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Order/RecInfoList")]
+        public ResponseResult RecInfoList(string BuyerId,string Receiver,string ShopSit,string SortField,string SortDirection,string PageIndex,string NumPerPage)
+        {   
+            int x;
+            var cp = new RecInfoParm();
+            cp.CoID = int.Parse(GetCoid());
+            cp.BuyerId = BuyerId;
+            cp.Receiver = Receiver;
+            cp.ShopSit = ShopSit;
+            if(!string.IsNullOrEmpty(SortField))
+            {
+                if(CommHaddle.SysColumnExists(DbBase.CoreConnectString,"recinfo",SortField).s == 1)
+                {
+                    cp.SortField = SortField;
+                }
+            }
+            if(!string.IsNullOrEmpty(SortDirection))
+            {
+                 if(SortDirection.ToUpper() == "ASC" || SortDirection.ToUpper() == "DESC")
+                {
+                    cp.SortDirection = SortDirection;
+                }
+            }
+            if (int.TryParse(NumPerPage, out x))
+            {
+                cp.NumPerPage = int.Parse(NumPerPage);
+            }
+            if (int.TryParse(PageIndex, out x))
+            {
+                cp.PageIndex = int.Parse(PageIndex);
+            }
+            var data = OrderHaddle.GetRecInfoList(cp);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }
