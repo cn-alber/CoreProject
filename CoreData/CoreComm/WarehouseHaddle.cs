@@ -275,7 +275,7 @@ namespace CoreData.CoreComm
             var TransComm = CommDBconn.BeginTransaction();
             var TransUser = UserDBconn.BeginTransaction();
             try{
-                string wheresql = "select * from warehouse where id =" + wh.id + " and coid = " + CoID ;
+                string wheresql = "select * from warehouse where parentid=0 and coid = " + CoID ;
                 var u = CommDBconn.Query<Warehouse>(wheresql).AsList();
                 if(u.Count == 0)
                 {
@@ -352,7 +352,7 @@ namespace CoreData.CoreComm
                 //销售主仓库（零数）更新
                 if(wh.name1 != null || contents != "")
                 {
-                    wheresql = "select * from warehouse where parentid =" + wh.id + " and coid = " + CoID + " and type = 1" ;
+                    wheresql = "select * from warehouse where  coid = " + CoID + " and type = 1" ;
                     var a = CommDBconn.Query<Warehouse>(wheresql).AsList();
                     if(a.Count == 0)
                     {
@@ -390,7 +390,7 @@ namespace CoreData.CoreComm
                 //销售主仓库（整数）更新
                 if(wh.name2 != null || contents != "")
                 {
-                    wheresql = "select * from warehouse where parentid =" + wh.id + " and coid = " + CoID + " and type = 2" ;
+                    wheresql = "select * from warehouse where coid = " + CoID + " and type = 2" ;
                     var a = CommDBconn.Query<Warehouse>(wheresql).AsList();
                     if(a.Count > 0)
                     {
@@ -426,7 +426,7 @@ namespace CoreData.CoreComm
                 //销售退货仓库更新
                 if(wh.name3 != null || contents != "")
                 {
-                    wheresql = "select * from warehouse where parentid =" + wh.id + " and coid = " + CoID + " and type = 3" ;
+                    wheresql = "select * from warehouse where coid = " + CoID + " and type = 3" ;
                     var a = CommDBconn.Query<Warehouse>(wheresql).AsList();
                     if(a.Count == 0)
                     {
@@ -464,7 +464,7 @@ namespace CoreData.CoreComm
                 //进货仓库更新
                 if(wh.name4 != null || contents != "")
                 {
-                    wheresql = "select * from warehouse where parentid =" + wh.id + " and coid = " + CoID + " and type = 4" ;
+                    wheresql = "select * from warehouse where coid = " + CoID + " and type = 4" ;
                     var a = CommDBconn.Query<Warehouse>(wheresql).AsList();
                     if(a.Count == 0)
                     {
@@ -502,7 +502,7 @@ namespace CoreData.CoreComm
                 //次品仓库资料更新
                 if(wh.name5 != null || contents != null)
                 {
-                    wheresql = "select * from warehouse where parentid =" + wh.id + " and coid = " + CoID + " and type = 5" ;
+                    wheresql = "select * from warehouse where coid = " + CoID + " and type = 5" ;
                     var a = CommDBconn.Query<Warehouse>(wheresql).AsList();
                     if(a.Count == 0)
                     {

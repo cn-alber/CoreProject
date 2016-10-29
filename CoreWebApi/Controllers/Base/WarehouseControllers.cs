@@ -26,7 +26,7 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Warehouse/UpdateWarehouse")]
         public ResponseResult UpdateWarehouse([FromBodyAttribute]JObject co)
         {   
-            var wh = Newtonsoft.Json.JsonConvert.DeserializeObject<WarehouseInsert>(co["Warehouse"].ToString());
+            var wh = Newtonsoft.Json.JsonConvert.DeserializeObject<WarehouseInsert>(co.ToString());            
             string UserName = GetUname(); 
             int CoID = int.Parse(GetCoid());
             var data = WarehouseHaddle.UpdateWarehouse(wh,UserName,CoID);
