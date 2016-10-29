@@ -3,6 +3,10 @@ using Newtonsoft.Json.Linq;
 // using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyComm;
 using CoreData.CoreComm;
+using CoreModels.XyUser;
+using System;
+using CoreModels;
+
 namespace CoreWebApi
 {
     // [AllowAnonymous]
@@ -24,9 +28,8 @@ namespace CoreWebApi
         {   
             var wh = Newtonsoft.Json.JsonConvert.DeserializeObject<WarehouseInsert>(co["Warehouse"].ToString());
             string UserName = GetUname(); 
-            string Company = co["Company"].ToString();
             int CoID = int.Parse(GetCoid());
-            var data = WarehouseHaddle.UpdateWarehouse(wh,UserName,Company,CoID);
+            var data = WarehouseHaddle.UpdateWarehouse(wh,UserName,CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -89,6 +92,30 @@ namespace CoreWebApi
         {   
             string CoID = GetCoid();
             var data = WarehouseHaddle.selfList(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Warehouse/openOtherWare")]
+        public ResponseResult openOtherWare([FromBodyAttribute]JObject co)
+        {   
+            var data = new DataResult(1,null);
+            var owr = Newtonsoft.Json.JsonConvert.DeserializeObject<openWareRequset>(co.ToString());
+            if(string.IsNullOrEmpty(owr.pwd)|| owr.pwd.Length<6||owr.pwd.Length>18){
+                data.s = -3107;
+            } 
+            if(string.IsNullOrEmpty(owr.username)){
+                data.s = -3108;
+            }        
+            
+        
+
+            var uname = GetUname();
+            string CoID = GetCoid();
+            var user = new UserEdit();
+            user.Enable = true;
+            user.Account = owr.username;
+            user.PassWord =owr.pwd;   
+            data = WarehouseHaddle.openOtherWare(user,Convert.ToInt16(CoID),uname,owr.warename,owr.wareadmin);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 

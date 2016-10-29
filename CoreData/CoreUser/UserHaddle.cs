@@ -72,7 +72,7 @@ namespace CoreData.CoreUser
 
 
         ///<summary>
-        ///获取菜单列表(避免与上面部分代码冲突)
+        ///获取菜单列表
         ///</summary>
         public static DataResult GetRefreshList(string roleid, string coid, string uname, string uid)
         {

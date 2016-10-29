@@ -4,6 +4,9 @@ using Dapper;
 using System;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
+using CoreModels.XyUser;
+using CoreData.CoreUser;
+
 namespace CoreData.CoreComm
 {
     public static class WarehouseHaddle
@@ -258,7 +261,7 @@ namespace CoreData.CoreComm
         ///<summary>
         ///仓库基本资料更新
         ///</summary>
-        public static DataResult UpdateWarehouse(WarehouseInsert wh,string UserName,string Company,int CoID)
+        public static DataResult UpdateWarehouse(WarehouseInsert wh,string UserName,int CoID)
         {
             var result = new DataResult(1,null);  
             string contents = ""; 
@@ -608,15 +611,14 @@ namespace CoreData.CoreComm
         {
             var result = new DataResult(1,null);     
             string wheresql = "select * from warehouse where type = 0 and coid = " + CoID;
-            var res = new List<WarehouseInsert>();
+            var res = new List<WarehouseResponse>();
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try{    
                     var u = conn.Query<Warehouse>(wheresql).AsList();
                     foreach(var a in u)
                     {
-                        var rr = new WarehouseInsert();
-                        rr.area = new List<int>(){0,0,0};
-                        rr.id = a.id;
+                        var rr = new WarehouseResponse();
+                        rr.area = new List<int>(){0,0,0};                        
                         rr.name0 = a.warehousename;
                         rr.contract = a.contract;
                         rr.phone = a.phone;
@@ -869,6 +871,48 @@ namespace CoreData.CoreComm
         }
 
         ///<summary>
+        /// 开通分仓
+        ///</summary>
+         public static DataResult openOtherWare(UserEdit user,int CoID,string UserName,string warename,string wareadmin){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    string sql = "SELECT ID FROM ware_third_party WHERE WareName = '"+warename+"';";
+                    var res = conn.Query<int>(sql).AsList();
+                    if(res.Count > 0){
+                        result.s = -3105;
+                    }else{
+                        var has = UserHaddle.ExistUser(user.Account, 0, CoID);
+
+                        sql = @"INSERT ware_third_party SET 
+                                    ware_third_party.CoID = @CoID,
+                                    ware_third_party.WareName = @warename,
+                                    ware_third_party.WareAdmin = @wareadmin,";
+                        var rnt = conn.Execute(sql,new {
+                                        CoID = CoID,
+                                        warename = warename,
+                                        wareadmin = wareadmin
+                                    });
+                        if(rnt>0){
+                            UserHaddle.SaveInsertUser(user, CoID,UserName);
+                        }else{
+                            result.s = -3106;
+                        }                        
+                    }            
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
+
+        ///<summary>
         /// 获取仓储列表
         ///</summary>
          public static DataResult storageLst(string CoID){
@@ -929,26 +973,7 @@ namespace CoreData.CoreComm
             return result;
         }
 
-        ///<summary>
-        /// 开通分仓
-        ///</summary>
-         public static DataResult openOtherWare(){
-            var result = new DataResult(1,null);
-            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
-                try
-                {
         
-
-                }
-                catch (Exception e)
-                {
-                    result.s = -1;
-                    result.d= e.Message; 
-                    conn.Dispose();
-                }
-            }
-            return result;
-        }
 
 
 

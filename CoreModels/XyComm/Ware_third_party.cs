@@ -10,5 +10,13 @@ namespace CoreModels.XyComm
 
     }
 
+    public class openWareRequset{
+        public string username{get;set;}
+        public string pwd{get;set;}
+        public string warename{get;set;}
+        public string wareadmin{get;set;}
+    }
+
+
 
 }
