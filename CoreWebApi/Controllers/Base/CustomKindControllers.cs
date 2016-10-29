@@ -81,7 +81,7 @@ namespace CoreWebApi
         #endregion
         #region 获取商品属性
         [HttpGetAttribute("/Core/XyComm/Customkind/SkuKindProps")]
-        public ResponseResult SkuKindProps(string ID,string Enable)
+        public ResponseResult SkuKindProps(string ID, string Enable)
         {
             var res = new DataResult(1, null);
             string CoID = GetCoid();
@@ -89,7 +89,7 @@ namespace CoreWebApi
             if (int.TryParse(ID, out PID))
             {
                 PID = int.Parse(ID);
-                res = CustomKindHaddle.GetSkuKindProps(PID,Enable, CoID);
+                res = CustomKindHaddle.GetSkuKindProps(PID, Enable, CoID);
             }
             else
             {
@@ -101,7 +101,7 @@ namespace CoreWebApi
         #endregion
 
 
-         #region 获取商品单个属性
+        #region 获取商品单个属性
         [HttpGetAttribute("/Core/XyComm/CustomKindProps/SkuKindProp")]
         public ResponseResult SkuKindProp(string ID)
         {
@@ -111,7 +111,7 @@ namespace CoreWebApi
             if (int.TryParse(ID, out PID))
             {
                 PID = int.Parse(ID);
-                res = CustomKindHaddle.GetSkuKindProp(PID,CoID);
+                res = CustomKindHaddle.GetSkuKindProp(PID, CoID);
             }
             else
             {
@@ -157,7 +157,7 @@ namespace CoreWebApi
         {
             var res = new DataResult(1, null);
             bool eb = true;
-            if (obj["Enable"]==null || !bool.TryParse(obj["Enable"].ToString(), out eb))
+            if (obj["Enable"] == null || !bool.TryParse(obj["Enable"].ToString(), out eb))
             {
                 res.s = -1;
                 res.d = "无效参数Enable";
@@ -166,7 +166,7 @@ namespace CoreWebApi
             {
                 CustomKind Kind = Newtonsoft.Json.JsonConvert.DeserializeObject<CustomKind>(obj.ToString());
                 res = CustomKindHaddle.UptKind(Kind, GetCoid(), GetUname());
-            }            
+            }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
@@ -303,14 +303,41 @@ namespace CoreWebApi
         [HttpGetAttribute("/Core/XyComm/CustomKindProps/CopyToKindLst")]
         public ResponseResult CopyToKindLst()
         {
-            var res = CustomKindHaddle.GetCopyToKindLst(GetCoid(),"");
+            var res = CustomKindHaddle.GetCopyToKindLst(GetCoid(), "");
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
-        
+
         #endregion
 
 
-
+        #region 拷贝商品类目属性--更新资料
+        [HttpPostAttribute("/Core/XyComm/CustomKindProps/SaveCopyToProps")]
+        public ResponseResult SaveCopyToProps([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
+            var KindIDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["KindIDLst"].ToString());
+            var Type = obj["Type"].ToString();
+            int i;
+            if (KindIDLst.Count == 0)
+            {
+                res.s = -1;
+                res.d = "请先选中目的类目";
+            }
+            else if(!int.TryParse(Type,out i))
+            {
+                res.s = -1;
+                res.d = "无效参数Type";
+            }
+            else
+            {
+                string CoID = GetCoid();
+                string UserName = GetUname();
+                CustomKindPropsHaddle.CopyProps(IDLst, KindIDLst, int.Parse(Type), CoID, UserName);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
 
 
 

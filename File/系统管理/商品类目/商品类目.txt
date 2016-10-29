@@ -183,13 +183,24 @@ function说明
         Prop        Customkind_props    单笔商品属性资料
     参考：output json 文件：SkuKindProp_output.json
 15.CopyToKindLst()//获取所有商品类目名称
-    方法：POST
+    方法：GET
     路由：http://192.168.30.211:5000/Core/XyComm/CustomKindProps/CopyToKindLst
     参数：
         InPut: null
         OutPut: 
             KindNameLst         List<CustomKindname>   商品ID,KindName 列表
     参考：output json 文件：CopyToKindLst_output.json
+16.SaveCopyToProps()//保存拷贝商品类目属性--更新资料
+    方法：POST
+    路由：http://192.168.30.211:5000/Core/XyComm/CustomKindProps/SaveCopyToProps
+    参数：
+        InPut:
+            IDLst         List<int>      商品属性ID (*必填项*)  
+            KindIDLst     List<int>      商品类目ID (*必填项*)  
+            Type          int            判断1.更新/2.覆盖
+    参考：input json 文件：SaveCopyToProps_input.json
+        
+
 
 
 
