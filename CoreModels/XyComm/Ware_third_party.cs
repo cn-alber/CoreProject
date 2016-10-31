@@ -18,6 +18,13 @@ namespace CoreModels.XyComm
 
     }
 
+    public class wareLst{
+        public int id{get;set;}
+        public int coid{get;set;}
+        public string warename{get;set;}
+    }
+
+
     public class itWare{
         public int id{get;set;}
         public int coid{get;set;}

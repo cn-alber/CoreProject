@@ -826,7 +826,7 @@ namespace CoreData.CoreComm
         }
 
         ///<summary>
-        /// 申请加入仓储服务
+        /// 申请加入第三方仓储服务
         ///</summary>
          public static DataResult askFor(string CoID,string code,string itremark){
             var result = new DataResult(1,null);
@@ -930,6 +930,9 @@ namespace CoreData.CoreComm
                     if(string.Join(",", status).IndexOf("3")>-1){
                         coids += res.OnCancle.Replace("-","");   
                     }
+                    if(string.IsNullOrEmpty(coids)){
+                        coids = "''";
+                    }
 
                     sql =@"SELECT 
                             w.ID,w.WareName,w.myremark,w.itremark,w.Enable,w.Source ,w.ItName,w.Mdate,w.CoID
@@ -952,7 +955,8 @@ namespace CoreData.CoreComm
                     }
                     result.d = new {
                         Lst = storageLst,
-                        code = res.Code
+                        code = res.Code,
+                        coid = CoID
                     };
                 }
                 catch (Exception e)
@@ -964,6 +968,45 @@ namespace CoreData.CoreComm
             }
             return result;
         }
+
+       ///<summary>
+        /// 获取仓储列表
+        ///</summary>
+         public static DataResult wareLst(string CoID){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {                                             
+                    string sql =@"SELECT 
+                                    w.ItCoid,w.Code,w.RelationShip,w.OnPassing,w.OnCancle,OnPass
+                                  FROM 
+                                    ware_third_party as w 
+                                  WHERE w.CoID="+CoID;
+                    var res = conn.Query<remarkSqlRes>(sql).AsList()[0];                    
+                  
+                    sql =@"SELECT 
+                            w.ID,w.WareName,w.CoID
+                           FROM 
+                            ware_third_party as w 
+                           WHERE w.CoID in("+res.OnPass.Replace("-","")+");";                                                                     
+                    var storageLst = conn.Query<wareLst>(sql).AsList();                    
+        
+                    result.d = new {
+                        Lst = storageLst,             
+                    };
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
+
+
 
         ///<summary>
         /// 修改备注
