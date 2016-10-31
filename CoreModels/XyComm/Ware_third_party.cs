@@ -2,6 +2,7 @@ namespace CoreModels.XyComm
 {
     public class wareThirdParty{
         public int id{get;set;}
+        public int coid{get;set;}
         public string warename{get;set;}
         public string itname{get;set;}
         public string myremark{get;set;}
@@ -40,9 +41,19 @@ namespace CoreModels.XyComm
     }
 
     public class remarkSqlRes{
+        public string Coid{get;set;}
         public string ItCoid{get;set;}
         public string Code{get;set;}
+        public string RelationShip{get;set;}
+        public string OnPassing{get;set;}
+        public string OnCancle{get;set;}
+        public string OnPass{get;set;}
 
+    }
+
+    public class editRemarkRequest{
+        public string id{get;set;}
+        public string remark{get;set;}
     }
 
 

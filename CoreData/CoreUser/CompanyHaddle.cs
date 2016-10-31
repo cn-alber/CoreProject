@@ -4,6 +4,7 @@ using Dapper;
 using System;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
+using CoreData.CoreComm;
 
 namespace CoreData.CoreUser
 {
@@ -222,6 +223,7 @@ namespace CoreData.CoreUser
                 com.id = rtn;
                 CacheBase.Set<Company>("company" + rtn.ToString(), com);      
                 TransUser.Commit();
+                WarehouseHaddle.serviceCode(rtn.ToString(), com.name,user.Name);
             }catch(Exception ex){
                 TransUser.Rollback();
                 TransUser.Dispose();
