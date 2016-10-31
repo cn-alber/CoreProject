@@ -283,5 +283,51 @@ namespace CoreWebApi
             var data = OrderHaddle.GetRecInfoList(cp);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Order/InsertOrderDetail")]
+        public ResponseResult InsertOrderDetail([FromBodyAttribute]JObject co)
+        {   
+            int id = int.Parse(co["OID"].ToString());
+            long soid = long.Parse(co["SoID"].ToString());
+            List<int> skuid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["SkuIDList"].ToString());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.InsertOrderDetail(id,soid,skuid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/DeleteOrderDetail")]
+        public ResponseResult DeleteOrderDetail([FromBodyAttribute]JObject co)
+        {   
+            int id = int.Parse(co["OID"].ToString());
+            long soid = long.Parse(co["SoID"].ToString());
+            List<int> skuid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["SkuIDList"].ToString());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.DeleteOrderDetail(id,soid,skuid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/UpdateOrderDetail")]
+        public ResponseResult UpdateOrderDetail([FromBodyAttribute]JObject co)
+        {   
+            int id = int.Parse(co["OID"].ToString());
+            long soid = long.Parse(co["SoID"].ToString());
+            int skuid = int.Parse(co["SkuAutoID"].ToString());
+            decimal price = -1;
+            int qty = -1;
+            if(!string.IsNullOrEmpty(co["Price"].ToString()))
+            {
+                price = decimal.Parse(co["Price"].ToString());
+            }
+            if(!string.IsNullOrEmpty(co["Qty"].ToString()))
+            {
+                qty = int.Parse(co["Qty"].ToString());
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.UpdateOrderDetail(id,soid,skuid,CoID,username,price,qty);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }
