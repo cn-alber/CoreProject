@@ -50,12 +50,8 @@ namespace CoreModels.XyComm
     public class remarkSqlRes{
         public string Coid{get;set;}
         public string ItCoid{get;set;}
-        public string Code{get;set;}
-        public string RelationShip{get;set;}
-        public string OnPassing{get;set;}
-        public string OnCancle{get;set;}
-        public string OnPass{get;set;}
-
+        public string ApplyCoid{get;set;}
+        
     }
 
     public class editRemarkRequest{

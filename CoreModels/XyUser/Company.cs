@@ -17,6 +17,7 @@ namespace CoreModels.XyUser
         public DateTime createdate {get;set;}
         public string modifier {get;set;}
         public DateTime modifydate {get;set;}
+        public string warecode{get;set;}
     }
     public class CompanyParm
     {

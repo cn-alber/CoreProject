@@ -112,8 +112,7 @@ namespace CoreWebApi
                 }
                 var com = new Company();                
                 com.name = owr.warename;
-                var comRes = CompanyHaddle.InsertCompany(com,uname,int.Parse(CoID),user);
-                Console.WriteLine(Convert.ToInt16(comRes.d));   
+                var comRes = CompanyHaddle.InsertCompany(com,uname,int.Parse(CoID),user);                  
                 data = WarehouseHaddle.openOtherWare(Convert.ToInt16(comRes.d),CoID);
             }                                    
             return CoreResult.NewResponse(data.s, data.d, "General"); 
@@ -163,6 +162,23 @@ namespace CoreWebApi
             }        
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Warehouse/wareGiveUp")]
+        public ResponseResult wareGiveUp([FromBodyAttribute]JObject co)
+        {   
+            var data = new DataResult(1,null);
+            var m = Newtonsoft.Json.JsonConvert.DeserializeObject<editRemarkRequest>(co.ToString());
+            if(string.IsNullOrEmpty(m.id)){
+                data.s = -3008;
+            }else{
+                string CoID = GetCoid();
+                string uname = GetUname();
+                data = WarehouseHaddle.wareGiveUp(m.id, CoID, uname);
+            }        
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+
 
 
 
