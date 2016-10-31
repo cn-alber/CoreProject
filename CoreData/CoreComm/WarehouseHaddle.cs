@@ -928,8 +928,7 @@ namespace CoreData.CoreComm
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {                                    
-                    string c1 = "";
-                    string c2 ="";
+                    string c = "w.CoID = "+CoID;
                     string s = status.Length> 0 ? " AND w.Enable in ("+string.Join(",", status)+")":"";
             
 
@@ -939,19 +938,22 @@ namespace CoreData.CoreComm
                                     ware_third_party as w 
                                   WHERE w.CoID="+CoID;
                     var res = conn.Query<remarkSqlRes>(sql).AsList()[0];
+                    
                     if(string.Join(",", contains).IndexOf("1")>-1){
-                        c1 = "w.CoID in("+res.ItCoid+")";
+                        c = "w.CoID in("+res.ItCoid.Replace("-","")+")";
                     }
                     if(string.Join(",", contains).IndexOf("2")>-1){
-                        c2 = "w.ItCoid in("+res.ItCoid+")";
+                        c = "w.ItCoid like '"+CoID+"-%' ";
                     }
-
+                    if(string.Join(",", contains).IndexOf("1")>-1 && string.Join(",", contains).IndexOf("2")>-1){
+                        c = "(w.CoID in("+res.ItCoid.Replace("-","")+") OR "+"w.ItCoid like '"+CoID+"-%')";
+                    }
 
                     sql =@"SELECT 
                             w.ID,w.WareName,w.myremark,w.itremark,w.Enable,w.Source ,w.ItName,w.Mdate
                            FROM 
                             ware_third_party as w 
-                           WHERE "+c1+c2+s;
+                           WHERE "+c+s;
 
                     Console.WriteLine(sql);                                  
                     var storageLst = conn.Query<wareThirdParty>(sql).AsList();
