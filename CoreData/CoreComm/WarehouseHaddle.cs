@@ -834,7 +834,7 @@ namespace CoreData.CoreComm
                 try
                 {
                     string sql = @"SELECT 
-                                    w.ID,w.WareName,w.myremark,w.itremark,w.Enable,w.Soure ,w.Cdate
+                                    w.ID,w.WareName,w.myremark,w.itremark,w.Enable,w.Source ,w.Cdate
                                   FROM 
                                     ware_third_party as w WHERE  w.`Code` = "+code;
                     var res = conn.Query<itWare>(sql).AsList();
