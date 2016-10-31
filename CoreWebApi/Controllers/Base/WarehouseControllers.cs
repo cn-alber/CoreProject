@@ -61,7 +61,7 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-        [HttpGetAttribute("/Core/Warehouse/serviceCodeRebuild")]
+        [HttpPostAttribute("/Core/Warehouse/serviceCodeRebuild")]
         public ResponseResult serviceCodeRebuild()
         {   
             string CoID = GetCoid();

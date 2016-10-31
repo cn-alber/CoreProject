@@ -831,38 +831,31 @@ namespace CoreData.CoreComm
                                     w.ID,w.WareName,w.myremark,w.itremark,w.Enable,w.Soure ,w.Cdate
                                   FROM 
                                     ware_third_party as w WHERE  w.`Code` = "+code;
-                    var res = conn.Query<wareThirdParty>(sql).AsList();
+                    var res = conn.Query<itWare>(sql).AsList();
                     if(res.Count == 0){
                         result.s = -3104;
                     }else{
-                        var thirdWare = res[0];                        
+                        var itware = res[0];                        
                         sql = @"UPDATE ware_third_party SET 
-                                    ware_third_party.Enable = 2,
-                                    ware_third_party.itremark = @itremark,
+                                    ware_third_party.Enable = 2,                                                                   
+                                    ware_third_party.ItCoid =CONCAT(ware_third_party.ItCode,',',@itCoID), 
+                                    ware_third_party.Mdate = Now(),                     
+                                WHERE 
+                                    ware_third_party.CoID = @CoID;
+                                UPDATE ware_third_party SET 
                                     ware_third_party.Enable = 2,  
                                     ware_third_party.Soure = 1,
-                                    ware_third_party.CoID = @CoID,                                 
-                                    ware_third_party.ItCode =@otherCoid, 
-                                    ware_third_party.Cdate = @Cdate,
+                                    ware_third_party.ItRemark = @itremark,                                                  
+                                    ware_third_party.Mdate = Now(),
                                     ware_third_party.Pdate = Now(),
                                 WHERE 
-                                    ware_third_party.`Code` = @Code;
-                                INSERT ware_third_party SET 
-                                    ware_third_party.WareName = @WareName,
-                                    ware_third_party.myremark =@itremark,
-                                    ware_third_party.itremark =@myremark,
-                                    
-                                    ware_third_party.Pid=@Pid;
-                                    ";
-                        var rnt = conn.Execute(sql,new {
-                            WareName = thirdWare.warename,
-                            Code = code,
+                                    ware_third_party.CoID = @itCoID;";
+                        var rnt = conn.Execute(sql,new {   
                             itremark = itremark,
-                            myremark = thirdWare.myremark, // 第三方物流的'我方备注' 即为 我方公司的'对方备注'
+                            myremark = itware.myremark, 
                             CoID = CoID,
-                            Pid = thirdWare.id,
-                            //Cdate = thirdWare.cdate,
-                            ItCode = code
+                            itCoID = itware.coid
+           
                         });
                     }                                        
                 }
@@ -934,22 +927,38 @@ namespace CoreData.CoreComm
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
-                {                    
-                    string c = contains.Length> 0 ?" AND w.Source in("+string.Join(",", contains)+")" :"";
+                {                                    
+                    string c1 = "";
+                    string c2 ="";
                     string s = status.Length> 0 ? " AND w.Enable in ("+string.Join(",", status)+")":"";
+            
 
                     string sql =@"SELECT 
-                                    w.ID,w.WareName,w.myremark,w.itremark,w.Enable,w.Source ,w.ItName,w.Mdate
+                                    w.ItCoid,w.Code
                                   FROM 
                                     ware_third_party as w 
-                                  WHERE w.ItCoid = "+CoID+" OR w.CoID="+CoID+c+s;
+                                  WHERE w.CoID="+CoID;
+                    var res = conn.Query<remarkSqlRes>(sql).AsList()[0];
+                    if(string.Join(",", contains).IndexOf("1")>-1){
+                        c1 = "w.CoID in("+res.ItCoid+")";
+                    }
+                    if(string.Join(",", contains).IndexOf("2")>-1){
+                        c2 = "w.ItCoid in("+res.ItCoid+")";
+                    }
+
+
+                    sql =@"SELECT 
+                            w.ID,w.WareName,w.myremark,w.itremark,w.Enable,w.Source ,w.ItName,w.Mdate
+                           FROM 
+                            ware_third_party as w 
+                           WHERE "+c1+c2+s;
+
                     Console.WriteLine(sql);                                  
                     var storageLst = conn.Query<wareThirdParty>(sql).AsList();
-                    string code = conn.Query<string>(@"SELECT  w.Code FROM  ware_third_party as w WHERE w.CoID="+CoID+" AND w.Pid =0").AsList()[0];
 
                     result.d = new {
                         Lst = storageLst,
-                        code = code
+                        code = res.Code
                     };
                 }
                 catch (Exception e)
@@ -994,64 +1003,64 @@ namespace CoreData.CoreComm
         ///<param name="type">1：我方；2：第三方仓储方 </param>
          public static DataResult editRemark(string CoID,string uname,string id,int type,string remark){
             var result = new DataResult(1,null);
-            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
-                try
-                {
-                    string sql = "SELECT ware_third_party.ItCode ,ware_third_party.`Code` FROM ware_third_party WHERE ware_third_party.ID = "+id;
-                    var res = conn.Query<remarkSqlRes>(sql).AsList();
-                    if(res.Count>0){
-                        sql = @"UPDATE ware_third_party SET
-                                        ware_third_party.myremark = @remark,
-                                        ware_third_party.Log = @log,
-                                        ware_third_party.EndMan = @endman,
-                                        ware_third_party.Mdate = Now()
-                                    WHERE 
-                                        ware_third_party.ID = @id;";
-                        if(type == 1){ //我方 仓储列表界面
-                            var a = res[0];
-                            sql += @"UPDATE ware_third_party SET
-                                        ware_third_party.itremark = @remark,
-                                        ware_third_party.Log = @log,
-                                        ware_third_party.EndMan = @endman,
-                                        ware_third_party.Mdate = Now()
-                                    WHERE 
-                                        ware_third_party.`Code` = @code AND ware_third_party.ItCode =@coid";
-                            conn.Execute(sql,new {
-                                id = id,
-                                coid = CoID,
-                                remark = remark,
-                                code = a.Code,
-                                log = "用户："+uname+" 修改备注;",
-                                endman = uname
-                            });         
-                        }else{  //第三方仓储列表界面
-                            var a = res[0];
-                            sql += @"UPDATE ware_third_party SET
-                                        ware_third_party.itremark = @remark,
-                                        ware_third_party.Log = @log,
-                                        ware_third_party.EndMan = @endman,
-                                        ware_third_party.Mdate = Now()
-                                    WHERE 
-                                        ware_third_party.ItCode =@code AND  ware_third_party.CoID = @coid";
-                            conn.Execute(sql,new {
-                                id = id,
-                                coid = a.ItCode, //第三方仓储中存在 我方的coid，避免 多条数据服务号相同
-                                remark = remark,
-                                code = a.Code,
-                                log = "用户："+uname+" 修改备注;",
-                                endman = uname
-                            });         
+            // using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+            //     try
+            //     {
+            //         string sql = "SELECT ware_third_party.ItCode ,ware_third_party.`Code` FROM ware_third_party WHERE ware_third_party.ID = "+id;
+            //         var res = conn.Query<remarkSqlRes>(sql).AsList();
+            //         if(res.Count>0){
+            //             sql = @"UPDATE ware_third_party SET
+            //                             ware_third_party.myremark = @remark,
+            //                             ware_third_party.Log = @log,
+            //                             ware_third_party.EndMan = @endman,
+            //                             ware_third_party.Mdate = Now()
+            //                         WHERE 
+            //                             ware_third_party.ID = @id;";
+            //             if(type == 1){ //我方 仓储列表界面
+            //                 var a = res[0];
+            //                 sql += @"UPDATE ware_third_party SET
+            //                             ware_third_party.itremark = @remark,
+            //                             ware_third_party.Log = @log,
+            //                             ware_third_party.EndMan = @endman,
+            //                             ware_third_party.Mdate = Now()
+            //                         WHERE 
+            //                             ware_third_party.`Code` = @code AND ware_third_party.ItCode =@coid";
+            //                 conn.Execute(sql,new {
+            //                     id = id,
+            //                     coid = CoID,
+            //                     remark = remark,
+            //                     code = a.Code,
+            //                     log = "用户："+uname+" 修改备注;",
+            //                     endman = uname
+            //                 });         
+            //             }else{  //第三方仓储列表界面
+            //                 var a = res[0];
+            //                 sql += @"UPDATE ware_third_party SET
+            //                             ware_third_party.itremark = @remark,
+            //                             ware_third_party.Log = @log,
+            //                             ware_third_party.EndMan = @endman,
+            //                             ware_third_party.Mdate = Now()
+            //                         WHERE 
+            //                             ware_third_party.ItCode =@code AND  ware_third_party.CoID = @coid";
+            //                 conn.Execute(sql,new {
+            //                     id = id,
+            //                     coid = a.ItCode, //第三方仓储中存在 我方的coid，避免 多条数据服务号相同
+            //                     remark = remark,
+            //                     code = a.Code,
+            //                     log = "用户："+uname+" 修改备注;",
+            //                     endman = uname
+            //                 });         
 
-                        }      
-                    }
-                }
-                catch (Exception e)
-                {
-                    result.s = -1;
-                    result.d= e.Message; 
-                    conn.Dispose();
-                }
-            }
+            //             }      
+            //         }
+            //     }
+            //     catch (Exception e)
+            //     {
+            //         result.s = -1;
+            //         result.d= e.Message; 
+            //         conn.Dispose();
+            //     }
+            // }
             return result;
         }
 

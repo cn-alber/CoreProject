@@ -17,6 +17,21 @@ namespace CoreModels.XyComm
 
     }
 
+    public class itWare{
+        public int id{get;set;}
+        public int coid{get;set;}
+        public string warename{get;set;}
+        public string itname{get;set;}
+        public string myremark{get;set;}
+        public string itremark{get;set;}
+        public int enable{get;set;}
+        public int  source{get;set;} 
+        //public string cdate{get;set;}
+        public string mdate{get;set;}
+    }
+
+
+
     public class openWareRequset{
         public string username{get;set;}
         public string pwd{get;set;}
@@ -25,7 +40,7 @@ namespace CoreModels.XyComm
     }
 
     public class remarkSqlRes{
-        public string ItCode{get;set;}
+        public string ItCoid{get;set;}
         public string Code{get;set;}
 
     }
