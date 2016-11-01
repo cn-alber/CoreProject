@@ -4,6 +4,7 @@ using Dapper;
 using System;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
+using CoreData.CoreComm;
 
 namespace CoreData.CoreUser
 {
@@ -61,7 +62,8 @@ namespace CoreData.CoreUser
         ///</summary>
         public static DataResult GetCompanyEdit(int ID)
         {
-            var result = new DataResult(1,null);        
+            var result = new DataResult(1,null);
+            CacheBase.Remove("company" + ID.ToString());        
             var parent = CacheBase.Get<Company>("company" + ID.ToString());  
             if (parent == null)
             {
@@ -87,6 +89,35 @@ namespace CoreData.CoreUser
             }                            
             return result;
         }
+
+  ///<summary>
+        ///根据仓库服务号，获取公司
+        ///</summary>
+        public static DataResult GetByWarecode(string code)
+        {
+            var result = new DataResult(1,null);
+
+            using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
+                try{
+                    string wheresql = "select * from company where warecode ='" + code + "'" ;
+                    var u = conn.Query<Company>(wheresql).AsList();
+                    if (u.Count > 0)
+                    {                        
+                        result.d = u[0];
+                    }else{
+                        result.s = -3009;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }                                           
+            
+                          
+            return result;
+        }
+
         ///<summary>
         ///检查公司资料是否已经存在
         ///</summary>
@@ -172,6 +203,9 @@ namespace CoreData.CoreUser
                     return  result;
                 }
                 int rtn = UserDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
+                string code =  DateTime.Now.ToString("yyMMddHHmmss")+rtn;  //生成服务码
+                UserDBconn.Execute("UPDATE Company SET Company.`WareCode` ="+code+" WHERE Company.ID = "+rtn);
+
                 sqlCommandText = @"INSERT INTO user(account,name,password,email,gender,mobile,qq,companyid,creator) VALUES(
                     @Account,@Name,@Password,@Email,@Gender,@Mobile,@Qq,@Companyid,@Creator)";
                 user.CompanyID = rtn;

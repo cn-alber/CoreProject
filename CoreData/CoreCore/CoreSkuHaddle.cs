@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System;
 using System.Text;
 using CoreModels.XyCore;
+using MySql.Data.MySqlClient;
 
 namespace CoreData.CoreCore
 {
@@ -517,6 +518,70 @@ namespace CoreData.CoreCore
             return res;
         }
         #endregion
+
+        public static DataResult getWareSku(CoreSkuParam IParam){
+            var result = new DataResult(1,null); 
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try
+                {
+                    StringBuilder querysql=new StringBuilder();
+                    StringBuilder totalSql = new StringBuilder();
+                    var p = new DynamicParameters();
+                    querysql.Append("SELECT distinct  SkuID,SkuName,Norm FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE ");
+                    totalSql.Append("SELECT COUNT(ID) FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE ");
+                    if (!string.IsNullOrEmpty(IParam.GoodsCode))
+                    {
+                        querysql.Append(" AND GoodsCode = @GoodsCode");
+                        totalSql.Append(" AND GoodsCode = @GoodsCode");
+                        p.Add("@GoodsCode", IParam.GoodsCode);
+                    }
+                    if (!string.IsNullOrEmpty(IParam.GoodsName))
+                    {
+                        querysql.Append(" AND GoodsName = @GoodsName");
+                        totalSql.Append(" AND GoodsName = @GoodsName");
+                        p.Add("@GoodsName", IParam.GoodsName);
+                    }
+                    if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
+                    {
+                        querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
+                        totalSql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
+                    }
+                    decimal total = conn.Query<decimal>(totalSql.ToString(),p).AsList()[0];
+                    if(total>0){
+                        decimal pagecnt = Math.Ceiling(total / decimal.Parse(IParam.PageSize.ToString()));
+                        int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
+                        querysql.Append(" LIMIT @ls , @le");
+                        p.Add("@ls", dataindex);
+                        p.Add("@le", IParam.PageSize);
+                        var list = conn.Query<wareSku>(querysql.ToString(),p).AsList();
+                        if(IParam.PageIndex == 1){
+                            result.d = new {
+                                list = list,                                          
+                                page = IParam.PageIndex,
+                                pageSize = IParam.PageSize,
+                                pageTotal = pagecnt,
+                                total = total
+                            };
+                        }else{
+                            result.d = new {
+                                list = list,                                          
+                                page = IParam.PageIndex
+                            };
+                        }                        
+                    }                                                
+                }catch{
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
+
+
+
+
+
+
     }
 
 }

@@ -184,5 +184,20 @@ namespace CoreWebApi
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
+
+        #region 获取第三方仓储或分仓
+        [HttpGetAttribute("/Core/Warehouse/wareLst")]
+        public ResponseResult wareLst()
+        {
+            var res = new DataResult(1, null);
+            string CoID = GetCoid();
+            res = WarehouseHaddle.wareLst(CoID);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+
+
+
     }
 }

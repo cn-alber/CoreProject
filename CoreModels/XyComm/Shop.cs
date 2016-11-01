@@ -88,5 +88,12 @@ namespace CoreModels.XyComm
 
     }
 
+    public class shopEnum{
+	    public int value{get;set;}
+		public string label{get;set;}
+
+    }
+
+
 
 }

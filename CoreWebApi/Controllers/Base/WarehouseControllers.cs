@@ -6,6 +6,9 @@ using CoreData.CoreComm;
 using CoreModels.XyUser;
 using System;
 using CoreModels;
+using CoreData.CoreUser;
+using CoreData.CoreCore;
+using CoreModels.XyCore;
 
 namespace CoreWebApi
 {
@@ -52,14 +55,7 @@ namespace CoreWebApi
             var data = WarehouseHaddle.UpdateWarehouseEnable(id,Company,UserName,CoID,Enable);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
-        
-        [HttpGetAttribute("/Core/Warehouse/serviceCode")]
-        public ResponseResult serviceCode(string cname)
-        {   
-            string CoID = GetCoid();
-            var data = WarehouseHaddle.serviceCode(CoID,cname);
-            return CoreResult.NewResponse(data.s, data.d, "General"); 
-        }
+    
 
         [HttpPostAttribute("/Core/Warehouse/serviceCodeRebuild")]
         public ResponseResult serviceCodeRebuild()
@@ -89,7 +85,7 @@ namespace CoreWebApi
 
 
         [HttpPostAttribute("/Core/Warehouse/openOtherWare")]
-        public ResponseResult openOtherWare([FromBodyAttribute]JObject co)
+        public ResponseResult openOtherWare([FromBodyAttribute]JObject co) //
         {   
             var data = new DataResult(1,null);
             var owr = Newtonsoft.Json.JsonConvert.DeserializeObject<openWareRequset>(co.ToString());
@@ -105,19 +101,115 @@ namespace CoreWebApi
                 var user = new UserEdit();
                 user.Enable = true;
                 user.Account = owr.username;
-                user.PassWord =GetMD5(owr.pwd, "Xy@.");   
-                data = WarehouseHaddle.openOtherWare(user,Convert.ToInt16(CoID),uname,owr.warename,owr.wareadmin);
-            }        
-                            
+                user.Name = owr.wareadmin;
+                user.PassWord =GetMD5(owr.pwd, "Xy@.");
+                var res = CompanyHaddle.IsComExist(owr.warename);
+                if (bool.Parse(res.d.ToString()) == true)       //判断公司名称是否存在
+                {
+                    return CoreResult.NewResponse(-1, "仓库名已存在", "General"); 
+                }
+                var hasUser = UserHaddle.ExistUser(user.Account, 0, int.Parse(CoID));
+                if(hasUser.s != 1){                             //判断用户是否存在
+                    return CoreResult.NewResponse(hasUser.s, hasUser.d, "General"); 
+                }
+                var com = new Company();                
+                com.name = owr.warename;
+                var comRes = CompanyHaddle.InsertCompany(com,uname,int.Parse(CoID),user);                  
+                data = WarehouseHaddle.openOtherWare(Convert.ToInt16(comRes.d),CoID);
+            }                                    
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
         [HttpPostAttribute("/Core/Warehouse/editRemark")]
-        public ResponseResult editRemark(string id,int type,string remark)
+        public ResponseResult editRemark([FromBodyAttribute]JObject co)
+        {   
+            var data = new DataResult(1,null);
+            var m = Newtonsoft.Json.JsonConvert.DeserializeObject<editRemarkRequest>(co.ToString());
+            if(string.IsNullOrEmpty(m.id)){
+                data.s = -3008;
+            }else{
+                string CoID = GetCoid();
+                string uname = GetUname();
+                data = WarehouseHaddle.editRemark(CoID,uname,m.id,m.remark);
+            }
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Warehouse/passThird")]
+        public ResponseResult passThird([FromBodyAttribute]JObject co)
+        {   
+            var data = new DataResult(1,null);
+            var m = Newtonsoft.Json.JsonConvert.DeserializeObject<editRemarkRequest>(co.ToString());
+            if(string.IsNullOrEmpty(m.id)){
+                data.s = -3008;
+            }else{
+                string CoID = GetCoid();
+                string uname = GetUname();
+                data = WarehouseHaddle.passThird(m.id, CoID, uname);
+            }        
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Warehouse/wareCancle")]
+        public ResponseResult wareCancle([FromBodyAttribute]JObject co)
+        {   
+            var data = new DataResult(1,null);
+            var m = Newtonsoft.Json.JsonConvert.DeserializeObject<editRemarkRequest>(co.ToString());
+            if(string.IsNullOrEmpty(m.id)){
+                data.s = -3008;
+            }else{
+                string CoID = GetCoid();
+                string uname = GetUname();
+                data = WarehouseHaddle.passThird(m.id, CoID, uname);
+            }        
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Warehouse/wareGiveUp")]
+        public ResponseResult wareGiveUp([FromBodyAttribute]JObject co)
+        {   
+            var data = new DataResult(1,null);
+            var m = Newtonsoft.Json.JsonConvert.DeserializeObject<editRemarkRequest>(co.ToString());
+            if(string.IsNullOrEmpty(m.id)){
+                data.s = -3008;
+            }else{
+                string CoID = GetCoid();
+                string uname = GetUname();
+                data = WarehouseHaddle.wareGiveUp(m.id, CoID, uname);
+            }        
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Warehouse/editploy")]
+        public ResponseResult editploy(string id="")
         {   
             string CoID = GetCoid();
-            string uname = GetUname();
-            var data = WarehouseHaddle.editRemark(CoID,uname,id,type,remark);
+            var data = WarehouseHaddle.editploy(CoID,id);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Warehouse/createploy")]
+        public ResponseResult createploy([FromBodyAttribute]JObject co)
+        {   
+            WarePloy w = Newtonsoft.Json.JsonConvert.DeserializeObject<WarePloy>(co.ToString());
+            string CoID = GetCoid();
+            var data = WarehouseHaddle.createploy(CoID,w);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Warehouse/getWareSku")]
+        public ResponseResult getWareSku(string GoodsCode="",string GoodsName="", string Filter="", int PageIndex= 1, int PageSize = 20, string SortField="", string SortDirection="")
+        {   
+            var param = new CoreSkuParam();
+            param.GoodsCode = GoodsCode;
+            param.GoodsName = GoodsName;
+            param.Filter = Filter;
+            param.PageIndex = PageIndex;
+            param.PageSize = PageSize;
+            param.SortField = SortField;
+            param.SortDirection = SortDirection;
+            string CoID = GetCoid();
+            var data = CoreSkuHaddle.getWareSku(param);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 

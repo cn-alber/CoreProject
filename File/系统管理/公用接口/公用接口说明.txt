@@ -73,4 +73,11 @@ OutPut:
     KindLst             List<CustomKindData>    商品类目列表
 参考:output json 文件:CommSkuKindLst_output.json
 
-
+7.wareLst() //获取第三方仓储或分仓
+接口路径：CoreWebApi\Controllers\Base\WarehouseControllers.cs
+路由：/Core/Warehouse/wareLst
+InPut:
+     
+OutPut:
+    Lst                 List<wareLst>           仓储列表
+接口路径：CoreWebApi\Controllers\Base\WareLst_output.json   
