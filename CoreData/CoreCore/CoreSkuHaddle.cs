@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System;
 using System.Text;
 using CoreModels.XyCore;
+using MySql.Data.MySqlClient;
 
 namespace CoreData.CoreCore
 {
@@ -517,6 +518,27 @@ namespace CoreData.CoreCore
             return res;
         }
         #endregion
+
+        public static List<wareSku> getWareSku(){
+            var result = new List<wareSku>(); 
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try
+                {
+                    string sql="SELECT distinct  SkuID,SkuName,Norm FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE;";
+                    result = conn.Query<wareSku>(sql).AsList();
+                }catch{
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
+
+
+
+
+
+
     }
 
 }

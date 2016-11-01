@@ -362,6 +362,17 @@ namespace CoreModels.XyCore
     }
     #endregion
 
+    #region 分仓抓取Sku
+
+    public class wareSku{
+        public string SkuID{get;set;}
+        public string SkuName{get;set;}
+        public string Norm{get;set;}
+    }
+
+
+    #endregion
+
 
 
 }

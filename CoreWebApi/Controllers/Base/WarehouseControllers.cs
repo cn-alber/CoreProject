@@ -178,8 +178,27 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
+        [HttpGetAttribute("/Core/Warehouse/editploy")]
+        public ResponseResult editploy(string id="")
+        {   
+            string CoID = GetCoid();
+            var data = WarehouseHaddle.editploy(CoID,id);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
 
+        [HttpGetAttribute("/Core/Warehouse/createploy")]
+        public ResponseResult createploy(string name,int level,int province,int shopid)
+        {   
+            WarePloy w = new WarePloy();
+            w.Name = name;
+            w.Level = level;
+            w.Province = province;
+            w.Shopid = shopid;
 
+            string CoID = GetCoid();
+            var data = WarehouseHaddle.createploy(CoID,w);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
 
 
 

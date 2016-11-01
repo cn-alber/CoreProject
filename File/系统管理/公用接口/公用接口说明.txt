@@ -75,6 +75,7 @@ OutPut:
 
 7.wareLst() //获取第三方仓储或分仓
 接口路径：CoreWebApi\Controllers\Base\WarehouseControllers.cs
+路由：/Core/Warehouse/wareLst
 InPut:
      
 OutPut:

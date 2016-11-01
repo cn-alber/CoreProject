@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using CoreModels.XyUser;
 using CoreData.CoreUser;
+using System.Threading.Tasks;
 
 namespace CoreData.CoreComm
 {
@@ -1113,7 +1114,6 @@ namespace CoreData.CoreComm
                         if(CoID == a.ApplyCoid){
                             sql = @"UPDATE ware_third_party SET
                                         ware_third_party.myremark = @remark,
-                                        ware_third_party.Log = @log,
                                         ware_third_party.EndMan = @endman,
                                         ware_third_party.Mdate = Now()
                                     WHERE 
@@ -1121,7 +1121,6 @@ namespace CoreData.CoreComm
                         }else{
                             sql = @"UPDATE ware_third_party SET
                                         ware_third_party.itremark = @remark,
-                                        ware_third_party.Log = @log,
                                         ware_third_party.EndMan = @endman,
                                         ware_third_party.Mdate = Now()
                                     WHERE 
@@ -1130,7 +1129,6 @@ namespace CoreData.CoreComm
                         var rnt =  conn.Execute(sql,new {
                                 id = id,
                                 remark = remark,
-                                log = "用户："+uname+" 修改备注;",
                                 endman = uname
                             });
                         if(rnt>0){
@@ -1163,12 +1161,10 @@ namespace CoreData.CoreComm
                                         ware_third_party.EndMan = @endman,
                                         ware_third_party.Pdate = Now(),
                                         ware_third_party.Mdate = Now(),
-                                        ware_third_party.Log = @log
                                     WHERE 
                                         ware_third_party.ID =@id;";
                     var rnt = conn.Execute(sql,new {
                             endman = uname,
-                            log = "用户："+uname+"审核通过",
                             id = id
                     });       
                     if(rnt > 0){
@@ -1201,7 +1197,6 @@ namespace CoreData.CoreComm
                                         ware_third_party.EndMan = @endman,
                                         ware_third_party.Pdate = Now(),
                                         ware_third_party.Mdate = Now(),
-                                        ware_third_party.Log = @log
                                     WHERE 
                                         ware_third_party.ID =@id;";
                     var rnt = conn.Execute(sql,new {                                    
@@ -1238,12 +1233,10 @@ namespace CoreData.CoreComm
                                         ware_third_party.Enable = 0,
                                         ware_third_party.EndMan = @endman,                                        
                                         ware_third_party.Mdate = Now(),
-                                        ware_third_party.Log = @log
                                     WHERE 
                                         ware_third_party.ID =@id;";
                     var rnt = conn.Execute(sql,new {                                    
                                     endman = uname,
-                                    log = "用户："+uname+"取消申请",
                                     id = id
                             });       
                     if(rnt > 0){
@@ -1262,6 +1255,160 @@ namespace CoreData.CoreComm
             }
             return result;
         }
+
+    public static List<wareLst> getWarelist(string CoID){
+        var res = new List<wareLst>();
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    string sql = @"SELECT 
+                            w.ID,w.WareName,w.CoID
+                        FROM 
+                            ware_third_party as w 
+                        WHERE w.CoID ="+CoID; 
+                    res = conn.Query<wareLst>(sql).AsList();                                  
+                }
+                catch
+                {
+                    conn.Dispose();
+                }
+            }
+
+        return res;
+    }
+
+    public static List<AreaAll> getAreaAll(){
+        var res = new List<AreaAll>();
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    string sql = @"SELECT  area.ID as value,  area.ParentId ,  area.`Name` as label FROM area WHERE LevelType = 1 AND ParentId = 100000 "; 
+                    res = conn.Query<AreaAll>(sql).AsList();                                  
+                }
+                catch
+                {
+                    conn.Dispose();
+                }
+            }
+
+        return res;
+    }
+
+    public static List<shopEnum> getShopEnum(string CoID){
+        var res = new List<shopEnum>();
+        using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+            try
+            {
+                string sql = @"SELECT ID as value ,ShopName as label FROM shop WHERE CoID in(0,"+CoID+");";
+                res = conn.Query<shopEnum>(sql).AsList();                                  
+            }
+            catch
+            {
+                conn.Dispose();
+            }
+        }
+
+        return res;
+    }
+
+    public static DataResult editploy(string CoID,string id = ""){
+            var result = new DataResult(1,null);
+            var warelist = new List<wareLst>();
+            var province = new List<AreaAll>();
+            var shop = new List<shopEnum>();
+            Task[] tasks = new Task[3];
+            tasks[0] =  Task.Factory.StartNew(()=>{
+                warelist = getWarelist(CoID);
+            });  
+            tasks[1] =   Task.Factory.StartNew(()=>{
+                province = getAreaAll();
+            }); 
+            tasks[2] =  Task.Factory.StartNew(()=>{
+                shop = getShopEnum(CoID);
+            });
+              
+            Task.WaitAll(tasks);
+
+            if(string.IsNullOrEmpty(id)){
+                result.d = new{
+                    warelist = warelist,
+                    province = province,
+                    shop = shop
+                };
+            }else{
+                using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                    try
+                    {
+                        string sql ="SELECT * FROM wareploy WHERE ID = "+id;                                                                         
+                        var res = conn.Query<WarePloy>(sql).AsList();
+                        if(res.Count>0){
+                            result.d = new{
+                                warelist = warelist,
+                                province = province,
+                                shop = shop,
+                                ploy = res[0]
+                            };
+                        }else{
+                            result.d = new{
+                                warelist = warelist,
+                                province = province,
+                                shop = shop
+                            };
+                        }
+
+                    }
+                    catch (Exception e)
+                    {
+                        result.s = -1;
+                        result.d= e.Message; 
+                        conn.Dispose();
+                    }
+                }
+            }
+            
+            return result;
+        }
+
+        public static DataResult createploy(string CoID,WarePloy wareploy ){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    wareploy.CoID = Convert.ToInt16(CoID);
+                    string sql = @"INSERT wareploy SET
+                                        wareploy.`Name` = @Name,
+                                        wareploy.CoID = @CoID,
+                                        wareploy.`Level`= @Level,
+                                        wareploy.Wid= @Wid,
+                                        wareploy.Province = @Province,
+                                        wareploy.Shopid = @Shopid,
+                                        wareploy.Did = @Did,
+                                        wareploy.ContainGoods= @ContainGoods,
+                                        wareploy.RemoveGoods= @RemoveGoods,
+                                        wareploy.ContainStyle = @ContainStyle,
+                                        wareploy.RemoveStyle = @RemoveStyle,
+                                        wareploy.MinNum = @MinNum,
+                                        wareploy.MaxNum= @MaxNum,
+                                        wareploy.Payment = @Payment;";                                                                         
+                     var rnt = conn.Execute(sql,wareploy);
+                     if(rnt>0){
+                         result.s = 1;
+                     }else{
+                         result.s = -1;
+                     }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
+
+
 
 
 
