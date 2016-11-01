@@ -519,13 +519,39 @@ namespace CoreData.CoreCore
         }
         #endregion
 
-        public static List<wareSku> getWareSku(){
+        public static List<wareSku> getWareSku(CoreSkuParam IParam){
             var result = new List<wareSku>(); 
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try
                 {
-                    string sql="SELECT distinct  SkuID,SkuName,Norm FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE;";
-                    result = conn.Query<wareSku>(sql).AsList();
+                    StringBuilder querysql=new StringBuilder();
+                    StringBuilder totalSql = new StringBuilder();
+                    var p = new DynamicParameters();
+                    querysql.Append("SELECT distinct  SkuID,SkuName,Norm FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE ");
+                    totalSql.Append("SELECT COUNT(ID) FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE ");
+                    if (!string.IsNullOrEmpty(IParam.GoodsCode))
+                    {
+                        querysql.Append(" AND GoodsCode = @GoodsCode");
+                        totalSql.Append(" AND GoodsCode = @GoodsCode");
+                        p.Add("@GoodsCode", IParam.GoodsCode);
+                    }
+                    if (!string.IsNullOrEmpty(IParam.GoodsName))
+                    {
+                        querysql.Append(" AND GoodsName = @GoodsName");
+                        totalSql.Append(" AND GoodsName = @GoodsName");
+                        p.Add("@GoodsName", IParam.GoodsName);
+                    }
+                    if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
+                    {
+                        querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
+                        totalSql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
+                    }
+                    var total = conn.Query<long>(totalSql.ToString(),p).AsList()[0];
+                    if(total>0){}
+                    
+
+                    
+                    result = conn.Query<wareSku>(querysql.ToString(),p).AsList();
                 }catch{
                     conn.Dispose();
                 }

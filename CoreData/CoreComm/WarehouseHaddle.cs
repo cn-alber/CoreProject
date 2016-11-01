@@ -1030,22 +1030,30 @@ namespace CoreData.CoreComm
             var com = CompanyHaddle.GetCompanyEdit(int.Parse(CoID)).d as Company;
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
-                {                                    
-                    string c = " 1 = 1 ";
+                {            
+                    string wh = " WHERE 1 !=1 ";
+                    if(contains.Length>0 || status.Length >0){
+                        wh = " WHERE 1 = 1";
+                    }                        
+                    string c = " ";
                     string s = status.Length>0?" AND w.Enable in("+string.Join(",", status)+")":"";
                     string sql = "";              
 
                     if(string.Join(",", contains).IndexOf("1")>-1){                        
-                        c += " AND w.CoID = "+CoID;
+                        c = " AND w.CoID = "+CoID;
                     }
                     if(string.Join(",", contains).IndexOf("2")>-1){
-                        c += " OR w.ItCoid = "+CoID+" ";
-                    }        
+                        c = " AND w.ItCoid = "+CoID+" ";
+                    }
+                    if(string.Join(",", contains).IndexOf("1")>-1 && string.Join(",", contains).IndexOf("2")>-1 ){
+                        c = " AND w.CoID = "+CoID + " OR w.ItCoid = "+CoID+" ";
+                    }
+
+
                     sql =@"SELECT 
-                            w.ID,w.WareName,w.myremark,w.itremark,w.Enable,w.Source ,w.ItName,w.Mdate,w.CoID
+                            w.ID,w.WareName,w.myremark,w.itremark,w.Enable,w.Source ,w.ItName,w.Mdate,w.CoID,w.ItCoid,w.ApplyCoid
                            FROM 
-                            ware_third_party as w 
-                           WHERE "+c+s;
+                            ware_third_party as w "+wh+c+s;
                     Console.WriteLine(sql);                                                      
                     var storageLst = conn.Query<wareThirdParty>(sql).AsList();                    
                     result.d = new {
