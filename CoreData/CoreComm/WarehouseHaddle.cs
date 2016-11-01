@@ -902,46 +902,6 @@ namespace CoreData.CoreComm
         }
 
         ///<summary>
-        ///生成第三方物流服务号
-        ///</summary>
-         public static DataResult serviceCode (string CoID,string ComName,string wareadmin){
-            var result = new DataResult(1,null);
-            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
-                try
-                {
-                    string code =  DateTime.Now.ToString("yyMMddHHmmss")+CoID;                    
-                    string sql = @"INSERT ware_third_party SET 
-                                        ware_third_party.CoID = @CoID,
-                                        ware_third_party.`Code` =@Code,
-                                        ware_third_party.Cdate = Now(),
-                                        ware_third_party.WareName = @name,
-                                        ware_third_party.WareAdmin = @wareadmin;";
-                    var rnt = conn.Execute(sql,new {
-                        CoID = CoID,
-                        Code = code,
-                        name = ComName,
-                        wareadmin = wareadmin
-                    });
-                    if(rnt>0){
-                        result.s = 1;
-                        result.d = new {
-                            code = code
-                        };
-                    }else{
-                        result.s = -3103;
-                    }
-                }
-                catch (Exception e)
-                {
-                    result.s = -1;
-                    result.d= e.Message; 
-                    conn.Dispose();
-                }
-            }
-            return result;
-        }
-
-        ///<summary>
         ///重新生成第三方物流服务号
         ///</summary>
          public static DataResult serviceCodeRebuild (string CoID){
@@ -979,23 +939,43 @@ namespace CoreData.CoreComm
         ///</summary>
          public static DataResult askFor(string CoID,string code,string itremark){
             var result = new DataResult(1,null);
-            var comres = CompanyHaddle.GetByWarecode(code);
-            if(comres.s == 1){
-                var itCom = comres.d as Company;
+            var comRes = CompanyHaddle.GetByWarecode(code);
+            var myCom = CompanyHaddle.GetCompanyEdit(int.Parse(CoID)).d as Company;
+            if(comRes.s == 1){
+                var itCom = comRes.d as Company;
                 using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                     try
-                    {                     
-                           string sql = @"INSERT ware_third_party SET 
+                    {      
+                           
+                           string  sql = "SELECT ware_third_party.ID FROM ware_third_party where ware_third_party.CoID = "+CoID+" AND ware_third_party.ItCoid = "+itCom.id;
+                           var res = conn.Query<int>(sql).AsList();
+                           if(res.Count > 0){
+                               sql = @"INSERT ware_third_party SET 
                                             ware_third_party.Enable = 1,                                                                   
                                             ware_third_party.Cdate = Now(),                                                          
                                             ware_third_party.CoID = @CoID,
+                                            ware_third_party.WareName =@warename,
+                                            ware_third_party.ItName = @itname,
                                             ware_third_party.ItCoid = @itcoid,
                                             ware_third_party.ItRemark = @itremark,
                                             ware_third_party.ApplyCoid = @CoID;";
+                           }else{
+                               sql = @"UPDATE ware_third_party SET 
+                                            ware_third_party.Enable = 1,                                                                                                                                                                         
+                                            ware_third_party.CoID = @CoID,
+                                            ware_third_party.WareName =@warename,
+                                            ware_third_party.ItName = @itname,
+                                            ware_third_party.ItCoid = @itcoid,
+                                            ware_third_party.ItRemark = @itremark,
+                                            ware_third_party.ApplyCoid = @CoID;";
+                           }
+                           
                             var rnt = conn.Execute(sql,new {   
                                 itremark = itremark,        
                                 CoID = CoID,
-                                itcoid = itCom.id                                        
+                                itcoid = itCom.id,
+                                warename = myCom.name,
+                                itname = itCom.name                                       
                             });                                                         
                     }
                     catch (Exception e)

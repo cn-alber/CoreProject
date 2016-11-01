@@ -256,10 +256,6 @@ namespace CoreData.CoreUser
                 com.id = rtn;
                 CacheBase.Set<Company>("company" + rtn.ToString(), com);      
                 TransUser.Commit();
-
-                WarehouseHaddle.serviceCode(rtn.ToString(), com.name,user.Name);
-                //WarehouseHaddle.InsertWare(user.Name,com.name,rtn);
-
             }catch(Exception ex){
                 TransUser.Rollback();
                 TransUser.Dispose();
