@@ -1206,10 +1206,10 @@ namespace CoreData.CoreComm
                                         ware_third_party.Pdate = Now(),
                                         ware_third_party.Mdate = Now(),
                                     WHERE 
-                                        ware_third_party.ID =@id;";
+                                        ware_third_party.ID =@id AND (ware_third_party.CoID = @CoID OR ware_third_party.ItCoid = @CoID );";
                     var rnt = conn.Execute(sql,new {                                    
                                     endman = uname,
-                                    log = "用户："+uname+"终止合作",
+                                    CoID = coid,
                                     id = id
                             });       
                     if(rnt > 0){
@@ -1240,12 +1240,13 @@ namespace CoreData.CoreComm
                     string sql =@"UPDATE ware_third_party SET                               
                                         ware_third_party.Enable = 0,
                                         ware_third_party.EndMan = @endman,                                        
-                                        ware_third_party.Mdate = Now(),
+                                        ware_third_party.Mdate = Now()
                                     WHERE 
-                                        ware_third_party.ID =@id;";
+                                        ware_third_party.ID =@id AND ware_third_party.CoID = @CoID;";
                     var rnt = conn.Execute(sql,new {                                    
                                     endman = uname,
-                                    id = id
+                                    id = id,
+                                    CoID = coid
                             });       
                     if(rnt > 0){
                         result.s = 1;
@@ -1263,7 +1264,9 @@ namespace CoreData.CoreComm
             }
             return result;
         }
-
+        ///<summary>
+        /// 指定仓库
+        ///</summary>
     public static List<wareLst> getWarelist(string CoID){
         var res = new List<wareLst>();
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
@@ -1285,6 +1288,9 @@ namespace CoreData.CoreComm
         return res;
     }
 
+    ///<summary>
+    /// 限定省份
+    ///</summary>
     public static List<AreaAll> getAreaAll(){
         var res = new List<AreaAll>();
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
@@ -1302,6 +1308,9 @@ namespace CoreData.CoreComm
         return res;
     }
 
+    ///<summary>
+    /// 指定店铺
+    ///</summary>
     public static List<shopEnum> getShopEnum(string CoID){
         var res = new List<shopEnum>();
         using(var conn = new MySqlConnection(DbBase.CommConnectString) ){

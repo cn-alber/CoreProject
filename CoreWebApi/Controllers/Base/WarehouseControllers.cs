@@ -7,6 +7,8 @@ using CoreModels.XyUser;
 using System;
 using CoreModels;
 using CoreData.CoreUser;
+using CoreData.CoreCore;
+using CoreModels.XyCore;
 
 namespace CoreWebApi
 {
@@ -192,6 +194,22 @@ namespace CoreWebApi
             WarePloy w = Newtonsoft.Json.JsonConvert.DeserializeObject<WarePloy>(co.ToString());
             string CoID = GetCoid();
             var data = WarehouseHaddle.createploy(CoID,w);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Warehouse/getWareSku")]
+        public ResponseResult getWareSku(string GoodsCode="",string GoodsName="", string Filter="", int PageIndex= 1, int PageSize = 20, string SortField="", string SortDirection="")
+        {   
+            var param = new CoreSkuParam();
+            param.GoodsCode = GoodsCode;
+            param.GoodsName = GoodsName;
+            param.Filter = Filter;
+            param.PageIndex = PageIndex;
+            param.PageSize = PageSize;
+            param.SortField = SortField;
+            param.SortDirection = SortDirection;
+            string CoID = GetCoid();
+            var data = CoreSkuHaddle.getWareSku(param);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 

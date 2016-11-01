@@ -519,8 +519,8 @@ namespace CoreData.CoreCore
         }
         #endregion
 
-        public static List<wareSku> getWareSku(CoreSkuParam IParam){
-            var result = new List<wareSku>(); 
+        public static DataResult getWareSku(CoreSkuParam IParam){
+            var result = new DataResult(1,null); 
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try
                 {
@@ -546,12 +546,29 @@ namespace CoreData.CoreCore
                         querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                         totalSql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                     }
-                    var total = conn.Query<long>(totalSql.ToString(),p).AsList()[0];
-                    if(total>0){}
-                    
-
-                    
-                    result = conn.Query<wareSku>(querysql.ToString(),p).AsList();
+                    decimal total = conn.Query<decimal>(totalSql.ToString(),p).AsList()[0];
+                    if(total>0){
+                        decimal pagecnt = Math.Ceiling(total / decimal.Parse(IParam.PageSize.ToString()));
+                        int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
+                        querysql.Append(" LIMIT @ls , @le");
+                        p.Add("@ls", dataindex);
+                        p.Add("@le", IParam.PageSize);
+                        var list = conn.Query<wareSku>(querysql.ToString(),p).AsList();
+                        if(IParam.PageIndex == 1){
+                            result.d = new {
+                                list = list,                                          
+                                page = IParam.PageIndex,
+                                pageSize = IParam.PageSize,
+                                pageTotal = pagecnt,
+                                total = total
+                            };
+                        }else{
+                            result.d = new {
+                                list = list,                                          
+                                page = IParam.PageIndex
+                            };
+                        }                        
+                    }                                                
                 }catch{
                     conn.Dispose();
                 }
