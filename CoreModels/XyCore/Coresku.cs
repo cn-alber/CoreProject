@@ -373,6 +373,21 @@ namespace CoreModels.XyCore
 
     #endregion
 
+    #region 天猫生成sku商品
+    public class TmallSku{
+        public string SkuID{get;set;}
+        public string SkuName{get;set;}
+        public string GoodsCode{get;set;}
+        public string GoodsName{get;set;}
+        public string SalePrice{get;set;}
+        public string Norm{get;set;}
+        public string Img{get;set;}
+        public int CoID{get;set;}
+        public bool Enable{get;set;}
+        public string Creator{get;set;}
+        public bool IsParent{set;get;}
+    }
 
+    #endregion
 
 }
