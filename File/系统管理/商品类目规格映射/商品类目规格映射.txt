@@ -1,0 +1,14 @@
+接口名称:SkuPropsController
+路径：\CoreProject\CoreWebApi\Controllers\Base
+
+function说明
+#######################################################
+1.SkuProps()//查询商品类目资料(CustomKind_skuprops)
+    方法：Get
+    路由：http://192.168.30.211:5000/Core/XyComm/CustomKindSkuProps/SkuProps
+    InPut:
+        Null                
+    OutPut:
+        SkuProps             List<skuprops>         商品Sku属性映射列表
+    参考:output json 文件:SkuProps_output.json
+#######################################################

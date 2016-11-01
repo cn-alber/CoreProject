@@ -13,6 +13,9 @@ namespace CoreWebApi.XyCore
     // [AllowAnonymous]
     public class CoreSkuControllers : ControllBase
     {
+
+
+
         #region 商品管理-获取商品主要资料
         [HttpGetAttribute("Core/XyCore/CoreSku/GoodsQueryLst")]
         public ResponseResult GoodsQueryLst(string Type,string GoodsCode,string GoodsName, string Filter, string Enable, string PageIndex, string PageSize, string SortField, string SortDirection)
@@ -66,7 +69,7 @@ namespace CoreWebApi.XyCore
             var Result = CoreResult.NewResponse(res.s, res.d, "General");
             return Result;
         }
-        #endregion
+        #endregion        
 
         #region 商品管理 - 获取单笔Sku详情
         [HttpPostAttribute("Core/XyCore/CoreSku/GoodsQuery")]

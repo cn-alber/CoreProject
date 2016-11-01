@@ -338,16 +338,16 @@ namespace CoreWebApi
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
-
+     
 
 
 
         #region
         [HttpGetAttribute("/Core/XyComm/Customkind/GetSkuProps")]
-        public ResponseResult GetSkuProps()
+        public ResponseResult GetSkuProps(string Cid)
         {
             // var res = CoreData.CoreApi.TmallHaddle.GetSellercatsList("南极人羽绒旗舰店");
-            var res = CoreData.CoreApi.TmallHaddle.itemProps("3035");
+            var res = CoreData.CoreApi.TmallHaddle.itemProps(Cid);
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion

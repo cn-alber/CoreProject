@@ -88,7 +88,7 @@ function说明
                 1.返回错误信息
     参考:input json 文件:SkuKindEnable_input.json
 #######################################################
-8.InsertStdKind()//添加标准类目
+8.InsertStandardKind()//添加标准类目
     方法：POST
     路由:http://192.168.30.211:5000/Core/XyComm/Customkind/InsertStandardKind
     input： ID           int            标准类目ID
@@ -199,8 +199,15 @@ function说明
             KindIDLst     List<int>      商品类目ID (*必填项*)  
             Type          int            判断1.更新/2.覆盖
     参考：input json 文件：SaveCopyToProps_input.json
-        
 
+17.GetColorLst()//根据商品类目获取颜色列表
+    方法：GET
+    路由：
+
+18.GetSizeLst()//根据商品类目获取尺码列表
+    方法：GET
+    路由：
+        
 
 
 
