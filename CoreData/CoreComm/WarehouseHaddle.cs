@@ -1036,7 +1036,7 @@ namespace CoreData.CoreComm
                         wh = " WHERE 1 = 1";
                     }                        
                     string c = " ";
-                    string s = status.Length>0?" AND w.Enable in("+string.Join(",", status)+")":"";
+                    string s = status.Length>0?" AND w.Enable in("+string.Join(",", status)+")":" AND w.Enable in (1,2,3)";
                     string sql = "";              
 
                     if(string.Join(",", contains).IndexOf("1")>-1){                        
@@ -1046,7 +1046,7 @@ namespace CoreData.CoreComm
                         c = " AND w.ItCoid = "+CoID+" ";
                     }
                     if(string.Join(",", contains).IndexOf("1")>-1 && string.Join(",", contains).IndexOf("2")>-1 ){
-                        c = " AND w.CoID = "+CoID + " OR w.ItCoid = "+CoID+" ";
+                        c = " AND (w.CoID = "+CoID + " OR w.ItCoid = "+CoID+") ";
                     }
 
 
@@ -1170,10 +1170,11 @@ namespace CoreData.CoreComm
                                         ware_third_party.Pdate = Now(),
                                         ware_third_party.Mdate = Now(),
                                     WHERE 
-                                        ware_third_party.ID =@id;";
+                                        ware_third_party.ID =@id AND ware_third_party.CoID = @CoID;";
                     var rnt = conn.Execute(sql,new {
                             endman = uname,
-                            id = id
+                            id = id,
+                            CoID = coid
                     });       
                     if(rnt > 0){
                         result.s = 1;
