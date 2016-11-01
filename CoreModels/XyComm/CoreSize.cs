@@ -13,3 +13,9 @@ public class CoreSize
     public string ModifyDate { get; set; }
     public int CoID { get; set; }
 }
+public class SizeData
+{
+    public int id { get; set; }
+    public string sizeid { get; set; }
+    public string name { get; set; }
+}

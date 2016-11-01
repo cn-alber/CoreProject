@@ -217,11 +217,7 @@ namespace CoreData.CoreComm
         {
             var result = ExistKind(kind.KindName, kind.ParentID, 0, kind.CoID);//判断类目名称是否已存在
             if (result.s == 1)
-            {
-                if (kind.mode == 2)
-                {
-                    kind.norm = string.Join(",", kind.NormLst.ToArray());
-                }
+            {                
                 result = AddKind(kind);
             }
             return result;
@@ -232,9 +228,11 @@ namespace CoreData.CoreComm
             var result = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CommConnectString))
             {
+                conn.Open();
+                var Trans = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
                 try
                 {
-                    int count = conn.Execute(AddKindSql(), kind);
+                    int count = conn.Execute(AddKindSql(), kind,Trans);
                     kind.ID = conn.QueryFirst<int>("select LAST_INSERT_ID()");
                     if (count < 0)
                     {
@@ -242,16 +240,53 @@ namespace CoreData.CoreComm
                     }
                     else
                     {
-                        var Kind = conn.QueryFirst<CustomKind>("SELECT * FROM customkind WHERE CoID=@CoID AND ID=@KindID AND IsDelete=0", new { CoID = kind.CoID, KindID = kind.ID });
+                        var SkuPropLst = new List<Customkind_skuprops>();
+                        //现有的自定义类目
+                        if (kind.mode == 2)//新增自定义规格
+                        {
+                            kind.norm = string.Join(",", kind.NormLst.ToArray());
+                            var OldPropLst = conn.Query<skuprops_data>(@"SELECT distinct pid,name FROM customkind_skuprops WHERE CoID=@CoID AND tb_cid=0",new{CoID=kind.CoID}).AsList();
+                            foreach(var pname in kind.NormLst)
+                            {
+                                var prop = new Customkind_skuprops();
+                                prop.CoID = kind.CoID;
+                                prop.kindid = kind.ID;
+                                prop.name = pname;
+                                prop.Creator = kind.Creator;
+                                prop.CreateDate = kind.CreateDate;
+                                if(OldPropLst.Select(a=>a.name).Contains(pname))
+                                {
+                                    prop.pid = OldPropLst.Where(a=>a.name==pname).Select(a=>a.pid).First();
+                                }
+                                else
+                                {
+                                    prop.pid = long.Parse(CommHaddle.GetRecordID(kind.CoID));                                
+                                }
+                                SkuPropLst.Add(prop);
+                            }  
+                            if(SkuPropLst.Count>0)
+                            {
+                                conn.Execute(AddSkuPropSql(),SkuPropLst,Trans);
+                            }                      
+                        }   
+                        // var Kind = conn.QueryFirst<CustomKind>("SELECT * FROM customkind WHERE CoID=@CoID AND ID=@KindID AND IsDelete=0", new { CoID = kind.CoID, KindID = kind.ID });
                         string cname = "customkind" + kind.CoID + kind.ID;
                         CacheBase.Set(cname, kind);//新增缓存
+                        Trans.Commit();
                         CoreUser.LogComm.InsertUserLog("新增" + kind.Type, "CustomKind", kind.KindName, kind.Creator, kind.CoID, DateTime.Now);
                     }
                 }
                 catch (Exception e)
                 {
+                    Trans.Rollback();
                     result.s = -1;
                     result.d = e.Message;
+                }
+                finally
+                {
+                    Trans.Dispose();
+                    conn.Dispose();
+                    conn.Close();
                 }
                 return result;
             }
@@ -526,12 +561,18 @@ namespace CoreData.CoreComm
                             dynamic item_sku_props = result.d;
                             var ItemPropLst = new List<Customkind_props>();//商品类目属性
                             var ItemPropValLst = new List<Customkind_props_value>();//商品类目属性之可选属性值
-                            var ColorLst = new List<CoreColor>();//颜色属性
-                            var SizeLst = new List<CoreSize>();//尺码熟悉
+                            var SkuPropLst = new List<Customkind_skuprops>();//Sku属性（颜色|尺码）
+                            var SkuPropValLst = new List<Customkind_skuprops_value>();
+                            var OldSkuValLst = conn.Query<skuprops_value_data>("SELECT pid,vid FROM Customkind_skuprops_value WHERE CoID=@CoID", new { CoID = IParam.CoID });
+                            // var SizeLst = new List<CoreSize>();//尺码熟悉
                             int order = 1;
                             foreach (var item in item_sku_props["item_props"])
                             {
                                 var prop = new Customkind_props();
+                                if (item["is_material"] != null)
+                                {
+                                    prop.is_material = item["is_material"];
+                                }
                                 if (item["is_allow_alias"] != null)
                                 {
                                     prop.is_allow_alias = item["is_allow_alias"];
@@ -561,6 +602,7 @@ namespace CoreData.CoreComm
                                     prop.multi = item["multi"];
                                 }
                                 int ValOrder = 1;
+                                // if(item["material_do"]!=null&& item["material_do"]["materials"] != null)
                                 if (item["prop_values"] != null && item["prop_values"]["prop_value"] != null)
                                 {
                                     foreach (var v in item["prop_values"]["prop_value"])
@@ -595,53 +637,89 @@ namespace CoreData.CoreComm
                             foreach (var item in item_sku_props["sku_props"])
                             {
                                 var skupid = item["pid"];
-                                if (item["is_color_prop"] != null && item["is_color_prop"] == true)//新增颜色属性
+                                var prop = new Customkind_skuprops();
+                                prop.CoID = IParam.CoID;
+                                prop.kindid = kindid;
+                                prop.name = item["name"];
+                                prop.pid = skupid;
+                                prop.tb_cid = Kind_standard.tb_cid;
+                                prop.is_color_prop = item["is_color_prop"];
+                                prop.Creator = IParam.Creator;
+                                prop.CreateDate = IParam.CreateDate;
+                                SkuPropLst.Add(prop);
+                                if (item["prop_values"] != null && item["prop_values"]["prop_value"] != null)
                                 {
-                                    foreach (var col in item["prop_values"]["prop_value"])
+                                    foreach (var v in item["prop_values"]["prop_value"])
                                     {
-                                        var color = new CoreColor();
-                                        color.colorid = col["vid"];
-                                        color.vid = col["vid"];
-                                        color.name = col["name"];
-                                        color.CoID = IParam.CoID;
-                                        color.Creator = IParam.Creator;
-                                        color.CreateDate = IParam.CreateDate;
-                                        color.pid = skupid;
-                                        color.tb_cid = Kind_standard.tb_cid;
-                                        color.kindid = kindid;
-                                        ColorLst.Add(color);
+                                        long vid = v["vid"];
+                                        if (OldSkuValLst.Where(a => a.vid == vid && a.pid == prop.pid).Count() == 0)
+                                        {
+                                            var val = new Customkind_skuprops_value();
+                                            val.vid = vid;
+                                            val.pid = skupid;
+                                            val.name = v["name"];
+                                            val.Creator = IParam.Creator;
+                                            val.CreateDate = IParam.CreateDate;
+                                            val.CoID = IParam.CoID;
+                                            SkuPropValLst.Add(val);
+                                        }
                                     }
                                 }
-                                else
-                                {
-                                    foreach (var col in item["prop_values"]["prop_value"])
-                                    {
-                                        var size = new CoreSize();
-                                        size.sizeid = col["vid"];
-                                        size.vid = col["vid"];
-                                        size.name = col["name"];
-                                        size.CoID = IParam.CoID;
-                                        size.Creator = IParam.Creator;
-                                        size.CreateDate = IParam.CreateDate;
-                                        size.pid = skupid;
-                                        size.tb_cid = Kind_standard.tb_cid;
-                                        size.kindid = kindid;
-                                        SizeLst.Add(size);
-                                    }
-                                }
+                                // if (item["is_color_prop"] != null && item["is_color_prop"] == true)//新增颜色属性
+                                // {
+                                //     foreach (var col in item["prop_values"]["prop_value"])
+                                //     {
+                                //         var color = new CoreColor();
+                                //         color.colorid = col["vid"];
+                                //         color.vid = col["vid"];
+                                //         color.name = col["name"];
+                                //         color.CoID = IParam.CoID;
+                                //         color.Creator = IParam.Creator;
+                                //         color.CreateDate = IParam.CreateDate;
+                                //         color.pid = skupid;
+                                //         color.tb_cid = Kind_standard.tb_cid;
+                                //         color.kindid = kindid;
+                                //         ColorLst.Add(color);
+                                //     }
+                                // }
+                                // else
+                                // {
+                                //     foreach (var col in item["prop_values"]["prop_value"])
+                                //     {
+                                //         var size = new CoreSize();
+                                //         size.sizeid = col["vid"];
+                                //         size.vid = col["vid"];
+                                //         size.name = col["name"];
+                                //         size.CoID = IParam.CoID;
+                                //         size.Creator = IParam.Creator;
+                                //         size.CreateDate = IParam.CreateDate;
+                                //         size.pid = skupid;
+                                //         size.tb_cid = Kind_standard.tb_cid;
+                                //         size.kindid = kindid;
+                                //         SizeLst.Add(size);
+                                //     }
+                                // }
                             }
                             if (ItemPropLst.Count > 0)
                             {
                                 conn.Execute(AddKindPorpSql(), ItemPropLst, Trans);
                             }
-                            if (ColorLst.Count > 0)
+                            if(SkuPropLst.Count>0)
                             {
-                                conn.Execute(AddColorSql(), ColorLst, Trans);
+                                conn.Execute(AddSkuPropSql(),SkuPropLst,Trans);
                             }
-                            if (SizeLst.Count > 0)
+                            if (SkuPropValLst.Count > 0)
                             {
-                                conn.Execute(AddSizeSql(), SizeLst, Trans);
+                                conn.Execute(AddSkuPropValSql(),SkuPropValLst,Trans);
                             }
+                            // if (ColorLst.Count > 0)
+                            // {
+                            //     conn.Execute(AddColorSql(), ColorLst, Trans);
+                            // }
+                            // if (SizeLst.Count > 0)
+                            // {
+                            //     conn.Execute(AddSizeSql(), SizeLst, Trans);
+                            // }
                             if (ItemPropValLst.Count > 0)
                             {
                                 conn.Execute(AddKindPropValueSql(), ItemPropValLst, Trans);
@@ -839,7 +917,7 @@ namespace CoreData.CoreComm
         public static DataResult GetKindNameLst(string CoID, int ParentID, string Enable)
         {
             var result = new DataResult(1, null);
-            var KindLst = new List<CustomKindname>();        
+            var KindLst = new List<CustomKindname>();
             using (var conn = new MySqlConnection(DbBase.CommConnectString))
             {
                 try
@@ -857,7 +935,7 @@ namespace CoreData.CoreComm
                     KindLst.AddRange(ParentLst);
                     foreach (var kind in ParentLst)
                     {
-                        var res = GetKindNameLst(CoID, kind.ID,Enable);
+                        var res = GetKindNameLst(CoID, kind.ID, Enable);
                         if (res.s == 1)
                         {
                             kind.Children = res.d as List<CustomKindname>;
@@ -1047,6 +1125,57 @@ namespace CoreData.CoreComm
                                         @CoID,
                                         @Creator,
                                         @CreateDate
+                                        )";
+            return sql;
+        }
+        #endregion
+
+        #region 新增Sku属性
+         public static string AddSkuPropSql()
+        {
+            string sql = @" INSERT INTO customkind_skuprops(
+                                        kindid,
+                                        `name`,
+                                        pid,
+                                        tb_cid,
+                                        is_color_prop,
+                                        `Order`,
+                                        `Enable`,
+                                        Creator,
+                                        CreateDate,
+                                        CoID
+                                    ) VALUES (
+                                        @kindid,
+                                        @name,
+                                        @pid,
+                                        @tb_cid,
+                                        @is_color_prop,
+                                        @Order,
+                                        @Enable,
+                                        @Creator,
+                                        @CreateDate,
+                                        @CoID              
+                                        )";
+            return sql;
+        }
+        public static string AddSkuPropValSql()
+        {
+            string sql = @" INSERT INTO customkind_skuprops_value(                                        
+                                        `name`,
+                                        mapping,
+                                        pid,
+                                        vid,    
+                                        Creator,
+                                        CreateDate,
+                                        CoID
+                                    ) VALUES (
+                                        @name,
+                                        @mapping,
+                                        @pid,
+                                        @vid,
+                                        @Creator,
+                                        @CreateDate,
+                                        @CoID              
                                         )";
             return sql;
         }

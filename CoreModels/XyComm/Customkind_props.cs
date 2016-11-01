@@ -6,6 +6,7 @@ namespace CoreModels.XyComm
     {
         private bool _must = false; //是否必选
         private bool _multi = false; //是否多选
+        private bool _is_material = false;
         private bool _is_allow_alias = false;//是否允许别名        
         private bool _is_enum_prop = false;//是否枚举      
         private bool _is_input_prop = false;//在is_enum_prop是true的前提下，是否是卖家可以自行输入      
@@ -26,6 +27,11 @@ namespace CoreModels.XyComm
         {
             get { return _multi; }
             set { this._multi = value; }
+        }
+        public bool is_material
+        {
+            get { return _is_material; }
+            set { this._is_material = value; }
         }
         public bool is_allow_alias
         {
@@ -74,17 +80,4 @@ namespace CoreModels.XyComm
         public List<string> ValLst { get; set; }
     }
 
-    public class item_props
-    {
-        public object item_prop { get; set; }
-    }
-    public class sku_props
-    {
-        public object item_prop { get; set; }
-    }
-    public class item_sku_props
-    {
-        public List<item_props> item { get; set; }
-        public List<sku_props> sku { get; set; }
-    }
 }

@@ -13,3 +13,10 @@ public class CoreColor
     public string ModifyDate { get; set; }
     public int CoID { get; set; }
 }
+
+public class ColorData
+{
+    public int id { get; set; }
+    public string colorid { get; set; }
+    public string name { get; set; }
+}
