@@ -1,0 +1,39 @@
+{
+    "SkuPropLst": [
+        {
+            "pid": 122216343,
+            "skuprops_values": [
+                {
+                    "id": 1119,
+                    "mapping": "0048",
+                    "name": "48"
+                },
+                {
+                    "id": 1120,
+                    "mapping": "0052",
+                    "name": "52"
+                }
+            ]
+        },
+        {
+            "pid": 10002016110194736,
+            "skuprops_values": [
+                {
+                    "id": -1,
+                    "mapping": "W",
+                    "name": "白色"
+                }
+            ]
+        },
+        {
+            "pid": 10002016110114200,
+            "skuprops_values": [
+                {
+                    "id": -1,
+                    "mapping": "001",
+                    "name": "XL"
+                }
+            ]
+        }
+    ]
+}

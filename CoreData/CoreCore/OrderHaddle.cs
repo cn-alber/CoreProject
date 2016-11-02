@@ -1290,7 +1290,6 @@ namespace CoreData.CoreCore
         public static DataResult UpdateOrderDetail(int id,long soid,int skuid,int CoID,string Username,decimal price,int qty)
         {
             var result = new DataResult(1,null);  
-            var res = new OrderDetailInsert();
             var logs = new List<Log>();
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
@@ -1395,6 +1394,839 @@ namespace CoreData.CoreCore
                         result.s = -3002;
                         return result;
                     }
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            return result;
+        }
+        ///<summary>
+        ///手工支付
+        ///</summary>
+        public static DataResult ManualPay(PayInfo pay,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var logs = new List<Log>();
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string wheresql = "select * from `order` where id =" + pay.OID + " and soid = " + pay.SoID + " and coid =" + CoID;
+                var u = CoreDBconn.Query<Order>(wheresql).AsList();
+                var ord = new Order();
+                if (u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "此订单不存在!";
+                    return result;
+                }
+                else
+                {
+                    ord = u[0] as Order;
+                    if (ord.Status != 0 && ord.Status != 1 && ord.Status != 7)
+                    {
+                        result.s = -1;
+                        result.d = "只有待付款/已付款待审核/异常的订单才可以新增付款!";
+                        return result;
+                    }
+                }
+                decimal PaidAmount=0,PayAmount=0,Amount=0;
+                if(!string.IsNullOrEmpty(ord.PaidAmount))
+                {
+                    PaidAmount = decimal.Parse(ord.PaidAmount);
+                }
+                if(!string.IsNullOrEmpty(ord.PayAmount))
+                {
+                    PayAmount = decimal.Parse(ord.PayAmount);
+                }
+                if(!string.IsNullOrEmpty(ord.Amount))
+                {
+                    Amount = decimal.Parse(ord.Amount);
+                }
+                if(Amount - PaidAmount <= 0)
+                {
+                    result.s = -1;
+                    result.d = "该笔订单已完成支付，不需再支付!";
+                    return result;
+                }
+                pay.RecID = ord.BuyerID;
+                pay.RecName = ord.RecName;
+                pay.Title = ord.InvoiceTitle;
+                pay.DataSource = 0;
+                pay.Status = 1;
+                pay.CoID = CoID;
+                pay.Creator = UserName;
+                pay.CreateDate = DateTime.Now;
+                pay.Confirmer = UserName;
+                pay.ConfirmDate = DateTime.Now;
+                var log = new Log();
+                log.OID = pay.OID;
+                log.SoID = pay.SoID;
+                log.Type = 0;
+                log.LogDate = DateTime.Now;
+                log.UserName = UserName;
+                log.Title = "添加支付";
+                log.Remark = pay.Payment + pay.PayAmount;
+                log.CoID = CoID;
+                logs.Add(log);
+                if(PaidAmount + decimal.Parse(pay.PayAmount) != Amount &&　ord.StatusDec != "部分付款")
+                {
+                    if(ord.Status == 7 )
+                    {
+                        log = new Log();
+                        log.OID = pay.OID;
+                        log.SoID = pay.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "取消异常标记";
+                        log.Remark = ord.StatusDec;
+                        log.CoID = CoID;
+                        logs.Add(log);
+                        ord.Status = 0;
+                        ord.AbnormalStatus = 0;
+                        ord.StatusDec = "";
+                    }
+                    log = new Log();
+                    log.OID = pay.OID;
+                    log.SoID = pay.SoID;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "判断金额不符";
+                    log.Remark = "标记部分付款";
+                    log.CoID = CoID;
+                    logs.Add(log);
+                }
+                if(PaidAmount + decimal.Parse(pay.PayAmount) == Amount &&　ord.StatusDec == "部分付款" && ord.Status == 7)
+                {
+                    log = new Log();
+                    log.OID = pay.OID;
+                    log.SoID = pay.SoID;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "取消异常标记";
+                    log.Remark = ord.StatusDec;
+                    log.CoID = CoID;
+                    logs.Add(log);
+                }
+                log = new Log();
+                log.OID = pay.OID;
+                log.SoID = pay.SoID;
+                log.Type = 0;
+                log.LogDate = DateTime.Now;
+                log.UserName = UserName;
+                log.Title = "支付单确认";
+                log.CoID = CoID;
+                logs.Add(log);
+                //新增支付单资料
+                string sqlCommandText = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SOID,Payment,PayAccount,PayDate,Title,Amount,PayAmount,DataSource,Status,CoID,Creator,CreateDate,Confirmer,ConfirmDate) 
+                                    VALUES(@PayNbr,@RecID,@RecName,@OID,@SOID,@Payment,@PayAccount,@PayDate,@Title,@Amount,@PayAmount,@DataSource,@Status,@CoID,@Creator,@CreateDate,@Confirmer,@ConfirmDate)";
+                int count = CoreDBconn.Execute(sqlCommandText,pay,TransCore);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                //更新订单
+                ord.PaidAmount = (PaidAmount + decimal.Parse(pay.PayAmount)).ToString();
+                ord.PayAmount = (PayAmount + decimal.Parse(pay.PayAmount)).ToString();
+                if(ord.PayDate == null)
+                {
+                    ord.PayDate = pay.PayDate;
+                }
+                if(string.IsNullOrEmpty(ord.PayNbr))
+                {
+                    ord.PayNbr = pay.PayNbr;
+                }
+                if(ord.PaidAmount == ord.Amount)
+                {
+                    ord.IsPaid = true;
+                    ord.Status = 1;
+                    ord.AbnormalStatus = 0;
+                    ord.StatusDec = "";
+                }
+                else
+                {
+                    if(ord.Status != 7 && ord.StatusDec != "部分付款")
+                    {
+                        ord.IsPaid = false;
+                        ord.Status = 7;
+                        var rss = GetReasonID("部分付款",CoID);
+                        if(rss.s == -1)
+                        {
+                            result.s = -1;
+                            result.d = rss.d;
+                            return result;
+                        }
+                        ord.AbnormalStatus = rss.s;
+                        ord.StatusDec = "部分付款";
+                    }   
+                }
+                ord.Modifier = UserName;
+                ord.ModifyDate = DateTime.Now;
+                sqlCommandText = @"update `order` set PaidAmount = @PaidAmount,PayAmount = @PayAmount,PayDate =@PayDate,PayNbr = @PayNbr,IsPaid=@IsPaid,Status=@Status,AbnormalStatus=@AbnormalStatus,
+                                    StatusDec=@StatusDec,Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and CoID = @CoID";
+                count = CoreDBconn.Execute(sqlCommandText,ord, TransCore);
+                if (count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }
+                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                count = CoreDBconn.Execute(loginsert,logs, TransCore);
+                if (count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            
+            return result;
+        }
+        ///<summary>
+        ///取消支付审核
+        ///</summary>
+        public static DataResult CancleConfirmPay(int oid,long soid,int payid,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var logs = new List<Log>();
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string wheresql = "select * from `order` where id =" + oid + " and soid = " + soid + " and coid =" + CoID;
+                var u = CoreDBconn.Query<Order>(wheresql).AsList();
+                var ord = new Order();
+                if (u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "此订单不存在!";
+                    return result;
+                }
+                else
+                {
+                    ord = u[0] as Order;
+                    if (ord.Status != 0 && ord.Status != 1 && ord.Status != 7)
+                    {
+                        result.s = -1;
+                        result.d = "只有待付款/已付款待审核/异常的订单才可以取消核准付款";
+                        return result;
+                    }
+                }
+                decimal PaidAmount=0,PayAmount=0,Amount=0;
+                if(!string.IsNullOrEmpty(ord.PaidAmount))
+                {
+                    PaidAmount = decimal.Parse(ord.PaidAmount);
+                }
+                if(!string.IsNullOrEmpty(ord.PayAmount))
+                {
+                    PayAmount = decimal.Parse(ord.PayAmount);
+                }
+                if(!string.IsNullOrEmpty(ord.Amount))
+                {
+                    Amount = decimal.Parse(ord.Amount);
+                }
+                var log = new Log();
+                log.OID = oid;
+                log.SoID = soid;
+                log.Type = 0;
+                log.LogDate = DateTime.Now;
+                log.UserName = UserName;
+                log.Title = "支付单取消确认";
+                log.CoID = CoID;
+                logs.Add(log);
+                wheresql = "select PayAmount,status from payinfo where id =" + payid + " and coid =" + CoID;
+                var payinfo = CoreDBconn.Query<PayInfo>(wheresql).AsList();
+                if(payinfo.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "该笔支付单参数异常!";
+                    return result;
+                }
+                else
+                {
+                    if(payinfo[0].Status != 1)
+                    {
+                        result.s = -1;
+                        result.d = "该笔支付单不可取消确认!";
+                        return result;
+                    }
+                }
+                decimal pay = decimal.Parse(payinfo[0].PayAmount);
+                if(PaidAmount - pay > 0 &&　ord.StatusDec != "部分付款")
+                {
+                    if(ord.Status == 7 )
+                    {
+                        log = new Log();
+                        log.OID = oid;
+                        log.SoID = soid;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "取消异常标记";
+                        log.Remark = ord.StatusDec;
+                        log.CoID = CoID;
+                        logs.Add(log);
+                        ord.Status = 0;
+                        ord.AbnormalStatus = 0;
+                        ord.StatusDec = "";
+                    }
+                    log = new Log();
+                    log.OID = oid;
+                    log.SoID = soid;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "判断金额不符";
+                    log.Remark = "标记部分付款";
+                    log.CoID = CoID;
+                    logs.Add(log);
+                }
+                if(PaidAmount - pay == 0 &&　ord.StatusDec == "部分付款" && ord.Status == 7)
+                {
+                    log = new Log();
+                    log.OID = oid;
+                    log.SoID = soid;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "取消异常标记";
+                    log.Remark = ord.StatusDec;
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    ord.Status = 0;
+                    ord.AbnormalStatus = 0;
+                    ord.StatusDec = "";
+                }
+                //更新支付单资料
+                string sqlCommandText = @"update payinfo set Status = 0,Confirmer=@Confirmer,ConfirmDate = @ConfirmDate where id = @ID and coid = @Coid";
+                int count = CoreDBconn.Execute(sqlCommandText,new {Confirmer = "",ConfirmDate=new DateTime(),ID = payid,Coid = CoID },TransCore);
+                if(count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }
+                //更新订单
+                ord.PaidAmount = (PaidAmount - pay).ToString();
+                ord.PayAmount = (PayAmount - pay).ToString();
+                ord.IsPaid = false;
+                if(decimal.Parse(ord.PaidAmount) == 0)
+                {
+                    ord.PayDate = new DateTime();
+                    ord.PayNbr = null;
+                }
+                if(decimal.Parse(ord.PaidAmount) == 0 && ord.Status != 7)
+                {
+                    ord.Status = 0;
+                    ord.AbnormalStatus = 0;
+                    ord.StatusDec = "";
+                }
+                if(decimal.Parse(ord.PaidAmount) > 0)
+                {
+                    if(ord.Status != 7 && ord.StatusDec != "部分付款")
+                    {
+                        ord.Status = 7;
+                        var rss = GetReasonID("部分付款",CoID);
+                        if(rss.s == -1)
+                        {
+                            result.s = -1;
+                            result.d = rss.d;
+                            return result;
+                        }
+                        ord.AbnormalStatus = rss.s;
+                        ord.StatusDec = "部分付款";
+                    }   
+                }
+                ord.Modifier = UserName;
+                ord.ModifyDate = DateTime.Now;
+                sqlCommandText = @"update `order` set PaidAmount = @PaidAmount,PayAmount = @PayAmount,PayDate =@PayDate,PayNbr = @PayNbr,IsPaid=@IsPaid,Status=@Status,AbnormalStatus=@AbnormalStatus,
+                                    StatusDec=@StatusDec,Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and CoID = @CoID";
+                count = CoreDBconn.Execute(sqlCommandText,ord, TransCore);
+                if (count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }
+                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                count = CoreDBconn.Execute(loginsert,logs, TransCore);
+                if (count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            
+            return result;
+        }
+        ///<summary>
+        ///支付审核
+        ///</summary>
+        public static DataResult ConfirmPay(int oid,long soid,int payid,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var logs = new List<Log>();
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string wheresql = "select * from `order` where id =" + oid + " and soid = " + soid + " and coid =" + CoID;
+                var u = CoreDBconn.Query<Order>(wheresql).AsList();
+                var ord = new Order();
+                if (u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "此订单不存在!";
+                    return result;
+                }
+                else
+                {
+                    ord = u[0] as Order;
+                    if (ord.Status != 0 && ord.Status != 1 && ord.Status != 7)
+                    {
+                        result.s = -1;
+                        result.d = "只有待付款/已付款待审核/异常的订单才可以核准付款!";
+                        return result;
+                    }
+                }
+                decimal PaidAmount=0,PayAmount=0,Amount=0;
+                if(!string.IsNullOrEmpty(ord.PaidAmount))
+                {
+                    PaidAmount = decimal.Parse(ord.PaidAmount);
+                }
+                if(!string.IsNullOrEmpty(ord.PayAmount))
+                {
+                    PayAmount = decimal.Parse(ord.PayAmount);
+                }
+                if(!string.IsNullOrEmpty(ord.Amount))
+                {
+                    Amount = decimal.Parse(ord.Amount);
+                }
+                if(Amount - PaidAmount <= 0)
+                {
+                    result.s = -1;
+                    result.d = "该笔订单已完成支付，不需再支付!";
+                    return result;
+                }
+                var log = new Log();
+                log.OID = oid;
+                log.SoID = soid;
+                log.Type = 0;
+                log.LogDate = DateTime.Now;
+                log.UserName = UserName;
+                log.Title = "支付单确认";
+                log.CoID = CoID;
+                logs.Add(log);
+                wheresql = "select PayAmount,status,paydate,paynbr from payinfo where id =" + payid + " and coid =" + CoID;
+                var payinfo = CoreDBconn.Query<PayInfo>(wheresql).AsList();
+                if(payinfo.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "该笔支付单参数异常!";
+                    return result;
+                }
+                else
+                {
+                    if(payinfo[0].Status != 0)
+                    {
+                        result.s = -1;
+                        result.d = "该笔支付单不可确认!";
+                        return result;
+                    }
+                }
+                decimal pay = decimal.Parse(payinfo[0].PayAmount);
+                if(PaidAmount +  pay != Amount &&　ord.StatusDec != "部分付款")
+                {
+                    if(ord.Status == 7 )
+                    {
+                        log = new Log();
+                        log.OID = oid;
+                        log.SoID = soid;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "取消异常标记";
+                        log.Remark = ord.StatusDec;
+                        log.CoID = CoID;
+                        logs.Add(log);
+                        ord.Status = 0;
+                        ord.AbnormalStatus = 0;
+                        ord.StatusDec = "";
+                    }
+                    log = new Log();
+                    log.OID = oid;
+                    log.SoID = soid;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "判断金额不符";
+                    log.Remark = "标记部分付款";
+                    log.CoID = CoID;
+                    logs.Add(log);
+                }
+                if(PaidAmount + pay == Amount &&　ord.StatusDec == "部分付款" && ord.Status == 7)
+                {
+                    log = new Log();
+                    log.OID = oid;
+                    log.SoID = soid;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "取消异常标记";
+                    log.Remark = ord.StatusDec;
+                    log.CoID = CoID;
+                    logs.Add(log);
+                }
+                //更新支付单资料
+                string sqlCommandText = @"update payinfo set Status = 1,Confirmer=@Confirmer,ConfirmDate = @ConfirmDate where id = @ID and coid = @Coid";
+                int count = CoreDBconn.Execute(sqlCommandText,new {Confirmer = UserName,ConfirmDate=DateTime.Now,ID = payid,Coid = CoID },TransCore);
+                if(count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }
+                //更新订单
+                ord.PaidAmount = (PaidAmount + pay).ToString();
+                ord.PayAmount = (PayAmount + pay).ToString();
+                if(ord.PayDate == null)
+                {
+                    ord.PayDate = payinfo[0].PayDate;
+                }
+                if(string.IsNullOrEmpty(ord.PayNbr))
+                {
+                    ord.PayNbr = payinfo[0].PayNbr;
+                }
+                if(ord.PaidAmount == ord.Amount)
+                {
+                    ord.IsPaid = true;
+                    ord.Status = 1;
+                    ord.AbnormalStatus = 0;
+                    ord.StatusDec = "";
+                }
+                else
+                {
+                    if(ord.Status != 7 && ord.StatusDec != "部分付款")
+                    {
+                        ord.IsPaid = false;
+                        ord.Status = 7;
+                        var rss = GetReasonID("部分付款",CoID);
+                        if(rss.s == -1)
+                        {
+                            result.s = -1;
+                            result.d = rss.d;
+                            return result;
+                        }
+                        ord.AbnormalStatus = rss.s;
+                        ord.StatusDec = "部分付款";
+                    }   
+                }
+                ord.Modifier = UserName;
+                ord.ModifyDate = DateTime.Now;
+                sqlCommandText = @"update `order` set PaidAmount = @PaidAmount,PayAmount = @PayAmount,PayDate =@PayDate,PayNbr = @PayNbr,IsPaid=@IsPaid,Status=@Status,AbnormalStatus=@AbnormalStatus,
+                                    StatusDec=@StatusDec,Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and CoID = @CoID";
+                count = CoreDBconn.Execute(sqlCommandText,ord, TransCore);
+                if (count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }
+                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                count = CoreDBconn.Execute(loginsert,logs, TransCore);
+                if (count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            
+            return result;
+        }
+        ///<summary>
+        ///支付作废
+        ///</summary>
+        public static DataResult CanclePay(int oid,long soid,int payid,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var logs = new List<Log>();
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string wheresql = "select status from `order` where id =" + oid + " and soid = " + soid + " and coid =" + CoID;
+                var u = CoreDBconn.Query<Order>(wheresql).AsList();
+                if (u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "此订单不存在!";
+                    return result;
+                }
+                else
+                {
+                    if (u[0].Status != 0 && u[0].Status != 1 && u[0].Status != 7)
+                    {
+                        result.s = -1;
+                        result.d = "只有待付款/已付款待审核/异常的订单才可以作废付款!";
+                        return result;
+                    }
+                }
+                var log = new Log();
+                log.OID = oid;
+                log.SoID = soid;
+                log.Type = 0;
+                log.LogDate = DateTime.Now;
+                log.UserName = UserName;
+                log.Title = "支付单作废";
+                log.CoID = CoID;
+                logs.Add(log);
+                wheresql = "select status from payinfo where id =" + payid + " and coid =" + CoID;
+                var payinfo = CoreDBconn.Query<PayInfo>(wheresql).AsList();
+                if(payinfo.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "该笔支付单参数异常!";
+                    return result;
+                }
+                else
+                {
+                    if(payinfo[0].Status != 0)
+                    {
+                        result.s = -1;
+                        result.d = "该笔支付单不可作废!";
+                        return result;
+                    }
+                }
+                //更新支付单资料
+                string sqlCommandText = @"update payinfo set Status = 2 where id = " + payid + " and coid = " + CoID;
+                int count = CoreDBconn.Execute(sqlCommandText,TransCore);
+                if(count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }
+                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                count = CoreDBconn.Execute(loginsert,logs, TransCore);
+                if (count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            
+            return result;
+        }
+        ///<summary>
+        ///快速支付
+        ///</summary>
+        public static DataResult QuickPay(int id,long soid,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var logs = new List<Log>();
+            var pay = new PayInfo();
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string wheresql = "select * from `order` where id =" + id + " and soid = " + soid + " and coid =" + CoID;
+                var u = CoreDBconn.Query<Order>(wheresql).AsList();
+                var ord = new Order();
+                if (u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "此订单不存在!";
+                    return result;
+                }
+                else
+                {
+                    ord = u[0] as Order;
+                    if (ord.Status != 0 && ord.Status != 1 && ord.Status != 7)
+                    {
+                        result.s = -1;
+                        result.d = "只有待付款/已付款待审核/异常的订单才可以新增付款!";
+                        return result;
+                    }
+                }
+                decimal PaidAmount=0,PayAmount=0,Amount=0;
+                if(!string.IsNullOrEmpty(ord.PaidAmount))
+                {
+                    PaidAmount = decimal.Parse(ord.PaidAmount);
+                }
+                if(!string.IsNullOrEmpty(ord.PayAmount))
+                {
+                    PayAmount = decimal.Parse(ord.PayAmount);
+                }
+                if(!string.IsNullOrEmpty(ord.Amount))
+                {
+                    Amount = decimal.Parse(ord.Amount);
+                }
+                if(Amount - PaidAmount <= 0)
+                {
+                    result.s = -1;
+                    result.d = "该笔订单已完成支付，不需再支付!";
+                    return result;
+                }
+                pay.RecID = ord.BuyerID;
+                pay.RecName = ord.RecName;
+                pay.Title = ord.InvoiceTitle;
+                pay.DataSource = 0;
+                pay.Status = 1;
+                pay.CoID = CoID;
+                pay.OID = id;
+                pay.SoID = soid;
+                pay.Payment = "快速支付";
+                pay.PayNbr = "S" + DateTime.Now.Ticks.ToString().Substring(0,12);
+                pay.PayDate = DateTime.Now;
+                pay.PayAmount = (Amount - PaidAmount).ToString();
+                pay.Amount = (Amount - PaidAmount).ToString();
+                pay.Creator = UserName;
+                pay.CreateDate = DateTime.Now;
+                pay.Confirmer = UserName;
+                pay.ConfirmDate = DateTime.Now;
+                var log = new Log();
+                log.OID = pay.OID;
+                log.SoID = pay.SoID;
+                log.Type = 0;
+                log.LogDate = DateTime.Now;
+                log.UserName = UserName;
+                log.Title = "添加支付";
+                log.Remark = "快速支付" + pay.PayAmount;
+                log.CoID = CoID;
+                logs.Add(log);
+                if(ord.StatusDec == "部分付款" && ord.Status == 7)
+                {
+                    log = new Log();
+                    log.OID = pay.OID;
+                    log.SoID = pay.SoID;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "取消异常标记";
+                    log.Remark = ord.StatusDec;
+                    log.CoID = CoID;
+                    logs.Add(log);
+                }
+                log = new Log();
+                log.OID = pay.OID;
+                log.SoID = pay.SoID;
+                log.Type = 0;
+                log.LogDate = DateTime.Now;
+                log.UserName = UserName;
+                log.Title = "支付单确认";
+                log.CoID = CoID;
+                logs.Add(log);
+                //新增支付单资料
+                string sqlCommandText = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SOID,Payment,PayAccount,PayDate,Title,Amount,PayAmount,DataSource,Status,CoID,Creator,CreateDate,Confirmer,ConfirmDate) 
+                                    VALUES(@PayNbr,@RecID,@RecName,@OID,@SOID,@Payment,@PayAccount,@PayDate,@Title,@Amount,@PayAmount,@DataSource,@Status,@CoID,@Creator,@CreateDate,@Confirmer,@ConfirmDate)";
+                int count = CoreDBconn.Execute(sqlCommandText,pay,TransCore);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                //更新订单
+                ord.PaidAmount = Amount.ToString();
+                ord.PayAmount = (Amount - PaidAmount + decimal.Parse(ord.PayAmount)).ToString();
+                if(ord.PayDate == null)
+                {
+                    ord.PayDate = pay.PayDate;
+                }
+                if(string.IsNullOrEmpty(ord.PayNbr))
+                {
+                    ord.PayNbr = pay.PayNbr;
+                }
+                ord.IsPaid = true;
+                ord.Status = 1;
+                ord.AbnormalStatus = 0;
+                ord.StatusDec = "";
+                ord.Modifier = UserName;
+                ord.ModifyDate = DateTime.Now;
+                sqlCommandText = @"update `order` set PaidAmount = @PaidAmount,PayAmount = @PayAmount,PayDate =@PayDate,PayNbr = @PayNbr,IsPaid=@IsPaid,Status=@Status,AbnormalStatus=@AbnormalStatus,
+                                    StatusDec=@StatusDec,Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and CoID = @CoID";
+                count = CoreDBconn.Execute(sqlCommandText,ord, TransCore);
+                if (count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }
+                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                        VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                 count = CoreDBconn.Execute(loginsert,logs, TransCore);
+                if (count < 0)
+                {
+                    result.s = -3002;
+                    return result;
                 }
                 TransCore.Commit();
             }

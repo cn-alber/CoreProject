@@ -3,7 +3,7 @@
 
 function说明
 #######################################################
-1.SkuProps()//查询商品类目资料(CustomKind_skuprops)
+1.SkuProps()//查询商品规格属性资料(CustomKind_skuprops)
     方法：Get
     路由：http://192.168.30.211:5000/Core/XyComm/CustomKindSkuProps/SkuProps
     InPut:
@@ -12,3 +12,34 @@ function说明
         SkuProps             List<skuprops>         商品Sku属性映射列表
     参考:output json 文件:SkuProps_output.json
 #######################################################
+2.DelSkuPropsValues()//商品规格属性维护 - 删除Sku属性值(CustomKind_skuprops_value)
+    方法：Post
+    路由：http://192.168.30.211:5000/Core/XyComm/CustomKindSkuProps/DelSkuPropsValues
+    InPut:
+        ID              int                 商品属性值ID(CustomKind_skuprops_value.id)
+    参考：input json 文件：DelSkuPropsValues_input.json
+3.UptSkuPropsValues()//商品规格属性维护 - 修改Sku属性值、
+    方法：Post
+    路由：http://192.168.30.211:5000/Core/XyComm/CustomKindSkuProps/UptSkuPropsValues
+    InPut:List<skuprops>
+        {
+            "SkuPropLst":[
+                {
+                "pid": 20509,                           ---Sku属性name对应的pid
+                    "skuprops_values": [
+                        {
+                        "id": 798,                  ---Sku属性值-autoid
+                        "mapping": null,            ---val属性映射值
+                        "name": "XXXXL"             ---val属性的name描述
+                            },
+                        {
+                        "id": 799,
+                        "mapping": null,
+                        "name": "C36"
+                        }
+                        ]
+                },
+                {...}
+            ]
+        }
+    参考：input json 文件：UptSkuPropsValues_input.json

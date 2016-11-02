@@ -1,199 +1,199 @@
 {
-"s": 1,
-"d": [
-{
-"pid": 20509,
-"name": "尺码",
-"KindNames": "针织衫/毛衣,休闲裤,衬衫,皮裤,西裤,毛衣,打底裤,连衣裙,女装衬衫,女装棉衣/棉服,女装大衣,通用男装,男装T恤,男装皮衣,自行车",
-"skuprops_values": []
-},
-{
-"pid": 1627207,
-"name": "颜色分类",
-"KindNames": "女装衬衫,女装棉衣/棉服,女装大衣,通用男装,男装T恤,男装皮衣,自行车,风衣",
-"skuprops_values": []
-},
-{
-"pid": 122216343,
-"name": "参考身高",
-"KindNames": "风衣",
-"skuprops_values": [
-{
-"pid": 122216343,
-"id": 1119,
-"mapping": null,
-"name": "48"
-},
-{
-"pid": 122216343,
-"id": 1120,
-"mapping": null,
-"name": "52"
-},
-{
-"pid": 122216343,
-"id": 1121,
-"mapping": null,
-"name": "59"
-},
-{
-"pid": 122216343,
-"id": 1122,
-"mapping": null,
-"name": "66"
-},
-{
-"pid": 122216343,
-"id": 1123,
-"mapping": null,
-"name": "73"
-},
-{
-"pid": 122216343,
-"id": 1124,
-"mapping": null,
-"name": "80"
-},
-{
-"pid": 122216343,
-"id": 1125,
-"mapping": null,
-"name": "85"
-},
-{
-"pid": 122216343,
-"id": 1126,
-"mapping": null,
-"name": "90"
-},
-{
-"pid": 122216343,
-"id": 1127,
-"mapping": null,
-"name": "95"
-},
-{
-"pid": 122216343,
-"id": 1128,
-"mapping": null,
-"name": "100"
-},
-{
-"pid": 122216343,
-"id": 1129,
-"mapping": null,
-"name": "105"
-},
-{
-"pid": 122216343,
-"id": 1130,
-"mapping": null,
-"name": "110"
-},
-{
-"pid": 122216343,
-"id": 1131,
-"mapping": null,
-"name": "115"
-},
-{
-"pid": 122216343,
-"id": 1132,
-"mapping": null,
-"name": "120"
-},
-{
-"pid": 122216343,
-"id": 1133,
-"mapping": null,
-"name": "125"
-},
-{
-"pid": 122216343,
-"id": 1134,
-"mapping": null,
-"name": "130"
-},
-{
-"pid": 122216343,
-"id": 1135,
-"mapping": null,
-"name": "135"
-},
-{
-"pid": 122216343,
-"id": 1136,
-"mapping": null,
-"name": "140"
-},
-{
-"pid": 122216343,
-"id": 1137,
-"mapping": null,
-"name": "145"
-},
-{
-"pid": 122216343,
-"id": 1138,
-"mapping": null,
-"name": "150"
-},
-{
-"pid": 122216343,
-"id": 1139,
-"mapping": null,
-"name": "155"
-},
-{
-"pid": 122216343,
-"id": 1140,
-"mapping": null,
-"name": "160"
-},
-{
-"pid": 122216343,
-"id": 1141,
-"mapping": null,
-"name": "165"
-},
-{
-"pid": 122216343,
-"id": 1142,
-"mapping": null,
-"name": "170"
-},
-{
-"pid": 122216343,
-"id": 1143,
-"mapping": null,
-"name": "175"
-},
-{
-"pid": 122216343,
-"id": 1144,
-"mapping": null,
-"name": "180"
-},
-{
-"pid": 122216343,
-"id": 1145,
-"mapping": null,
-"name": "185"
-}
-]
-},
-{
-"pid": 10002016110194736,
-"name": "颜色",
-"KindNames": "自定义类目测试1,自定义类目测试2,自定义类目测试3",
-"skuprops_values": []
-},
-{
-"pid": 10002016110114200,
-"name": "尺码",
-"KindNames": "自定义类目测试1,自定义类目测试2,自定义类目测试3",
-"skuprops_values": []
-}
-],
-"m": ""
+    "s": 1,
+    "d": [
+        {
+            "pid": 20509,
+            "name": "尺码",
+            "KindNames": "针织衫/毛衣,休闲裤,衬衫,皮裤,西裤,毛衣,打底裤,连衣裙,女装衬衫,女装棉衣/棉服,女装大衣,通用男装,男装T恤,男装皮衣,自行车",
+            "skuprops_values": []
+        },
+        {
+            "pid": 1627207,
+            "name": "颜色分类",
+            "KindNames": "女装衬衫,女装棉衣/棉服,女装大衣,通用男装,男装T恤,男装皮衣,自行车,风衣",
+            "skuprops_values": []
+        },
+        {
+            "pid": 122216343,
+            "name": "参考身高",
+            "KindNames": "风衣",
+            "skuprops_values": [
+                {
+                    "pid": 122216343,
+                    "id": 1119,
+                    "mapping": null,
+                    "name": "48"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1120,
+                    "mapping": null,
+                    "name": "52"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1121,
+                    "mapping": null,
+                    "name": "59"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1122,
+                    "mapping": null,
+                    "name": "66"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1123,
+                    "mapping": null,
+                    "name": "73"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1124,
+                    "mapping": null,
+                    "name": "80"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1125,
+                    "mapping": null,
+                    "name": "85"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1126,
+                    "mapping": null,
+                    "name": "90"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1127,
+                    "mapping": null,
+                    "name": "95"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1128,
+                    "mapping": null,
+                    "name": "100"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1129,
+                    "mapping": null,
+                    "name": "105"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1130,
+                    "mapping": null,
+                    "name": "110"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1131,
+                    "mapping": null,
+                    "name": "115"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1132,
+                    "mapping": null,
+                    "name": "120"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1133,
+                    "mapping": null,
+                    "name": "125"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1134,
+                    "mapping": null,
+                    "name": "130"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1135,
+                    "mapping": null,
+                    "name": "135"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1136,
+                    "mapping": null,
+                    "name": "140"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1137,
+                    "mapping": null,
+                    "name": "145"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1138,
+                    "mapping": null,
+                    "name": "150"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1139,
+                    "mapping": null,
+                    "name": "155"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1140,
+                    "mapping": null,
+                    "name": "160"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1141,
+                    "mapping": null,
+                    "name": "165"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1142,
+                    "mapping": null,
+                    "name": "170"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1143,
+                    "mapping": null,
+                    "name": "175"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1144,
+                    "mapping": null,
+                    "name": "180"
+                },
+                {
+                    "pid": 122216343,
+                    "id": 1145,
+                    "mapping": null,
+                    "name": "185"
+                }
+            ]
+        },
+        {
+            "pid": 10002016110194736,
+            "name": "颜色",
+            "KindNames": "自定义类目测试1,自定义类目测试2,自定义类目测试3",
+            "skuprops_values": []
+        },
+        {
+            "pid": 10002016110114200,
+            "name": "尺码",
+            "KindNames": "自定义类目测试1,自定义类目测试2,自定义类目测试3",
+            "skuprops_values": []
+        }
+    ],
+    "m": ""
 }
