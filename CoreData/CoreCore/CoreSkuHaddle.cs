@@ -524,7 +524,27 @@ namespace CoreData.CoreCore
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try
                 {
-                    string sql = @"INSERT coresku SET 
+                    string sql = "SELECT ID FROM coresku WHERE SkuID = '"+sku.SkuID+"'";
+                    var res = conn.Query<long>(sql).AsList();
+                    if(res.Count >0){
+                        Console.WriteLine("--------UPDATE");
+                        sql = @"UPDATE coresku SET                                     
+                                    coresku.SkuName =@SkuName,
+                                    coresku.GoodsCode = @GoodsCode,
+                                    coresku.GoodsName = @GoodsName,
+                                    coresku.SalePrice = @SalePrice,
+                                    coresku.Norm = @Norm,
+                                    coresku.Img = @Img,
+                                    coresku.CoID = @CoID,
+                                    coresku.`Enable` = @Enable,
+                                    coresku.Creator = @Creator,
+                                    coresku.CreateDate = NOW(),
+                                    coresku.SafeQty = @SafeQty,                                   
+                                    coresku.IsParent = @IsParent
+                                WHERE 
+                                    coresku.SkuID = @SkuID;";
+                    }else{
+                        sql = @"INSERT coresku SET 
                                     coresku.SkuID = @SkuID,
                                     coresku.SkuName =@SkuName,
                                     coresku.GoodsCode = @GoodsCode,
@@ -536,18 +556,24 @@ namespace CoreData.CoreCore
                                     coresku.`Enable` = @Enable,
                                     coresku.Creator = @Creator,
                                     coresku.CreateDate = NOW(),
+                                    coresku.SafeQty = @SafeQty,
                                     coresku.IsParent = @IsParent;";
+                    }
+
+                    
                     var rnt = conn.Execute(sql,sku);
                     if(rnt>0){
                         result.s = 1;
                     }else{
                         result.s = -1;
+                        Console.WriteLine("---------"+sku.SkuID);
                     }
 
 
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message; 
+                    Console.WriteLine(ex.Message);
                     conn.Dispose();
                 }
 
@@ -556,16 +582,22 @@ namespace CoreData.CoreCore
         }
 
 
-        public static DataResult getWareSku(CoreSkuParam IParam){
+        public static DataResult getWareSku(CoreSkuParam IParam,string coid){
             var result = new DataResult(1,null); 
+            var goods =getWareGoodsInner(coid);
+            string goodCodes = "'0'";
+            foreach(var good in goods){
+                goodCodes +=",'"+good.GoodsCode+"'";
+            }
+            
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try
                 {
                     StringBuilder querysql=new StringBuilder();
                     StringBuilder totalSql = new StringBuilder();
                     var p = new DynamicParameters();
-                    querysql.Append("SELECT distinct  SkuID,SkuName,Norm FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE ");
-                    totalSql.Append("SELECT COUNT(ID) FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE ");
+                    querysql.Append("SELECT distinct  SkuID,SkuName,Norm FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE AND CoID = "+coid+" AND GoodsCode in ("+goodCodes+") ");
+                    totalSql.Append("SELECT COUNT(ID) FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE  AND CoID = "+coid+"  AND GoodsCode in ("+goodCodes+") ");
                     if (!string.IsNullOrEmpty(IParam.GoodsCode))
                     {
                         querysql.Append(" AND GoodsCode = @GoodsCode");
@@ -613,10 +645,81 @@ namespace CoreData.CoreCore
             return result;
         }
 
+        public static DataResult getWareGoods(CoreSkuParam IParam,string coid){
+            var result = new DataResult(1,null); 
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try
+                {
+                    StringBuilder querysql=new StringBuilder();
+                    StringBuilder totalSql = new StringBuilder();
+                    var p = new DynamicParameters();
+                    querysql.Append("SELECT distinct  SkuID,SkuName,Norm,GoodsCode FROM coresku WHERE Type=0 AND IsParent = True  AND IsDelete = FALSE AND CoID = "+coid+" ");
+                    totalSql.Append("SELECT COUNT(ID) FROM coresku WHERE Type=0 AND IsParent = TRUE  AND IsDelete = FALSE AND CoID = "+coid+" ");
+                    if (!string.IsNullOrEmpty(IParam.GoodsCode))
+                    {
+                        querysql.Append(" AND GoodsCode = @GoodsCode");
+                        totalSql.Append(" AND GoodsCode = @GoodsCode");
+                        p.Add("@GoodsCode", IParam.GoodsCode);
+                    }
+                    if (!string.IsNullOrEmpty(IParam.GoodsName))
+                    {
+                        querysql.Append(" AND GoodsName = @GoodsName");
+                        totalSql.Append(" AND GoodsName = @GoodsName");
+                        p.Add("@GoodsName", IParam.GoodsName);
+                    }
+                    if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
+                    {
+                        querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
+                        totalSql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
+                    }
+                    decimal total = conn.Query<decimal>(totalSql.ToString(),p).AsList()[0];
+                    if(total>0){
+                        decimal pagecnt = Math.Ceiling(total / decimal.Parse(IParam.PageSize.ToString()));
+                        int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
+                        querysql.Append(" LIMIT @ls , @le");
+                        p.Add("@ls", dataindex);
+                        p.Add("@le", IParam.PageSize);
+                        var list = conn.Query<wareGoods>(querysql.ToString(),p).AsList();
+                        if(IParam.PageIndex == 1){
+                            result.d = new {
+                                list = list,                                          
+                                page = IParam.PageIndex,
+                                pageSize = IParam.PageSize,
+                                pageTotal = pagecnt,
+                                total = total
+                            };
+                        }else{
+                            result.d = new {
+                                list = list,                                          
+                                page = IParam.PageIndex
+                            };
+                        }                        
+                    }                                                
+                }catch{
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
 
-
-
-
+        public static List<wareGoods> getWareGoodsInner(string coid){
+            var result = new List<wareGoods>(); 
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try
+                {
+                    StringBuilder querysql=new StringBuilder();
+                    StringBuilder totalSql = new StringBuilder();
+                    var p = new DynamicParameters();
+                    querysql.Append("SELECT distinct  SkuID,SkuName,Norm,GoodsCode FROM coresku WHERE Type=0 AND IsParent = True  AND IsDelete = FALSE AND CoID = "+coid+" ORDER BY SkuID ASC");                                
+                    result = conn.Query<wareGoods>(querysql.ToString()).AsList();
+                                      
+                                                                   
+                }catch{
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
 
 
     }

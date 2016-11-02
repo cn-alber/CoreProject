@@ -209,7 +209,23 @@ namespace CoreWebApi
             param.SortField = SortField;
             param.SortDirection = SortDirection;
             string CoID = GetCoid();
-            var data = CoreSkuHaddle.getWareSku(param);
+            var data = CoreSkuHaddle.getWareSku(param,CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Warehouse/getWareGoods")]
+        public ResponseResult getWareGoods(string GoodsCode="",string GoodsName="", string Filter="", int PageIndex= 1, int PageSize = 20, string SortField="", string SortDirection="")
+        {   
+            var param = new CoreSkuParam();
+            param.GoodsCode = GoodsCode;
+            param.GoodsName = GoodsName;
+            param.Filter = Filter;
+            param.PageIndex = PageIndex;
+            param.PageSize = PageSize;
+            param.SortField = SortField;
+            param.SortDirection = SortDirection;
+            string CoID = GetCoid();
+            var data = CoreSkuHaddle.getWareGoods(param,CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
