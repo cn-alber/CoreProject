@@ -1389,6 +1389,18 @@ namespace CoreData.CoreComm
 
         public static DataResult createploy(string CoID,WarePloy wareploy ){
             var result = new DataResult(1,null);
+            if(!string.IsNullOrEmpty(wareploy.ContainGoods)){
+                wareploy.ContainGoods = ","+ wareploy.ContainGoods+","; 
+            }
+            if(!string.IsNullOrEmpty(wareploy.ContainSkus)){
+                wareploy.ContainSkus = ","+ wareploy.ContainSkus+","; 
+            }
+            if(!string.IsNullOrEmpty(wareploy.RemoveGoods)){
+                wareploy.RemoveGoods = ","+ wareploy.RemoveGoods+","; 
+            }
+            if(!string.IsNullOrEmpty(wareploy.RemoveSkus)){
+                wareploy.RemoveSkus = ","+ wareploy.RemoveSkus+","; 
+            }
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
@@ -1427,6 +1439,18 @@ namespace CoreData.CoreComm
 
         public static DataResult modifyploy(string CoID,WarePloy wareploy){
             var result = new DataResult(1,null);
+            if(!string.IsNullOrEmpty(wareploy.ContainGoods)){
+                wareploy.ContainGoods = ","+ wareploy.ContainGoods+","; 
+            }
+            if(!string.IsNullOrEmpty(wareploy.ContainSkus)){
+                wareploy.ContainSkus = ","+ wareploy.ContainSkus+","; 
+            }
+            if(!string.IsNullOrEmpty(wareploy.RemoveGoods)){
+                wareploy.RemoveGoods = ","+ wareploy.RemoveGoods+","; 
+            }
+            if(!string.IsNullOrEmpty(wareploy.RemoveSkus)){
+                wareploy.RemoveSkus = ","+ wareploy.RemoveSkus+","; 
+            }
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {

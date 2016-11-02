@@ -365,12 +365,14 @@ namespace CoreModels.XyCore
     #region 分仓抓取Sku
 
     public class wareSku{
+        public int ID{get;set;}
         public string SkuID{get;set;}
         public string SkuName{get;set;}
         public string Norm{get;set;}
     }
 
     public class wareGoods{
+        public int ID{get;set;}
         public string SkuID{get;set;}
         public string SkuName{get;set;}
         public string GoodsCode{get;set;}
