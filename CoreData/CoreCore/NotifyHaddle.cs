@@ -66,7 +66,10 @@ namespace CoreData.CoreUser
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{                
                     //获取未关联到 msrelationshiop 
-                    var unrelation = conn.Query<int>("SELECT m.Id FROM userwebmsg as m LEFT JOIN msgmask as mk ON mk.Uid = 1 where m.RoleType like '%1%' AND m.Id > mk.MsgMaskId ORDER BY m.Id ASC").AsList();
+                    var unrelation = conn.Query<int>(@"SELECT m.Id FROM 
+                                                            userwebmsg as m 
+                                                       LEFT JOIN msgmask as mk ON mk.Uid = "+uid+@" 
+                                                       where (m.RoleType like '%"+roleid+"%' OR m.Appoint like ',"+uid+",' ) AND m.Id > mk.MsgMaskId ORDER BY m.Id ASC").AsList();
                     if(unrelation.Count>0){
                         string sql = "";
                         //未关联的信息在用户登录后发送给用户
@@ -97,9 +100,9 @@ namespace CoreData.CoreUser
                 int rnt =  conn.Execute("INSERT INTO userwebmsg(userwebmsg.CoId,userwebmsg.Content,userwebmsg.`Create`,userwebmsg.Creater,userwebmsg.`Level`,userwebmsg.RoleType)"+ 
                                     "VALUES("+cid+",'"+content+"',NOW(),"+uid+","+level+",'"+roletype+"');");
                 //获取最新插入ID                                  
-                var lastid = conn.Query<int>("SELECT um.Id FROM userwebmsg as um ORDER BY um.`Create` DESC LIMIT 0,1").AsList()[0];                 
+                var lastid = conn.QueryFirst<int>("SELECT LAST_INSERT_ID()");                 
                 //更新 msgrelationshiop 和 msgmask
-                string sql = "INSERT INTO msgrelationshiop(msgrelationshiop.Uid,msgrelationshiop.MsgId,msgrelationshiop.Readed,msgrelationshiop.ReadTime,msgrelationshiop.Uname) VALUES("+uid+","+lastid.ToString()+",1,NOW(),'"+uname+"');"+
+                string sql = "INSERT INTO msgrelationshiop(msgrelationshiop.Uid,msgrelationshiop.MsgId,msgrelationshiop.Readed,msgrelationshiop.ReadTime,msgrelationshiop.Uname) VALUES("+uid+","+lastid.ToString()+",0,NOW(),'"+uname+"');"+
                             "UPDATE msgmask SET msgmask.MsgMaskId = "+lastid.ToString()+" WHERE msgmask.Uid = "+uid+";"; 
                 rnt = conn.Execute(sql);
                 if(rnt == 0) result.s = -1;
@@ -133,6 +136,37 @@ namespace CoreData.CoreUser
             }
             return result;
         }
+    
+        public static DataResult MsgPoint(string content,string level,string appoint,string cid,string uid,string uname){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                int rnt =  conn.Execute("INSERT INTO userwebmsg(userwebmsg.CoId,userwebmsg.Content,userwebmsg.`Create`,userwebmsg.Creater,userwebmsg.`Level`,userwebmsg.`Appoint`)"+ 
+                                    "VALUES("+cid+",'"+content+"',NOW(),"+uid+","+level+",'"+appoint+"');");
+                                                  
+                var lastid = conn.QueryFirst<int>("SELECT LAST_INSERT_ID()");                 
+                
+                string sql = @"INSERT INTO msgrelationshiop(
+                                    msgrelationshiop.Uid,
+                                    msgrelationshiop.MsgId,
+                                    msgrelationshiop.Readed,
+                                    msgrelationshiop.ReadTime,
+                                    msgrelationshiop.Uname) 
+                                VALUES("+uid+","+lastid.ToString()+",0,NOW(),'"+uname+"');";
+                            //"UPDATE msgmask SET msgmask.MsgMaskId = "+lastid.ToString()+" WHERE msgmask.Uid = "+uid+";"; 
+                rnt = conn.Execute(sql);
+                if(rnt == 0) result.s = -1;
+                }catch(Exception e){
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();  
+                }    
+            }    
+
+
+            return result;
+        }
+
 
 
 

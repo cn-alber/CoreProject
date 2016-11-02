@@ -162,7 +162,7 @@ namespace CoreData.CoreUser
                         }else{
                             result.s = -2014;
                         }
-                        LogComm.InsertLog("新增菜单", "menu", "菜单名"+name ,uname,Convert.ToInt16(coid), DateTime.Now);
+                        LogComm.InsertLog("新增菜单", "menu", "菜单名"+name ,uname,Convert.ToInt16(coid));
                     }
                     catch (Exception e)
                     {
@@ -254,7 +254,7 @@ namespace CoreData.CoreUser
                     }else{
                         result.s = -2016;
                     }
-                    LogComm.InsertLog("编辑菜单", "menu", contents ,uname, Convert.ToInt16(coid), DateTime.Now);
+                    LogComm.InsertLog("编辑菜单", "menu", contents ,uname, Convert.ToInt16(coid));
                 }
                 catch (Exception e)
                 {

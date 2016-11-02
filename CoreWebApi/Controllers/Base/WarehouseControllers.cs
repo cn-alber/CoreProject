@@ -70,7 +70,7 @@ namespace CoreWebApi
         {   
             string code = co["code"]!=null?co["code"].ToString():"0";
             string otherRemark = co["otherRemark"]!=null?co["otherRemark"].ToString():"";            
-            string CoID = GetCoid();
+            string CoID = GetCoid();        
             var data = WarehouseHaddle.askFor(CoID,code,otherRemark);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -193,7 +193,8 @@ namespace CoreWebApi
         {   
             WarePloy w = Newtonsoft.Json.JsonConvert.DeserializeObject<WarePloy>(co.ToString());
             string CoID = GetCoid();
-            var data = WarehouseHaddle.createploy(CoID,w);
+            string uname =GetUname();
+            var data = WarehouseHaddle.createploy(CoID,w,uname);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
         [HttpPostAttribute("/Core/Warehouse/modifyploy")]
@@ -201,7 +202,8 @@ namespace CoreWebApi
         {   
             WarePloy w = Newtonsoft.Json.JsonConvert.DeserializeObject<WarePloy>(co.ToString());
             string CoID = GetCoid();
-            var data = WarehouseHaddle.modifyploy(CoID,w);
+            string uname = GetUname();
+            var data = WarehouseHaddle.modifyploy(CoID,w,uname);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 

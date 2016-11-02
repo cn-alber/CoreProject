@@ -977,7 +977,13 @@ namespace CoreData.CoreComm
                                 itcoid = itCom.id,
                                 warename = myCom.name,
                                 itname = itCom.name                                       
-                            });                                                         
+                            });  
+                            if(rnt>0){                                
+                                //MsgPoint(content,level,appoint,cid,uid,uname);
+                            }else{
+                                result.s = -1;
+                            }
+
                     }
                     catch (Exception e)
                     {
@@ -1387,7 +1393,7 @@ namespace CoreData.CoreComm
             return result;
         }
 
-        public static DataResult createploy(string CoID,WarePloy wareploy ){
+        public static DataResult createploy(string CoID,WarePloy wareploy,string uname){
             var result = new DataResult(1,null);
             if(!string.IsNullOrEmpty(wareploy.ContainGoods)){
                 wareploy.ContainGoods = ","+ wareploy.ContainGoods+","; 
@@ -1423,6 +1429,7 @@ namespace CoreData.CoreComm
                      var rnt = conn.Execute(sql,wareploy);
                      if(rnt>0){
                          result.s = 1;
+                         LogComm.InsertLog("新增分仓策略：","WareHouse","",uname,Convert.ToInt16(CoID));
                      }else{
                          result.s = -1;
                      }
@@ -1437,8 +1444,10 @@ namespace CoreData.CoreComm
             return result;
         }
 
-        public static DataResult modifyploy(string CoID,WarePloy wareploy){
+        public static DataResult modifyploy(string CoID,WarePloy wareploy,string uname){
             var result = new DataResult(1,null);
+            string content = "";
+        
             if(!string.IsNullOrEmpty(wareploy.ContainGoods)){
                 wareploy.ContainGoods = ","+ wareploy.ContainGoods+","; 
             }
@@ -1454,28 +1463,73 @@ namespace CoreData.CoreComm
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    wareploy.CoID = Convert.ToInt16(CoID);
-                    string sql = @"UPDATE wareploy SET
-                                        wareploy.`Name` = @Name,                                        
-                                        wareploy.`Level`= @Level,
-                                        wareploy.Wid= @Wid,
-                                        wareploy.Province = @Province,
-                                        wareploy.Shopid = @Shopid,
-                                        wareploy.Did = @Did,
-                                        wareploy.ContainGoods= @ContainGoods,
-                                        wareploy.RemoveGoods= @RemoveGoods,
-                                        wareploy.ContainSkus = @ContainSkus,
-                                        wareploy.RemoveSkus = @RemoveSkus,
-                                        wareploy.MinNum = @MinNum,
-                                        wareploy.MaxNum= @MaxNum,
-                                        wareploy.Payment = @Payment
-                                     WHERE
-                                        wareploy.CoID = @CoID AND wareploy.ID = @ID ;";                                                                         
-                     var rnt = conn.Execute(sql,wareploy);
-                     if(rnt>0){
-                         result.s = 1;
-                     }else{
-                         result.s = -1;
+                    var res = conn.Query<WarePloy>("SELECT * FROM wareploy WHERE ID = "+wareploy.ID).AsList();
+                    if(res.Count>0){
+                        var oldPloy = res[0];
+                        if(oldPloy.ContainGoods != wareploy.ContainGoods){
+                            content += " 包含货号："+wareploy.ContainGoods +" => "+ oldPloy.ContainGoods+",";
+                        }
+                        if(oldPloy.ContainSkus != wareploy.ContainSkus){
+                            content += " 包含商品："+wareploy.ContainSkus +" => "+ oldPloy.ContainSkus+",";
+                        }
+                        if(oldPloy.Did != wareploy.Did){
+                            content += " 限定分销商："+wareploy.Did +" => "+ oldPloy.Did+",";
+                        }
+                        if(oldPloy.Level != wareploy.Level){
+                            content += " 优先级："+wareploy.Level +" => "+ oldPloy.Level+",";
+                        }
+                        if(oldPloy.MaxNum != wareploy.MaxNum){
+                            content += " 商品最大数："+wareploy.MaxNum +" => "+ oldPloy.MaxNum+",";
+                        }
+                        if(oldPloy.MinNum != wareploy.MinNum){
+                            content += " 商品最小数："+wareploy.MinNum +" => "+ oldPloy.MinNum+",";
+                        }
+                        if(oldPloy.Name != wareploy.Name){
+                            content += " 策略名："+wareploy.Name +" => "+ oldPloy.Name+",";
+                        }
+                        if(oldPloy.Payment != wareploy.Payment){
+                            content += " 付款方式："+wareploy.Payment +" => "+ oldPloy.Payment+",";
+                        }
+                        if(oldPloy.Province != wareploy.Province){
+                            content += " 省份："+wareploy.Province +" => "+ oldPloy.Province+",";
+                        }
+                        if(oldPloy.RemoveGoods != wareploy.RemoveGoods){
+                            content += " 排除货号："+wareploy.RemoveGoods +" => "+ oldPloy.RemoveGoods+",";
+                        }
+                        if(oldPloy.RemoveSkus != wareploy.RemoveSkus){
+                            content += " 排除商品："+wareploy.RemoveSkus +" => "+ oldPloy.RemoveSkus+",";
+                        }
+                        if(oldPloy.Shopid != wareploy.Shopid){
+                            content += " 店铺："+wareploy.Shopid +" => "+ oldPloy.Shopid+",";
+                        }
+                        if(oldPloy.Wid != wareploy.Wid){
+                            content += " 仓位："+wareploy.Wid +" => "+ oldPloy.Wid+",";
+                        }                       
+                        
+                        wareploy.CoID = Convert.ToInt16(CoID);
+                        string sql = @"UPDATE wareploy SET
+                                            wareploy.`Name` = @Name,                                        
+                                            wareploy.`Level`= @Level,
+                                            wareploy.Wid= @Wid,
+                                            wareploy.Province = @Province,
+                                            wareploy.Shopid = @Shopid,
+                                            wareploy.Did = @Did,
+                                            wareploy.ContainGoods= @ContainGoods,
+                                            wareploy.RemoveGoods= @RemoveGoods,
+                                            wareploy.ContainSkus = @ContainSkus,
+                                            wareploy.RemoveSkus = @RemoveSkus,
+                                            wareploy.MinNum = @MinNum,
+                                            wareploy.MaxNum= @MaxNum,
+                                            wareploy.Payment = @Payment
+                                        WHERE
+                                            wareploy.CoID = @CoID AND wareploy.ID = @ID ;";                                                                         
+                        var rnt = conn.Execute(sql,wareploy);
+                        if(rnt>0){
+                            result.s = 1;
+                            LogComm.InsertLog("更新ID："+ wareploy.ID+" 分仓策略：","WareHouse",content,uname,Convert.ToInt16(CoID));
+                        }else{
+                            result.s = -1;
+                        }
                      }
                 }
                 catch (Exception e)
