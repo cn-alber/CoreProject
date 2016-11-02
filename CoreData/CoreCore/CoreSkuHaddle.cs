@@ -519,6 +519,43 @@ namespace CoreData.CoreCore
         }
         #endregion
 
+        public static DataResult createSku(TmallSku sku){
+            var result = new DataResult(1,null); 
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try
+                {
+                    string sql = @"INSERT coresku SET 
+                                    coresku.SkuID = @SkuID,
+                                    coresku.SkuName =@SkuName,
+                                    coresku.GoodsCode = @GoodsCode,
+                                    coresku.GoodsName = @GoodsName,
+                                    coresku.SalePrice = @SalePrice,
+                                    coresku.Norm = @Norm,
+                                    coresku.Img = @Img,
+                                    coresku.CoID = @CoID,
+                                    coresku.`Enable` = @Enable,
+                                    coresku.Creator = @Creator,
+                                    coresku.CreateDate = NOW(),
+                                    coresku.IsParent = @IsParent;";
+                    var rnt = conn.Execute(sql,sku);
+                    if(rnt>0){
+                        result.s = 1;
+                    }else{
+                        result.s = -1;
+                    }
+
+
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message; 
+                    conn.Dispose();
+                }
+
+            }
+            return result;
+        }
+
+
         public static DataResult getWareSku(CoreSkuParam IParam){
             var result = new DataResult(1,null); 
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){

@@ -107,4 +107,52 @@ output: s=1成功 else 错误代码
 参考:input jason 文件:UpdateOrderDetail_input.json
 参考:output jason 文件:UpdateOrderDetail_output.json
 
+8.InsertManualPay()手工支付
+路由:http://localhost:5000/Core/Order/InsertManualPay
+input:OID         int       内部订单号
+      SoID        int       线上订单号
+      Payment     string    支付方式
+      PayDate     string    支付日期
+      PayNbr      string    支付单号
+      PayAmount   string    支付金额
+      PayAccount  string    买家账号
+output: s=1成功 else 错误代码
+参考:input jason 文件:InsertManualPay_input.json
+参考:output jason 文件:InsertManualPay_output.json
+
+9.CancleConfirmPay()取消核准支付
+路由:http://localhost:5000/Core/Order/CancleConfirmPay
+input:OID         int       内部订单号
+      SoID        int       线上订单号
+      PayID       int       付款id
+output: s=1成功 else 错误代码
+参考:input jason 文件:CancleConfirmPay_input.json
+参考:output jason 文件:CancleConfirmPay_output.json
+
+10.ConfirmPay()核准支付
+路由:http://localhost:5000/Core/Order/ConfirmPay
+input:OID         int       内部订单号
+      SoID        int       线上订单号
+      PayID       int       付款id
+output: s=1成功 else 错误代码
+参考:input jason 文件:ConfirmPay_input.json
+参考:output jason 文件:ConfirmPay_output.json
+
+11.CanclePay()作废支付
+路由:http://localhost:5000/Core/Order/CanclePay
+input:OID         int       内部订单号
+      SoID        int       线上订单号
+      PayID       int       付款id
+output: s=1成功 else 错误代码
+参考:input jason 文件:CanclePay_input.json
+参考:output jason 文件:CanclePay_output.json
+
+12.QuickPay()快速支付
+路由:http://localhost:5000/Core/Order/QuickPay
+input:OID         int       内部订单号
+      SoID        int       线上订单号
+output: s=1成功 else 错误代码
+参考:input jason 文件:QuickPay_input.json
+参考:output jason 文件:QuickPay_output.json
+
 
