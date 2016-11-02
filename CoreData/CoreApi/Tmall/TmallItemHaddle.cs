@@ -55,7 +55,7 @@ namespace CoreData.CoreApi
             try{                                        
                 Tmparam.Add("method", "taobao.item.seller.get");
                 Tmparam.Add("session", TOKEN);
-                Tmparam.Add("fields",SELLER_GET);
+                Tmparam.Add("fields",SELLER_GET);   
                 Tmparam.Add("num_iid",num_iid);
 
 
@@ -67,7 +67,10 @@ namespace CoreData.CoreApi
                     result.s = -1;
                     result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
                 }else{
-                    result.d = res.items_onsale_get_response.items.item;
+                    if(response.Result.ToString().IndexOf("sku")>-1){
+                        result.d = res.item_seller_get_response.item.skus.sku;
+                    }
+                    
                 }            
             }catch(Exception ex){                
                 result.s = -1;

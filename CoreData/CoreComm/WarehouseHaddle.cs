@@ -1086,7 +1086,7 @@ namespace CoreData.CoreComm
                             w.ID,w.WareName,w.CoID
                            FROM 
                             ware_third_party as w 
-                           WHERE w.CoID ="+CoID;                                                                     
+                           WHERE w.Enable = 2 AND   w.CoID ="+CoID;                                                                     
                     var storageLst = conn.Query<wareLst>(sql).AsList();                    
         
                     result.d = new {

@@ -370,6 +370,14 @@ namespace CoreModels.XyCore
         public string Norm{get;set;}
     }
 
+    public class wareGoods{
+        public string SkuID{get;set;}
+        public string SkuName{get;set;}
+        public string GoodsCode{get;set;}
+
+        public string Norm{get;set;}
+    }
+
 
     #endregion
 
@@ -386,8 +394,12 @@ namespace CoreModels.XyCore
         public bool Enable{get;set;}
         public string Creator{get;set;}
         public bool IsParent{set;get;}
+        public int SafeQty{get;set;}
+        
     }
 
     #endregion
+
+
 
 }
