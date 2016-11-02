@@ -329,5 +329,113 @@ namespace CoreWebApi
             var data = OrderHaddle.UpdateOrderDetail(id,soid,skuid,CoID,username,price,qty);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Order/InsertManualPay")]
+        public ResponseResult InsertManualPay([FromBodyAttribute]JObject co)
+        {   
+            var data = new DataResult(1,null);
+            var pay = new PayInfo();
+            if(string.IsNullOrEmpty(co["Payment"].ToString()))
+            {
+                data.s = -1;
+                data.d = "支付方式必须有值!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            else
+            {
+                pay.Payment = co["Payment"].ToString();
+            }
+            if(string.IsNullOrEmpty(co["PayNbr"].ToString()))
+            {
+                if(pay.Payment != "现金支付")
+                {
+                    data.s = -1;
+                    data.d = "支付单号必须有值!";
+                    return CoreResult.NewResponse(data.s, data.d, "General"); 
+                }
+            }
+            else
+            {
+                pay.PayNbr = co["PayNbr"].ToString();
+            }
+            pay.OID = int.Parse(co["OID"].ToString());
+            pay.SoID = long.Parse(co["SoID"].ToString());
+            if(!string.IsNullOrEmpty(co["PayAccount"].ToString()))
+            {
+                pay.PayAccount = co["PayAccount"].ToString();
+            }
+            if(string.IsNullOrEmpty(co["PayDate"].ToString()))
+            {
+                data.s = -1;
+                data.d = "支付日期必须有值!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            else
+            {
+                pay.PayDate = DateTime.Parse(co["PayDate"].ToString());
+            }
+            if(string.IsNullOrEmpty(co["PayAmount"].ToString()))
+            {
+                data.s = -1;
+                data.d = "支付金额必须有值!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            else
+            {
+                pay.PayAmount = co["PayAmount"].ToString();
+                pay.Amount = co["PayAmount"].ToString();
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            data = OrderHaddle.ManualPay(pay,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/CancleConfirmPay")]
+        public ResponseResult CancleConfirmPay([FromBodyAttribute]JObject co)
+        {   
+            int OID = int.Parse(co["OID"].ToString());
+            long SoID = long.Parse(co["SoID"].ToString());
+            int payid = int.Parse(co["PayID"].ToString());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.CancleConfirmPay(OID,SoID,payid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/ConfirmPay")]
+        public ResponseResult ConfirmPay([FromBodyAttribute]JObject co)
+        {   
+            int OID = int.Parse(co["OID"].ToString());
+            long SoID = long.Parse(co["SoID"].ToString());
+            int payid = int.Parse(co["PayID"].ToString());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.ConfirmPay(OID,SoID,payid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/CanclePay")]
+        public ResponseResult CanclePay([FromBodyAttribute]JObject co)
+        {   
+            int OID = int.Parse(co["OID"].ToString());
+            long SoID = long.Parse(co["SoID"].ToString());
+            int payid = int.Parse(co["PayID"].ToString());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.CanclePay(OID,SoID,payid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/QuickPay")]
+        public ResponseResult QuickPay([FromBodyAttribute]JObject co)
+        {   
+            int OID = int.Parse(co["OID"].ToString());
+            long SoID = long.Parse(co["SoID"].ToString());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.QuickPay(OID,SoID,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }
