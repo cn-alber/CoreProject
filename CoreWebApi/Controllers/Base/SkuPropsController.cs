@@ -52,7 +52,7 @@ namespace CoreWebApi
         [HttpPostAttribute("Core/XyComm/CustomKindSkuProps/UptSkuPropsValues")]
         public ResponseResult UptSkuPropsValues([FromBodyAttribute]JObject obj)
         {
-            var SkuPropLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<skuprops>>(obj.ToString());
+            var SkuPropLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<skuprops>>(obj["SkuPropLst"].ToString());
             string CoID = GetCoid();
             string UserName = GetUname();
             var res = SkuPropsHaddle.UptSkuProps(SkuPropLst, CoID, UserName);

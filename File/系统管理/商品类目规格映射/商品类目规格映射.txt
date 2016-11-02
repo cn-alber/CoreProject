@@ -21,25 +21,25 @@ function说明
 3.UptSkuPropsValues()//商品规格属性维护 - 修改Sku属性值、
     方法：Post
     路由：http://192.168.30.211:5000/Core/XyComm/CustomKindSkuProps/UptSkuPropsValues
-    InPut:
-        [
-            {
-            "pid": 20509,                           ---Sku属性name对应的pid
+    InPut:List<skuprops>
+        {
+            "SkuPropLst":[
+                {
+                "pid": 20509,                           ---Sku属性name对应的pid
                     "skuprops_values": [
                         {
-                        "pid": 20509,               ---Sku属性name对应的pid（可不赋值）
                         "id": 798,                  ---Sku属性值-autoid
                         "mapping": null,            ---val属性映射值
-                        "name": "XXXXL"             ---val属性的name描述（可不赋值）
-                        },
+                        "name": "XXXXL"             ---val属性的name描述
+                            },
                         {
-                        "pid": 20509,
                         "id": 799,
                         "mapping": null,
                         "name": "C36"
                         }
                         ]
-            },
-            {...}
-        ]
+                },
+                {...}
+            ]
+        }
     参考：input json 文件：UptSkuPropsValues_input.json
