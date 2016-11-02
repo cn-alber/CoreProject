@@ -59,6 +59,27 @@ namespace CoreWebApi
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
+
+        #region 商品资料新增 - 根据商品类目获取Sku属性值
+        [HttpGetAttribute("Core/XyComm/CustomKindSkuProps/SkuPropsByKind")]
+        public ResponseResult SkuPropsByKind(string KindID)
+        {
+            var res = new DataResult(1, null);
+            int x = 0;
+            if (!int.TryParse(KindID, out x))
+            {
+                res.s = -1;
+                res.d = "无效参数ID";
+            }
+            else
+            {
+                string CoID = GetCoid();
+                res = SkuPropsHaddle.GetSkuPropsByKind(KindID,CoID);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+
+        #endregion
         // #region 商品资料新增 - 根据商品类目获取颜色列表
         // [HttpGetAttribute("Core/XyComm/ColorSize/GetColorLst")]
         // public ResponseResult GetColorLst(string ID)

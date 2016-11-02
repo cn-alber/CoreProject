@@ -147,7 +147,7 @@ namespace CoreData.CoreComm
                     }).AsList();
                     //修改Sku属性值Lst
                     var UptValLst = PropValLst
-                    .Where(a => OldValLst.Any(b => b.id == a.id && b.mapping != a.mapping))
+                    .Where(a => OldValLst.Any(b => b.id == a.id && !(b.mapping == a.mapping && b.name == a.name)))
                     .Select(c => new Customkind_skuprops_value
                     {
                         id = c.id,
@@ -166,7 +166,7 @@ namespace CoreData.CoreComm
                     {
                         string sql = @" UPDATE
                                         customkind_skuprops_value
-                                    SET mapping=@mapping,Modifier=@Modifier,ModifyDate=@ModifyDate
+                                    SET mapping=@mapping,name=@name,Modifier=@Modifier,ModifyDate=@ModifyDate
                                     WHERE
                                         CoID =@CoID
                                     AND id = @id";
@@ -182,6 +182,67 @@ namespace CoreData.CoreComm
                 }
             }
             return res;
+        }
+        #endregion
+
+        #region 根据商品类目获取商品规格属性
+        public static DataResult GetSkuPropsByKind(string KindID, string CoID)
+        {
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    string SkuPropSql = @"SELECT
+                                            customkind_skuprops.pid,
+                                            customkind_skuprops.`name`,
+                                            customkind.KindName AS KindNames
+                                        FROM
+                                            customkind_skuprops,
+                                            customkind
+                                        WHERE
+                                            customkind_skuprops.kindid = customkind.ID
+                                        AND customkind_skuprops.IsDelete = 0
+                                        AND customkind_skuprops.CoID = customkind.CoID
+                                        AND customkind_skuprops.CoID = @CoID
+                                        AND customkind.ID=@KindID";
+                    string PropValueSql = @"SELECT
+                                                pid,
+                                                id,
+                                                mapping,
+                                                NAME
+                                            FROM
+                                                customkind_skuprops_value
+                                            WHERE
+                                                CoID =@CoID
+                                            AND pid IN @PidLst
+                                            AND IsDelete = 0";
+                    var SkuProps = conn.Query<skuprops>(SkuPropSql, new { CoID = CoID, KindID = KindID }).AsList();
+                    var SkuPropLst = (from p in SkuProps
+                                      group p by new { p.pid, p.name } into g
+                                      select new skuprops
+                                      {
+                                          pid = g.Key.pid,
+                                          name = g.Key.name
+                                      }).AsList();
+                    if (SkuPropLst.Count > 0)
+                    {
+                        var SkuPropValues = conn.Query<skuprops_value>(PropValueSql, new { CoID = CoID, PidLst = SkuPropLst.Select(a => a.pid).AsList() }).AsList();
+                        foreach (var prop in SkuPropLst)
+                        {
+                            prop.skuprops_values = SkuPropValues.Where(a => a.pid == prop.pid).AsList();
+                            prop.KindNames = string.Join(",", SkuProps.Where(a => a.pid == prop.pid).Select(a => a.KindNames).AsList().ToArray());
+                        }
+                    }
+                    res.d = SkuPropLst;
+                }
+                catch (Exception e)
+                {
+                    res.s = -1;
+                    res.d = e.Message;
+                }
+                return res;
+            }
         }
         #endregion
     }
