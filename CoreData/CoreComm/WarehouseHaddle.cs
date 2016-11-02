@@ -1403,11 +1403,50 @@ namespace CoreData.CoreComm
                                         wareploy.Did = @Did,
                                         wareploy.ContainGoods= @ContainGoods,
                                         wareploy.RemoveGoods= @RemoveGoods,
-                                        wareploy.ContainStyle = @ContainStyle,
-                                        wareploy.RemoveStyle = @RemoveStyle,
+                                        wareploy.ContainSkus = @ContainSkus,
+                                        wareploy.RemoveSkus = @RemoveSkus,
                                         wareploy.MinNum = @MinNum,
                                         wareploy.MaxNum= @MaxNum,
                                         wareploy.Payment = @Payment;";                                                                         
+                     var rnt = conn.Execute(sql,wareploy);
+                     if(rnt>0){
+                         result.s = 1;
+                     }else{
+                         result.s = -1;
+                     }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
+        public static DataResult modifyploy(string CoID,WarePloy wareploy){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    wareploy.CoID = Convert.ToInt16(CoID);
+                    string sql = @"UPDATE wareploy SET
+                                        wareploy.`Name` = @Name,                                        
+                                        wareploy.`Level`= @Level,
+                                        wareploy.Wid= @Wid,
+                                        wareploy.Province = @Province,
+                                        wareploy.Shopid = @Shopid,
+                                        wareploy.Did = @Did,
+                                        wareploy.ContainGoods= @ContainGoods,
+                                        wareploy.RemoveGoods= @RemoveGoods,
+                                        wareploy.ContainSkus = @ContainSkus,
+                                        wareploy.RemoveSkus = @RemoveSkus,
+                                        wareploy.MinNum = @MinNum,
+                                        wareploy.MaxNum= @MaxNum,
+                                        wareploy.Payment = @Payment
+                                     WHERE
+                                        wareploy.CoID = @CoID AND wareploy.ID = @ID ;";                                                                         
                      var rnt = conn.Execute(sql,wareploy);
                      if(rnt>0){
                          result.s = 1;

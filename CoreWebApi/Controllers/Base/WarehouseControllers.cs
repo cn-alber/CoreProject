@@ -196,6 +196,14 @@ namespace CoreWebApi
             var data = WarehouseHaddle.createploy(CoID,w);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+        [HttpPostAttribute("/Core/Warehouse/modifyploy")]
+        public ResponseResult modifyploy([FromBodyAttribute]JObject co)
+        {   
+            WarePloy w = Newtonsoft.Json.JsonConvert.DeserializeObject<WarePloy>(co.ToString());
+            string CoID = GetCoid();
+            var data = WarehouseHaddle.modifyploy(CoID,w);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
 
         [HttpGetAttribute("/Core/Warehouse/getWareSku")]
         public ResponseResult getWareSku(string GoodsCode="",string GoodsName="", string Filter="", int PageIndex= 1, int PageSize = 20, string SortField="", string SortDirection="")
