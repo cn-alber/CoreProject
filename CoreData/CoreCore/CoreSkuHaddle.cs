@@ -584,14 +584,20 @@ namespace CoreData.CoreCore
 
         public static DataResult getWareSku(CoreSkuParam IParam,string coid){
             var result = new DataResult(1,null); 
+            var goods =getWareGoodsInner(coid);
+            string goodCodes = "'0'";
+            foreach(var good in goods){
+                goodCodes +=",'"+good.GoodsCode+"'";
+            }
+            
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try
                 {
                     StringBuilder querysql=new StringBuilder();
                     StringBuilder totalSql = new StringBuilder();
                     var p = new DynamicParameters();
-                    querysql.Append("SELECT distinct  SkuID,SkuName,Norm FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE AND CoID = "+coid+" ");
-                    totalSql.Append("SELECT COUNT(ID) FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE  AND CoID = "+coid+" ");
+                    querysql.Append("SELECT distinct  SkuID,SkuName,Norm FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE AND CoID = "+coid+" AND GoodsCode in ("+goodCodes+") ");
+                    totalSql.Append("SELECT COUNT(ID) FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE  AND CoID = "+coid+"  AND GoodsCode in ("+goodCodes+") ");
                     if (!string.IsNullOrEmpty(IParam.GoodsCode))
                     {
                         querysql.Append(" AND GoodsCode = @GoodsCode");
