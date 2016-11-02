@@ -18,8 +18,6 @@ namespace CoreData.CoreComm
         public static DataResult GetSkuProps(string CoID)
         {
             var res = new DataResult(1, null);
-
-            // string sql = @"SELECT id,sizeid,name FROM coresize WHERE CoID=@CoID AND kindid = @KindID AND IsDelete=0";
             using (var conn = new MySqlConnection(DbBase.CommConnectString))
             {
                 try
@@ -45,7 +43,8 @@ namespace CoreData.CoreComm
                                                 customkind_skuprops_value
                                             WHERE
                                                 CoID =@CoID
-                                            AND pid IN @PidLst";
+                                            AND pid IN @PidLst
+                                            AND IsDelete = 0";
                     var SkuProps = conn.Query<skuprops>(SkuPropSql, new { CoID = CoID }).AsList();
                     var SkuPropLst = (from p in SkuProps
                                       group p by new { p.pid, p.name } into g
@@ -54,19 +53,16 @@ namespace CoreData.CoreComm
                                           pid = g.Key.pid,
                                           name = g.Key.name
                                       }).AsList();
-                    //SkuProps.GroupBy(s=>).Select(a=>new skuprops{pid=a.pid,name=a.name}).AsList();
                     if (SkuPropLst.Count > 0)
                     {
                         var SkuPropValues = conn.Query<skuprops_value>(PropValueSql, new { CoID = CoID, PidLst = SkuPropLst.Select(a => a.pid).AsList() }).AsList();
-                        foreach(var prop in SkuPropLst)
+                        foreach (var prop in SkuPropLst)
                         {
-                            prop.skuprops_values = SkuPropValues.Where(a=>a.pid==prop.pid).AsList();
-                            prop.KindNames = string.Join(",",SkuProps.Where(a=>a.pid==prop.pid).Select(a=>a.KindNames).AsList().ToArray());
+                            prop.skuprops_values = SkuPropValues.Where(a => a.pid == prop.pid).AsList();
+                            prop.KindNames = string.Join(",", SkuProps.Where(a => a.pid == prop.pid).Select(a => a.KindNames).AsList().ToArray());
                         }
                     }
                     res.d = SkuPropLst;
-                    //         var SizeLst = conn.Query<SizeData>(sql, new { KindID = KindID, CoID = CoID }).AsList();
-                    //         res.d = SizeLst;
                 }
                 catch (Exception e)
                 {
@@ -78,7 +74,115 @@ namespace CoreData.CoreComm
         }
         #endregion
         #region 删除商品类目尺码列表
-        // public static DataResult DelSkuProps
+        public static DataResult DelSkuProps(string ID, string CoID, string UserName)
+        {
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                conn.Open();
+                var Trans = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
+                try
+                {
+                    string sql = @" UPDATE
+                                        customkind_skuprops_value
+                                    SET IsDelete=1,Modifier=@Modifier,ModifyDate=@ModifyDate
+                                    WHERE
+                                        CoID =@CoID
+                                    AND id = @ID";
+                    conn.Execute(sql, new { CoID = CoID, ID = ID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                    Trans.Commit();
+                }
+                catch (Exception e)
+                {
+                    Trans.Rollback();
+                    res.s = -1;
+                    res.d = e.Message;
+                }
+            }
+            return res;
+        }
+        #endregion
+
+        #region 修改商品类目
+        public static DataResult UptSkuProps(List<skuprops> SkuPropLst, string CoID, string UserName)
+        {
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                conn.Open();
+                var Trans = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
+                try
+                {
+                    var PropValLst = new List<skuprops_value>();
+                    // var NewValLst = new List<skuprops_value>();
+                    // var UptValLst = new List<skuprops_value>();
+                    List<long> PidLst = SkuPropLst.Select(a => a.pid).AsList();
+                    string PropValueSql = @"SELECT
+                                                pid,
+                                                id,
+                                                mapping,
+                                                NAME
+                                            FROM
+                                                customkind_skuprops_value
+                                            WHERE
+                                                CoID =@CoID
+                                            AND pid IN @PidLst
+                                            AND IsDelete = 0";
+                    var OldValLst = conn.Query<skuprops_value>(PropValueSql, new { CoID = CoID, PidLst = PidLst });
+                    foreach (var prop in SkuPropLst)
+                    {
+                        var valLst = prop.skuprops_values.Select(a => new skuprops_value { pid = prop.pid, id = a.id, mapping = a.mapping, name = a.name }).AsList();
+                        PropValLst.AddRange(valLst);
+                    }
+                    //新增sku属性值Lst
+                    var NewValLst = PropValLst.Where(a => a.id <= 0)
+                    .Select(b => new Customkind_skuprops_value
+                    {
+                        mapping = b.mapping,
+                        name = b.name,
+                        pid = b.pid,
+                        Creator = UserName,
+                        CreateDate = DateTime.Now.ToString(),
+                        CoID = int.Parse(CoID)
+                    }).AsList();
+                    //修改Sku属性值Lst
+                    var UptValLst = PropValLst
+                    .Where(a => OldValLst.Any(b => b.id == a.id && b.mapping != a.mapping))
+                    .Select(c => new Customkind_skuprops_value
+                    {
+                        id = c.id,
+                        mapping = c.mapping,
+                        name = c.name,
+                        pid = c.pid,
+                        Modifier = UserName,
+                        ModifyDate = DateTime.Now.ToString(),
+                        CoID = int.Parse(CoID)
+                    }).AsList();
+                    if (NewValLst.Count > 0)
+                    {
+                        conn.Execute(CustomKindHaddle.AddSkuPropValSql(), NewValLst, Trans);
+                    }
+                    if (UptValLst.Count > 0)
+                    {
+                        string sql = @" UPDATE
+                                        customkind_skuprops_value
+                                    SET mapping=@mapping,Modifier=@Modifier,ModifyDate=@ModifyDate
+                                    WHERE
+                                        CoID =@CoID
+                                    AND id = @id";
+                        conn.Execute(sql, UptValLst, Trans);
+                    }
+                    Trans.Commit();
+                }
+                catch (Exception e)
+                {
+                    Trans.Rollback();
+                    res.s = -1;
+                    res.d = e.Message;
+                }
+            }
+            return res;
+        }
         #endregion
     }
 }
