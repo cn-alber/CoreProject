@@ -2244,5 +2244,24 @@ namespace CoreData.CoreCore
             }
             return result;
         }
+        ///<summary>
+        ///抓取异常List
+        ///</summary>
+        public static DataResult GetAbnormalList(int CoID)
+        {
+            var result = new DataResult(1,null);
+            string sqlcommand = "select ID,Name from orderabnormal where coid =" + CoID + " order by IsCustom asc,ID asc"; 
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    var u = conn.Query<AbnormalReason>(sqlcommand).AsList();
+                    result.d = u;             
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }    
+            return result;
+        }
     }
 }

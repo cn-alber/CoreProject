@@ -221,14 +221,12 @@ namespace CoreData.CoreCore
                 try{
                     if ( pur.warehouseid == 0)
                     {
-                        result.s = -1;
-                        result.d = "仓库编号必须有值!";
-                        return result;
+                        pur.warehousename = "";
                     }
                     else
                     {
-                        string wheresql = "select * from warehouse where id =" + pur.warehouseid + " and coid =" + CoID;
-                        var u = DbBase.CommDB.Query<Warehouse>(wheresql).AsList();
+                        string wheresql = "select ID,WareName,Enable from ware_third_party where id =" + pur.warehouseid + " and coid =" + CoID;
+                        var u = DbBase.CommDB.Query<wareThirdParty>(wheresql).AsList();
                         if(u.Count == 0)
                         {
                             result.s = -1;
@@ -237,24 +235,15 @@ namespace CoreData.CoreCore
                         }
                         else
                         {
-                            if(u[0].enable == false)
+                            if(u[0].enable != 2)
                             {
                                 result.s = -1;
-                                result.d = "仓库编号已停用!!";
+                                result.d = "仓库编号不是生效状态!!";
                                 return result;
                             }
                             else
                             {
-                                if(u[0].parentid > 0)
-                                {
-                                    result.s = -1;
-                                    result.d = "请选择主仓库!";
-                                    return result;
-                                }
-                                else
-                                {
-                                    pur.warehousename = u[0].warehousename;
-                                }
+                                pur.warehousename = u[0].warename;
                             }
                         }
                     }
@@ -353,44 +342,26 @@ namespace CoreData.CoreCore
         public static DataResult UpdatePurchase(Purchase pur,int CoID,string UserName)
         {
             var result = new DataResult(1,null);  
-            var p = new DynamicParameters();      
-            string uptsql = @"update purchase set ";
-            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
-                try{   
-                    if(pur.warehouseid != 0)
+            var purOlder = new Purchase();
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{      
+                    string wheresql = "select * from purchase where id =" + pur.id + " and coid = " + CoID;
+                    var u = conn.Query<Purchase>(wheresql).AsList();
+                    if(u.Count == 0)
                     {
-                        string wheresql = "select * from warehouse where id =" + pur.warehouseid + " and coid =" + CoID;
-                        var u = DbBase.CommDB.Query<Warehouse>(wheresql).AsList();
-                        if(u.Count == 0)
+                        result.s = -1;
+                        result.d = "该采购单不存在!!";
+                        return result;
+                    }
+                    else
+                    {
+                        if(u[0].status != 0)
                         {
                             result.s = -1;
-                            result.d = "仓库编号不存在!!";
+                            result.d = "该采购单不允许修改!!";
                             return result;
                         }
-                        else
-                        {
-                            if(u[0].enable == false)
-                            {
-                                result.s = -1;
-                                result.d = "仓库编号已停用!!";
-                                return result;
-                            }
-                            else
-                            {
-                                if(u[0].parentid > 0)
-                                {
-                                    result.s = -1;
-                                    result.d = "请选择主仓库!!";
-                                    return result;
-                                }
-                                else
-                                {
-                                    uptsql = uptsql + "warehouseid = @Warehouseid,warehousename = @Warehousename,";
-                                    p.Add("@Warehouseid", pur.warehouseid);
-                                    p.Add("@Warehousename", u[0].warehousename);
-                                }
-                            }
-                        }
+                        purOlder = u[0];
                     }
                 }catch(Exception ex){
                     result.s = -1;
@@ -398,15 +369,58 @@ namespace CoreData.CoreCore
                     conn.Dispose();
                 }
             } 
+            var p = new DynamicParameters();      
+            string uptsql = @"update purchase set ";
+            if(purOlder.warehouseid != pur.warehouseid)
+            {
+                using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                    try{   
+                        if(pur.warehouseid == 0)
+                        {
+                            pur.warehousename = "";
+                        }
+                        else
+                        {
+                            string wheresql = "select ID,WareName,Enable from ware_third_party where id =" + pur.warehouseid + " and coid =" + CoID;
+                            var u = DbBase.CommDB.Query<wareThirdParty>(wheresql).AsList();
+                            if(u.Count == 0)
+                            {
+                                result.s = -1;
+                                result.d = "仓库编号不存在!!";
+                                return result;
+                            }
+                            else
+                            {
+                                if(u[0].enable != 2)
+                                {
+                                    result.s = -1;
+                                    result.d = "仓库编号不是生效状态!!";
+                                    return result;
+                                }
+                                else
+                                {
+                                    pur.warehousename = u[0].warename;
+                                }
+                            }
+                        }
+                        uptsql = uptsql + "warehouseid = @Warehouseid,warehousename = @Warehousename,";
+                        p.Add("@Warehouseid", pur.warehouseid);
+                        p.Add("@Warehousename", pur.warehousename);
+                    }catch(Exception ex){
+                        result.s = -1;
+                        result.d = ex.Message;
+                        conn.Dispose();
+                    }
+                } 
+            }
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{      
-                    
-                    if ( pur.purchasedate != null)
+                    if ( pur.purchasedate != null && pur.purchasedate != purOlder.purchasedate)
                     {
                         uptsql = uptsql + "purchasedate = @Purdate,";
                         p.Add("@Purdate", pur.purchasedate);
                     }
-                    if ( pur.scoid != 0)
+                    if ( pur.scoid != 0 && pur.scoid != purOlder.scoid)
                     {
                         string wheresql = "select * from supplycompany where id =" + pur.scoid + " and coid = " + CoID;
                         var u = conn.Query<ScoCompany>(wheresql).AsList();
@@ -432,47 +446,47 @@ namespace CoreData.CoreCore
                             }
                         }
                     }
-                    if ( pur.remark != null)
+                    if ( pur.remark != null && pur.remark != purOlder.remark)
                     {
                         uptsql = uptsql + "remark=@Remark,";
                         p.Add("@Remark", pur.remark);
                     }
-                    if ( pur.shplogistics != null)
+                    if ( pur.shplogistics != null && pur.shplogistics != purOlder.shplogistics)
                     {
                         uptsql = uptsql + "shplogistics = @Shplogistics,";
                         p.Add("@Shplogistics", pur.shplogistics);
                     }
-                    if ( pur.shpcity != null)
+                    if ( pur.shpcity != null && pur.shpcity != purOlder.shpcity)
                     {
                         uptsql = uptsql + "shpcity = @Shpcity,";
                         p.Add("@Shpcity", pur.shpcity);
                     }
-                    if ( pur.shpdistrict != null)
+                    if ( pur.shpdistrict != null && pur.shpdistrict != purOlder.shpdistrict)
                     {
                         uptsql = uptsql + "shpdistrict = @Shpdistrict,";
                         p.Add("@Shpdistrict", pur.shpdistrict);
                     }
-                    if ( pur.shpaddress != null)
+                    if ( pur.shpaddress != null && pur.shpaddress != purOlder.shpaddress)
                     {
                         uptsql = uptsql + "shpaddress=@Shpaddress,";
                         p.Add("@Shpaddress", pur.shpaddress);
                     }
-                    if ( pur.contract != null)
+                    if ( pur.contract != null && pur.contract != purOlder.contract)
                     {
                         uptsql = uptsql + "contract = @Contract,";
                         p.Add("@Contract", pur.contract);
                     }
-                    if ( pur.purtype != null)
+                    if ( pur.purtype != null && pur.purtype != purOlder.purtype)
                     {
                         uptsql = uptsql + "purtype=@Purtype,";
                         p.Add("@Purtype", pur.purtype);
                     }
-                    if ( pur.buyyer != null)
+                    if ( pur.buyyer != null && pur.buyyer != purOlder.buyyer)
                     {
                         uptsql = uptsql + "buyyer=@Buyyer,";
                         p.Add("@Buyyer", pur.buyyer);
                     }
-                    if ( pur.taxrate != null)
+                    if ( pur.taxrate != null && pur.taxrate != purOlder.taxrate)
                     {
                         uptsql = uptsql + "taxrate=@Taxrate,";
                         p.Add("@Taxrate", pur.taxrate);
@@ -1141,11 +1155,8 @@ namespace CoreData.CoreCore
             status.Add(5,"作废");
             res.status = status;
             //仓库列表
-            var wh = CoreComm.WarehouseHaddle.GetParentWarehouseList(CoID);
-            if(wh.s == 1)
-            {
-                res.warehouse = wh.d as List<Warehouse>;//Newtonsoft.Json.JsonConvert.DeserializeObject<>(wh.d.ToString());
-            }
+            var wh = CoreComm.WarehouseHaddle.getWarelist(CoID.ToString());
+            res.warehouse = wh as List<wareLst>;//Newtonsoft.Json.JsonConvert.DeserializeObject<>(wh.d.ToString());
             //采购单基本资料
             string sqlcount = "select count(id) from purchase where 1 = 1"; 
             string sqlCommand = "select * from purchase where 1 = 1"; 

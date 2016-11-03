@@ -140,7 +140,7 @@ OutPut: 1 成功  else 失败代号
 input:
 OutPut:     
             status          Dictionary<int,string>    状态列表
-            warehouse       List<Warehouse>           仓库资料
+            warehouse       List<wareLst>             第三方仓库资料
             Datacnt         int                       资料总笔数
             Pagecnt         int                       总页数
             Pur             List<Purchase>            Purchase 资料

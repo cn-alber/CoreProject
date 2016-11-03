@@ -437,5 +437,13 @@ namespace CoreWebApi
             var data = OrderHaddle.QuickPay(OID,SoID,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpGetAttribute("/Core/Order/GetAbnormalList")]
+        public ResponseResult GetAbnormalList()
+        {   
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.GetAbnormalList(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }
