@@ -10,22 +10,24 @@ using CoreData;
 namespace CoreWebApi.XyCore
 
 {
-    // [AllowAnonymous]
+    [AllowAnonymous]
     public class CoreSkuControllers : ControllBase
     {
 
-
-
         #region 商品管理-获取商品主要资料
         [HttpGetAttribute("Core/XyCore/CoreSku/GoodsQueryLst")]
-        public ResponseResult GoodsQueryLst(string Type,string GoodsCode,string GoodsName, string Filter, string Enable, string PageIndex, string PageSize, string SortField, string SortDirection)
+        public ResponseResult GoodsQueryLst(string Type, string GoodsCode, string SkuID, string ScoGoodsCode, string KindID, string Enable, string PageIndex, string PageSize, string SortField, string SortDirection)
         {
             var cp = new CoreSkuParam();
             int x;
-            cp.Filter = Filter;
-            if (!string.IsNullOrEmpty(Type)&&int.TryParse(Type, out x))
+            // cp.Filter = Filter;
+            if (!string.IsNullOrEmpty(Type) && int.TryParse(Type, out x))
             {
                 cp.Type = int.Parse(Type);
+            }
+            if (int.TryParse(KindID, out x))
+            {
+                cp.KindID = KindID;
             }
             if (!string.IsNullOrEmpty(Enable) && (Enable.ToUpper() == "TRUE" || Enable.ToUpper() == "FALSE"))
             {
@@ -54,8 +56,11 @@ namespace CoreWebApi.XyCore
             }
             // var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<CoreSkuParam>(obj["CoreSkuParam"].ToString());
             cp.CoID = int.Parse(GetCoid());
+            cp.GoodsCode = GoodsCode;
+            cp.SkuID = SkuID;
+            cp.ScoGoodsCode = ScoGoodsCode;
             var Result = CoreSkuHaddle.GetGoodsLst(cp);
-            return  CoreResult.NewResponse(Result.s, Result.d, "General");
+            return CoreResult.NewResponse(Result.s, Result.d, "General");
         }
         #endregion
         #region 商品管理 - 获取商品明细列表
@@ -145,11 +150,11 @@ namespace CoreWebApi.XyCore
         [HttpPostAttribute("Core/XyCore/CoreSku/SkuQuery")]
         public ResponseResult SkuQuery([FromBodyAttribute]JObject obj)
         {
-        var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<SkuParam>(obj["SkuParam"].ToString());
-        int CoID = int.Parse(GetCoid());
-        var res = CoreSkuHaddle.GetSkuAll(cp,CoID,2);
-        var Result = CoreResult.NewResponse(res.s, res.d, "General");
-        return Result;
+            var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<SkuParam>(obj["SkuParam"].ToString());
+            int CoID = int.Parse(GetCoid());
+            var res = CoreSkuHaddle.GetSkuAll(cp, CoID, 2);
+            var Result = CoreResult.NewResponse(res.s, res.d, "General");
+            return Result;
         }
 
         #endregion

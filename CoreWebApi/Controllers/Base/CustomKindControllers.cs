@@ -128,6 +128,7 @@ namespace CoreWebApi
         public ResponseResult InsertSkuKind([FromBodyAttribute]JObject obj)
         {
             var res = new DataResult(1, null);
+            // var d = CommHaddle.GetRecordID(1);
             // var cp = new CustomKind();
             // cp.KindName = obj["KindName"].ToString();
             string PID = obj["ParentID"].ToString();
