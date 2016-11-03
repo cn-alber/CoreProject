@@ -38,7 +38,8 @@ namespace CoreWebApi
              var menus = Newtonsoft.Json.JsonConvert.DeserializeObject<MenuModifyRequest>(lo.ToString());
              var icon = new string[]{menus.iconName,menus.iconPrefix};
              var uname = GetUname();
-             var coid = GetCoid();        
+             var coid = GetCoid();  
+             Console.WriteLine(menus.pid);      
              var m = AdminHaddle.modifyMenu(menus.id,menus.name,menus.router,icon,menus.order,menus.remark,menus.pid,menus.accessid,uname,coid);
             return CoreResult.NewResponse(m.s, m.d, "Indentity");           
          }

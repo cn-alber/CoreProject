@@ -114,7 +114,7 @@ namespace CoreModels.XyCore
             get { return _FilterType; }
             set { this._FilterType = value; }
         }//过滤类型
-        
+
         public string Enable
         {
             get { return _Enable; }
@@ -386,9 +386,9 @@ namespace CoreModels.XyCore
     #endregion
 
     #region 分仓抓取Sku
-
     public class wareSku
     {
+        public int ID { get; set; }
         public string SkuID { get; set; }
         public string SkuName { get; set; }
         public string Norm { get; set; }
@@ -396,10 +396,10 @@ namespace CoreModels.XyCore
 
     public class wareGoods
     {
+        public int ID { get; set; }
         public string SkuID { get; set; }
         public string SkuName { get; set; }
         public string GoodsCode { get; set; }
-
         public string Norm { get; set; }
     }
 

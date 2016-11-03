@@ -155,4 +155,8 @@ output: s=1成功 else 错误代码
 参考:input jason 文件:QuickPay_input.json
 参考:output jason 文件:QuickPay_output.json
 
-
+13.GetAbnormalList() //查询订单异常
+  路由:http://localhost:5000/Core/Order/GetAbnormalList
+input:      None
+OutPut:     List<AbnormalReason>   异常原因List
+参考:output jason 文件:GetAbnormalList_output.json

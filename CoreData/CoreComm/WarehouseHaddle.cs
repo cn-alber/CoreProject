@@ -938,7 +938,7 @@ namespace CoreData.CoreComm
         ///<summary>
         /// 申请加入第三方仓储服务
         ///</summary>
-         public static DataResult askFor(string CoID,string code,string itremark){
+         public static DataResult askFor(string CoID,string code,string itremark,string uid,string uname){
             var result = new DataResult(1,null);
             var comRes = CompanyHaddle.GetByWarecode(code);
             var myCom = CompanyHaddle.GetCompanyEdit(int.Parse(CoID)).d as Company;
@@ -977,7 +977,15 @@ namespace CoreData.CoreComm
                                 itcoid = itCom.id,
                                 warename = myCom.name,
                                 itname = itCom.name                                       
-                            });                                                         
+                            });  
+                            if(rnt>0){   
+                                Task.Factory.StartNew(()=>{
+                                    NotifyHaddle.MsgPoint(itCom.name + "申请成为贵公司第三方仓储","3",CoID,CoID,uid,uname);
+                                });                                                             
+                            }else{
+                                result.s = -1;
+                            }
+
                     }
                     catch (Exception e)
                     {
@@ -1110,12 +1118,12 @@ namespace CoreData.CoreComm
         /// 修改备注
         ///</summary>
         ///<param name="type">1：我方；2：第三方仓储方 </param>
-         public static DataResult editRemark(string CoID,string uname,string id,string remark){
+         public static DataResult editRemark(string CoID,string uname,string id,string remark,string uid){
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    string sql = "SELECT ware_third_party.ApplyCoid FROM ware_third_party WHERE ware_third_party.ID = "+id;
+                    string sql = "SELECT ware_third_party.ApplyCoid ,ware_third_party.ItCoid FROM ware_third_party WHERE ware_third_party.ID = "+id;
                     var res = conn.Query<remarkSqlRes>(sql).AsList();
                     if(res.Count>0){
                         var a = res[0];
@@ -1140,7 +1148,14 @@ namespace CoreData.CoreComm
                                 endman = uname
                             });
                         if(rnt>0){
-                            result.s = 1;
+                            result.s = 1;                            
+                            Task.Factory.StartNew(()=>{
+                                NotifyHaddle.MsgPoint(uname + "修改备注","3",res[0].ItCoid,CoID,uid,uname);
+                            });    
+                            Task.Factory.StartNew(()=>{
+                                NotifyHaddle.MsgPoint(uname + "修改备注","3",CoID,CoID,uid,uname);
+                            });  
+                                                                                 
                         }else{
                             result.s = -1;
                         }
@@ -1159,28 +1174,41 @@ namespace CoreData.CoreComm
         ///<summary>
         /// 审核第三方仓储
         ///</summary>
-         public static DataResult passThird(string id,string coid,string uname){
+         public static DataResult passThird(string id,string coid,string uname,string uid){
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    string sql =@"UPDATE ware_third_party SET                               
+                    string sql = "SELECT ware_third_party.ApplyCoid ,ware_third_party.ItCoid FROM ware_third_party WHERE ware_third_party.ID = "+id;
+                    var res = conn.Query<remarkSqlRes>(sql).AsList();
+                    if(res.Count>0){
+                        sql =@"UPDATE ware_third_party SET                               
                                         ware_third_party.Enable = 2,
                                         ware_third_party.EndMan = @endman,
                                         ware_third_party.Pdate = Now(),
                                         ware_third_party.Mdate = Now(),
                                     WHERE 
                                         ware_third_party.ID =@id AND ware_third_party.CoID = @CoID;";
-                    var rnt = conn.Execute(sql,new {
-                            endman = uname,
-                            id = id,
-                            CoID = coid
-                    });       
-                    if(rnt > 0){
-                        result.s = 1;
+                        var rnt = conn.Execute(sql,new {
+                                endman = uname,
+                                id = id,
+                                CoID = coid
+                        });       
+                        if(rnt > 0){
+                            result.s = 1;
+                            Task.Factory.StartNew(()=>{
+                                NotifyHaddle.MsgPoint(uname + "修改备注","3",res[0].ItCoid,coid,uid,uname);
+                            });    
+                            Task.Factory.StartNew(()=>{
+                                NotifyHaddle.MsgPoint(uname + "修改备注","3",coid,coid,uid,uname);
+                            });  
+                        }else{
+                            result.s = -1;
+                        }
                     }else{
-                        result.s = -1;
+                        result.s = -3008;
                     }
+                    
          
                 }
                 catch (Exception e)
@@ -1196,29 +1224,40 @@ namespace CoreData.CoreComm
         ///<summary>
         /// 终止合作
         ///</summary>
-         public static DataResult wareCancle(string id,string coid,string uname){
+         public static DataResult wareCancle(string id,string coid,string uname,string uid){
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    string sql =@"UPDATE ware_third_party SET                               
-                                        ware_third_party.Enable = 3,
-                                        ware_third_party.EndMan = @endman,
-                                        ware_third_party.Pdate = Now(),
-                                        ware_third_party.Mdate = Now(),
-                                    WHERE 
-                                        ware_third_party.ID =@id AND (ware_third_party.CoID = @CoID OR ware_third_party.ItCoid = @CoID );";
-                    var rnt = conn.Execute(sql,new {                                    
-                                    endman = uname,
-                                    CoID = coid,
-                                    id = id
-                            });       
-                    if(rnt > 0){
-                        result.s = 1;
+                    string sql = "SELECT ware_third_party.ApplyCoid ,ware_third_party.ItCoid FROM ware_third_party WHERE ware_third_party.ID = "+id;
+                    var res = conn.Query<remarkSqlRes>(sql).AsList();
+                    if(res.Count>0){
+                        sql =@"UPDATE ware_third_party SET                               
+                                            ware_third_party.Enable = 3,
+                                            ware_third_party.EndMan = @endman,
+                                            ware_third_party.Pdate = Now(),
+                                            ware_third_party.Mdate = Now(),
+                                        WHERE 
+                                            ware_third_party.ID =@id AND (ware_third_party.CoID = @CoID OR ware_third_party.ItCoid = @CoID );";
+                        var rnt = conn.Execute(sql,new {                                    
+                                        endman = uname,
+                                        CoID = coid,
+                                        id = id
+                                });       
+                        if(rnt > 0){
+                            result.s = 1;
+                            Task.Factory.StartNew(()=>{
+                                NotifyHaddle.MsgPoint(uname + "修改备注","3",res[0].ItCoid,coid,uid,uname);
+                            });    
+                            Task.Factory.StartNew(()=>{
+                                NotifyHaddle.MsgPoint(uname + "修改备注","3",coid,coid,uid,uname);
+                            });  
+                        }else{
+                            result.s = -1;
+                        }
                     }else{
-                        result.s = -1;
+                        result.s = -3008;
                     }
-
                 }
                 catch (Exception e)
                 {
@@ -1231,28 +1270,40 @@ namespace CoreData.CoreComm
         }
 
         ///<summary>
-        /// 终止合作
+        /// 取消申请合作
         ///</summary>
-         public static DataResult wareGiveUp(string id,string coid,string uname){
+         public static DataResult wareGiveUp(string id,string coid,string uname, string uid){
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    string sql =@"UPDATE ware_third_party SET                               
-                                        ware_third_party.Enable = 0,
-                                        ware_third_party.EndMan = @endman,                                        
-                                        ware_third_party.Mdate = Now()
-                                    WHERE 
-                                        ware_third_party.ID =@id AND ware_third_party.CoID = @CoID;";
-                    var rnt = conn.Execute(sql,new {                                    
-                                    endman = uname,
-                                    id = id,
-                                    CoID = coid
-                            });       
-                    if(rnt > 0){
-                        result.s = 1;
+                    string sql = "SELECT ware_third_party.ApplyCoid ,ware_third_party.ItCoid FROM ware_third_party WHERE ware_third_party.ID = "+id;
+                    var res = conn.Query<remarkSqlRes>(sql).AsList();
+                    if(res.Count>0){
+                        sql =@"UPDATE ware_third_party SET                               
+                                            ware_third_party.Enable = 0,
+                                            ware_third_party.EndMan = @endman,                                        
+                                            ware_third_party.Mdate = Now()
+                                        WHERE 
+                                            ware_third_party.ID =@id AND ware_third_party.CoID = @CoID;";
+                        var rnt = conn.Execute(sql,new {                                    
+                                        endman = uname,
+                                        id = id,
+                                        CoID = coid
+                                });       
+                        if(rnt > 0){
+                            result.s = 1;
+                            Task.Factory.StartNew(()=>{
+                                NotifyHaddle.MsgPoint(uname + "修改备注","3",res[0].ItCoid,coid,uid,uname);
+                            });    
+                            Task.Factory.StartNew(()=>{
+                                NotifyHaddle.MsgPoint(uname + "修改备注","3",coid,coid,uid,uname);
+                            });  
+                        }else{
+                            result.s = -1;
+                        }
                     }else{
-                        result.s = -1;
+                        result.s = -3008;
                     }
 
                 }
@@ -1387,8 +1438,20 @@ namespace CoreData.CoreComm
             return result;
         }
 
-        public static DataResult createploy(string CoID,WarePloy wareploy ){
+        public static DataResult createploy(string CoID,WarePloy wareploy,string uname){
             var result = new DataResult(1,null);
+            if(!string.IsNullOrEmpty(wareploy.ContainGoods)){
+                wareploy.ContainGoods = ","+ wareploy.ContainGoods+","; 
+            }
+            if(!string.IsNullOrEmpty(wareploy.ContainSkus)){
+                wareploy.ContainSkus = ","+ wareploy.ContainSkus+","; 
+            }
+            if(!string.IsNullOrEmpty(wareploy.RemoveGoods)){
+                wareploy.RemoveGoods = ","+ wareploy.RemoveGoods+","; 
+            }
+            if(!string.IsNullOrEmpty(wareploy.RemoveSkus)){
+                wareploy.RemoveSkus = ","+ wareploy.RemoveSkus+","; 
+            }
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
@@ -1403,16 +1466,115 @@ namespace CoreData.CoreComm
                                         wareploy.Did = @Did,
                                         wareploy.ContainGoods= @ContainGoods,
                                         wareploy.RemoveGoods= @RemoveGoods,
-                                        wareploy.ContainStyle = @ContainStyle,
-                                        wareploy.RemoveStyle = @RemoveStyle,
+                                        wareploy.ContainSkus = @ContainSkus,
+                                        wareploy.RemoveSkus = @RemoveSkus,
                                         wareploy.MinNum = @MinNum,
                                         wareploy.MaxNum= @MaxNum,
                                         wareploy.Payment = @Payment;";                                                                         
                      var rnt = conn.Execute(sql,wareploy);
                      if(rnt>0){
                          result.s = 1;
+                         LogComm.InsertLog("新增分仓策略：","WareHouse","",uname,Convert.ToInt16(CoID));
                      }else{
                          result.s = -1;
+                     }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
+        public static DataResult modifyploy(string CoID,WarePloy wareploy,string uname){
+            var result = new DataResult(1,null);
+            string content = "";
+        
+            if(!string.IsNullOrEmpty(wareploy.ContainGoods)){
+                wareploy.ContainGoods = ","+ wareploy.ContainGoods+","; 
+            }
+            if(!string.IsNullOrEmpty(wareploy.ContainSkus)){
+                wareploy.ContainSkus = ","+ wareploy.ContainSkus+","; 
+            }
+            if(!string.IsNullOrEmpty(wareploy.RemoveGoods)){
+                wareploy.RemoveGoods = ","+ wareploy.RemoveGoods+","; 
+            }
+            if(!string.IsNullOrEmpty(wareploy.RemoveSkus)){
+                wareploy.RemoveSkus = ","+ wareploy.RemoveSkus+","; 
+            }
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    var res = conn.Query<WarePloy>("SELECT * FROM wareploy WHERE ID = "+wareploy.ID).AsList();
+                    if(res.Count>0){
+                        var oldPloy = res[0];
+                        if(oldPloy.ContainGoods != wareploy.ContainGoods){
+                            content += " 包含货号："+wareploy.ContainGoods +" => "+ oldPloy.ContainGoods+",";
+                        }
+                        if(oldPloy.ContainSkus != wareploy.ContainSkus){
+                            content += " 包含商品："+wareploy.ContainSkus +" => "+ oldPloy.ContainSkus+",";
+                        }
+                        if(oldPloy.Did != wareploy.Did){
+                            content += " 限定分销商："+wareploy.Did +" => "+ oldPloy.Did+",";
+                        }
+                        if(oldPloy.Level != wareploy.Level){
+                            content += " 优先级："+wareploy.Level +" => "+ oldPloy.Level+",";
+                        }
+                        if(oldPloy.MaxNum != wareploy.MaxNum){
+                            content += " 商品最大数："+wareploy.MaxNum +" => "+ oldPloy.MaxNum+",";
+                        }
+                        if(oldPloy.MinNum != wareploy.MinNum){
+                            content += " 商品最小数："+wareploy.MinNum +" => "+ oldPloy.MinNum+",";
+                        }
+                        if(oldPloy.Name != wareploy.Name){
+                            content += " 策略名："+wareploy.Name +" => "+ oldPloy.Name+",";
+                        }
+                        if(oldPloy.Payment != wareploy.Payment){
+                            content += " 付款方式："+wareploy.Payment +" => "+ oldPloy.Payment+",";
+                        }
+                        if(oldPloy.Province != wareploy.Province){
+                            content += " 省份："+wareploy.Province +" => "+ oldPloy.Province+",";
+                        }
+                        if(oldPloy.RemoveGoods != wareploy.RemoveGoods){
+                            content += " 排除货号："+wareploy.RemoveGoods +" => "+ oldPloy.RemoveGoods+",";
+                        }
+                        if(oldPloy.RemoveSkus != wareploy.RemoveSkus){
+                            content += " 排除商品："+wareploy.RemoveSkus +" => "+ oldPloy.RemoveSkus+",";
+                        }
+                        if(oldPloy.Shopid != wareploy.Shopid){
+                            content += " 店铺："+wareploy.Shopid +" => "+ oldPloy.Shopid+",";
+                        }
+                        if(oldPloy.Wid != wareploy.Wid){
+                            content += " 仓位："+wareploy.Wid +" => "+ oldPloy.Wid+",";
+                        }                       
+                        
+                        wareploy.CoID = Convert.ToInt16(CoID);
+                        string sql = @"UPDATE wareploy SET
+                                            wareploy.`Name` = @Name,                                        
+                                            wareploy.`Level`= @Level,
+                                            wareploy.Wid= @Wid,
+                                            wareploy.Province = @Province,
+                                            wareploy.Shopid = @Shopid,
+                                            wareploy.Did = @Did,
+                                            wareploy.ContainGoods= @ContainGoods,
+                                            wareploy.RemoveGoods= @RemoveGoods,
+                                            wareploy.ContainSkus = @ContainSkus,
+                                            wareploy.RemoveSkus = @RemoveSkus,
+                                            wareploy.MinNum = @MinNum,
+                                            wareploy.MaxNum= @MaxNum,
+                                            wareploy.Payment = @Payment
+                                        WHERE
+                                            wareploy.CoID = @CoID AND wareploy.ID = @ID ;";                                                                         
+                        var rnt = conn.Execute(sql,wareploy);
+                        if(rnt>0){
+                            result.s = 1;
+                            LogComm.InsertLog("更新ID："+ wareploy.ID+" 分仓策略：","WareHouse",content,uname,Convert.ToInt16(CoID));
+                        }else{
+                            result.s = -1;
+                        }
                      }
                 }
                 catch (Exception e)

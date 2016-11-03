@@ -6,6 +6,8 @@ using System;
 using System.Text;
 using CoreModels.XyCore;
 using MySql.Data.MySqlClient;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CoreData.CoreCore
 {
@@ -244,6 +246,10 @@ namespace CoreData.CoreCore
                 if (count <= 0)
                 {
                     res.s = -3004;
+                }else{
+                    Task.Factory.StartNew(()=>{
+                        wareployContain("",GoodsLst,CoID,1);
+                    });
                 }
             }
             catch (Exception e)
@@ -286,6 +292,10 @@ namespace CoreData.CoreCore
                 if (count <= 0)
                 {
                     res.s = -3004;
+                }else{
+                    Task.Factory.StartNew(()=>{
+                        wareployContain(Sku,null,CoID,1);
+                    });
                 }
             }
             catch (Exception e)
@@ -613,7 +623,7 @@ namespace CoreData.CoreCore
                     StringBuilder querysql=new StringBuilder();
                     StringBuilder totalSql = new StringBuilder();
                     var p = new DynamicParameters();
-                    querysql.Append("SELECT distinct  SkuID,SkuName,Norm FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE AND CoID = "+coid+" AND GoodsCode in ("+goodCodes+") ");
+                    querysql.Append("SELECT distinct  SkuID,ID, SkuName,Norm FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE AND CoID = "+coid+" AND GoodsCode in ("+goodCodes+") ");
                     totalSql.Append("SELECT COUNT(ID) FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE  AND CoID = "+coid+"  AND GoodsCode in ("+goodCodes+") ");
                     if (!string.IsNullOrEmpty(IParam.GoodsCode))
                     {
@@ -670,7 +680,7 @@ namespace CoreData.CoreCore
                     StringBuilder querysql=new StringBuilder();
                     StringBuilder totalSql = new StringBuilder();
                     var p = new DynamicParameters();
-                    querysql.Append("SELECT distinct  SkuID,SkuName,Norm,GoodsCode FROM coresku WHERE Type=0 AND IsParent = True  AND IsDelete = FALSE AND CoID = "+coid+" ");
+                    querysql.Append("SELECT distinct  SkuID,ID, SkuName,Norm,GoodsCode FROM coresku WHERE Type=0 AND IsParent = True  AND IsDelete = FALSE AND CoID = "+coid+" ");
                     totalSql.Append("SELECT COUNT(ID) FROM coresku WHERE Type=0 AND IsParent = TRUE  AND IsDelete = FALSE AND CoID = "+coid+" ");
                     if (!string.IsNullOrEmpty(IParam.GoodsCode))
                     {
@@ -737,6 +747,69 @@ namespace CoreData.CoreCore
             }
             return result;
         }
+
+        public static void wareployContain(string skuid , List<string> goodscode,int coid,int type){    //type: 1 sku  2 good     
+            string sql ="";
+            var  ids = new List<string>();
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try
+                {
+                    if(type == 1){
+                        sql = "SELECT id FROM coresku WHERE SkuID='"+skuid+"' AND CoID = '"+coid+"';";
+                    }else{
+                        
+                        sql = "SELECT id FROM coresku WHERE GoodsCode in ("+string.Join(",",goodscode.ToArray())+") AND CoID = '"+coid+"';";
+                    }
+                                                                   
+                }catch{
+                    conn.Dispose();
+                }
+            }
+            if(ids.Count>0){
+                int  i= 0;
+                var tasks = new Task[10];
+                foreach(var id in ids){
+                    tasks[i]= Task.Factory.StartNew(()=>{
+                        removeContain(id);
+                    });
+                    i++;
+                    if(i == 10){
+                        i=0;
+                        Task.WaitAll(tasks);
+                    }
+                }
+            }
+        }
+
+        public static void removeContain(string id){
+            string sql = "";
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    
+                    sql = "SELECT ID FROM wareploy WHERE ContainGoods LIKE ',"+id+",' OR ContainSkus LIKE ',"+id+",' OR RemoveGoods LIKE ',"+id+",' OR RemoveSkus LIKE ',"+id+",' ;";                                
+                    var ids = conn.Query<int>(sql).AsList();
+                    if(ids.Count>0){
+                        string a = string.Join(",", ids.ToArray());
+                        sql=@"UPDATE wareploy SET	
+                                    ContainGoods = REPLACE(ContainGoods, ',"+id+@",', ','),
+                                    ContainSkus  = REPLACE(ContainSkus, ',"+id+@",', ','),
+                                    RemoveGoods  = REPLACE(RemoveGoods, ',"+id+@",', ','),
+                                    RemoveSkus = REPLACE(RemoveSkus, ',"+id+@",', ',')
+                                WHERE ID in("+a+")";                         
+                    }
+                                        
+                                                                    
+                }catch{
+                    conn.Dispose();
+                }
+            }
+        }
+
+        
+
+
+
 
 
     }

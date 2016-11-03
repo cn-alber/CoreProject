@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace CoreModels.XyCore{
     public  class UserWebMsg
@@ -61,7 +62,7 @@ namespace CoreModels.XyCore{
 			get{return _creater;}
 		}
 		/// <summary>
-		/// 全局或分组或个人
+		/// 0:全局  >0 :公司ID 
 		/// </summary>
 		public int? Appoint
 		{
@@ -84,7 +85,7 @@ namespace CoreModels.XyCore{
     {
         public string LevelList { get; set; }
         public string IsRead { get; set; }
-
+		public List<int> levels{get;set;}
         public int PageIndex{get;set;}
         public int PageSize{get;set;}
         public int PageCount {get;set;}//总页数
@@ -107,6 +108,14 @@ namespace CoreModels.XyCore{
         public string  ReadDate{get;set;}       
 
     }
+
+	public class MsgModel{
+		public string content{get;set;}
+		public int level{get;set;}
+		public List<int> roletype{get;set;}
+		public int appoint{get;set;}
+
+	}
 
 
 

@@ -12,8 +12,8 @@ namespace CoreModels.XyComm
 		private int? _did;
 		private string _containgoods;
 		private string _removegoods;
-		private string _containstyle;
-		private string _removestyle;
+		private string _containskus;
+		private string _removeskus;
 		private int? _minnum;
 		private int? _maxnum;
 		private int? _payment;
@@ -93,18 +93,18 @@ namespace CoreModels.XyComm
 		/// <summary>
 		/// 包含商品的款式编码
 		/// </summary>
-		public string ContainStyle
+		public string ContainSkus
 		{
-			set{ _containstyle=value;}
-			get{return _containstyle;}
+			set{ _containskus=value;}
+			get{return _containskus;}
 		}
 		/// <summary>
 		/// 排除商品的款式编码
 		/// </summary>
-		public string RemoveStyle
+		public string RemoveSkus
 		{
-			set{ _removestyle=value;}
-			get{return _removestyle;}
+			set{ _removeskus=value;}
+			get{return _removeskus;}
 		}
 		/// <summary>
 		/// 限定商品最小数量

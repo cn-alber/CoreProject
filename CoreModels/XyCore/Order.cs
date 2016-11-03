@@ -474,4 +474,9 @@ namespace CoreModels.XyCore
         public string Confirmer{get;set;}
         public DateTime ConfirmDate{get;set;}
     }
+    public class AbnormalReason
+    {
+        public int ID{get;set;}
+        public string Name{get;set;}
+    }
 }
