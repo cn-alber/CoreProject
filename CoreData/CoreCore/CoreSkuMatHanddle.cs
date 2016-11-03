@@ -239,13 +239,13 @@ namespace CoreData.CoreCore
             sku.ValUnit = ckm.ValUnit;
             sku.CnvRate = ckm.CnvRate;
             sku.PurPrice = ckm.PurPrice;
-            sku.KID = ckm.KID;
-            sku.KName = ckm.KName;
+            sku.KindID = ckm.KindID;
+            sku.KindName = ckm.KindName;
             sku.SCoList = ckm.SCoList;
             sku.ParentID = ckm.ParentID;
             sku.Type = 2;
             sku.Creator = ckm.Creator;
-            sku.CreateDate = DateTime.Now;
+            sku.CreateDate = DateTime.Now.ToString();
             sku.IsParent = true;
             return sku;
         }
@@ -264,18 +264,18 @@ namespace CoreData.CoreCore
                 sku.ValUnit = ckm.ValUnit;
                 sku.CnvRate = ckm.CnvRate;
                 sku.PurPrice = ckm.PurPrice;
-                sku.KID = ckm.KID;
-                sku.KName = ckm.KName;
+                sku.KindID = ckm.KindID;
+                sku.KindName = ckm.KindName;
                 sku.SCoList = ckm.SCoList;
                 sku.SkuID = cki.SkuID;
-                sku.ColorID = cki.ColorID;
-                sku.ColorName = cki.ColorName;
+                // sku.ColorID = cki.ColorID;
+                // sku.ColorName = cki.ColorName;
                 sku.ParentID = ckm.ParentID;
-                sku.SizeID = cki.SizeID;
-                sku.SizeName = cki.SizeName;
+                // sku.SizeID = cki.SizeID;
+                // sku.SizeName = cki.SizeName;
                 sku.Type = 2;
                 sku.Creator = ckm.Creator;
-                sku.CreateDate = DateTime.Now;
+                sku.CreateDate = DateTime.Now.ToString();
                 sku.IsParent = false;
                 skuLst.Add(sku);
             }

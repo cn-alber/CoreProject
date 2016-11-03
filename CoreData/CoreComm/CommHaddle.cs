@@ -161,9 +161,9 @@ namespace CoreData.CoreComm
             { comp = comp + "0"; }
             if (a > 3)
             { comp = comp.Substring(0, 4); }
-            comp = comp + DateTime.Now.ToString("yyyy-MM-dd").Substring(0, 4);
-            comp = comp + DateTime.Now.ToString("yyyy-MM-dd").Substring(5, 2);
-            comp = comp + DateTime.Now.ToString("yyyy-MM-dd").Substring(8, 2);
+            comp = comp + DateTime.Now.ToString("yy-MM-dd").Substring(0, 2);
+            comp = comp + DateTime.Now.ToString("yy-MM-dd").Substring(3, 2);
+            comp = comp + DateTime.Now.ToString("yy-MM-dd").Substring(6, 2);
             Random Rd = new Random((int)DateTime.Now.Ticks);
             string rds = Rd.Next().ToString();
             comp = comp + rds.Remove(0, rds.Length - 5);
