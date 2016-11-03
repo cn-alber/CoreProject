@@ -70,8 +70,10 @@ namespace CoreWebApi
         {   
             string code = co["code"]!=null?co["code"].ToString():"0";
             string otherRemark = co["otherRemark"]!=null?co["otherRemark"].ToString():"";            
-            string CoID = GetCoid();        
-            var data = WarehouseHaddle.askFor(CoID,code,otherRemark);
+            string CoID = GetCoid(); 
+            string uid = GetUid();
+            string uname = GetUname();       
+            var data = WarehouseHaddle.askFor(CoID,code,otherRemark,uid,uname);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -130,7 +132,8 @@ namespace CoreWebApi
             }else{
                 string CoID = GetCoid();
                 string uname = GetUname();
-                data = WarehouseHaddle.editRemark(CoID,uname,m.id,m.remark);
+                string uid = GetUid();
+                data = WarehouseHaddle.editRemark(CoID,uname,m.id,m.remark,uid);
             }
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -145,7 +148,8 @@ namespace CoreWebApi
             }else{
                 string CoID = GetCoid();
                 string uname = GetUname();
-                data = WarehouseHaddle.passThird(m.id, CoID, uname);
+                string uid = GetUid();
+                data = WarehouseHaddle.passThird(m.id, CoID, uname,uid);
             }        
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -160,7 +164,8 @@ namespace CoreWebApi
             }else{
                 string CoID = GetCoid();
                 string uname = GetUname();
-                data = WarehouseHaddle.passThird(m.id, CoID, uname);
+                string uid = GetUid();
+                data = WarehouseHaddle.wareCancle(m.id, CoID, uname,uid);
             }        
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -175,7 +180,8 @@ namespace CoreWebApi
             }else{
                 string CoID = GetCoid();
                 string uname = GetUname();
-                data = WarehouseHaddle.wareGiveUp(m.id, CoID, uname);
+                string uid = GetUid();
+                data = WarehouseHaddle.wareGiveUp(m.id, CoID, uname,uid);
             }        
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }

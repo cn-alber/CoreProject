@@ -45,25 +45,16 @@ namespace CoreWebApi
         [HttpPostAttribute("/core/profile/msg")]
         public ResponseResult msg([FromBodyAttribute]JObject lo)
         {
-            var msgparam = new MsgParam();
-            msgparam.IsRead = lo["readed"].ToString();
-            if(Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(lo["levels"].ToString()).Count == 0){
-                msgparam.LevelList = "5";
-            }else{
-                foreach (string  i in lo["levels"])
-                {
-                    msgparam.LevelList += i+",";
-                }
-                msgparam.LevelList = msgparam.LevelList.Substring(0,msgparam.LevelList.Length - 1);
-            }             
-
-            msgparam.PageIndex = lo["page"] !=null? int.Parse(lo["page"].ToString()):1;
-            msgparam.PageSize = lo["pageSize"] !=null? int.Parse(lo["pageSize"].ToString()):20;           
-            msgparam.SortDirection=" ASC ";   
-
+            var msgparam  =Newtonsoft.Json.JsonConvert.DeserializeObject<MsgParam>(lo.ToString());
+            msgparam.PageIndex = msgparam.PageIndex < 1 ? 1 : Math.Max(msgparam.PageIndex,1);
+            msgparam.PageSize = msgparam.PageSize < 1 ? 20 : Math.Min(msgparam.PageSize,100);
+            msgparam.SortDirection=" ASC "; 
+            msgparam.LevelList = msgparam.levels.Count >0 ? string.Join(",",msgparam.levels.ToArray()):"5"; 
+            
             var uid = GetUid();
+            var coid = GetCoid();
             var roleid = GetRoleid();
-            var m = NotifyHaddle.GetMsgList(uid,roleid,msgparam);
+            var m = NotifyHaddle.GetMsgList(uid,roleid,coid,msgparam);
             return CoreResult.NewResponse(m.s, m.d, "Basic");
         }
 
@@ -76,7 +67,8 @@ namespace CoreWebApi
             
             var uid = GetUid();
             var roleid = GetRoleid();
-            var m = NotifyHaddle.GetMsgCount(uid,roleid);
+            var coid = GetCoid();
+            var m = NotifyHaddle.GetMsgCount(uid,coid,roleid);
             return CoreResult.NewResponse(m.s, m.d, "Basic");
         }
 
@@ -86,20 +78,12 @@ namespace CoreWebApi
         [HttpPostAttribute("/core/profile/msgadd")]
         public ResponseResult msgadd([FromBodyAttribute]JObject lo)
         {
-            var content =  lo["content"].ToString();
-            var level =  lo["level"].ToString();
-            var roletype =  "";
-            if(!string.IsNullOrEmpty(lo["roletype"].ToString())){               
-                foreach (string  i in lo["roletype"])
-                {
-                    roletype += i+",";
-                }
-                roletype = roletype.Substring(0,roletype.Length - 1);
-            }        
+            var msg =Newtonsoft.Json.JsonConvert.DeserializeObject<MsgModel>(lo.ToString());
+      
             var cid = GetCoid();
             var uid = GetUid();
             var uname = GetUname();
-            var m =  NotifyHaddle.MsgAdd(content,level,roletype,cid,uid,uname);
+            var m =  NotifyHaddle.MsgAdd(msg.content,msg.level,string.Join(",",msg.roletype.ToArray()),msg.appoint,cid,uid,uname); 
             return CoreResult.NewResponse(m.s, m.d, "Basic");    
         }
 
