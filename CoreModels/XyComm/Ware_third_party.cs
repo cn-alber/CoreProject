@@ -52,7 +52,11 @@ namespace CoreModels.XyComm
         public string Coid{get;set;}
         public string ItCoid{get;set;}
         public string ApplyCoid{get;set;}
-        
+
+        public string MyRemark{get;set;}
+        public string ItRemark{get;set;}
+        public string WareName{get;set;}
+        public string ItName{get;set;}
     }
 
     public class editRemarkRequest{

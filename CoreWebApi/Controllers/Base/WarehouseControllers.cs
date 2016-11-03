@@ -245,6 +245,24 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
+        [HttpGetAttribute("/Core/Warehouse/wareSettingGet")]
+        public ResponseResult wareSettingGet()
+        {   
+            var param = new CoreSkuParam();
+            string CoID = GetCoid();
+            var data = WarehouseHaddle.wareSettingGet(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Warehouse/modifyWareSetting")]
+        public ResponseResult modifyWareSetting([FromBodyAttribute]JObject co)
+        {   
+            var w = Newtonsoft.Json.JsonConvert.DeserializeObject<ware_setting>(co.ToString());
+            string CoID = GetCoid();
+            var data = WarehouseHaddle.modifyWareSetting(w,CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
 
 
 

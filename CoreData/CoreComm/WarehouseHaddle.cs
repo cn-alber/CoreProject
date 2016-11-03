@@ -1123,11 +1123,13 @@ namespace CoreData.CoreComm
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    string sql = "SELECT ware_third_party.ApplyCoid ,ware_third_party.ItCoid FROM ware_third_party WHERE ware_third_party.ID = "+id;
+                    string sql = "SELECT ware_third_party.ApplyCoid ,ware_third_party.ItCoid,ware_third_party.MyRemark ,ware_third_party.ItRemark FROM ware_third_party WHERE ware_third_party.ID = "+id;
                     var res = conn.Query<remarkSqlRes>(sql).AsList();
                     if(res.Count>0){
+                        string oldRemark = "";
                         var a = res[0];
-                        if(CoID == a.ApplyCoid){
+                        if(CoID != a.ApplyCoid){
+                            oldRemark = a.MyRemark;
                             sql = @"UPDATE ware_third_party SET
                                         ware_third_party.myremark = @remark,
                                         ware_third_party.EndMan = @endman,
@@ -1135,6 +1137,7 @@ namespace CoreData.CoreComm
                                     WHERE 
                                         ware_third_party.ID = @id;";                                                      
                         }else{
+                            oldRemark = a.ItRemark;
                             sql = @"UPDATE ware_third_party SET
                                         ware_third_party.itremark = @remark,
                                         ware_third_party.EndMan = @endman,
@@ -1150,10 +1153,10 @@ namespace CoreData.CoreComm
                         if(rnt>0){
                             result.s = 1;                            
                             Task.Factory.StartNew(()=>{
-                                NotifyHaddle.MsgPoint(uname + "修改备注","3",res[0].ItCoid,CoID,uid,uname);
+                                NotifyHaddle.MsgPoint(uname + "修改备注 "+oldRemark+" => "+remark,"3",res[0].ItCoid,CoID,uid,uname);
                             });    
                             Task.Factory.StartNew(()=>{
-                                NotifyHaddle.MsgPoint(uname + "修改备注","3",CoID,CoID,uid,uname);
+                                NotifyHaddle.MsgPoint(uname + "修改备注 "+oldRemark+" => "+remark,"3",CoID,CoID,uid,uname);
                             });  
                                                                                  
                         }else{
@@ -1179,7 +1182,7 @@ namespace CoreData.CoreComm
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    string sql = "SELECT ware_third_party.ApplyCoid ,ware_third_party.ItCoid FROM ware_third_party WHERE ware_third_party.ID = "+id;
+                    string sql = "SELECT ware_third_party.ApplyCoid ,ware_third_party.ItCoid ,ware_third_party.ItName,ware_third_party.WareName FROM ware_third_party WHERE ware_third_party.ID = "+id;
                     var res = conn.Query<remarkSqlRes>(sql).AsList();
                     if(res.Count>0){
                         sql =@"UPDATE ware_third_party SET                               
@@ -1197,10 +1200,10 @@ namespace CoreData.CoreComm
                         if(rnt > 0){
                             result.s = 1;
                             Task.Factory.StartNew(()=>{
-                                NotifyHaddle.MsgPoint(uname + "修改备注","3",res[0].ItCoid,coid,uid,uname);
+                                NotifyHaddle.MsgPoint(uname + "审核通过公司 "+res[0].ItName +" 成为 "+res[0].WareName+" 第三方仓储","3",res[0].ItCoid,coid,uid,uname);
                             });    
                             Task.Factory.StartNew(()=>{
-                                NotifyHaddle.MsgPoint(uname + "修改备注","3",coid,coid,uid,uname);
+                                NotifyHaddle.MsgPoint(uname + "审核通过公司 "+res[0].ItName +" 成为 "+res[0].WareName+" 第三方仓储","3",coid,coid,uid,uname);
                             });  
                         }else{
                             result.s = -1;
@@ -1229,7 +1232,7 @@ namespace CoreData.CoreComm
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    string sql = "SELECT ware_third_party.ApplyCoid ,ware_third_party.ItCoid FROM ware_third_party WHERE ware_third_party.ID = "+id;
+                    string sql = "SELECT ware_third_party.ApplyCoid ,ware_third_party.ItCoid ,ware_third_party.ItName,ware_third_party.WareName FROM ware_third_party WHERE ware_third_party.ID = "+id;
                     var res = conn.Query<remarkSqlRes>(sql).AsList();
                     if(res.Count>0){
                         sql =@"UPDATE ware_third_party SET                               
@@ -1586,6 +1589,61 @@ namespace CoreData.CoreComm
             }
             return result;
         }
+
+        ///<summary>
+        /// 获取第三方仓储服务设置
+        ///</summary>
+         public static DataResult wareSettingGet(string coid){
+            var result = new DataResult(1,null);
+            var setting = CacheBase.Get<ware_setting>("waresettingh"+coid);
+            if(setting == null){
+                using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                    try
+                    {
+                        var res = conn.Query<ware_setting>("SELECT * FROM ware_setting WHERE CoID = "+coid).AsList();
+                        if(res.Count >0){
+                            setting =res[0]; 
+                            CacheBase.Set<ware_setting>("waresettingh"+coid,setting);
+                        }else{
+                            result.s= -3010;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        result.s = -1;
+                        result.d= e.Message; 
+                        conn.Dispose();
+                    }
+                }
+            }
+            result.d = setting;
+            return result;
+        }
+
+        public static DataResult modifyWareSetting(ware_setting setting,string coid){
+            var result = new DataResult(1,null);
+            var oldset = wareSettingGet(coid).d as ware_setting;
+            string content = "";
+
+
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    
+
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+
+        }
+
+
 
 
 

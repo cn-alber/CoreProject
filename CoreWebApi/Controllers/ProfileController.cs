@@ -48,7 +48,7 @@ namespace CoreWebApi
             var msgparam  =Newtonsoft.Json.JsonConvert.DeserializeObject<MsgParam>(lo.ToString());
             msgparam.PageIndex = msgparam.PageIndex < 1 ? 1 : Math.Max(msgparam.PageIndex,1);
             msgparam.PageSize = msgparam.PageSize < 1 ? 20 : Math.Min(msgparam.PageSize,100);
-            msgparam.SortDirection=" ASC "; 
+            msgparam.SortDirection=" DESC "; 
             msgparam.LevelList = msgparam.levels.Count >0 ? string.Join(",",msgparam.levels.ToArray()):"5"; 
             
             var uid = GetUid();

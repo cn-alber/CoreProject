@@ -23,7 +23,7 @@ namespace CoreWebApi
          [HttpPostAttribute("/core/admin/createmenus")]
          public ResponseResult createmenus([FromBodyAttribute]JObject lo)
          {
-
+             if(lo["pid"] == null){lo["pid"]  = "0";}
              var  menus = Newtonsoft.Json.JsonConvert.DeserializeObject<MenuCreateRequest>(lo.ToString());
              var icon = new string[]{menus.iconName,menus.iconPrefix};
              var uname = GetUname();
@@ -35,6 +35,7 @@ namespace CoreWebApi
          [HttpPostAttribute("/core/admin/modifymenus")]
          public ResponseResult modifymenus([FromBodyAttribute]JObject lo)
          {
+             if(lo["pid"] == null){lo["pid"]  = "0";}
              var menus = Newtonsoft.Json.JsonConvert.DeserializeObject<MenuModifyRequest>(lo.ToString());
              var icon = new string[]{menus.iconName,menus.iconPrefix};
              var uname = GetUname();

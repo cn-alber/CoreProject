@@ -123,7 +123,7 @@ namespace CoreData.CoreUser
             return parent ;
         }
 
-        public static DataResult CreatMenu(string name,string router,string[] iconArr,int order,string remark,int parentid,int accessid,string uname,string coid){            
+        public static DataResult CreatMenu(string name,string router,string[] iconArr,string order,string remark,string parentid,string accessid,string uname,string coid){            
             var result = new DataResult(1,null);
             if(isMenuExist(router)){
                 
@@ -134,11 +134,11 @@ namespace CoreData.CoreUser
                     {       
                         Menus menus = new Menus();
                         menus.Name = name;
-                        menus.SortIndex = order;
+                        menus.SortIndex = Convert.ToInt16(order);
                         menus.NewUrl = router;
                         menus.Remark = remark;
-                        menus.ParentID = parentid;
-                        menus.ViewPowerID = accessid;
+                        menus.ParentID = Convert.ToInt16(parentid);
+                        menus.ViewPowerID = Convert.ToInt16(accessid);
                         menus.NewIcon = iconArr[0];
                         if(!string.IsNullOrEmpty(iconArr[1])){
                             menus.NewIconPre = iconArr[1];
@@ -177,7 +177,7 @@ namespace CoreData.CoreUser
         }
 
   
-        public static DataResult modifyMenu(string id,string name,string router,string[] iconArr,int order,string remark,int parentid,int accessid,string uname,string coid){
+        public static DataResult modifyMenu(string id,string name,string router,string[] iconArr,string order,string remark,string parentid,string accessid,string uname,string coid){
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
                 try
