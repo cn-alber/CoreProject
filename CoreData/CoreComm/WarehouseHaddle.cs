@@ -1189,7 +1189,7 @@ namespace CoreData.CoreComm
                                         ware_third_party.Enable = 2,
                                         ware_third_party.EndMan = @endman,
                                         ware_third_party.Pdate = Now(),
-                                        ware_third_party.Mdate = Now(),
+                                        ware_third_party.Mdate = Now()
                                     WHERE 
                                         ware_third_party.ID =@id AND ware_third_party.CoID = @CoID;";
                         var rnt = conn.Execute(sql,new {
@@ -1239,7 +1239,7 @@ namespace CoreData.CoreComm
                                             ware_third_party.Enable = 3,
                                             ware_third_party.EndMan = @endman,
                                             ware_third_party.Pdate = Now(),
-                                            ware_third_party.Mdate = Now(),
+                                            ware_third_party.Mdate = Now()
                                         WHERE 
                                             ware_third_party.ID =@id AND (ware_third_party.CoID = @CoID OR ware_third_party.ItCoid = @CoID );";
                         var rnt = conn.Execute(sql,new {                                    
