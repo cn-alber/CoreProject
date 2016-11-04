@@ -64,4 +64,12 @@ namespace CoreModels.XyComm
         public int DataCount { get; set; } //总行数
         public List<Brand> BrandLst { get; set; }//返回查询结果
     }
+
+    public class BrandDDLB
+    {
+        public int ID { get; set; }
+        public string Name { get; set; }
+        public string Intro { get; set; }
+    }
+
 }

@@ -26,7 +26,6 @@ namespace CoreModels.XyCore
         public bool Enable { get; set; }
         public string Creator { get; set; }
         public string CreateDate { get; set; }
-        public bool IsDelete { get; set; }
         public string Modifier { get; set; }
         public string ModifyDate { get; set; }
     }
@@ -41,9 +40,9 @@ namespace CoreModels.XyCore
         public string val_name { get; set; }
         public int CoID { get; set; }
         public bool Enable { get; set; }
+        public string ParentID { get; set; }
         public string Creator { get; set; }
         public string CreateDate { get; set; }
-        public bool IsDelete { get; set; }
         public string Modifier { get; set; }
         public string ModifyDate { get; set; }
     }
@@ -60,10 +59,29 @@ namespace CoreModels.XyCore
         public bool IsOther { get; set; }
         public int CoID { get; set; }
         public bool Enable { get; set; }
+        public string ParentID { get; set; }
         public string Creator { get; set; }
         public string CreateDate { get; set; }
-        public bool IsDelete { get; set; }
         public string Modifier { get; set; }
         public string ModifyDate { get; set; }
+    }
+
+    public class Item_Props
+    {       
+        public int ID { get; set; }        
+        public string pid { get; set; }
+        public string val_id { get; set; }
+        public string val_name { get; set; }
+        public bool Enable { get; set; }
+    }
+    public class Sku_Props
+    {
+        public int ID { get; set; }    
+        public string pid { get; set; }
+        public string val_id { get; set; }
+        public string val_name { get; set; }
+        public string mapping { get; set; }
+        public bool IsOther { get; set; }
+        public bool Enable { get; set; }
     }
 }

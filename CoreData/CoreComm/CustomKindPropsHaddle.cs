@@ -445,5 +445,25 @@ namespace CoreData.CoreComm
 
         #endregion
 
+        #region 商品資料新增 - 根據類目獲取商品類目屬性
+        public static DataResult GetItemPropsByKindID(string ID, string CoID)
+        {
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+
+                }
+                catch (Exception e)
+                {
+                    res.s = -1;
+                    res.d = e.Message;
+                }
+            }
+            return res;
+        }
+        #endregion
+
     }
 }

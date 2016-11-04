@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CoreModels.XyComm;
 namespace CoreModels.XyCore
 {
 
@@ -9,6 +10,7 @@ namespace CoreModels.XyCore
         public int ID { get; set; }
         public string SkuID { get; set; }
         public string SkuName { get; set; }
+        public string SkuSimple { get; set; }
         public string Brand { get; set; }
         public int KindID { get; set; }
         public string KindName { get; set; }
@@ -35,6 +37,9 @@ namespace CoreModels.XyCore
         public string Img { get; set; }
         public string BigImg { get; set; }
         public string SCoList { get; set; }
+        public string ScoID { get; set; }
+        public string ScoGoodsCode { get; set; }
+        public string ScoSku { get; set; }
         public int SafeQty { get; set; }
         public string Remark { get; set; }
         public bool IsParent { get; set; }
@@ -53,11 +58,18 @@ namespace CoreModels.XyCore
     {
         public string GoodsCode { get; set; }
         public string GoodsName { get; set; }
+        public string KindID { get; set; }
         public string KindName { get; set; }
         public bool Enable { get; set; }
-        public string Price { get; set; }
+        public string SalePrice { get; set; }
         public string ScoGoodsCode { get; set; }
         public int Type { get; set; }
+    }
+
+    public class CoreKind
+    {
+        public string KindID { get; set; }
+        public string KindName { get; set; }
     }
     #endregion
 
@@ -69,15 +81,24 @@ namespace CoreModels.XyCore
         public string GoodsName { get; set; }
         public string SkuID { get; set; }
         public string SkuName { get; set; }
+        public string SkuSimple { get; set; }
         public string Norm { get; set; }
         public string GBCode { get; set; }
         public string Brand { get; set; }
-        public decimal CostPrice { get; set; }
-        public decimal SalePrice { get; set; }
-        public bool Enable { get; set; }
-        public string Creator { get; set; }
+        public string PurPrice { get; set; }
+        public string MarketPrice { get; set; }
+        public string CostPrice { get; set; }
+        public string SalePrice { get; set; }
+        public string Weight { get; set; }
+        public string Enable { get; set; }
+        public string ScoGoodsCode { get; set; }
+        public string ScoSku { get; set; }
+        public string SCoID { get; set; }
         public string Img { get; set; }
+        public string Creator { get; set; }
         public string CreateDate { get; set; }
+        public string Modifier { get; set; }
+        public string ModifyDate { get; set; }
     }
     #endregion
 
@@ -87,7 +108,7 @@ namespace CoreModels.XyCore
         private int _CoID;//公司编号
         private string _Filter;//过滤条件
         private int _FilterType = 1;//过滤类型
-        private string _Enable = "all";//是否启用
+        private string _Enable;//状态(0.禁用；1.启用；2.备用)
         private int _PageSize = 20;//每页笔数
         private int _PageIndex = 1;//页码
         private string _SortField;//排序字段
@@ -95,9 +116,17 @@ namespace CoreModels.XyCore
         private string _GoodsCode;
         private string _GoodsName;
         private string _SkuID;
-        private string _ScoGoodsCode;//供应商货号
         private string _KindID;//商品类目
         private int _Type = 0;
+        public string SkuName { get; set; }//款式编码
+        public string SkuSimple { get; set; }//商品简称
+        public string Norm { get; set; }//颜色规格
+        public string Brand { get; set; }//品牌
+        public string ScoGoodsCode { get; set; }//供应商货号
+        public string ScoSku { get; set; }//供应商款式编号
+        public string SCoID { get; set; }//供应商名
+        public string PriceS { get; set; }//成本价起
+        public string PriceT { get; set; }//成本价讫
 
         public int CoID
         {
@@ -119,7 +148,7 @@ namespace CoreModels.XyCore
         {
             get { return _Enable; }
             set { this._Enable = value; }
-        }//是否启用
+        }//状态(0.禁用；1.启用；2.备用)
         public int PageSize
         {
             get { return _PageSize; }
@@ -157,16 +186,12 @@ namespace CoreModels.XyCore
             get { return _KindID; }
             set { this._KindID = value; }
         }//指定商品类目
-        public string ScoGoodsCode
-        {
-            get { return _ScoGoodsCode; }
-            set { this._ScoGoodsCode = value; }
-        }//指定供应商货号
         public string SkuID
         {
             get { return _SkuID; }
             set { this._SkuID = value; }
         }//指定Sku编码查询
+
         public int Type
         {
             get { return _Type; }
@@ -180,13 +205,22 @@ namespace CoreModels.XyCore
         public int DataCount { get; set; } //总行数
         public int PageCount { get; set; }//总页数
         public List<GoodsQuery> GoodsLst { get; set; }//返回资料     
-        public List<SkuQuery> SkuLst { get; set; }//返回资料       
+        public List<SkuQuery> SkuLst { get; set; }//返回资料   
+        public List<ScoCompDDLB> ScoLst { get; set; }//供应商资料
+        public List<BrandDDLB> BrandLst { get; set; }//品牌资料
     }
     #endregion
 
     #region 商品编辑 - 主信息
     public partial class CoreSkuAuto
     {
+        public Coresku_main main { get; set; }
+        public List<coresku_item_props> items_propLst { get; set; }
+        public List<coresku_sku_props> sku_propLst { get; set; }
+        public List<Coresku> ItemLst { get; set; }
+        
+
+
         public string SkuName { get; set; }
         public string GoodsCode { get; set; }
         public string GoodsName { get; set; }

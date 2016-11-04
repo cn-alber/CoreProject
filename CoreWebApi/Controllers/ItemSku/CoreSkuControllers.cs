@@ -6,7 +6,7 @@ using CoreModels.XyCore;
 using System.Collections.Generic;
 using CoreData.CoreComm;
 using CoreData;
-// using CoreModels;
+using CoreModels;
 namespace CoreWebApi.XyCore
 
 {
@@ -29,9 +29,9 @@ namespace CoreWebApi.XyCore
             {
                 cp.KindID = KindID;
             }
-            if (!string.IsNullOrEmpty(Enable) && (Enable.ToUpper() == "TRUE" || Enable.ToUpper() == "FALSE"))
+            if (!string.IsNullOrEmpty(Enable) && int.TryParse(Enable, out x))
             {
-                cp.Enable = Enable.ToUpper();
+                cp.Enable = Enable;
             }
             if (int.TryParse(PageIndex, out x))
             {
@@ -64,13 +64,105 @@ namespace CoreWebApi.XyCore
         }
         #endregion
         #region 商品管理 - 获取商品明细列表
-        [HttpPostAttribute("Core/XyCore/CoreSku/SkuQueryLst")]
-        public ResponseResult SkuQueryLst([FromBodyAttribute]JObject obj)
+        [HttpGetAttribute("Core/XyCore/CoreSku/SkuQueryLst")]
+        public ResponseResult SkuQueryLst(string Filter, string SkuName, string SkuSimple, string Norm, string Brand, string ScoGoodsCode, string ScoSku, string ScoID, string PriceS, string PriceT, string Enable, string PageIndex, string PageSize, string SortField, string SortDirection)
         {
-            var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<CoreSkuParam>(obj["CoreSkuParam"].ToString());
+            // var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<CoreSkuParam>(obj["CoreSkuParam"].ToString());
+            var res = new DataResult(1, null);
+            var cp = new CoreSkuParam();
+            int x;
             cp.CoID = int.Parse(GetCoid());
-            // var Result = CoreResult.NewResponse(-3001,null,"General");
-            var res = CoreSkuHaddle.GetSkuLst(cp);
+            cp.Filter = Filter;
+            cp.SkuName = SkuName;
+            cp.SkuSimple = SkuSimple;
+            cp.Norm = Norm;
+            cp.ScoGoodsCode = ScoGoodsCode;
+            cp.ScoSku = ScoSku;
+            if (!string.IsNullOrEmpty(Brand))
+            {
+                if (int.TryParse(Brand, out x))
+                {
+                    cp.Brand = Brand;
+                }
+                else
+                {
+                    res.s = -1;
+                    res.d = "品牌参数异常";
+                }
+            }
+            if (!string.IsNullOrEmpty(ScoID))
+            {
+                if (int.TryParse(ScoID, out x))
+                {
+                    cp.SCoID = ScoID;
+                }
+                else
+                {
+                    res.s = -1;
+                    res.d = "供应商参数异常";
+                }
+            }
+            if (!string.IsNullOrEmpty(PriceS))
+            {
+                if (int.TryParse(PriceS, out x))
+                {
+                    cp.PriceS = PriceS;
+                }
+                else
+                {
+                    res.s = -1;
+                    res.d = "成本价参数异常";
+                }
+            }
+            if (!string.IsNullOrEmpty(PriceT))
+            {
+                if (int.TryParse(PriceT, out x))
+                {
+                    cp.PriceT = PriceT;
+                }
+                else
+                {
+                    res.s = -1;
+                    res.d = "成本价参数异常";
+                }
+            }
+            if (!string.IsNullOrEmpty(Enable))
+            {
+                if (int.TryParse(Enable, out x))
+                {
+                    cp.Enable = Enable;
+                }
+                // else
+                // {
+                //     res.s = -1;
+                //     res.d = "是否启用参数异常";
+                // }
+            }
+            if (int.TryParse(PageIndex, out x))
+            {
+                cp.PageIndex = int.Parse(PageIndex);
+            }
+            if (int.TryParse(PageSize, out x))
+            {
+                cp.PageSize = int.Parse(PageSize);
+            }
+            //排序参数赋值
+            if (!string.IsNullOrEmpty(SortField))
+            {
+                res = CommHaddle.SysColumnExists(DbBase.CoreConnectString, "coresku", SortField);
+                if (res.s == 1)
+                {
+                    cp.SortField = SortField;
+                    if (!string.IsNullOrEmpty(SortDirection) && (SortDirection.ToUpper() == "DESC" || SortDirection.ToUpper() == "ASC"))
+                    {
+                        cp.SortDirection = SortDirection.ToUpper();
+                    }
+                }
+            }
+            if(res.s==1)
+            {
+                res = CoreSkuHaddle.GetSkuLst(cp);
+            }
             var Result = CoreResult.NewResponse(res.s, res.d, "General");
             return Result;
         }
@@ -81,7 +173,7 @@ namespace CoreWebApi.XyCore
         public ResponseResult GoodsQuery([FromBodyAttribute]JObject obj)
         {
             string GoodsCode = obj["GoodsCode"].ToString();
-            int CoID = int.Parse(GetCoid());
+            string CoID = GetCoid();
             var res = CoreSkuHaddle.GetCoreSkuEdit(GoodsCode, CoID);
             var Result = CoreResult.NewResponse(res.s, res.d, "General");
             return Result;
@@ -138,9 +230,9 @@ namespace CoreWebApi.XyCore
         [HttpPostAttribute("Core/XyCore/CoreSku/InsertGoods")]
         public ResponseResult InsertGoods([FromBodyAttribute]JObject obj)
         {
-            CoreSkuAuto ckm = Newtonsoft.Json.JsonConvert.DeserializeObject<CoreSkuAuto>(obj["CoreSkuAuto"].ToString());
-            CoreSkuItem cki = Newtonsoft.Json.JsonConvert.DeserializeObject<CoreSkuItem>(obj["CoreSkuItem"].ToString());
-            var res = CoreSkuHaddle.NewCore(ckm, cki);
+            // CoreSkuAuto ckm = Newtonsoft.Json.JsonConvert.DeserializeObject<CoreSkuAuto>(obj["CoreSkuAuto"].ToString());
+            // CoreSkuItem cki = Newtonsoft.Json.JsonConvert.DeserializeObject<CoreSkuItem>(obj["CoreSkuItem"].ToString());
+            var res = new DataResult(1,null);//CoreSkuHaddle.NewCore(ckm, cki);
             var Result = CoreResult.NewResponse(res.s, res.d, "General");
             return Result;
         }

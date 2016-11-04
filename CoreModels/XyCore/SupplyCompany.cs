@@ -80,4 +80,11 @@ namespace CoreModels.XyCore
         public decimal Pagecnt {get;set;}//总页数
         public List<ScoCompany> Com {get;set;}//公司资料List
     }
+
+    public class ScoCompDDLB
+    {
+        public int id {get;set;}
+        public string scocode {get;set;}
+        public string scosimple {get;set;}
+    }
 }

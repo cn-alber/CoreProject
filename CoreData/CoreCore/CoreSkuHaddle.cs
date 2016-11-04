@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System;
 using System.Text;
 using CoreModels.XyCore;
+using CoreModels.XyComm;
 using MySql.Data.MySqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,23 +21,23 @@ namespace CoreData.CoreCore
             var res = new DataResult(1, null);
             StringBuilder querysql = new StringBuilder();
             StringBuilder querycount = new StringBuilder();
-            var p = new DynamicParameters();            
+            var p = new DynamicParameters();
             querycount.Append("SELECT count(ID) FROM coresku_main where Type = @Type");
-            querysql.Append("select GoodsCode,GoodsName,KindName,Enable,Price,ScoGoodsCode from coresku_main where Type = @Type");
+            querysql.Append("select GoodsCode,GoodsName,KindID,KindName,Enable,SalePrice,ScoGoodsCode from coresku_main where Type = @Type");
             p.Add("@Type", IParam.Type);
             if (IParam.CoID != 1)
-            {                
+            {
                 querycount.Append(" AND CoID = @CoID");
                 querysql.Append(" AND CoID = @CoID");
                 p.Add("@CoID", IParam.CoID);
             }
-            if (!string.IsNullOrEmpty(IParam.Enable) && IParam.Enable.ToUpper() != "ALL")//是否启用
+            if (!string.IsNullOrEmpty(IParam.Enable))//是否启用
             {
                 querycount.Append(" AND Enable = @Enable");
                 querysql.Append(" AND Enable = @Enable");
-                p.Add("@Enable", IParam.Enable.ToUpper() == "TRUE" ? true : false);
+                p.Add("@Enable", IParam.Enable);
             }
-            if(!string.IsNullOrEmpty(IParam.KindID))
+            if (!string.IsNullOrEmpty(IParam.KindID))
             {
                 querycount.Append(" AND KindID = @KindID");
                 querysql.Append(" AND KindID = @KindID");
@@ -48,8 +49,8 @@ namespace CoreData.CoreCore
                 querysql.Append(" AND GoodsCode like @GoodsCode");
                 p.Add("@GoodsCode", "%" + IParam.GoodsCode + "%");
             }
-             if (!string.IsNullOrEmpty(IParam.ScoGoodsCode))
-            {                
+            if (!string.IsNullOrEmpty(IParam.ScoGoodsCode))
+            {
                 querycount.Append(" AND ScoGoodsCode like @ScoGoodsCode");
                 querysql.Append(" AND ScoGoodsCode like @ScoGoodsCode");
                 p.Add("@ScoGoodsCode", "%" + IParam.ScoGoodsCode + "%");
@@ -66,87 +67,11 @@ namespace CoreData.CoreCore
                 // p.Add("@SortField", IParam.SortField);
                 // p.Add("@SortDirection", IParam.SortDirection);
             }
+            var CommConn = new MySqlConnection(DbBase.CommConnectString);
+            var CoreConn = new MySqlConnection(DbBase.CoreConnectString);
             try
             {
-                var DataCount = CoreData.DbBase.CoreDB.QueryFirst<int>(querycount.ToString(), p);
-                if (DataCount < 0)
-                {
-                    res.s = -3001;
-                }
-                else
-                {
-                    cs.DataCount =DataCount;
-                    decimal pagecnt = Math.Ceiling(decimal.Parse(cs.DataCount.ToString()) / decimal.Parse(IParam.PageSize.ToString()));
-                    cs.PageCount = Convert.ToInt32(pagecnt);
-                    int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
-                    querysql.Append(" LIMIT @ls , @le");
-                    p.Add("@ls", dataindex);
-                    p.Add("@le", IParam.PageSize);
-                    var GoodsLst = CoreData.DbBase.CoreDB.Query<GoodsQuery>(querysql.ToString(), p).AsList();
-                    cs.GoodsLst = GoodsLst;
-                    res.d = cs;
-                }
-            }
-            catch (Exception e)
-            {
-                res.s = -1;
-                res.d = e.Message;
-            }
-
-
-            return res;
-        }
-        #endregion
-
-        #region 商品资料管理-查询SKU明细
-        public static DataResult GetSkuLst(CoreSkuParam IParam)
-        {
-            var cs = new CoreSkuQuery();
-            var res = new DataResult(1, null);
-            StringBuilder querysql = new StringBuilder();
-            StringBuilder querycount = new StringBuilder();
-            var p = new DynamicParameters();
-            querycount.Append("SELECT count(GoodsCode) FROM coresku where Type = @Type");
-            querysql.Append("select ID,GoodsCode,GoodsName,SkuID,SkuName,Norm,CostPrice,SalePrice,Enable,Creator,CreateDate from coresku where Type = @Type");
-            p.Add("@Type", IParam.Type);
-            if (IParam.CoID != 1)
-            {
-                querycount.Append(" AND CoID = @CoID");
-                querysql.Append(" AND CoID = @CoID");
-                p.Add("@CoID", IParam.CoID);
-            }
-            if (!string.IsNullOrEmpty(IParam.Enable) && IParam.Enable.ToUpper() != "ALL")//是否启用
-            {
-                querycount.Append(" AND Enable = @Enable");
-                querysql.Append(" AND Enable = @Enable");
-                p.Add("@Enable", IParam.Enable.ToUpper() == "TRUE" ? true : false);
-            }
-            if (!string.IsNullOrEmpty(IParam.GoodsCode))
-            {
-                querycount.Append(" AND GoodsCode = @GoodsCode");
-                querysql.Append(" AND GoodsCode = @GoodsCode");
-                p.Add("@GoodsCode", IParam.GoodsCode);
-            }
-            if (!string.IsNullOrEmpty(IParam.GoodsName))
-            {
-                querycount.Append(" AND GoodsName = @GoodsName");
-                querysql.Append(" AND GoodsName = @GoodsName");
-                p.Add("@GoodsName", IParam.GoodsName);
-            }
-            if (!string.IsNullOrEmpty(IParam.Filter))
-            {
-                querycount.Append(" AND (SkuID like @Filter or SkuName like @Filter or Norm like @Filter)");
-                querysql.Append(" AND (SkuID like @Filter or SkuName like @Filter or Norm like @Filter)");
-                p.Add("@Filter", "'%" + IParam.Filter + "'");
-            }
-            if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
-            {
-                querycount.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
-                querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
-            }
-            try
-            {
-                var DataCount = CoreData.DbBase.CoreDB.QueryFirst<int>(querycount.ToString(), p);
+                var DataCount = CoreConn.QueryFirst<int>(querycount.ToString(), p);
                 if (DataCount < 0)
                 {
                     res.s = -3001;
@@ -160,8 +85,179 @@ namespace CoreData.CoreCore
                     querysql.Append(" LIMIT @ls , @le");
                     p.Add("@ls", dataindex);
                     p.Add("@le", IParam.PageSize);
-                    var SkuLst = CoreData.DbBase.CoreDB.Query<SkuQuery>(querysql.ToString(), p).AsList();
+                    var GoodsLst = CoreConn.Query<GoodsQuery>(querysql.ToString(), p).AsList();
+                    var KindIDLst = GoodsLst.Select(a => a.KindID).AsList();
+                    string kindsql = "SELECT ID AS KindID,KindName FROM customkind WHERE ID in @KindIDLst AND CoID=@CoID";
+                    var KindLst = CommConn.Query<CoreKind>(kindsql, new { KindIDLst = KindIDLst, CoID = IParam.CoID }).AsList();
+                    foreach (var goods in GoodsLst)
+                    {
+                        goods.KindName = KindLst.Where(a => a.KindID == goods.KindID).Select(a => a.KindName).First();
+                    }
+                    cs.GoodsLst = GoodsLst;
+                    res.d = cs;
+                }
+            }
+            catch (Exception e)
+            {
+                res.s = -1;
+                res.d = e.Message;
+            }
+            finally
+            {
+                CommConn.Dispose();
+                CoreConn.Dispose();
+                CommConn.Close();
+                CoreConn.Close();
+            }
+            return res;
+        }
+        #endregion
+
+        #region 商品资料管理-查询SKU明细
+        public static DataResult GetSkuLst(CoreSkuParam IParam)
+        {
+            var cs = new CoreSkuQuery();
+            var res = new DataResult(1, null);
+            StringBuilder querysql = new StringBuilder();
+            StringBuilder querycount = new StringBuilder();
+            var p = new DynamicParameters();
+            string sql = @"SELECT  ID,
+                            GoodsCode,
+                            SkuID,
+                            SkuName,
+                            SkuSimple,
+                            GBCode,
+                            Norm,
+                            IFNULL(Brand,0) AS Brand,
+                            PurPrice,
+                            MarketPrice,
+                            SalePrice,
+                            Weight,
+                            `Enable`,
+                            ScoGoodsCode,
+                            ScoSku,
+                            IFNULL(SCoID,0) AS SCoID,
+                            Creator,
+                            CreateDate,
+                            Modifier,
+                            ModifyDate
+                        FROM
+                            coresku
+                        WHERE 1=1";
+            querycount.Append("SELECT count(ID) FROM coresku where 1 = 1");
+            querysql.Append(sql);
+            if (IParam.CoID != 1)
+            {
+                querycount.Append(" AND CoID = @CoID");
+                querysql.Append(" AND CoID = @CoID");
+                p.Add("@CoID", IParam.CoID);
+            }
+            if (!string.IsNullOrEmpty(IParam.Enable))//是否启用
+            {
+                querycount.Append(" AND Enable = @Enable");
+                querysql.Append(" AND Enable = @Enable");
+                p.Add("@Enable", IParam.Enable);
+            }
+            if (!string.IsNullOrEmpty(IParam.Filter))
+            {
+
+                querycount.Append(" AND (SkuID like @Filter or GoodsCode like @Filter)");
+                querysql.Append(" AND (SkuID like @Filter or GoodsCode like @Filter)");
+                p.Add("@Filter", "%" + IParam.Filter + "%");
+            }
+            if (!string.IsNullOrEmpty(IParam.SkuName))
+            {
+                querycount.Append(" AND SkuName LIKE @SkuName");
+                querysql.Append(" AND SkuName LIKE @SkuName");
+                p.Add("@SkuName", "%" + IParam.SkuName + "%");
+            }
+            if (!string.IsNullOrEmpty(IParam.Brand))
+            {
+                querycount.Append(" AND Brand LIKE @Brand");
+                querysql.Append(" AND Brand LIKE @Brand");
+                p.Add("@Brand", "%" + IParam.Brand + "%");
+            }
+            if (!string.IsNullOrEmpty(IParam.SCoID))
+            {
+                querycount.Append(" AND SCoID = @SCoID");
+                querysql.Append(" AND SCoID = @SCoID");
+                p.Add("@SCoID", IParam.SCoID);
+            }
+            if (!string.IsNullOrEmpty(IParam.ScoGoodsCode))
+            {
+                querycount.Append(" AND ScoGoodsCode LIKE @ScoGoodsCode");
+                querysql.Append(" AND ScoGoodsCode LIKE @ScoGoodsCode");
+                p.Add("@ScoGoodsCode", "%" + IParam.ScoGoodsCode + "%");
+            }
+            if (!string.IsNullOrEmpty(IParam.ScoSku))
+            {
+                querycount.Append(" AND ScoSku LIKE @ScoSku");
+                querysql.Append(" AND ScoSku LIKE @ScoSku");
+                p.Add("@ScoSku", "%" + IParam.ScoSku + "%");
+            }
+
+            if (!string.IsNullOrEmpty(IParam.SkuSimple))
+            {
+                querycount.Append(" AND SkuSimple LIKE @SkuSimple");
+                querysql.Append(" AND SkuSimple LIKE @SkuSimple");
+                p.Add("@SkuSimple", "%" + IParam.SkuSimple + "%");
+            }
+            if (!string.IsNullOrEmpty(IParam.Norm))
+            {
+                querycount.Append(" AND Norm LIKE @Norm");
+                querysql.Append(" AND Norm LIKE @Norm");
+                p.Add("@Norm", "%" + IParam.Norm + "%");
+            }
+            if (!string.IsNullOrEmpty(IParam.PriceS))
+            {
+                querycount.Append(" AND IFNULL(PurPrice,0) >= @PriceS");
+                querysql.Append(" AND IFNULL(PurPrice,0) >= @PriceS");
+                p.Add("@PriceS", IParam.PriceS);
+            }
+            if (!string.IsNullOrEmpty(IParam.PriceT))
+            {
+                querycount.Append(" AND IFNULL(PurPrice,0) <= @PriceT");
+                querysql.Append(" AND IFNULL(PurPrice,0) <= @PriceT");
+                p.Add("@PriceT", IParam.PriceT);
+            }
+            if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
+            {
+                querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
+            }
+            var CoreConn = new MySqlConnection(DbBase.CoreConnectString);
+            var CommConn = new MySqlConnection(DbBase.CommConnectString);
+            try
+            {
+                var DataCount = CoreConn.QueryFirst<int>(querycount.ToString(), p);
+                if (DataCount < 0)
+                {
+                    res.s = -3001;
+                }
+                else
+                {
+                    cs.DataCount = DataCount;
+                    decimal pagecnt = Math.Ceiling(decimal.Parse(cs.DataCount.ToString()) / decimal.Parse(IParam.PageSize.ToString()));
+                    cs.PageCount = Convert.ToInt32(pagecnt);
+                    int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
+                    querysql.Append(" LIMIT @ls , @le");
+                    p.Add("@ls", dataindex);
+                    p.Add("@le", IParam.PageSize);
+                    var SkuLst = CoreConn.Query<SkuQuery>(querysql.ToString(), p).AsList();
                     cs.SkuLst = SkuLst;
+                    cs.BrandLst = new List<BrandDDLB>();
+                    cs.ScoLst = new List<ScoCompDDLB>();
+                    var BrandIDLst = SkuLst.Where(a => a.Brand != null).Select(a => a.Brand).Distinct().AsList();
+                    var SCoIDLst = SkuLst.Where(a => a.SCoID != null).Select(a => a.SCoID).Distinct().AsList();
+                    if (BrandIDLst.Count > 0)
+                    {
+                        var BrandLst = CommConn.Query<BrandDDLB>("SELECT ID,Name,Intro FROM Brand WHERE CoID=@CoID AND ID IN @IDLST", new { CoID = IParam.CoID, IDLST = BrandIDLst }).AsList();
+                        cs.BrandLst = BrandLst;
+                    }
+                    if (SCoIDLst.Count > 0)
+                    {
+                        var SCoLst = CoreConn.Query<ScoCompDDLB>("SELECT id,scocode,scosimple FROM supplycompany WHERE CoID=@CoID AND id IN @IDLST", new { CoID = IParam.CoID, IDLST = SCoIDLst }).AsList();
+                        cs.ScoLst = SCoLst;
+                    }
                     res.d = cs;
                 }
             }
@@ -174,20 +270,20 @@ namespace CoreData.CoreCore
         }
         #endregion
         #region 商品管理 - 获取单笔Sku详情
-        public static DataResult GetCoreSkuEdit(string GoodsCode, int CoID)
+        public static DataResult GetCoreSkuEdit(string ID, string CoID)
         {
             var cs = new CoreSkuAuto();
             var res = new DataResult(1, null);
             var p = new DynamicParameters();
-            string msql = @"select distinct GoodsCode,GoodsName,Brand,KID,KName,CoID,
-                            Unit,Weight,Creator,SCoList,SkuName      
-                         from coresku where GoodsCode=@GoodsCode and CoID = @CoID
-                         LIMIT 1";
-            p.Add("@GoodsCode", GoodsCode);
+            string msql = @"SELECT * FROM coresku_main WHERE ID=@ID AND CoID = @CoID";
+            // string itempropsql = @"SELECT * FROM coresku_item_props WHERE ParentID=@ID AND CoID = @CoID";
+            // string skupropsql = @"SELECT * FROM coresku_sku_props WHERE ParentID=@ID AND CoID = @CoID";
+            // string itemsql = @"SELECT * FROM coresku ParentID=@ID AND CoID = @CoID AND IsDelete=0";
+            p.Add("@ID", ID);
             p.Add("@CoID", CoID);
             try
             {
-                var main = DbBase.CoreDB.QueryFirst<CoreSkuAuto>(msql, p);
+                var main = DbBase.CoreDB.QueryFirst<Coresku_main>(msql, p);
                 if (main == null)
                 {
                     res.s = -3001;
@@ -198,7 +294,7 @@ namespace CoreData.CoreCore
                                     ColorID,ColorName,SizeID,SizeName,ParentID,Remark
                          from coresku where GoodsCode=@GoodsCode and CoID = @CoID";
                     var item = DbBase.CoreDB.Query<CoreSkuItem>(dsql, p).AsList();
-                    main.items = item;
+                    // main.items = item;
                     res.d = main;
                 }
 
@@ -246,9 +342,12 @@ namespace CoreData.CoreCore
                 if (count <= 0)
                 {
                     res.s = -3004;
-                }else{
-                    Task.Factory.StartNew(()=>{
-                        wareployContain("",GoodsLst,CoID,1);
+                }
+                else
+                {
+                    Task.Factory.StartNew(() =>
+                    {
+                        wareployContain("", GoodsLst, CoID, 1);
                     });
                 }
             }
@@ -292,9 +391,12 @@ namespace CoreData.CoreCore
                 if (count <= 0)
                 {
                     res.s = -3004;
-                }else{
-                    Task.Factory.StartNew(()=>{
-                        wareployContain(Sku,null,CoID,1);
+                }
+                else
+                {
+                    Task.Factory.StartNew(() =>
+                    {
+                        wareployContain(Sku, null, CoID, 1);
                     });
                 }
             }
@@ -333,70 +435,70 @@ namespace CoreData.CoreCore
         #endregion
 
         #region 
-        public static DataResult NewCore(CoreSkuAuto ckm, CoreSkuItem cki)
-        {
+        // public static DataResult NewCore(CoreSkuAuto ckm, CoreSkuItem cki)
+        // {
 
-            var res = new DataResult(1, null);
-            DbBase.CoreDB.Open();
-            var Trans = DbBase.CoreDB.BeginTransaction();
-            try
-            {
-                string sql = @"INSERT INTO coresku(SkuID,SkuName,Type,Unit,Weight,
-                                       CoID, Brand,  KID, KName,SCoList,
-                                       GoodsCode,GoodsName,ColorID,ColorName,SizeID,
-                                       ParentID,SizeName,CostPrice,SalePrice,Norm,
-                                       Creator,CreateDate
-                                       ) 
-                                VALUES(@SkuID,@SkuName,@Type,@Unit,@Weight,
-                                       @CoID,@Brand,  @KID, @KName,@SCoList,
-                                       @GoodsCode,@GoodsName,@ColorID,@ColorName,@SizeID,
-                                       @ParentID,@SizeName,@CostPrice,@SalePrice,@Norm,
-                                       @Creator,@CreateDate
-                                ) ";
+        //     var res = new DataResult(1, null);
+        //     DbBase.CoreDB.Open();
+        //     var Trans = DbBase.CoreDB.BeginTransaction();
+        //     try
+        //     {
+        //         string sql = @"INSERT INTO coresku(SkuID,SkuName,Type,Unit,Weight,
+        //                                CoID, Brand,  KID, KName,SCoList,
+        //                                GoodsCode,GoodsName,ColorID,ColorName,SizeID,
+        //                                ParentID,SizeName,CostPrice,SalePrice,Norm,
+        //                                Creator,CreateDate
+        //                                ) 
+        //                         VALUES(@SkuID,@SkuName,@Type,@Unit,@Weight,
+        //                                @CoID,@Brand,  @KID, @KName,@SCoList,
+        //                                @GoodsCode,@GoodsName,@ColorID,@ColorName,@SizeID,
+        //                                @ParentID,@SizeName,@CostPrice,@SalePrice,@Norm,
+        //                                @Creator,@CreateDate
+        //                         ) ";
 
-                var sku = new Coresku();
-                sku.SkuID = cki.SkuID;
-                sku.SkuName = ckm.SkuName;
-                sku.Type = 0;
-                sku.Unit = ckm.Unit;
-                sku.Weight = ckm.Weight;
-                sku.CoID = ckm.CoID;
-                sku.Brand = ckm.Brand;
-                sku.KindID = ckm.KindID;
-                sku.KindName = ckm.KindName;
-                sku.SCoList = ckm.SCoList;
-                sku.GoodsCode = ckm.GoodsCode;
-                sku.GoodsName = ckm.GoodsName;
-                // sku.ColorID = cki.ColorID;
-                // sku.ColorName = cki.ColorName;
-                // sku.SizeID = cki.SizeID;
-                sku.ParentID = cki.ParentID;
-                // sku.SizeName = cki.SizeName;
-                sku.CostPrice = cki.CostPrice;
-                sku.SalePrice = cki.SalePrice;
-                sku.Norm = cki.ColorName + ";" + cki.SizeName;
-                sku.Creator = ckm.Creator;
-                sku.CreateDate = DateTime.Now.ToString();
-                int count = DbBase.UserDB.Execute(sql, sku, Trans);
-                if (count == 0)
-                {
-                    res.s = -3002;
-                }
-                Trans.Commit();
-            }
-            catch (Exception e)
-            {
-                res.s = -1;
-                res.d = e.Message;
-            }
-            finally
-            {
-                Trans.Dispose();
-                DbBase.CoreDB.Close();
-            }
+        //         var sku = new Coresku();
+        //         sku.SkuID = cki.SkuID;
+        //         sku.SkuName = ckm.SkuName;
+        //         sku.Type = 0;
+        //         sku.Unit = ckm.Unit;
+        //         sku.Weight = ckm.Weight;
+        //         sku.CoID = ckm.CoID;
+        //         sku.Brand = ckm.Brand;
+        //         sku.KindID = ckm.KindID;
+        //         sku.KindName = ckm.KindName;
+        //         sku.SCoList = ckm.SCoList;
+        //         sku.GoodsCode = ckm.GoodsCode;
+        //         sku.GoodsName = ckm.GoodsName;
+        //         // sku.ColorID = cki.ColorID;
+        //         // sku.ColorName = cki.ColorName;
+        //         // sku.SizeID = cki.SizeID;
+        //         sku.ParentID = cki.ParentID;
+        //         // sku.SizeName = cki.SizeName;
+        //         sku.CostPrice = cki.CostPrice;
+        //         sku.SalePrice = cki.SalePrice;
+        //         sku.Norm = cki.ColorName + ";" + cki.SizeName;
+        //         sku.Creator = ckm.Creator;
+        //         sku.CreateDate = DateTime.Now.ToString();
+        //         int count = DbBase.UserDB.Execute(sql, sku, Trans);
+        //         if (count == 0)
+        //         {
+        //             res.s = -3002;
+        //         }
+        //         Trans.Commit();
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         res.s = -1;
+        //         res.d = e.Message;
+        //     }
+        //     finally
+        //     {
+        //         Trans.Dispose();
+        //         DbBase.CoreDB.Close();
+        //     }
 
-            return res;
-        }
+        //     return res;
+        // }
         #endregion
 
 
@@ -546,14 +648,17 @@ namespace CoreData.CoreCore
         }
         #endregion
 
-        public static DataResult createSku(TmallSku sku){
-            var result = new DataResult(1,null); 
-            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+        public static DataResult createSku(TmallSku sku)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
                 try
                 {
-                    string sql = "SELECT ID FROM coresku WHERE SkuID = '"+sku.SkuID+"'";
+                    string sql = "SELECT ID FROM coresku WHERE SkuID = '" + sku.SkuID + "'";
                     var res = conn.Query<long>(sql).AsList();
-                    if(res.Count >0){
+                    if (res.Count > 0)
+                    {
                         Console.WriteLine("--------UPDATE");
                         sql = @"UPDATE coresku SET                                     
                                     coresku.SkuName =@SkuName,
@@ -570,7 +675,9 @@ namespace CoreData.CoreCore
                                     coresku.IsParent = @IsParent
                                 WHERE 
                                     coresku.SkuID = @SkuID;";
-                    }else{
+                    }
+                    else
+                    {
                         sql = @"INSERT coresku SET 
                                     coresku.SkuID = @SkuID,
                                     coresku.SkuName =@SkuName,
@@ -587,19 +694,24 @@ namespace CoreData.CoreCore
                                     coresku.IsParent = @IsParent;";
                     }
 
-                    
-                    var rnt = conn.Execute(sql,sku);
-                    if(rnt>0){
+
+                    var rnt = conn.Execute(sql, sku);
+                    if (rnt > 0)
+                    {
                         result.s = 1;
-                    }else{
+                    }
+                    else
+                    {
                         result.s = -1;
-                        Console.WriteLine("---------"+sku.SkuID);
+                        Console.WriteLine("---------" + sku.SkuID);
                     }
 
 
-                }catch(Exception ex){
+                }
+                catch (Exception ex)
+                {
                     result.s = -1;
-                    result.d = ex.Message; 
+                    result.d = ex.Message;
                     Console.WriteLine(ex.Message);
                     conn.Dispose();
                 }
@@ -609,22 +721,25 @@ namespace CoreData.CoreCore
         }
 
 
-        public static DataResult getWareSku(CoreSkuParam IParam,string coid){
-            var result = new DataResult(1,null); 
-            var goods =getWareGoodsInner(coid);
+        public static DataResult getWareSku(CoreSkuParam IParam, string coid)
+        {
+            var result = new DataResult(1, null);
+            var goods = getWareGoodsInner(coid);
             string goodCodes = "'0'";
-            foreach(var good in goods){
-                goodCodes +=",'"+good.GoodsCode+"'";
+            foreach (var good in goods)
+            {
+                goodCodes += ",'" + good.GoodsCode + "'";
             }
-            
-            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
                 try
                 {
-                    StringBuilder querysql=new StringBuilder();
+                    StringBuilder querysql = new StringBuilder();
                     StringBuilder totalSql = new StringBuilder();
                     var p = new DynamicParameters();
-                    querysql.Append("SELECT distinct  SkuID,ID, SkuName,Norm FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE AND CoID = "+coid+" AND GoodsCode in ("+goodCodes+") ");
-                    totalSql.Append("SELECT COUNT(ID) FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE  AND CoID = "+coid+"  AND GoodsCode in ("+goodCodes+") ");
+                    querysql.Append("SELECT distinct  SkuID,ID, SkuName,Norm FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE AND CoID = " + coid + " AND GoodsCode in (" + goodCodes + ") ");
+                    totalSql.Append("SELECT COUNT(ID) FROM coresku WHERE Type=0 AND IsParent = FALSE AND SkuName !='' AND IsDelete = FALSE  AND CoID = " + coid + "  AND GoodsCode in (" + goodCodes + ") ");
                     if (!string.IsNullOrEmpty(IParam.GoodsCode))
                     {
                         querysql.Append(" AND GoodsCode = @GoodsCode");
@@ -642,46 +757,56 @@ namespace CoreData.CoreCore
                         querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                         totalSql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                     }
-                    decimal total = conn.Query<decimal>(totalSql.ToString(),p).AsList()[0];
-                    if(total>0){
+                    decimal total = conn.Query<decimal>(totalSql.ToString(), p).AsList()[0];
+                    if (total > 0)
+                    {
                         decimal pagecnt = Math.Ceiling(total / decimal.Parse(IParam.PageSize.ToString()));
                         int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
                         querysql.Append(" LIMIT @ls , @le");
                         p.Add("@ls", dataindex);
                         p.Add("@le", IParam.PageSize);
-                        var list = conn.Query<wareSku>(querysql.ToString(),p).AsList();
-                        if(IParam.PageIndex == 1){
-                            result.d = new {
-                                list = list,                                          
+                        var list = conn.Query<wareSku>(querysql.ToString(), p).AsList();
+                        if (IParam.PageIndex == 1)
+                        {
+                            result.d = new
+                            {
+                                list = list,
                                 page = IParam.PageIndex,
                                 pageSize = IParam.PageSize,
                                 pageTotal = pagecnt,
                                 total = total
                             };
-                        }else{
-                            result.d = new {
-                                list = list,                                          
+                        }
+                        else
+                        {
+                            result.d = new
+                            {
+                                list = list,
                                 page = IParam.PageIndex
                             };
-                        }                        
-                    }                                                
-                }catch{
+                        }
+                    }
+                }
+                catch
+                {
                     conn.Dispose();
                 }
             }
             return result;
         }
 
-        public static DataResult getWareGoods(CoreSkuParam IParam,string coid){
-            var result = new DataResult(1,null); 
-            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+        public static DataResult getWareGoods(CoreSkuParam IParam, string coid)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
                 try
                 {
-                    StringBuilder querysql=new StringBuilder();
+                    StringBuilder querysql = new StringBuilder();
                     StringBuilder totalSql = new StringBuilder();
                     var p = new DynamicParameters();
-                    querysql.Append("SELECT distinct  SkuID,ID, SkuName,Norm,GoodsCode FROM coresku WHERE Type=0 AND IsParent = True  AND IsDelete = FALSE AND CoID = "+coid+" ");
-                    totalSql.Append("SELECT COUNT(ID) FROM coresku WHERE Type=0 AND IsParent = TRUE  AND IsDelete = FALSE AND CoID = "+coid+" ");
+                    querysql.Append("SELECT distinct  SkuID,ID, SkuName,Norm,GoodsCode FROM coresku WHERE Type=0 AND IsParent = True  AND IsDelete = FALSE AND CoID = " + coid + " ");
+                    totalSql.Append("SELECT COUNT(ID) FROM coresku WHERE Type=0 AND IsParent = TRUE  AND IsDelete = FALSE AND CoID = " + coid + " ");
                     if (!string.IsNullOrEmpty(IParam.GoodsCode))
                     {
                         querysql.Append(" AND GoodsCode = @GoodsCode");
@@ -699,114 +824,142 @@ namespace CoreData.CoreCore
                         querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                         totalSql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                     }
-                    decimal total = conn.Query<decimal>(totalSql.ToString(),p).AsList()[0];
-                    if(total>0){
+                    decimal total = conn.Query<decimal>(totalSql.ToString(), p).AsList()[0];
+                    if (total > 0)
+                    {
                         decimal pagecnt = Math.Ceiling(total / decimal.Parse(IParam.PageSize.ToString()));
                         int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
                         querysql.Append(" LIMIT @ls , @le");
                         p.Add("@ls", dataindex);
                         p.Add("@le", IParam.PageSize);
-                        var list = conn.Query<wareGoods>(querysql.ToString(),p).AsList();
-                        if(IParam.PageIndex == 1){
-                            result.d = new {
-                                list = list,                                          
+                        var list = conn.Query<wareGoods>(querysql.ToString(), p).AsList();
+                        if (IParam.PageIndex == 1)
+                        {
+                            result.d = new
+                            {
+                                list = list,
                                 page = IParam.PageIndex,
                                 pageSize = IParam.PageSize,
                                 pageTotal = pagecnt,
                                 total = total
                             };
-                        }else{
-                            result.d = new {
-                                list = list,                                          
+                        }
+                        else
+                        {
+                            result.d = new
+                            {
+                                list = list,
                                 page = IParam.PageIndex
                             };
-                        }                        
-                    }                                                
-                }catch{
+                        }
+                    }
+                }
+                catch
+                {
                     conn.Dispose();
                 }
             }
             return result;
         }
 
-        public static List<wareGoods> getWareGoodsInner(string coid){
-            var result = new List<wareGoods>(); 
-            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+        public static List<wareGoods> getWareGoodsInner(string coid)
+        {
+            var result = new List<wareGoods>();
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
                 try
                 {
-                    StringBuilder querysql=new StringBuilder();
+                    StringBuilder querysql = new StringBuilder();
                     StringBuilder totalSql = new StringBuilder();
                     var p = new DynamicParameters();
-                    querysql.Append("SELECT distinct  SkuID,SkuName,Norm,GoodsCode FROM coresku WHERE Type=0 AND IsParent = True  AND IsDelete = FALSE AND CoID = "+coid+" ORDER BY SkuID ASC");                                
+                    querysql.Append("SELECT distinct  SkuID,SkuName,Norm,GoodsCode FROM coresku WHERE Type=0 AND IsParent = True  AND IsDelete = FALSE AND CoID = " + coid + " ORDER BY SkuID ASC");
                     result = conn.Query<wareGoods>(querysql.ToString()).AsList();
-                                      
-                                                                   
-                }catch{
+
+
+                }
+                catch
+                {
                     conn.Dispose();
                 }
             }
             return result;
         }
 
-        public static void wareployContain(string skuid , List<string> goodscode,int coid,int type){    //type: 1 sku  2 good     
-            string sql ="";
-            var  ids = new List<string>();
-            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+        public static void wareployContain(string skuid, List<string> goodscode, int coid, int type)
+        {    //type: 1 sku  2 good     
+            string sql = "";
+            var ids = new List<string>();
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
                 try
                 {
-                    if(type == 1){
-                        sql = "SELECT id FROM coresku WHERE SkuID='"+skuid+"' AND CoID = '"+coid+"';";
-                    }else{
-                        
-                        sql = "SELECT id FROM coresku WHERE GoodsCode in ("+string.Join(",",goodscode.ToArray())+") AND CoID = '"+coid+"';";
+                    if (type == 1)
+                    {
+                        sql = "SELECT id FROM coresku WHERE SkuID='" + skuid + "' AND CoID = '" + coid + "';";
                     }
-                                                                   
-                }catch{
+                    else
+                    {
+
+                        sql = "SELECT id FROM coresku WHERE GoodsCode in (" + string.Join(",", goodscode.ToArray()) + ") AND CoID = '" + coid + "';";
+                    }
+
+                }
+                catch
+                {
                     conn.Dispose();
                 }
             }
-            if(ids.Count>0){
-                int  i= 0;
+            if (ids.Count > 0)
+            {
+                int i = 0;
                 var tasks = new Task[10];
-                foreach(var id in ids){
-                    tasks[i]= Task.Factory.StartNew(()=>{
+                foreach (var id in ids)
+                {
+                    tasks[i] = Task.Factory.StartNew(() =>
+                    {
                         removeContain(id);
                     });
                     i++;
-                    if(i == 10){
-                        i=0;
+                    if (i == 10)
+                    {
+                        i = 0;
                         Task.WaitAll(tasks);
                     }
                 }
             }
         }
 
-        public static void removeContain(string id){
+        public static void removeContain(string id)
+        {
             string sql = "";
-            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
                 try
                 {
-                    
-                    sql = "SELECT ID FROM wareploy WHERE ContainGoods LIKE ',"+id+",' OR ContainSkus LIKE ',"+id+",' OR RemoveGoods LIKE ',"+id+",' OR RemoveSkus LIKE ',"+id+",' ;";                                
+
+                    sql = "SELECT ID FROM wareploy WHERE ContainGoods LIKE '," + id + ",' OR ContainSkus LIKE '," + id + ",' OR RemoveGoods LIKE '," + id + ",' OR RemoveSkus LIKE '," + id + ",' ;";
                     var ids = conn.Query<int>(sql).AsList();
-                    if(ids.Count>0){
+                    if (ids.Count > 0)
+                    {
                         string a = string.Join(",", ids.ToArray());
-                        sql=@"UPDATE wareploy SET	
-                                    ContainGoods = REPLACE(ContainGoods, ',"+id+@",', ','),
-                                    ContainSkus  = REPLACE(ContainSkus, ',"+id+@",', ','),
-                                    RemoveGoods  = REPLACE(RemoveGoods, ',"+id+@",', ','),
-                                    RemoveSkus = REPLACE(RemoveSkus, ',"+id+@",', ',')
-                                WHERE ID in("+a+")";                         
+                        sql = @"UPDATE wareploy SET	
+                                    ContainGoods = REPLACE(ContainGoods, '," + id + @",', ','),
+                                    ContainSkus  = REPLACE(ContainSkus, '," + id + @",', ','),
+                                    RemoveGoods  = REPLACE(RemoveGoods, '," + id + @",', ','),
+                                    RemoveSkus = REPLACE(RemoveSkus, '," + id + @",', ',')
+                                WHERE ID in(" + a + ")";
                     }
-                                        
-                                                                    
-                }catch{
+
+
+                }
+                catch
+                {
                     conn.Dispose();
                 }
             }
         }
 
-        
+
 
 
 

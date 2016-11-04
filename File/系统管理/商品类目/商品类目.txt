@@ -200,14 +200,21 @@ function说明
             Type          int            判断1.更新/2.覆盖
     参考：input json 文件：SaveCopyToProps_input.json
 
-17.GetColorLst()//根据商品类目获取颜色列表
-    方法：GET
-    路由：
+17.SkuPropsByKind()//商品资料新增 - 根据商品类目获取Sku属性值(顔色|尺碼)
+    方法：Get
+    路由：http://192.168.30.211:5000/Core/XyComm/CustomKindSkuProps/SkuPropsByKind?KindID=365
+    InPut：
+          null
+    OutPut:List<skuprops>
+            pid                 long                    Sku属性name对应的pid
+            name                string                  Sku属性name(顔色|尺碼)
+            KindNames           string                  商品類目
+            skuprops_values     List<skuprops_values>   Sku属性可選值列表
 
-18.GetSizeLst()//根据商品类目获取尺码列表
-    方法：GET
-    路由：
-        
+    參考：output json 文件：SkuPropsByKind_output.json
+
+
+
 
 
 

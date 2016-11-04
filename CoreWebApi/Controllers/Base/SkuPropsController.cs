@@ -69,7 +69,7 @@ namespace CoreWebApi
             if (!int.TryParse(KindID, out x))
             {
                 res.s = -1;
-                res.d = "无效参数ID";
+                res.d = "无效参数KindID";
             }
             else
             {
