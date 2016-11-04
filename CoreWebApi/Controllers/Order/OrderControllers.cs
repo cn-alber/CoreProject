@@ -445,5 +445,35 @@ namespace CoreWebApi
             var data = OrderHaddle.GetAbnormalList(CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Order/TransferNormal")]
+        public ResponseResult TransferNormal([FromBodyAttribute]JObject co)
+        {   
+            List<int> oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.TransferNormal(oid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Order/GetMergeOrd")]
+        public ResponseResult GetMergeOrd(string OID)
+        {   
+            int x,oid = 0;
+            var data = new DataResult(1,null);
+            if (int.TryParse(OID, out x))
+            {
+                oid = int.Parse(OID);
+            }
+            else
+            {
+                data.s = -1;
+                data.d = "参数无效!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            int CoID = int.Parse(GetCoid());
+            data = OrderHaddle.GetMergeOrd(oid,CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }

@@ -160,3 +160,17 @@ output: s=1成功 else 错误代码
 input:      None
 OutPut:     List<AbnormalReason>   异常原因List
 参考:output jason 文件:GetAbnormalList_output.json
+
+14.TransferNormal()转正常单
+路由:http://localhost:5000/Core/Order/TransferNormal
+input:OID    List<int>      内部订单号
+output: s=1成功 else 错误代码
+参考:input jason 文件:TransferNormal_input.json
+参考:output jason 文件:TransferNormal_output.json
+
+15.GetMergeOrd() //查询合并订单
+  路由:http://localhost:5000/Core/Order/GetMergeOrd
+input:      string      OID     主订单的内部单号
+OutPut:     List<MergerOrd>     符合条件的订单;type说明:A:主订单;L:推荐项;M:中风险;H:高风险
+参考:output jason 文件:GetMergeOrd_output.json
+

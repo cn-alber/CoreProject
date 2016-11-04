@@ -2263,5 +2263,196 @@ namespace CoreData.CoreCore
             }    
             return result;
         }
+        ///<summary>
+        ///异常单转正常
+        ///</summary>
+        public static DataResult TransferNormal(List<int> oid,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var logs = new List<Log>();
+            string sqlCommandText = string.Empty;
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string wheresql = "select count(id) from `order` where id in @ID and coid = @Coid and status <> 7";
+                int count = CoreDBconn.QueryFirst<int>(wheresql,new {ID = oid,Coid = CoID});
+                if (count > 0)
+                {
+                    result.s = -1;
+                    result.d = "只有异常状态的订单才可转正常!";
+                    return result;
+                }
+                wheresql = "select id,soid,StatusDec,IsPaid,coid from `order` where id in @ID and coid = @Coid";
+                var u = CoreDBconn.Query<Order>(wheresql,new {ID = oid,Coid = CoID}).AsList();
+                foreach(var a in u)
+                {
+                    var log = new Log();
+                    log.OID = a.ID;
+                    log.SoID = a.SoID;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "取消异常标记";
+                    log.Remark = a.StatusDec;
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    if(a.IsPaid == true)
+                    {
+                        a.Status = 1;
+                    }
+                    else
+                    {
+                        a.Status = 0;
+                    }
+                    a.AbnormalStatus = 0;
+                    a.StatusDec = "";
+                    a.Modifier = UserName;
+                    a.ModifyDate = DateTime.Now;
+                    sqlCommandText = @"update `order` set Status=@Status,AbnormalStatus=@AbnormalStatus,StatusDec=@StatusDec,Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and CoID = @CoID";
+                    count = CoreDBconn.Execute(sqlCommandText,a,TransCore);
+                    if (count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                }                
+                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                        VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                count = CoreDBconn.Execute(loginsert,logs, TransCore);
+                if (count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            return result;
+        }
+        ///<summary>
+        ///订单合并资料筛选
+        ///</summary>
+        public static DataResult GetMergeOrd(int oid,int CoID)
+        {
+            var result = new DataResult(1,null);
+            var res = new List<MergerOrd>();
+            string sqlcommand = "select * from `order` where id = " + oid + " and coid = " + CoID; 
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    var u = conn.Query<Order>(sqlcommand).AsList();
+                    if(u.Count == 0)
+                    {
+                        result.s = -1;
+                        result.d = "内部订单号无效!";
+                        return result;
+                    }
+                    else
+                    {
+                        if(u[0].Status != 1 &&　u[0].Status != 7)
+                        {
+                            result.s = -1;
+                            result.d = "此订单状态不符合合并的条件!";
+                            return result;
+                        }
+                        if(u[0].DealerType == 2)
+                        {
+                            result.s = -1;
+                            result.d = "供销订单不允许合并,请联系分销商合并订单!";
+                            return result;
+                        }
+                    }
+                    var rr = new MergerOrd();
+                    rr.type = "A";
+                    rr.MOrd = u;
+                    res.Add(rr);
+                    //抓取推荐合并项
+                    sqlcommand = "select * from `order` where coid = " + CoID + " and buyershopid = '" + u[0].BuyerShopID + "' and recname = '" + u[0].RecName + 
+                                "' and reclogistics = '" + u[0].RecLogistics + "' and reccity = '" + u[0].RecCity + "' and recdistrict = '" + u[0].RecDistrict + 
+                                "' and recaddress = '" + u[0].RecAddress + "' and status in (1,7) and IsPaid = true and id != " + oid;
+                    var tt = conn.Query<Order>(sqlcommand).AsList();
+                    rr = new MergerOrd();
+                    rr.type = "L";
+                    rr.MOrd = tt;
+                    res.Add(rr);
+                    //抓取中风险合并项
+                    sqlcommand = "select * from `order` where coid = " + CoID + " and status in (1,7) and IsPaid = true" + " and ((" + 
+                                "buyershopid = '" + u[0].BuyerShopID + "' and ( recname != '" + u[0].RecName + 
+                                "' or reclogistics != '" + u[0].RecLogistics + "' or reccity != '" + u[0].RecCity + "' or recdistrict != '" + u[0].RecDistrict + 
+                                "' or recaddress != '" + u[0].RecAddress + "')) or (" + 
+                                "buyershopid != '" + u[0].BuyerShopID + "' and recname = '" + u[0].RecName + 
+                                "' and reclogistics = '" + u[0].RecLogistics + "' and reccity = '" + u[0].RecCity + "' and recdistrict = '" + u[0].RecDistrict + 
+                                "' and recaddress = '" + u[0].RecAddress + "'))" ;
+                    tt = conn.Query<Order>(sqlcommand).AsList();
+                    rr = new MergerOrd();
+                    rr.type = "M";
+                    rr.MOrd = tt;
+                    res.Add(rr);
+                    //抓取高风险合并项
+                    sqlcommand = "select * from `order` where coid = " + CoID + " and buyershopid = '" + u[0].BuyerShopID + "' and recname = '" + u[0].RecName + 
+                                "' and reclogistics = '" + u[0].RecLogistics + "' and reccity = '" + u[0].RecCity + "' and recdistrict = '" + u[0].RecDistrict + 
+                                "' and recaddress = '" + u[0].RecAddress + "' and status in (0,7) and IsPaid = false";
+                    tt = conn.Query<Order>(sqlcommand).AsList();
+                    rr = new MergerOrd();
+                    rr.type = "H";
+                    rr.MOrd = tt;
+                    res.Add(rr);
+                    
+                    result.d = res;             
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }    
+            return result;
+        }
+
+
+
+        
+        ///<summary>
+        ///抓取快递List
+        ///</summary>
+        public static DataResult GetExpress(int CoID)
+        {
+            var result = new DataResult(1,null);
+            string sqlcommand = "select ID,ExpName from express where coid =" + CoID + " and enable = true"; 
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{    
+                    var u = conn.Query<Express>(sqlcommand).AsList();
+                    result.d = u;             
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }    
+            return result;
+        }
+        ///<summary>
+        ///设定快递
+        ///</summary>
+        public static DataResult SetExpress()
+        {
+            var result = new DataResult(1,null);
+
+
+
+
+            return result;
+        }
     }
 }
