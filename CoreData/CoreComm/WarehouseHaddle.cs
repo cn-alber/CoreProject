@@ -1603,28 +1603,49 @@ namespace CoreData.CoreComm
         ///</summary>
          public static DataResult  wareSettingGet(string coid){
             var result = new DataResult(1,null);
-            var setting = CacheBase.Get<ware_setting>("waresettingh"+coid);
-            if(setting == null){
-                using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
-                    try
-                    {
-                        var res = conn.Query<ware_setting>("SELECT * FROM ware_setting WHERE CoID = "+coid).AsList();
+            // var setting = CacheBase.Get<ware_setting>("waresettingh"+coid);
+            // if(setting == null){
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    string sql = "SELECT * FROM ware_setting WHERE CoID = "+coid ;
+                    var isMain = conn.Query<int>("SELECT ID FROM ware_third_party WHERE CoID = "+coid).AsList();
+                    if(isMain.Count>0){ // 判断是否为主仓
+                        var res = conn.Query<ware_setting>(sql).AsList();
                         if(res.Count >0){
-                            setting =res[0]; 
-                            CacheBase.Set<ware_setting>("waresettingh"+coid,setting);
+                            result.d =res[0]; 
+                            // CacheBase.Set<ware_setting>("waresettingh"+coid,setting);
                         }else{
                             result.s= -3010;
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        result.s = -1;
-                        result.d= e.Message; 
-                        conn.Dispose();
-                    }
+                    }else{                            
+                        var isFen = conn.Query<int>("SELECT ID FROM ware_third_party WHERE ItCoid = "+coid).AsList();
+                        if(isFen.Count>0){ 
+                            var res = conn.Query<ware_f_setting>(sql).AsList();
+                            if(res.Count >0){
+                                result.d =res[0];                                 
+                            }else{
+                                result.s= -3010;
+                            }
+                        }else{ //不为主仓，亦不为分仓，可能是主账号但未有分仓，故没有记录
+                            var res = conn.Query<ware_setting>(sql).AsList();
+                            if(res.Count >0){
+                                result.d =res[0];                                 
+                            }else{
+                                result.s= -3010;
+                            }
+                        }
+                    }             
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
                 }
             }
-            result.d = setting;
+            //}
+            //result.d = setting;
             return result;
         }
 

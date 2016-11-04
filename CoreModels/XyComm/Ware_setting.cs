@@ -1,31 +1,33 @@
 namespace CoreModels.XyComm
 {
     public class ware_setting{
-       #region Model
+      #region Model
 		private int _id;
 		private int? _coid;
-		private bool _locksku;
-		private bool _ispositionaccurate;
-		private bool _synchrosku;
+		private int? _locksku;
+		private int? _ispositionaccurate;
+		private int? _synchrosku;
 		private int? _isbeyondcount;
-		private bool _orderstore;
+		private int? _orderstore;
 		private int? _pickingmethod;
-		private bool _goodsuniquecode;
+		private int? _goodsuniquecode;
 		private int? _codepre;
-		private bool _singlegoods;
+		private int? _singlegoods;
 		private int? _intervalchar;
-		private bool _sendonpicking;
+		private int? _sendonpicking;
 		private int? _cabinetheight;
 		private int? _cabinetnum;
-		private bool _limitsender;
+		private int? _limitsender;
 		private int? _isgoodsrule;
-		private bool _segmentpicking;
-		private bool _autolossc;
-		private bool _autodelivery;
-		private bool _mixedpicking;
-		private bool _pickingnominus;
+		private int? _segmentpicking;
+		private int? _autolossc;
+		private int? _autodelivery;
+		private int? _mixedpicking;
+		private int? _pickingnominus;
 		private int? _reducestock;
 		private int? _locktime;
+		private int? _onemoreprint;
+		private int? _onemoreonlyex;
 		/// <summary>
 		/// 
 		/// </summary>
@@ -45,7 +47,7 @@ namespace CoreModels.XyComm
 		/// <summary>
 		/// 特殊订单锁定库存 1：锁定 0：不锁定
 		/// </summary>
-		public bool LockSku
+		public int? LockSku
 		{
 			set{ _locksku=value;}
 			get{return _locksku;}
@@ -53,7 +55,7 @@ namespace CoreModels.XyComm
 		/// <summary>
 		/// 仓位精确库存
 		/// </summary>
-		public bool IsPositionAccurate
+		public int? IsPositionAccurate
 		{
 			set{ _ispositionaccurate=value;}
 			get{return _ispositionaccurate;}
@@ -61,7 +63,7 @@ namespace CoreModels.XyComm
 		/// <summary>
 		/// 从商品维护导入商品信息时，默认禁止同步库存
 		/// </summary>
-		public bool SynchroSku
+		public int? SynchroSku
 		{
 			set{ _synchrosku=value;}
 			get{return _synchrosku;}
@@ -77,7 +79,7 @@ namespace CoreModels.XyComm
 		/// <summary>
 		/// 允许直接登记采购入库单并审核入库
 		/// </summary>
-		public bool OrderStore
+		public int? OrderStore
 		{
 			set{ _orderstore=value;}
 			get{return _orderstore;}
@@ -93,7 +95,7 @@ namespace CoreModels.XyComm
 		/// <summary>
 		/// 商品唯一码
 		/// </summary>
-		public bool GoodsUniqueCode
+		public int? GoodsUniqueCode
 		{
 			set{ _goodsuniquecode=value;}
 			get{return _goodsuniquecode;}
@@ -109,7 +111,7 @@ namespace CoreModels.XyComm
 		/// <summary>
 		/// 一单一货
 		/// </summary>
-		public bool SingleGoods
+		public int? SingleGoods
 		{
 			set{ _singlegoods=value;}
 			get{return _singlegoods;}
@@ -125,7 +127,7 @@ namespace CoreModels.XyComm
 		/// <summary>
 		/// 手执拣货一单多货，边捡边播
 		/// </summary>
-		public bool SendOnPicking
+		public int? SendOnPicking
 		{
 			set{ _sendonpicking=value;}
 			get{return _sendonpicking;}
@@ -149,7 +151,7 @@ namespace CoreModels.XyComm
 		/// <summary>
 		/// 限定由拣货人员播种
 		/// </summary>
-		public bool LimitSender
+		public int? LimitSender
 		{
 			set{ _limitsender=value;}
 			get{return _limitsender;}
@@ -165,7 +167,7 @@ namespace CoreModels.XyComm
 		/// <summary>
 		/// 分段拣货 0未开通 1 开通
 		/// </summary>
-		public bool SegmentPicking
+		public int? SegmentPicking
 		{
 			set{ _segmentpicking=value;}
 			get{return _segmentpicking;}
@@ -173,7 +175,7 @@ namespace CoreModels.XyComm
 		/// <summary>
 		/// 零拣区找不到商品时自动盘亏当前仓位
 		/// </summary>
-		public bool AutoLossc
+		public int? AutoLossc
 		{
 			set{ _autolossc=value;}
 			get{return _autolossc;}
@@ -181,7 +183,7 @@ namespace CoreModels.XyComm
 		/// <summary>
 		/// 大单拣货成时自动出库 0 关闭 1开通
 		/// </summary>
-		public bool AutoDelivery
+		public int? AutoDelivery
 		{
 			set{ _autodelivery=value;}
 			get{return _autodelivery;}
@@ -189,7 +191,7 @@ namespace CoreModels.XyComm
 		/// <summary>
 		/// 混合拣货 0 关闭 1开通
 		/// </summary>
-		public bool MixedPicking
+		public int? MixedPicking
 		{
 			set{ _mixedpicking=value;}
 			get{return _mixedpicking;}
@@ -197,7 +199,7 @@ namespace CoreModels.XyComm
 		/// <summary>
 		/// 拣货暂存位禁止负库存
 		/// </summary>
-		public bool PickingNoMinus
+		public int? PickingNoMinus
 		{
 			set{ _pickingnominus=value;}
 			get{return _pickingnominus;}
@@ -218,10 +220,54 @@ namespace CoreModels.XyComm
 			set{ _locktime=value;}
 			get{return _locktime;}
 		}
+		/// <summary>
+		/// 一单多货打印拣货单时同时打印小订单
+		/// </summary>
+		public int? OneMorePrint
+		{
+			set{ _onemoreprint=value;}
+			get{return _onemoreprint;}
+		}
+		/// <summary>
+		/// 一单多货验货只需要扫描快递单号
+		/// </summary>
+		public int? OneMoreOnlyEx
+		{
+			set{ _onemoreonlyex=value;}
+			get{return _onemoreonlyex;}
+		}
 		#endregion Model
 
-
     }
+
+	public class ware_f_setting{
+		public int ID{get;set;}
+		public int CoID{get;set;}
+		public int LockSku{get;set;}
+		public int IsPositionAccurate{get;set;}
+		public int SynchroSku{get;set;}
+		public int IsBeyondCount{get;set;}
+		public int OrderStore{get;set;}
+		public int PickingMethod{get;set;}
+		public int SingleGoods{get;set;}
+		public int IntervalChar{get;set;}
+		public int SendOnPicking{get;set;}
+		public int CabinetHeight{get;set;}
+		public int CabinetNum{get;set;}
+		public int LimitSender{get;set;}
+		public int IsGoodsRule{get;set;}
+		public int SegmentPicking{get;set;}
+		public int AutoLossc{get;set;}
+		public int AutoDelivery{get;set;}
+		public int MixedPicking{get;set;}
+		public int PickingNoMinus{get;set;}
+		public int ReduceStock{get;set;}
+		public int LockTime{get;set;}
+		public int OneMorePrint{get;set;}
+		public int OneMoreOnlyEx{get;set;}
+
+	}
+
 
 
 
