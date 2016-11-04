@@ -1250,10 +1250,10 @@ namespace CoreData.CoreComm
                         if(rnt > 0){
                             result.s = 1;
                             Task.Factory.StartNew(()=>{
-                                NotifyHaddle.MsgPoint(uname + "修改备注","3",res[0].ItCoid,coid,uid,uname);
+                                NotifyHaddle.MsgPoint(uname + "终止公司 "+res[0].ItName +" 与 "+res[0].WareName+" 的合作","3",res[0].ItCoid,coid,uid,uname);
                             });    
                             Task.Factory.StartNew(()=>{
-                                NotifyHaddle.MsgPoint(uname + "修改备注","3",coid,coid,uid,uname);
+                                NotifyHaddle.MsgPoint(uname + "终止公司 "+res[0].ItName +" 与 "+res[0].WareName+" 的合作","3",coid,coid,uid,uname);
                             });  
                         }else{
                             result.s = -1;
@@ -1280,7 +1280,7 @@ namespace CoreData.CoreComm
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    string sql = "SELECT ware_third_party.ApplyCoid ,ware_third_party.ItCoid FROM ware_third_party WHERE ware_third_party.ID = "+id;
+                    string sql = "SELECT ware_third_party.ApplyCoid ,ware_third_party.ItCoid,ware_third_party.ItName,ware_third_party.WareName FROM ware_third_party WHERE ware_third_party.ID = "+id;
                     var res = conn.Query<remarkSqlRes>(sql).AsList();
                     if(res.Count>0){
                         sql =@"UPDATE ware_third_party SET                               
@@ -1297,10 +1297,10 @@ namespace CoreData.CoreComm
                         if(rnt > 0){
                             result.s = 1;
                             Task.Factory.StartNew(()=>{
-                                NotifyHaddle.MsgPoint(uname + "修改备注","3",res[0].ItCoid,coid,uid,uname);
+                                NotifyHaddle.MsgPoint(uname + "取消 "+res[0].ItName +" 成为 "+res[0].WareName+" 第三方仓储申请","3",res[0].ItCoid,coid,uid,uname);
                             });    
                             Task.Factory.StartNew(()=>{
-                                NotifyHaddle.MsgPoint(uname + "修改备注","3",coid,coid,uid,uname);
+                                NotifyHaddle.MsgPoint(uname + "取消 "+res[0].ItName +" 成为 "+res[0].WareName+" 第三方仓储申请","3",coid,coid,uid,uname);
                             });  
                         }else{
                             result.s = -1;
