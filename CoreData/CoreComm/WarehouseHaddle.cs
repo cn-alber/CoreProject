@@ -251,131 +251,139 @@ namespace CoreData.CoreComm
             warehouse.createdate = DateTime.Now;
             warehouse.modifier = UserName;
             warehouse.modifydate = DateTime.Now;
-            warehouse.coid = CoID;
-            // var CommDBconn = new MySqlConnection(DbBase.CommConnectString);
-            // var UserDBconn = new MySqlConnection(DbBase.UserConnectString);
-            // CommDBconn.Open();
-            // UserDBconn.Open();
-            // var TransComm = CommDBconn.BeginTransaction();
-            // var TransUser = UserDBconn.BeginTransaction();
-            // int rtn = 0;
-            // try{
-            //     string sqlCommandText = @"INSERT INTO warehouse(parentid,warehousename,type,contract,phone,logistics,city,district,address,enable,creator,createdate,modifier,modifydate,coid) 
-            //     VALUES(@Parentid,@Warehousename,@Type,@Contract,@Phone,@Logistics,@City,@District,@Address,@Enable,@Creator,@Createdate,@Modifier,@Modifydate,@Coid)";
-            //     //新增主仓库资料
-            //     int count =CommDBconn.Execute(sqlCommandText,warehouse,TransComm);
-            //     if(count < 0)
-            //     {
-            //         result.s = -3002;
-            //         return result;
-            //     }
-            //     else
-            //     {
-            //         rtn = CommDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
-            //         CoreUser.LogComm.InsertUserLogTran(TransUser,"新增仓库资料", "warehouse", wh.name0 ,UserName, CoID, DateTime.Now);
-            //         CacheBase.Set<Warehouse>("warehouse" + CoID + rtn, warehouse);
-            //     }    
-            //     //新增销售主仓库(零数)资料
-            //     warehouse.parentid = rtn;
-            //     warehouse.warehousename = wh.name1;
-            //     warehouse.type = 1;
-            //     count =CommDBconn.Execute(sqlCommandText,warehouse,TransComm);
-            //     if(count < 0)
-            //     {
-            //         result.s = -3002;
-            //         return result;
-            //     }
-            //     else
-            //     {
-            //         int a = CommDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
-            //         CoreUser.LogComm.InsertUserLogTran(TransUser,"新增仓库资料", "warehouse", wh.name1 ,UserName, CoID, DateTime.Now);
-            //         CacheBase.Set<Warehouse>("warehouse"  +CoID + a, warehouse);
-            //     }   
-            //     //新增销售主仓库(整数)资料
-            //     if(wh.name2 != null)
-            //     {
-            //         warehouse.parentid = rtn;
-            //         warehouse.warehousename = wh.name2;
-            //         warehouse.type = 2;
-            //         count =CommDBconn.Execute(sqlCommandText,warehouse,TransComm);
-            //         if(count < 0)
-            //         {
-            //             result.s = -3002;
-            //             return result;
-            //         }
-            //         else
-            //         {
-            //             int a = CommDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
-            //             CoreUser.LogComm.InsertUserLogTran(TransUser,"新增仓库资料", "warehouse", wh.name2 ,UserName, CoID, DateTime.Now);
-            //             CacheBase.Set<Warehouse>("warehouse"  +CoID + a, warehouse);
-            //         }        
-            //     }
-            //     //新增销售退货仓库资料
-            //     warehouse.parentid = rtn;
-            //     warehouse.warehousename = wh.name3;
-            //     warehouse.type = 3;
-            //     count =CommDBconn.Execute(sqlCommandText,warehouse,TransComm);
-            //     if(count < 0)
-            //     {
-            //         result.s = -3002;
-            //         return result;
-            //     }
-            //     else
-            //     {
-            //         int a = CommDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
-            //         CoreUser.LogComm.InsertUserLogTran(TransUser,"新增仓库资料", "warehouse", wh.name3 ,UserName, CoID, DateTime.Now);
-            //         CacheBase.Set<Warehouse>("warehouse"  +CoID + a, warehouse);
-            //     }   
-            //     //新增销进货仓库资料
-            //     warehouse.parentid = rtn;
-            //     warehouse.warehousename = wh.name4;
-            //     warehouse.type = 4;
-            //     count =CommDBconn.Execute(sqlCommandText,warehouse,TransComm);
-            //     if(count < 0)
-            //     {
-            //         result.s = -3002;
-            //         return result;
-            //     }
-            //     else
-            //     {
-            //         int a = CommDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
-            //         CoreUser.LogComm.InsertUserLogTran(TransUser,"新增仓库资料", "warehouse", wh.name4 ,UserName, CoID, DateTime.Now);
-            //         CacheBase.Set<Warehouse>("warehouse"  +CoID + a, warehouse);
-            //     }   
-            //     //新增次品仓库资料
-            //     warehouse.parentid = rtn;
-            //     warehouse.warehousename = wh.name5;
-            //     warehouse.type = 5;
-            //     count =CommDBconn.Execute(sqlCommandText,warehouse,TransComm);
-            //     if(count < 0)
-            //     {
-            //         result.s = -3002;
-            //         return result;
-            //     }
-            //     else
-            //     {
-            //         int a = CommDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
-            //         CoreUser.LogComm.InsertUserLogTran(TransUser,"新增仓库资料", "warehouse", wh.name5 ,UserName, CoID, DateTime.Now);
-            //         CacheBase.Set<Warehouse>("warehouse"  +CoID + a, warehouse);
-            //     }        
-            //     TransComm.Commit();
-            //     TransUser.Commit();       
-            // }
-            // catch(Exception ex){
-            //     TransComm.Rollback();
-            //     TransUser.Rollback();
-            //     TransComm.Dispose();
-            //     TransUser.Dispose();
-            //     result.s = -1;
-            //     result.d = ex.Message;
-            // }
-            // finally
-            // {
-            //     TransComm.Dispose();
-            //     TransUser.Dispose();
-            //     CommDBconn.Dispose();
-            //     UserDBconn.Dispose();
-            // }
+            warehouse.coid = CoID;    
+
+            var wh = new WarehouseInsert();
+            wh.name1 = Company+"配送1仓1";
+            wh.name2 = Company+"配送2仓";
+            wh.name3 = Company+"销退1仓2";
+            wh.name4 = Company+"进货1仓3";
+            wh.name5 = Company+"次品1仓4";
+
+            var CommDBconn = new MySqlConnection(DbBase.CommConnectString);
+            var UserDBconn = new MySqlConnection(DbBase.UserConnectString);
+            CommDBconn.Open();
+            UserDBconn.Open();
+            var TransComm = CommDBconn.BeginTransaction();
+            var TransUser = UserDBconn.BeginTransaction();
+            int rtn = 0;
+            try{
+                string sqlCommandText = @"INSERT INTO warehouse(parentid,warehousename,type,contract,phone,logistics,city,district,address,enable,creator,createdate,modifier,modifydate,coid) 
+                VALUES(@Parentid,@Warehousename,@Type,@Contract,@Phone,@Logistics,@City,@District,@Address,@Enable,@Creator,@Createdate,@Modifier,@Modifydate,@Coid)";
+                //新增主仓库资料
+                int count =CommDBconn.Execute(sqlCommandText,warehouse,TransComm);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                else
+                {
+                    rtn = CommDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
+                    CoreUser.LogComm.InsertUserLogTran(TransUser,"初始化仓库资料", "warehouse", Company ,UserName, CoID, DateTime.Now);
+                    CacheBase.Set<Warehouse>("warehouse" + CoID + rtn, warehouse);
+                }    
+                //新增销售主仓库(零数)资料
+                warehouse.parentid = rtn;
+                warehouse.warehousename = wh.name1;
+                warehouse.type = 1;
+                count =CommDBconn.Execute(sqlCommandText,warehouse,TransComm);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                else
+                {
+                    int a = CommDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
+                    CoreUser.LogComm.InsertUserLogTran(TransUser,"初始化仓库资料", "warehouse", wh.name1 ,UserName, CoID, DateTime.Now);
+                    CacheBase.Set<Warehouse>("warehouse"  +CoID + a, warehouse);
+                }   
+                //新增销售主仓库(整数)资料
+                if(wh.name2 != null)
+                {
+                    warehouse.parentid = rtn;
+                    warehouse.warehousename = wh.name2;
+                    warehouse.type = 2;
+                    count =CommDBconn.Execute(sqlCommandText,warehouse,TransComm);
+                    if(count < 0)
+                    {
+                        result.s = -3002;
+                        return result;
+                    }
+                    else
+                    {
+                        int a = CommDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
+                        CoreUser.LogComm.InsertUserLogTran(TransUser,"初始化仓库资料", "warehouse", wh.name2 ,UserName, CoID, DateTime.Now);
+                        CacheBase.Set<Warehouse>("warehouse"  +CoID + a, warehouse);
+                    }        
+                }
+                //新增销售退货仓库资料
+                warehouse.parentid = rtn;
+                warehouse.warehousename = wh.name3;
+                warehouse.type = 3;
+                count =CommDBconn.Execute(sqlCommandText,warehouse,TransComm);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                else
+                {
+                    int a = CommDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
+                    CoreUser.LogComm.InsertUserLogTran(TransUser,"初始化仓库资料", "warehouse", wh.name3 ,UserName, CoID, DateTime.Now);
+                    CacheBase.Set<Warehouse>("warehouse"  +CoID + a, warehouse);
+                }   
+                //新增销进货仓库资料
+                warehouse.parentid = rtn;
+                warehouse.warehousename = wh.name4;
+                warehouse.type = 4;
+                count =CommDBconn.Execute(sqlCommandText,warehouse,TransComm);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                else
+                {
+                    int a = CommDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
+                    CoreUser.LogComm.InsertUserLogTran(TransUser,"初始化仓库资料", "warehouse", wh.name4 ,UserName, CoID, DateTime.Now);
+                    CacheBase.Set<Warehouse>("warehouse"  +CoID + a, warehouse);
+                }   
+                //新增次品仓库资料
+                warehouse.parentid = rtn;
+                warehouse.warehousename = wh.name5;
+                warehouse.type = 5;
+                count =CommDBconn.Execute(sqlCommandText,warehouse,TransComm);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                else
+                {
+                    int a = CommDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
+                    CoreUser.LogComm.InsertUserLogTran(TransUser,"初始化仓库资料", "warehouse", wh.name5 ,UserName, CoID, DateTime.Now);
+                    CacheBase.Set<Warehouse>("warehouse"  +CoID + a, warehouse);
+                }        
+                TransComm.Commit();
+                TransUser.Commit();       
+            }
+            catch(Exception ex){
+                TransComm.Rollback();
+                TransUser.Rollback();
+                TransComm.Dispose();
+                TransUser.Dispose();
+                result.s = -1;
+                result.d = ex.Message;
+            }
+            finally
+            {
+                TransComm.Dispose();
+                TransUser.Dispose();
+                CommDBconn.Dispose();
+                UserDBconn.Dispose();
+            }
  
             return result;
         }
@@ -1200,10 +1208,10 @@ namespace CoreData.CoreComm
                         if(rnt > 0){
                             result.s = 1;
                             Task.Factory.StartNew(()=>{
-                                NotifyHaddle.MsgPoint(uname + "审核通过公司 "+res[0].ItName +" 成为 "+res[0].WareName+" 第三方仓储","3",res[0].ItCoid,coid,uid,uname);
+                                NotifyHaddle.MsgPoint(uname + " 审核通过公司 "+res[0].ItName +" 成为 "+res[0].WareName+" 第三方仓储","3",res[0].ItCoid,coid,uid,uname);
                             });    
                             Task.Factory.StartNew(()=>{
-                                NotifyHaddle.MsgPoint(uname + "审核通过公司 "+res[0].ItName +" 成为 "+res[0].WareName+" 第三方仓储","3",coid,coid,uid,uname);
+                                NotifyHaddle.MsgPoint(uname + " 审核通过公司 "+res[0].ItName +" 成为 "+res[0].WareName+" 第三方仓储","3",coid,coid,uid,uname);
                             });  
                         }else{
                             result.s = -1;
@@ -1250,10 +1258,10 @@ namespace CoreData.CoreComm
                         if(rnt > 0){
                             result.s = 1;
                             Task.Factory.StartNew(()=>{
-                                NotifyHaddle.MsgPoint(uname + "终止公司 "+res[0].ItName +" 与 "+res[0].WareName+" 的合作","3",res[0].ItCoid,coid,uid,uname);
+                                NotifyHaddle.MsgPoint(uname + " 终止公司 "+res[0].ItName +" 与 "+res[0].WareName+" 的合作","3",res[0].ItCoid,coid,uid,uname);
                             });    
                             Task.Factory.StartNew(()=>{
-                                NotifyHaddle.MsgPoint(uname + "终止公司 "+res[0].ItName +" 与 "+res[0].WareName+" 的合作","3",coid,coid,uid,uname);
+                                NotifyHaddle.MsgPoint(uname + " 终止公司 "+res[0].ItName +" 与 "+res[0].WareName+" 的合作","3",coid,coid,uid,uname);
                             });  
                         }else{
                             result.s = -1;
@@ -1288,7 +1296,7 @@ namespace CoreData.CoreComm
                                             ware_third_party.EndMan = @endman,                                        
                                             ware_third_party.Mdate = Now()
                                         WHERE 
-                                            ware_third_party.ID =@id AND ware_third_party.CoID = @CoID;";
+                                            ware_third_party.ID =@id AND ware_third_party.ItCoid = @CoID;";
                         var rnt = conn.Execute(sql,new {                                    
                                         endman = uname,
                                         id = id,
@@ -1297,10 +1305,10 @@ namespace CoreData.CoreComm
                         if(rnt > 0){
                             result.s = 1;
                             Task.Factory.StartNew(()=>{
-                                NotifyHaddle.MsgPoint(uname + "取消 "+res[0].ItName +" 成为 "+res[0].WareName+" 第三方仓储申请","3",res[0].ItCoid,coid,uid,uname);
+                                NotifyHaddle.MsgPoint(uname + " 取消 "+res[0].ItName +" 成为 "+res[0].WareName+" 第三方仓储申请","3",res[0].ItCoid,coid,uid,uname);
                             });    
                             Task.Factory.StartNew(()=>{
-                                NotifyHaddle.MsgPoint(uname + "取消 "+res[0].ItName +" 成为 "+res[0].WareName+" 第三方仓储申请","3",coid,coid,uid,uname);
+                                NotifyHaddle.MsgPoint(uname + " 取消 "+res[0].ItName +" 成为 "+res[0].WareName+" 第三方仓储申请","3",coid,coid,uid,uname);
                             });  
                         }else{
                             result.s = -1;
