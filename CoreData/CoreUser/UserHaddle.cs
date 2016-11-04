@@ -51,7 +51,12 @@ namespace CoreData.CoreUser
                 var u = DbBase.UserDB.Query<Role>("select * from role where id = @rid and companyid = @coid", new { rid = roleid, coid = coid }).AsList();
                 if (u.Count == 0)
                 {
-                    s = -2003;
+                    if(roleid == "1"){
+                        u = DbBase.UserDB.Query<Role>("select * from role where companyid = 0").AsList();
+                        cu = u[0];
+                    }else{
+                        s = -2003;
+                    }                    
                 }
                 else
                 {
@@ -129,14 +134,15 @@ namespace CoreData.CoreUser
                 {
                     //获取权限列表
                     var role = GetRole(roleid, coid);
-                    if (role.s > 1) return null;
-                    var r = role.d as Role;
+                    if (role.s != 1){
+                        return null;                                            
+                    } 
+                    var r = role.d as Role;                    
 
-                    // var child = conn.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where viewpowerid in (" +
-                    //                              r.ViewList + ") order by ParentID,sortindex").AsList();
-                    var child = conn.Query<Refresh>("select id,name,NewIcon, NewIconPre,NewUrl as path,ParentID from menus where NewUrl != '' and viewpowerid in (0," +
-                                r.ViewList + ") order by ParentID,sortindex").AsList();
-
+                    string sql = "select id,name,NewIcon, NewIconPre,NewUrl as path,ParentID from menus where NewUrl != '' and viewpowerid in (0," +
+                                r.ViewList + ") order by ParentID,sortindex";
+                    var child = conn.Query<Refresh>(sql).AsList();
+                    Console.WriteLine(sql);
                     foreach (var c in child)
                     {
                         if (!string.IsNullOrEmpty(c.NewIconPre))
@@ -156,9 +162,9 @@ namespace CoreData.CoreUser
                     // }
                     var pidarray = (from c in child select c.parentID).Distinct().ToArray();
                     var pid = string.Join(",", pidarray);
-
-                    //parent = conn.Query<Refresh>("select id,name,CASE NewIcon  WHEN NewIconPre IS NOT NULL  THEN CONCAT(NewIcon,',','') ELSE CONCAT(NewIconPre,',','fa') END AS icons ,NewUrl as path,ParentID from menus where id in (" + pid + ") order by sortindex").AsList();
-                    parent = conn.Query<Refresh>("select id,name,NewIcon , NewIconPre ,NewUrl as path,ParentID from menus where id in (0," + pid + ") order by sortindex").AsList();
+                    sql = "select id,name,NewIcon , NewIconPre ,NewUrl as path,ParentID from menus where id in (0," + pid + ") order by sortindex";                    
+                    parent = conn.Query<Refresh>(sql).AsList();
+                    Console.WriteLine(sql);
                     foreach (var p in parent)
                     {
                         p.type = 2;

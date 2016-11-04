@@ -253,6 +253,9 @@ namespace CoreData.CoreUser
                 }
                 result.d = rtn;
                 LogComm.InsertUserLog("新增公司资料", "company", "新增公司" + com.name ,UserName, CoID, DateTime.Now);
+                System.Threading.Tasks.Task.Factory.StartNew(()=>{
+                    WarehouseHaddle.InsertWare(UserName,com.name,rtn); // 初始化仓库资料
+                });                
                 com.id = rtn;
                 CacheBase.Set<Company>("company" + rtn.ToString(), com);      
                 TransUser.Commit();

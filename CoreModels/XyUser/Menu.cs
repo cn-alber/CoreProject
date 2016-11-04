@@ -179,10 +179,10 @@ namespace CoreModels.XyUser
 		public string router{get;set;}
 		public string iconName{get;set;}
 		public string iconPrefix{get;set;}
-		public int order{get;set;}
+		public string order{get;set;}
 		public string remark{get;set;}
-		public int pid{get;set;}
-		public int accessid{get;set;}
+		public string pid{get;set;}
+		public string accessid{get;set;}
 	}
 
 	public class MenuModifyRequest{
@@ -191,10 +191,10 @@ namespace CoreModels.XyUser
 		public string router{get;set;}
 		public string iconName{get;set;}
 		public string iconPrefix{get;set;}
-		public int order{get;set;}
+		public string order{get;set;}
 		public string remark{get;set;}
-		public int pid{get;set;}
-		public int accessid{get;set;}
+		public string pid{get;set;}
+		public string accessid{get;set;}
 	}
 
 
