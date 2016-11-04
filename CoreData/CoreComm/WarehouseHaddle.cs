@@ -1601,7 +1601,7 @@ namespace CoreData.CoreComm
         ///<summary>
         /// 获取第三方仓储服务设置
         ///</summary>
-         public static DataResult wareSettingGet(string coid){
+         public static DataResult  wareSettingGet(string coid){
             var result = new DataResult(1,null);
             var setting = CacheBase.Get<ware_setting>("waresettingh"+coid);
             if(setting == null){
