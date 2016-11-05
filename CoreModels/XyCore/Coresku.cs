@@ -204,57 +204,51 @@ namespace CoreModels.XyCore
     {
         public int DataCount { get; set; } //总行数
         public int PageCount { get; set; }//总页数
-        public List<GoodsQuery> GoodsLst { get; set; }//返回资料     
-        public List<SkuQuery> SkuLst { get; set; }//返回资料   
+        public List<GoodsQuery> GoodsLst { get; set; }//货品主资料     
+        public List<SkuQuery> SkuLst { get; set; }//商品Sku明细资料   
         public List<ScoCompDDLB> ScoLst { get; set; }//供应商资料
         public List<BrandDDLB> BrandLst { get; set; }//品牌资料
     }
     #endregion
 
-    #region 商品编辑 - 主信息
-    public partial class CoreSkuAuto
+    #region 商品维护 - Get单笔商品资料 
+    public class CoreSkuAuto
     {
         public Coresku_main main { get; set; }
-        public List<coresku_item_props> items_propLst { get; set; }
-        public List<coresku_sku_props> sku_propLst { get; set; }
-        public List<Coresku> ItemLst { get; set; }
-        
-
-
-        public string SkuName { get; set; }
-        public string GoodsCode { get; set; }
-        public string GoodsName { get; set; }
-        public string Brand { get; set; }
-        public int KindID { get; set; }
-        public string KindName { get; set; }
-        public int CoID { get; set; }
-        public string Unit { get; set; }
-        public decimal Weight { get; set; }
-        public string SCoList { get; set; }
-        public string Creator { get; set; }
-        public int? status { get; set; }
-
+        public List<itemprops> itemprops_base { get; set; }//商品类目item属性基础资料
+        public List<skuprops> skuprops_base { get; set; }//商品类目Sku属性基础资料
+        public List<goods_item_props> itemprops { get; set; }//货品item属性
+        public List<goods_sku_props> skuprops { get; set; }//货品Sku属性
         public List<CoreSkuItem> items { get; set; }
     }
     #endregion
-    #region 商品编辑 - 明细列表
-    public partial class CoreSkuItem
+    #region 商品维护 - Sku明细列表
+    public class CoreSkuItem
     {
-        public string GoodsCode { get; set; }
         public string SkuID { get; set; }
         public string SkuName { get; set; }
-        public decimal CostPrice { get; set; }
-        public decimal SalePrice { get; set; }
-        public string ColorID { get; set; }
-        public string ColorName { get; set; }
-        public string SizeID { get; set; }
-        public string SizeName { get; set; }
+        public string SkuSimple { get; set; }
+        public string Norm { get; set; }
+        public string PurPrice { get; set; }
+        public string MarketPrice { get; set; }
+        public string SalePrice { get; set; }
+        public string Weight { get; set; }
         public string ParentID { get; set; }
-        public string Remark { get; set; }
-        public string Creator { get; set; }
-        public int status { get; set; }
     }
     #endregion 
+
+    #region 普通商品Sku明细 - sku属性资料
+    public class DetailSkuProps
+    {
+        public string ParentID { get; set; }
+        public string pid1 { get; set; }
+        public string val_id1 { get; set; }
+        public string pid2 { get; set; }
+        public string val_id2 { get; set; }
+        public string pid3 { get; set; }
+        public string val_id3 { get; set; }
+    }
+    #endregion
 
 
     #region ######### CoreMat

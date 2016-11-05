@@ -159,12 +159,12 @@ namespace CoreWebApi.XyCore
                     }
                 }
             }
-            if(res.s==1)
+            if (res.s == 1)
             {
                 res = CoreSkuHaddle.GetSkuLst(cp);
             }
-            var Result = CoreResult.NewResponse(res.s, res.d, "General");
-            return Result;
+
+            return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion        
 
@@ -172,27 +172,41 @@ namespace CoreWebApi.XyCore
         [HttpPostAttribute("Core/XyCore/CoreSku/GoodsQuery")]
         public ResponseResult GoodsQuery([FromBodyAttribute]JObject obj)
         {
-            string GoodsCode = obj["GoodsCode"].ToString();
-            string CoID = GetCoid();
-            var res = CoreSkuHaddle.GetCoreSkuEdit(GoodsCode, CoID);
-            var Result = CoreResult.NewResponse(res.s, res.d, "General");
-            return Result;
+            var res = new DataResult(1, null);
+            string ID = obj["ID"].ToString();
+            int x;
+            if (!string.IsNullOrEmpty(ID) && int.TryParse(ID, out x))
+            {
+                string CoID = GetCoid();
+                res = CoreSkuHaddle.GetCoreSkuEdit(ID, CoID);
+            }
+            else
+            {
+                res.s = -1;
+                res.d = "品牌参数异常";
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
 
         #region Update商品删除标记
-        [HttpPostAttribute("Core/XyCore/CoreSku/UptGoodsDel")]
+        [HttpPostAttribute("Core/XyCore/CoreSku/DeleteGoods")]
         public ResponseResult UptGoodsDel([FromBodyAttribute]JObject obj)
         {
-            List<string> GoodsLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(obj["GoodsLst"].ToString());
-            // string UserName = obj["UserName"].ToString();
-            bool IsDelete = (obj["IsDelete"].ToString().ToUpper() == "TRUE") ? true : false;
-            // int CoID = 1;
-            string UserName = GetUname();
-            int CoID = int.Parse(GetCoid());
-            var res = CoreSkuHaddle.DelGoods(GoodsLst, IsDelete, UserName, CoID);
-            var Result = CoreResult.NewResponse(res.s, res.d, "General");
-            return Result;
+            var res = new DataResult(1, null);
+            List<int> IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
+            if (IDLst.Count > 0)
+            {
+                string UserName = GetUname();
+                int CoID = int.Parse(GetCoid());
+                res = CoreSkuHaddle.DelGoods(IDLst, UserName, CoID);
+            }
+            else
+            {
+                res.s = -1;
+                res.d = "请选择需要删除的商品";
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
 
@@ -200,13 +214,19 @@ namespace CoreWebApi.XyCore
         [HttpPostAttribute("Core/XyCore/CoreSku/UptSkuDel")]
         public ResponseResult UptSkuDel([FromBodyAttribute]JObject obj)
         {
-            string Sku = obj["Sku"].ToString();
-            //string UserName = obj["UserName"].ToString();
-            bool IsDelete = (obj["IsDelete"].ToString().ToUpper() == "TRUE") ? true : false;
-            // int CoID = 1;
-            string UserName = GetUname();
-            int CoID = int.Parse(GetCoid());
-            var res = CoreSkuHaddle.DelSku(Sku, IsDelete, UserName, CoID);
+            var res = new DataResult(1, null);
+            List<int> IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
+            if (IDLst.Count > 0)
+            {
+                string UserName = GetUname();
+                int CoID = int.Parse(GetCoid());
+                res = CoreSkuHaddle.DelSku(IDLst, UserName, CoID);
+            }
+            else
+            {
+                res.s = -1;
+                res.d = "请选择需要删除的商品";
+            }
             var Result = CoreResult.NewResponse(res.s, res.d, "General");
             return Result;
         }
@@ -232,7 +252,7 @@ namespace CoreWebApi.XyCore
         {
             // CoreSkuAuto ckm = Newtonsoft.Json.JsonConvert.DeserializeObject<CoreSkuAuto>(obj["CoreSkuAuto"].ToString());
             // CoreSkuItem cki = Newtonsoft.Json.JsonConvert.DeserializeObject<CoreSkuItem>(obj["CoreSkuItem"].ToString());
-            var res = new DataResult(1,null);//CoreSkuHaddle.NewCore(ckm, cki);
+            var res = new DataResult(1, null);//CoreSkuHaddle.NewCore(ckm, cki);
             var Result = CoreResult.NewResponse(res.s, res.d, "General");
             return Result;
         }

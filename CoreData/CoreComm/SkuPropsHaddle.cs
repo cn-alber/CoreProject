@@ -116,7 +116,7 @@ namespace CoreData.CoreComm
                     var PropValLst = new List<skuprops_value>();
                     // var NewValLst = new List<skuprops_value>();
                     // var UptValLst = new List<skuprops_value>();
-                    List<long> PidLst = SkuPropLst.Select(a => a.pid).AsList();
+                    List<string> PidLst = SkuPropLst.Select(a => a.pid).AsList();
                     string PropValueSql = @"SELECT
                                                 pid,
                                                 id,

@@ -80,4 +80,19 @@ namespace CoreModels.XyComm
         public List<string> ValLst { get; set; }
     }
 
+    public class itemprops
+    {
+        // public int id { get; set; }
+        public string pid { get; set; }
+        public string name { get; set; }
+        public List<itemprops_value> itemprops_values { get; set; }
+    }
+
+    public class itemprops_value
+    {
+        public string pid { get; set; }
+        public string id { get; set; }
+        public string name { get; set; }
+    }
+
 }

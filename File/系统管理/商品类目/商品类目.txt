@@ -209,9 +209,19 @@ function说明
             pid                 long                    Sku属性name对应的pid
             name                string                  Sku属性name(顔色|尺碼)
             KindNames           string                  商品類目
-            skuprops_values     List<skuprops_values>   Sku属性可選值列表
+            skuprops_values     List<skuprops_value>    Sku属性可選值列表
 
     參考：output json 文件：SkuPropsByKind_output.json
+18.ItemPropsByKind()//商品资料新增 - 根据商品类目获取item属性值
+    方法：Get
+    路由：http://192.168.30.211:5000/Core/XyComm/CustomKindProps/ItemPropsByKind?KindID=362
+    InPut：
+          null
+    OutPut:List<itemprops>
+            pid                 long                    item属性name对应的pid
+            name                string                  item属性name
+            itemprops_values    List<itemprops_value>   item属性可選值列表
+    參考： output json 文件：ItemPropsByKind_output.json
 
 
 

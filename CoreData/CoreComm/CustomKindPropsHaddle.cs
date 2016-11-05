@@ -446,14 +446,28 @@ namespace CoreData.CoreComm
         #endregion
 
         #region 商品資料新增 - 根據類目獲取商品類目屬性
-        public static DataResult GetItemPropsByKindID(string ID, string CoID)
+        public static DataResult GetItemPropsByKind(string KindID, string CoID)
         {
             var res = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CommConnectString))
             {
                 try
                 {
-
+                    string sql = "SELECT pid,name FROM customkind_props WHERE kindid=@ID AND CoID=@CoID AND IsDelete = 0 AND Enable = 1";
+                    var p = new DynamicParameters();
+                    p.Add("@ID", KindID);
+                    p.Add("@CoID",CoID);
+                    var props = conn.Query<itemprops>(sql,p).AsList();
+                    if(props.Count>0)
+                    {
+                        string valsql = @"SELECT pid,id,name,`Order` FROM customkind_props_value WHERE kindid=@ID AND CoID=@CoID AND IsDelete=0 AND Enable = 1";
+                        var ValLst = conn.Query<Customkind_props_value>(valsql,p);
+                        foreach(var prop in props)
+                        {
+                            prop.itemprops_values =  ValLst.Where(a => a.pid.ToString() == prop.pid).OrderBy(a => a.Order).AsList().Select(c => new itemprops_value{pid=c.pid.ToString(),name = c.name,id = c.id.ToString()}).AsList();
+                        }
+                    }
+                    res.d = props;
                 }
                 catch (Exception e)
                 {

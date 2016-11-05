@@ -10,19 +10,19 @@ namespace CoreModels.XyCore
         public string GoodsCode { get; set; }
         public string GoodsName { get; set; }
         public string Brand { get; set; }
-        public int KindID { get; set; }
+        public string KindID { get; set; }
         public string KindName { get; set; }
-        public int ScoID { get; set; }
+        public string ScoID { get; set; }
         public string ScoGoodsCode { get; set; }
-        public decimal Weight { get; set; }
-        public decimal CostPrice { get; set; }
-        public decimal SalePrice { get; set; }
-        public decimal Price { get; set; }
+        public string Weight { get; set; }
+        public string CostPrice { get; set; }
+        public string SalePrice { get; set; }
+        public string Price { get; set; }
         public string TempShopID { get; set; }
         public string TempID { get; set; }
         public string Remark { get; set; }
         public string Img { get; set; }
-        public int CoID { get; set; }
+        public string CoID { get; set; }
         public bool Enable { get; set; }
         public string Creator { get; set; }
         public string CreateDate { get; set; }
@@ -66,7 +66,7 @@ namespace CoreModels.XyCore
         public string ModifyDate { get; set; }
     }
 
-    public class Item_Props
+    public class goods_item_props
     {       
         public int ID { get; set; }        
         public string pid { get; set; }
@@ -74,7 +74,7 @@ namespace CoreModels.XyCore
         public string val_name { get; set; }
         public bool Enable { get; set; }
     }
-    public class Sku_Props
+    public class goods_sku_props
     {
         public int ID { get; set; }    
         public string pid { get; set; }

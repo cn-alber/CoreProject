@@ -46,7 +46,7 @@ namespace CoreModels.XyComm
 
     public class skuprops
     {
-        public long pid { get; set; }
+        public string pid { get; set; }
         public string name { get; set; }
         public string KindNames { get; set; }
         public List<skuprops_value> skuprops_values { get; set; }

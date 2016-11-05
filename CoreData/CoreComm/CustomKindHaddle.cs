@@ -145,9 +145,10 @@ namespace CoreData.CoreComm
                     // var props = CacheBase.Get<List<Customkind_props>>(cname);//读取缓存
                     // if (props == null)
                     // {
-                    string sql = "SELECT * FROM customkind_props WHERE kindid=@ID";
+                    string sql = "SELECT * FROM customkind_props WHERE kindid=@ID AND CoID=@CoID";
                     var p = new DynamicParameters();
                     p.Add("@ID", KindID);
+                    p.Add("@CoID",CoID);
                     if (!string.IsNullOrEmpty(Enable) && Enable.ToUpper() != "ALL")
                     {
                         sql = sql + " AND Enable=@Enable";

@@ -4,8 +4,10 @@ using System.Collections.Generic;
 // using System.Linq;
 using System;
 using System.Text;
+using System.Data;
 using CoreModels.XyCore;
 using CoreModels.XyComm;
+using CoreData.CoreComm;
 using MySql.Data.MySqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,7 +16,7 @@ namespace CoreData.CoreCore
 {
     public static class CoreSkuHaddle
     {
-        #region 商品资料管理-查询货品资料
+        #region 商品资料管理-查询货品资料-商品维护查询
         public static DataResult GetGoodsLst(CoreSkuParam IParam)
         {
             var cs = new CoreSkuQuery();
@@ -113,7 +115,7 @@ namespace CoreData.CoreCore
         }
         #endregion
 
-        #region 商品资料管理-查询SKU明细
+        #region 商品资料管理-查询SKU明细-普通商品查询
         public static DataResult GetSkuLst(CoreSkuParam IParam)
         {
             var cs = new CoreSkuQuery();
@@ -269,77 +271,80 @@ namespace CoreData.CoreCore
             return res;
         }
         #endregion
-        #region 商品管理 - 获取单笔Sku详情
+        #region 商品管理 - 获取单笔Sku详情 - 编辑商品维护
         public static DataResult GetCoreSkuEdit(string ID, string CoID)
         {
             var cs = new CoreSkuAuto();
-            var res = new DataResult(1, null);
-            var p = new DynamicParameters();
+            var result = new DataResult(1, null);
             string msql = @"SELECT * FROM coresku_main WHERE ID=@ID AND CoID = @CoID";
-            // string itempropsql = @"SELECT * FROM coresku_item_props WHERE ParentID=@ID AND CoID = @CoID";
-            // string skupropsql = @"SELECT * FROM coresku_sku_props WHERE ParentID=@ID AND CoID = @CoID";
-            // string itemsql = @"SELECT * FROM coresku ParentID=@ID AND CoID = @CoID AND IsDelete=0";
+            string itempropsql = @"SELECT * FROM coresku_item_props WHERE ParentID=@ID AND CoID = @CoID AND ISDelete = 0";
+            string skupropsql = @"SELECT * FROM coresku_sku_props WHERE ParentID=@ID AND CoID = @CoID AND ISDelete = 0";
+            string itemsql = @"SELECT * FROM coresku ParentID=@ID AND CoID = @CoID AND IsDelete=0";
+            var p = new DynamicParameters();
             p.Add("@ID", ID);
             p.Add("@CoID", CoID);
-            try
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
             {
-                var main = DbBase.CoreDB.QueryFirst<Coresku_main>(msql, p);
-                if (main == null)
+                try
                 {
-                    res.s = -3001;
+                    var main = conn.QueryFirst<Coresku_main>(msql, p);
+                    if (main == null)
+                    {
+                        result.s = -3001;
+                    }
+                    else
+                    {
+                        var KindID = main.KindID;
+                        var res = CustomKindPropsHaddle.GetItemPropsByKind(KindID, CoID);
+                        if (res.s == 1)
+                        {
+                            cs.itemprops_base = res.d as List<itemprops>;
+                        }
+                        res = SkuPropsHaddle.GetSkuPropsByKind(KindID, CoID);
+                        if (res.s == 1)
+                        {
+                            cs.skuprops_base = res.d as List<skuprops>;
+                        }
+                        cs.items = conn.Query<CoreSkuItem>(itemsql, p).AsList();
+                        cs.itemprops = conn.Query<goods_item_props>(itempropsql, p).AsList();
+                        cs.skuprops = conn.Query<goods_sku_props>(skupropsql, p).AsList();
+                        result.d = cs;
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    string dsql = @"select GoodsCode,SkuID,SkuName,CostPrice,SalePrice,
-                                    ColorID,ColorName,SizeID,SizeName,ParentID,Remark
-                         from coresku where GoodsCode=@GoodsCode and CoID = @CoID";
-                    var item = DbBase.CoreDB.Query<CoreSkuItem>(dsql, p).AsList();
-                    // main.items = item;
-                    res.d = main;
+                    result.s = -1;
+                    result.d = e.Message;
                 }
-
-            }
-            catch (Exception e)
-            {
-                res.s = -1;
-                res.d = e.Message;
             }
 
-            return res;
+
+            return result;
 
         }
         #endregion
 
         #region 商品管理 - 删除商品 - 修改Delete标记
-        public static DataResult DelGoods(List<string> GoodsLst, bool ISDelete, string UserName, int CoID)
+        public static DataResult DelGoods(List<int> IDLst, string UserName, int CoID)
         {
             var res = new DataResult(1, null);
-            string Deleter = UserName;
-            DateTime? DeleteDate = DateTime.Now;
-            DateTime? DateNull = null;
-
+            var conn = new MySqlConnection(DbBase.CoreConnectString);
+            conn.Open();
+            var Trans = conn.BeginTransaction();
             try
             {
-                string UptSql = @"UPDATE coresku
-                                    SET IsDelete = @ISDelete,
-                                    Deleter = @Deleter,
-                                    DeleteDate = @DeleteDate
-                                    WHERE CoID = @CoID
-                                    AND GoodsCode IN @GoodsLst  ";
+                string UptMainSql = @"UPDATE coresku_main SET IsDelete=1,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID = @CoID AND ID IN @IDLst AND IsDelete=0";
+                string UptSql = @"UPDATE coresku SET IsDelete=1,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID = @CoID AND ParentID IN @IDLst AND IsDelete=0";
+                string UptSkuSql = @"UPDATE coresku_sku_props SET Enable=0,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE ParentID IN @IDLst AND IsDelete=0 AND Enable=1";
                 var p = new DynamicParameters();
                 p.Add("@CoID", CoID);
-                p.Add("@IsDelete", ISDelete);
-                p.Add("@GoodsLst", GoodsLst);
-                if (!ISDelete)
-                {
-                    Deleter = string.Empty;
-                    DeleteDate = DateNull;
-                }
-                p.Add("@Deleter", Deleter);
-                p.Add("@DeleteDate", DeleteDate);
-
-                int count = DbBase.CoreDB.Execute(UptSql, p);
-                if (count <= 0)
+                p.Add("@IDLst", IDLst);
+                p.Add("@Modifier", UserName);
+                p.Add("@ModifyDate", DateTime.Now.ToString());
+                int count1 = conn.Execute(UptMainSql, p, Trans);
+                int count2 = conn.Execute(UptSql, p, Trans);
+                int count3 = conn.Execute(UptSkuSql, p, Trans);
+                if (count1 < 0 || count2 < 0 || count3 < 0)
                 {
                     res.s = -3004;
                 }
@@ -347,7 +352,7 @@ namespace CoreData.CoreCore
                 {
                     Task.Factory.StartNew(() =>
                     {
-                        wareployContain("", GoodsLst, CoID, 1);
+                        // wareployContain("", GoodsLst, CoID, 1);
                     });
                 }
             }
@@ -361,42 +366,65 @@ namespace CoreData.CoreCore
         #endregion
 
         #region 商品管理 - 删除Sku商品 - 修改Delete标记
-        public static DataResult DelSku(string Sku, bool ISDelete, string UserName, int CoID)
+        public static DataResult DelSku(List<int> IDLst, string UserName, int CoID)
         {
             var res = new DataResult(1, null);
-            string Deleter = UserName;
-            DateTime? DeleteDate = DateTime.Now;
-            DateTime? DateNull = null;
+            var conn = new MySqlConnection(DbBase.CoreConnectString);
+            conn.Open();
+            var Trans = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
             try
             {
-                string UptSql = @"UPDATE coresku
-                                    SET IsDelete = @ISDelete,
-                                    Deleter = @Deleter,
-                                    DeleteDate = @DeleteDate
-                                    WHERE CoID = @CoID
-                                    AND SkuID = @Sku  ";
+                string UptSql = @"UPDATE coresku SET IsDelete=1,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID = @CoID AND ID IN @IDLst AND IsDelete=0";
                 var p = new DynamicParameters();
                 p.Add("@CoID", CoID);
-                p.Add("@IsDelete", ISDelete);
-                p.Add("@Sku", Sku);
-                if (!ISDelete)
-                {
-                    Deleter = string.Empty;
-                    DeleteDate = DateNull;
-                }
-                p.Add("@Deleter", Deleter);
-                p.Add("@DeleteDate", DeleteDate);
-
-                int count = DbBase.CoreDB.Execute(UptSql, p);
-                if (count <= 0)
+                p.Add("@IDLst", IDLst);
+                p.Add("@Modifier", UserName);
+                p.Add("@ModifyDate", DateTime.Now.ToString());
+                int count = conn.Execute(UptSql, p, Trans);
+                if (count < 0)
                 {
                     res.s = -3004;
                 }
                 else
                 {
+                    #region 获取现有Sku明细属性，更新商品Sku属性表
+                    string goodSql = @"SELECT Distinct ParentID FROM coresku WHERE ID IN @IDLst AND CoID = @CoID";
+                    string PropSql = @"SELECT ParentID,pid1,val_id1,pid2,val_id2,pid3,val_id3 FROM coresku WHERE CoID=@CoID AND IsDelete=0 AND ParentID IN @ParentIDLst";
+                    var ParentIDLst = conn.Query<string>(goodSql, new { CoID = CoID, IDLst = IDLst }, Trans).AsList();
+                    var DSkuProps = conn.Query<DetailSkuProps>(PropSql, new { CoID = CoID, ParentIDLst = ParentIDLst }, Trans).AsList();
+                    var SkuPropsValLst = new List<string>();
+                    if (DSkuProps.Count > 0)
+                    {
+                        foreach (var d in DSkuProps)
+                        {
+                            if (!SkuPropsValLst.Contains(d.val_id1))
+                                SkuPropsValLst.Add(d.val_id1);
+                            if (!SkuPropsValLst.Contains(d.val_id2))
+                                SkuPropsValLst.Add(d.val_id2);
+                            if (!SkuPropsValLst.Contains(d.val_id3))
+                                SkuPropsValLst.Add(d.val_id3);
+                        }
+                    }
+                    string UptSkuPropSql = "UPDATE coresku_sku_props SET Enable=0,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ParentID IN @ParentIDLst AND Enable = 1";                    
+                    var p1 = new DynamicParameters();
+                    p1.Add("@CoID", CoID);
+                    p1.Add("@ParentIDLst", ParentIDLst);
+                    p1.Add("@Modifier", UserName);
+                    p1.Add("@ModifyDate", DateTime.Now.ToString());
+                    if (SkuPropsValLst.Count > 0)
+                    {
+                        UptSkuPropSql = UptSkuPropSql + " AND ID NOT IN @SkuPropsValLst";
+                        p1.Add("@SkuPropsValLst",SkuPropsValLst);
+                    }
+                    conn.Execute(UptSkuPropSql,p1,Trans);   
+
+                    #endregion
+
+                    Trans.Commit();
+
                     Task.Factory.StartNew(() =>
                     {
-                        wareployContain(Sku, null, CoID, 1);
+                        // wareployContain(Sku, null, CoID, 1);
                     });
                 }
             }
@@ -409,7 +437,7 @@ namespace CoreData.CoreCore
         }
         #endregion
 
-        #region 清除商品回收站
+        #region 清除商品回收站--停用
         public static DataResult DelGoodsRec(List<string> GoodsLst, int CoID)
         {
             var res = new DataResult(1, null);

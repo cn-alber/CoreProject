@@ -10,7 +10,7 @@ namespace CoreModels.XyComm
         public int id { get; set; }
         public string mapping { get; set; }//映射
         public string name { get; set; }//属性可选值value
-        public long pid { get; set; }
+        public string pid { get; set; }
         public long vid { get; set; }
         public bool Enable
         {
@@ -38,7 +38,7 @@ namespace CoreModels.XyComm
     public class skuprops_value
     {
         
-        public long pid { get; set; }
+        public string pid { get; set; }
         public int id { get; set; }
         public string mapping { get; set; }//映射
         public string name { get; set; }//属性可选值value
