@@ -48,7 +48,7 @@ namespace CoreData.CoreUser
                         }else{
                             result.d = new {
                                 list = notifyMsg,
-                                page = msgp.PageIndex,
+                                page = msgp.PageIndex
                             };
                         }                    
                     }
