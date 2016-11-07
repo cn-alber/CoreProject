@@ -4,30 +4,33 @@ namespace CoreModels.XyComm
       #region Model
 		private int _id;
 		private int? _coid;
-		private int? _locksku;
-		private int? _ispositionaccurate;
-		private int? _synchrosku;
-		private int? _isbeyondcount;
-		private int? _orderstore;
-		private int? _pickingmethod;
-		private int? _goodsuniquecode;
-		private int? _codepre;
-		private int? _singlegoods;
-		private int? _intervalchar;
-		private int? _sendonpicking;
-		private int? _cabinetheight;
-		private int? _cabinetnum;
-		private int? _limitsender;
-		private int? _isgoodsrule;
-		private int? _segmentpicking;
-		private int? _autolossc;
-		private int? _autodelivery;
-		private int? _mixedpicking;
-		private int? _pickingnominus;
-		private int? _reducestock;
-		private int? _locktime;
-		private int? _onemoreprint;
-		private int? _onemoreonlyex;
+		private int? _locksku=0;
+		private int? _ispositionaccurate=0;
+		private int? _synchrosku=0;
+		private int? _isbeyondcount=1;
+		private int? _orderstore=0;
+		private int? _pickingmethod=1;
+		private int? _goodsuniquecode=0;
+		private int? _codepre=1;
+		private int? _singlegoods=0;
+		private int? _intervalchar=4;
+		private int? _sendonpicking=0;
+		private int? _cabinetheight=3;
+		private int? _cabinetnum=0;
+		private int? _limitsender=0;
+		private int? _sendusecount;
+		private int? _isgoodsrule=2;
+		private int? _segmentpicking=0;
+		private int? _autolossc=0;
+		private int? _autodelivery=0;
+		private int? _mixedpicking=0;
+		private int? _pickingnominus=0;
+		private int? _reducestock=1;
+		private int? _locktime=0;
+		private int? _onemoreprint=0;
+		private int? _onemoreonlyex=0;
+		private bool _ismain= false;
+		private bool _isfen= false;
 		/// <summary>
 		/// 
 		/// </summary>
@@ -157,6 +160,14 @@ namespace CoreModels.XyComm
 			get{return _limitsender;}
 		}
 		/// <summary>
+		/// 播种时时候需要输入数量 1：逐一扫描  2：输入数量
+		/// </summary>
+		public int? SendUseCount
+		{
+			set{ _sendusecount=value;}
+			get{return _sendusecount;}
+		}
+		/// <summary>
 		/// 仓位货物置放规则 1 一仓多货 2 一仓一货
 		/// </summary>
 		public int? IsGoodsRule
@@ -235,6 +246,22 @@ namespace CoreModels.XyComm
 		{
 			set{ _onemoreonlyex=value;}
 			get{return _onemoreonlyex;}
+		}
+		/// <summary>
+		/// 是否是主仓
+		/// </summary>
+		public bool IsMain
+		{
+			set{ _ismain=value;}
+			get{return _ismain;}
+		}
+		/// <summary>
+		/// 是否是分仓
+		/// </summary>
+		public bool IsFen
+		{
+			set{ _isfen=value;}
+			get{return _isfen;}
 		}
 		#endregion Model
 

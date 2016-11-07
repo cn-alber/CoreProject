@@ -1442,11 +1442,30 @@ namespace CoreData.CoreComm
                     {
                         string sql ="SELECT * FROM wareploy WHERE ID = "+id;                                                                         
                         var res = conn.Query<WarePloy>(sql).AsList();
+                        
                         if(res.Count>0){
+                            var p = res[0];                                                     
                             result.d = new{
                                 province = province,
-                                shop = shop,
-                                ploy = res[0]
+                                shop = shop,                                
+                                ploy = new {
+                                    ID = p.ID,
+                                    CoID = p.CoID,
+                                    Name = p.Name,
+                                    Level = p.Level,
+                                    Wid = p.Wid,
+                                    Wname = p.Wname,
+                                    Province = string.IsNullOrEmpty(p.Province)? new string[]{} : p.Province.Split(new char[] {','},StringSplitOptions.RemoveEmptyEntries),
+                                    Shopid = string.IsNullOrEmpty(p.Shopid)? new string[]{} : p.Shopid.Split(new char[] {','},StringSplitOptions.RemoveEmptyEntries),
+                                    Did = string.IsNullOrEmpty(p.Did)? new string[]{} :  p.Did.Split(new char[] {','},StringSplitOptions.RemoveEmptyEntries),
+                                    ContainGoods = string.IsNullOrEmpty(p.ContainGoods)? new string[]{} :  p.ContainGoods.Split(new char[] {','},StringSplitOptions.RemoveEmptyEntries),
+                                    RemoveGoods = string.IsNullOrEmpty(p.RemoveGoods)? new string[]{} :  p.RemoveGoods.Split(new char[] {','},StringSplitOptions.RemoveEmptyEntries),
+                                    ContainSkus = string.IsNullOrEmpty(p.ContainSkus)? new string[]{} : p.ContainSkus.Split(new char[] {','},StringSplitOptions.RemoveEmptyEntries),
+                                    RemoveSkus =  string.IsNullOrEmpty(p.RemoveSkus)? new string[]{} : p.RemoveSkus.Split(new char[] {','},StringSplitOptions.RemoveEmptyEntries),
+                                    MinNum = p.MinNum,
+                                    MaxNum = p.MaxNum,
+                                    Payment = p.Payment
+                                }
                             };
                         }else{
                             result.d = new{
@@ -1622,39 +1641,44 @@ namespace CoreData.CoreComm
         ///</summary>
          public static DataResult  wareSettingGet(string coid){
             var result = new DataResult(1,null);
-            // var setting = CacheBase.Get<ware_setting>("waresettingh"+coid);
+            var setting = new ware_setting();
             // if(setting == null){
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
                     string sql = "SELECT * FROM ware_setting WHERE CoID = "+coid ;
-                    var isMain = conn.Query<int>("SELECT ID FROM ware_third_party WHERE CoID = "+coid).AsList();
-                    if(isMain.Count>0){ // 判断是否为主仓
-                        var res = conn.Query<ware_setting>(sql).AsList();
-                        if(res.Count >0){
-                            result.d =res[0]; 
-                            // CacheBase.Set<ware_setting>("waresettingh"+coid,setting);
-                        }else{
-                            result.s= -3010;
-                        }
-                    }else{                            
-                        var isFen = conn.Query<int>("SELECT ID FROM ware_third_party WHERE ItCoid = "+coid).AsList();
-                        if(isFen.Count>0){ 
-                            var res = conn.Query<ware_f_setting>(sql).AsList();
-                            if(res.Count >0){
-                                result.d =res[0];                                 
-                            }else{
-                                result.s= -3010;
-                            }
-                        }else{ //不为主仓，亦不为分仓，可能是主账号但未有分仓，故没有记录
-                            var res = conn.Query<ware_setting>(sql).AsList();
-                            if(res.Count >0){
-                                result.d =res[0];                                 
-                            }else{
-                                result.s= -3010;
-                            }
-                        }
-                    }             
+                    var res = conn.Query<ware_setting>(sql).AsList();
+                    if(res.Count >0){
+                        setting = res[0];
+                        
+
+                         
+                        // CacheBase.Set<ware_setting>("waresettingh"+coid,setting);
+                    }else{
+                        result.s= -3010;
+                    }
+
+
+                    // if(isMain.Count>0){ // 判断是否为主仓
+                        
+                    // }else{                            
+                    //     var isFen = conn.Query<int>("SELECT ID FROM ware_third_party WHERE ItCoid = "+coid).AsList();
+                    //     if(isFen.Count>0){ 
+                    //         var res = conn.Query<ware_f_setting>(sql).AsList();
+                    //         if(res.Count >0){
+                    //             result.d =res[0];                                 
+                    //         }else{
+                    //             result.s= -3010;
+                    //         }
+                    //     }else{ //不为主仓，亦不为分仓，可能是主账号但未有分仓，故没有记录
+                    //         var res = conn.Query<ware_setting>(sql).AsList();
+                    //         if(res.Count >0){
+                    //             result.d =res[0];                                 
+                    //         }else{
+                    //             result.s= -3010;
+                    //         }
+                    //     }
+                    // }             
                 }
                 catch (Exception e)
                 {
