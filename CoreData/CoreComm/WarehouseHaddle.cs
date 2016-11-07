@@ -1449,8 +1449,7 @@ namespace CoreData.CoreComm
                                 province = province,
                                 shop = shop,                                
                                 ploy = new {
-                                    ID = p.ID,
-                                    CoID = p.CoID,
+                                    ID = p.ID,                                    
                                     Name = p.Name,
                                     Level = p.Level,
                                     Wid = p.Wid,
@@ -1458,10 +1457,10 @@ namespace CoreData.CoreComm
                                     Province = string.IsNullOrEmpty(p.Province)? new string[]{} : p.Province.Split(new char[] {','},StringSplitOptions.RemoveEmptyEntries),
                                     Shopid = string.IsNullOrEmpty(p.Shopid)? new string[]{} : p.Shopid.Split(new char[] {','},StringSplitOptions.RemoveEmptyEntries),
                                     Did = string.IsNullOrEmpty(p.Did)? new string[]{} :  p.Did.Split(new char[] {','},StringSplitOptions.RemoveEmptyEntries),
-                                    ContainGoods = string.IsNullOrEmpty(p.ContainGoods)? new string[]{} :  p.ContainGoods.Split(new char[] {','},StringSplitOptions.RemoveEmptyEntries),
-                                    RemoveGoods = string.IsNullOrEmpty(p.RemoveGoods)? new string[]{} :  p.RemoveGoods.Split(new char[] {','},StringSplitOptions.RemoveEmptyEntries),
-                                    ContainSkus = string.IsNullOrEmpty(p.ContainSkus)? new string[]{} : p.ContainSkus.Split(new char[] {','},StringSplitOptions.RemoveEmptyEntries),
-                                    RemoveSkus =  string.IsNullOrEmpty(p.RemoveSkus)? new string[]{} : p.RemoveSkus.Split(new char[] {','},StringSplitOptions.RemoveEmptyEntries),
+                                    ContainGoods = p.ContainGoods,
+                                    RemoveGoods = p.RemoveGoods,
+                                    ContainSkus = p.ContainSkus,
+                                    RemoveSkus =  p.RemoveSkus,
                                     MinNum = p.MinNum,
                                     MaxNum = p.MaxNum,
                                     Payment = p.Payment
@@ -1650,6 +1649,29 @@ namespace CoreData.CoreComm
         }
 
         ///<summary>
+        /// 
+        ///</summary>
+         public static DataResult checkWare(){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+        
+
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
+
+
+        ///<summary>
         /// 获取第三方仓储服务设置
         ///</summary>
          public static DataResult  wareSettingGet(string coid){
@@ -1708,7 +1730,7 @@ namespace CoreData.CoreComm
         }
 
          ///<summary>
-        /// 
+        /// 商家个人设置
         ///</summary>
          public static DataResult warePersonSet(string coid){
             var result = new DataResult(1,null);
