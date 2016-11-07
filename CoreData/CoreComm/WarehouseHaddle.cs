@@ -1343,7 +1343,7 @@ namespace CoreData.CoreComm
                             w.ID,w.WareName,w.CoID
                         FROM 
                             ware_third_party as w 
-                        WHERE w.CoID ="+CoID; 
+                        WHERE w.Enable = 2 AND w.CoID ="+CoID; 
                     res = conn.Query<wareLst>(sql).AsList();                                  
                 }
                 catch
@@ -1419,17 +1419,13 @@ namespace CoreData.CoreComm
 
     public static DataResult editploy(string CoID,string id = ""){
             var result = new DataResult(1,null);
-            var warelist = new List<wareLst>();
             var province = new List<AreaAll>();
             var shop = new List<shopEnum>();
-            Task[] tasks = new Task[3];
-            tasks[0] =  Task.Factory.StartNew(()=>{
-                warelist = getWarelist(CoID);
-            });  
-            tasks[1] =   Task.Factory.StartNew(()=>{
+            Task[] tasks = new Task[2];
+            tasks[0] =   Task.Factory.StartNew(()=>{
                 province = getAreaAll();
             }); 
-            tasks[2] =  Task.Factory.StartNew(()=>{
+            tasks[1] =  Task.Factory.StartNew(()=>{
                 shop = getShopEnum(CoID);
             });
               
@@ -1437,7 +1433,6 @@ namespace CoreData.CoreComm
 
             if(string.IsNullOrEmpty(id)){
                 result.d = new{
-                    warelist = warelist,
                     province = province,
                     shop = shop
                 };
@@ -1449,14 +1444,12 @@ namespace CoreData.CoreComm
                         var res = conn.Query<WarePloy>(sql).AsList();
                         if(res.Count>0){
                             result.d = new{
-                                warelist = warelist,
                                 province = province,
                                 shop = shop,
                                 ploy = res[0]
                             };
                         }else{
                             result.d = new{
-                                warelist = warelist,
                                 province = province,
                                 shop = shop
                             };

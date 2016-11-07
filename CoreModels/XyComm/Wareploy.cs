@@ -6,10 +6,11 @@ namespace CoreModels.XyComm
 		private int _id;
 		private string _name;
 		private int? _level;
-		private int? _wid;
-		private int? _province;
-		private int? _shopid;
-		private int? _did;
+		private int? _wid=0;
+		private string _wname;
+		private string _province;
+		private string _shopid;
+		private string _did;
 		private string _containgoods;
 		private string _removegoods;
 		private string _containskus;
@@ -51,9 +52,17 @@ namespace CoreModels.XyComm
 			get{return _wid;}
 		}
 		/// <summary>
+		/// 仓库名
+		/// </summary>
+		public string Wname
+		{
+			set{ _wname=value;}
+			get{return _wname;}
+		}
+		/// <summary>
 		/// 限定省份
 		/// </summary>
-		public int? Province
+		public string Province
 		{
 			set{ _province=value;}
 			get{return _province;}
@@ -61,7 +70,7 @@ namespace CoreModels.XyComm
 		/// <summary>
 		/// 限定店铺
 		/// </summary>
-		public int? Shopid
+		public string Shopid
 		{
 			set{ _shopid=value;}
 			get{return _shopid;}
@@ -69,13 +78,13 @@ namespace CoreModels.XyComm
 		/// <summary>
 		/// 分销商ID
 		/// </summary>
-		public int? Did
+		public string Did
 		{
 			set{ _did=value;}
 			get{return _did;}
 		}
 		/// <summary>
-		/// 包含商品编码
+		/// 包含商品货号
 		/// </summary>
 		public string ContainGoods
 		{
@@ -83,7 +92,7 @@ namespace CoreModels.XyComm
 			get{return _containgoods;}
 		}
 		/// <summary>
-		/// 排除的商品编码
+		/// 排除的商品货号
 		/// </summary>
 		public string RemoveGoods
 		{
@@ -91,7 +100,7 @@ namespace CoreModels.XyComm
 			get{return _removegoods;}
 		}
 		/// <summary>
-		/// 包含商品的款式编码
+		/// 包含商品编码
 		/// </summary>
 		public string ContainSkus
 		{
@@ -99,7 +108,7 @@ namespace CoreModels.XyComm
 			get{return _containskus;}
 		}
 		/// <summary>
-		/// 排除商品的款式编码
+		/// 排除商品编码
 		/// </summary>
 		public string RemoveSkus
 		{
@@ -139,8 +148,12 @@ namespace CoreModels.XyComm
 			get{return _coid;}
 		}
 		#endregion Model
+
         
     }
+
+
+
 
 
 }
