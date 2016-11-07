@@ -1480,7 +1480,7 @@ namespace CoreData.CoreComm
                             if(p.Wid == 0){
                                 p.Name = "本仓";
                             }else{
-                                p.Name = conn.Query<string>("SELECT WareName from ware_third_party WHERE ID = 2;").AsList()[0];
+                                p.Name = conn.Query<string>("SELECT WareName from ware_third_party WHERE ID ="+p.Wid).AsList()[0];
                             }
                             result.d = new{
                                 province = province,
