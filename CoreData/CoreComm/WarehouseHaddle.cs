@@ -1327,9 +1327,13 @@ namespace CoreData.CoreComm
             }
             return result;
         }
-        ///<summary>
-        /// 指定仓库
-        ///</summary>
+
+
+
+
+    ///<summary>
+    /// 指定仓库
+    ///</summary>
     public static List<wareLst> getWarelist(string CoID){
         var res = new List<wareLst>();
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
@@ -1370,6 +1374,28 @@ namespace CoreData.CoreComm
 
         return res;
     }
+
+    ///<summary>
+    ///  分仓策略list
+    ///</summary>
+    public static DataResult WarePloyList(string CoID){
+        var result = new DataResult(1,null);
+        using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+            try
+            {
+                string sql = @"SELECT ID,`Name` FROM wareploy WHERE CoID ="+CoID+";";
+                result.d = conn.Query<wareploylist>(sql).AsList();                                  
+            }
+            catch (Exception e)
+            {
+                result.s = -1;
+                result.d= e.Message; 
+                conn.Dispose();
+            }
+        }
+        return result;
+    }
+
 
     ///<summary>
     /// 指定店铺

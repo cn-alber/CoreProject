@@ -25,6 +25,13 @@ namespace CoreModels.XyComm
         public string warename{get;set;}
     }
 
+    public class wareploylist{
+        public int id{get;set;}
+        public string name{get;set;}
+
+    }
+
+
 
     public class itWare{
         public int id{get;set;}

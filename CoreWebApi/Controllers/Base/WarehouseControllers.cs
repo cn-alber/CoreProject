@@ -186,6 +186,14 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
+        [HttpGetAttribute("/Core/Warehouse/WarePloyList")]
+        public ResponseResult WarePloyList(string id="")
+        {   
+            string CoID = GetCoid();
+            var data = WarehouseHaddle.WarePloyList(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
         [HttpGetAttribute("/Core/Warehouse/editploy")]
         public ResponseResult editploy(string id="")
         {   
