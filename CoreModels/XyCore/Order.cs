@@ -489,4 +489,9 @@ namespace CoreModels.XyCore
         public string type{get;set;}//H高风险;M中风险;L推荐项;A主订单
         public List<Order> MOrd{get;set;}
     }
+    public class SplitOrd
+    {
+        public int Skuid{get;set;}
+        public int Qty{get;set;}
+    }
 }

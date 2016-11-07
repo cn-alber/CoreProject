@@ -290,8 +290,8 @@ namespace CoreWebApi
             int id = int.Parse(co["OID"].ToString());
             long soid = long.Parse(co["SoID"].ToString());
             List<int> skuid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["SkuIDList"].ToString());
-            string username = GetUname();
-            int CoID = int.Parse(GetCoid());
+            string username = "管理员";//GetUname();
+            int CoID = 1;//int.Parse(GetCoid());
             var data = OrderHaddle.InsertOrderDetail(id,soid,skuid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -302,8 +302,8 @@ namespace CoreWebApi
             int id = int.Parse(co["OID"].ToString());
             long soid = long.Parse(co["SoID"].ToString());
             List<int> skuid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["SkuIDList"].ToString());
-            string username = GetUname();
-            int CoID = int.Parse(GetCoid());
+            string username = "管理员";//GetUname();
+            int CoID = 1;//int.Parse(GetCoid());
             var data = OrderHaddle.DeleteOrderDetail(id,soid,skuid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -324,8 +324,8 @@ namespace CoreWebApi
             {
                 qty = int.Parse(co["Qty"].ToString());
             }
-            string username = GetUname();
-            int CoID = int.Parse(GetCoid());
+            string username = "管理员";//GetUname();
+            int CoID = 1;//int.Parse(GetCoid());
             var data = OrderHaddle.UpdateOrderDetail(id,soid,skuid,CoID,username,price,qty);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -385,8 +385,8 @@ namespace CoreWebApi
                 pay.PayAmount = co["PayAmount"].ToString();
                 pay.Amount = co["PayAmount"].ToString();
             }
-            string username = GetUname();
-            int CoID = int.Parse(GetCoid());
+            string username = "管理员";//GetUname();
+            int CoID = 1;//int.Parse(GetCoid());
             data = OrderHaddle.ManualPay(pay,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -397,8 +397,8 @@ namespace CoreWebApi
             int OID = int.Parse(co["OID"].ToString());
             long SoID = long.Parse(co["SoID"].ToString());
             int payid = int.Parse(co["PayID"].ToString());
-            string username = GetUname();
-            int CoID = int.Parse(GetCoid());
+            string username = "管理员";//GetUname();
+            int CoID = 1;//int.Parse(GetCoid());
             var data = OrderHaddle.CancleConfirmPay(OID,SoID,payid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -409,8 +409,8 @@ namespace CoreWebApi
             int OID = int.Parse(co["OID"].ToString());
             long SoID = long.Parse(co["SoID"].ToString());
             int payid = int.Parse(co["PayID"].ToString());
-            string username = GetUname();
-            int CoID = int.Parse(GetCoid());
+            string username = "管理员";//GetUname();
+            int CoID = 1;//int.Parse(GetCoid());
             var data = OrderHaddle.ConfirmPay(OID,SoID,payid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -421,8 +421,8 @@ namespace CoreWebApi
             int OID = int.Parse(co["OID"].ToString());
             long SoID = long.Parse(co["SoID"].ToString());
             int payid = int.Parse(co["PayID"].ToString());
-            string username = GetUname();
-            int CoID = int.Parse(GetCoid());
+            string username = "管理员";//GetUname();
+            int CoID = 1;//int.Parse(GetCoid());
             var data = OrderHaddle.CanclePay(OID,SoID,payid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -432,8 +432,8 @@ namespace CoreWebApi
         {   
             int OID = int.Parse(co["OID"].ToString());
             long SoID = long.Parse(co["SoID"].ToString());
-            string username = GetUname();
-            int CoID = int.Parse(GetCoid());
+            string username = "管理员";//GetUname();
+            int CoID = 1;//int.Parse(GetCoid());
             var data = OrderHaddle.QuickPay(OID,SoID,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -473,6 +473,17 @@ namespace CoreWebApi
             }
             int CoID = int.Parse(GetCoid());
             data = OrderHaddle.GetMergeOrd(oid,CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/OrdMerger")]
+        public ResponseResult OrdMerger([FromBodyAttribute]JObject co)
+        {   
+            int oid = int.Parse(co["OID"].ToString());
+            List<int> merid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["MerID"].ToString());
+            string username = "管理员";//GetUname();
+            int CoID = 1;//int.Parse(GetCoid());
+            var data = OrderHaddle.OrdMerger(oid,merid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     }

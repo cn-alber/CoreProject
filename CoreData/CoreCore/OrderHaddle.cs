@@ -1153,9 +1153,9 @@ namespace CoreData.CoreCore
                 //更新订单的金额和重量
                 if (rr.Count > 0)
                 {
-                    string sqlCommandText = @"update `order` set SkuAmount = SkuAmount + @SkuAmount,Amount = SkuAmount + ExAmount,ExWeight = ExWeight + @ExWeight,Modifier=@Modifier,ModifyDate=@ModifyDate 
-                                              where ID = @ID and CoID = @CoID";
-                    int count = CoreDBconn.Execute(sqlCommandText, new { SkuAmount = amt, ExWeight = weight, Modifier = Username, ModifyDate = DateTime.Now, ID = id, CoID = CoID }, TransCore);
+                    string sqlCommandText = @"update `order` set SkuAmount = SkuAmount + @SkuAmount,Amount = SkuAmount + ExAmount,ExWeight = ExWeight + @ExWeight,
+                                            OrdQty = @OrdQty,Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and CoID = @CoID";
+                    int count = CoreDBconn.Execute(sqlCommandText, new { SkuAmount = amt, ExWeight = weight, OrdQty = rr.Count,Modifier = Username, ModifyDate = DateTime.Now, ID = id, CoID = CoID }, TransCore);
                     if (count < 0)
                     {
                         result.s = -3003;
@@ -1223,12 +1223,13 @@ namespace CoreData.CoreCore
                         return result;
                     }
                 }
-                decimal amt = 0, weight = 0;
+                decimal amt = 0, weight = 0,qty = 0;
                 foreach (int a in skuid)
                 {
                     var x = CoreDBconn.Query<OrderItem>("select id,skuid,realprice,qty,amount,totalweight from orderitem where oid = " + id + " and soid =" + soid + " and coid =" + CoID + " and skuautoid = " + a).AsList();
                     if (x.Count > 0)
                     {
+                        qty += x[0].Qty;
                         amt += decimal.Parse(x[0].Amount);
                         weight += decimal.Parse(x[0].TotalWeight);
                         var log = new Log();
@@ -1251,9 +1252,9 @@ namespace CoreData.CoreCore
                     return result;
                 }
                 //更新订单的金额和重量
-                sqlCommandText = @"update `order` set SkuAmount = SkuAmount - @SkuAmount,Amount = SkuAmount + ExAmount,ExWeight = ExWeight - @ExWeight,Modifier=@Modifier,ModifyDate=@ModifyDate 
-                                            where ID = @ID and CoID = @CoID";
-                count = CoreDBconn.Execute(sqlCommandText, new { SkuAmount = amt, ExWeight = weight, Modifier = Username, ModifyDate = DateTime.Now, ID = id, CoID = CoID }, TransCore);
+                sqlCommandText = @"update `order` set SkuAmount = SkuAmount - @SkuAmount,Amount = SkuAmount + ExAmount,ExWeight = ExWeight - @ExWeight,
+                                  OrdQty = OrdQty - @OrdQty, Modifier=@Modifier,ModifyDate=@ModifyDate  where ID = @ID and CoID = @CoID";
+                count = CoreDBconn.Execute(sqlCommandText, new { SkuAmount = amt, ExWeight = weight, OrdQty = qty,Modifier = Username, ModifyDate = DateTime.Now, ID = id, CoID = CoID }, TransCore);
                 if (count < 0)
                 {
                     result.s = -3003;
@@ -1378,9 +1379,9 @@ namespace CoreData.CoreCore
                         result.s = -3003;
                         return result;
                     }
-                    sqlCommandText = @"update `order` set SkuAmount = SkuAmount + @SkuAmount,Amount = SkuAmount + ExAmount,ExWeight = ExWeight + @ExWeight,Modifier=@Modifier,ModifyDate=@ModifyDate 
+                    sqlCommandText = @"update `order` set SkuAmount = SkuAmount + @SkuAmount,Amount = SkuAmount + ExAmount,ExWeight = ExWeight + @ExWeight,ordqty = ordqty + @Ordqty ,Modifier=@Modifier,ModifyDate=@ModifyDate 
                                               where ID = @ID and CoID = @CoID";
-                    count = CoreDBconn.Execute(sqlCommandText, new { SkuAmount = pricenew * qtynew - amt, ExWeight = qtynew * decimal.Parse(x[0].Weight) - weight, Modifier = Username, ModifyDate = DateTime.Now, ID = id, CoID = CoID }, TransCore);
+                    count = CoreDBconn.Execute(sqlCommandText, new { SkuAmount = pricenew * qtynew - amt, ExWeight = qtynew * decimal.Parse(x[0].Weight) - weight,Ordqty = qtynew - x[0].Qty, Modifier = Username, ModifyDate = DateTime.Now, ID = id, CoID = CoID }, TransCore);
                     if (count < 0)
                     {
                         result.s = -3003;
@@ -1544,7 +1545,7 @@ namespace CoreData.CoreCore
                 //更新订单
                 ord.PaidAmount = (PaidAmount + decimal.Parse(pay.PayAmount)).ToString();
                 ord.PayAmount = (PayAmount + decimal.Parse(pay.PayAmount)).ToString();
-                if(ord.PayDate == null)
+                if(ord.PayDate == null || ord.PayDate <= DateTime.Parse("1900-01-01"))
                 {
                     ord.PayDate = pay.PayDate;
                 }
@@ -1931,7 +1932,7 @@ namespace CoreData.CoreCore
                 //更新订单
                 ord.PaidAmount = (PaidAmount + pay).ToString();
                 ord.PayAmount = (PayAmount + pay).ToString();
-                if(ord.PayDate == null)
+                if(ord.PayDate == null || ord.PayDate <= DateTime.Parse("1900-01-01"))
                 {
                     ord.PayDate = payinfo[0].PayDate;
                 }
@@ -2198,7 +2199,7 @@ namespace CoreData.CoreCore
                 //更新订单
                 ord.PaidAmount = Amount.ToString();
                 ord.PayAmount = (Amount - PaidAmount + decimal.Parse(ord.PayAmount)).ToString();
-                if(ord.PayDate == null)
+                if(ord.PayDate == null || ord.PayDate <= DateTime.Parse("1900-01-01"))
                 {
                     ord.PayDate = pay.PayDate;
                 }
@@ -2419,10 +2420,205 @@ namespace CoreData.CoreCore
             }    
             return result;
         }
+        ///<summary>
+        ///订单合并
+        ///</summary>
+        public static DataResult OrdMerger(int oid,List<int> MerID,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var logs = new List<Log>();
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlcommand = "select * from `order` where id = " + oid + " and coid = " + CoID;
+                var u = CoreDBconn.Query<Order>(sqlcommand).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "主订单单号无效";
+                    return result;
+                }
+                var MainOrd = u[0] as Order;
+                sqlcommand = "select * from `order` where id  in @ID and coid = @Coid";
+                u = CoreDBconn.Query<Order>(sqlcommand,new{ID = MerID,Coid = CoID}).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "无需要合并的订单!";
+                    return result;
+                }
+                var OrdList = u as List<Order>;
+                string remark="";
+                foreach(var o in OrdList)
+                {
+                    o.MergeOID = oid;
+                    o.MergeSoID = MainOrd.SoID;
+                    o.Status = 5;
+                    o.AbnormalStatus = 0;
+                    o.StatusDec = "";
+                    o.Modifier = UserName;
+                    o.ModifyDate = DateTime.Now;
+                    MainOrd.OrdQty = MainOrd.OrdQty + o.OrdQty;
+                    MainOrd.SkuAmount = (decimal.Parse(MainOrd.SkuAmount) + decimal.Parse(o.SkuAmount)).ToString();
+                    MainOrd.PaidAmount = (decimal.Parse(MainOrd.PaidAmount) + decimal.Parse(o.PaidAmount)).ToString();
+                    MainOrd.PayAmount = (decimal.Parse(MainOrd.PayAmount) + decimal.Parse(o.PayAmount)).ToString();
+                    MainOrd.ExAmount = (decimal.Parse(MainOrd.ExAmount) + decimal.Parse(o.ExAmount)).ToString();
+                    MainOrd.RecMessage = MainOrd.RecMessage + o.RecMessage;
+                    MainOrd.SendMessage = MainOrd.SendMessage + o.SendMessage;
+                    MainOrd.ExWeight = (decimal.Parse(MainOrd.ExWeight) + decimal.Parse(o.ExWeight)).ToString();
+                    
+                    var log = new Log();
+                    log.OID = o.ID;
+                    log.SoID = o.SoID;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "被合并";
+                    log.Remark = oid.ToString();
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    remark = remark + o.ID.ToString() + ",";
+
+                    sqlcommand = @"update `order` set MergeOID = @MergeOID,MergeSoID = @MergeSoID,Status=@Status,AbnormalStatus=@AbnormalStatus,StatusDec=@StatusDec,
+                                    Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and CoID = @CoID";
+                    int r = CoreDBconn.Execute(sqlcommand,o,TransCore);
+                    if (r < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                }
+                MainOrd.Amount = (decimal.Parse(MainOrd.ExAmount) + decimal.Parse(MainOrd.SkuAmount)).ToString();
+                MainOrd.IsMerge = true;
+                if(decimal.Parse(MainOrd.Amount) == decimal.Parse(MainOrd.PaidAmount))
+                {
+                    MainOrd.IsPaid = true;
+                    MainOrd.Status = 1;
+                }
+                else
+                {
+                    MainOrd.IsPaid = false;
+                    MainOrd.Status = 0;
+                }
+                MainOrd.AbnormalStatus = 0;
+                MainOrd.StatusDec = "";
+                MainOrd.Modifier = UserName;
+                MainOrd.ModifyDate = DateTime.Now;
+
+                var logn = new Log();
+                logn.OID = MainOrd.ID;
+                logn.SoID = MainOrd.SoID;
+                logn.Type = 0;
+                logn.LogDate = DateTime.Now;
+                logn.UserName = UserName;
+                logn.Title = "合并";
+                logn.Remark = remark.Substring(0,remark.Length - 1);
+                logn.CoID = CoID;
+                logs.Add(logn);
+
+                sqlcommand = @"update `order` set OrdQty = @OrdQty,SkuAmount = @SkuAmount,PaidAmount=@PaidAmount,PayAmount=@PayAmount,ExAmount=@ExAmount,RecMessage=@RecMessage,
+                                SendMessage=@SendMessage,ExWeight=@ExWeight,Amount=@Amount,IsMerge=@IsMerge,IsPaid=@IsPaid,Status=@Status,AbnormalStatus=@AbnormalStatus,StatusDec=@StatusDec,
+                                Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and CoID = @CoID";
+                int count = CoreDBconn.Execute(sqlcommand,MainOrd,TransCore);
+                if (count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }
+                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                        VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                count = CoreDBconn.Execute(loginsert,logs, TransCore);
+                if (count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                //订单明细
+                sqlcommand = "select * from orderitem where oid  in @ID and coid = @Coid";
+                var item = CoreDBconn.Query<OrderItem>(sqlcommand,new{ID = MerID,Coid = CoID}).AsList();
+                if(item.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "订单明细异常!";
+                    return result;
+                }
+                foreach(var i in item)
+                {
+                    sqlcommand = "select * from orderitem where oid  = @ID and coid = @Coid and skuautoid = @Sku";
+                    var x = CoreDBconn.Query<OrderItem>(sqlcommand,new{ID = oid,Coid = CoID,Sku = i.SkuAutoID}).AsList();
+                    if(x.Count == 0)
+                    {
+                        sqlcommand = @"INSERT INTO orderitem(oid,soid,coid,skuautoid,skuid,skuname,norm,qty,saleprice,realprice,amount,discountrate,img,weight,totalweight,isgift,remark,creator,modifier) 
+                                    VALUES(@OID,@Soid,@Coid,@Skuautoid,@Skuid,@Skuname,@Norm,@Qty,@Saleprice,@Realprice,@Amount,@DiscountRate,@Img,@Weight,@Totalweight,@IsGift,@Remark,@Creator,@Modifier)";
+                        i.OID = oid;
+                        i.SoID = MainOrd.SoID;
+                        i.Modifier = UserName;
+                        count = CoreDBconn.Execute(sqlcommand,i, TransCore);
+                        if (count < 0)
+                        {
+                            result.s = -3002;
+                            return result;
+                        }
+                    }
+                    else
+                    {
+                        sqlcommand = @"update orderitem set qty = qty + @Qty,amount = amount + @Amount,realprice = amount/qty,totalweight = weight * qty,
+                                        modifier = @Modifier,modifydate = @ModifyDate where id = @ID and coid = @Coid";
+                        count = CoreDBconn.Execute(sqlcommand,new{Qty = i.Qty,Amount = i.Amount,Modifier=UserName,ModifyDate=DateTime.Now,ID=x[0].ID,Coid = CoID}, TransCore);
+                        if (count < 0)
+                        {
+                            result.s = -3003;
+                            return result;
+                        }
+                    }
+                }
+                //付款明细
+                sqlcommand = "select * from payinfo where oid in @ID and coid = @Coid";
+                var pay = CoreDBconn.Query<PayInfo>(sqlcommand,new{ID = MerID,Coid = CoID}).AsList();
+                foreach(var p in pay)
+                {
+                    sqlcommand = @"update payinfo set oid = @Oid,soid = @Soid where oid in @ID and coid = @Coid";
+                    count = CoreDBconn.Execute(sqlcommand,new{Oid = MainOrd.ID,Soid = MainOrd.SoID,ID=MerID,Coid = CoID}, TransCore);
+                    if (count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+
+            return result;
+        }
+        ///<summary>
+        ///订单拆分
+        ///</summary>
+        public static DataResult OrdSplit(int oid,List<SplitOrd> SplitArray)
+        {
+            var result = new DataResult(1,null);
 
 
 
+
+            return result;
+        }
         
+
+
         ///<summary>
         ///抓取快递List
         ///</summary>
