@@ -166,9 +166,9 @@ namespace CoreModels.XyComm
         public string[] RemoveGoods {get;set;}
         public string[] ContainSkus {get;set;}
         public string[] RemoveSkus {get;set;}
-        public int MinNum {get;set;}
-        public int MaxNum {get;set;}
-        public int Payment{get;set;}
+        public int? MinNum {get;set;}
+        public int? MaxNum {get;set;}
+        public int? Payment{get;set;}
 
 	}
 
