@@ -204,10 +204,9 @@ namespace CoreWebApi
 
         [HttpGetAttribute("/Core/Warehouse/getPloySetting")]
         public ResponseResult getPloySetting(string id="")
-        {   
-            var data = new DataResult(1,null);
+        {               
             string CoID = GetCoid();
-            data.d = WarehouseHaddle.getPloySetting(CoID);
+            var data = WarehouseHaddle.getPloySetting(CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
