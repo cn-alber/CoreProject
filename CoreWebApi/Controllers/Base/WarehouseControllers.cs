@@ -205,7 +205,7 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Warehouse/createploy")]
         public ResponseResult createploy([FromBodyAttribute]JObject co)
         {   
-            WarePloy w = Newtonsoft.Json.JsonConvert.DeserializeObject<WarePloy>(co.ToString());
+            WarePloyRequest w = Newtonsoft.Json.JsonConvert.DeserializeObject<WarePloyRequest>(co.ToString());
             string CoID = GetCoid();
             string uname =GetUname();
             var data = WarehouseHaddle.createploy(CoID,w,uname);
@@ -214,7 +214,7 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Warehouse/modifyploy")]
         public ResponseResult modifyploy([FromBodyAttribute]JObject co)
         {   
-            WarePloy w = Newtonsoft.Json.JsonConvert.DeserializeObject<WarePloy>(co.ToString());
+            WarePloyRequest w = Newtonsoft.Json.JsonConvert.DeserializeObject<WarePloyRequest>(co.ToString());
             string CoID = GetCoid();
             string uname = GetUname();
             var data = WarehouseHaddle.modifyploy(CoID,w,uname);

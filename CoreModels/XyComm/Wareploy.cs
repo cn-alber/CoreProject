@@ -152,6 +152,26 @@ namespace CoreModels.XyComm
         
     }
 
+	public class WarePloyRequest{
+		public int ID{get;set;}
+        public int CoID{get;set;}
+    	public string Name{get;set;} 
+        public int Level{get;set;}
+    	public int Wid{get;set;}
+        public string Wname {get;set;}
+        public string[] Province {get;set;}                                   
+		public string[]	Shopid {get;set;}
+        public string[] Did {get;set;}
+        public string[] ContainGoods {get;set;}
+        public string[] RemoveGoods {get;set;}
+        public string[] ContainSkus {get;set;}
+        public string[] RemoveSkus {get;set;}
+        public int MinNum {get;set;}
+        public int MaxNum {get;set;}
+        public int Payment{get;set;}
+
+	}
+
 
 
 

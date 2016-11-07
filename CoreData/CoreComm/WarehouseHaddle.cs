@@ -1487,20 +1487,29 @@ namespace CoreData.CoreComm
             return result;
         }
 
-        public static DataResult createploy(string CoID,WarePloy wareploy,string uname){
+        public static DataResult createploy(string CoID,WarePloyRequest w,string uname){
             var result = new DataResult(1,null);
-            if(!string.IsNullOrEmpty(wareploy.ContainGoods)){
-                wareploy.ContainGoods = ","+ wareploy.ContainGoods+","; 
-            }
-            if(!string.IsNullOrEmpty(wareploy.ContainSkus)){
-                wareploy.ContainSkus = ","+ wareploy.ContainSkus+","; 
-            }
-            if(!string.IsNullOrEmpty(wareploy.RemoveGoods)){
-                wareploy.RemoveGoods = ","+ wareploy.RemoveGoods+","; 
-            }
-            if(!string.IsNullOrEmpty(wareploy.RemoveSkus)){
-                wareploy.RemoveSkus = ","+ wareploy.RemoveSkus+","; 
-            }
+            WarePloy wareploy = new WarePloy();            
+            // wareploy.ContainGoods = ","+ string.Join(",",w.ContainGoods); 
+            // wareploy.ContainSkus = ","+ string.Join(",",w.ContainSkus); 
+            // wareploy.RemoveGoods = ","+ string.Join(",",w.RemoveGoods); 
+            // wareploy.RemoveSkus = ","+string.Join(",",wareploy.RemoveSkus);            
+            wareploy.CoID = w.CoID;
+            wareploy.Name = w.Name;
+            wareploy.Level = w.Level;
+            wareploy.Wid = w.Wid;
+            wareploy.Wname = w.Wname;
+            wareploy.Province = string.Join(",",w.Province);
+            wareploy.Shopid = string.Join(",",w.Shopid);
+            wareploy.Did = string.Join(",",w.Did);
+            wareploy.ContainGoods = string.Join(",",w.ContainGoods); 
+            wareploy.ContainSkus = string.Join(",",w.ContainSkus); 
+            wareploy.RemoveGoods = string.Join(",",w.RemoveGoods); 
+            wareploy.RemoveSkus = string.Join(",",wareploy.RemoveSkus); 
+            wareploy.MinNum = w.MinNum;
+            wareploy.MaxNum = w.MaxNum;
+            wareploy.Payment = w.Payment;
+            
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
@@ -1538,22 +1547,26 @@ namespace CoreData.CoreComm
             return result;
         }
 
-        public static DataResult modifyploy(string CoID,WarePloy wareploy,string uname){
+        public static DataResult modifyploy(string CoID,WarePloyRequest w,string uname){
             var result = new DataResult(1,null);
             string content = "";
-        
-            if(!string.IsNullOrEmpty(wareploy.ContainGoods)){
-                wareploy.ContainGoods = ","+ wareploy.ContainGoods+","; 
-            }
-            if(!string.IsNullOrEmpty(wareploy.ContainSkus)){
-                wareploy.ContainSkus = ","+ wareploy.ContainSkus+","; 
-            }
-            if(!string.IsNullOrEmpty(wareploy.RemoveGoods)){
-                wareploy.RemoveGoods = ","+ wareploy.RemoveGoods+","; 
-            }
-            if(!string.IsNullOrEmpty(wareploy.RemoveSkus)){
-                wareploy.RemoveSkus = ","+ wareploy.RemoveSkus+","; 
-            }
+            WarePloy wareploy = new WarePloy();
+            wareploy.ID = w.ID;
+            wareploy.CoID = w.CoID;
+            wareploy.Name = w.Name;
+            wareploy.Level = w.Level;
+            wareploy.Wid = w.Wid;
+            wareploy.Wname = w.Wname;
+            wareploy.Province = string.Join(",",w.Province);
+            wareploy.Shopid = string.Join(",",w.Shopid);
+            wareploy.Did = string.Join(",",w.Did);
+            wareploy.ContainGoods = string.Join(",",w.ContainGoods); 
+            wareploy.ContainSkus = string.Join(",",w.ContainSkus); 
+            wareploy.RemoveGoods = string.Join(",",w.RemoveGoods); 
+            wareploy.RemoveSkus = string.Join(",",wareploy.RemoveSkus); 
+            wareploy.MinNum = w.MinNum;
+            wareploy.MaxNum = w.MaxNum;
+            wareploy.Payment = w.Payment;           
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
