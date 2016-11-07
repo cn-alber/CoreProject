@@ -1444,7 +1444,12 @@ namespace CoreData.CoreComm
                         var res = conn.Query<WarePloy>(sql).AsList();
                         
                         if(res.Count>0){
-                            var p = res[0];                                                     
+                            var p = res[0];
+                            if(p.Wid == 0){
+                                p.Name = "本仓";
+                            }else{
+                                p.Name = conn.Query<string>("SELECT WareName from ware_third_party WHERE ID = 2;").AsList()[0];
+                            }
                             result.d = new{
                                 province = province,
                                 shop = shop,                                
@@ -1527,10 +1532,12 @@ namespace CoreData.CoreComm
                                         wareploy.RemoveSkus = @RemoveSkus,
                                         wareploy.MinNum = @MinNum,
                                         wareploy.MaxNum= @MaxNum,
-                                        wareploy.Payment = @Payment;";                                                                         
-                     var rnt = conn.Execute(sql,wareploy);
+                                        wareploy.Payment = @Payment;
+                                        SELECT LAST_INSERT_ID() as lastid;";                                                                         
+                     var rnt = conn.Query<int>(sql,wareploy).AsList()[0];
                      if(rnt>0){
                          result.s = 1;
+                         result.d = rnt;
                          LogComm.InsertLog("新增分仓策略：","WareHouse","",uname,Convert.ToInt16(CoID));
                      }else{
                          result.s = -1;
