@@ -1417,6 +1417,38 @@ namespace CoreData.CoreComm
         return res;
     }
 
+    public static DataResult getPloySetting(string CoID){
+        var result = new DataResult(1,null);
+        var province = new List<AreaAll>();
+        var shop = new List<shopEnum>();
+        using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+            try
+            {
+                Task[] tasks = new Task[2];
+                tasks[0] =   Task.Factory.StartNew(()=>{
+                    province = getAreaAll();
+                }); 
+                tasks[1] =  Task.Factory.StartNew(()=>{
+                    shop = getShopEnum(CoID);
+                });
+                
+                Task.WaitAll(tasks);
+                result.d = new{
+                    province = province,
+                    shop = shop
+                };
+
+            }
+            catch (Exception e)
+            {
+                result.s = -1;
+                result.d= e.Message; 
+                conn.Dispose();
+            }
+        }
+        return result;
+    }
+
     public static DataResult editploy(string CoID,string id = ""){
             var result = new DataResult(1,null);
             var province = new List<AreaAll>();

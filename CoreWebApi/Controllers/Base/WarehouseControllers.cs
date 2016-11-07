@@ -202,20 +202,12 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-        [HttpGetAttribute("/Core/Warehouse/getAreaAll")]
-        public ResponseResult getAreaAll(string id="")
-        {   
-            var data = new DataResult(1,null);            
-            data.d = WarehouseHaddle.getAreaAll();
-            return CoreResult.NewResponse(data.s, data.d, "General"); 
-        }
-
-        [HttpGetAttribute("/Core/Warehouse/getShopEnum")]
-        public ResponseResult getShopEnum(string id="")
+        [HttpGetAttribute("/Core/Warehouse/getPloySetting")]
+        public ResponseResult getPloySetting(string id="")
         {   
             var data = new DataResult(1,null);
             string CoID = GetCoid();
-            data.d = WarehouseHaddle.getShopEnum(CoID);
+            data.d = WarehouseHaddle.getPloySetting(CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
