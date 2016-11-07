@@ -262,6 +262,16 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
+        [HttpGetAttribute("/Core/Warehouse/warePersonSet")]
+        public ResponseResult warePersonSet()
+        {               
+            string CoID = GetCoid();
+            var data = WarehouseHaddle.warePersonSet(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+
+
         [HttpPostAttribute("/Core/Warehouse/modifyWareSetting")]
         public ResponseResult modifyWareSetting([FromBodyAttribute]JObject co)
         {   

@@ -282,6 +282,7 @@ namespace CoreModels.XyComm
 		public int CabinetHeight{get;set;}
 		public int CabinetNum{get;set;}
 		public int LimitSender{get;set;}
+		public int SendUseCount{get;set;}
 		public int IsGoodsRule{get;set;}
 		public int SegmentPicking{get;set;}
 		public int AutoLossc{get;set;}
@@ -292,7 +293,8 @@ namespace CoreModels.XyComm
 		public int LockTime{get;set;}
 		public int OneMorePrint{get;set;}
 		public int OneMoreOnlyEx{get;set;}
-
+		public bool IsMain{get;set;}
+		public bool IsFen{get;set;}
 	}
 
 

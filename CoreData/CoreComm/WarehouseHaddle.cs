@@ -1663,9 +1663,11 @@ namespace CoreData.CoreComm
                     var res = conn.Query<ware_setting>(sql).AsList();
                     if(res.Count >0){
                         setting = res[0];
-                        
-
-                         
+                        if(!setting.IsMain && setting.IsFen){
+                            result.d = conn.Query<ware_f_setting>(sql).AsList()[0];
+                        }else{
+                            result.d = setting;
+                        }                         
                         // CacheBase.Set<ware_setting>("waresettingh"+coid,setting);
                     }else{
                         result.s= -3010;
@@ -1704,6 +1706,45 @@ namespace CoreData.CoreComm
             //result.d = setting;
             return result;
         }
+
+         ///<summary>
+        /// 
+        ///</summary>
+         public static DataResult warePersonSet(string coid){
+            var result = new DataResult(1,null);
+            var setting  = new ware_setting();            
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    string sql = "SELECT * FROM ware_setting WHERE CoID = "+coid ;
+                    var res = conn.Query<ware_setting>(sql).AsList();
+                    if(res.Count >0){
+                        setting = res[0];
+                        if(setting.IsPositionAccurate == 1){
+                            result.d = new {
+                                SendUseCount = setting.SendUseCount,
+                                ReduceStock = setting.ReduceStock
+                            };
+                        }else{
+                             result.d = new {
+                                SendUseCount = setting.SendUseCount                                
+                            };
+                        }   
+                    }else{
+                        result.s= -3010;
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
 
         public static DataResult modifyWareSetting(ware_setting setting,string coid){
             var result = new DataResult(1,null);
