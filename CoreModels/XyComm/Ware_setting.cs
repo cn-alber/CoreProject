@@ -15,6 +15,7 @@ namespace CoreModels.XyComm
 		private int? _singlegoods=0;
 		private int? _intervalchar=4;
 		private int? _sendonpicking=0;
+		private int? _pickedautosend=0;
 		private int? _cabinetheight=3;
 		private int? _cabinetnum=0;
 		private int? _limitsender=0;
@@ -134,6 +135,14 @@ namespace CoreModels.XyComm
 		{
 			set{ _sendonpicking=value;}
 			get{return _sendonpicking;}
+		}
+		/// <summary>
+		/// 边拣边播，拣货完成自动出库
+		/// </summary>
+		public int? PickedAutoSend
+		{
+			set{ _pickedautosend=value;}
+			get{return _pickedautosend;}
 		}
 		/// <summary>
 		/// 播种柜层高
@@ -279,6 +288,7 @@ namespace CoreModels.XyComm
 		public int SingleGoods{get;set;}
 		public int IntervalChar{get;set;}
 		public int SendOnPicking{get;set;}
+		public int PickedAutoSend{get;set;}
 		public int CabinetHeight{get;set;}
 		public int CabinetNum{get;set;}
 		public int LimitSender{get;set;}
