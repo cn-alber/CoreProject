@@ -386,21 +386,21 @@ namespace CoreModels.XyComm
         /// <summary>
         /// 播种柜层高
         /// </summary>
-        public string CabinetHeight
+        public int CabinetHeight
         {
             get; set;
         }
         /// <summary>
         /// 播种柜总格
         /// </summary>
-        public string CabinetNum
+        public int CabinetNum
         {
             get; set;
         }
 		/// <summary>
 		/// 播种柜列数
 		/// </summary>
-		public string CabinetColumn
+		public int CabinetColumn
 		{
             get; set;
         }
@@ -470,7 +470,7 @@ namespace CoreModels.XyComm
         /// <summary>
         /// 一单一货连打发货锁定订单时间（秒）
         /// </summary>
-        public string LockTime
+        public int LockTime
         {
             get; set;
         }
@@ -520,9 +520,9 @@ namespace CoreModels.XyComm
         public string IntervalChar { get; set; }
         public string SendOnPicking { get; set; }
         public string PickedAutoSend { get; set; }
-        public string CabinetHeight { get; set; }
-        public string CabinetNum { get; set; }
-		public string CabinetColumn{get; set;}
+        public int CabinetHeight { get; set; }
+        public int CabinetNum { get; set; }
+		public int CabinetColumn{get; set;}
         public string LimitSender { get; set; }
         public string SendUseCount { get; set; }
         public string IsGoodsRule { get; set; }

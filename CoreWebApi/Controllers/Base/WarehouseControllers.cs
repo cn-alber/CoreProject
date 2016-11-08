@@ -242,18 +242,18 @@ namespace CoreWebApi
             var s1 = new SkuQuery();
             var s2 = new SkuQuery();
             var s3 = new SkuQuery();
-            s1.GoodsCode = "N3L6F55521";
-            s2.GoodsCode = "N3L6F55522";
-            s3.GoodsCode = "N3L6F55523";
+            s1.GoodsCode = "N3L4F51001";
+            s2.GoodsCode = "N3L4F51002";
+            s3.GoodsCode = "N3L4F51004";
             s1.SkuID = "N3L4F51001025190";
-            s2.SkuID = "N3L4F51001025191";
-            s3.SkuID = "N3L4F51001025192";
+            s2.SkuID = "N3L4F51002025191";
+            s3.SkuID = "N3L4F51003025193";
             skus.Add(s1);
-            skus.Add(s2);
+            //skus.Add(s2);
             //skus.Add(s3);
 
             string CoID = GetCoid();            
-            var data = WarehouseHaddle.chooseWare(CoID,"8",skus);
+            var data = WarehouseHaddle.chooseWare(CoID,"8",110000,1,1,1,skus,3,"8989");
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -313,7 +313,7 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Warehouse/modifyWareSetting")]
         public ResponseResult modifyWareSetting([FromBodyAttribute]JObject co)
         {   
-            var w = Newtonsoft.Json.JsonConvert.DeserializeObject<ware_setting>(co.ToString());
+            var w = Newtonsoft.Json.JsonConvert.DeserializeObject<ware_m_setting>(co.ToString());
             string CoID = GetCoid();
             var data = WarehouseHaddle.modifyWareSetting(w,CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
