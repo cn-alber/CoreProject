@@ -1712,7 +1712,7 @@ namespace CoreData.CoreComm
                             where (
                                 c.Shopid.Split(',').Contains(shopid) 
                                 && (c.ContainGoods.IndexOf(sku.GoodsCode)>-1 || c.ContainSkus.IndexOf(sku.SkuID)>-1)
-                                && (c.RemoveGoods.IndexOf(sku.GoodsCode)>-1)
+                                && (c.RemoveGoods.IndexOf(sku.GoodsCode) == 0)
                              ) 
                             select c).Distinct().AsList() ;
                     if(i == 0){
