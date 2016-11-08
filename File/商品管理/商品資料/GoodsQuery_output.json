@@ -1,153 +1,286 @@
 {
     "s": 1,
     "d": {
-        "SkuName": "南极人 男士中长款商务立领毛呢大衣 2014秋冬新品首发 灰色",
-        "GoodsCode": "NJ64F50341",
-        "GoodsName": "NJ64F50341",
-        "Brand": "",
-        "KID": 0,
-        "KName": "",
-        "CoID": 1,
-        "Unit": "件",
-        "Weight": 0.0,
-        "SCoList": "",
-        "Creator": "",
-        "status": null,
+        "main": {
+            "ID": 6,
+            "GoodsCode": "ABCTST",
+            "GoodsName": "ABC测试",
+            "Brand": "1",
+            "KindID": "365",
+            "KindName": "自定义类目测试1",
+            "ScoID": "1",
+            "ScoGoodsCode": "scotest",
+            "ScoSku": null,
+            "Weight": "0.80",
+            "CostPrice": null,
+            "PurPrice": "100.00",
+            "SalePrice": "120.00",
+            "MarketPrice": null,
+            "TempShopID": "11",
+            "TempID": "0",
+            "Remark": "Remarktest1",
+            "Img": null,
+            "CoID": "1",
+            "Enable": 1,
+            "Type": 0,
+            "Creator": "管理员",
+            "CreateDate": "2016/11/8 11:19:10",
+            "Modifier": "",
+            "ModifyDate": null
+        },
+        "itemprops_base": [
+            {
+                "pid": "122216507",
+                "name": "厚薄",
+                "itemprops_values": [
+                    {
+                        "pid": "122216507",
+                        "id": "13061",
+                        "name": "薄款"
+                    },
+                    {
+                        "pid": "122216507",
+                        "id": "13062",
+                        "name": "厚"
+                    },
+                    {
+                        "pid": "122216507",
+                        "id": "13063",
+                        "name": "加厚"
+                    },
+                    {
+                        "pid": "122216507",
+                        "id": "13064",
+                        "name": "常规"
+                    }
+                ]
+            },
+            {
+                "pid": "42722636",
+                "name": "基础风格",
+                "itemprops_values": [
+                    {
+                        "pid": "42722636",
+                        "id": "13065",
+                        "name": "青春流行"
+                    },
+                    {
+                        "pid": "42722636",
+                        "id": "13066",
+                        "name": "其他"
+                    },
+                    {
+                        "pid": "42722636",
+                        "id": "13067",
+                        "name": "时尚都市"
+                    },
+                    {
+                        "pid": "42722636",
+                        "id": "13068",
+                        "name": "商务绅士"
+                    }
+                ]
+            },
+            {
+                "pid": "100016110755910",
+                "name": "属性测试",
+                "itemprops_values": [
+                    {
+                        "pid": "100016110755910",
+                        "id": "13069",
+                        "name": "测试1"
+                    },
+                    {
+                        "pid": "100016110755910",
+                        "id": "13070",
+                        "name": "测试2"
+                    }
+                ]
+            }
+        ],
+        "skuprops_base": [
+            {
+                "pid": "100016110194735",
+                "name": "颜色",
+                "KindNames": "自定义类目测试1",
+                "skuprops_values": [
+                    {
+                        "pid": "100016110194735",
+                        "id": 1162,
+                        "mapping": "001",
+                        "name": "白色1"
+                    },
+                    {
+                        "pid": "100016110194735",
+                        "id": 1163,
+                        "mapping": "002",
+                        "name": "红色1"
+                    }
+                ]
+            },
+            {
+                "pid": "100016110114201",
+                "name": "尺码",
+                "KindNames": "自定义类目测试1",
+                "skuprops_values": [
+                    {
+                        "pid": "100016110114201",
+                        "id": 1164,
+                        "mapping": "001",
+                        "name": "S"
+                    },
+                    {
+                        "pid": "100016110114201",
+                        "id": 1165,
+                        "mapping": "002",
+                        "name": "M"
+                    },
+                    {
+                        "pid": "100016110114201",
+                        "id": 1166,
+                        "mapping": "003",
+                        "name": "L"
+                    }
+                ]
+            }
+        ],
+        "itemprops": [
+            {
+                "ID": 13,
+                "pid": "122216507",
+                "val_id": "13061",
+                "val_name": "",
+                "Enable": 1
+            },
+            {
+                "ID": 14,
+                "pid": "42722636",
+                "val_id": "13065",
+                "val_name": "",
+                "Enable": 1
+            },
+            {
+                "ID": 15,
+                "pid": "100016110755910",
+                "val_id": "13069",
+                "val_name": "",
+                "Enable": 1
+            }
+        ],
+        "skuprops": [
+            {
+                "_Enable": 1,
+                "ID": 5,
+                "pid": "100016110194735",
+                "val_id": "1162",
+                "val_name": "白色1",
+                "mapping": "001",
+                "IsOther": 0,
+                "Enable": 1
+            },
+            {
+                "_Enable": 1,
+                "ID": 6,
+                "pid": "100016110194735",
+                "val_id": "1163",
+                "val_name": "红色1",
+                "mapping": "002",
+                "IsOther": 0,
+                "Enable": 1
+            },
+            {
+                "_Enable": 1,
+                "ID": 7,
+                "pid": "100016110114201",
+                "val_id": "1164",
+                "val_name": "S",
+                "mapping": "001",
+                "IsOther": 0,
+                "Enable": 1
+            },
+            {
+                "_Enable": 1,
+                "ID": 8,
+                "pid": "100016110114201",
+                "val_id": "1165",
+                "val_name": "M",
+                "mapping": "002",
+                "IsOther": 0,
+                "Enable": 1
+            }
+        ],
         "items": [
             {
-                "GoodsCode": "NJ64F50341",
-                "SkuID": "NJ64F50341194170",
-                "SkuName": "南极人 男士中长款商务立领毛呢大衣 2014秋冬新品首发 灰色",
-                "CostPrice": 0.0,
-                "SalePrice": 199.0,
-                "ColorID": "0174",
-                "ColorName": "灰色",
-                "SizeID": "195",
-                "SizeName": "170/88A(M)",
-                "ParentID": "013",
-                "Remark": "",
-                "Creator": null,
-                "status": null
+                "ID": 17586,
+                "SkuID": "ABCTST001001",
+                "SkuName": "ABC测试白色1S",
+                "SkuSimple": "ABC测试白色1S",
+                "Norm": "白色1;S",
+                "PurPrice": "100.00",
+                "MarketPrice": null,
+                "SalePrice": "120.00",
+                "Weight": "0.80",
+                "ParentID": "6",
+                "pid1": "100016110114201",
+                "val_id1": "7",
+                "pid2": "100016110194735",
+                "val_id2": "5",
+                "pid3": null,
+                "val_id3": null
             },
             {
-                "GoodsCode": "NJ64F50341",
-                "SkuID": "NJ64F50341194175",
-                "SkuName": "南极人 男士中长款商务立领毛呢大衣 2014秋冬新品首发 灰色",
-                "CostPrice": 0.0,
-                "SalePrice": 199.0,
-                "ColorID": "0174",
-                "ColorName": "灰色",
-                "SizeID": "207",
-                "SizeName": "175/92A(L)",
-                "ParentID": "013",
-                "Remark": "",
-                "Creator": null,
-                "status": null
+                "ID": 17587,
+                "SkuID": "ABCTST001002",
+                "SkuName": "ABC测试红色1S",
+                "SkuSimple": "ABC测试红色1S",
+                "Norm": "红色1;S",
+                "PurPrice": "100.00",
+                "MarketPrice": null,
+                "SalePrice": "120.00",
+                "Weight": "0.80",
+                "ParentID": "6",
+                "pid1": "100016110114201",
+                "val_id1": "7",
+                "pid2": "100016110194735",
+                "val_id2": "6",
+                "pid3": null,
+                "val_id3": null
             },
             {
-                "GoodsCode": "NJ64F50341",
-                "SkuID": "NJ64F50341194180",
-                "SkuName": "南极人 男士中长款商务立领毛呢大衣 2014秋冬新品首发 灰色",
-                "CostPrice": 0.0,
-                "SalePrice": 199.0,
-                "ColorID": "0174",
-                "ColorName": "灰色",
-                "SizeID": "226",
-                "SizeName": "180/96A(XL)",
-                "ParentID": "013",
-                "Remark": "",
-                "Creator": null,
-                "status": null
+                "ID": 17588,
+                "SkuID": "ABCTST002001",
+                "SkuName": "ABC测试白色1M",
+                "SkuSimple": "ABC测试白色1M",
+                "Norm": "白色1;M",
+                "PurPrice": "100.00",
+                "MarketPrice": null,
+                "SalePrice": "120.00",
+                "Weight": "0.80",
+                "ParentID": "6",
+                "pid1": "100016110114201",
+                "val_id1": "8",
+                "pid2": "100016110194735",
+                "val_id2": "5",
+                "pid3": null,
+                "val_id3": null
             },
             {
-                "GoodsCode": "NJ64F50341",
-                "SkuID": "NJ64F50341194190",
-                "SkuName": "南极人 男士中长款商务立领毛呢大衣 2014秋冬新品首发 灰色",
-                "CostPrice": 0.0,
-                "SalePrice": 199.0,
-                "ColorID": "0174",
-                "ColorName": "灰色",
-                "SizeID": "098",
-                "SizeName": "190/104A(XXXL)",
-                "ParentID": "013",
-                "Remark": "",
-                "Creator": null,
-                "status": null
-            },
-            {
-                "GoodsCode": "NJ64F50341",
-                "SkuID": "NJ64F50341194185",
-                "SkuName": "南极人 男士中长款商务立领毛呢大衣 2014秋冬新品首发 灰色",
-                "CostPrice": 0.0,
-                "SalePrice": 199.0,
-                "ColorID": "0174",
-                "ColorName": "灰色",
-                "SizeID": "235",
-                "SizeName": "185/100A(XXL)",
-                "ParentID": "013",
-                "Remark": "",
-                "Creator": null,
-                "status": null
-            },
-            {
-                "GoodsCode": "NJ64F50341",
-                "SkuID": "78207228231",
-                "SkuName": "南极人大衣 灰色",
-                "CostPrice": 0.0,
-                "SalePrice": 2000.0,
-                "ColorID": "0174",
-                "ColorName": "灰色",
-                "SizeID": null,
-                "SizeName": "180/100A",
-                "ParentID": null,
-                "Remark": "",
-                "Creator": null,
-                "status": null
-            },
-            {
-                "GoodsCode": "NJ64F50341",
-                "SkuID": "78207228232",
-                "SkuName": "南极人大衣 灰色",
-                "CostPrice": 0.0,
-                "SalePrice": 2000.0,
-                "ColorID": "0174",
-                "ColorName": "灰色",
-                "SizeID": "210",
-                "SizeName": "175/96A",
-                "ParentID": "013",
-                "Remark": "",
-                "Creator": null,
-                "status": null
-            },
-            {
-                "GoodsCode": "NJ64F50341",
-                "SkuID": "78207228233",
-                "SkuName": "南极人大衣 灰色",
-                "CostPrice": 0.0,
-                "SalePrice": 2000.0,
-                "ColorID": "0174",
-                "ColorName": "灰色",
-                "SizeID": "197",
-                "SizeName": "170/92A",
-                "ParentID": "013",
-                "Remark": "",
-                "Creator": null,
-                "status": null
-            },
-            {
-                "GoodsCode": "NJ64F50341",
-                "SkuID": "78207228234",
-                "SkuName": "南极人大衣 灰色",
-                "CostPrice": 0.0,
-                "SalePrice": 2000.0,
-                "ColorID": "0174",
-                "ColorName": "灰色",
-                "SizeID": null,
-                "SizeName": "185/104A",
-                "ParentID": null,
-                "Remark": "",
-                "Creator": null,
-                "status": null
+                "ID": 17589,
+                "SkuID": "ABCTST002002",
+                "SkuName": "ABC测试红色1M",
+                "SkuSimple": "ABC测试红色1M",
+                "Norm": "红色1;M",
+                "PurPrice": "100.00",
+                "MarketPrice": null,
+                "SalePrice": "120.00",
+                "Weight": "0.80",
+                "ParentID": "6",
+                "pid1": "100016110114201",
+                "val_id1": "8",
+                "pid2": "100016110194735",
+                "val_id2": "6",
+                "pid3": null,
+                "val_id3": null
             }
         ]
     },

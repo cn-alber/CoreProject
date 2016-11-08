@@ -7,12 +7,13 @@ namespace CoreModels.XyCore
     #region 
     public class Coresku
     {
+        private int _Enable = 1;//可选值状态
         public int ID { get; set; }
         public string SkuID { get; set; }
         public string SkuName { get; set; }
         public string SkuSimple { get; set; }
         public string Brand { get; set; }
-        public int KindID { get; set; }
+        public string KindID { get; set; }
         public string KindName { get; set; }
         public int Type { get; set; }
         public bool SynStock { get; set; }
@@ -21,12 +22,12 @@ namespace CoreModels.XyCore
         public string GBCode { get; set; }
         public string Unit { get; set; }
         public string ValUnit { get; set; }
-        public decimal CnvRate { get; set; }
-        public decimal Weight { get; set; }
-        public decimal CostPrice { get; set; }
-        public decimal PurPrice { get; set; }
-        public decimal SalePrice { get; set; }
-        public decimal Price { get; set; }
+        public string CnvRate { get; set; }
+        public string Weight { get; set; }
+        public string CostPrice { get; set; }
+        public string PurPrice { get; set; }
+        public string SalePrice { get; set; }
+        public string MarketPrice { get; set; }
         public string pid1 { get; set; }
         public string val_id1 { get; set; }
         public string pid2 { get; set; }
@@ -44,8 +45,12 @@ namespace CoreModels.XyCore
         public string Remark { get; set; }
         public bool IsParent { get; set; }
         public string ParentID { get; set; }
-        public int CoID { get; set; }
-        public bool Enable { get; set; }
+        public string CoID { get; set; }
+        public int Enable
+        {
+            get { return _Enable; }
+            set { this._Enable = value; }
+        }
         public string Creator { get; set; }
         public string CreateDate { get; set; }
         public bool IsDelete { get; set; }
@@ -225,6 +230,7 @@ namespace CoreModels.XyCore
     #region 商品维护 - Sku明细列表
     public class CoreSkuItem
     {
+        public int ID { get; set; }
         public string SkuID { get; set; }
         public string SkuName { get; set; }
         public string SkuSimple { get; set; }
@@ -234,6 +240,12 @@ namespace CoreModels.XyCore
         public string SalePrice { get; set; }
         public string Weight { get; set; }
         public string ParentID { get; set; }
+        public string pid1 { get; set; }
+        public string val_id1 { get; set; }
+        public string pid2 { get; set; }
+        public string val_id2 { get; set; }
+        public string pid3 { get; set; }
+        public string val_id3 { get; set; }
     }
     #endregion 
 

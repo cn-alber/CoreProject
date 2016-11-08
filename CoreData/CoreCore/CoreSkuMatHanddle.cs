@@ -230,23 +230,23 @@ namespace CoreData.CoreCore
         public static Coresku NewMat(CoreSkuMatAuto ckm)
         {
             var sku = new Coresku();
-            sku.CoID = ckm.CoID;
-            sku.GoodsCode = ckm.GoodsCode;
-            sku.SkuID = ckm.GoodsCode;
-            sku.GoodsName = ckm.GoodsName;
-            sku.Norm = ckm.Norm;
-            sku.Unit = ckm.Unit;
-            sku.ValUnit = ckm.ValUnit;
-            sku.CnvRate = ckm.CnvRate;
-            sku.PurPrice = ckm.PurPrice;
-            sku.KindID = ckm.KindID;
-            sku.KindName = ckm.KindName;
-            sku.SCoList = ckm.SCoList;
-            sku.ParentID = ckm.ParentID;
-            sku.Type = 2;
-            sku.Creator = ckm.Creator;
-            sku.CreateDate = DateTime.Now.ToString();
-            sku.IsParent = true;
+            // sku.CoID = ckm.CoID;
+            // sku.GoodsCode = ckm.GoodsCode;
+            // sku.SkuID = ckm.GoodsCode;
+            // sku.GoodsName = ckm.GoodsName;
+            // sku.Norm = ckm.Norm;
+            // sku.Unit = ckm.Unit;
+            // sku.ValUnit = ckm.ValUnit;
+            // sku.CnvRate = ckm.CnvRate;
+            // sku.PurPrice = ckm.PurPrice;
+            // sku.KindID = ckm.KindID;
+            // sku.KindName = ckm.KindName;
+            // sku.SCoList = ckm.SCoList;
+            // sku.ParentID = ckm.ParentID;
+            // sku.Type = 2;
+            // sku.Creator = ckm.Creator;
+            // sku.CreateDate = DateTime.Now.ToString();
+            // sku.IsParent = true;
             return sku;
         }
 
@@ -256,27 +256,27 @@ namespace CoreData.CoreCore
             foreach (var cki in ckiLst)
             {
                 var sku = new Coresku();
-                sku.CoID = ckm.CoID;
-                sku.GoodsCode = ckm.GoodsCode;
-                sku.GoodsName = ckm.GoodsName;
-                sku.Norm = ckm.Norm;
-                sku.Unit = ckm.Unit;
-                sku.ValUnit = ckm.ValUnit;
-                sku.CnvRate = ckm.CnvRate;
-                sku.PurPrice = ckm.PurPrice;
-                sku.KindID = ckm.KindID;
-                sku.KindName = ckm.KindName;
-                sku.SCoList = ckm.SCoList;
-                sku.SkuID = cki.SkuID;
-                // sku.ColorID = cki.ColorID;
-                // sku.ColorName = cki.ColorName;
-                sku.ParentID = ckm.ParentID;
-                // sku.SizeID = cki.SizeID;
-                // sku.SizeName = cki.SizeName;
-                sku.Type = 2;
-                sku.Creator = ckm.Creator;
-                sku.CreateDate = DateTime.Now.ToString();
-                sku.IsParent = false;
+                // sku.CoID = ckm.CoID;
+                // sku.GoodsCode = ckm.GoodsCode;
+                // sku.GoodsName = ckm.GoodsName;
+                // sku.Norm = ckm.Norm;
+                // sku.Unit = ckm.Unit;
+                // sku.ValUnit = ckm.ValUnit;
+                // sku.CnvRate = ckm.CnvRate;
+                // sku.PurPrice = ckm.PurPrice;
+                // sku.KindID = ckm.KindID;
+                // sku.KindName = ckm.KindName;
+                // sku.SCoList = ckm.SCoList;
+                // sku.SkuID = cki.SkuID;
+                // // sku.ColorID = cki.ColorID;
+                // // sku.ColorName = cki.ColorName;
+                // sku.ParentID = ckm.ParentID;
+                // // sku.SizeID = cki.SizeID;
+                // // sku.SizeName = cki.SizeName;
+                // sku.Type = 2;
+                // sku.Creator = ckm.Creator;
+                // sku.CreateDate = DateTime.Now.ToString();
+                // sku.IsParent = false;
                 skuLst.Add(sku);
             }
             return skuLst;

@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Authorization;
 using CoreData.CoreCore;
 using CoreModels.XyCore;
+using System;
 using System.Collections.Generic;
 using CoreData.CoreComm;
 using CoreData;
@@ -169,11 +170,10 @@ namespace CoreWebApi.XyCore
         #endregion        
 
         #region 商品管理 - 获取单笔Sku详情
-        [HttpPostAttribute("Core/XyCore/CoreSku/GoodsQuery")]
-        public ResponseResult GoodsQuery([FromBodyAttribute]JObject obj)
+        [HttpGetAttribute("Core/XyCore/CoreSku/GoodsQuery")]
+        public ResponseResult GoodsQuery(string ID)
         {
             var res = new DataResult(1, null);
-            string ID = obj["ID"].ToString();
             int x;
             if (!string.IsNullOrEmpty(ID) && int.TryParse(ID, out x))
             {
@@ -183,7 +183,7 @@ namespace CoreWebApi.XyCore
             else
             {
                 res.s = -1;
-                res.d = "品牌参数异常";
+                res.d = "商品参数异常";
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
@@ -233,7 +233,7 @@ namespace CoreWebApi.XyCore
         #endregion
 
 
-        #region 删除回收站
+        #region 删除回收站--****该接口暂停使用****
         [HttpPostAttribute("Core/XyCore/CoreSku/DelGoodsRec")]
         public ResponseResult DelGoodsRec([FromBodyAttribute]JObject obj)
         {
@@ -250,14 +250,19 @@ namespace CoreWebApi.XyCore
         [HttpPostAttribute("Core/XyCore/CoreSku/InsertGoods")]
         public ResponseResult InsertGoods([FromBodyAttribute]JObject obj)
         {
-            // CoreSkuAuto ckm = Newtonsoft.Json.JsonConvert.DeserializeObject<CoreSkuAuto>(obj["CoreSkuAuto"].ToString());
-            // CoreSkuItem cki = Newtonsoft.Json.JsonConvert.DeserializeObject<CoreSkuItem>(obj["CoreSkuItem"].ToString());
-            var res = new DataResult(1, null);//CoreSkuHaddle.NewCore(ckm, cki);
+            var main = Newtonsoft.Json.JsonConvert.DeserializeObject<Coresku_main>(obj["Coresku_main"].ToString());   
+            var itemprops = Newtonsoft.Json.JsonConvert.DeserializeObject<List<goods_item_props>>(obj["itemprops"].ToString()); 
+            var skuprops = Newtonsoft.Json.JsonConvert.DeserializeObject<List<goods_sku_props>>(obj["skuprops"].ToString()); 
+            var items = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CoreSkuItem>>(obj["items"].ToString()); 
+            main.CoID = GetCoid();  
+            main.Creator = GetUname();
+            main.CreateDate = DateTime.Now.ToString();
+            var res = CoreSkuHaddle.NewCore(main,itemprops,skuprops,items);
             var Result = CoreResult.NewResponse(res.s, res.d, "General");
             return Result;
         }
-        #endregion    
-
+        #endregion   
+        
         #region 采购查询
         [HttpPostAttribute("Core/XyCore/CoreSku/SkuQuery")]
         public ResponseResult SkuQuery([FromBodyAttribute]JObject obj)

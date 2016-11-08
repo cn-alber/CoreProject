@@ -76,7 +76,7 @@ function说明
         更新删除标记，返回操作信息
     参考：input json 文件:UptSkuDel_input.json
     参考：output json 文件:UptSkuDel_output.json      
-6.DelGoodsRec()//删除回收站商品
+6.DelGoodsRec()//删除回收站商品（****该接口暂停使用****）
     方法：POST
     路由：http://localhost:5000/Core/XyCore/CoreSku/DelGoodsRec
     参数：
@@ -85,4 +85,6 @@ function说明
     OutPut:
         清空回收站，返回操作信息
     参考：input json 文件:DelGoodsRec_input.json
-    参考：output json 文件:DelGoodsRec_output.json      
+7.商品维护 - 新增商品资料
+    方法：POST
+    
