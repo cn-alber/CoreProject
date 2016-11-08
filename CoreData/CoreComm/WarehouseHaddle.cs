@@ -1027,7 +1027,14 @@ namespace CoreData.CoreComm
                                     CoID = CoID,
                                     itCoid = itCoid                     
                                 });                                                                                         
-                               
+                     if(rnt>0){
+                            Task.Factory.StartNew(()=>{
+                                updateWareSettingM(CoID,true);
+                            });  
+                            Task.Factory.StartNew(()=>{
+                                updateWareSettingF(itCoid.ToString(),true);
+                            });   
+                     }         
                 }
                 catch (Exception e)
                 {
@@ -1215,6 +1222,12 @@ namespace CoreData.CoreComm
                             Task.Factory.StartNew(()=>{
                                 NotifyHaddle.MsgPoint(uname + " 审核通过公司 "+res[0].ItName +" 成为 "+res[0].WareName+" 第三方仓储","3",coid,coid,uid,uname);
                             });  
+                            Task.Factory.StartNew(()=>{
+                                updateWareSettingM(coid,true);
+                            });  
+                            Task.Factory.StartNew(()=>{
+                                updateWareSettingF(res[0].ItCoid,true);
+                            });                                                  
                         }else{
                             result.s = -1;
                         }
@@ -1383,7 +1396,9 @@ namespace CoreData.CoreComm
     public static List<WarePloy> WarePloyList(string CoID){
         var result = new DataResult(1,null);
         var cacheName = "wareploylist"+CoID;
+        //var ploys = new List<WarePloy>();
         var ploys = CacheBase.Get<List<WarePloy>>(cacheName);
+        ploys = null;
         if(ploys == null){
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
@@ -1697,38 +1712,47 @@ namespace CoreData.CoreComm
 
 
         ///<summary>
-        /// 选择分仓
+        /// 选择分仓(返回空时无匹配 ，默认本仓发货)
         ///</summary>
-         public static DataResult chooseWare(string coid, string shopid,List<SkuQuery> skus){ //
+        ///<param name="province"></param>
+        ///<param name="did"></param>
+        ///<param name="payment"></param>
+        ///<param name="goodscout"></param>
+
+         public static DataResult chooseWare(string coid, string shopid,int province,int did,int payment,int goodscout,List<SkuQuery> skus){ //
             var result = new DataResult(1,null);
             var ploys = WarePloyList(coid);
             var ploylist = new List<WarePloy>();
-
-            foreach(var sku in skus){
-
-            }
-
-            var q = from c in ploys where c.Shopid.Split(',').Contains(shopid) select c ;
-            
-            result.d = q;
-            
-
-            // using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
-            //     try
-            //     {
+            int i = 0;
+            try{            
+                foreach(var sku in skus){
+                    var q = (from c in ploys 
+                            where (
+                                c.Shopid.Split(',').Contains(shopid)
+                                && c.Province.IndexOf(province.ToString())>-1    
+                                && c.Did.Split(',').Contains(did.ToString())
+                                && c.Payment == payment
+                                && (goodscout > c.MinNum -1 || goodscout < c.MaxNum+1)                             
+                                && (c.ContainGoods.IndexOf(sku.GoodsCode)>-1 || c.ContainSkus.IndexOf(sku.SkuID)>-1)
+                                && (c.RemoveGoods.IndexOf(sku.GoodsCode) == -1 && c.RemoveSkus.IndexOf(sku.SkuID) == -1 )
+                             )
+                            orderby c.Level 
+                            select c).Distinct().AsList() ;
+                    if(i == 0){
+                        ploylist = q;
+                    }else{
+                        ploylist = ploylist.Intersect(q).Distinct().AsList();
+                    }
+                    i++;                
+                }
+                result.d = ploylist;
                 
-            //         string sql = "";
-
-        
-
-            //     }
-            //     catch (Exception e)
-            //     {
-            //         result.s = -1;
-            //         result.d= e.Message; 
-            //         conn.Dispose();
-            //     }
-            // }
+                                            
+            }catch(Exception ex){
+                result.s = -1;
+                result.d = ex.Message;
+            }
+                      
             return result;
         }
 
@@ -1739,46 +1763,24 @@ namespace CoreData.CoreComm
         ///</summary>
          public static DataResult  wareSettingGet(string coid){
             var result = new DataResult(1,null);
-            var setting = new ware_setting();
+            var setting = new ware_m_setting();
             // if(setting == null){
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    string sql = "SELECT * FROM ware_setting WHERE CoID = "+coid ;
-                    var res = conn.Query<ware_setting>(sql).AsList();
+                    string sql = "SELECT * FROM ware_setting WHERE CoID = "+coid ;                    
+                    var res = conn.Query<ware_m_setting>(sql).AsList();
                     if(res.Count >0){
                         setting = res[0];
                         if(!setting.IsMain && setting.IsFen){
                             result.d = conn.Query<ware_f_setting>(sql).AsList()[0];
-                        }else{
+                        }else{                            
                             result.d = setting;
                         }                         
                         // CacheBase.Set<ware_setting>("waresettingh"+coid,setting);
                     }else{
                         result.s= -3010;
-                    }
-
-
-                    // if(isMain.Count>0){ // 判断是否为主仓
-                        
-                    // }else{                            
-                    //     var isFen = conn.Query<int>("SELECT ID FROM ware_third_party WHERE ItCoid = "+coid).AsList();
-                    //     if(isFen.Count>0){ 
-                    //         var res = conn.Query<ware_f_setting>(sql).AsList();
-                    //         if(res.Count >0){
-                    //             result.d =res[0];                                 
-                    //         }else{
-                    //             result.s= -3010;
-                    //         }
-                    //     }else{ //不为主仓，亦不为分仓，可能是主账号但未有分仓，故没有记录
-                    //         var res = conn.Query<ware_setting>(sql).AsList();
-                    //         if(res.Count >0){
-                    //             result.d =res[0];                                 
-                    //         }else{
-                    //             result.s= -3010;
-                    //         }
-                    //     }
-                    // }             
+                    }                   
                 }
                 catch (Exception e)
                 {
@@ -1830,18 +1832,152 @@ namespace CoreData.CoreComm
             return result;
         }
 
+        ///<summary>
+        ///设置为主仓
+        ///</summary>
+        public static void updateWareSettingM(string coid,bool IsMain){
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {                    
+                    string sql ="";
+                    sql = @"UPDATE ware_setting SET 
+                                    IsMain =@IsMain
+                                   WHERE
+                                    CoID  =@CoID
+                                    ";
+                     conn.Execute(sql,new {
+                            CoID = coid,
+                            IsMain = IsMain
+                     }); 
+                }catch{
+                    conn.Dispose();
+                }
+            }
+        }
 
-        public static DataResult modifyWareSetting(ware_setting setting,string coid){
+        ///<summary>
+        ///设置为分仓
+        ///</summary>
+        public static void updateWareSettingF(string coid,bool IsFen){
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {                    
+                    string sql ="";
+                    sql = @"UPDATE ware_setting SET 
+                                    IsFen =@IsFen
+                                   WHERE
+                                    CoID  =@CoID
+                                    ";
+                     conn.Execute(sql,new {
+                            CoID = coid,
+                            IsFen = IsFen
+                     }); 
+                }catch{
+                    conn.Dispose();
+                }
+            }
+        }
+
+        public static DataResult modifyWareSetting(ware_m_setting setting,string coid,string uname){
             var result = new DataResult(1,null);
-            var oldset = wareSettingGet(coid).d as ware_setting;
-            string content = "";
-
-
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    
+                    string sql = "SELECT * FROM ware_setting WHERE CoID = "+coid ;
+                    var oldset = conn.Query<ware_m_setting>(sql).AsList()[0];
+                    string content = "";
+                    if (oldset.LockSku != setting.LockSku && !string.IsNullOrEmpty(setting.LockSku)) 
+                        { oldset.LockSku = setting.LockSku; content = "特殊订单锁定库存 " + oldset.LockSku + " => " + setting.LockSku; }
+                    if (oldset.IsPositionAccurate != setting.IsPositionAccurate&& !string.IsNullOrEmpty(setting.IsPositionAccurate)) 
+                        { oldset.IsPositionAccurate = setting.IsPositionAccurate; content = "仓位精确库存 " + oldset.IsPositionAccurate + " => " + setting.IsPositionAccurate; }
+                    if (oldset.SynchroSku != setting.SynchroSku && !string.IsNullOrEmpty(setting.SynchroSku)) 
+                        { oldset.SynchroSku = setting.SynchroSku; content = "从商品维护导入商品信息时，默认禁止同步库存 " + oldset.SynchroSku + " => " + setting.SynchroSku; }
+                    if (oldset.IsBeyondCount != setting.IsBeyondCount && !string.IsNullOrEmpty(setting.IsBeyondCount)) 
+                        { oldset.IsBeyondCount = setting.IsBeyondCount; content = "采购入库超入处理 " + oldset.IsBeyondCount + " => " + setting.IsBeyondCount; }
+                    if (oldset.OrderStore != setting.OrderStore && !string.IsNullOrEmpty(setting.OrderStore)) 
+                        { oldset.OrderStore = setting.OrderStore; content = "允许直接登记采购入库单并审核入库 " + oldset.OrderStore + " => " + setting.OrderStore; }
+                    if (oldset.PickingMethod != setting.PickingMethod && !string.IsNullOrEmpty(setting.PickingMethod)) 
+                        { oldset.PickingMethod = setting.PickingMethod; content = "拣货方式 " + oldset.PickingMethod + " => " + setting.PickingMethod; }
+                    if (oldset.GoodsUniqueCode != setting.GoodsUniqueCode && !string.IsNullOrEmpty(setting.GoodsUniqueCode)) 
+                        { oldset.GoodsUniqueCode = setting.GoodsUniqueCode; content = "商品唯一码 " + oldset.GoodsUniqueCode + " => " + setting.GoodsUniqueCode; }
+                    if (oldset.CodePre != setting.CodePre && !string.IsNullOrEmpty(setting.CodePre)) 
+                        { oldset.CodePre = setting.CodePre; content = "唯一码前缀 " + oldset.CodePre + " => " + setting.CodePre; }
+                    if (oldset.SingleGoods != setting.SingleGoods && !string.IsNullOrEmpty(setting.SingleGoods)) 
+                        { oldset.SingleGoods = setting.SingleGoods; content = "一单一货 " + oldset.SingleGoods + " => " + setting.SingleGoods; }
+                    if (oldset.IntervalChar != setting.IntervalChar && !string.IsNullOrEmpty(setting.IntervalChar)) 
+                        { oldset.IntervalChar = setting.IntervalChar; content = "商品编码间隔符 " + oldset.IntervalChar + " => " + setting.IntervalChar; }
+                    if (oldset.SendOnPicking != setting.SendOnPicking && !string.IsNullOrEmpty(setting.SendOnPicking)) 
+                        { oldset.SendOnPicking = setting.SendOnPicking; content = "手执拣货一单多货，边拣边播 " + oldset.SendOnPicking + " => " + setting.SendOnPicking; }
+                    if (oldset.PickedAutoSend != setting.PickedAutoSend && !string.IsNullOrEmpty(setting.PickedAutoSend)) 
+                        { oldset.PickedAutoSend = setting.PickedAutoSend; content = "边拣边播，拣货完成自动出库 " + oldset.PickedAutoSend + " => " + setting.PickedAutoSend; }
+                    if (oldset.CabinetHeight != setting.CabinetHeight ) 
+                        { oldset.CabinetHeight = setting.CabinetHeight; content = "播种柜层高 " + oldset.CabinetHeight + " => " + setting.CabinetHeight; }
+                    if (oldset.CabinetNum != setting.CabinetNum ) 
+                        { oldset.CabinetNum = setting.CabinetNum; content = "播种柜总格数 " + oldset.CabinetNum + " => " + setting.CabinetNum; }
+                    if (oldset.CabinetColumn != setting.CabinetColumn) 
+                        { oldset.CabinetColumn = setting.CabinetColumn; content = "播种柜列数 " + oldset.CabinetColumn + " => " + setting.CabinetColumn; }
+                    if (oldset.LimitSender != setting.LimitSender && !string.IsNullOrEmpty(setting.LimitSender)) 
+                        { oldset.LimitSender = setting.LimitSender; content = "限定由拣货人员播种" + oldset.LimitSender + " => " + setting.LimitSender; }
+                    if (oldset.SendUseCount != setting.SendUseCount && !string.IsNullOrEmpty(setting.SendUseCount)) 
+                        { oldset.SendUseCount = setting.SendUseCount; content = "播种时是否需要输入数量 " + oldset.SendUseCount + " => " + setting.SendUseCount; }
+                    if (oldset.IsGoodsRule != setting.IsGoodsRule && !string.IsNullOrEmpty(setting.IsGoodsRule)) 
+                        { oldset.IsGoodsRule = setting.IsGoodsRule; content = "仓位货物置放规则 " + oldset.IsGoodsRule + " => " + setting.IsGoodsRule; }
+                    if (oldset.SegmentPicking != setting.SegmentPicking && !string.IsNullOrEmpty(setting.SegmentPicking)) 
+                        { oldset.SegmentPicking = setting.SegmentPicking; content = "分段拣货 " + oldset.SegmentPicking + " => " + setting.SegmentPicking; }
+                    if (oldset.AutoLossc != setting.AutoLossc && !string.IsNullOrEmpty(setting.AutoLossc)) 
+                        { oldset.AutoLossc = setting.AutoLossc; content = "零拣区找不到商品时自动盘亏当前仓位 " + oldset.AutoLossc + " => " + setting.AutoLossc; }
+                    if (oldset.AutoDelivery != setting.AutoDelivery && !string.IsNullOrEmpty(setting.AutoDelivery)) 
+                        { oldset.AutoDelivery = setting.AutoDelivery; content = "大单拣货成时自动出库 " + oldset.AutoDelivery + " => " + setting.AutoDelivery; }
+                    if (oldset.MixedPicking != setting.MixedPicking && !string.IsNullOrEmpty(setting.MixedPicking)) 
+                        { oldset.MixedPicking = setting.MixedPicking; content = "混合拣货 " + oldset.MixedPicking + " => " + setting.MixedPicking; }
+                    if (oldset.PickingNoMinus != setting.PickingNoMinus && !string.IsNullOrEmpty(setting.PickingNoMinus)) 
+                        { oldset.PickingNoMinus = setting.PickingNoMinus; content = "拣货暂存位禁止负库存 " + oldset.PickingNoMinus + " => " + setting.PickingNoMinus; }
+                    if (oldset.ReduceStock != setting.ReduceStock && !string.IsNullOrEmpty(setting.ReduceStock)) 
+                        { oldset.ReduceStock = setting.ReduceStock; content = " " + oldset.ReduceStock + " => " + setting.ReduceStock; }
+                    if (oldset.LockTime != setting.LockTime) 
+                        { oldset.LockTime = setting.LockTime; content = "打单界面模块 " + oldset.LockTime + " => " + setting.LockTime; }
+                    if (oldset.OneMorePrint != setting.OneMorePrint && !string.IsNullOrEmpty(setting.OneMorePrint)) 
+                        { oldset.OneMorePrint = setting.OneMorePrint; content = "一单多货打印拣货单时同时打印小订单 " + oldset.OneMorePrint + " => " + setting.OneMorePrint; }
+                    if (oldset.OneMoreOnlyEx != setting.OneMoreOnlyEx && !string.IsNullOrEmpty(setting.OneMoreOnlyEx)) 
+                        { oldset.OneMoreOnlyEx = setting.OneMoreOnlyEx; content = "一单多货验货只需要扫描快递单号 " + oldset.OneMoreOnlyEx + " => " + setting.OneMoreOnlyEx; }
 
+                    sql = @"UPDATE ware_setting SET 
+                                    LockSku=@LockSku,
+                                    IsPositionAccurate=@IsPositionAccurate,
+                                    SynchroSku=@SynchroSku,
+                                    IsBeyondCount=@IsBeyondCount,
+                                    OrderStore=@OrderStore,
+                                    PickingMethod=@PickingMethod,
+                                    GoodsUniqueCode=@GoodsUniqueCode,
+                                    CodePre=@CodePre,
+                                    SingleGoods=@SingleGoods,
+                                    IntervalChar=@IntervalChar,
+                                    SendOnPicking=@SendOnPicking,
+                                    PickedAutoSend=@PickedAutoSend,
+                                    CabinetHeight=@CabinetHeight,
+                                    CabinetNum=@CabinetNum,
+                                    CabinetColumn=@CabinetColumn,
+                                    LimitSender=@LimitSender,
+                                    SendUseCount=@SendUseCount,
+                                    IsGoodsRule=@IsGoodsRule,
+                                    SegmentPicking=@SegmentPicking,
+                                    AutoLossc=@AutoLossc,
+                                    AutoDelivery=@AutoDelivery,
+                                    MixedPicking=@MixedPicking,
+                                    PickingNoMinus=@PickingNoMinus,
+                                    ReduceStock=@ReduceStock,
+                                    LockTime=@LockTime,
+                                    OneMorePrint=@OneMorePrint,
+                                    OneMoreOnlyEx=@OneMoreOnlyEx
+                                  WHERE 
+                                   CoID  =@CoID";
+                      int rnt = conn.Execute(sql,oldset);
+                      if(rnt > 0){
+                          result.s = 1;
+                      }else{
+                          result.s = -1;
+                      }
+                      LogComm.InsertLog("更新企业应用增强设置","ware_setting",content,uname,int.Parse(coid));
                 }
                 catch (Exception e)
                 {
@@ -1854,6 +1990,27 @@ namespace CoreData.CoreComm
 
         }
 
+
+        ///<summary>
+        /// 创建企业应用增强设置
+        ///</summary>
+         public static DataResult createWareSetting(int coid){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    string sql = "INSERT ware_setting SET CoID = "+coid;
+                    conn.Execute(sql);
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
 
 
 

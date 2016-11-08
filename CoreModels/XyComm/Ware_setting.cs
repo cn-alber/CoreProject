@@ -1,7 +1,8 @@
 namespace CoreModels.XyComm
 {
-    public class ware_setting{
-      #region Model
+    public class ware_setting
+    {
+        #region Model
 		private int _id;
 		private int? _coid;
 		private int? _locksku=0;
@@ -17,6 +18,7 @@ namespace CoreModels.XyComm
 		private int? _sendonpicking=0;
 		private int? _pickedautosend=0;
 		private int? _cabinetheight=3;
+		private int? _cabinetcolumn=0;
 		private int? _cabinetnum=0;
 		private int? _limitsender=0;
 		private int? _sendusecount;
@@ -153,6 +155,14 @@ namespace CoreModels.XyComm
 			get{return _cabinetheight;}
 		}
 		/// <summary>
+		/// 播种柜列数
+		/// </summary>
+		public int? CabinetColumn
+		{
+			set{ _cabinetcolumn=value;}
+			get{return _cabinetcolumn;}
+		}
+		/// <summary>
 		/// 播种柜总格
 		/// </summary>
 		public int? CabinetNum
@@ -276,36 +286,258 @@ namespace CoreModels.XyComm
 
     }
 
-	public class ware_f_setting{
-		public int ID{get;set;}
-		public int CoID{get;set;}
-		public int LockSku{get;set;}
-		public int IsPositionAccurate{get;set;}
-		public int SynchroSku{get;set;}
-		public int IsBeyondCount{get;set;}
-		public int OrderStore{get;set;}
-		public int PickingMethod{get;set;}
-		public int SingleGoods{get;set;}
-		public int IntervalChar{get;set;}
-		public int SendOnPicking{get;set;}
-		public int PickedAutoSend{get;set;}
-		public int CabinetHeight{get;set;}
-		public int CabinetNum{get;set;}
-		public int LimitSender{get;set;}
-		public int SendUseCount{get;set;}
-		public int IsGoodsRule{get;set;}
-		public int SegmentPicking{get;set;}
-		public int AutoLossc{get;set;}
-		public int AutoDelivery{get;set;}
-		public int MixedPicking{get;set;}
-		public int PickingNoMinus{get;set;}
-		public int ReduceStock{get;set;}
-		public int LockTime{get;set;}
-		public int OneMorePrint{get;set;}
-		public int OneMoreOnlyEx{get;set;}
-		public bool IsMain{get;set;}
-		public bool IsFen{get;set;}
-	}
+    public class ware_m_setting
+    {
+        public int ID
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public int? CoID
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 特殊订单锁定库存 1：锁定 0：不锁定
+        /// </summary>
+        public string LockSku
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 仓位精确库存
+        /// </summary>
+        public string IsPositionAccurate
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 从商品维护导入商品信息时，默认禁止同步库存
+        /// </summary>
+        public string SynchroSku
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 采购入库超入处理：1允许入库 2不允许 3 预警提示
+        /// </summary>
+        public string IsBeyondCount
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 允许直接登记采购入库单并审核入库
+        /// </summary>
+        public string OrderStore
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 拣货方式 "1" 手执拣货  "2" 纸质拣货
+        /// </summary>
+        public string PickingMethod
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 商品唯一码
+        /// </summary>
+        public string GoodsUniqueCode
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 唯一码前缀 1 商品编码 2 重新数字编码
+        /// </summary>
+        public string CodePre
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 一单一货
+        /// </summary>
+        public string SingleGoods
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 商品编码间隔符 1 - 2 /  3 .  4 无
+        /// </summary>
+        public string IntervalChar
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 手执拣货一单多货，边捡边播
+        /// </summary>
+        public string SendOnPicking
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 边拣边播，拣货完成自动出库
+        /// </summary>
+        public string PickedAutoSend
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 播种柜层高
+        /// </summary>
+        public int CabinetHeight
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 播种柜总格
+        /// </summary>
+        public int CabinetNum
+        {
+            get; set;
+        }
+		/// <summary>
+		/// 播种柜列数
+		/// </summary>
+		public int CabinetColumn
+		{
+            get; set;
+        }
+        /// <summary>
+        /// 限定由拣货人员播种
+        /// </summary>
+        public string LimitSender
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 播种时时候需要输入数量 1：逐一扫描  2：输入数量
+        /// </summary>
+        public string SendUseCount
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 仓位货物置放规则 1 一仓多货 2 一仓一货
+        /// </summary>
+        public string IsGoodsRule
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 分段拣货 0未开通 1 开通
+        /// </summary>
+        public string SegmentPicking
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 零拣区找不到商品时自动盘亏当前仓位
+        /// </summary>
+        public string AutoLossc
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 大单拣货成时自动出库 0 关闭 1开通
+        /// </summary>
+        public string AutoDelivery
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 混合拣货 0 关闭 1开通
+        /// </summary>
+        public string MixedPicking
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 拣货暂存位禁止负库存
+        /// </summary>
+        public string PickingNoMinus
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 打单界面模块 - 直接发货：减库存方式 1:减拣货暂存位库存  2: 减仓位库存
+        /// </summary>
+        public string ReduceStock
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 一单一货连打发货锁定订单时间（秒）
+        /// </summary>
+        public int LockTime
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 一单多货打印拣货单时同时打印小订单
+        /// </summary>
+        public string OneMorePrint
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 一单多货验货只需要扫描快递单号
+        /// </summary>
+        public string OneMoreOnlyEx
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 是否是主仓
+        /// </summary>
+        public bool IsMain
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 是否是分仓
+        /// </summary>
+        public bool IsFen
+        {
+            get; set;
+        }
+
+    }
+
+
+    public class ware_f_setting
+    {
+        public int ID { get; set; }
+        public int CoID { get; set; }
+        public string LockSku { get; set; }
+        public string IsPositionAccurate { get; set; }
+        public string SynchroSku { get; set; }
+        public string IsBeyondCount { get; set; }
+        public string OrderStore { get; set; }
+        public string PickingMethod { get; set; }
+        public string SingleGoods { get; set; }
+        public string IntervalChar { get; set; }
+        public string SendOnPicking { get; set; }
+        public string PickedAutoSend { get; set; }
+        public int CabinetHeight { get; set; }
+        public int CabinetNum { get; set; }
+		public int CabinetColumn{get; set;}
+        public string LimitSender { get; set; }
+        public string SendUseCount { get; set; }
+        public string IsGoodsRule { get; set; }
+        public string SegmentPicking { get; set; }
+        public string AutoLossc { get; set; }
+        public string AutoDelivery { get; set; }
+        public string MixedPicking { get; set; }
+        public string PickingNoMinus { get; set; }
+        public string ReduceStock { get; set; }
+        public string LockTime { get; set; }
+        public string OneMorePrint { get; set; }
+        public string OneMoreOnlyEx { get; set; }
+        public bool IsMain { get; set; }
+        public bool IsFen { get; set; }
+    }
 
 
 
