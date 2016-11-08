@@ -1027,7 +1027,14 @@ namespace CoreData.CoreComm
                                     CoID = CoID,
                                     itCoid = itCoid                     
                                 });                                                                                         
-                               
+                     if(rnt>0){
+                            Task.Factory.StartNew(()=>{
+                                updateWareSettingM(CoID,true);
+                            });  
+                            Task.Factory.StartNew(()=>{
+                                updateWareSettingF(itCoid.ToString(),true);
+                            });   
+                     }         
                 }
                 catch (Exception e)
                 {
@@ -1215,6 +1222,12 @@ namespace CoreData.CoreComm
                             Task.Factory.StartNew(()=>{
                                 NotifyHaddle.MsgPoint(uname + " 审核通过公司 "+res[0].ItName +" 成为 "+res[0].WareName+" 第三方仓储","3",coid,coid,uid,uname);
                             });  
+                            Task.Factory.StartNew(()=>{
+                                updateWareSettingM(coid,true);
+                            });  
+                            Task.Factory.StartNew(()=>{
+                                updateWareSettingF(res[0].ItCoid,true);
+                            });                                                  
                         }else{
                             result.s = -1;
                         }
@@ -1705,9 +1718,8 @@ namespace CoreData.CoreComm
         ///<param name="did"></param>
         ///<param name="payment"></param>
         ///<param name="goodscout"></param>
-        ///<param name="ruleType">选择规则 ： 1 优先级选择 ， 2 随机选择 3 指定分仓（需指定策略名）</param>
-        ///<param name="ployid">指定的策略名</param>
-         public static DataResult chooseWare(string coid, string shopid,int province,int did,int payment,int goodscout,List<SkuQuery> skus,int ruleType,string ployname = ""){ //
+
+         public static DataResult chooseWare(string coid, string shopid,int province,int did,int payment,int goodscout,List<SkuQuery> skus){ //
             var result = new DataResult(1,null);
             var ploys = WarePloyList(coid);
             var ploylist = new List<WarePloy>();
@@ -1729,18 +1741,8 @@ namespace CoreData.CoreComm
                     }
                     i++;                
                 }
-                if(ploylist.Count >0){
-                    if(ruleType == 1){
-                        result.d = ploylist[0];
-                    }else if(ruleType == 2){
-                        Random ran=new Random();
-                        result.d = ploylist[ran.Next(0, ploylist.Count()-1 )];
-                    }else{
-                        result.d = from c in ploylist where c.Name == ployname select c;
-                    }                    
-                }else{
-                    result.d = ploylist;
-                }
+                result.d = ploylist;
+                
                                             
             }catch(Exception ex){
                 result.s = -1;
@@ -1826,8 +1828,53 @@ namespace CoreData.CoreComm
             return result;
         }
 
+        ///<summary>
+        ///设置为主仓
+        ///</summary>
+        public static void updateWareSettingM(string coid,bool IsMain){
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {                    
+                    string sql ="";
+                    sql = @"UPDATE ware_setting SET 
+                                    IsMain =@IsMain
+                                   WHERE
+                                    CoID  =@CoID
+                                    ";
+                     conn.Execute(sql,new {
+                            CoID = coid,
+                            IsMain = IsMain
+                     }); 
+                }catch{
+                    conn.Dispose();
+                }
+            }
+        }
 
-        public static DataResult modifyWareSetting(ware_m_setting setting,string coid){
+        ///<summary>
+        ///设置为分仓
+        ///</summary>
+        public static void updateWareSettingF(string coid,bool IsFen){
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {                    
+                    string sql ="";
+                    sql = @"UPDATE ware_setting SET 
+                                    IsFen =@IsFen
+                                   WHERE
+                                    CoID  =@CoID
+                                    ";
+                     conn.Execute(sql,new {
+                            CoID = coid,
+                            IsFen = IsFen
+                     }); 
+                }catch{
+                    conn.Dispose();
+                }
+            }
+        }
+
+        public static DataResult modifyWareSetting(ware_m_setting setting,string coid,string uname){
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
@@ -1919,15 +1966,14 @@ namespace CoreData.CoreComm
                                     OneMorePrint=@OneMorePrint,
                                     OneMoreOnlyEx=@OneMoreOnlyEx
                                   WHERE 
-                                   CoID  =@CoID        
-
-                                    ";
+                                   CoID  =@CoID";
                       int rnt = conn.Execute(sql,oldset);
                       if(rnt > 0){
                           result.s = 1;
                       }else{
                           result.s = -1;
                       }
+                      LogComm.InsertLog("更新企业应用增强设置","ware_setting",content,uname,int.Parse(coid));
                 }
                 catch (Exception e)
                 {

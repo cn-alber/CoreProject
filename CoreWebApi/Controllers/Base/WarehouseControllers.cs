@@ -253,7 +253,7 @@ namespace CoreWebApi
             //skus.Add(s3);
 
             string CoID = GetCoid();            
-            var data = WarehouseHaddle.chooseWare(CoID,"8",110000,1,1,1,skus,3,"8989");
+            var data = WarehouseHaddle.chooseWare(CoID,"8",110000,1,1,1,skus);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -315,7 +315,8 @@ namespace CoreWebApi
         {   
             var w = Newtonsoft.Json.JsonConvert.DeserializeObject<ware_m_setting>(co.ToString());
             string CoID = GetCoid();
-            var data = WarehouseHaddle.modifyWareSetting(w,CoID);
+            string uname = GetUname();
+            var data = WarehouseHaddle.modifyWareSetting(w,CoID,uname);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
