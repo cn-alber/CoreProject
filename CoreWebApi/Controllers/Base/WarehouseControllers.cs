@@ -9,6 +9,7 @@ using CoreModels;
 using CoreData.CoreUser;
 using CoreData.CoreCore;
 using CoreModels.XyCore;
+using System.Collections.Generic;
 
 namespace CoreWebApi
 {
@@ -189,8 +190,11 @@ namespace CoreWebApi
         [HttpGetAttribute("/Core/Warehouse/WarePloyList")]
         public ResponseResult WarePloyList(string id="")
         {   
+            var data = new DataResult(1,null);
             string CoID = GetCoid();
-            var data = WarehouseHaddle.WarePloyList(CoID);
+            data.d = Newtonsoft.Json.JsonConvert.DeserializeObject<List<wareploylist>>(
+                                            Newtonsoft.Json.JsonConvert.SerializeObject(WarehouseHaddle.WarePloyList(CoID)));
+
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -220,6 +224,7 @@ namespace CoreWebApi
             var data = WarehouseHaddle.createploy(CoID,w,uname);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
         [HttpPostAttribute("/Core/Warehouse/modifyploy")]
         public ResponseResult modifyploy([FromBodyAttribute]JObject co)
         {   
@@ -229,6 +234,30 @@ namespace CoreWebApi
             var data = WarehouseHaddle.modifyploy(CoID,w,uname);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpGetAttribute("/Core/Warehouse/chooseWare")]
+        public ResponseResult chooseWare()
+        {           
+            List<SkuQuery> skus = new List<SkuQuery>();
+            var s1 = new SkuQuery();
+            var s2 = new SkuQuery();
+            var s3 = new SkuQuery();
+            s1.GoodsCode = "N3L6F55521";
+            s2.GoodsCode = "N3L6F55522";
+            s3.GoodsCode = "N3L6F55523";
+            s1.SkuID = "N3L4F51001025190";
+            s2.SkuID = "N3L4F51001025191";
+            s3.SkuID = "N3L4F51001025192";
+            skus.Add(s1);
+            skus.Add(s2);
+            skus.Add(s3);
+
+            string CoID = GetCoid();            
+            var data = WarehouseHaddle.chooseWare(CoID,"8",skus);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+
 
         [HttpGetAttribute("/Core/Warehouse/getWareSku")]
         public ResponseResult getWareSku(string GoodsCode="",string GoodsName="", string Filter="", int PageIndex= 1, int PageSize = 20, string SortField="", string SortDirection="")

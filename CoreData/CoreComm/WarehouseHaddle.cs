@@ -7,6 +7,8 @@ using MySql.Data.MySqlClient;
 using CoreModels.XyUser;
 using CoreData.CoreUser;
 using System.Threading.Tasks;
+using CoreModels.XyCore;
+using System.Linq;
 
 namespace CoreData.CoreComm
 {
@@ -1378,22 +1380,26 @@ namespace CoreData.CoreComm
     ///<summary>
     ///  分仓策略list
     ///</summary>
-    public static DataResult WarePloyList(string CoID){
+    public static List<WarePloy> WarePloyList(string CoID){
         var result = new DataResult(1,null);
-        using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
-            try
-            {
-                string sql = @"SELECT ID,`Name` FROM wareploy WHERE CoID ="+CoID+";";
-                result.d = conn.Query<wareploylist>(sql).AsList();                                  
-            }
-            catch (Exception e)
-            {
-                result.s = -1;
-                result.d= e.Message; 
-                conn.Dispose();
+        var cacheName = "wareploylist"+CoID;
+        var ploys = CacheBase.Get<List<WarePloy>>(cacheName);
+        if(ploys == null){
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    string sql = @"SELECT * FROM wareploy WHERE CoID ="+CoID+";";
+                    ploys = conn.Query<WarePloy>(sql).AsList();    
+                    CacheBase.Set<List<WarePloy>>(cacheName,ploys);                               
+                }
+                catch
+                {
+                    conn.Dispose();
+                }
             }
         }
-        return result;
+        
+        return ploys;
     }
 
 
@@ -1478,9 +1484,9 @@ namespace CoreData.CoreComm
                         if(res.Count>0){
                             var p = res[0];
                             if(p.Wid == 0){
-                                p.Name = "本仓";
+                                p.Wname = "本仓";
                             }else{
-                                p.Name = conn.Query<string>("SELECT WareName from ware_third_party WHERE ID ="+p.Wid).AsList()[0];
+                                p.Wname = conn.Query<string>("SELECT WareName from ware_third_party WHERE ID ="+p.Wid).AsList()[0];
                             }
                             result.d = new{
                                 province = province,
@@ -1501,7 +1507,7 @@ namespace CoreData.CoreComm
                                     MinNum = p.MinNum,
                                     MaxNum = p.MaxNum,
                                     Payment = p.Payment
-                                }
+                                } 
                             };
                         }else{
                             result.d = new{
@@ -1687,24 +1693,42 @@ namespace CoreData.CoreComm
             return result;
         }
 
-        ///<summary>
-        /// 
-        ///</summary>
-         public static DataResult checkWare(){
-            var result = new DataResult(1,null);
-            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
-                try
-                {
         
 
-                }
-                catch (Exception e)
-                {
-                    result.s = -1;
-                    result.d= e.Message; 
-                    conn.Dispose();
-                }
+
+        ///<summary>
+        /// 选择分仓
+        ///</summary>
+         public static DataResult chooseWare(string coid, string shopid,List<SkuQuery> skus){ //
+            var result = new DataResult(1,null);
+            var ploys = WarePloyList(coid);
+            var ploylist = new List<WarePloy>();
+
+            foreach(var sku in skus){
+
             }
+
+            var q = from c in ploys where c.Shopid.Split(',').Contains(shopid) select c ;
+            
+            result.d = q;
+            
+
+            // using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+            //     try
+            //     {
+                
+            //         string sql = "";
+
+        
+
+            //     }
+            //     catch (Exception e)
+            //     {
+            //         result.s = -1;
+            //         result.d= e.Message; 
+            //         conn.Dispose();
+            //     }
+            // }
             return result;
         }
 
