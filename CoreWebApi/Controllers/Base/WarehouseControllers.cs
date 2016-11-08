@@ -218,20 +218,36 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Warehouse/createploy")]
         public ResponseResult createploy([FromBodyAttribute]JObject co)
         {   
+            var data = new DataResult(1,null);
             WarePloyRequest w = Newtonsoft.Json.JsonConvert.DeserializeObject<WarePloyRequest>(co.ToString());
-            string CoID = GetCoid();
-            string uname =GetUname();
-            var data = WarehouseHaddle.createploy(CoID,w,uname);
+            if(w.MinNum<0 || w.MaxNum<0){
+                data.s = -3111;
+            }else if(w.MaxNum<w.MinNum){
+                data.s = -3112;
+            }else{
+                string CoID = GetCoid();
+                string uname =GetUname();
+                data = WarehouseHaddle.createploy(CoID,w,uname);    
+            }
+
+            
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
         [HttpPostAttribute("/Core/Warehouse/modifyploy")]
         public ResponseResult modifyploy([FromBodyAttribute]JObject co)
         {   
+            var data = new DataResult(1,null);
             WarePloyRequest w = Newtonsoft.Json.JsonConvert.DeserializeObject<WarePloyRequest>(co.ToString());
-            string CoID = GetCoid();
-            string uname = GetUname();
-            var data = WarehouseHaddle.modifyploy(CoID,w,uname);
+            if(w.MinNum<0 || w.MaxNum<0){
+                data.s = -3111;
+            }else if(w.MaxNum<w.MinNum){
+                data.s = -3112;
+            }else{
+                string CoID = GetCoid();
+                string uname = GetUname();
+                data = WarehouseHaddle.modifyploy(CoID,w,uname);
+            }
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 

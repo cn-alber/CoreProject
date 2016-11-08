@@ -1728,7 +1728,11 @@ namespace CoreData.CoreComm
                 foreach(var sku in skus){
                     var q = (from c in ploys 
                             where (
-                                c.Shopid.Split(',').Contains(shopid) 
+                                c.Shopid.Split(',').Contains(shopid)
+                                && c.Province.IndexOf(province.ToString())>-1    
+                                && c.Did.Split(',').Contains(did.ToString())
+                                && c.Payment == payment
+                                && (goodscout > c.MinNum -1 || goodscout < c.MaxNum+1)                             
                                 && (c.ContainGoods.IndexOf(sku.GoodsCode)>-1 || c.ContainSkus.IndexOf(sku.SkuID)>-1)
                                 && (c.RemoveGoods.IndexOf(sku.GoodsCode) == -1 && c.RemoveSkus.IndexOf(sku.SkuID) == -1 )
                              )
@@ -1986,6 +1990,27 @@ namespace CoreData.CoreComm
 
         }
 
+
+        ///<summary>
+        /// 创建企业应用增强设置
+        ///</summary>
+         public static DataResult createWareSetting(int coid){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    string sql = "INSERT ware_setting SET CoID = "+coid;
+                    conn.Execute(sql);
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
 
 
 
