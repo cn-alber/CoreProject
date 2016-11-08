@@ -250,7 +250,7 @@ namespace CoreWebApi
             s3.SkuID = "N3L4F51001025192";
             skus.Add(s1);
             skus.Add(s2);
-            skus.Add(s3);
+            //skus.Add(s3);
 
             string CoID = GetCoid();            
             var data = WarehouseHaddle.chooseWare(CoID,"8",skus);

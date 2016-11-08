@@ -1383,7 +1383,9 @@ namespace CoreData.CoreComm
     public static List<WarePloy> WarePloyList(string CoID){
         var result = new DataResult(1,null);
         var cacheName = "wareploylist"+CoID;
+//        var ploys = new List<WarePloy>();
         var ploys = CacheBase.Get<List<WarePloy>>(cacheName);
+        ploys = null;
         if(ploys == null){
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
@@ -1703,14 +1705,35 @@ namespace CoreData.CoreComm
             var result = new DataResult(1,null);
             var ploys = WarePloyList(coid);
             var ploylist = new List<WarePloy>();
-
-            foreach(var sku in skus){
-
+            int i = 0;
+            try{            
+                foreach(var sku in skus){
+                    var q = (from c in ploys 
+                            where (
+                                c.Shopid.Split(',').Contains(shopid) 
+                                && (c.ContainGoods.IndexOf(sku.GoodsCode)>-1 || c.ContainSkus.IndexOf(sku.SkuID)>-1)
+                                && (c.RemoveGoods.IndexOf(sku.GoodsCode)>-1)
+                             ) 
+                            select c).Distinct().AsList() ;
+                    if(i == 0){
+                        ploylist = q;
+                    }else{
+                        ploylist = ploylist.Intersect(q).Distinct().AsList();
+                    }
+                    i++;                
+                }
+                if(ploylist.Count >0 ){
+                    result.d = ploylist;
+                }
+                
+            }catch(Exception ex){
+                result.s = -1;
+                result.d = ex.Message;
             }
-
-            var q = from c in ploys where c.Shopid.Split(',').Contains(shopid) select c ;
+                      
             
-            result.d = q;
+
+            
             
 
             // using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
@@ -1739,46 +1762,24 @@ namespace CoreData.CoreComm
         ///</summary>
          public static DataResult  wareSettingGet(string coid){
             var result = new DataResult(1,null);
-            var setting = new ware_setting();
+            var setting = new ware_m_setting();
             // if(setting == null){
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    string sql = "SELECT * FROM ware_setting WHERE CoID = "+coid ;
-                    var res = conn.Query<ware_setting>(sql).AsList();
+                    string sql = "SELECT * FROM ware_setting WHERE CoID = "+coid ;                    
+                    var res = conn.Query<ware_m_setting>(sql).AsList();
                     if(res.Count >0){
                         setting = res[0];
                         if(!setting.IsMain && setting.IsFen){
                             result.d = conn.Query<ware_f_setting>(sql).AsList()[0];
-                        }else{
+                        }else{                            
                             result.d = setting;
                         }                         
                         // CacheBase.Set<ware_setting>("waresettingh"+coid,setting);
                     }else{
                         result.s= -3010;
-                    }
-
-
-                    // if(isMain.Count>0){ // 判断是否为主仓
-                        
-                    // }else{                            
-                    //     var isFen = conn.Query<int>("SELECT ID FROM ware_third_party WHERE ItCoid = "+coid).AsList();
-                    //     if(isFen.Count>0){ 
-                    //         var res = conn.Query<ware_f_setting>(sql).AsList();
-                    //         if(res.Count >0){
-                    //             result.d =res[0];                                 
-                    //         }else{
-                    //             result.s= -3010;
-                    //         }
-                    //     }else{ //不为主仓，亦不为分仓，可能是主账号但未有分仓，故没有记录
-                    //         var res = conn.Query<ware_setting>(sql).AsList();
-                    //         if(res.Count >0){
-                    //             result.d =res[0];                                 
-                    //         }else{
-                    //             result.s= -3010;
-                    //         }
-                    //     }
-                    // }             
+                    }                   
                 }
                 catch (Exception e)
                 {
