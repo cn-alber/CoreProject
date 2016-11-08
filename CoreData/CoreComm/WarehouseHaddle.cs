@@ -1383,10 +1383,10 @@ namespace CoreData.CoreComm
     public static List<WarePloy> WarePloyList(string CoID){
         var result = new DataResult(1,null);
         var cacheName = "wareploylist"+CoID;
-//        var ploys = new List<WarePloy>();
-        var ploys = CacheBase.Get<List<WarePloy>>(cacheName);
-        ploys = null;
-        if(ploys == null){
+        var ploys = new List<WarePloy>();
+        // var ploys = CacheBase.Get<List<WarePloy>>(cacheName);
+        // ploys = null;
+        // if(ploys == null){
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
@@ -1399,7 +1399,7 @@ namespace CoreData.CoreComm
                     conn.Dispose();
                 }
             }
-        }
+        //}
         
         return ploys;
     }
@@ -1711,8 +1711,8 @@ namespace CoreData.CoreComm
                     var q = (from c in ploys 
                             where (
                                 c.Shopid.Split(',').Contains(shopid) 
-                                && (c.ContainGoods.IndexOf(sku.GoodsCode)>-1 || c.ContainSkus.IndexOf(sku.SkuID)>-1)
-                                && (c.RemoveGoods.IndexOf(sku.GoodsCode) == 0)
+                                //&& (c.ContainGoods.IndexOf(sku.GoodsCode)>-1 || c.ContainSkus.IndexOf(sku.SkuID)>-1)
+                                && (c.RemoveGoods.IndexOf(sku.GoodsCode) == -1 && c.RemoveSkus.IndexOf(sku.SkuID) == -1 )
                              ) 
                             select c).Distinct().AsList() ;
                     if(i == 0){
@@ -1722,9 +1722,9 @@ namespace CoreData.CoreComm
                     }
                     i++;                
                 }
-                if(ploylist.Count >0 ){
-                    result.d = ploylist;
-                }
+                
+                result.d = ploylist;
+                
                 
             }catch(Exception ex){
                 result.s = -1;

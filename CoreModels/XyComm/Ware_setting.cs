@@ -520,8 +520,8 @@ namespace CoreModels.XyComm
         public string IntervalChar { get; set; }
         public string SendOnPicking { get; set; }
         public string PickedAutoSend { get; set; }
-        // public string CabinetHeight { get; set; }
-        // public string CabinetNum { get; set; }
+        public string CabinetHeight { get; set; }
+        public string CabinetNum { get; set; }
 		public string CabinetColumn{get; set;}
         public string LimitSender { get; set; }
         public string SendUseCount { get; set; }
