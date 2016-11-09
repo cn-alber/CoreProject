@@ -83,7 +83,7 @@ namespace CoreModels.XyCore
 
     public class ScoCompDDLB
     {
-        public int id {get;set;}
+        public string id {get;set;}
         public string scocode {get;set;}
         public string scosimple {get;set;}
     }

@@ -182,3 +182,10 @@ output: s=1成功 else 错误代码
 参考:input jason 文件:OrdMerger_input.json
 参考:output jason 文件:OrdMerger_output.json
 
+17.CancleOrdMerge()订单合并还原
+路由:http://localhost:5000/Core/Order/OrdMerCancleOrdMergeger
+input:OID    List<int>           内部订单号
+output: s=1成功 else 错误代码
+参考:input jason 文件:CancleOrdMerge_input.json
+参考:output jason 文件:CancleOrdMerge_output.json
+

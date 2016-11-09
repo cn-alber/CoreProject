@@ -67,7 +67,7 @@ namespace CoreModels.XyComm
 
     public class BrandDDLB
     {
-        public int ID { get; set; }
+        public string ID { get; set; }
         public string Name { get; set; }
         public string Intro { get; set; }
     }
