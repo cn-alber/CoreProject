@@ -94,6 +94,15 @@ namespace CoreModels.XyComm
         public List<CustomKindData> Children { get; set; }
     }
 
+    public class CustomCategory
+    {
+        public int ID { get; set; }
+        public string Name { get; set; }        
+        public bool IsParent{get;set;}
+
+    }
+
+
     public class TmaoData
     {
         public long cid { get; set; }

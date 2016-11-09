@@ -41,7 +41,12 @@ namespace CoreData.CoreComm
                         Kind = res.d as CustomKindData;
                     }
                     Kind.Children = Children;
-
+                    if(Children.Count > 0 && IParam.ParentID != 0){
+                        System.Threading.Tasks.Task.Factory.StartNew(()=>{
+                            conn.Execute("UPDATE customkind SET IsParent = TRUE WHERE ID = "+IParam.ParentID);
+                        });
+                        
+                    }
                     // foreach (var p in ParentLst)
                     // {
                     //     var res = GetKindLst(Type, p.ID, CoID);
@@ -65,6 +70,41 @@ namespace CoreData.CoreComm
         }
         #endregion
 
+        #region 获取类目列表 -- 公共
+        public static DataResult GetCustomCats(CusKindParam IParam)
+        {
+            var result = new DataResult(1, null);
+            var Kind = new CustomKindData();
+            string sql = @"SELECT customkind.ID ,customkind.KindName as NAME ,customkind.IsParent  FROM customkind WHERE Type=@Type AND CoID=@CoID AND IsDelete=0 AND ParentID = @ParentID";
+            var p = new DynamicParameters();
+            p.Add("@Type", IParam.Type);
+            p.Add("@CoID", IParam.CoID);
+            p.Add("@ParentID", IParam.ParentID);
+            if (!string.IsNullOrEmpty(IParam.Enable) && IParam.Enable.ToUpper() != "ALL")//是否启用
+            {
+                sql = sql + " AND Enable = @Enable";
+                p.Add("@Enable", IParam.Enable.ToUpper() == "TRUE" ? true : false);
+            }
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    result.d = conn.Query<CustomCategory>(sql, p).AsList();                                        
+                    conn.Close();
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+        #endregion
+
+
+
+
         #region 获取标准类目列表
         public static DataResult GetStdKindLst(int ParentID)
         {
@@ -82,6 +122,7 @@ namespace CoreData.CoreComm
                 {
                     var ParentLst = conn.Query<ItemCateStdData>(sql, new { ParentID = ParentID }).AsList();
                     KindLst.AddRange(ParentLst);
+                    
                     // foreach (var p in ParentLst)
                     // {
                     //     var res = GetStdKindLst(p.id);
