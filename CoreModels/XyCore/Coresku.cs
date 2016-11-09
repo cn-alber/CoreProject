@@ -54,8 +54,8 @@ namespace CoreModels.XyCore
         public string Creator { get; set; }
         public string CreateDate { get; set; }
         public bool IsDelete { get; set; }
-        public string Deleter { get; set; }
-        public DateTime DeleteDate { get; set; }
+        public string Modifier { get; set; }
+        public string ModifyDate { get; set; }
     }
     #endregion
     #region 商品主查詢
@@ -211,8 +211,11 @@ namespace CoreModels.XyCore
         public int PageCount { get; set; }//总页数
         public List<GoodsQuery> GoodsLst { get; set; }//货品主资料     
         public List<SkuQuery> SkuLst { get; set; }//商品Sku明细资料   
-        public List<ScoCompDDLB> ScoLst { get; set; }//供应商资料
-        public List<BrandDDLB> BrandLst { get; set; }//品牌资料
+        // public List<ScoCompDDLB> ScoLst { get; set; }//供应商资料
+        public Dictionary<string, object> ScoLst { get; set; }
+        public Dictionary<string, object> BrandLst { get; set; }
+        // public List<BrandDDLB> BrandLst { get; set; }//品牌资料
+        // public Dictionary<string, string>{}
     }
     #endregion
 
@@ -235,10 +238,6 @@ namespace CoreModels.XyCore
         public string SkuName { get; set; }
         public string SkuSimple { get; set; }
         public string Norm { get; set; }
-        public string PurPrice { get; set; }
-        public string MarketPrice { get; set; }
-        public string SalePrice { get; set; }
-        public string Weight { get; set; }
         public string ParentID { get; set; }
         public string pid1 { get; set; }
         public string val_id1 { get; set; }
@@ -246,6 +245,10 @@ namespace CoreModels.XyCore
         public string val_id2 { get; set; }
         public string pid3 { get; set; }
         public string val_id3 { get; set; }
+        public string PurPrice { get; set; }
+        public string SalePrice { get; set; }
+        public string Weight { get; set; }
+
     }
     #endregion 
 
