@@ -493,5 +493,6 @@ namespace CoreModels.XyCore
     {
         public int Skuid{get;set;}
         public int Qty{get;set;}
+        public int QtyNew{get;set;}
     }
 }

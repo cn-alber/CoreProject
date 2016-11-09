@@ -486,5 +486,15 @@ namespace CoreWebApi
             var data = OrderHaddle.OrdMerger(oid,merid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Order/CancleOrdMerge")]
+        public ResponseResult CancleOrdMerge([FromBodyAttribute]JObject co)
+        {   
+            List<int> oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            string username = "管理员";//GetUname();
+            int CoID = 1;//int.Parse(GetCoid());
+            var data = OrderHaddle.CancleOrdMerge(oid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }
