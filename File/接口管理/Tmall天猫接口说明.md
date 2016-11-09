@@ -1078,6 +1078,29 @@ function说明
 
 ```
 
+27.onsaleGet()            获取店铺在售商品存入本地数据库
+
+ 路由:`/core/Api/TmItem/onsaleGet`
+
+ input:
+        page
+        pageSize
+        start_modified
+        end_modified
+
+28.sellerGet()            获取下载店铺在售商品sku信息
+
+ 路由:`/core/Api/TmItem/sellerGet`
+
+ input:
+        none
+
+
+
+
+
+
+
 
 
 

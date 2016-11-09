@@ -52,7 +52,7 @@ namespace CoreWebApi.Api.Tmall{
         }
         #endregion
 
-        #region  获取下载店铺在售商品
+        #region  获取下载店铺在售商品sku信息
         [HttpGetAttribute("/core/Api/TmItem/sellerGet")]
         public ResponseResult sellerGet(){
             var m = new DataResult(1,null);    
@@ -110,6 +110,20 @@ namespace CoreWebApi.Api.Tmall{
                 m.d = ex.Message;
             }    
             
+            return CoreResult.NewResponse(m.s, m.d, "Api");
+        }
+        #endregion
+
+        #region
+        [HttpGetAttribute("/core/Api/TmTrades/itemAdd")]
+        public ResponseResult itemAdd(string token){
+            var m = new DataResult(1,null);
+            if(string.IsNullOrEmpty(token)){
+                m.s = -5000;
+            }else{
+                var item = new item_add_request();
+                TmallItemHaddle.itemAdd(token,item);
+            }
             return CoreResult.NewResponse(m.s, m.d, "Api");
         }
         #endregion
