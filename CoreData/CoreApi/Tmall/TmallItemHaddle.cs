@@ -58,7 +58,7 @@ namespace CoreData.CoreApi
                 Tmparam.Add("fields",SELLER_GET);   
                 Tmparam.Add("num_iid",num_iid);
 
-
+                removeEmptyParam();
                 string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
                 Tmparam.Add("sign", sign);//                                      
                 var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
@@ -81,6 +81,52 @@ namespace CoreData.CoreApi
             return result;
         }
         #endregion
+
+        #region 
+        /// <summary>
+        ///   添加一个商品 参考网址： https://open.tmall.com/doc2/apiDetail.htm?apiId=22
+        /// </summary>
+        /// <param name=""></param>
+        /// <param name=""></param>
+        public static DataResult itemAdd(string token,item_add_request item){
+            var result = new DataResult(1,null);
+            try{                                        
+                Tmparam.Add("method", "taobao.item.add");
+                Tmparam.Add("session", token);
+                Tmparam.Add("num",item.num.ToString());
+                Tmparam.Add("title",item.title);
+                Tmparam.Add("des",item.des);
+                Tmparam.Add("input_str",item.input_str);
+                Tmparam.Add("input_pids",item.input_pids);
+                Tmparam.Add("price",item.price);
+                Tmparam.Add("type",item.type);
+                Tmparam.Add("stuff_status",item.stuff_status);
+                Tmparam.Add("location.state",item.locationState);
+                Tmparam.Add("location.city",item.locationCity);
+                Tmparam.Add("cid",item.cid.ToString());
+            
+                removeEmptyParam();
+                string sign = JsonResponse.SignTopRequest(Tmparam, SECRET, "md5");
+                Tmparam.Add("sign", sign);//                                      
+                var response = JsonResponse.CreatePostHttpResponse(SERVER_URL, Tmparam);            
+                var res = JsonConvert.DeserializeObject<dynamic>(response.Result.ToString().Replace("\"","\'")+"}");                                                               
+                if(response.Result.ToString().IndexOf("error_response") > 0){
+                    result.s = -1;
+                    result.d ="code:"+res.error_response.code+" "+res.error_response.sub_msg+" "+res.error_response.msg;
+                }else{
+                    result.d = res;
+                }            
+            }catch(Exception ex){                
+                result.s = -1;
+                result.d =  ex.Message;
+            }finally{
+                cleanParam();
+            }        
+            return result;
+        }
+        #endregion
+
+
 
 
 

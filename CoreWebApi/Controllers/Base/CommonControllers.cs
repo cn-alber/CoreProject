@@ -185,6 +185,31 @@ namespace CoreWebApi
         }
         #endregion
 
+
+        #region 获取商品类目 -- 公共
+        [HttpGetAttribute("/Core/XyComm/Customkind/GetCustomCats")]
+        public ResponseResult GetCustomCats(string ParentID)
+        {
+            var res = new DataResult(1, null);
+            var cp = new CusKindParam();
+            cp.CoID = int.Parse(GetCoid());
+            int PID = 0;
+            if (!int.TryParse(ParentID, out PID))
+            {
+                res.s = -1;
+                res.d = "无效参数ParentID";
+            }
+            else
+            {
+                cp.ParentID = int.Parse(ParentID);
+                cp.Enable = "TRUE";
+                res = CustomKindHaddle.GetCustomCats(cp);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+
         #region 获取第三方仓储或分仓
         [HttpGetAttribute("/Core/Warehouse/wareLst")]
         public ResponseResult wareLst()

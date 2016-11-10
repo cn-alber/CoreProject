@@ -175,7 +175,7 @@ namespace CoreData.CoreApi
 
         #region 在线订单发货处理（支持货到付款）
         /// <summary>
-        ///  在线订单发货处理（支持货到付款） 参考网址： http://open.taobao.com/docs/api.htm?apiId=10687
+        ///  在线订单发货处理（支持货到付款） 参考网址： http://open.taobao.com/docs/api.htm?apiId=10687 
         /// </summary>
         /// <param name="sub_tid">需要拆单发货的子订单集合，针对的是一笔交易下有多个子订单需要分开发货的场景；1次可传人多个子订单号，子订单间用逗号隔开；为空表示不做拆单发货。</param>
         /// <param name="tid">必选， 淘宝交易ID</param>
