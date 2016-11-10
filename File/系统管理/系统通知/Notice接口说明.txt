@@ -27,8 +27,7 @@ function说明
     路由：http://localhost:5000/Core/XyUser/Notice/InsertNotice
     参数：
     InPut:
-        Title             
-        Content
+ 
     OutPut:
         成功：
             1.新增资料
