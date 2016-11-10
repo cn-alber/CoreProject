@@ -5,17 +5,17 @@ namespace CoreModels.XyUser
     public class Notice
     {
 
-        public string title { get; set; }
-        public string content { get; set; }
-        public string userid{get;set;}
-        public string date{get;set;}
+        public string Title { get; set; }
+        public string Content { get; set; }
+        public string UserID{get;set;}
+        public string Date{get;set;}
     }
     public class Notice2
     {
 
-        public string title { get; set; }
-        public string content { get; set; }
-        public string date{get;set;}
+        public string Title { get; set; }
+        public string Content { get; set; }
+        public string Date{get;set;}
     }
 
     public class NoticeParam

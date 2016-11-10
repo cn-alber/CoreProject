@@ -31,7 +31,7 @@ namespace CoreWebApi
             var not = Newtonsoft.Json.JsonConvert.DeserializeObject<Notice>(obj["Notice"].ToString());
             int CoID = int.Parse(GetCoid());
             string UserName = GetUname();            
-            not.userid = GetUid();
+            not.UserID = GetUid();
             var res = NoticeHaddle.SaveInsertNot(not, CoID, UserName);
             return CoreResult.NewResponse(res.s, res.d, "General");
         }

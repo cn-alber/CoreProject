@@ -19,8 +19,11 @@ namespace CoreData.CoreUser
                 try
                 {
                     string sql = @"SELECT * FROM notice ORDER BY ID desc LIMIT 0,1";
-                    res.d = conn.Query<Notice2>(sql).AsList();
-                    
+                    var lst = conn.Query<Notice2>(sql).AsList();
+                    if(lst.Count >0 ){
+                        res.d = lst[0];
+                    }
+
                 }
                 catch (Exception e)
                 {
@@ -51,10 +54,10 @@ namespace CoreData.CoreUser
                                         Content,
                                         UserID,
                                         Date) VALUES(
-                                        @coid,
-                                        @title,
-                                        @content,
-                                        @userid,
+                                        @Coid,
+                                        @Title,
+                                        @Content,
+                                        @UserId,
                                         Now())";
 
                     var rnt = conn.Execute(sql,not);
