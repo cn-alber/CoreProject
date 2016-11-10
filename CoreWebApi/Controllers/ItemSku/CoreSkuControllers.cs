@@ -11,7 +11,7 @@ using CoreModels;
 namespace CoreWebApi.XyCore
 
 {
-    [AllowAnonymous]
+    // [AllowAnonymous]
     public class CoreSkuControllers : ControllBase
     {
 

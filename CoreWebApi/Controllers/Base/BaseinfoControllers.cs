@@ -10,7 +10,7 @@ using CoreData;
 using CoreModels;
 namespace CoreWebApi
 {
-    [AllowAnonymous]
+    // [AllowAnonymous]
     public class BaseinfoController : ControllBase
     {
         #region 数据字典 - 资料查询

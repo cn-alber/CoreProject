@@ -10,7 +10,7 @@ using CoreModels;
 
 namespace CoreWebApi
 {
-    [AllowAnonymous]
+    // [AllowAnonymous]
     public class UserController : ControllBase
     {
         #region 用户管理 - 查询

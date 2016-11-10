@@ -12,7 +12,7 @@ using CoreModels;
 namespace CoreWebApi
 {
 
-    [AllowAnonymous]
+    // [AllowAnonymous]
     public class CustomkindController : ControllBase
     {
         #region 获取商品类目列表
