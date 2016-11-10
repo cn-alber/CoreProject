@@ -9,7 +9,7 @@ using CoreData;
 using CoreModels;
 namespace CoreWebApi
 {
-    [AllowAnonymous]
+    // [AllowAnonymous]
     public class NoticeController : ControllBase
     {
         #region 系统通知 - 资料查询

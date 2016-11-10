@@ -8,7 +8,7 @@ using CoreModels;
 
 namespace CoreWebApi.Base
 {
-    [AllowAnonymous]
+    // [AllowAnonymous]
     public class ShopController:ControllBase
     {
         //查询多笔店铺资料

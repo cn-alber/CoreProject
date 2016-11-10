@@ -11,7 +11,7 @@ using CoreModels;
 namespace CoreWebApi.XyCore
 
 {
-    [AllowAnonymous]
+    // [AllowAnonymous]
     public class CoreSkuControllers : ControllBase
     {
 
@@ -250,7 +250,7 @@ namespace CoreWebApi.XyCore
         [HttpPostAttribute("Core/XyCore/CoreSku/InsertGoods")]
         public ResponseResult InsertGoods([FromBodyAttribute]JObject obj)
         {
-            var main = Newtonsoft.Json.JsonConvert.DeserializeObject<Coresku_main>(obj["Coresku_main"].ToString());   
+            var main = Newtonsoft.Json.JsonConvert.DeserializeObject<Coresku_main>(obj["main"].ToString());   
             var itemprops = Newtonsoft.Json.JsonConvert.DeserializeObject<List<goods_item_props>>(obj["itemprops"].ToString()); 
             var skuprops = Newtonsoft.Json.JsonConvert.DeserializeObject<List<goods_sku_props>>(obj["skuprops"].ToString()); 
             var items = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CoreSkuItem>>(obj["items"].ToString()); 
@@ -267,7 +267,7 @@ namespace CoreWebApi.XyCore
         [HttpPostAttribute("Core/XyCore/CoreSku/UpdateGoods")]
         public ResponseResult UpdateGoods([FromBodyAttribute]JObject obj)
         {
-            var main = Newtonsoft.Json.JsonConvert.DeserializeObject<Coresku_main>(obj["Coresku_main"].ToString());   
+            var main = Newtonsoft.Json.JsonConvert.DeserializeObject<Coresku_main>(obj["main"].ToString());   
             var itemprops = Newtonsoft.Json.JsonConvert.DeserializeObject<List<goods_item_props>>(obj["itemprops"].ToString()); 
             var skuprops = Newtonsoft.Json.JsonConvert.DeserializeObject<List<goods_sku_props>>(obj["skuprops"].ToString()); 
             var items = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CoreSkuItem>>(obj["items"].ToString()); 

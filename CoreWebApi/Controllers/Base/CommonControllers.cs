@@ -12,7 +12,7 @@ using CoreModels;
 
 namespace CoreWebApi
 {
-    [AllowAnonymous]
+    // [AllowAnonymous]
     public class CommonController : ControllBase
     {
         [HttpGetAttribute("/Core/Common/ScoCompanySimple")]

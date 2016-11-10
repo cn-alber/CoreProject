@@ -87,4 +87,21 @@ function说明
     参考：input json 文件:DelGoodsRec_input.json
 7.商品维护 - 新增商品资料
     方法：POST
-    
+    路由：http://192.168.30.211:5000/Core/XyCore/CoreSku/InsertGoods
+    参数：
+     InPut:
+        main            Coresku_main                商品主资料
+        itemprops       List<goods_item_props>      商品item属性Lst
+        skuprops        List<goods_sku_props>       商品Sku属性Lst
+        items           List<CoreSkuItem>           商品Sku明细Lst
+    参考：input json 文件：InsertGoods_input.json
+8.商品维护 - 修改商品资料
+    方法：POST
+    路由：http://192.168.30.211:5000/Core/XyCore/CoreSku/UpdateGoods
+    参数：
+    InPut:
+        main            Coresku_main                商品主资料
+        itemprops       List<goods_item_props>      商品item属性Lst
+        skuprops        List<goods_sku_props>       商品Sku属性Lst
+        items           List<CoreSkuItem>           商品Sku明细Lst
+    参考：input json 文件：UpdateGoods_input.json
