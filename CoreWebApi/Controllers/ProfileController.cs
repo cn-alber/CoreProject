@@ -96,6 +96,16 @@ namespace CoreWebApi
             return CoreResult.NewResponse(m.s,m.d, "Basic");    
         }
 
+        // [HttpGetAttribute("/core/profile/index")]
+        // public ResponseResult index()
+        // {
+        //     var roleid = GetRoleid();
+        //     var coid = GetCoid();
+        //     var uid = GetUid();
+        //     var m = UserHaddle.GetIndexIntro();
+        //     return CoreResult.NewResponse(m.s, m.d, "Indentity");
+        // }
+
 
 
 
