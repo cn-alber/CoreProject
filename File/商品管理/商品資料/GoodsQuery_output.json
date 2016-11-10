@@ -2,9 +2,9 @@
     "s": 1,
     "d": {
         "main": {
-            "ID": 6,
-            "GoodsCode": "ABCTST",
-            "GoodsName": "ABC测试",
+            "ID": 7,
+            "GoodsCode": "ABCTST2",
+            "GoodsName": "ABC测试2",
             "Brand": "1",
             "KindID": "365",
             "KindName": "自定义类目测试1",
@@ -24,7 +24,7 @@
             "Enable": 1,
             "Type": 0,
             "Creator": "管理员",
-            "CreateDate": "2016/11/8 11:19:10",
+            "CreateDate": "2016/11/9 15:38:41",
             "Modifier": "",
             "ModifyDate": null
         },
@@ -146,31 +146,30 @@
         ],
         "itemprops": [
             {
-                "ID": 13,
+                "ID": 16,
                 "pid": "122216507",
                 "val_id": "13061",
-                "val_name": "",
+                "val_name": "薄款",
                 "Enable": 1
             },
             {
-                "ID": 14,
+                "ID": 17,
                 "pid": "42722636",
                 "val_id": "13065",
-                "val_name": "",
+                "val_name": "青春流行",
                 "Enable": 1
             },
             {
-                "ID": 15,
+                "ID": 18,
                 "pid": "100016110755910",
                 "val_id": "13069",
-                "val_name": "",
+                "val_name": "测试1",
                 "Enable": 1
             }
         ],
         "skuprops": [
             {
-                "_Enable": 1,
-                "ID": 5,
+                "ID": 9,
                 "pid": "100016110194735",
                 "val_id": "1162",
                 "val_name": "白色1",
@@ -179,8 +178,7 @@
                 "Enable": 1
             },
             {
-                "_Enable": 1,
-                "ID": 6,
+                "ID": 10,
                 "pid": "100016110194735",
                 "val_id": "1163",
                 "val_name": "红色1",
@@ -189,8 +187,7 @@
                 "Enable": 1
             },
             {
-                "_Enable": 1,
-                "ID": 7,
+                "ID": 11,
                 "pid": "100016110114201",
                 "val_id": "1164",
                 "val_name": "S",
@@ -199,8 +196,7 @@
                 "Enable": 1
             },
             {
-                "_Enable": 1,
-                "ID": 8,
+                "ID": 12,
                 "pid": "100016110114201",
                 "val_id": "1165",
                 "val_name": "M",
@@ -211,76 +207,72 @@
         ],
         "items": [
             {
-                "ID": 17586,
-                "SkuID": "ABCTST001001",
+                "ID": 17590,
+                "SkuID": "ABCTST2001001",
                 "SkuName": "ABC测试白色1S",
                 "SkuSimple": "ABC测试白色1S",
                 "Norm": "白色1;S",
-                "PurPrice": "100.00",
-                "MarketPrice": null,
-                "SalePrice": "120.00",
-                "Weight": "0.80",
-                "ParentID": "6",
+                "ParentID": "7",
                 "pid1": "100016110114201",
-                "val_id1": "7",
+                "val_id1": "11",
                 "pid2": "100016110194735",
-                "val_id2": "5",
+                "val_id2": "9",
                 "pid3": null,
-                "val_id3": null
+                "val_id3": null,
+                "PurPrice": "100.00",
+                "SalePrice": "120.00",
+                "Weight": "0.80"
             },
             {
-                "ID": 17587,
-                "SkuID": "ABCTST001002",
+                "ID": 17591,
+                "SkuID": "ABCTST2001002",
                 "SkuName": "ABC测试红色1S",
                 "SkuSimple": "ABC测试红色1S",
                 "Norm": "红色1;S",
-                "PurPrice": "100.00",
-                "MarketPrice": null,
-                "SalePrice": "120.00",
-                "Weight": "0.80",
-                "ParentID": "6",
+                "ParentID": "7",
                 "pid1": "100016110114201",
-                "val_id1": "7",
+                "val_id1": "11",
                 "pid2": "100016110194735",
-                "val_id2": "6",
+                "val_id2": "10",
                 "pid3": null,
-                "val_id3": null
+                "val_id3": null,
+                "PurPrice": "100.00",
+                "SalePrice": "120.00",
+                "Weight": "0.80"
             },
             {
-                "ID": 17588,
-                "SkuID": "ABCTST002001",
+                "ID": 17592,
+                "SkuID": "ABCTST2002001",
                 "SkuName": "ABC测试白色1M",
                 "SkuSimple": "ABC测试白色1M",
                 "Norm": "白色1;M",
-                "PurPrice": "100.00",
-                "MarketPrice": null,
-                "SalePrice": "120.00",
-                "Weight": "0.80",
-                "ParentID": "6",
+                "ParentID": "7",
                 "pid1": "100016110114201",
-                "val_id1": "8",
+                "val_id1": "12",
                 "pid2": "100016110194735",
-                "val_id2": "5",
+                "val_id2": "9",
                 "pid3": null,
-                "val_id3": null
+                "val_id3": null,
+                "PurPrice": "100.00",
+                "SalePrice": "120.00",
+                "Weight": "0.80"
             },
             {
-                "ID": 17589,
-                "SkuID": "ABCTST002002",
+                "ID": 17593,
+                "SkuID": "ABCTST2002002",
                 "SkuName": "ABC测试红色1M",
                 "SkuSimple": "ABC测试红色1M",
                 "Norm": "红色1;M",
-                "PurPrice": "100.00",
-                "MarketPrice": null,
-                "SalePrice": "120.00",
-                "Weight": "0.80",
-                "ParentID": "6",
+                "ParentID": "7",
                 "pid1": "100016110114201",
-                "val_id1": "8",
+                "val_id1": "12",
                 "pid2": "100016110194735",
-                "val_id2": "6",
+                "val_id2": "10",
                 "pid3": null,
-                "val_id3": null
+                "val_id3": null,
+                "PurPrice": "100.00",
+                "SalePrice": "120.00",
+                "Weight": "0.80"
             }
         ]
     },

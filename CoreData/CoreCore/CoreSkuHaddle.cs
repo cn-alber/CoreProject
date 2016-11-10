@@ -25,7 +25,7 @@ namespace CoreData.CoreCore
             StringBuilder querycount = new StringBuilder();
             var p = new DynamicParameters();
             querycount.Append("SELECT count(ID) FROM coresku_main where Type = @Type");
-            querysql.Append("select GoodsCode,GoodsName,KindID,KindName,Enable,SalePrice,ScoGoodsCode from coresku_main where Type = @Type");
+            querysql.Append("select ID,GoodsCode,GoodsName,KindID,KindName,Enable,SalePrice,ScoGoodsCode from coresku_main where Type = @Type");
             p.Add("@Type", IParam.Type);
             if (IParam.CoID != 1)
             {
@@ -254,17 +254,17 @@ namespace CoreData.CoreCore
                     if (BrandIDLst.Count > 0)
                     {
                         var BrandLst = CommConn.Query<BrandDDLB>("SELECT ID,Name,Intro FROM Brand WHERE CoID=@CoID AND ID IN @IDLST", new { CoID = IParam.CoID, IDLST = BrandIDLst }).AsList();
-                        foreach(var b in BrandLst)
+                        foreach (var b in BrandLst)
                         {
-                            cs.BrandLst.Add(b.ID,b);
+                            cs.BrandLst.Add(b.ID, b);
                         }
                     }
                     if (SCoIDLst.Count > 0)
                     {
                         var SCoLst = CoreConn.Query<ScoCompDDLB>("SELECT id,scocode,scosimple FROM supplycompany WHERE CoID=@CoID AND id IN @IDLST", new { CoID = IParam.CoID, IDLST = SCoIDLst }).AsList();
-                        foreach(var s in SCoLst)
+                        foreach (var s in SCoLst)
                         {
-                            cs.ScoLst.Add(s.id,s);
+                            cs.ScoLst.Add(s.id, s);
                         }
                         // cs.ScoLst = SCoLst;
                     }
@@ -639,9 +639,9 @@ namespace CoreData.CoreCore
             conn.Open();
             var Trans = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
             string msql = @"SELECT * FROM coresku_main WHERE ID=@ID AND CoID = @CoID";
-            // string itempropsql = @"SELECT * FROM coresku_item_props WHERE ParentID=@ID AND CoID = @CoID AND ISDelete = 0";
-            // string skupropsql = @"SELECT * FROM coresku_sku_props WHERE ParentID=@ID AND CoID = @CoID AND ISDelete = 0";
-            string itemsql = @"SELECT * FROM coresku WHERE ParentID=@ID AND CoID = @CoID AND IsDelete=0";
+            string itempropsql = @"SELECT * FROM coresku_item_props WHERE ParentID=@ID AND CoID = @CoID AND ISDelete = 0";
+            string skupropsql = @"SELECT * FROM coresku_sku_props WHERE ParentID=@ID AND CoID = @CoID AND ISDelete = 0";
+            string itemsql = @"SELECT * FROM coresku WHERE ParentID=@ID AND CoID = @CoID";
             string contents = string.Empty;
             var p = new DynamicParameters();
             p.Add("@ID", main.ID);
@@ -649,8 +649,8 @@ namespace CoreData.CoreCore
             try
             {
                 var main_Old = conn.QueryFirst<Coresku_main>(msql, p, Trans);
-                // var itemprops_Old = conn.Query<coresku_item_props>(itempropsql, p, Trans).AsList();
-                // var skuprops_Old = conn.Query<coresku_sku_props>(skupropsql, p, Trans).AsList();
+                var itemprops_Old = conn.Query<coresku_item_props>(itempropsql, p, Trans).AsList();
+                var skuprops_Old = conn.Query<coresku_sku_props>(skupropsql, p, Trans).AsList();
                 var items_Old = conn.Query<Coresku>(itemsql, p, Trans).AsList();
                 #region 更新主表信息
                 string UptMainSql = "UPDATE coresku_main SET Modifier = @Modifier,ModifyDate=@ModifyDate";
@@ -729,7 +729,7 @@ namespace CoreData.CoreCore
                     conn.Execute(UptMainSql, main, Trans);
                 }
                 #endregion
-                #region 更新商品item属性
+                #region 更新商品item属性/Sku属性/商品明细资料
                 var NewItemPorpLst = itemprops.Where(a => a.ID <= 0)
                                             .Select(a => new coresku_item_props
                                             {
@@ -741,7 +741,11 @@ namespace CoreData.CoreCore
                                                 Creator = UserName,
                                                 CreateDate = DateTime.Now.ToString()
                                             }).AsList();
-                var UptItemPropLst = itemprops.Where(a => a.ID > 0)
+                var UptItemPropLst = itemprops.Where(a => a.ID > 0 &&
+                                                     !itemprops_Old.Any(b => a.pid == b.pid &&
+                                                                            a.val_id == b.val_id &&
+                                                                            a.val_name == b.val_name &&
+                                                                            a.Enable == b.Enable))
                                             .Select(a => new coresku_item_props
                                             {
                                                 ID = a.ID,
@@ -767,7 +771,12 @@ namespace CoreData.CoreCore
                                             Creator = UserName,
                                             CreateDate = DateTime.Now.ToString()
                                         }).AsList();
-                var UptSkuPropLst = skuprops.Where(a => a.ID > 0)
+                var UptSkuPropLst = skuprops.Where(a => a.ID > 0 &&
+                                                     !skuprops_Old.Any(b => a.pid == b.pid &&
+                                                                            a.val_id == b.val_id &&
+                                                                            a.val_name == b.val_name &&
+                                                                            a.mapping == b.mapping &&
+                                                                            a.Enable == b.Enable))
                                         .Select(a => new coresku_sku_props
                                         {
                                             ID = a.ID,
@@ -775,14 +784,21 @@ namespace CoreData.CoreCore
                                             val_id = a.val_id,
                                             val_name = a.val_name,
                                             mapping = a.mapping,
-                                            IsOther = a.IsOther,
+                                            Enable = a.Enable,
                                             ParentID = main.ID.ToString(),
                                             CoID = CoID,
                                             Modifier = UserName,
                                             ModifyDate = DateTime.Now.ToString()
                                         }).AsList();
-                var NewCoreSkuLst = items.Where(a => a.ID <= 0)
-                                        .Select(a => new Coresku
+
+                var NewCoreSkuLst = items.Where(a => !items_Old.Any(b => a.pid1 == b.pid1 &&
+                                                                a.val_id1 == b.val_id1 &&
+                                                                a.pid2 == b.pid2 &&
+                                                                a.val_id2 == b.val_id2 &&
+                                                                a.pid3 == b.pid3 &&
+                                                                a.val_id3 == b.val_id3))
+
+                                        .Select((a) => new Coresku
                                         {
                                             GoodsCode = main.GoodsCode,
                                             GoodsName = main.GoodsName,
@@ -814,59 +830,79 @@ namespace CoreData.CoreCore
                                             ParentID = main.ID.ToString()
                                         }).AsList();
 
-                var UptCoreSkuLst = items.Where(a => a.ID > 0)
-                                    .Select(a => new Coresku
-                                    {
-                                        ID = a.ID,
-                                        Type = main.Type,
-                                        GoodsCode = main.GoodsCode,
-                                        GoodsName = main.GoodsName,
-                                        Brand = main.Brand,
-                                        KindID = main.KindID,
-                                        KindName = main.KindName,
-                                        ScoID = main.ScoID,
-                                        ScoSku = main.ScoSku,
-                                        Remark = main.Remark,
-                                        SkuID = a.SkuID,
-                                        SkuName = a.SkuName,
-                                        SkuSimple = a.SkuSimple,
-                                        Norm = a.Norm,
-                                        MarketPrice = main.MarketPrice,
-                                        PurPrice = a.PurPrice,
-                                        SalePrice = a.SalePrice,
-                                        Weight = a.Weight,
-                                        pid1 = a.pid1,
-                                        val_id1 = a.val_id1,
-                                        pid2 = a.pid2,
-                                        val_id2 = a.val_id2,
-                                        pid3 = a.pid3,
-                                        val_id3 = a.val_id3,
-                                        CoID = CoID,
-                                        Modifier = UserName,
-                                        ModifyDate = DateTime.Now.ToString()
-                                    })
+                var UptCoreSkuLst = (from a in items
+                                     join b in items_Old
+                                     on new { pid1 = a.pid1, val_id1 = a.val_id1, pid2 = a.pid2, val_id2 = a.val_id2, pid3 = a.pid3, val_id3 = a.val_id3 }
+                                     equals new { pid1 = b.pid1, val_id1 = b.val_id1, pid2 = b.pid2, val_id2 = b.val_id2, pid3 = b.pid3, val_id3 = b.val_id3 }
+                                     group new { a, b } by new
+                                     {
+                                         b.ID,
+                                         a.SkuID,
+                                         a.SkuName,
+                                         a.SkuSimple,
+                                         a.Norm,
+                                         a.PurPrice,
+                                         a.SalePrice,
+                                         a.Weight,
+                                         a.pid1,
+                                         a.val_id1,
+                                         a.pid2,
+                                         a.val_id2,
+                                         a.pid3,
+                                         a.val_id3
+                                     } into n
+                                     select new Coresku
+                                     {
+                                         ID = n.Key.ID,
+                                         Type = main.Type,
+                                         GoodsCode = main.GoodsCode,
+                                         GoodsName = main.GoodsName,
+                                         Brand = main.Brand,
+                                         KindID = main.KindID,
+                                         KindName = main.KindName,
+                                         ScoID = main.ScoID,
+                                         ScoSku = main.ScoSku,
+                                         Remark = main.Remark,
+                                         SkuID = n.Key.SkuID,
+                                         SkuName = n.Key.SkuName,
+                                         SkuSimple = n.Key.SkuSimple,
+                                         Norm = n.Key.Norm,
+                                         MarketPrice = main.MarketPrice,
+                                         PurPrice = n.Key.PurPrice,
+                                         SalePrice = n.Key.SalePrice,
+                                         Weight = n.Key.Weight,
+                                         pid1 = n.Key.pid1,
+                                         val_id1 = n.Key.val_id1,
+                                         pid2 = n.Key.pid2,
+                                         val_id2 = n.Key.val_id2,
+                                         pid3 = n.Key.pid3,
+                                         val_id3 = n.Key.val_id3,
+                                         CoID = CoID,
+                                         Modifier = UserName,
+                                         ModifyDate = DateTime.Now.ToString()
+                                     })
                                     .AsList();
-                foreach (var Upt in UptCoreSkuLst)
+                var RmvLst = UptCoreSkuLst;
+                if (String.IsNullOrEmpty(contents))
                 {
-                    var EqCount = items_Old.Where(a => a.ID == Upt.ID &&
-                    a.SkuID == Upt.SkuID &&
-                    a.SkuName == Upt.SkuName &&
-                    a.SkuSimple == Upt.SkuName &&
-                    a.Norm == Upt.Norm &&
-                    a.Weight == Upt.Weight &&
-                    a.PurPrice == Upt.PurPrice &&
-                    a.SalePrice == Upt.SalePrice &&
-                    a.pid1 == Upt.pid1 &&
-                    a.val_id1 == Upt.val_id1 &&
-                    a.pid2 == Upt.pid2 &&
-                    a.val_id2 == Upt.val_id2 &&
-                    a.pid3 == Upt.pid3 &&
-                    a.val_id3 == Upt.val_id3).Count();
-                    if (EqCount > 0 && String.IsNullOrEmpty(contents))
+                    foreach (var Upt in RmvLst)//移除未修改项
                     {
-                        UptCoreSkuLst.Remove(Upt);
+                        var EqCount = items_Old.Where(a => a.ID == Upt.ID &&
+                        a.SkuID == Upt.SkuID &&
+                        a.SkuName == Upt.SkuName &&
+                        a.SkuSimple == Upt.SkuName &&
+                        a.Norm == Upt.Norm &&
+                        a.Weight == Upt.Weight &&
+                        a.PurPrice == Upt.PurPrice &&
+                        a.SalePrice == Upt.SalePrice &&
+                        a.IsDelete == false).Count();
+                        if (EqCount > 0)
+                        {
+                            UptCoreSkuLst.Remove(Upt);
+                        }
                     }
                 }
+
                 var DelIDLst = items_Old.Select(a => a.ID).Where(a => items.Select(b => b.ID).Contains(a)).AsList();
                 if (!string.IsNullOrEmpty(contents))
                 {
@@ -912,50 +948,71 @@ namespace CoreData.CoreCore
                 }
                 if (UptSkuPropLst.Count > 0)
                 {
-                    string UptSql = @"UPDATE coresku_sku_props SET ";
+                    string UptSql = @"UPDATE coresku_sku_props
+                                         SET pid =@pid,
+                                        val_id =@val_id,
+                                        val_name =@val_name,
+                                        mapping =@mapping,                                        
+                                        Enable = @Enable,
+                                        Modifier =@Modifier,
+                                        ModifyDate =@ModifyDate
+                                        WHERE CoID=@CoID
+                                        AND ParentID=@ParentID
+                                        AND ID = @ID";
                     conn.Execute(UptSql, UptSkuPropLst, Trans);
                 }
                 if (UptCoreSkuLst.Count > 0)
                 {
-                    string UptSql = @"UPDATE coresku
-                                    SET SkuID =@SkuID,
-                                        SkuName =@SkuName,
-                                        SkuSimple =@SkuSimple,
-                                        Brand =@Brand,
-                                        KindID =@KindID,
-                                        Type =@Type,
-                                        GoodsCode =@GoodsCode,
-                                        GoodsName =@GoodsName,
-                                        GBCode =@GBCode,
-                                        Weight =@Weight,
-                                        PurPrice =@PurPrice,
-                                        SalePrice =@SalePrice,
-                                        MarketPrice =@MarketPrice,
-                                        pid1 =@pid1,
-                                        val_id1 =@val_id1,
-                                        pid2 =@pid2,
-                                        val_id2 =@val_id2,
-                                        pid3 =@pid3,
-                                        val_id3 =@val_id3,
-                                        Norm =@Norm,
-                                        Img =@Img,
-                                        BigImg =@BigImg,
-                                        ScoID =@ScoID,
-                                        ScoGoodsCode =@ScoGoodsCode,
-                                        ScoSku =@ScoSku,
-                                        Remark =@Remark,
-                                        Modifier = @Modifier,
-                                        ModifyDate = @ModifyDate
-                                    WHERE
-                                        ID =@ID
-                                        AND CoID =@CoID
-                                        AND ParentID = @ParentID
-                                    ";
-                    conn.Execute(UptSql, UptCoreSkuLst, Trans);
+                    conn.Execute(UptCoreSkuSql(), UptCoreSkuLst, Trans);
                 }
-
-
-
+                if (DelIDLst.Count > 0)
+                {
+                    conn.Execute(DelCoreSkuSql(), new { CoID = CoID, IDLst = DelIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                }
+                if (NewCoreSkuLst.Count > 0)
+                {
+                    conn.Execute(AddCoresku_sql(), NewCoreSkuLst, Trans);
+                    long ID = conn.QueryFirst<long>("select LAST_INSERT_ID()", Trans);//获取新增id
+                    if (!string.IsNullOrEmpty(NewCoreSkuLst[0].pid1))
+                    {
+                        string UptValSql = @"UPDATE coresku,coresku_sku_props
+                                    SET val_id1 =  coresku_sku_props.ID
+                                    WHERE coresku.ParentID = coresku_sku_props.ParentID
+                                    AND coresku.CoID = coresku_sku_props.CoID
+                                    AND coresku.pid1 = coresku_sku_props.pid
+                                    AND coresku.val_id1 = coresku_sku_props.val_id
+                                    AND coresku.CoID = @CoID
+                                    AND coresku.ParentID = @ParentID
+                                    AND coresku.ID>=@ID";
+                        conn.Execute(UptValSql, new { CoID = main.CoID, ParentID = main.ID, ID = ID }, Trans);
+                    }
+                    if (!string.IsNullOrEmpty(NewCoreSkuLst[0].pid2))
+                    {
+                        string UptValSql = @"UPDATE coresku,coresku_sku_props
+                                    SET val_id2 =  coresku_sku_props.ID
+                                    WHERE coresku.ParentID = coresku_sku_props.ParentID
+                                    AND coresku.CoID = coresku_sku_props.CoID
+                                    AND coresku.pid2 = coresku_sku_props.pid
+                                    AND coresku.val_id2 = coresku_sku_props.val_id
+                                    AND coresku.CoID = @CoID
+                                    AND coresku.ParentID = @ParentID
+                                    AND coresku.ID>=@ID";
+                        conn.Execute(UptValSql, new { CoID = main.CoID, ParentID = main.ID, ID = ID }, Trans);
+                    }
+                    if (!string.IsNullOrEmpty(NewCoreSkuLst[0].pid3))
+                    {
+                        string UptValSql = @"UPDATE coresku,coresku_sku_props
+                                    SET val_id3 =  coresku_sku_props.ID
+                                    WHERE coresku.ParentID = coresku_sku_props.ParentID
+                                    AND coresku.CoID = coresku_sku_props.CoID
+                                    AND coresku.pid3 = coresku_sku_props.pid
+                                    AND coresku.val_id3 = coresku_sku_props.val_id
+                                    AND coresku.CoID = @CoID
+                                    AND coresku.ParentID = @ParentID
+                                    AND coresku.ID>=@ID";
+                        conn.Execute(UptValSql, new { CoID = main.CoID, ParentID = main.ID, ID = ID }, Trans);
+                    }
+                }
                 #endregion
 
 
@@ -1434,7 +1491,7 @@ namespace CoreData.CoreCore
             }
         }
 
-
+        #region 新增 - 商品主表SQL - 商品维护
         public static string AddCoresku_Main_Sql()
         {
             string sql = @"INSERT INTO coresku_main(GoodsCode,
@@ -1481,12 +1538,14 @@ namespace CoreData.CoreCore
                                             @CreateDate)";
             return sql;
         }
-
+        #endregion
+        #region 新增 - 商品item属性SQL
         public static string AddCoresku_item_props_sql()
         {
             string sql = @"INSERT INTO coresku_item_props(
                                             pid,
                                             val_id,
+                                            val_name,
                                             ParentID,
                                             CoID,
                                             `Enable`,
@@ -1495,6 +1554,7 @@ namespace CoreData.CoreCore
                                         VALUES (
                                             @pid,
                                             @val_id,
+                                            @val_name,
                                             @ParentID,
                                             @CoID,
                                             @Enable,
@@ -1503,6 +1563,8 @@ namespace CoreData.CoreCore
                                             )";
             return sql;
         }
+        #endregion
+        #region 新增 - 商品sku属性SQL
         public static string AddCoresku_sku_props_sql()
         {
             string sql = @"INSERT INTO coresku_sku_props(
@@ -1530,6 +1592,8 @@ namespace CoreData.CoreCore
                                             )";
             return sql;
         }
+        #endregion
+        #region 新增 - 商品明细SQL
         public static string AddCoresku_sql()
         {
             string sql = @"INSERT INTO coresku
@@ -1597,8 +1661,64 @@ namespace CoreData.CoreCore
                             @Enable) ";
             return sql;
         }
+        #endregion
 
+        #region 修改 - 商品明细SQL
+        public static string UptCoreSkuSql()
+        {
+            string UptSql = @"UPDATE coresku
+                                    SET SkuID =@SkuID,
+                                        SkuName =@SkuName,
+                                        SkuSimple =@SkuSimple,
+                                        Brand =@Brand,
+                                        KindID =@KindID,
+                                        Type =@Type,
+                                        GoodsCode =@GoodsCode,
+                                        GoodsName =@GoodsName,
+                                        GBCode =@GBCode,
+                                        Weight =@Weight,
+                                        PurPrice =@PurPrice,
+                                        SalePrice =@SalePrice,
+                                        MarketPrice =@MarketPrice,
+                                        pid1 =@pid1,
+                                        val_id1 =@val_id1,
+                                        pid2 =@pid2,
+                                        val_id2 =@val_id2,
+                                        pid3 =@pid3,
+                                        val_id3 =@val_id3,
+                                        Norm =@Norm,
+                                        Img =@Img,
+                                        BigImg =@BigImg,
+                                        ScoID =@ScoID,
+                                        ScoGoodsCode =@ScoGoodsCode,
+                                        ScoSku =@ScoSku,
+                                        Remark =@Remark,
+                                        ISDelete=0,
+                                        Modifier = @Modifier,
+                                        ModifyDate = @ModifyDate
+                                    WHERE
+                                        ID =@ID
+                                        AND CoID =@CoID
+                                        AND ParentID = @ParentID
+                                    ";
+            return UptSql;
+        }
+        #endregion
 
+        #region 删除 - 商品明细SQL
+        public static string DelCoreSkuSql()
+        {
+            string UptSql = @"UPDATE coresku
+                                    SET IsDelete = 1,
+                                        Modifier =@Modifier,
+                                        ModifyDate =@ModifyDate
+                                    WHERE
+                                        ID IN @IDLst
+                                    AND CoID =@CoID";
+            return UptSql;
+        }
+
+        #endregion
 
 
     }

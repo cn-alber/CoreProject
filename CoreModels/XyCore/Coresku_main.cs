@@ -101,7 +101,7 @@ namespace CoreModels.XyCore
     public class goods_sku_props
     {
         private int _IsOther = 0;//是否属于其他属性
-        public int _Enable = 1;//可选值状态
+        private int _Enable = 1;//可选值状态
         public int ID { get; set; }
         public string pid { get; set; }
         public string val_id { get; set; }

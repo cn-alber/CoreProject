@@ -61,6 +61,7 @@ namespace CoreModels.XyCore
     #region 商品主查詢
     public class GoodsQuery
     {
+        public string ID { get; set; }
         public string GoodsCode { get; set; }
         public string GoodsName { get; set; }
         public string KindID { get; set; }

@@ -246,7 +246,7 @@ namespace CoreWebApi.XyCore
         }
         #endregion
 
-        #region 新增Sku
+        #region 新增Sku - 商品维护
         [HttpPostAttribute("Core/XyCore/CoreSku/InsertGoods")]
         public ResponseResult InsertGoods([FromBodyAttribute]JObject obj)
         {
@@ -262,6 +262,22 @@ namespace CoreWebApi.XyCore
             return Result;
         }
         #endregion   
+
+        #region 修改Sku - 商品维护
+        [HttpPostAttribute("Core/XyCore/CoreSku/UpdateGoods")]
+        public ResponseResult UpdateGoods([FromBodyAttribute]JObject obj)
+        {
+            var main = Newtonsoft.Json.JsonConvert.DeserializeObject<Coresku_main>(obj["Coresku_main"].ToString());   
+            var itemprops = Newtonsoft.Json.JsonConvert.DeserializeObject<List<goods_item_props>>(obj["itemprops"].ToString()); 
+            var skuprops = Newtonsoft.Json.JsonConvert.DeserializeObject<List<goods_sku_props>>(obj["skuprops"].ToString()); 
+            var items = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CoreSkuItem>>(obj["items"].ToString()); 
+            string CoID = GetCoid();
+            string UserName = GetUname();
+            string CreateDate = DateTime.Now.ToString();
+            var res = CoreSkuHaddle.EditCore(main,itemprops,skuprops,items,CoID,UserName);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
         
         #region 采购查询
         [HttpPostAttribute("Core/XyCore/CoreSku/SkuQuery")]

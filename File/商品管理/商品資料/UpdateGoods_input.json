@@ -1,0 +1,145 @@
+{
+    "Coresku_main": {
+        "ID": 7,
+        "GoodsCode": "ABCTST2",
+        "GoodsName": "ABC测试2",
+        "Brand": "1",
+        "KindID": "365",
+        "ScoID": "1",
+        "ScoGoodsCode": "scotest",
+        "ScoSku": null,
+        "Weight": "0.80",
+        "CostPrice": null,
+        "PurPrice": "100.00",
+        "SalePrice": "120.00",
+        "MarketPrice": null,
+        "TempShopID": "11",
+        "TempID": "0",
+        "Remark": "Remarktest1",
+        "Img": null,
+        "CoID": "1",
+        "Enable": 1,
+        "Type": 0
+    },
+    "itemprops": [
+        {
+            "ID": 16,
+            "pid": "122216507",
+            "val_id": "13061",
+            "val_name": "薄款",
+            "Enable": 1
+        },
+        {
+            "ID": 17,
+            "pid": "42722636",
+            "val_id": "13065",
+            "val_name": "青春流行",
+            "Enable": 1
+        },
+        {
+            "ID": 18,
+            "pid": "100016110755910",
+            "val_id": "13069",
+            "val_name": "测试1",
+            "Enable": 0 //商品属性停用
+        }
+    ],
+    "skuprops": [
+        {
+            "ID": 9,
+            "pid": "100016110194735",
+            "val_id": "1162",
+            "val_name": "白色1",
+            "mapping": "001",
+            "IsOther": 0,
+            "Enable": 1
+        },
+        {
+            "ID": 10,
+            "pid": "100016110194735",
+            "val_id": "1163",
+            "val_name": "红色1",
+            "mapping": "002",
+            "IsOther": 0,
+            "Enable": 0 //Sku属性 - 颜色 - 不勾选
+        },
+        {
+            "ID": 11,
+            "pid": "100016110114201",
+            "val_id": "1164",
+            "val_name": "S",
+            "mapping": "001",
+            "IsOther": 0,
+            "Enable": 1
+        },
+        {
+            "ID": 12,
+            "pid": "100016110114201",
+            "val_id": "1165",
+            "val_name": "M",
+            "mapping": "002",
+            "IsOther": 0,
+            "Enable": 1
+        },
+        {
+            "ID": -1,
+            "pid": "100016110114201",
+            "val_id": "1166",
+            "mapping": "003",
+            "val_name": "L" //Sku - 尺码 - 新增
+        }
+    ],
+    "items": [
+        {
+            "ID": 17591,
+            "SkuID": "ABCTST2001002",
+            "SkuName": "ABC测试红色1S",
+            "SkuSimple": "ABC测试红色1S",
+            "Norm": "红色1;S",
+            "ParentID": "7",
+            "pid1": "100016110114201",
+            "val_id1": "11",
+            "pid2": "100016110194735",
+            "val_id2": "10",
+            "pid3": null,
+            "val_id3": null,
+            "PurPrice": "100.00",
+            "SalePrice": "120.00",
+            "Weight": "0.80"
+        },
+        {
+            "ID": 17593,
+            "SkuID": "ABCTST2002002",
+            "SkuName": "ABC测试红色1M",
+            "SkuSimple": "ABC测试红色1M",
+            "Norm": "红色1;M",
+            "ParentID": "7",
+            "pid1": "100016110114201",
+            "val_id1": "12",
+            "pid2": "100016110194735",
+            "val_id2": "10",
+            "pid3": null,
+            "val_id3": null,
+            "PurPrice": "100.00",
+            "SalePrice": "120.00",
+            "Weight": "0.80"
+        },
+        {
+            "ID": -1, //CoreSku商品明细 - 新增
+            "SkuID": "ABCTST2003002",
+            "SkuName": "ABC测试红色1L",
+            "SkuSimple": "ABC测试红色1L",
+            "Norm": "红色1;L",
+            "ParentID": "7",
+            "pid1": "100016110114201",
+            "val_id1": "1166", //新增的尺码属性 - 先给sku属性的val_id
+            "pid2": "100016110194735",
+            "val_id2": "10", //已经存在的尺码属性 - 直接给 sku属性的ID
+            "pid3": null,
+            "val_id3": null,
+            "PurPrice": "100.00",
+            "SalePrice": "120.00",
+            "Weight": "0.80"
+        }
+    ]
+}
