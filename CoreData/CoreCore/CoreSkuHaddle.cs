@@ -636,12 +636,13 @@ namespace CoreData.CoreCore
         {
             var res = new DataResult(1, null);
             var conn = new MySqlConnection(DbBase.CoreConnectString);
+            bool IsCommit = false;
             conn.Open();
             var Trans = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
             string msql = @"SELECT * FROM coresku_main WHERE ID=@ID AND CoID = @CoID";
-            string itempropsql = @"SELECT * FROM coresku_item_props WHERE ParentID=@ID AND CoID = @CoID AND ISDelete = 0";
-            string skupropsql = @"SELECT * FROM coresku_sku_props WHERE ParentID=@ID AND CoID = @CoID AND ISDelete = 0";
-            string itemsql = @"SELECT * FROM coresku WHERE ParentID=@ID AND CoID = @CoID";
+            string itempropsql = @"SELECT * FROM coresku_item_props WHERE CoID = @CoID AND ParentID=@ID AND ISDelete = 0";
+            string skupropsql = @"SELECT * FROM coresku_sku_props WHERE CoID = @CoID AND ParentID=@ID AND ISDelete = 0";
+            string itemsql = @"SELECT * FROM coresku WHERE CoID = @CoID AND ParentID=@ID";
             string contents = string.Empty;
             var p = new DynamicParameters();
             p.Add("@ID", main.ID);
@@ -726,6 +727,8 @@ namespace CoreData.CoreCore
                 }
                 if (!string.IsNullOrEmpty(contents))
                 {
+                    IsCommit = true;
+                    UptMainSql = UptMainSql + " WHERE CoID=@CoID AND ID=@ID";
                     conn.Execute(UptMainSql, main, Trans);
                 }
                 #endregion
@@ -861,6 +864,7 @@ namespace CoreData.CoreCore
                                          KindID = main.KindID,
                                          KindName = main.KindName,
                                          ScoID = main.ScoID,
+                                         ScoGoodsCode = main.ScoGoodsCode,
                                          ScoSku = main.ScoSku,
                                          Remark = main.Remark,
                                          SkuID = n.Key.SkuID,
@@ -879,10 +883,12 @@ namespace CoreData.CoreCore
                                          val_id3 = n.Key.val_id3,
                                          CoID = CoID,
                                          Modifier = UserName,
-                                         ModifyDate = DateTime.Now.ToString()
+                                         ModifyDate = DateTime.Now.ToString(),
+                                         ParentID = main.ID.ToString()
                                      })
                                     .AsList();
-                var RmvLst = UptCoreSkuLst;
+                var RmvLst = new List<Coresku>();
+                RmvLst.AddRange(UptCoreSkuLst);
                 if (String.IsNullOrEmpty(contents))
                 {
                     foreach (var Upt in RmvLst)//移除未修改项
@@ -923,10 +929,12 @@ namespace CoreData.CoreCore
                                         WHERE ID=@ID AND CoID=@CoID;
                                             ";
                     conn.Execute(UptMain, main, Trans);//更新商品主表
+                    IsCommit = true;
                 }
                 if (NewItemPorpLst.Count > 0)//新增商品屬性
                 {
                     conn.Execute(AddCoresku_item_props_sql(), NewItemPorpLst, Trans);
+                    IsCommit = true;
                 }
                 if (UptItemPropLst.Count > 0)
                 {
@@ -941,10 +949,12 @@ namespace CoreData.CoreCore
                                         AND ParentID=@ParentID
                                         AND ID = @ID";
                     conn.Execute(UptSql, UptItemPropLst, Trans);
+                    IsCommit = true;
                 }
                 if (NewSkuPropLst.Count > 0)
                 {
                     conn.Execute(AddCoresku_sku_props_sql(), NewSkuPropLst, Trans);
+                    IsCommit = true;
                 }
                 if (UptSkuPropLst.Count > 0)
                 {
@@ -960,14 +970,17 @@ namespace CoreData.CoreCore
                                         AND ParentID=@ParentID
                                         AND ID = @ID";
                     conn.Execute(UptSql, UptSkuPropLst, Trans);
+                    IsCommit = true;
                 }
                 if (UptCoreSkuLst.Count > 0)
                 {
                     conn.Execute(UptCoreSkuSql(), UptCoreSkuLst, Trans);
+                    IsCommit = true;
                 }
                 if (DelIDLst.Count > 0)
                 {
                     conn.Execute(DelCoreSkuSql(), new { CoID = CoID, IDLst = DelIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                    IsCommit = true;
                 }
                 if (NewCoreSkuLst.Count > 0)
                 {
@@ -1014,8 +1027,8 @@ namespace CoreData.CoreCore
                     }
                 }
                 #endregion
-
-
+                if (IsCommit)
+                    Trans.Commit();
             }
             catch (Exception e)
             {
@@ -1028,7 +1041,6 @@ namespace CoreData.CoreCore
                 Trans.Dispose();
                 conn.Close();
             }
-
             return res;
         }
         #endregion
