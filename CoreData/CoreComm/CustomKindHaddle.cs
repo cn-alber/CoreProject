@@ -186,7 +186,7 @@ namespace CoreData.CoreComm
                     // var props = CacheBase.Get<List<Customkind_props>>(cname);//读取缓存
                     // if (props == null)
                     // {
-                    string sql = "SELECT * FROM customkind_props WHERE kindid=@ID AND CoID=@CoID";
+                    string sql = "SELECT * FROM customkind_props WHERE IsDelete=0 AND kindid=@ID AND CoID=@CoID";
                     var p = new DynamicParameters();
                     p.Add("@ID", KindID);
                     p.Add("@CoID",CoID);

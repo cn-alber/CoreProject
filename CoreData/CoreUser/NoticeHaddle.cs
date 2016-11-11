@@ -48,19 +48,14 @@ namespace CoreData.CoreUser
             {
                 try
                 {
-                    string sql = @"INSERT INTO notice
-                                        (Coid,
-                                        Title,
-                                        Content,
-                                        UserID,
-                                        Date) VALUES(
-                                        @Coid,
-                                        @Title,
-                                        @Content,
-                                        @UserId,
-                                        Now())";
+                    string sql = @"INSERT INTO notice(Coid,Title,Content,UserID, Date) VALUES(@Coid,@Title,@Content,@UserID,Now())";
 
-                    var rnt = conn.Execute(sql,not);
+                    var rnt = conn.Execute(sql,new {
+                        Coid = CoID,
+                        Title = not.Title,
+                        Content = not.Content,
+                        UserID = not.UserID
+                    });
                     if(rnt >0){
                         result.s = 1;
                     }else{

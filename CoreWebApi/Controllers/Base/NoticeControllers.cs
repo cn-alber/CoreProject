@@ -28,7 +28,7 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/XyUser/Notice/InsertNotice")]
         public ResponseResult InsertNotice([FromBodyAttribute]JObject obj)
         {
-            var not = Newtonsoft.Json.JsonConvert.DeserializeObject<Notice>(obj["Notice"].ToString());
+            var not = Newtonsoft.Json.JsonConvert.DeserializeObject<Notice>(obj.ToString());
             int CoID = int.Parse(GetCoid());
             string UserName = GetUname();            
             not.UserID = GetUid();
