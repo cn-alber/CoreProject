@@ -1045,6 +1045,73 @@ namespace CoreData.CoreCore
         }
         #endregion
 
+        #region 商品维护——启用|停用|备用
+        public static DataResult UptGoodsEnable(List<int> IDLst, string CoID, string UserName, int Enable)
+        {
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                conn.Open();
+                var Trans = conn.BeginTransaction();
+                try
+                {
+                    string contents = string.Empty;
+                    string UptSql = @"UPDATE coresku_main SET Enable=@Enable,Modifier=@ModifyDate,ModifyDate=@ModifyDate where CoID=@CoID AND ID in @IDLst";
+                    string UptSkuSql = @"UPDATE coresku SET Enable=@Enable,Modifier=@ModifyDate,ModifyDate=@ModifyDate where CoID=@CoID AND ParentID in @IDLst";
+                    var p = new DynamicParameters();
+                    p.Add("@CoID", CoID);
+                    p.Add("@Enable", Enable);
+                    p.Add("@Modifier", UserName);
+                    p.Add("@ModifyDate", DateTime.Now);
+                    p.Add("@IDLst", IDLst);
+                    int count1 = conn.Execute(UptSql, p, Trans);
+                    int count2 = conn.Execute(UptSkuSql, p, Trans);
+
+                    if (count1 < 0 || count2 < 0)
+                    {
+                        res.s = -3003;
+                    }
+                    else
+                    {
+                        if (Enable==1)
+                        {
+                            contents = "商品启用：";
+                            // res.s = 3001;
+                        }
+                        else if (Enable==0)
+                        {
+                            contents = "商品停用：";
+                            // res.s = 3002;
+                        }
+                        else if(Enable==2)
+                        {
+                             contents = "商品备用：";
+                        }
+                        contents += string.Join(",", IDLst.ToArray());
+                        CoreUser.LogComm.InsertUserLog("修改商品状态", "Coresku_main", contents, UserName, int.Parse(CoID), DateTime.Now);
+                        if (res.s > 0)
+                        {
+                            Trans.Commit();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Trans.Rollback();
+                    res.s = -1;
+                    res.d = e.Message;
+                }
+                finally
+                {
+                    Trans.Dispose();
+                    conn.Close();
+                }
+            }
+
+            return res;
+        }
+        #endregion
+
 
         #region 根据条件抓取商品list(采购用)
         public static DataResult GetSkuAll(SkuParam cp, int CoID, int Type)

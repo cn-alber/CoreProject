@@ -105,3 +105,13 @@ function说明
         skuprops        List<goods_sku_props>       商品Sku属性Lst
         items           List<CoreSkuItem>           商品Sku明细Lst
     参考：input json 文件：UpdateGoods_input.json
+9.商品维护 - 商品资料停用|启用|备用
+    方法：POST
+    路由：http://192.168.30.211:5000/Core/XyCore/CoreSku/UpdateGoodsEnable
+    参数：
+    InPut：
+            {    
+                "IDLst": [6,7],         List<int>  货品ID
+                "Enable":1              int        0.停用1.启用2.备用
+            }  
+    参考：input json 文件：UpdateGoodsEnable_input.json
