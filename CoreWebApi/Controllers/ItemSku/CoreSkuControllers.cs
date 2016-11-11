@@ -11,7 +11,7 @@ using CoreModels;
 namespace CoreWebApi.XyCore
 
 {
-    // [AllowAnonymous]
+    [AllowAnonymous]
     public class CoreSkuControllers : ControllBase
     {
 
@@ -275,6 +275,34 @@ namespace CoreWebApi.XyCore
             string UserName = GetUname();
             string CreateDate = DateTime.Now.ToString();
             var res = CoreSkuHaddle.EditCore(main,itemprops,skuprops,items,CoID,UserName);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 商品维护——0.停用|1.启用|2.备用
+        [HttpPostAttribute("Core/XyCore/CoreSku/UpdateGoodsEnable")]
+        public ResponseResult UpdateGoodsEnable([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            int Enable = 0;            
+            var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
+            if (IDLst.Count == 0)
+            {
+                res.s = -1;
+                res.d = "请先选中操作明细";
+            }
+            else if(!int.TryParse(obj["Enable"].ToString(),out Enable))
+            {
+                res.s = -1;
+                res.d = "无效参数Enable";
+            }
+            else
+            {                
+                string CoID = GetCoid();
+                string UserName = GetUname();
+                Enable = int.Parse(obj["Enable"].ToString());
+                res = CoreSkuHaddle.UptGoodsEnable(IDLst, CoID, UserName, Enable);
+            }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
