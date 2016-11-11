@@ -118,7 +118,7 @@ namespace CoreWebApi.ApiTask
         internal static TaskWrapper CreateApi(ApiJob job)
         {
             string taskName = job.ApiKey;            
-            return CreateApiByAssembly(job);
+            return CreateApiBySiteType(job);
         }
 
 
@@ -131,7 +131,7 @@ namespace CoreWebApi.ApiTask
         /// <param name="typeName">完整类名</param>
         /// <param name="crossDomain">跨域运行</param>
         /// <returns></returns>
-        static TaskWrapper CreateApiByAssembly(ApiJob job)
+        static TaskWrapper CreateApiBySiteType(ApiJob job)
         {
             string taskName = job.ApiKey;
             BaseApi api = null;
