@@ -17,9 +17,9 @@ namespace CoreWebApi
         public ResponseResult OrderList(string ID,string SoID,string PayNbr,string BuyerShopID,string ExCode,string RecName,string RecPhone,string RecTel,
                                         string RecLogistics,string RecCity,string RecDistrict,string RecAddress,string StatusList,string AbnormalStatusList,
                                         string IsRecMsgYN,string RecMessage,string IsSendMsgYN,string SendMessage,string Datetype,string DateStart,string Dateend,
-                                        string Skuid,string Ordqtystart,string Ordqtyend,string Ordamtstart,string Ordamtend,string Skuname,string Norm,
-                                        string ShopStatus,string Osource,string Type,string IsCOD,string ShopID,string IsDisSelectAll,string Distributor,
-                                        string ExID,string SendWarehouse,string SortField,string SortDirection,string PageIndex,string NumPerPage)
+                                        string Skuid,string GoodsCode,string Ordqtystart,string Ordqtyend,string Ordamtstart,string Ordamtend,string Skuname,string Norm,
+                                        string ShopStatus,string Osource,string Type,string IsCOD,string IsPaid,string IsShopSelectAll,string ShopID,string IsDisSelectAll,string Distributor,
+                                        string ExID,string SendWarehouse,string Others,string SortField,string SortDirection,string PageIndex,string NumPerPage)
         {   
             int x;
             var cp = new OrderParm();
@@ -97,6 +97,7 @@ namespace CoreWebApi
                 cp.DateEnd = DateTime.Parse(Dateend);
             }
             cp.Skuid = Skuid;
+            cp.GoodsCode = GoodsCode;
             if(!string.IsNullOrEmpty(Ordqtystart))
             {
                 if (int.TryParse(Ordqtystart, out x))
@@ -158,6 +159,20 @@ namespace CoreWebApi
                     cp.IsCOD = IsCOD;
                 }
             }
+            if(!string.IsNullOrEmpty(IsPaid))
+            {
+                if(IsPaid.ToUpper() == "Y" || IsPaid.ToUpper() == "N")
+                {
+                    cp.IsPaid = IsPaid;
+                }
+            }
+            if(!string.IsNullOrEmpty(IsShopSelectAll))
+            {
+                if(IsShopSelectAll.ToUpper() == "TRUE")
+                {
+                    cp.IsShopSelectAll = true;
+                }
+            }
             if(!string.IsNullOrEmpty(ShopID))
             {
                 string[] a = ShopID.Split(',');
@@ -195,6 +210,14 @@ namespace CoreWebApi
                 foreach(var i in a)
                 {
                     cp.SendWarehouse.Add(i);
+                }
+            }
+            if(!string.IsNullOrEmpty(Others))
+            {
+                string[] a = Others.Split(',');
+                foreach(var i in a)
+                {
+                    cp.Others.Add(int.Parse(i));
                 }
             }
             if(!string.IsNullOrEmpty(SortField))
@@ -290,8 +313,8 @@ namespace CoreWebApi
             int id = int.Parse(co["OID"].ToString());
             long soid = long.Parse(co["SoID"].ToString());
             List<int> skuid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["SkuIDList"].ToString());
-            string username = "管理员";//GetUname();
-            int CoID = 1;//int.Parse(GetCoid());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.InsertOrderDetail(id,soid,skuid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -302,8 +325,8 @@ namespace CoreWebApi
             int id = int.Parse(co["OID"].ToString());
             long soid = long.Parse(co["SoID"].ToString());
             List<int> skuid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["SkuIDList"].ToString());
-            string username = "管理员";//GetUname();
-            int CoID = 1;//int.Parse(GetCoid());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.DeleteOrderDetail(id,soid,skuid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -324,8 +347,8 @@ namespace CoreWebApi
             {
                 qty = int.Parse(co["Qty"].ToString());
             }
-            string username = "管理员";//GetUname();
-            int CoID = 1;//int.Parse(GetCoid());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.UpdateOrderDetail(id,soid,skuid,CoID,username,price,qty);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -385,8 +408,8 @@ namespace CoreWebApi
                 pay.PayAmount = co["PayAmount"].ToString();
                 pay.Amount = co["PayAmount"].ToString();
             }
-            string username = "管理员";//GetUname();
-            int CoID = 1;//int.Parse(GetCoid());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
             data = OrderHaddle.ManualPay(pay,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -397,8 +420,8 @@ namespace CoreWebApi
             int OID = int.Parse(co["OID"].ToString());
             long SoID = long.Parse(co["SoID"].ToString());
             int payid = int.Parse(co["PayID"].ToString());
-            string username = "管理员";//GetUname();
-            int CoID = 1;//int.Parse(GetCoid());
+            string username = GetUname();
+            int CoID =  int.Parse(GetCoid());
             var data = OrderHaddle.CancleConfirmPay(OID,SoID,payid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -409,8 +432,8 @@ namespace CoreWebApi
             int OID = int.Parse(co["OID"].ToString());
             long SoID = long.Parse(co["SoID"].ToString());
             int payid = int.Parse(co["PayID"].ToString());
-            string username = "管理员";//GetUname();
-            int CoID = 1;//int.Parse(GetCoid());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.ConfirmPay(OID,SoID,payid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -421,8 +444,8 @@ namespace CoreWebApi
             int OID = int.Parse(co["OID"].ToString());
             long SoID = long.Parse(co["SoID"].ToString());
             int payid = int.Parse(co["PayID"].ToString());
-            string username = "管理员";//GetUname();
-            int CoID = 1;//int.Parse(GetCoid());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.CanclePay(OID,SoID,payid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -432,8 +455,8 @@ namespace CoreWebApi
         {   
             int OID = int.Parse(co["OID"].ToString());
             long SoID = long.Parse(co["SoID"].ToString());
-            string username = "管理员";//GetUname();
-            int CoID = 1;//int.Parse(GetCoid());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.QuickPay(OID,SoID,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -481,8 +504,8 @@ namespace CoreWebApi
         {   
             int oid = int.Parse(co["OID"].ToString());
             List<int> merid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["MerID"].ToString());
-            string username = "管理员";//GetUname();
-            int CoID = 1;//int.Parse(GetCoid());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.OrdMerger(oid,merid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -491,10 +514,48 @@ namespace CoreWebApi
         public ResponseResult CancleOrdMerge([FromBodyAttribute]JObject co)
         {   
             List<int> oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
-            string username = "管理员";//GetUname();
-            int CoID = 1;//int.Parse(GetCoid());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.CancleOrdMerge(oid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Order/OrdSplit")]
+        public ResponseResult OrdSplit([FromBodyAttribute]JObject co)
+        {   
+            int oid = int.Parse(co["OID"].ToString());
+            List<SplitOrd> splitOrd = Newtonsoft.Json.JsonConvert.DeserializeObject<List<SplitOrd>>(co["SplitOrd"].ToString());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid()); 
+            var data = OrderHaddle.OrdSplit(oid,splitOrd,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/ModifyFreight")]
+        public ResponseResult ModifyFreight([FromBodyAttribute]JObject co)
+        {   
+            decimal freight = decimal.Parse(co["Freight"].ToString());
+            List<int> oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid()); 
+            var data = OrderHaddle.ModifyFreight(oid,freight,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Order/GetInitData")]
+        public ResponseResult GetInitData()
+        {   
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.GetInitData(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Order/GetStatusCount")]
+        public ResponseResult GetStatusCount()
+        {   
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.GetStatusCount(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
-}
+}  

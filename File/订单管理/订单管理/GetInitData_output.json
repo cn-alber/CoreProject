@@ -1,0 +1,1387 @@
+{
+    "s": 1,
+    "d": {
+        "OrdStatus": [//订单状态&各状态的资料笔数
+            {
+                "Value": 0,
+                "Label": "待付款",
+                "Count": 50
+            },
+            {
+                "Value": 1,
+                "Label": "已付款待审核",
+                "Count": 1432
+            },
+            {
+                "Value": 2,
+                "Label": "发货中",
+                "Count": 18
+            },
+            {
+                "Value": 3,
+                "Label": "已发货",
+                "Count": 0
+            },
+            {
+                "Value": 4,
+                "Label": "已取消",
+                "Count": 0
+            },
+            {
+                "Value": 5,
+                "Label": "被合并",
+                "Count": 0
+            },
+            {
+                "Value": 7,
+                "Label": "异常",
+                "Count": 565
+            }
+        ],
+        "OrdAbnormalStatus": [//异常说明&资料笔数
+            {
+                "Value": 1,
+                "Label": "等待订单合并",
+                "Count": 1
+            },
+            {
+                "Value": 2,
+                "Label": "等待订单拆分",
+                "Count": 0
+            },
+            {
+                "Value": 3,
+                "Label": "缺货",
+                "Count": 0
+            },
+            {
+                "Value": 4,
+                "Label": "获取电子面单错误",
+                "Count": 0
+            },
+            {
+                "Value": 5,
+                "Label": "等待卖家收货",
+                "Count": 0
+            },
+            {
+                "Value": 6,
+                "Label": "商品编码缺失",
+                "Count": 0
+            },
+            {
+                "Value": 7,
+                "Label": "部分付款",
+                "Count": 0
+            },
+            {
+                "Value": 8,
+                "Label": "测试",
+                "Count": 0
+            }
+        ],
+        "BuyerRemark": [//买家留言选项
+            {
+                "Value": "A",
+                "Label": "不过滤"
+            },
+            {
+                "Value": "N",
+                "Label": "无留言"
+            },
+            {
+                "Value": "Y",
+                "Label": "有留言"
+            }
+        ],
+        "SellerRemark": [//卖家备注选项
+            {
+                "Value": "A",
+                "Label": "不过滤"
+            },
+            {
+                "Value": "N",
+                "Label": "无备注"
+            },
+            {
+                "Value": "Y",
+                "Label": "有备注"
+            }
+        ],
+        "OSource": [//订单来源
+            {
+                "ID": -1,
+                "Name": "--- 不限 ---"
+            },
+            {
+                "ID": 0,
+                "Name": "微信订单"
+            },
+            {
+                "ID": 1,
+                "Name": "PC端订单"
+            },
+            {
+                "ID": 2,
+                "Name": "移动端订单"
+            },
+            {
+                "ID": 3,
+                "Name": "手工下单"
+            },
+            {
+                "ID": 4,
+                "Name": "手Q订单"
+            },
+            {
+                "ID": 5,
+                "Name": "历史订单暂无来源"
+            }
+        ],
+        "OType": [//订单类型
+            {
+                "ID": 0,
+                "Name": "普通订单"
+            },
+            {
+                "ID": 1,
+                "Name": "补发订单"
+            },
+            {
+                "ID": 2,
+                "Name": "换货订单"
+            },
+            {
+                "ID": 3,
+                "Name": "天猫分销"
+            },
+            {
+                "ID": 4,
+                "Name": "天猫供销"
+            },
+            {
+                "ID": 5,
+                "Name": "协同订单"
+            },
+            {
+                "ID": 6,
+                "Name": "普通订单,分销+"
+            },
+            {
+                "ID": 7,
+                "Name": "补发订单,分销+"
+            },
+            {
+                "ID": 8,
+                "Name": "换货订单,分销+"
+            },
+            {
+                "ID": 9,
+                "Name": "天猫供销,分销+"
+            },
+            {
+                "ID": 10,
+                "Name": "协同订单,分销+"
+            },
+            {
+                "ID": 11,
+                "Name": "普通订单,供销+"
+            },
+            {
+                "ID": 12,
+                "Name": "补发订单,供销+"
+            },
+            {
+                "ID": 13,
+                "Name": "换货订单,供销+"
+            },
+            {
+                "ID": 14,
+                "Name": "天猫供销,供销+"
+            },
+            {
+                "ID": 15,
+                "Name": "协同订单,供销+"
+            },
+            {
+                "ID": 16,
+                "Name": "普通订单,分销+,供销+"
+            },
+            {
+                "ID": 17,
+                "Name": "补发订单,分销+,供销+"
+            },
+            {
+                "ID": 18,
+                "Name": "换货订单,分销+,供销+"
+            },
+            {
+                "ID": 19,
+                "Name": "天猫供销,分销+,供销+"
+            },
+            {
+                "ID": 20,
+                "Name": "协同订单,分销+,供销+"
+            }
+        ],
+        "LoanType": [//贷款方式
+            {
+                "Value": "A",
+                "Label": "所有(不区分货款方式)"
+            },
+            {
+                "Value": "N",
+                "Label": "在线支付(非货到付款)"
+            },
+            {
+                "Value": "Y",
+                "Label": "货到付款"
+            }
+        ],
+        "IsPaid": [//是否已经付款
+            {
+                "Value": "A",
+                "Label": "所有(不区分是否付款)"
+            },
+            {
+                "Value": "N",
+                "Label": "未付款"
+            },
+            {
+                "Value": "Y",
+                "Label": "已付款"
+            }
+        ],
+        "Shop": [//店铺
+            {
+                "value": 1,
+                "label": "京东南极人男装官方旗舰店"
+            },
+            {
+                "value": 2,
+                "label": "京东南极人羽绒服旗舰店"
+            },
+            {
+                "value": 3,
+                "label": "南极人羽绒旗舰店"
+            },
+            {
+                "value": 7,
+                "label": "京东测试1"
+            },
+            {
+                "value": 8,
+                "label": "雅鹿男装旗舰店"
+            },
+            {
+                "value": 11,
+                "label": "京东Core测试1"
+            },
+            {
+                "value": 12,
+                "label": "京东Core测试2"
+            },
+            {
+                "value": 13,
+                "label": "京东Core测试3"
+            },
+            {
+                "value": 15,
+                "label": "123"
+            },
+            {
+                "value": 16,
+                "label": "12321"
+            },
+            {
+                "value": 17,
+                "label": "周周"
+            },
+            {
+                "value": 18,
+                "label": "oppo"
+            },
+            {
+                "value": 19,
+                "label": "武进"
+            },
+            {
+                "value": 20,
+                "label": "JUNAILU/爵奈璐"
+            },
+            {
+                "value": 21,
+                "label": "897"
+            }
+        ],
+        "Distributor": [//分销商
+            {
+                "ID": 1,
+                "Name": "南极人罗凤专卖店-taobao"
+            },
+            {
+                "ID": 2,
+                "Name": "liuyushi66-taobao"
+            },
+            {
+                "ID": 3,
+                "Name": "我是神201288-taobao"
+            }
+        ],
+        "Express": [//快递
+            {
+                "ID": 1,
+                "Name": "现场取货"
+            },
+            {
+                "ID": 2,
+                "Name": "韵达快运"
+            },
+            {
+                "ID": 3,
+                "Name": "京东快递"
+            },
+            {
+                "ID": 4,
+                "Name": "EMS"
+            },
+            {
+                "ID": 5,
+                "Name": "顺丰速运"
+            },
+            {
+                "ID": 6,
+                "Name": "申通E物流"
+            },
+            {
+                "ID": 7,
+                "Name": "圆通速递"
+            },
+            {
+                "ID": 8,
+                "Name": "国通快递"
+            }
+        ],
+        "Others": [//其他
+            {
+                "ID": 0,
+                "Name": "合并订单"
+            },
+            {
+                "ID": 1,
+                "Name": "拆分订单"
+            },
+            {
+                "ID": 2,
+                "Name": "非合并订单"
+            },
+            {
+                "ID": 3,
+                "Name": "非拆分订单"
+            },
+            {
+                "ID": 4,
+                "Name": "开发票"
+            }
+        ],
+        "Datacnt": 2072,//总订单资料笔数
+        "Pagecnt": 104,//总页数
+         "Ord": [
+            {
+                "ID": 10871,//内部订单号
+                "Type": 0,//订单类型
+                "DealerType": 0,//经销商类型
+                "IsMerge": false,//是否为合并订单
+                "IsSplit": true,//是否为拆分订单
+                "SoID": 63614300347,//线上订单号，非合并订单时显示
+                "ODate": "2016-10-26 00:00:00",//下单日期
+                "PayDate": "2016-11-01 14:47:15",//付款日期
+                "BuyerShopID": "测试1026",//买家账号
+                "ShopName": "京东南极人羽绒服旗舰店",//店铺
+                "Amount": "31.00",//应付金额
+                "PaidAmount": "11.00",//已付金额
+                "ExAmount": "20.00",//运费
+                "IsCOD": false,//是否货到付款
+                "Status": 0,//状态
+                "AbnormalStatus": 0,//异常状态
+                "StatusDec": "",//异常状态说明
+                "RecMessage": "RecMessage1026RecMessage1026",//买家留言
+                "SendMessage": "SendMessageSendMessage",//卖家备注
+                "Express": null,//快递公司
+                "RecLogistics": "江苏省",//省
+                "RecCity": "苏州市",//市
+                "RecDistrict": "常熟市",//县
+                "RecAddress": "可美国际大厦",//具体地址
+                "RecName": "测试1026name2",//收货人
+                "ExWeight": "1.00",//重量
+                "Distributor": "",//分销商
+                "SupDistributor": "",//供销商
+                "InvoiceTitle": "",//发票抬头
+                "PlanDate": null,//计划发货日
+                "SendWarehouse": "",//发货仓库
+                "SendDate": null,//发货日期
+                "ExCode": "",//运单号
+                "SoIDList": null,//线上订单号集合，合并订单时显示
+                "SkuList": [//商品List
+                    {
+                        "SkuAutoID": 3,
+                        "Img": "",//图片地址
+                        "Qty": 1,//数量
+                        "GoodsCode": "",//货号
+                        "SkuID": "test1234560004014",//商品ID
+                        "SkuName": "南极人2016男装夹克",//商品名称
+                        "Norm": "红色1;46",//规格
+                        "RealPrice": "11.00"//单价
+                    }
+                ]
+            },
+            {
+                "ID": 10870,
+                "Type": 0,
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": true,
+                "SoID": 63614299499,
+                "ODate": "2016-10-26 00:00:00",
+                "PayDate": "2016-11-01 14:47:15",
+                "BuyerShopID": "测试1026",
+                "ShopName": "京东南极人羽绒服旗舰店",
+                "Amount": "250.00",
+                "PaidAmount": "230.00",
+                "ExAmount": "20.00",
+                "IsCOD": false,
+                "Status": 0,
+                "AbnormalStatus": 0,
+                "StatusDec": "",
+                "RecMessage": "RecMessage1026RecMessage1026",
+                "SendMessage": "SendMessageSendMessage",
+                "Express": null,
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "可美国际大厦",
+                "RecName": "测试1026name2",
+                "ExWeight": "20.00",
+                "Distributor": "",
+                "SupDistributor": "",
+                "InvoiceTitle": "",
+                "PlanDate": null,
+                "SendWarehouse": "",
+                "SendDate": null,
+                "ExCode": "",
+                "SoIDList": null,
+                "SkuList": [
+                    {
+                        "SkuAutoID": 2,
+                        "Img": "",
+                        "Qty": 20,
+                        "GoodsCode": "",
+                        "SkuID": "test1234560004007",
+                        "SkuName": "南极人2016男装夹克",
+                        "Norm": "红色1;43",
+                        "RealPrice": "6.00"
+                    },
+                    {
+                        "SkuAutoID": 3,
+                        "Img": "",
+                        "Qty": 10,
+                        "GoodsCode": "",
+                        "SkuID": "test1234560004014",
+                        "SkuName": "南极人2016男装夹克",
+                        "Norm": "红色1;46",
+                        "RealPrice": "11.00"
+                    }
+                ]
+            },
+            {
+                "ID": 10869,
+                "Type": 0,
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": true,
+                "SoID": 63614298740,
+                "ODate": "2016-10-26 00:00:00",
+                "PayDate": "2016-11-05 13:53:14",
+                "BuyerShopID": "测试1026",
+                "ShopName": "京东南极人羽绒服旗舰店",
+                "Amount": "150.00",
+                "PaidAmount": "130.00",
+                "ExAmount": "20.00",
+                "IsCOD": false,
+                "Status": 0,
+                "AbnormalStatus": 0,
+                "StatusDec": "",
+                "RecMessage": "RecMessage1026",
+                "SendMessage": "SendMessage",
+                "Express": null,
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "可美国际大厦",
+                "RecName": "测试1026name2",
+                "ExWeight": "28.00",
+                "Distributor": "",
+                "SupDistributor": "",
+                "InvoiceTitle": "",
+                "PlanDate": null,
+                "SendWarehouse": "",
+                "SendDate": null,
+                "ExCode": "",
+                "SoIDList": null,
+                "SkuList": [
+                    {
+                        "SkuAutoID": 14,
+                        "Img": "",
+                        "Qty": 10,
+                        "GoodsCode": "",
+                        "SkuID": "test4560007007",
+                        "SkuName": "南极人2016男装休闲西裤",
+                        "Norm": "棕色;43",
+                        "RealPrice": "9.00"
+                    },
+                    {
+                        "SkuAutoID": 15,
+                        "Img": "",
+                        "Qty": 4,
+                        "GoodsCode": "",
+                        "SkuID": "test4560007014",
+                        "SkuName": "南极人2016男装休闲西裤",
+                        "Norm": "棕色;46",
+                        "RealPrice": "10.00"
+                    }
+                ]
+            },
+            {
+                "ID": 10868,
+                "Type": 0,
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": false,
+                "SoID": 63613180287,
+                "ODate": "2016-10-27 00:00:00",
+                "PayDate": "2016-11-05 14:36:40",
+                "BuyerShopID": "测试1027",
+                "ShopName": "京东南极人羽绒服旗舰店",
+                "Amount": "85.00",
+                "PaidAmount": "85.00",
+                "ExAmount": "5.00",
+                "IsCOD": false,
+                "Status": 1,
+                "AbnormalStatus": 0,
+                "StatusDec": "",
+                "RecMessage": "RecMessage1026",
+                "SendMessage": "SendMessage",
+                "Express": null,
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "可美国际大厦",
+                "RecName": "测试1027name2",
+                "ExWeight": "5.00",
+                "Distributor": "",
+                "SupDistributor": "",
+                "InvoiceTitle": "",
+                "PlanDate": null,
+                "SendWarehouse": "",
+                "SendDate": null,
+                "ExCode": "",
+                "SoIDList": null,
+                "SkuList": [
+                    {
+                        "SkuAutoID": 2,
+                        "Img": "",
+                        "Qty": 10,
+                        "GoodsCode": "",
+                        "SkuID": "test1234560004007",
+                        "SkuName": "南极人2016男装夹克",
+                        "Norm": "红色1;43",
+                        "RealPrice": "8.00"
+                    }
+                ]
+            },
+            {
+                "ID": 10867,
+                "Type": 0,
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": false,
+                "SoID": 63613180284,
+                "ODate": "2016-10-27 00:00:00",
+                "PayDate": "2016-11-05 14:42:23",
+                "BuyerShopID": "测试1027",
+                "ShopName": "京东南极人羽绒服旗舰店",
+                "Amount": "80.00",
+                "PaidAmount": "80.00",
+                "ExAmount": "0.00",
+                "IsCOD": false,
+                "Status": 1,
+                "AbnormalStatus": 0,
+                "StatusDec": "",
+                "RecMessage": "RecMessage1026RecMessage1026",
+                "SendMessage": "SendMessageSendMessage",
+                "Express": null,
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "可美国际大厦",
+                "RecName": "测试1027name2",
+                "ExWeight": "10.00",
+                "Distributor": "",
+                "SupDistributor": "",
+                "InvoiceTitle": "",
+                "PlanDate": null,
+                "SendWarehouse": "",
+                "SendDate": null,
+                "ExCode": "",
+                "SoIDList": null,
+                "SkuList": [
+                    {
+                        "SkuAutoID": 3,
+                        "Img": "",
+                        "Qty": 10,
+                        "GoodsCode": "",
+                        "SkuID": "test1234560004014",
+                        "SkuName": "南极人2016男装夹克",
+                        "Norm": "红色1;46",
+                        "RealPrice": "8.00"
+                    }
+                ]
+            },
+            {
+                "ID": 10866,
+                "Type": 0,
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": false,
+                "SoID": 63613178410,
+                "ODate": "2016-10-27 00:00:00",
+                "PayDate": null,
+                "BuyerShopID": "测试1027",
+                "ShopName": "京东南极人羽绒服旗舰店",
+                "Amount": "0.00",
+                "PaidAmount": "0.00",
+                "ExAmount": "0.00",
+                "IsCOD": false,
+                "Status": 7,
+                "AbnormalStatus": 1,
+                "StatusDec": "等待订单合并",
+                "RecMessage": "RecMessage1027",
+                "SendMessage": "SendMessage1027",
+                "Express": null,
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "可美国际大厦",
+                "RecName": "测试1027name",
+                "ExWeight": "0.00",
+                "Distributor": "",
+                "SupDistributor": "",
+                "InvoiceTitle": "",
+                "PlanDate": null,
+                "SendWarehouse": "",
+                "SendDate": null,
+                "ExCode": "",
+                "SoIDList": null,
+                "SkuList": []
+            },
+            {
+                "ID": 10865,
+                "Type": 0,
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": false,
+                "SoID": 63613159390,
+                "ODate": "2016-10-27 00:00:00",
+                "PayDate": null,
+                "BuyerShopID": "测试1027",
+                "ShopName": "京东南极人羽绒服旗舰店",
+                "Amount": "0.00",
+                "PaidAmount": "0.00",
+                "ExAmount": "0.00",
+                "IsCOD": false,
+                "Status": 0,
+                "AbnormalStatus": 0,
+                "StatusDec": "",
+                "RecMessage": "RecMessage1027",
+                "SendMessage": "SendMessage1027",
+                "Express": null,
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "可美国际大厦",
+                "RecName": "测试1027name",
+                "ExWeight": "0.00",
+                "Distributor": "",
+                "SupDistributor": "",
+                "InvoiceTitle": "",
+                "PlanDate": null,
+                "SendWarehouse": "",
+                "SendDate": null,
+                "ExCode": "",
+                "SoIDList": null,
+                "SkuList": []
+            },
+            {
+                "ID": 10861,
+                "Type": 0,
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": false,
+                "SoID": 63613159101,
+                "ODate": "2016-10-27 00:00:00",
+                "PayDate": null,
+                "BuyerShopID": "测试1027",
+                "ShopName": "京东南极人羽绒服旗舰店",
+                "Amount": "0.00",
+                "PaidAmount": "0.00",
+                "ExAmount": "0.00",
+                "IsCOD": false,
+                "Status": 0,
+                "AbnormalStatus": 0,
+                "StatusDec": "",
+                "RecMessage": "RecMessage1027",
+                "SendMessage": "SendMessage1027",
+                "Express": null,
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "可美国际大厦",
+                "RecName": "测试1027name",
+                "ExWeight": "0.00",
+                "Distributor": "",
+                "SupDistributor": "",
+                "InvoiceTitle": "",
+                "PlanDate": null,
+                "SendWarehouse": "",
+                "SendDate": null,
+                "ExCode": "",
+                "SoIDList": null,
+                "SkuList": []
+            },
+            {
+                "ID": 10860,
+                "Type": 0,
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": true,
+                "SoID": 63613076331,
+                "ODate": "2016-10-26 00:00:00",
+                "PayDate": "2016-11-01 14:47:15",
+                "BuyerShopID": "测试1026",
+                "ShopName": "京东南极人羽绒服旗舰店",
+                "Amount": "124.00",
+                "PaidAmount": "124.00",
+                "ExAmount": "0.00",
+                "IsCOD": false,
+                "Status": 1,
+                "AbnormalStatus": 0,
+                "StatusDec": "",
+                "RecMessage": "RecMessage1026RecMessage1026",
+                "SendMessage": "SendMessageSendMessage",
+                "Express": null,
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "可美国际大厦",
+                "RecName": "测试1026name2",
+                "ExWeight": "19.00",
+                "Distributor": "",
+                "SupDistributor": "",
+                "InvoiceTitle": "",
+                "PlanDate": null,
+                "SendWarehouse": "",
+                "SendDate": null,
+                "ExCode": "",
+                "SoIDList": null,
+                "SkuList": [
+                    {
+                        "SkuAutoID": 8,
+                        "Img": "",
+                        "Qty": 10,
+                        "GoodsCode": "",
+                        "SkuID": "test2510002007",
+                        "SkuName": "南极人2016男装夹克休闲版",
+                        "Norm": "白色;43",
+                        "RealPrice": "8.00"
+                    },
+                    {
+                        "SkuAutoID": 3,
+                        "Img": "",
+                        "Qty": 4,
+                        "GoodsCode": "",
+                        "SkuID": "test1234560004014",
+                        "SkuName": "南极人2016男装夹克",
+                        "Norm": "红色1;46",
+                        "RealPrice": "11.00"
+                    }
+                ]
+            },
+            {
+                "ID": 10859,
+                "Type": 0,
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": true,
+                "SoID": 7613425,
+                "ODate": "2016-10-26 00:00:00",
+                "PayDate": "2016-11-05 13:53:14",
+                "BuyerShopID": "测试1026",
+                "ShopName": "京东南极人羽绒服旗舰店",
+                "Amount": "140.00",
+                "PaidAmount": "140.00",
+                "ExAmount": "0.00",
+                "IsCOD": false,
+                "Status": 1,
+                "AbnormalStatus": 0,
+                "StatusDec": "",
+                "RecMessage": "RecMessage1026",
+                "SendMessage": "SendMessage",
+                "Express": null,
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "可美国际大厦",
+                "RecName": "测试1026name2",
+                "ExWeight": "17.00",
+                "Distributor": "",
+                "SupDistributor": "",
+                "InvoiceTitle": "",
+                "PlanDate": null,
+                "SendWarehouse": "",
+                "SendDate": null,
+                "ExCode": "",
+                "SoIDList": null,
+                "SkuList": [
+                    {
+                        "SkuAutoID": 2,
+                        "Img": "",
+                        "Qty": 10,
+                        "GoodsCode": "",
+                        "SkuID": "test1234560004007",
+                        "SkuName": "南极人2016男装夹克",
+                        "Norm": "红色1;43",
+                        "RealPrice": "8.00"
+                    },
+                    {
+                        "SkuAutoID": 15,
+                        "Img": "",
+                        "Qty": 6,
+                        "GoodsCode": "",
+                        "SkuID": "test4560007014",
+                        "SkuName": "南极人2016男装休闲西裤",
+                        "Norm": "棕色;46",
+                        "RealPrice": "10.00"
+                    }
+                ]
+            },
+            {
+                "ID": 10858,
+                "Type": 0,
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": false,
+                "SoID": 379189,
+                "ODate": "2016-10-25 00:00:00",
+                "PayDate": null,
+                "BuyerShopID": "测试102501",
+                "ShopName": "京东南极人羽绒服旗舰店",
+                "Amount": "0.00",
+                "PaidAmount": "0.00",
+                "ExAmount": "0.00",
+                "IsCOD": false,
+                "Status": 0,
+                "AbnormalStatus": 0,
+                "StatusDec": "",
+                "RecMessage": "买家备注测试",
+                "SendMessage": "卖家备注测试",
+                "Express": null,
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "可美国际大厦",
+                "RecName": "测试102501name",
+                "ExWeight": "0.00",
+                "Distributor": "",
+                "SupDistributor": "",
+                "InvoiceTitle": "",
+                "PlanDate": null,
+                "SendWarehouse": "",
+                "SendDate": null,
+                "ExCode": "",
+                "SoIDList": null,
+                "SkuList": []
+            },
+            {
+                "ID": 10857,
+                "Type": 0,
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": false,
+                "SoID": 368046,
+                "ODate": "2016-10-25 00:00:00",
+                "PayDate": null,
+                "BuyerShopID": "测试102501",
+                "ShopName": "京东南极人羽绒服旗舰店",
+                "Amount": "0.00",
+                "PaidAmount": "0.00",
+                "ExAmount": "0.00",
+                "IsCOD": false,
+                "Status": 0,
+                "AbnormalStatus": 0,
+                "StatusDec": "",
+                "RecMessage": "买家备注测试",
+                "SendMessage": "卖家备注测试",
+                "Express": null,
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "可美国际大厦",
+                "RecName": "测试102501name",
+                "ExWeight": "0.00",
+                "Distributor": "",
+                "SupDistributor": "",
+                "InvoiceTitle": "",
+                "PlanDate": null,
+                "SendWarehouse": "",
+                "SendDate": null,
+                "ExCode": "",
+                "SoIDList": null,
+                "SkuList": []
+            },
+            {
+                "ID": 10855,
+                "Type": 0,
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": false,
+                "SoID": 316687,
+                "ODate": "2016-10-25 00:00:00",
+                "PayDate": null,
+                "BuyerShopID": "测试1025",
+                "ShopName": "京东南极人男装官方旗舰店",
+                "Amount": "0.00",
+                "PaidAmount": "0.00",
+                "ExAmount": "0.00",
+                "IsCOD": false,
+                "Status": 0,
+                "AbnormalStatus": 0,
+                "StatusDec": "",
+                "RecMessage": "买家备注测试",
+                "SendMessage": "卖家备注测试",
+                "Express": null,
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "可美国际大厦",
+                "RecName": "测试1025name",
+                "ExWeight": "0.00",
+                "Distributor": "",
+                "SupDistributor": "",
+                "InvoiceTitle": "",
+                "PlanDate": null,
+                "SendWarehouse": "",
+                "SendDate": null,
+                "ExCode": "",
+                "SoIDList": null,
+                "SkuList": []
+            },
+            {
+                "ID": 10850,
+                "Type": 0,
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": false,
+                "SoID": 23176582273,
+                "ODate": "2016-09-11 12:16:15",
+                "PayDate": "2016-09-11 12:16:15",
+                "BuyerShopID": "葛三民",
+                "ShopName": "雅鹿男装旗舰店",
+                "Amount": "657.00",
+                "PaidAmount": "0.00",
+                "ExAmount": "0.00",
+                "IsCOD": false,
+                "Status": 1,
+                "AbnormalStatus": 0,
+                "StatusDec": "",
+                "RecMessage": null,
+                "SendMessage": null,
+                "Express": "",
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "江苏苏州市常熟市虞山镇和甸村恒源机械",
+                "RecName": "葛三民",
+                "ExWeight": "0.00",
+                "Distributor": null,
+                "SupDistributor": null,
+                "InvoiceTitle": null,
+                "PlanDate": "2016-09-18 15:34:57",
+                "SendWarehouse": "",
+                "SendDate": "2016-09-18 15:34:57",
+                "ExCode": "",
+                "SoIDList": null,
+                "SkuList": [
+                    {
+                        "SkuAutoID": 0,
+                        "Img": "",
+                        "Qty": 1,
+                        "GoodsCode": "",
+                        "SkuID": "10575890547",
+                        "SkuName": "雅鹿 2016秋冬男士时尚休闲羽绒服 藏青 175",
+                        "Norm": "携云科技;190;常规",
+                        "RealPrice": "698.00"
+                    },
+                    {
+                        "SkuAutoID": 0,
+                        "Img": "",
+                        "Qty": 1,
+                        "GoodsCode": "",
+                        "SkuID": "10578349065",
+                        "SkuName": "雅鹿男士时尚休闲轻薄秋羽绒 太空灰 175",
+                        "Norm": "携云科技;190;常规",
+                        "RealPrice": "-41.00"
+                    }
+                ]
+            },
+            {
+                "ID": 10849,
+                "Type": 0,
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": false,
+                "SoID": 23080873652,
+                "ODate": "2016-09-10 21:30:16",
+                "PayDate": "2016-09-10 21:30:16",
+                "BuyerShopID": "刘伟",
+                "ShopName": "雅鹿男装旗舰店",
+                "Amount": "657.00",
+                "PaidAmount": "0.00",
+                "ExAmount": "0.00",
+                "IsCOD": false,
+                "Status": 1,
+                "AbnormalStatus": 0,
+                "StatusDec": "",
+                "RecMessage": null,
+                "SendMessage": null,
+                "Express": "",
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "江苏苏州市常熟市虞山镇莫城言里石岸苑9号",
+                "RecName": "刘伟",
+                "ExWeight": "0.00",
+                "Distributor": null,
+                "SupDistributor": null,
+                "InvoiceTitle": null,
+                "PlanDate": "2016-09-18 15:34:57",
+                "SendWarehouse": "",
+                "SendDate": "2016-09-18 15:34:57",
+                "ExCode": "",
+                "SoIDList": null,
+                "SkuList": [
+                    {
+                        "SkuAutoID": 0,
+                        "Img": "",
+                        "Qty": 1,
+                        "GoodsCode": "",
+                        "SkuID": "10578349046",
+                        "SkuName": "雅鹿男士时尚休闲轻薄秋羽绒 酒红 185",
+                        "Norm": "携云科技;190;常规",
+                        "RealPrice": "598.00"
+                    },
+                    {
+                        "SkuAutoID": 0,
+                        "Img": "",
+                        "Qty": 1,
+                        "GoodsCode": "",
+                        "SkuID": "10575890559",
+                        "SkuName": "雅鹿 2016秋冬男士时尚休闲羽绒服 金驼 185",
+                        "Norm": "携云科技;190;常规",
+                        "RealPrice": "59.00"
+                    }
+                ]
+            },
+            {
+                "ID": 10848,
+                "Type": 0,
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": false,
+                "SoID": 23126613951,
+                "ODate": "2016-09-11 01:31:43",
+                "PayDate": "2016-09-11 01:31:43",
+                "BuyerShopID": "虞城南",
+                "ShopName": "雅鹿男装旗舰店",
+                "Amount": "898.00",
+                "PaidAmount": "0.00",
+                "ExAmount": "0.00",
+                "IsCOD": false,
+                "Status": 1,
+                "AbnormalStatus": 0,
+                "StatusDec": "",
+                "RecMessage": null,
+                "SendMessage": null,
+                "Express": "",
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "江苏苏州市常熟市虞山镇莫城东尖路6号3幢403",
+                "RecName": "虞城南",
+                "ExWeight": "0.00",
+                "Distributor": null,
+                "SupDistributor": null,
+                "InvoiceTitle": null,
+                "PlanDate": "2016-09-18 15:34:56",
+                "SendWarehouse": "",
+                "SendDate": "2016-09-18 15:34:56",
+                "ExCode": "",
+                "SoIDList": null,
+                "SkuList": [
+                    {
+                        "SkuAutoID": 0,
+                        "Img": "",
+                        "Qty": 1,
+                        "GoodsCode": "",
+                        "SkuID": "10580397490",
+                        "SkuName": "雅鹿冬季男士中长款商务休闲羽绒服 黑色 195",
+                        "Norm": "携云科技;190;常规",
+                        "RealPrice": "999.00"
+                    },
+                    {
+                        "SkuAutoID": 0,
+                        "Img": "",
+                        "Qty": 1,
+                        "GoodsCode": "",
+                        "SkuID": "10576870278",
+                        "SkuName": "雅鹿冬季男士中长款商务休闲修身羽绒服 深卡其 195",
+                        "Norm": "携云科技;190;常规",
+                        "RealPrice": "-101.00"
+                    }
+                ]
+            },
+            {
+                "ID": 10847,
+                "Type": 0,
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": false,
+                "SoID": 23082490028,
+                "ODate": "2016-09-11 00:06:42",
+                "PayDate": "2016-09-11 00:06:42",
+                "BuyerShopID": "单伟宏",
+                "ShopName": "雅鹿男装旗舰店",
+                "Amount": "299.00",
+                "PaidAmount": "0.00",
+                "ExAmount": "0.00",
+                "IsCOD": false,
+                "Status": 1,
+                "AbnormalStatus": 0,
+                "StatusDec": "",
+                "RecMessage": null,
+                "SendMessage": null,
+                "Express": "",
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "江苏苏州市常熟市虞山镇莫城徐巷村九组41号",
+                "RecName": "单伟宏",
+                "ExWeight": "0.00",
+                "Distributor": null,
+                "SupDistributor": null,
+                "InvoiceTitle": null,
+                "PlanDate": "2016-09-18 15:34:55",
+                "SendWarehouse": "",
+                "SendDate": "2016-09-18 15:34:55",
+                "ExCode": "",
+                "SoIDList": null,
+                "SkuList": [
+                    {
+                        "SkuAutoID": 0,
+                        "Img": "",
+                        "Qty": 1,
+                        "GoodsCode": "",
+                        "SkuID": "10578349065",
+                        "SkuName": "雅鹿男士时尚休闲轻薄秋羽绒 太空灰 175",
+                        "Norm": "携云科技;190;常规",
+                        "RealPrice": "299.00"
+                    }
+                ]
+            },
+            {
+                "ID": 10846,
+                "Type": 0,
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": false,
+                "SoID": 23116037229,
+                "ODate": "2016-09-11 21:32:53",
+                "PayDate": "2016-09-11 21:32:53",
+                "BuyerShopID": "李辉",
+                "ShopName": "雅鹿男装旗舰店",
+                "Amount": "798.00",
+                "PaidAmount": "0.00",
+                "ExAmount": "0.00",
+                "IsCOD": false,
+                "Status": 7,
+                "AbnormalStatus": 0,
+                "StatusDec": "等待订单拆分",
+                "RecMessage": null,
+                "SendMessage": null,
+                "Express": "",
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "江苏苏州市常熟市虞山镇莫城中心河路金正拉链厂",
+                "RecName": "李辉",
+                "ExWeight": "0.00",
+                "Distributor": null,
+                "SupDistributor": null,
+                "InvoiceTitle": null,
+                "PlanDate": "2016-09-18 15:34:54",
+                "SendWarehouse": "",
+                "SendDate": "2016-09-18 15:34:54",
+                "ExCode": "",
+                "SoIDList": null,
+                "SkuList": [
+                    {
+                        "SkuAutoID": 0,
+                        "Img": "",
+                        "Qty": 1,
+                        "GoodsCode": "",
+                        "SkuID": "10580397487",
+                        "SkuName": "雅鹿冬季男士中长款商务休闲羽绒服 黑色 180",
+                        "Norm": "携云科技;190;常规",
+                        "RealPrice": "999.00"
+                    },
+                    {
+                        "SkuAutoID": 0,
+                        "Img": "",
+                        "Qty": 1,
+                        "GoodsCode": "",
+                        "SkuID": "10578349066",
+                        "SkuName": "雅鹿男士时尚休闲轻薄秋羽绒 太空灰 180",
+                        "Norm": "携云科技;190;常规",
+                        "RealPrice": "-201.00"
+                    }
+                ]
+            },
+            {
+                "ID": 10845,
+                "Type": 0,
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": false,
+                "SoID": 23139009415,
+                "ODate": "2016-09-11 19:33:27",
+                "PayDate": "2016-09-11 19:33:27",
+                "BuyerShopID": "袁志强",
+                "ShopName": "雅鹿男装旗舰店",
+                "Amount": "698.00",
+                "PaidAmount": "0.00",
+                "ExAmount": "0.00",
+                "IsCOD": false,
+                "Status": 7,
+                "AbnormalStatus": 0,
+                "StatusDec": "等待订单拆分",
+                "RecMessage": null,
+                "SendMessage": null,
+                "Express": "",
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "江苏苏州市常熟市虞山镇莫城湖鹤新村东区109号",
+                "RecName": "袁志强",
+                "ExWeight": "0.00",
+                "Distributor": null,
+                "SupDistributor": null,
+                "InvoiceTitle": null,
+                "PlanDate": "2016-09-18 15:34:52",
+                "SendWarehouse": "",
+                "SendDate": "2016-09-18 15:34:52",
+                "ExCode": "",
+                "SoIDList": null,
+                "SkuList": [
+                    {
+                        "SkuAutoID": 0,
+                        "Img": "",
+                        "Qty": 1,
+                        "GoodsCode": "",
+                        "SkuID": "10576870282",
+                        "SkuName": "雅鹿冬季男士中长款商务休闲修身羽绒服 咸菜色 180",
+                        "Norm": "携云科技;190;常规",
+                        "RealPrice": "799.00"
+                    },
+                    {
+                        "SkuAutoID": 0,
+                        "Img": "",
+                        "Qty": 1,
+                        "GoodsCode": "",
+                        "SkuID": "10578349066",
+                        "SkuName": "雅鹿男士时尚休闲轻薄秋羽绒 太空灰 180",
+                        "Norm": "携云科技;190;常规",
+                        "RealPrice": "-101.00"
+                    }
+                ]
+            },
+            {
+                "ID": 10844,
+                "Type": 0,
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": false,
+                "SoID": 23175737930,
+                "ODate": "2016-09-10 22:26:15",
+                "PayDate": "2016-09-10 22:26:15",
+                "BuyerShopID": "江全",
+                "ShopName": "雅鹿男装旗舰店",
+                "Amount": "857.00",
+                "PaidAmount": "0.00",
+                "ExAmount": "0.00",
+                "IsCOD": false,
+                "Status": 7,
+                "AbnormalStatus": 0,
+                "StatusDec": "等待订单合并",
+                "RecMessage": null,
+                "SendMessage": null,
+                "Express": "",
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "江苏苏州市常熟市虞山镇莫城燕泾路1号世创商标",
+                "RecName": "江全",
+                "ExWeight": "0.00",
+                "Distributor": null,
+                "SupDistributor": null,
+                "InvoiceTitle": null,
+                "PlanDate": "2016-09-18 15:34:50",
+                "SendWarehouse": "",
+                "SendDate": "2016-09-18 15:34:50",
+                "ExCode": "",
+                "SoIDList": null,
+                "SkuList": [
+                    {
+                        "SkuAutoID": 0,
+                        "Img": "",
+                        "Qty": 1,
+                        "GoodsCode": "",
+                        "SkuID": "10575890560",
+                        "SkuName": "雅鹿 2016秋冬男士时尚休闲羽绒服 金驼 190",
+                        "Norm": "携云科技;190;常规",
+                        "RealPrice": "698.00"
+                    },
+                    {
+                        "SkuAutoID": 0,
+                        "Img": "",
+                        "Qty": 1,
+                        "GoodsCode": "",
+                        "SkuID": "10580397489",
+                        "SkuName": "雅鹿冬季男士中长款商务休闲羽绒服 黑色 190",
+                        "Norm": "携云科技;190;常规",
+                        "RealPrice": "159.00"
+                    }
+                ]
+            }
+        ]
+    },
+    "m": ""
+}

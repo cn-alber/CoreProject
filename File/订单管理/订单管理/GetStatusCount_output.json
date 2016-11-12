@@ -1,0 +1,58 @@
+{
+    "s": 1,
+    "d": {
+        "OrdStatus": [//订单状态计数
+            {
+                "Value": 0,
+                "Count": 50
+            },
+            {
+                "Value": 1,
+                "Count": 1432
+            },
+            {
+                "Value": 2,
+                "Count": 18
+            },
+            {
+                "Value": 7,
+                "Count": 565
+            }
+        ],
+        "OrdAbnormalStatus": [//异常状态计数
+            {
+                "Value": 1,
+                "Count": 1
+            },
+            {
+                "Value": 2,
+                "Count": 0
+            },
+            {
+                "Value": 3,
+                "Count": 0
+            },
+            {
+                "Value": 4,
+                "Count": 0
+            },
+            {
+                "Value": 5,
+                "Count": 0
+            },
+            {
+                "Value": 6,
+                "Count": 0
+            },
+            {
+                "Value": 7,
+                "Count": 0
+            },
+            {
+                "Value": 8,
+                "Count": 0
+            }
+        ]
+    },
+    "m": ""
+}

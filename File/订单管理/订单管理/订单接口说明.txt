@@ -183,9 +183,53 @@ output: s=1成功 else 错误代码
 参考:output jason 文件:OrdMerger_output.json
 
 17.CancleOrdMerge()订单合并还原
-路由:http://localhost:5000/Core/Order/OrdMerCancleOrdMergeger
+路由:http://localhost:5000/Core/Order/CancleOrdMerge
 input:OID    List<int>           内部订单号
 output: s=1成功 else 错误代码
 参考:input jason 文件:CancleOrdMerge_input.json
 参考:output jason 文件:CancleOrdMerge_output.json
 
+18.OrdSplit()订单拆分
+路由:http://localhost:5000/Core/Order/OrdSplit
+input:OID         int               内部订单号
+      SplitOrd    List<SplitOrd>    拆分明细 所有明细资料都要传入
+            Skuid  int        skuauto id
+            Qty    int        原数量
+            QtyNew int        拆分数量
+            Price  decimal    单价
+            Weight decimal    重量
+output: s=1成功 else 错误代码
+参考:input jason 文件:OrdSplit_input.json
+参考:output jason 文件:OrdSplit_output.json
+
+19.ModifyFreight()修改运费
+路由:http://localhost:5000/Core/Order/ModifyFreight
+input:OID         List<int>   内部订单号
+      Freight     decimal     修改后运费
+output: s=1成功 else 错误代码
+参考:input jason 文件:ModifyFreight_input.json
+参考:output jason 文件:ModifyFreight_output.json
+
+20.GetInitData()初始资料显示
+路由:http://localhost:5000/Core/Order/GetInitData
+input:  None
+output: OrdStatus             订单状态
+        OrdAbnormalStatus     异常状态
+        BuyerRemark           买家留言
+        SellerRemark          卖家备注
+        OSource               订单来源
+        OType                 订单类型
+        LoanType              贷款类型
+        IsPaid                是否付款
+        Shop                  店铺
+        Distributor           分销商
+        Express               快递
+        Others                其他
+参考:output jason 文件:GetInitData_output.json
+
+21.GetStatusCount()计数更新
+路由:http://localhost:5000/Core/Order/GetStatusCount
+input:  None
+output: OrdStatus             订单状态计数
+        OrdAbnormalStatus     异常状态计数
+参考:output jason 文件:GetStatusCount_output.json

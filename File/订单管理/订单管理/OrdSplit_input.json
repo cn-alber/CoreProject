@@ -1,0 +1,26 @@
+{
+    "OID": 10860,
+    "SplitOrd": [
+        {
+            "Skuid": 8,
+            "Qty": 10,
+            "QtyNew": 0,
+            "Price": 8,
+            "Weight": 1.5
+        },
+        {
+            "Skuid": 2,
+            "Qty": 20,
+            "QtyNew": 20,
+            "Price": 6,
+            "Weight":0.5
+        },
+        {
+            "Skuid": 3,
+            "Qty": 15,
+            "QtyNew": 10,
+            "Price": 11,
+            "Weight": 1
+        }
+    ]
+}

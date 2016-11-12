@@ -162,7 +162,7 @@ namespace CoreWebApi.Base
         {          
             var res = new DataResult(1,null);                            
             string Coid = GetCoid();            
-            res.d = WarehouseHaddle.getShopEnum(Coid);
+            res.d = ShopHaddle.getShopEnum(Coid);
             return CoreResult.NewResponse(res.s,res.d,"Api");
         }
 
