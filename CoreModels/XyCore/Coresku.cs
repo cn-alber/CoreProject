@@ -267,6 +267,18 @@ namespace CoreModels.XyCore
     #endregion
 
 
+    #region 商品资料-编号&名称&规格&小图
+    public class CoreSkuView
+    {
+        public string ID { get; set; }
+        public string SkuID { get; set; }
+        public string SkuName { get; set; }        
+        public string Norm { get; set; }
+        public string Img { get; set; }
+
+    }
+    #endregion
+
     #region ######### CoreMat
 
     public class CoreSkuMatQuery

@@ -3,6 +3,7 @@ using Dapper;
 using System;
 using System.Collections.Generic;
 using CoreModels.XyComm;
+using CoreModels.XyCore;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 // using Newtonsoft.Json;
@@ -103,43 +104,46 @@ namespace CoreData.CoreComm
         #endregion
 
         #region 获取所有省市区
-        public static DataResult GetAllArea(){
-            var result = new DataResult(1,null);
+        public static DataResult GetAllArea()
+        {
+            var result = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
                 {
-                    try
+                    string sql = @"SELECT  area.ID as value,  area.ParentId ,  area.`Name` as label FROM area WHERE LevelType = 1 AND ParentId = 100000 ";
+                    string cSql = "";
+                    var province = conn.Query<AreaAll>(sql).AsList();
+                    foreach (AreaAll p in province)
                     {
-                        string sql = @"SELECT  area.ID as value,  area.ParentId ,  area.`Name` as label FROM area WHERE LevelType = 1 AND ParentId = 100000 ";
-                        string cSql = "";
-                        var province = conn.Query<AreaAll>(sql).AsList();
-                        foreach(AreaAll p in province){
-                                cSql = @"SELECT  area.ID as value,  area.ParentId ,  area.`Name` as label FROM area WHERE LevelType = 2 AND ParentId =  "+p.value;
-                                p.children = new List<AreaAll>();
-                                var citys = conn.Query<AreaAll>(cSql).AsList();
-                                p.children = citys;
-                                cSql = "";
-                                string dSql="";
-                                foreach(AreaAll c in citys){
-                                    dSql = @"SELECT  area.ID as value,  area.ParentId ,  area.`Name` as label FROM area WHERE LevelType = 3 AND ParentId =  "+c.value;
-                                    c.children = new List<AreaAll>();
-                                    var district = conn.Query<AreaAll>(dSql).AsList();
-                                    c.children = district;
-                                    dSql = "";
-                                }
+                        cSql = @"SELECT  area.ID as value,  area.ParentId ,  area.`Name` as label FROM area WHERE LevelType = 2 AND ParentId =  " + p.value;
+                        p.children = new List<AreaAll>();
+                        var citys = conn.Query<AreaAll>(cSql).AsList();
+                        p.children = citys;
+                        cSql = "";
+                        string dSql = "";
+                        foreach (AreaAll c in citys)
+                        {
+                            dSql = @"SELECT  area.ID as value,  area.ParentId ,  area.`Name` as label FROM area WHERE LevelType = 3 AND ParentId =  " + c.value;
+                            c.children = new List<AreaAll>();
+                            var district = conn.Query<AreaAll>(dSql).AsList();
+                            c.children = district;
+                            dSql = "";
                         }
+                    }
 
-                        result.d = JsonConvert.DeserializeObject<List<AreaCascader>>(JsonConvert.SerializeObject(province));                        
-                    }
-                    catch (Exception e)
-                    {
-                        result.s = -1;
-                        result.d = e.Message;
-                    }
-                    finally
-                    {
-                        conn.Dispose();
-                    }
+                    result.d = JsonConvert.DeserializeObject<List<AreaCascader>>(JsonConvert.SerializeObject(province));
                 }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+                finally
+                {
+                    conn.Dispose();
+                }
+            }
 
             return result;
         }
@@ -168,6 +172,85 @@ namespace CoreData.CoreComm
             string rds = Rd.Next().ToString();
             comp = comp + rds.Remove(0, rds.Length - 5);
             return comp;
+        }
+        #endregion
+
+
+        #region 公用方法仓库基础资料查询
+        public static DataResult GetWhViewAll(string CoID)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    Dictionary<string, object> DicWh = new Dictionary<string, object>();
+                    string Sql = @"SELECT ID,WarehouseName AS WhName FROM warehouse WHERE CoID=@CoID";
+                    var WhLst = conn.Query<Warehouse_view>(Sql, new { CoID = CoID }).AsList();
+                    foreach (var wh in WhLst)
+                    {
+                        DicWh.Add(wh.ID, wh);
+                    }
+                    result.d = DicWh;
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+        public static DataResult GetWhViewByID(string CoID, List<String> IDLst)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    Dictionary<string, object> DicWh = new Dictionary<string, object>();
+                    string Sql = @"SELECT ID,WarehouseName AS WhName FROM warehouse WHERE CoID=@CoID AND ID in @IDLst";
+                    var WhLst = conn.Query<Warehouse_view>(Sql, new { CoID = CoID, IDLst = IDLst }).AsList();
+                    foreach (var wh in WhLst)
+                    {
+                        DicWh.Add(wh.ID, wh);
+                    }
+                    result.d = DicWh;
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+        #endregion
+
+
+        #region 公用方法——获取商品编号&名称&规格&图片
+        public static DataResult GetSkuViewByID(string CoID, List<String> IDLst)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                try
+                {
+                    Dictionary<string,object> DicSku = new Dictionary<string,object>();
+                    string Sql = @"SELECT ID,SkuID,SkuName,Norm,Img FROM coresku WHERE CoID=@CoID AND ID in @IDLst";
+                    var SkuLst = conn.Query<CoreSkuView>(Sql, new { CoID = CoID, IDLst = IDLst }).AsList();
+                    foreach(var sku in SkuLst)
+                    {
+                        DicSku.Add(sku.ID,sku);
+                    }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }               
+            }
+            return result;
         }
         #endregion
     }

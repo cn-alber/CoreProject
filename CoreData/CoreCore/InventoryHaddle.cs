@@ -156,20 +156,18 @@ namespace CoreData.CoreCore
                     StringBuilder querycount = new StringBuilder();
                     StringBuilder querysql = new StringBuilder();
                     var p = new DynamicParameters();
-                    string countsql = @"SELECT count(ID) FROM inventory WHERE CoID = @CoID";
+                    string countsql = @"SELECT count(ID) FROM inventory WHERE CoID = @CoID AND Type=0 AND WarehouseID>0";
                     string sql = @"SELECT
                                     inventory.ID,
                                     inventory.GoodsCode,
                                     inventory.SkuID,
                                     inventory.`Name`,
                                     inventory.Norm,
-                                    inventory.WarehouseID,
-                                    inventory.WarehouseName,
                                     inventory.StockQty,
                                     inventory.LockQty,
                                     inventory.PickQty,
                                     inventory.WaitInQty,
-                                    inventory.ReturnQty,
+                                    inventory.SaleRetuQty,
                                     inventory.SafeQty,
                                     inventory.DefectiveQty,
                                     inventory.VirtualQty,
@@ -178,7 +176,7 @@ namespace CoreData.CoreCore
                                     inventory.CoID
                                    FROM
                                     inventory
-                                   WHERE CoID = @CoID";
+                                   WHERE CoID = @CoID AND Type=0 AND WarehouseID>0";
                     querycount.Append(countsql);
                     querysql.Append(sql);
                     p.Add("@CoID", IParam.CoID);
@@ -640,8 +638,8 @@ namespace CoreData.CoreCore
                         string RecordID = CommHaddle.GetRecordID(CoID);
                         var inout = new Invinout();
                         var item = new Invinoutitem();
-                        inout.CoID = inv.CoID;
-                        inout.Status = "审核通过";
+                        inout.CoID = inv.CoID.ToString();
+                        inout.Status = 1;
                         inout.CusType = CusType;
                         if (inv.StockQty > 0)
                         {
@@ -652,16 +650,16 @@ namespace CoreData.CoreCore
                             inout.Type = 1;
                         }
                         inout.RecordID = RecordID;
-                        inout.WhID = inv.WarehouseID;
-                        inout.WhName = inv.WarehouseName;
+                        inout.WhID = inv.WarehouseID.ToString();
+                        // inout.WhName = inv.WarehouseName;
                         inout.Creator = UserName;
-                        inout.CreateDate = DateTime.Now;
+                        inout.CreateDate = DateTime.Now.ToString();
                         inout.IsExport = false;
                         item.CoID = CoID;
                         item.CusType = CusType;
                         item.IoID = RecordID;
                         item.WhID = inv.WarehouseID;
-                        item.WhName = inv.WarehouseName;
+                        // item.WhName = inv.WarehouseName;
                         item.SkuID = inv.SkuID;
                         item.SkuName = inv.Name;
                         item.Qty = Convert.ToInt32(0 - inv.StockQty);
@@ -1464,15 +1462,15 @@ namespace CoreData.CoreCore
         public static Invinout AddInvinout(InvinoutAuto IOauto)
         {
             var inout = new Invinout();
-            inout.CoID = IOauto.CoID;
-            inout.Status = "审核通过";
+            inout.CoID = IOauto.CoID.ToString();
+            inout.Status = 1;
             inout.CusType = IOauto.CusType;
             inout.Type = IOauto.Type;
             inout.RecordID = IOauto.RecordID;
-            inout.WhID = IOauto.inv.WarehouseID;
+            inout.WhID = IOauto.inv.WarehouseID.ToString();
             inout.WhName = IOauto.inv.WarehouseName;
             inout.Creator = IOauto.UserName;
-            inout.CreateDate = DateTime.Now;
+            inout.CreateDate = DateTime.Now.ToString();
             inout.IsExport = false;
             return inout;
         }
@@ -1500,15 +1498,15 @@ namespace CoreData.CoreCore
             foreach (var Inv in IOauto.InvLst)
             {
                 var inout = new Invinout();
-                inout.CoID = IOauto.CoID;
-                inout.Status = "审核通过";
+                inout.CoID = IOauto.CoID.ToString();
+                inout.Status = 1;
                 inout.CusType = IOauto.CusType;
                 inout.Type = IOauto.Type;
                 inout.RecordID = IOauto.RecordID;
-                inout.WhID = IOauto.inv.WarehouseID;
+                inout.WhID = IOauto.inv.WarehouseID.ToString();
                 inout.WhName = IOauto.inv.WarehouseName;
                 inout.Creator = IOauto.UserName;
-                inout.CreateDate = DateTime.Now;
+                inout.CreateDate = DateTime.Now.ToString();
                 inout.IsExport = false;
                 inoutLst.Add(inout);
             }

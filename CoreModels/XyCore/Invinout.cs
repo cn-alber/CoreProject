@@ -8,8 +8,8 @@ namespace CoreModels.XyCore
         public string RecordID { get; set; }
         public int Type { get; set; }
         public string CusType { get; set; }
-        public string Status { get; set; }
-        public int WhID { get; set; }
+        public int Status { get; set; }
+        public string WhID { get; set; }
         public string WhName { get; set; }
         // public int LinkWhID { get; set; }
         // public string LinkWhName { get; set; }
@@ -18,8 +18,8 @@ namespace CoreModels.XyCore
         public int RecID { get; set; }
         public int InvoiceID { get; set; }
         public string Creator { get; set; }
-        public DateTime CreateDate { get; set; }
-        public int CoID { get; set; }
+        public string CreateDate { get; set; }
+        public string CoID { get; set; }
         // public bool IsUpdate { get; set; }
         public int Qty { get; set; }
     }

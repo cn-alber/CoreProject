@@ -12,7 +12,7 @@ using CoreModels;
 
 namespace CoreWebApi
 {
-    // [AllowAnonymous]
+    [AllowAnonymous]
     public class CommonController : ControllBase
     {
         [HttpGetAttribute("/Core/Common/ScoCompanySimple")]
@@ -221,7 +221,16 @@ namespace CoreWebApi
         }
         #endregion
 
-
+        #region 获取本公司子仓库测试
+        [HttpGetAttribute("/Core/Common/Warehouse/WhView")]
+        public ResponseResult WhView()
+        {
+            var res = new DataResult(1, null);
+            string CoID = GetCoid();
+            res = CommHaddle.GetWhViewAll(CoID);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
 
 
     }

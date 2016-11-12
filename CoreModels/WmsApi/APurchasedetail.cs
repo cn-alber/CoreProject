@@ -49,7 +49,7 @@ namespace CoreModels.WmsApi
         public int invType { get; set; }
         public int Type { get; set; }
         public string CusType { get; set; }
-        public string Status { get; set; }
+        public int Status { get; set; }
         Boolean _IsUpdate = true;//是否更新库存
         public Boolean IsUpdate
         {

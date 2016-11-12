@@ -911,7 +911,6 @@ namespace CoreData.CoreComm
             }           
             return result;
         }
-
         ///<summary>
         ///重新生成第三方物流服务号
         ///</summary>

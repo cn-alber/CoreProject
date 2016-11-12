@@ -16,7 +16,7 @@ namespace CoreModels.XyCore
         public decimal LockQty { get; set; }
         public decimal PickQty { get; set; }
         public decimal WaitInQty { get; set; }
-        public decimal ReturnQty { get; set; }
+        public decimal SaleReturnQty { get; set; }
         public decimal SafeQty { get; set; }
         public decimal DefectiveQty { get; set; }
         public decimal VirtualQty { get; set; }
@@ -150,6 +150,13 @@ namespace CoreModels.XyCore
         public List<Inventory> InvLst { get; set; }//返回查询结果
     }
 
+    public class Sfc_InvStock
+    {
+        public int ID { get; set; }
+        public string Skuautoid { get; set; }
+        public string StockQty { get; set; }
+
+    }
     public class InventParams
     {
         public int ID { get; set; }

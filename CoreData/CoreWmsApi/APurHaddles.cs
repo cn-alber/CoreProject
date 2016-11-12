@@ -88,7 +88,7 @@ namespace CoreData.CoreWmsApi
                             int count = CoreConn.Execute(uptpilesql,args,CoreTrans);
                         }
                         IParam.invType = 1;
-                        IParam.Status = "审核通过";
+                        IParam.Status = 1;
                         #region 采购收料
                         if (IParam.IsPur)
                         {
@@ -608,11 +608,11 @@ namespace CoreData.CoreWmsApi
             inv.Type = IParam.invType;
             inv.CusType = IParam.CusType;
             inv.Status = IParam.Status;
-            inv.WhID = IParam.PWID;
+            inv.WhID = IParam.PWID.ToString();
             inv.WhName = IParam.PWName;
             inv.Creator = IParam.Creator;
-            inv.CreateDate = DateTime.Now;
-            inv.CoID = IParam.CoID;
+            inv.CreateDate = DateTime.Now.ToString();
+            inv.CoID = IParam.CoID.ToString();
             inv.RecID = IParam.PurRecID;
             return inv;
         }
