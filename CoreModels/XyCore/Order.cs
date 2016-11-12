@@ -276,6 +276,8 @@ namespace CoreModels.XyCore
         public string ShopSit{get;set;}
         public long SoID{get;set;}
         public long MergeSoID{get;set;}
+        public string CurrencyType{get;set;}
+        public decimal ExchangeRate{get;set;}
         public int OrdQty{get;set;}
         public string Amount{get;set;}
         public string SkuAmount{get;set;}
@@ -295,6 +297,7 @@ namespace CoreModels.XyCore
         public string StatusDec{get;set;}
         public string ShopStatus{get;set;}
         public string RecName{get;set;}
+        public string RecCountry{get;set;}
         public string RecLogistics{get;set;}
         public string RecCity{get;set;}
         public string RecDistrict{get;set;}
@@ -494,5 +497,85 @@ namespace CoreModels.XyCore
         public int Skuid{get;set;}
         public int Qty{get;set;}
         public int QtyNew{get;set;}
+        public decimal Price{get;set;}
+        public decimal Weight{get;set;}
+    }
+    public class OrdInitData
+    {
+        public List<OStatus> OrdStatus{get;set;}//订单状态
+        public List<OStatus> OrdAbnormalStatus{get;set;}//异常状态
+        public List<Filter> BuyerRemark{get;set;} //买家留言
+        public List<Filter> SellerRemark{get;set;}//卖家备注
+        public List<AbnormalReason> OSource {get;set;}//订单来源
+        public List<AbnormalReason> OType {get;set;} //订单类型
+        public List<Filter> LoanType{get;set;}//贷款类型
+        public List<Filter> IsPaid{get;set;}//是否付款
+        public List<shopEnum> Shop {get;set;}//店铺
+        public List<AbnormalReason> Distributor {get;set;}//分销商
+        public List<AbnormalReason> Express {get;set;}//快递
+        public List<AbnormalReason> Others {get;set;}//其他
+        public int Datacnt {get;set;}//总资料笔数
+        public decimal Pagecnt{get;set;}//总页数
+        public List<OrderQuery> Ord {get;set;}//订单资料List
+    }
+    public class OStatus
+    {
+        public int Value{get;set;}
+        public string Label{get;set;}
+        public int Count{get;set;}
+    }
+    public class Filter
+    {
+        public string Value{get;set;}
+        public string Label{get;set;}
+    }
+    public class OrderQuery
+    {
+        public int ID {get;set;}
+        public int Type{get;set;}
+        public int DealerType{get;set;}
+        public bool IsMerge{get;set;}
+        public bool IsSplit{get;set;}
+        public long SoID{get;set;}
+        public string ODate{get;set;}
+        public string PayDate{get;set;}
+        public string BuyerShopID{get;set;}
+        public string ShopName{get;set;}
+        public string Amount{get;set;}
+        public string PaidAmount{get;set;}
+        public string ExAmount{get;set;}
+        public bool IsCOD{get;set;}
+        public int Status{get;set;}
+        public int AbnormalStatus{get;set;}
+        public string StatusDec{get;set;}
+        public string RecMessage{get;set;}
+        public string SendMessage{get;set;}
+        public string Express{get;set;}
+        public string RecLogistics{get;set;}
+        public string RecCity{get;set;}
+        public string RecDistrict{get;set;}
+        public string RecAddress{get;set;}
+        public string RecName{get;set;}
+        public string ExWeight{get;set;}
+        public string Distributor{get;set;}
+        public string SupDistributor{get;set;}
+        public string InvoiceTitle{get;set;}
+        public string PlanDate{get;set;}
+        public string SendWarehouse{get;set;}
+        public string SendDate{get;set;}
+        public string ExCode{get;set;}
+        public List<long> SoIDList{get;set;}
+        public List<SkuList> SkuList{get;set;}
+    }
+    public class SkuList
+    {
+        public int SkuAutoID{get;set;}
+        public string Img{get;set;}
+        public int Qty{get;set;}
+        public string GoodsCode{get;set;}
+        public string SkuID{get;set;}
+        public string SkuName{get;set;}
+        public string Norm{get;set;}
+        public string RealPrice{get;set;}
     }
 }
