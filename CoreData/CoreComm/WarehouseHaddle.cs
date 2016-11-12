@@ -1418,25 +1418,7 @@ namespace CoreData.CoreComm
     }
 
 
-    ///<summary>
-    /// 指定店铺
-    ///</summary>
-    public static List<shopEnum> getShopEnum(string CoID){
-        var res = new List<shopEnum>();
-        using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
-            try
-            {
-                string sql = @"SELECT ID as value ,ShopName as label FROM shop WHERE CoID in(0,"+CoID+");";
-                res = conn.Query<shopEnum>(sql).AsList();                                  
-            }
-            catch
-            {
-                conn.Dispose();
-            }
-        }
-
-        return res;
-    }
+    
 
     public static DataResult getPloySetting(string CoID){
         var result = new DataResult(1,null);
@@ -1450,7 +1432,7 @@ namespace CoreData.CoreComm
                     province = getAreaAll();
                 }); 
                 tasks[1] =  Task.Factory.StartNew(()=>{
-                    shop = getShopEnum(CoID);
+                    shop = ShopHaddle.getShopEnum(CoID);
                 });
                 
                 Task.WaitAll(tasks);
@@ -1479,7 +1461,7 @@ namespace CoreData.CoreComm
                 province = getAreaAll();
             }); 
             tasks[1] =  Task.Factory.StartNew(()=>{
-                shop = getShopEnum(CoID);
+                shop = ShopHaddle.getShopEnum(CoID);
             });
               
             Task.WaitAll(tasks);
