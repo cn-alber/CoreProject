@@ -28,6 +28,7 @@ namespace CoreModels.XyCore
         public DateTime _dateStart = DateTime.Parse("1900-01-01");//日期起
         public DateTime _dateEnd = DateTime.Parse("2999-12-31");//日期迄
         public string _Skuid = null;//商品编码
+        public string _GoodsCode = null;//款式编码 add 2016-11-12
         public int _ordqtystart = 0;//数量起
         public int _ordqtyend = 0;//数量迄
         public decimal _ordamtstart = 0;//金额起
@@ -38,11 +39,14 @@ namespace CoreModels.XyCore
         public int _osource = -1;//订单来源
         public List<int> _type = null;//订单类型
         public string _IsCOD = "A";//是否货到付款
+        public string _IsPaid = "A";//是否付款 add 2016-11-12
+        public bool _IsShopSelectAll = false;//店铺是否全部选中 add 2016-11-12     
         public List<int> _ShopID= null;//店铺
         public bool _IsDisSelectAll = false;//分销商是否全部选中
         public List<string> _Distributor=null;//分销商
         public List<int> _ExID = null;//快递公司
         public List<string> _SendWarehouse = null;//仓库
+        public List<int> _Others = null;//其他 add 2016-11-12
         public string _SortField;//排序栏位
         public string _SortDirection;//排序方式
         public int _NumPerPage = 20;//每页显示资料笔数
@@ -162,6 +166,11 @@ namespace CoreModels.XyCore
             get { return _Skuid; }
             set { this._Skuid = value;}
         }
+        public string GoodsCode
+        {
+            get { return _GoodsCode; }
+            set { this._GoodsCode = value;}
+        }
         public int Ordqtystart
         {
             get { return _ordqtystart; }
@@ -212,6 +221,16 @@ namespace CoreModels.XyCore
             get { return _IsCOD; }
             set { this._IsCOD = value;}
         }
+        public string IsPaid
+        {
+            get { return _IsPaid; }
+            set { this._IsPaid = value;}
+        }
+        public bool IsShopSelectAll
+        {
+            get { return _IsShopSelectAll; }
+            set { this._IsShopSelectAll = value;}
+        }
         public List<int> ShopID
         {
             get { return _ShopID; }
@@ -236,6 +255,11 @@ namespace CoreModels.XyCore
         {
             get { return _SendWarehouse; }
             set { this._SendWarehouse = value;}
+        }
+        public List<int> Others
+        {   
+            get { return _Others; }
+            set { this._Others = value;}
         }
         public string SortField
         {
@@ -326,7 +350,7 @@ namespace CoreModels.XyCore
     {
         public int Datacnt {get;set;}//总资料笔数
         public decimal Pagecnt{get;set;}//总页数
-        public List<Order> Ord {get;set;}//订单资料List
+        public List<OrderQuery> Ord {get;set;}//订单资料List
     }
     public class RecInfo
     {
@@ -514,9 +538,6 @@ namespace CoreModels.XyCore
         public List<AbnormalReason> Distributor {get;set;}//分销商
         public List<AbnormalReason> Express {get;set;}//快递
         public List<AbnormalReason> Others {get;set;}//其他
-        public int Datacnt {get;set;}//总资料笔数
-        public decimal Pagecnt{get;set;}//总页数
-        public List<OrderQuery> Ord {get;set;}//订单资料List
     }
     public class OStatus
     {
@@ -577,5 +598,15 @@ namespace CoreModels.XyCore
         public string SkuName{get;set;}
         public string Norm{get;set;}
         public string RealPrice{get;set;}
+    }
+    public class StatusCount
+    {
+        public List<OStatusCnt> OrdStatus{get;set;}
+        public List<OStatusCnt> OrdAbnormalStatus{get;set;}
+    }
+    public class OStatusCnt
+    {
+        public int Value{get;set;}
+        public int Count{get;set;}
     }
 }

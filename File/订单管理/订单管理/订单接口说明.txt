@@ -212,7 +212,7 @@ output: s=1成功 else 错误代码
 
 20.GetInitData()初始资料显示
 路由:http://localhost:5000/Core/Order/GetInitData
-input:NumPerPage    string   每页显示资料笔数
+input:  None
 output: OrdStatus             订单状态
         OrdAbnormalStatus     异常状态
         BuyerRemark           买家留言
@@ -225,7 +225,11 @@ output: OrdStatus             订单状态
         Distributor           分销商
         Express               快递
         Others                其他
-        Datacnt               总资料笔数
-        Pagecnt               总页数
-        Ord                   订单资料List
 参考:output jason 文件:GetInitData_output.json
+
+21.GetStatusCount()计数更新
+路由:http://localhost:5000/Core/Order/GetStatusCount
+input:  None
+output: OrdStatus             订单状态计数
+        OrdAbnormalStatus     异常状态计数
+参考:output jason 文件:GetStatusCount_output.json

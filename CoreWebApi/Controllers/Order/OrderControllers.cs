@@ -17,9 +17,9 @@ namespace CoreWebApi
         public ResponseResult OrderList(string ID,string SoID,string PayNbr,string BuyerShopID,string ExCode,string RecName,string RecPhone,string RecTel,
                                         string RecLogistics,string RecCity,string RecDistrict,string RecAddress,string StatusList,string AbnormalStatusList,
                                         string IsRecMsgYN,string RecMessage,string IsSendMsgYN,string SendMessage,string Datetype,string DateStart,string Dateend,
-                                        string Skuid,string Ordqtystart,string Ordqtyend,string Ordamtstart,string Ordamtend,string Skuname,string Norm,
-                                        string ShopStatus,string Osource,string Type,string IsCOD,string ShopID,string IsDisSelectAll,string Distributor,
-                                        string ExID,string SendWarehouse,string SortField,string SortDirection,string PageIndex,string NumPerPage)
+                                        string Skuid,string GoodsCode,string Ordqtystart,string Ordqtyend,string Ordamtstart,string Ordamtend,string Skuname,string Norm,
+                                        string ShopStatus,string Osource,string Type,string IsCOD,string IsPaid,string IsShopSelectAll,string ShopID,string IsDisSelectAll,string Distributor,
+                                        string ExID,string SendWarehouse,string Others,string SortField,string SortDirection,string PageIndex,string NumPerPage)
         {   
             int x;
             var cp = new OrderParm();
@@ -97,6 +97,7 @@ namespace CoreWebApi
                 cp.DateEnd = DateTime.Parse(Dateend);
             }
             cp.Skuid = Skuid;
+            cp.GoodsCode = GoodsCode;
             if(!string.IsNullOrEmpty(Ordqtystart))
             {
                 if (int.TryParse(Ordqtystart, out x))
@@ -158,6 +159,20 @@ namespace CoreWebApi
                     cp.IsCOD = IsCOD;
                 }
             }
+            if(!string.IsNullOrEmpty(IsPaid))
+            {
+                if(IsPaid.ToUpper() == "Y" || IsPaid.ToUpper() == "N")
+                {
+                    cp.IsPaid = IsPaid;
+                }
+            }
+            if(!string.IsNullOrEmpty(IsShopSelectAll))
+            {
+                if(IsShopSelectAll.ToUpper() == "TRUE")
+                {
+                    cp.IsShopSelectAll = true;
+                }
+            }
             if(!string.IsNullOrEmpty(ShopID))
             {
                 string[] a = ShopID.Split(',');
@@ -195,6 +210,14 @@ namespace CoreWebApi
                 foreach(var i in a)
                 {
                     cp.SendWarehouse.Add(i);
+                }
+            }
+            if(!string.IsNullOrEmpty(Others))
+            {
+                string[] a = Others.Split(',');
+                foreach(var i in a)
+                {
+                    cp.Others.Add(int.Parse(i));
                 }
             }
             if(!string.IsNullOrEmpty(SortField))
@@ -520,15 +543,18 @@ namespace CoreWebApi
         }
 
         [HttpGetAttribute("/Core/Order/GetInitData")]
-        public ResponseResult GetInitData(string NumPerPage)
+        public ResponseResult GetInitData()
         {   
             int CoID = int.Parse(GetCoid());
-            int x,numPerPage=20;
-            if (int.TryParse(NumPerPage, out x))
-            {
-                numPerPage = int.Parse(NumPerPage);
-            }
-            var data = OrderHaddle.GetInitData(CoID,numPerPage);
+            var data = OrderHaddle.GetInitData(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Order/GetStatusCount")]
+        public ResponseResult GetStatusCount()
+        {   
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.GetStatusCount(CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     }

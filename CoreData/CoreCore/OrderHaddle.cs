@@ -129,6 +129,10 @@ namespace CoreData.CoreCore
             {
                wheresql = wheresql + " and exists(select id from orditem where oid = order.id and skuid = '" + cp.Skuid + "')";
             }
+            if(!string.IsNullOrEmpty(cp.GoodsCode))
+            {
+               wheresql = wheresql + " and exists(select id from orditem where oid = order.id and GoodsCode = '" + cp.Skuid + "')";
+            }
             if(cp.Ordqtystart > 0)
             {
                 wheresql = wheresql + " AND ordqty >= " +  cp.Ordqtystart + " and status in (0,1,2,7)";
@@ -179,7 +183,15 @@ namespace CoreData.CoreCore
             {
                 wheresql = wheresql + " AND iscod = false" ;
             }
-            if (cp.ShopID != null)
+            if(cp.IsPaid.ToUpper() == "Y")
+            {
+                wheresql = wheresql + " AND IsPaid = true" ;
+            }
+            if(cp.IsPaid.ToUpper() == "N")
+            {
+                wheresql = wheresql + " AND IsPaid = false" ;
+            }
+            if (cp.IsShopSelectAll == false &&　cp.ShopID != null)
             {
                 wheresql = wheresql + " AND shopid in ("+ string.Join(",", cp.ShopID) + ")" ;
             }
@@ -214,6 +226,29 @@ namespace CoreData.CoreCore
                 sendwarehouse = sendwarehouse.Substring(0,sendwarehouse.Length - 1);
                 wheresql = wheresql + " AND sendwarehouse in (" +  sendwarehouse + ")";
             }
+            if(cp.Others != null)
+            {
+                if(cp.Others.Contains(4))
+                {
+                    wheresql = wheresql + " and IsInvoice = true";
+                }
+                if(cp.Others.Contains(0) == true &&　cp.Others.Contains(0) == false)
+                {
+                    wheresql = wheresql + " and IsMerge = true";
+                }
+                if(cp.Others.Contains(0) == false &&　cp.Others.Contains(0) == true)
+                {
+                    wheresql = wheresql + " and IsMerge = false";
+                }
+                if(cp.Others.Contains(1) == true &&　cp.Others.Contains(3) == false)
+                {
+                    wheresql = wheresql + " and IsSplit = true";
+                }
+                if(cp.Others.Contains(1) == false &&　cp.Others.Contains(3) == true)
+                {
+                    wheresql = wheresql + " and IsSplit = false";
+                }
+            }
             if(!string.IsNullOrEmpty(cp.SortField) && !string.IsNullOrEmpty(cp.SortDirection))//排序
             {
                 wheresql = wheresql + " ORDER BY "+cp.SortField +" "+ cp.SortDirection;
@@ -225,10 +260,29 @@ namespace CoreData.CoreCore
                     decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
                     int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
-                    var u = conn.Query<Order>(sqlcommand + wheresql).AsList();
+                    var u = conn.Query<OrderQuery>(sqlcommand + wheresql).AsList();
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;
                     res.Ord = u;
+                    //订单资料
+                    foreach(var a in res.Ord)
+                    {
+                        if(a.IsMerge == true)
+                        {
+                            var soid = new List<long>();
+                            soid.Add(a.SoID);
+                            sqlcommand = "select soid from `ord` where coid = " + cp.CoID + " and MergeOID = " + a.ID;
+                            var y = conn.Query<Order>(sqlcommand).AsList();
+                            foreach(var b in y)
+                            {
+                                soid.Add(b.SoID);
+                            }
+                            a.SoIDList = soid;
+                        }
+                        sqlcommand = "select SkuAutoID,Img,Qty,GoodsCode,SkuID,SkuName,Norm,RealPrice from orderitem where oid = " + a.ID + " and coid =" + cp.CoID;
+                        var item = conn.Query<SkuList>(sqlcommand).AsList();
+                        a.SkuList = item;
+                    }
                     result.d = res;             
                 }catch(Exception ex){
                     result.s = -1;
@@ -453,8 +507,8 @@ namespace CoreData.CoreCore
                 log.Type = 0;
                 log.LogDate = DateTime.Now;
                 log.UserName = UserName;
-                log.Title = "新增订单";
-                log.Remark = "新增订单";
+                log.Title = "接单时间";
+                log.Remark = "手工下单时间";
                 log.CoID = CoID;
                 string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
                                                    VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
@@ -1143,8 +1197,8 @@ namespace CoreData.CoreCore
                         rt.Add(rf);
                         continue;
                     }
-                    string sqlCommandText = @"INSERT INTO orderitem(oid,soid,coid,skuautoid,skuid,skuname,norm,qty,saleprice,realprice,amount,img,weight,totalweight,creator,modifier) 
-                                            VALUES(@OID,@Soid,@Coid,@Skuautoid,@Skuid,@Skuname,@Norm,@Qty,@Saleprice,@Saleprice,@Saleprice,@Img,@Weight,@Weight,@Creator,@Creator)";
+                    string sqlCommandText = @"INSERT INTO orderitem(oid,soid,coid,skuautoid,skuid,skuname,norm,GoodsCode,qty,saleprice,realprice,amount,img,weight,totalweight,creator,modifier) 
+                                            VALUES(@OID,@Soid,@Coid,@Skuautoid,@Skuid,@Skuname,@Norm,@GoodsCode,@Qty,@Saleprice,@Saleprice,@Saleprice,@Img,@Weight,@Weight,@Creator,@Creator)";
                     var args = new
                     {
                         OID = id,
@@ -1153,6 +1207,7 @@ namespace CoreData.CoreCore
                         Skuid = s[0].skuid,
                         Skuname = s[0].skuname,
                         Norm = s[0].norm,
+                        GoodsCode = s[0].goodscode,
                         Qty = 1,
                         Saleprice = s[0].saleprice,
                         Img = s[0].img,
@@ -3197,7 +3252,7 @@ namespace CoreData.CoreCore
         ///<summary>
         ///初始资料
         ///</summary>
-        public static DataResult GetInitData(int CoID,int NumPerPage)
+        public static DataResult GetInitData(int CoID)                
         {
             var result = new DataResult(1,null);
             var res = new OrdInitData();
@@ -3242,35 +3297,7 @@ namespace CoreData.CoreCore
                     string sqlcommand = "select ID,DistributorName as Name from distributor where coid =" + CoID + " and enable = true";
                     var Distributor = conn.Query<AbnormalReason>(sqlcommand).AsList();
                     res.Distributor = Distributor;
-                    //订单资料
-                    sqlcommand = @"select count(id)  from `order` where coid =" + CoID + " and status in (0,1,2,3,7)";
-                    int count = conn.QueryFirst<int>(sqlcommand);
-                    decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(NumPerPage.ToString()));
-                    sqlcommand = @"select ID,Type,DealerType,IsMerge,IsSplit,SoID,ODate,PayDate,BuyerShopID,ShopName,Amount,PaidAmount,ExAmount,IsCOD,Status,AbnormalStatus,
-                                   StatusDec,RecMessage,SendMessage,Express,RecLogistics,RecCity,RecDistrict,RecAddress,RecName,ExWeight,Distributor,SupDistributor,InvoiceTitle,
-                                   PlanDate,SendWarehouse,SendDate,ExCode  from `order` where coid =" + CoID + " and status in (0,1,2,3,7) order by ID Desc limit 0," + NumPerPage.ToString();
-                    var u = conn.Query<OrderQuery>(sqlcommand).AsList();
-                    res.Datacnt = count;
-                    res.Pagecnt = pagecnt;
-                    res.Ord = u;
-                    foreach(var a in res.Ord)
-                    {
-                        if(a.IsMerge == true)
-                        {
-                            var soid = new List<long>();
-                            soid.Add(a.SoID);
-                            sqlcommand = "select soid from `ord` where coid = " + CoID + " and MergeOID = " + a.ID;
-                            var y = conn.Query<Order>(sqlcommand).AsList();
-                            foreach(var b in y)
-                            {
-                                soid.Add(b.SoID);
-                            }
-                            a.SoIDList = soid;
-                        }
-                        sqlcommand = "select SkuAutoID,Img,Qty,GoodsCode,SkuID,SkuName,Norm,RealPrice from orderitem where oid = " + a.ID + " and coid =" + CoID;
-                        var item = conn.Query<SkuList>(sqlcommand).AsList();
-                        a.SkuList = item;
-                    }
+                    
                     }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
@@ -3475,26 +3502,82 @@ namespace CoreData.CoreCore
         public static DataResult GetStatusCount(int CoID)
         {
             var result = new DataResult(1,null);
-
-
-
-
-
-
+            var res = new StatusCount();
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{  
+                    //订单状态设定
+                    var ss = new List<OStatusCnt>();
+                    foreach (int  myCode in Enum.GetValues(typeof(OrdStatus)))
+                    {
+                        if(myCode == 0 ||myCode == 1 ||myCode == 2 ||myCode == 7)
+                        {
+                            var s = new OStatusCnt();
+                            s.Value = myCode;
+                            int i = conn.QueryFirst<int>("select count(id) from `order` where status = " + myCode + " and coid =" + CoID);
+                            s.Count = i;
+                            ss.Add(s);
+                        }
+                    }
+                    res.OrdStatus = ss;
+                    //订单异常状态设定
+                    var re = GetAbnormalList(CoID);
+                    if(re.s == -1)
+                    {
+                        result.s = -1;
+                        result.d = re.d;
+                        return result;
+                    }
+                    var ab = re.d as List<AbnormalReason>;
+                    ss = new List<OStatusCnt>();
+                    foreach(var a in ab)
+                    {
+                        var s = new OStatusCnt();
+                        s.Value= a.ID;
+                        int i = conn.QueryFirst<int>("select count(id) from `order` where status = 7 and coid =" + CoID + " and AbnormalStatus =" + a.ID);
+                        s.Count = i;
+                        ss.Add(s);
+                    }
+                    res.OrdAbnormalStatus = ss;
+                    result.d = res;
+                    }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }    
             return result;
         }
         ///<summary>
         ///修改商品
         ///</summary>
-        public static DataResult ModifySku()
+        public static DataResult ModifySku(List<int> oid,string ModifySku,decimal ModifyPrice,string DeleteSku,string AddSku,decimal AddPrice,
+                                            decimal AddQty,string AddType,int CoID,string UserName)
         {
             var result = new DataResult(1,null);
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                foreach(var i in oid)
+                {
 
+                }
 
-
-
-
-
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
             return result;
         }
 
