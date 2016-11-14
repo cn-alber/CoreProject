@@ -139,11 +139,11 @@ namespace CoreData.CoreCore
             }
             if(!string.IsNullOrEmpty(cp.Skuid))
             {
-               wheresql = wheresql + " and exists(select id from orditem where oid = order.id and skuid = '" + cp.Skuid + "')";
+               wheresql = wheresql + " and exists(select id from orderitem where oid = order.id and skuid = '" + cp.Skuid + "')";
             }
             if(!string.IsNullOrEmpty(cp.GoodsCode))
             {
-               wheresql = wheresql + " and exists(select id from orditem where oid = order.id and GoodsCode = '" + cp.Skuid + "')";
+               wheresql = wheresql + " and exists(select id from orderitem where oid = order.id and GoodsCode = '" + cp.Skuid + "')";
             }
             if(cp.Ordqtystart > 0)
             {
@@ -163,11 +163,11 @@ namespace CoreData.CoreCore
             }
             if(!string.IsNullOrEmpty(cp.Skuname))
             {
-               wheresql = wheresql + " and exists(select id from orditem where oid = order.id and skuname like '%" + cp.Skuname + "%') and status in (0,1,2,7)";
+               wheresql = wheresql + " and exists(select id from orderitem where oid = order.id and skuname like '%" + cp.Skuname + "%') and status in (0,1,2,7)";
             }
             if(!string.IsNullOrEmpty(cp.Norm))
             {
-               wheresql = wheresql + " and exists(select id from orditem where oid = order.id and norm like '%" + cp.Norm + "%') and status in (0,1,2,7)";
+               wheresql = wheresql + " and exists(select id from orderitem where oid = order.id and norm like '%" + cp.Norm + "%') and status in (0,1,2,7)";
             }
             if(cp.ShopStatus != null)
             {
@@ -3315,7 +3315,27 @@ namespace CoreData.CoreCore
                     result.d = ex.Message;
                     conn.Dispose();
                 }
-            }    
+            }   
+            //仓库资料
+            List<string> wh = new List<string>();
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{  
+                    string sqlcommand = "select WarehouseName from Warehouse where coid =" + CoID + " and enable = true and type = 0";
+                    string name = conn.QueryFirst<string>(sqlcommand);
+                    wh.Add(name);
+                    }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }  
+            //分仓
+            var w = CoreComm.WarehouseHaddle.getWarelist(CoID.ToString());
+            foreach(var h in w)
+            {
+                wh.Add(h.warename);
+            }
+            res.Warehouse = wh ;
             //买家留言条件设定
             var ff = new List<Filter>();
             var f = new Filter();

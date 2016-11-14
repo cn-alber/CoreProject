@@ -537,6 +537,7 @@ namespace CoreModels.XyCore
         public List<shopEnum> Shop {get;set;}//店铺
         public List<AbnormalReason> Distributor {get;set;}//分销商
         public List<AbnormalReason> Express {get;set;}//快递
+        public List<string> Warehouse{get;set;}//仓库
         public List<AbnormalReason> Others {get;set;}//其他
     }
     public class OStatus

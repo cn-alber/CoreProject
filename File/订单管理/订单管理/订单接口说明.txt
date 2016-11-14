@@ -228,6 +228,7 @@ output: OrdStatus             订单状态
         Shop                  店铺
         Distributor           分销商
         Express               快递
+        Warehouse             仓库
         Others                其他
 参考:output jason 文件:GetInitData_output.json
 
