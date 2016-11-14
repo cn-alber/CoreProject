@@ -11,7 +11,7 @@ namespace CoreModels.XyCore
         public int Status { get; set; }
         public string WhID { get; set; }
         public string WhName { get; set; }
-        // public int LinkWhID { get; set; }
+        public string LinkWhID { get; set; }
         // public string LinkWhName { get; set; }
         // public string LinkIoID { get; set; }
         public bool IsExport { get; set; }
@@ -33,7 +33,7 @@ namespace CoreModels.XyCore
 
     public class InvinoutAuto
     {
-        public int CoID { get; set; }
+        public string CoID { get; set; }
         public decimal Qty { get; set; }
         public string UserName { get; set; }
         public string CusType { get; set; }

@@ -237,7 +237,7 @@ namespace CoreWebApi.XyCore
             {
                 SetQty = int.Parse(obj["SetQty"].ToString());
             }
-            int CoID = int.Parse(GetCoid());
+            string CoID = GetCoid();
             string UserName = GetUname();
             if (ID > 0)
             {
@@ -309,7 +309,7 @@ namespace CoreWebApi.XyCore
             }
             else
             {
-                int CoID = int.Parse(GetCoid());
+                string CoID = GetCoid();
                 string UserName = GetUname();
                 res = InventoryHaddle.ClearSku(IDLst, CoID, UserName);
             }

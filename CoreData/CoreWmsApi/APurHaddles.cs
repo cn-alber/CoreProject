@@ -57,12 +57,12 @@ namespace CoreData.CoreWmsApi
             IParam.WmsboxLst = BoxLst;
             IParam.BarCodeLst = PieceLst;
             if (IParam.BarCodeLst.Count > 0)
-                IParam.WmsboxLst.AddRange(ContactBox(IParam.BarCodeLst,IParam.Skuautoid,IParam.CoID));//组合箱码&件码
+                IParam.WmsboxLst.AddRange(ContactBox(IParam.BarCodeLst,IParam.Skuautoid,int.Parse(IParam.CoID)));//组合箱码&件码
             IParam.RecQty = IParam.WmsboxLst.Count();
             res = GetBoxByCode(IParam);//获取WmsPile 1.新增 2.修改
             if (res.s == 1)
             {
-                string RecordID = "RE" + CommHaddle.GetRecordID(IParam.CoID);
+                string RecordID = "RE" + CommHaddle.GetRecordID(int.Parse(IParam.CoID));
                 IParam.RecordID = RecordID;
                 var CoreConn = new MySqlConnection(DbBase.CoreConnectString);
                 var MsgConn = new MySqlConnection(DbBase.MsgConnectString);
@@ -572,7 +572,7 @@ namespace CoreData.CoreWmsApi
             rec.scoid = IParam.Apur.scoid;
             rec.sconame = IParam.Apur.sconame;
             rec.purchaseid = IParam.Apur.id;
-            rec.coid = IParam.CoID;
+            rec.coid = int.Parse(IParam.CoID);
             rec.creator = IParam.Creator;
             rec.createdate = DateTime.Now;
             rec.warehouseid = IParam.WarehouseID;
@@ -594,7 +594,7 @@ namespace CoreData.CoreWmsApi
             rec.goodscode = IParam.ApurDetail.goodscode;
             rec.creator = IParam.Creator;
             rec.createdate = DateTime.Now;
-            rec.coid = IParam.CoID;
+            rec.coid =  int.Parse(IParam.CoID);
             return rec;
         }
         #endregion
@@ -622,14 +622,14 @@ namespace CoreData.CoreWmsApi
             var inv = new Invinoutitem();
             inv.IoID = IParam.RecordID;
             inv.SkuID = IParam.ApurDetail.skuid;
-            inv.Skuautoid = IParam.ApurDetail.skuautoid;
+            inv.Skuautoid = IParam.ApurDetail.skuautoid.ToString();
             inv.Norm = IParam.ApurDetail.norm;
             inv.Qty = IParam.RecQty;
             inv.Creator = IParam.Creator;
-            inv.CreateDate = DateTime.Now;
+            inv.CreateDate = DateTime.Now.ToString();
             inv.CoID = IParam.CoID;
             inv.CusType = IParam.CusType;
-            inv.WhID = IParam.WarehouseID;
+            inv.WhID = IParam.WarehouseID.ToString();
             inv.WhName = IParam.WarehouseName;
             return inv;
         }
@@ -672,13 +672,13 @@ namespace CoreData.CoreWmsApi
             if (count <= 0)
             {
                 var inv = new Inventory();
-                inv.CoID = IParam.CoID;
-                inv.Skuautoid = IParam.ApurDetail.skuautoid;
+                inv.CoID =  IParam.CoID;
+                inv.Skuautoid = IParam.ApurDetail.skuautoid.ToString();
                 inv.SkuID = IParam.ApurDetail.skuid;
                 inv.Name = IParam.ApurDetail.skuname;
                 inv.Norm = IParam.ApurDetail.norm;
                 inv.GoodsCode = IParam.ApurDetail.goodscode;
-                inv.WarehouseID = IParam.WarehouseID;
+                inv.WarehouseID = IParam.WarehouseID.ToString();
                 inv.WarehouseName = IParam.WarehouseName;
                 InvLst.Add(inv);
             }

@@ -418,7 +418,7 @@ namespace CoreData.CoreCore
         #endregion
 
         #region 商品库存查询 - 修改现有库存-产生盘点交易
-        public static DataResult SetStockQtySingle(int ID, decimal SetQty, int CoID, string UserName)
+        public static DataResult SetStockQtySingle(int ID, decimal SetQty, string CoID, string UserName)
         {
             var res = new DataResult(1, null);
             var inoutAuto = new InvinoutAuto();
@@ -452,7 +452,7 @@ namespace CoreData.CoreCore
                             inoutAuto.CusType = "盘亏";
                             inoutAuto.Type = 2;
                         }
-                        inoutAuto.RecordID = CommHaddle.GetRecordID(CoID);
+                        inoutAuto.RecordID = CommHaddle.GetRecordID(int.Parse(CoID));
                         int count1 = conn.Execute(AddInvinoutSql(), AddInvinout(inoutAuto), TransCore);
                         int count2 = conn.Execute(AddInvinoutitemSql(), AddInvinoutitem(inoutAuto), TransCore);
                         string sql = @"UPDATE inventory SET StockQty = @StockQty WHERE ID=@ID ";
@@ -464,7 +464,7 @@ namespace CoreData.CoreCore
                         else
                         {
                             TransCore.Commit();
-                            CoreUser.LogComm.InsertUserLog("新增交易", "invinout", inoutAuto.CusType + inoutAuto.inv.SkuID + " " + inoutAuto.Qty.ToString(), UserName, CoID, DateTime.Now);
+                            CoreUser.LogComm.InsertUserLog("新增交易", "invinout", inoutAuto.CusType + inoutAuto.inv.SkuID + " " + inoutAuto.Qty.ToString(), UserName, int.Parse(CoID), DateTime.Now);
                         }
                     }
 
@@ -613,7 +613,7 @@ namespace CoreData.CoreCore
         #endregion
 
         #region 商品库存查询 - 库存清零
-        public static DataResult ClearSku(List<int> IDLst, int CoID, string UserName)
+        public static DataResult ClearSku(List<int> IDLst, string CoID, string UserName)
         {
             var res = new DataResult(1, null);
             var InvLst = DbBase.CoreDB.Query<Inventory>("SELECT * FROM inventory WHERE ID IN @IDLst", new { IDLst = IDLst }).AsList();
@@ -635,7 +635,7 @@ namespace CoreData.CoreCore
                 {
                     foreach (var inv in InvLst)
                     {
-                        string RecordID = CommHaddle.GetRecordID(CoID);
+                        string RecordID = CommHaddle.GetRecordID(int.Parse(CoID));
                         var inout = new Invinout();
                         var item = new Invinoutitem();
                         inout.CoID = inv.CoID.ToString();
@@ -658,14 +658,14 @@ namespace CoreData.CoreCore
                         item.CoID = CoID;
                         item.CusType = CusType;
                         item.IoID = RecordID;
-                        item.WhID = inv.WarehouseID;
+                        item.WhID = inv.WarehouseID.ToString();
                         // item.WhName = inv.WarehouseName;
                         item.SkuID = inv.SkuID;
                         item.SkuName = inv.Name;
                         item.Qty = Convert.ToInt32(0 - inv.StockQty);
                         item.Unit = "件";
                         item.Creator = UserName;
-                        item.CreateDate = DateTime.Now;
+                        item.CreateDate = DateTime.Now.ToString();
                         InoutLst.Add(inout);
                         ItemLst.Add(item);
                         RecIDLst.Add(RecordID);
@@ -682,7 +682,7 @@ namespace CoreData.CoreCore
                     else
                     {
                         TransCore.Commit();
-                        CoreUser.LogComm.InsertUserLog("新增库存清零交易", "invinout", "单据编号:" + string.Join(",", RecIDLst.ToArray()), UserName, CoID, DateTime.Now);
+                        CoreUser.LogComm.InsertUserLog("新增库存清零交易", "invinout", "单据编号:" + string.Join(",", RecIDLst.ToArray()), UserName, int.Parse(CoID), DateTime.Now);
                     }
                 }
                 catch (Exception e)
@@ -1481,14 +1481,14 @@ namespace CoreData.CoreCore
             item.CoID = IOauto.CoID;
             item.CusType = IOauto.CusType;
             item.IoID = IOauto.RecordID;
-            item.WhID = IOauto.inv.WarehouseID;
+            item.WhID = IOauto.inv.WarehouseID.ToString();
             item.WhName = IOauto.inv.WarehouseName;
             item.SkuID = IOauto.inv.SkuID;
             item.SkuName = IOauto.inv.Name;
             item.Qty = Convert.ToInt32(IOauto.Qty);
             item.Unit = "件";
             item.Creator = IOauto.UserName;
-            item.CreateDate = DateTime.Now;
+            item.CreateDate = DateTime.Now.ToString();
             return item;
         }
 
@@ -1521,14 +1521,14 @@ namespace CoreData.CoreCore
                 item.CoID = IOauto.CoID;
                 item.CusType = IOauto.CusType;
                 item.IoID = IOauto.RecordID;
-                item.WhID = IOauto.inv.WarehouseID;
+                item.WhID = IOauto.inv.WarehouseID.ToString();
                 item.WhName = IOauto.inv.WarehouseName;
                 item.SkuID = IOauto.inv.SkuID;
                 item.SkuName = IOauto.inv.Name;
                 item.Qty = Convert.ToInt32(0 - IOauto.inv.StockQty);
                 item.Unit = "件";
                 item.Creator = IOauto.UserName;
-                item.CreateDate = DateTime.Now;
+                item.CreateDate = DateTime.Now.ToString();
                 ItemLst.Add(item);
             }
             return ItemLst;

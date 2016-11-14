@@ -36,7 +36,7 @@ namespace CoreModels.WmsApi
 
     public class APurParams
     {
-        public int CoID { get; set; }
+        public string CoID { get; set; }
         public string Creator { get; set; }
         public int WarehouseID { get; set; }
         public string WarehouseName { get; set; }

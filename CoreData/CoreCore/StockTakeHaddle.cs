@@ -169,7 +169,7 @@ namespace CoreData.CoreCore
             try
             {
                 string sql = "UPDATE sfc_item SET InvQty = @InvQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID=@ID";
-                conn.Execute(sql,new{CoID=CoID,ID=ID,Modifier=UserName,ModifyDate=DateTime.Now.ToString()},Trans);
+                conn.Execute(sql, new { CoID = CoID, ID = ID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
                 Trans.Commit();
             }
             catch (Exception e)
@@ -201,30 +201,68 @@ namespace CoreData.CoreCore
                 string querymainsql = @"SELECT ID,WhID,Parent_WhID FROM Sfc_main WHERE ID=@ID";
                 string querysql = @"SELECT ID,Skuautoid,WhID,InvQty,Parent_WhID FROM sfc_item WHERE CoID=@CoID AND ParentID=@ID";
                 string InvQuerySql = @"SELECT ID,Skuautoid,StockQty FROM Inventory WHERE CoID=@CoID AND WarehouseID=@WarehouseID AND Skuautoid in @SkuIDLst";
-                var main = conn.QueryFirst<Sfc_main>(querymainsql,new{CoID=CoID,ID=ID});
-                var itemLst = conn.Query<Sfc_item>(querysql,new{CoID=CoID,ID=ID}).AsList();
-                if(itemLst.Count>0)
+                var main = conn.QueryFirst<Sfc_main>(querymainsql, new { CoID = CoID, ID = ID });
+                var itemLst = conn.Query<Sfc_item>(querysql, new { CoID = CoID, ID = ID }).AsList();
+                if (itemLst.Count > 0)
                 {
-                    string WhID=main.Parent_WhID;
-                    var SkuIDLst = itemLst.Select(a=>a.Skuautoid).AsList();
-                    var InvSkuLst = conn.Query<Sfc_InvStock>(InvQuerySql,new{CoID=CoID,@WarehouseID=@WhID,SkuIDLst=SkuIDLst}).AsList();//读取现有库存         
-                    var RecordID = CommHaddle.GetRecordID(int.Parse(CoID));           
+                    string Parent_WhID = main.Parent_WhID;//主仓ID
+                    string WhID = main.WhID;//分仓ID
+                    var SkuIDLst = itemLst.Select(a => a.Skuautoid).AsList();
+                    var InvSkuLst = conn.Query<Sfc_InvStock>(InvQuerySql, new { CoID = CoID, @WarehouseID = Parent_WhID, SkuIDLst = SkuIDLst }).AsList();//读取现有库存         
+                    var RecordID = "INV" + CommHaddle.GetRecordID(int.Parse(CoID));
+                    int Type = 1401;
+                    string CusType = "盘点";
+                    //交易主表         
                     var inv = new Invinout();
                     inv.RecordID = RecordID;
-                    inv.Type = 1401;
-                    inv.CusType = "盘点";
-                    inv.Status=1;//(0:待审核;1.审核通过;2.作废)
-                    inv.WhID=WhID;
+                    inv.Type = Type;
+                    inv.CusType = CusType;
+                    inv.Status = 1;//(0:待审核;1.审核通过;2.作废)
+                    inv.WhID = Parent_WhID;
+                    inv.LinkWhID = WhID;
                     inv.Creator = UserName;
-                    inv.CreateDate=DateTime.Now.ToString();
-                    inv.CoID=CoID;
-                    conn.Execute(InventoryHaddle.AddInvinoutSql(),inv,Trans);
-                    
+                    inv.CreateDate = DateTime.Now.ToString();
+                    inv.CoID = CoID;
+                    conn.Execute(InventoryHaddle.AddInvinoutSql(), inv, Trans);
+                    //交易明细
+                    var invitem = (from a in itemLst
+                                   join b in InvSkuLst on a.Skuautoid equals b.Skuautoid into result1
+                                   from c in result1.DefaultIfEmpty()
+                                   select new Invinoutitem
+                                   {
+                                       IoID = RecordID,
+                                       CusType = CusType,
+                                       Skuautoid = c.Skuautoid,
+                                       WhID = Parent_WhID,
+                                       LinkWhID=WhID,
+                                       Qty = (c.Skuautoid == null ? int.Parse(a.Qty) : (int.Parse(a.Qty) - int.Parse(c.StockQty))),
+                                       CoID = CoID,
+                                       Creator = UserName,
+                                       CreateDate = DateTime.Now.ToString()
+                                   }).ToList<Invinoutitem>();
+                    //库存sku新增
+                    var NewInvLst = itemLst.Where(a => !InvSkuLst
+                                                        .Select(b => b.Skuautoid)
+                                                        .Contains(a.Skuautoid))
+                                        .Select(a => new Inventory
+                                        {
+                                            Skuautoid = a.Skuautoid,
+                                            WarehouseID = a.Parent_WhID,
+                                            StockQty = int.Parse(a.Qty),
+                                            CoID = CoID
+                                        }).AsList();
+                    //库存更新
+                    foreach(var v in InvSkuLst)
+                    {
+                        v.StockQty=itemLst.Where(a=>a.Skuautoid.Contains(v.Skuautoid)).Select(a=>a.InvQty).First();
+                    }
+                   
+
                 }
 
 
 
-                conn.Execute(sql,new{CoID=CoID,ID=ID},Trans);
+                conn.Execute(sql, new { CoID = CoID, ID = ID }, Trans);
                 Trans.Commit();
             }
             catch (Exception e)

@@ -85,7 +85,7 @@ function说明
     OutPut:
         清空回收站，返回操作信息
     参考：input json 文件:DelGoodsRec_input.json
-7.商品维护 - 新增商品资料
+7.InsertGoods()//商品维护 - 新增商品资料
     方法：POST
     路由：http://192.168.30.211:5000/Core/XyCore/CoreSku/InsertGoods
     参数：
@@ -95,7 +95,7 @@ function说明
         skuprops        List<goods_sku_props>       商品Sku属性Lst
         items           List<CoreSkuItem>           商品Sku明细Lst
     参考：input json 文件：InsertGoods_input.json
-8.商品维护 - 修改商品资料
+8.UpdateGoods()//商品维护 - 修改商品资料
     方法：POST
     路由：http://192.168.30.211:5000/Core/XyCore/CoreSku/UpdateGoods
     参数：
@@ -105,7 +105,7 @@ function说明
         skuprops        List<goods_sku_props>       商品Sku属性Lst
         items           List<CoreSkuItem>           商品Sku明细Lst
     参考：input json 文件：UpdateGoods_input.json
-9.商品维护 - 商品资料停用|启用|备用
+9.UpdateGoodsEnable()//商品维护 - 商品资料停用|启用|备用
     方法：POST
     路由：http://192.168.30.211:5000/Core/XyCore/CoreSku/UpdateGoodsEnable
     参数：

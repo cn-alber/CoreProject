@@ -28,7 +28,7 @@ namespace CoreModels.WmsApi
 
     public class WmsPileAuto
     {
-        public int CoID { get; set; }
+        public string CoID { get; set; }
         public string GoodsCode { get; set; }
         public int Skuautoid{get;set;}
         public string SkuID { get; set; }

@@ -6,11 +6,11 @@ namespace CoreModels.XyCore
     {
         public int ID { get; set; }
         public string GoodsCode { get; set; }
-        public int Skuautoid { get; set; }
+        public string Skuautoid { get; set; }
         public string SkuID { get; set; }
         public string Name { get; set; }
         public string Norm { get; set; }
-        public int WarehouseID { get; set; }
+        public string WarehouseID { get; set; }
         public string WarehouseName { get; set; }
         public decimal StockQty { get; set; }
         public decimal LockQty { get; set; }
@@ -22,7 +22,7 @@ namespace CoreModels.XyCore
         public decimal VirtualQty { get; set; }
         public decimal PurchaseQty { get; set; }
         public string Pic { get; set; }
-        public int CoID { get; set; }
+        public string CoID { get; set; }
     }
 
     public class InvQueryParam
