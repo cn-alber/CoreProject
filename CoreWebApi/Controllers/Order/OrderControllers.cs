@@ -22,6 +22,7 @@ namespace CoreWebApi
                                         string ExID,string SendWarehouse,string Others,string SortField,string SortDirection,string PageIndex,string NumPerPage)
         {   
             int x;
+            long l;
             var cp = new OrderParm();
             cp.CoID = int.Parse(GetCoid());
             if(!string.IsNullOrEmpty(ID))
@@ -33,9 +34,9 @@ namespace CoreWebApi
             }
             if(!string.IsNullOrEmpty(SoID))
             {
-                if (int.TryParse(SoID, out x))
+                if (long.TryParse(SoID, out l))
                 {
-                    cp.SoID = int.Parse(SoID);
+                    cp.SoID = long.Parse(SoID);
                 }
             }
             cp.PayNbr = PayNbr;
@@ -51,18 +52,22 @@ namespace CoreWebApi
             if(!string.IsNullOrEmpty(StatusList))
             {
                 string[] a = StatusList.Split(',');
+                List<int> s = new List<int>();
                 foreach(var i in a)
                 {
-                    cp.StatusList.Add(int.Parse(i));
+                    s.Add(int.Parse(i));
                 }
+                cp.StatusList = s;
             }
             if(!string.IsNullOrEmpty(AbnormalStatusList))
             {
                 string[] a = AbnormalStatusList.Split(',');
+                List<int> s = new List<int>();
                 foreach(var i in a)
                 {
-                    cp.AbnormalStatusList.Add(int.Parse(i));
+                    s.Add(int.Parse(i));
                 }
+                cp.AbnormalStatusList = s;
             }
             if(!string.IsNullOrEmpty(IsRecMsgYN))
             {
@@ -132,10 +137,12 @@ namespace CoreWebApi
             if(!string.IsNullOrEmpty(ShopStatus))
             {
                 string[] a = ShopStatus.Split(',');
+                List<string> s = new List<string>();
                 foreach(var i in a)
                 {
-                    cp.ShopStatus.Add(i);
+                    s.Add(i);
                 }
+                cp.ShopStatus = s;
             }
             if(!string.IsNullOrEmpty(Osource))
             {
@@ -147,10 +154,12 @@ namespace CoreWebApi
             if(!string.IsNullOrEmpty(Type))
             {
                 string[] a = Type.Split(',');
+                List<int> s = new List<int>();
                 foreach(var i in a)
                 {
-                    cp.Type.Add(int.Parse(i));
+                    s.Add(int.Parse(i));
                 }
+                cp.Type = s;
             }
             if(!string.IsNullOrEmpty(IsCOD))
             {
@@ -176,10 +185,12 @@ namespace CoreWebApi
             if(!string.IsNullOrEmpty(ShopID))
             {
                 string[] a = ShopID.Split(',');
+                List<int> s = new List<int>();
                 foreach(var i in a)
                 {
-                    cp.ShopID.Add(int.Parse(i));
+                    s.Add(int.Parse(i));
                 }
+                cp.ShopID = s;
             }
             if(!string.IsNullOrEmpty(IsDisSelectAll))
             {
@@ -191,34 +202,42 @@ namespace CoreWebApi
             if(!string.IsNullOrEmpty(Distributor))
             {
                 string[] a = Distributor.Split(',');
+                List<string> s = new List<string>();
                 foreach(var i in a)
                 {
-                    cp.Distributor.Add(i);
+                    s.Add(i);
                 }
+                cp.Distributor = s;
             }
             if(!string.IsNullOrEmpty(ExID))
             {
                 string[] a = ExID.Split(',');
+                List<int> s = new List<int>();
                 foreach(var i in a)
                 {
-                    cp.ExID.Add(int.Parse(i));
+                    s.Add(int.Parse(i));
                 }
+                cp.ExID = s;
             }
             if(!string.IsNullOrEmpty(SendWarehouse))
             {
                 string[] a = SendWarehouse.Split(',');
+                List<string> s = new List<string>();
                 foreach(var i in a)
                 {
-                    cp.SendWarehouse.Add(i);
+                    s.Add(i);
                 }
+                cp.SendWarehouse = s;
             }
             if(!string.IsNullOrEmpty(Others))
             {
                 string[] a = Others.Split(',');
+                List<int> s = new List<int>();
                 foreach(var i in a)
                 {
-                    cp.Others.Add(int.Parse(i));
+                    s.Add(int.Parse(i));
                 }
+                cp.Others = s;
             }
             if(!string.IsNullOrEmpty(SortField))
             {

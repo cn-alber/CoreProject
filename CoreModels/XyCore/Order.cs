@@ -47,8 +47,8 @@ namespace CoreModels.XyCore
         public List<int> _ExID = null;//快递公司
         public List<string> _SendWarehouse = null;//仓库
         public List<int> _Others = null;//其他 add 2016-11-12
-        public string _SortField;//排序栏位
-        public string _SortDirection;//排序方式
+        public string _SortField = "id";//排序栏位
+        public string _SortDirection = "DESC";//排序方式
         public int _NumPerPage = 20;//每页显示资料笔数
         public int _PageIndex = 1;//页码
         public int CoID
@@ -530,25 +530,26 @@ namespace CoreModels.XyCore
         public List<OStatus> OrdAbnormalStatus{get;set;}//异常状态
         public List<Filter> BuyerRemark{get;set;} //买家留言
         public List<Filter> SellerRemark{get;set;}//卖家备注
-        public List<AbnormalReason> OSource {get;set;}//订单来源
-        public List<AbnormalReason> OType {get;set;} //订单类型
+        public List<Filter> OSource {get;set;}//订单来源
+        public List<Filter> OType {get;set;} //订单类型
         public List<Filter> LoanType{get;set;}//贷款类型
         public List<Filter> IsPaid{get;set;}//是否付款
-        public List<shopEnum> Shop {get;set;}//店铺
-        public List<AbnormalReason> Distributor {get;set;}//分销商
-        public List<AbnormalReason> Express {get;set;}//快递
-        public List<AbnormalReason> Others {get;set;}//其他
+        public List<Filter> Shop {get;set;}//店铺
+        public List<Filter> Distributor {get;set;}//分销商
+        public List<Filter> Express {get;set;}//快递
+        public List<Filter> Warehouse{get;set;}//仓库
+        public List<Filter> Others {get;set;}//其他
     }
     public class OStatus
     {
-        public int Value{get;set;}
-        public string Label{get;set;}
-        public int Count{get;set;}
+        public string value{get;set;}
+        public string label{get;set;}
+        public int count{get;set;}
     }
     public class Filter
     {
-        public string Value{get;set;}
-        public string Label{get;set;}
+        public string value{get;set;}
+        public string label{get;set;}
     }
     public class OrderQuery
     {
@@ -606,7 +607,7 @@ namespace CoreModels.XyCore
     }
     public class OStatusCnt
     {
-        public int Value{get;set;}
-        public int Count{get;set;}
+        public int value{get;set;}
+        public int count{get;set;}
     }
 }

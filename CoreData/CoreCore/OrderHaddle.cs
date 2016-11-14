@@ -77,7 +77,19 @@ namespace CoreData.CoreCore
             }
             if (cp.AbnormalStatusList != null)//异常状态List
             {
-                wheresql = wheresql + " AND abnormalstatus in (0,"+ string.Join(",", cp.StatusList) + ")" ;
+                string status = " AND abnormalstatus in (0,"+ string.Join(",", cp.AbnormalStatusList) + ")" ;
+                if(cp.StatusList != null)
+                {
+                    if(cp.StatusList.Count == 1 && cp.StatusList[0] == 7)
+                    {
+                        status = " AND abnormalstatus in ("+ string.Join(",", cp.AbnormalStatusList) + ")" ;
+                    }
+                }
+                else
+                {
+                    status = " AND abnormalstatus in ("+ string.Join(",", cp.AbnormalStatusList) + ")" ;
+                }
+                wheresql = wheresql + status ;
             }
             if(cp.IsRecMsgYN.ToUpper() == "Y")
             {
@@ -127,11 +139,11 @@ namespace CoreData.CoreCore
             }
             if(!string.IsNullOrEmpty(cp.Skuid))
             {
-               wheresql = wheresql + " and exists(select id from orditem where oid = order.id and skuid = '" + cp.Skuid + "')";
+               wheresql = wheresql + " and exists(select id from orderitem where oid = order.id and skuid = '" + cp.Skuid + "')";
             }
             if(!string.IsNullOrEmpty(cp.GoodsCode))
             {
-               wheresql = wheresql + " and exists(select id from orditem where oid = order.id and GoodsCode = '" + cp.Skuid + "')";
+               wheresql = wheresql + " and exists(select id from orderitem where oid = order.id and GoodsCode = '" + cp.Skuid + "')";
             }
             if(cp.Ordqtystart > 0)
             {
@@ -151,11 +163,11 @@ namespace CoreData.CoreCore
             }
             if(!string.IsNullOrEmpty(cp.Skuname))
             {
-               wheresql = wheresql + " and exists(select id from orditem where oid = order.id and skuname like '%" + cp.Skuname + "%') and status in (0,1,2,7)";
+               wheresql = wheresql + " and exists(select id from orderitem where oid = order.id and skuname like '%" + cp.Skuname + "%') and status in (0,1,2,7)";
             }
             if(!string.IsNullOrEmpty(cp.Norm))
             {
-               wheresql = wheresql + " and exists(select id from orditem where oid = order.id and norm like '%" + cp.Norm + "%') and status in (0,1,2,7)";
+               wheresql = wheresql + " and exists(select id from orderitem where oid = order.id and norm like '%" + cp.Norm + "%') and status in (0,1,2,7)";
             }
             if(cp.ShopStatus != null)
             {
@@ -271,7 +283,7 @@ namespace CoreData.CoreCore
                         {
                             var soid = new List<long>();
                             soid.Add(a.SoID);
-                            sqlcommand = "select soid from `ord` where coid = " + cp.CoID + " and MergeOID = " + a.ID;
+                            sqlcommand = "select soid from `order` where coid = " + cp.CoID + " and MergeOID = " + a.ID;
                             var y = conn.Query<Order>(sqlcommand).AsList();
                             foreach(var b in y)
                             {
@@ -3263,12 +3275,12 @@ namespace CoreData.CoreCore
                     foreach (int  myCode in Enum.GetValues(typeof(OrdStatus)))
                     {
                         var s = new OStatus();
-                        s.Value = myCode;
-                        s.Label = Enum.GetName(typeof(OrdStatus), myCode);//获取名称
+                        s.value = myCode.ToString();
+                        s.label = Enum.GetName(typeof(OrdStatus), myCode);//获取名称
                         if(myCode == 0 ||myCode == 1 ||myCode == 2 ||myCode == 7)
                         {
                             int i = conn.QueryFirst<int>("select count(id) from `order` where status = " + myCode + " and coid =" + CoID);
-                            s.Count = i;
+                            s.count = i;
                         }
                         ss.Add(s);
                     }
@@ -3286,210 +3298,262 @@ namespace CoreData.CoreCore
                     foreach(var a in ab)
                     {
                         var s = new OStatus();
-                        s.Value= a.ID;
-                        s.Label = a.Name;
+                        s.value= a.ID.ToString();
+                        s.label = a.Name;
                         int i = conn.QueryFirst<int>("select count(id) from `order` where status = 7 and coid =" + CoID + " and AbnormalStatus =" + a.ID);
-                        s.Count = i;
+                        s.count = i;
                         ss.Add(s);
                     }
                     res.OrdAbnormalStatus = ss;
                     //分销商
                     string sqlcommand = "select ID,DistributorName as Name from distributor where coid =" + CoID + " and enable = true";
                     var Distributor = conn.Query<AbnormalReason>(sqlcommand).AsList();
-                    res.Distributor = Distributor;
+                    var aa = new List<Filter>();
+                    foreach(var d in Distributor)
+                    {
+                        var a = new Filter();
+                        a.value = d.ID.ToString();
+                        a.label = d.Name;
+                        aa.Add(a);
+                    }
+                    res.Distributor = aa;
                     
                     }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
                     conn.Dispose();
                 }
-            }    
+            }   
+            //仓库资料
+            List<Filter> wh = new List<Filter>();
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{  
+                    var h = new Filter();
+                    string sqlcommand = "select WarehouseName from Warehouse where coid =" + CoID + " and enable = true and type = 0";
+                    string name = conn.QueryFirst<string>(sqlcommand);
+                    h.value = "0";
+                    h.label = name;
+                    wh.Add(h);
+                    }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }  
+            //分仓
+            var w = CoreComm.WarehouseHaddle.getWarelist(CoID.ToString());
+            foreach(var h in w)
+            {
+                var a = new Filter();
+                a.value = h.id.ToString();
+                a.label = h.warename;
+                wh.Add(a);
+            }
+            res.Warehouse = wh ;
             //买家留言条件设定
             var ff = new List<Filter>();
             var f = new Filter();
-            f.Value = "A";
-            f.Label = "不过滤";
+            f.value = "A";
+            f.label = "不过滤";
             ff.Add(f);
             f = new Filter();
-            f.Value = "N";
-            f.Label = "无留言";
+            f.value = "N";
+            f.label = "无留言";
             ff.Add(f);
             f = new Filter();
-            f.Value = "Y";
-            f.Label = "有留言";
+            f.value = "Y";
+            f.label = "有留言";
             ff.Add(f);
             res.BuyerRemark = ff;
             //卖家备注
             ff = new List<Filter>();
             f = new Filter();
-            f.Value = "A";
-            f.Label = "不过滤";
+            f.value = "A";
+            f.label = "不过滤";
             ff.Add(f);
             f = new Filter();
-            f.Value = "N";
-            f.Label = "无备注";
+            f.value = "N";
+            f.label = "无备注";
             ff.Add(f);
             f = new Filter();
-            f.Value = "Y";
-            f.Label = "有备注";
+            f.value = "Y";
+            f.label = "有备注";
             ff.Add(f);
             res.SellerRemark = ff;
             //订单资料来源
-            var oo = new List<AbnormalReason>();
-            var o = new AbnormalReason();
-            o.ID = -1;
-            o.Name = "--- 不限 ---";
+            var oo = new List<Filter>();
+            var o = new Filter();
+            o.value = "-1";
+            o.label = "--- 不限 ---";
             oo.Add(o);
             foreach (int  myCode in Enum.GetValues(typeof(OrdSource)))
             {
-                o = new AbnormalReason();
-                o.ID = myCode;
-                o.Name = Enum.GetName(typeof(OrdSource), myCode);//获取名称
+                o = new Filter();
+                o.value = myCode.ToString();
+                o.label = Enum.GetName(typeof(OrdSource), myCode);//获取名称
                 oo.Add(o);
             }
             res.OSource = oo;
             //订单类型
-            oo = new List<AbnormalReason>();
-            o = new AbnormalReason();
-            o.ID = 0;
-            o.Name = "普通订单";
+            oo = new List<Filter>();
+            o = new Filter();
+            o.value = "0";
+            o.label = "普通订单";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 1;
-            o.Name = "补发订单";
+            o = new Filter();
+            o.value = "1";
+            o.label = "补发订单";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 2;
-            o.Name = "换货订单";
+            o = new Filter();
+            o.value = "2";
+            o.label = "换货订单";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 3;
-            o.Name = "天猫分销";
+            o = new Filter();
+            o.value = "3";
+            o.label = "天猫分销";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 4;
-            o.Name = "天猫供销";
+            o = new Filter();
+            o.value = "4";
+            o.label = "天猫供销";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 5;
-            o.Name = "协同订单";
+            o = new Filter();
+            o.value = "5";
+            o.label = "协同订单";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 6;
-            o.Name = "普通订单,分销+";
+            o = new Filter();
+            o.value = "6";
+            o.label = "普通订单,分销+";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 7;
-            o.Name = "补发订单,分销+";
+            o = new Filter();
+            o.value = "7";
+            o.label = "补发订单,分销+";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 8;
-            o.Name = "换货订单,分销+";
+            o = new Filter();
+            o.value = "8";
+            o.label = "换货订单,分销+";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 9;
-            o.Name = "天猫供销,分销+";
+            o = new Filter();
+            o.value = "9";
+            o.label = "天猫供销,分销+";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 10;
-            o.Name = "协同订单,分销+";
+            o = new Filter();
+            o.value = "10";
+            o.label = "协同订单,分销+";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 11;
-            o.Name = "普通订单,供销+";
+            o = new Filter();
+            o.value = "11";
+            o.label = "普通订单,供销+";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 12;
-            o.Name = "补发订单,供销+";
+            o = new Filter();
+            o.value = "12";
+            o.label = "补发订单,供销+";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 13;
-            o.Name = "换货订单,供销+";
+            o = new Filter();
+            o.value = "13";
+            o.label = "换货订单,供销+";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 14;
-            o.Name = "天猫供销,供销+";
+            o = new Filter();
+            o.value = "14";
+            o.label = "天猫供销,供销+";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 15;
-            o.Name = "协同订单,供销+";
+            o = new Filter();
+            o.value = "15";
+            o.label = "协同订单,供销+";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 16;
-            o.Name = "普通订单,分销+,供销+";
+            o = new Filter();
+            o.value = "16";
+            o.label = "普通订单,分销+,供销+";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 17;
-            o.Name = "补发订单,分销+,供销+";
+            o = new Filter();
+            o.value = "17";
+            o.label = "补发订单,分销+,供销+";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 18;
-            o.Name = "换货订单,分销+,供销+";
+            o = new Filter();
+            o.value = "18";
+            o.label = "换货订单,分销+,供销+";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 19;
-            o.Name = "天猫供销,分销+,供销+";
+            o = new Filter();
+            o.value = "19";
+            o.label = "天猫供销,分销+,供销+";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 20;
-            o.Name = "协同订单,分销+,供销+";
+            o = new Filter();
+            o.value = "20";
+            o.label = "协同订单,分销+,供销+";
             oo.Add(o);
             res.OType = oo;
             //贷款方式
             ff = new List<Filter>();
             f = new Filter();
-            f.Value = "A";
-            f.Label = "所有(不区分货款方式)";
+            f.value = "A";
+            f.label = "所有(不区分货款方式)";
             ff.Add(f);
             f = new Filter();
-            f.Value = "N";
-            f.Label = "在线支付(非货到付款)";
+            f.value = "N";
+            f.label = "在线支付(非货到付款)";
             ff.Add(f);
             f = new Filter();
-            f.Value = "Y";
-            f.Label = "货到付款";
+            f.value = "Y";
+            f.label = "货到付款";
             ff.Add(f);
             res.LoanType = ff;
             //是否付款
             ff = new List<Filter>();
             f = new Filter();
-            f.Value = "A";
-            f.Label = "所有(不区分是否付款)";
+            f.value = "A";
+            f.label = "所有(不区分是否付款)";
             ff.Add(f);
             f = new Filter();
-            f.Value = "N";
-            f.Label = "未付款";
+            f.value = "N";
+            f.label = "未付款";
             ff.Add(f);
             f = new Filter();
-            f.Value = "Y";
-            f.Label = "已付款";
+            f.value = "Y";
+            f.label = "已付款";
             ff.Add(f);
             res.IsPaid = ff;
             //获取店铺List
-            res.Shop = CoreComm.ShopHaddle.getShopEnum(CoID.ToString()) as List<shopEnum>;  
+            var shop = CoreComm.ShopHaddle.getShopEnum(CoID.ToString()) as List<shopEnum>;
+            ff = new List<Filter>();
+            foreach(var t in shop)
+            {
+                f = new Filter();
+                f.value = t.value.ToString();
+                f.label = t.label;
+                ff.Add(f);
+            }
+            res.Shop = ff;  
             //快递Lsit
-            res.Express = GetExpress(CoID).d as List<AbnormalReason>;
+            var Express = GetExpress(CoID).d as List<AbnormalReason>;
+            ff = new List<Filter>();
+            foreach(var t in Express)
+            {
+                f = new Filter();
+                f.value = t.ID.ToString();
+                f.label = t.Name;
+                ff.Add(f);
+            }
+            res.Express = ff;  
             //其他
-            oo = new List<AbnormalReason>();
-            o = new AbnormalReason();
-            o.ID = 0;
-            o.Name = "合并订单";
+            oo = new List<Filter>();
+            o = new Filter();
+            o.value = "0";
+            o.label = "合并订单";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 1;
-            o.Name = "拆分订单";
+            o = new Filter();
+            o.value = "1";
+            o.label = "拆分订单";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 2;
-            o.Name = "非合并订单";
+            o = new Filter();
+            o.value = "2";
+            o.label = "非合并订单";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 3;
-            o.Name = "非拆分订单";
+            o = new Filter();
+            o.value = "3";
+            o.label = "非拆分订单";
             oo.Add(o);
-            o = new AbnormalReason();
-            o.ID = 4;
-            o.Name = "开发票";
+            o = new Filter();
+            o.value = "4";
+            o.label = "开发票";
             oo.Add(o);
             res.Others = oo;
 
@@ -3512,9 +3576,9 @@ namespace CoreData.CoreCore
                         if(myCode == 0 ||myCode == 1 ||myCode == 2 ||myCode == 7)
                         {
                             var s = new OStatusCnt();
-                            s.Value = myCode;
+                            s.value = myCode;
                             int i = conn.QueryFirst<int>("select count(id) from `order` where status = " + myCode + " and coid =" + CoID);
-                            s.Count = i;
+                            s.count = i;
                             ss.Add(s);
                         }
                     }
@@ -3532,9 +3596,9 @@ namespace CoreData.CoreCore
                     foreach(var a in ab)
                     {
                         var s = new OStatusCnt();
-                        s.Value= a.ID;
+                        s.value= a.ID;
                         int i = conn.QueryFirst<int>("select count(id) from `order` where status = 7 and coid =" + CoID + " and AbnormalStatus =" + a.ID);
-                        s.Count = i;
+                        s.count = i;
                         ss.Add(s);
                     }
                     res.OrdAbnormalStatus = ss;
@@ -3548,9 +3612,17 @@ namespace CoreData.CoreCore
             return result;
         }
         ///<summary>
+        ///平台订单新增入口
+        ///</summary>
+        public static DataResult ImportOrderInsert()
+        {
+            var result = new DataResult(1,null);
+            return result;
+        }
+        ///<summary>
         ///修改商品
         ///</summary>
-        public static DataResult ModifySku(List<int> oid,string ModifySku,decimal ModifyPrice,string DeleteSku,string AddSku,decimal AddPrice,
+        public static DataResult ModifySku(List<int> oid,int ModifySku,decimal ModifyPrice,int DeleteSku,int AddSku,decimal AddPrice,
                                             decimal AddQty,string AddType,int CoID,string UserName)
         {
             var result = new DataResult(1,null);
@@ -3561,6 +3633,15 @@ namespace CoreData.CoreCore
             {
                 foreach(var i in oid)
                 {
+                   string sqlcommand = "select id,soid from `order` where id = "+ i + " and coid = " + CoID;
+                   var u = CoreDBconn.Query<Order>(sqlcommand).AsList();
+                //    if()
+                   sqlcommand = "select count(id) from orderitem where oid = " + i + " and coid = " + CoID + " and skuautoid = " + ModifySku;
+                   int count = CoreDBconn.QueryFirst<int>(sqlcommand);
+                   if (count > 0)
+                   {
+                       sqlcommand = "update orderitem set RealPrice=@RealPrice,Amount=RealPrice*Qty,";
+                   } 
 
                 }
 

@@ -1,56 +1,56 @@
 {
     "s": 1,
     "d": {
-        "OrdStatus": [//订单状态计数
+        "OrdStatus": [//订单状态
             {
-                "Value": 0,
-                "Count": 50
+                "value": 0,
+                "count": 50
             },
             {
-                "Value": 1,
-                "Count": 1432
+                "value": 1,
+                "count": 1432
             },
             {
-                "Value": 2,
-                "Count": 18
+                "value": 2,
+                "count": 18
             },
             {
-                "Value": 7,
-                "Count": 565
+                "value": 7,
+                "count": 565
             }
         ],
-        "OrdAbnormalStatus": [//异常状态计数
+        "OrdAbnormalStatus": [//异常状态
             {
-                "Value": 1,
-                "Count": 1
+                "value": 1,
+                "count": 1
             },
             {
-                "Value": 2,
-                "Count": 0
+                "value": 2,
+                "count": 0
             },
             {
-                "Value": 3,
-                "Count": 0
+                "value": 3,
+                "count": 0
             },
             {
-                "Value": 4,
-                "Count": 0
+                "value": 4,
+                "count": 0
             },
             {
-                "Value": 5,
-                "Count": 0
+                "value": 5,
+                "count": 0
             },
             {
-                "Value": 6,
-                "Count": 0
+                "value": 6,
+                "count": 0
             },
             {
-                "Value": 7,
-                "Count": 0
+                "value": 7,
+                "count": 0
             },
             {
-                "Value": 8,
-                "Count": 0
+                "value": 8,
+                "count": 0
             }
         ]
     },
