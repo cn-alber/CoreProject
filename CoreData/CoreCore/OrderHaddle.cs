@@ -77,7 +77,19 @@ namespace CoreData.CoreCore
             }
             if (cp.AbnormalStatusList != null)//异常状态List
             {
-                wheresql = wheresql + " AND abnormalstatus in (0,"+ string.Join(",", cp.StatusList) + ")" ;
+                string status = " AND abnormalstatus in (0,"+ string.Join(",", cp.AbnormalStatusList) + ")" ;
+                if(cp.StatusList != null)
+                {
+                    if(cp.StatusList.Count == 1 && cp.StatusList[0] == 7)
+                    {
+                        status = " AND abnormalstatus in ("+ string.Join(",", cp.AbnormalStatusList) + ")" ;
+                    }
+                }
+                else
+                {
+                    status = " AND abnormalstatus in ("+ string.Join(",", cp.AbnormalStatusList) + ")" ;
+                }
+                wheresql = wheresql + status ;
             }
             if(cp.IsRecMsgYN.ToUpper() == "Y")
             {
@@ -271,7 +283,7 @@ namespace CoreData.CoreCore
                         {
                             var soid = new List<long>();
                             soid.Add(a.SoID);
-                            sqlcommand = "select soid from `ord` where coid = " + cp.CoID + " and MergeOID = " + a.ID;
+                            sqlcommand = "select soid from `order` where coid = " + cp.CoID + " and MergeOID = " + a.ID;
                             var y = conn.Query<Order>(sqlcommand).AsList();
                             foreach(var b in y)
                             {
@@ -3550,7 +3562,7 @@ namespace CoreData.CoreCore
         ///<summary>
         ///修改商品
         ///</summary>
-        public static DataResult ModifySku(List<int> oid,string ModifySku,decimal ModifyPrice,string DeleteSku,string AddSku,decimal AddPrice,
+        public static DataResult ModifySku(List<int> oid,int ModifySku,decimal ModifyPrice,int DeleteSku,int AddSku,decimal AddPrice,
                                             decimal AddQty,string AddType,int CoID,string UserName)
         {
             var result = new DataResult(1,null);
@@ -3561,6 +3573,15 @@ namespace CoreData.CoreCore
             {
                 foreach(var i in oid)
                 {
+                   string sqlcommand = "select id,soid from `order` where id = "+ i + " and coid = " + CoID;
+                   var u = CoreDBconn.Query<Order>(sqlcommand).AsList();
+                //    if()
+                   sqlcommand = "select count(id) from orderitem where oid = " + i + " and coid = " + CoID + " and skuautoid = " + ModifySku;
+                   int count = CoreDBconn.QueryFirst<int>(sqlcommand);
+                   if (count > 0)
+                   {
+                       sqlcommand = "update orderitem set RealPrice=@RealPrice,Amount=RealPrice*Qty,";
+                   } 
 
                 }
 

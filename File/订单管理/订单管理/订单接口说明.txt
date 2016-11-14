@@ -25,6 +25,7 @@ input:      ID                  string          内部订单单号 default null
             DateStart           string          日期起 default null
             Dateend             string          日期迄 default null
             Skuid               string          商品编码 default null
+            GoodsCode           string          货品编码 default null add 2016-11-14
             Ordqtystart         string          数量起 default null
             Ordqtyend           string          数量迄 default null
             Ordamtstart         string          金额起 default null
@@ -35,11 +36,14 @@ input:      ID                  string          内部订单单号 default null
             Osource             string          订单来源 default null
             Type                string          订单类型 default null,List 用逗号隔开
             IsCOD               string          贷款方式 default A
+            IsPaid              string          是否付款 default A add 2016-11-14
+            IsShopSelectAll     string          店铺是否全选 default false add 2016-11-14
             ShopID              string          店铺 default null,List 用逗号隔开
             IsDisSelectAll      string          分销商是否全选 default false
             Distributor         string          分销商 default null,List 用逗号隔开
             ExID                string          快递公司 default null,List 用逗号隔开
             SendWarehouse       string          发货仓库 default null,List 用逗号隔开
+            Others              string          其他选项 default null,List 用逗号隔开 add 2016-11-14
             SortField           string          排序栏位名称 default null
             SortDirection       string          排序方式 default null
             PageIndex           string          资料页数(ex.第一页就给1) default 1

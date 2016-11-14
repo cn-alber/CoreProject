@@ -47,8 +47,8 @@ namespace CoreModels.XyCore
         public List<int> _ExID = null;//快递公司
         public List<string> _SendWarehouse = null;//仓库
         public List<int> _Others = null;//其他 add 2016-11-12
-        public string _SortField;//排序栏位
-        public string _SortDirection;//排序方式
+        public string _SortField = "id";//排序栏位
+        public string _SortDirection = "DESC";//排序方式
         public int _NumPerPage = 20;//每页显示资料笔数
         public int _PageIndex = 1;//页码
         public int CoID
