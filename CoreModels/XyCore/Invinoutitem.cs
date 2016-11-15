@@ -6,7 +6,9 @@ namespace CoreModels.XyCore
     {
         public int ID { get; set; }
         public string IoID { get; set; }
+        public int Type { get; set; }
         public string CusType { get; set; }
+        public int Status { get; set; }
         public string Skuautoid { get; set; }
         public string SkuID { get; set; }
         public string SkuName { get; set; }
@@ -23,6 +25,7 @@ namespace CoreModels.XyCore
         // public string LinkWhName { get; set; }
         // public string LinkIoID { get; set; }
         // public bool IsUpdate { get; set; }
+        public string RefID{get;set;}//相关单据编号(来源ID)
     }
     public class InvItemData
     {

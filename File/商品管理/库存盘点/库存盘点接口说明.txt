@@ -1,0 +1,93 @@
+接口名称：StockTakeControllers
+路径：..\CoreProject\CoreWebApi\Controllers\ItemSku\StockTakeControllers.cs
+function说明
+1.StockTakeMainLst()//库存盘点 - 查询盘点单主表资料
+    方法：Get
+    路由：http://192.168.30.211:5000/Core/XyCore/StockTake/StockTakeMainLst?WhID=&DateF=&DateT=&Status=&Skuautoid=&PageIndex=1&PageSize=&SortField=&SortDirection=
+    参数: CoreModels.XyCore.Sfc_item_param
+    InPut:
+        WhID            int         查询匹配-盘点本公司分仓仓库ID(Default:null)
+        DateF           string      查询匹配-盘点单-单据日期-起(Default:null)
+        DateT           string      查询匹配-盘点单-单据日期-讫(Default:null)
+        Status          string      查询匹配-盘点单-状态(0.待确认;1.生效;2.作废)(Default:null)
+        Skuautoid       string      查询匹配(商品Sku编码autoid,Default:null)
+        PageIndex       int         当前页码(ex.第一页就给1)
+        PageSize        int         每页显示资料笔数(Default:20)
+        SortField       string      排序字段(Default:CreateDate)
+        SortDirection   string      排序方向(DESC|ASC,Default:DESC)
+    OutPut:       
+        PageCount       int                             总页数
+        DataCount       int                             资料总笔数
+        MainLst         List<Sfc_main_view>             盘点资料列表
+        DicWh           Dictionary<string, object>      仓库资料列表
+
+2.StockTakeItemLst()//库存盘点-商品sku明细查询
+    方法：Get
+    路由：http://192.168.30.211:5000/Core/XyCore/StockTake/StockTakeItemLst?ParentID=
+    参数:
+    InPut:
+        ParentID        int                             盘点单主表ID(*必填项*)
+    OutPut:
+        ItemLst         List<Sfc_item_view>             盘点单明细列表
+        DicSku          Dictionary<string, object>      盘点商品Sku列表
+
+3.InsertTakeMain()//库存盘点-新增-盘点主表
+    方法：Post
+    路由：http://192.168.30.211:5000/Core/XyCore/StockTake/InsertTakeMain
+    参数：
+    InPut:
+        WhID            int         本公司分仓仓库ID(*必填项*)
+        Parent_WhID     int         本公司主仓仓库ID(*必填项*)
+    OutPut:
+        新增盘点单主表 - 返回操作信息
+    参考：input json 文件：InsertTakeMain_input.json
+
+4.InsertTakeItem()//库存盘点 - 新增盘点子表
+    方法：Post
+    路由：http://192.168.30.211:5000/Core/XyCore/StockTake/InsertTakeItem
+    参数：
+    InPut:
+        ParentID        int                     单据主表ID(*必填项*)
+        SkuIDLst        List<int>               所需盘点Sku之autoid(*必填项*)
+    OutPut:
+        新增盘点单明细 - 返回操作信息
+    参考：input json 文件：InsertTakeItem_input.json
+
+5.SaveTakeQty()//库存盘点 - 修改保存盘点数量(单笔)
+    方法：Post
+    路由：http://192.168.30.211:5000/Core/XyCore/StockTake/SaveTakeQty
+    参数：
+    InPut:
+        ID              int                     单据明细ID(*必填项*)
+        InvQty          int                     Sku之实盘数量(*必填项*)
+    OutPut:
+        新增盘点单明细 - 返回操作信息
+    参考：input json 文件：SaveStockTakeQty_input.json
+
+6.CheckTake()//库存盘点 - 确认生效
+    方法：Post
+    路由：http://192.168.30.211:5000/Core/XyCore/StockTake/CheckTake
+    参数：
+    InPut:
+        ID              int                     单据明细ID(*必填项*)
+    OutPut:
+        确认盘点单 - 更新商品库存
+    参考：
+    {
+    "ID":4
+    }
+
+7.UnCheckTake()//库存盘点 - 确认生效
+    方法：Post
+    路由：http://192.168.30.211:5000/Core/XyCore/StockTake/UnCheckTake
+    参数：
+    InPut:
+        ID              int                     单据明细ID(*必填项*)
+    OutPut:
+        作废盘点单 - 更新商品库存
+    参考：
+    {
+    "ID":4
+    }
+    
+    

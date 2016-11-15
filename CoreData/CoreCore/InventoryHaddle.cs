@@ -1409,24 +1409,28 @@ namespace CoreData.CoreCore
                                 `Status`,
                                 WhID,
                                 WhName,
+                                LinkWhID,
                                 IsExport,
                                 RecID,
                                 InvoiceID,
                                 Creator,
                                 CreateDate,
-                                CoID ) VALUES(
+                                CoID,
+                                RefID ) VALUES(
                                 @RecordID,
                                 @Type,
                                 @CusType,
                                 @Status,
                                 @WhID,
                                 @WhName,
+                                @LinkWhID,
                                 @IsExport,
                                 @RecID,
                                 @InvoiceID,
                                 @Creator,
                                 @CreateDate,
-                                @CoID   )";
+                                @CoID,
+                                @RefID   )";
             return sql;
         }
         public static string AddInvinoutitemSql()
@@ -1435,6 +1439,7 @@ namespace CoreData.CoreCore
                             (
                                 IoID,
                                 CoID,
+                                Skuautoid,
                                 SkuID,
                                 SkuName,
                                 Norm,
@@ -1442,11 +1447,16 @@ namespace CoreData.CoreCore
                                 Unit,
                                 WhID,
                                 WhName,
+                                LinkWhID,
                                 Creator,
                                 CreateDate,
-                                CusType ) VALUES(
+                                Type,
+                                CusType,
+                                Status,
+                                RefID ) VALUES(
                                 @IoID,
                                 @CoID,
+                                @Skuautoid,
                                 @SkuID,
                                 @SkuName,
                                 @Norm,
@@ -1454,11 +1464,86 @@ namespace CoreData.CoreCore
                                 @Unit,
                                 @WhID,
                                 @WhName,
+                                @LinkWhID,
                                 @Creator,
                                 @CreateDate,
-                                @CusType)";
+                                @Type,
+                                @CusType,
+                                @Status,
+                                @RefID)";
             return sql;
         }
+        public static string AddInventorySql()
+        {
+            string sql = @"INSERT INTO inventory
+                        (
+                            Skuautoid,
+                            WarehouseID,
+                            StockQty,
+                            LockQty,
+                            PickQty,
+                            WaitInQty,
+                            SaleRetuQty,
+                            SafeQty,
+                            DefectiveQty,
+                            VirtualQty,
+                            PurchaseQty,
+                            CoID
+                        ) VALUES(
+                            @Skuautoid,
+                            @WarehouseID,
+                            @StockQty,
+                            @LockQty,
+                            @PickQty,
+                            @WaitInQty,
+                            @SaleRetuQty,
+                            @SafeQty,
+                            @DefectiveQty,
+                            @VirtualQty,
+                            @PurchaseQty,
+                            @CoID
+                        )";
+            return sql;
+        }
+
+        #region 更新库存数量
+        public static string UptInvStockQtySql()
+        {
+            string sql = @"UPDATE inventory SET StockQty= (
+	                                            SELECT
+		                                            IFNULL(sum(Qty),0)
+	                                            FROM
+		                                            invinoutitem
+	                                            WHERE
+		                                            invinoutitem.Skuautoid = inventory.Skuautoid
+	                                            AND invinoutitem.WhID = inventory.WarehouseID
+	                                            AND invinoutitem.CoID = inventory.CoID
+                                                AND invinoutitem.`Status` = 1
+                                                AND invinoutitem.Skuautoid in @SkuIDLst
+                                            )
+                                            WHERE
+	                                            inventory.CoID =@CoID
+                                            AND inventory.WarehouseID = @WarehouseID 
+                                            AND Inventory.Skuautoid in @SkuIDLst";
+            return sql;
+        }
+        #endregion
+
+        #region 
+        public static string UptInvMainStockQtySql()
+        {
+            string sql = @"UPDATE inventory,inventory a 
+                    SET inventory.StockQty = a.StockQty
+                    WHERE 
+                    inventory.CoID=@CoID
+                    AND inventory.Skuautoid IN @SkuIDLst
+                    AND inventory.CoID=a.CoID
+                    AND inventory.Skuautoid=a.Skuautoid
+                    AND inventory.WarehouseID=0
+                    AND a.WarehouseID=@WarehouseID  ";
+            return sql;
+        }
+        #endregion
         public static Invinout AddInvinout(InvinoutAuto IOauto)
         {
             var inout = new Invinout();
