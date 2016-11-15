@@ -458,6 +458,7 @@ namespace CoreModels.XyCore
         public string SkuID{get;set;}
         public string SkuName{get;set;}
         public string Norm{get;set;}
+        public string GoodsCode{get;set;}
         public int Qty{get;set;}
         public string SalePrice{get;set;}
         public string RealPrice{get;set;}
@@ -555,9 +556,11 @@ namespace CoreModels.XyCore
     {
         public int ID {get;set;}
         public int Type{get;set;}
+        public string TypeString{get;set;}
         public int DealerType{get;set;}
         public bool IsMerge{get;set;}
         public bool IsSplit{get;set;}
+        public int OSource{get;set;}
         public long SoID{get;set;}
         public string ODate{get;set;}
         public string PayDate{get;set;}
@@ -568,8 +571,9 @@ namespace CoreModels.XyCore
         public string ExAmount{get;set;}
         public bool IsCOD{get;set;}
         public int Status{get;set;}
-        public int AbnormalStatus{get;set;}
         public string StatusDec{get;set;}
+        public int AbnormalStatus{get;set;}
+        public string AbnormalStatusDec{get;set;}
         public string RecMessage{get;set;}
         public string SendMessage{get;set;}
         public string Express{get;set;}
@@ -586,6 +590,7 @@ namespace CoreModels.XyCore
         public string SendWarehouse{get;set;}
         public string SendDate{get;set;}
         public string ExCode{get;set;}
+        public string Creator{get;set;}
         public List<long> SoIDList{get;set;}
         public List<SkuList> SkuList{get;set;}
     }
@@ -609,5 +614,60 @@ namespace CoreModels.XyCore
     {
         public int value{get;set;}
         public int count{get;set;}
+    }
+    public class ImportOrderInsert
+    {
+        public int Type{get;set;}
+        public int OSource{get;set;}
+        public DateTime ODate{get;set;}
+        public string BuyerShopID{get;set;}
+        public string ShopName{get;set;}
+        public long SoID{get;set;}
+        public string Amount{get;set;}
+        public string PaidAmount{get;set;}
+        public string PayAmount{get;set;}
+        public string ExAmount{get;set;}
+        public bool IsInvoice{get;set;}
+        public string InvoiceType{get;set;}
+        public string InvoiceTitle{get;set;}
+        public DateTime InvoiceDate{get;set;}
+        public bool IsCOD{get;set;}
+        public string ShopStatus{get;set;}
+        public string RecName{get;set;}
+        public string RecLogistics{get;set;}
+        public string RecCity{get;set;}
+        public string RecDistrict{get;set;}
+        public string RecAddress{get;set;}
+        public string RecZip{get;set;}
+        public string RecTel{get;set;}
+        public string RecPhone{get;set;}
+        public string RecMessage{get;set;}
+        public string Distributor{get;set;}
+        public string SupDistributor{get;set;}
+        public List<ImportOrderItemDetail> Item{get;set;}
+        public List<ImportPayinfo> Pay{get;set;}
+    }
+    public class ImportOrderItemDetail
+    {
+        public string SkuID{get;set;}
+        public int Qty{get;set;}
+        public decimal Price{get;set;}
+        public decimal Amount{get;set;}
+        public string Remark{get;set;}
+    }
+    public class ImportPayinfo
+    {
+        public string PayNbr{get;set;}
+        public string Payment{get;set;}
+        public string PayAccount{get;set;}
+        public string SellerAccount{get;set;}
+        public string Platform{get;set;}
+        public DateTime PayDate{get;set;}
+        public string Bank{get;set;}
+        public string BankName{get;set;}
+        public string Title{get;set;}
+        public string Name{get;set;}
+        public string Amount{get;set;}
+        public string PayAmount{get;set;}
     }
 }

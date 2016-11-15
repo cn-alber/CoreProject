@@ -17,7 +17,9 @@ namespace CoreData.CoreCore
         {
             var result = new DataResult(1,null);    
             string sqlcount = "select count(id) from `order` where 1=1";
-            string sqlcommand = "select * from `order` where 1=1"; 
+            string sqlcommand = @"select ID,Type,DealerType,IsMerge,IsSplit,OSource,SoID,ODate,PayDate,BuyerShopID,ShopName,Amount,PaidAmount,ExAmount,IsCOD,Status,AbnormalStatus,
+                                  StatusDec,RecMessage,SendMessage,Express,RecLogistics,RecCity,RecDistrict,RecAddress,RecName,ExWeight,Distributor,SupDistributor,InvoiceTitle,
+                                  PlanDate,SendWarehouse,SendDate,ExCode,Creator from `order` where 1=1"; 
             string wheresql = string.Empty;
             if(cp.CoID != 1)//公司编号
             {
@@ -279,6 +281,13 @@ namespace CoreData.CoreCore
                     //订单资料
                     foreach(var a in res.Ord)
                     {
+                        a.TypeString = GetTypeName(a.Type);
+                        a.AbnormalStatusDec = a.StatusDec;
+                        a.StatusDec = Enum.GetName(typeof(OrdStatus), a.Status);
+                        if(a.OSource != 3)
+                        {
+                            a.Creator = "";
+                        }
                         if(a.IsMerge == true)
                         {
                             var soid = new List<long>();
@@ -3612,11 +3621,511 @@ namespace CoreData.CoreCore
             return result;
         }
         ///<summary>
+        ///获取type说明
+        ///</summary>
+        public static string GetTypeName(int type)                
+        {
+            string Name = string.Empty;
+            if(type == 0)
+            {
+                Name = "普通订单";
+            }
+            if(type == 1)
+            {
+                Name = "补发订单";
+            }
+            if(type == 2)
+            {
+                Name = "换货订单";
+            }
+            if(type == 3)
+            {
+                Name = "天猫分销";
+            }
+            if(type == 4)
+            {
+                Name = "天猫供销";
+            }
+            if(type == 5)
+            {
+                Name = "协同订单";
+            }
+            if(type == 6)
+            {
+                Name = "普通订单,分销+";
+            }
+            if(type == 7)
+            {
+                Name = "补发订单,分销+";
+            }
+            if(type == 8)
+            {
+                Name = "换货订单,分销+";
+            }
+            if(type == 9)
+            {
+                Name = "天猫供销,分销+";
+            }
+            if(type == 10)
+            {
+                Name = "协同订单,分销+";
+            }
+            if(type == 11)
+            {
+                Name = "普通订单,供销+";
+            }
+            if(type == 12)
+            {
+                Name = "补发订单,供销+";
+            }
+            if(type == 13)
+            {
+                Name = "换货订单,供销+";
+            }
+            if(type == 14)
+            {
+                Name = "天猫供销,供销+";
+            }
+            if(type == 15)
+            {
+                Name = "协同订单,供销+";
+            }
+            if(type == 16)
+            {
+                Name = "普通订单,分销+,供销+";
+            }
+            if(type == 17)
+            {
+                Name = "补发订单,分销+,供销+";
+            }
+            if(type == 18)
+            {
+                Name = "换货订单,分销+,供销+";
+            }
+            if(type == 19)
+            {
+                Name = "天猫供销,分销+,供销+";
+            }
+            if(type == 20)
+            {
+                Name = "协同订单,分销+,供销+";
+            }            
+            return Name;
+        }
+        ///<summary>
         ///平台订单新增入口
         ///</summary>
-        public static DataResult ImportOrderInsert()
+        public static DataResult ImportOrderInsert(ImportOrderInsert Order,int CoID,string UserName)
         {
             var result = new DataResult(1,null);
+            //检查平台单号是否已经存在，若是，则不能新增
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string wheresql = "select count(id) from `order` where soid =" + Order.SoID + " and coid =" + CoID;
+                    int u = conn.QueryFirst<int>(wheresql);
+                    if(u > 0)
+                    {
+                        result.s = -1;
+                        result.d = "该订单已经导入!";
+                        return result;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+            int shopid = 0;
+            string shopsit = "";
+            var logs = new List<Log>();
+            List<int> idlist = new List<int>();
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{
+                    string wheresql = "select * from Shop where ShopName =" + Order.ShopName + " and coid =" + CoID;
+                    var u = conn.Query<Shop>(wheresql).AsList();
+                    if(u.Count > 0)
+                    {
+                        shopid = u[0].ID;
+                        shopsit = u[0].ShopSite;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                var orderitem = new List<OrderItem>();
+                decimal Amount = 0,TotalWeight = 0;
+                int Qty = 0;
+                string sqlcommand = "";
+                bool IsSku = true,isRecExsit = true,isMerge = false;
+                var rec = new RecInfo();
+                //处理订单明细
+                foreach(var a in Order.Item)
+                {
+                    var item = new OrderItem();
+                    item.SoID = Order.SoID;
+                    item.CoID = CoID;
+                    item.SkuID = a.SkuID;
+                    item.Qty = a.Qty;
+                    item.RealPrice = a.Price.ToString();
+                    item.Amount = a.Amount.ToString();
+                    item.Remark = a.Remark;
+                    item.Creator = UserName;
+                    item.CreateDate = DateTime.Now;
+                    item.Modifier = UserName;
+                    item.ModifyDate= DateTime.Now;
+
+                    Amount = Amount + a.Amount;
+                    Qty = Qty + a.Qty;
+                    int i = CoreDBconn.QueryFirst<int>("select count(id) from coresku where skuid = '" + a.SkuID + "' and coid = " + CoID);
+                    if(i == 0)
+                    {
+                        IsSku = false;
+                    }
+                    else
+                    {
+                        int j = CoreDBconn.QueryFirst<int>("select id from coresku where skuid = '" + a.SkuID + "' and coid = " + CoID);
+                        sqlcommand = "select skuid,skuname,norm,img,goodscode,enable,saleprice,weight from coresku where id =" + j + " and coid =" + CoID;
+                        var s = CoreDBconn.Query<SkuInsert>(sqlcommand).AsList();
+                        item.SkuAutoID = j;
+                        item.SkuName = s[0].skuname;
+                        item.Norm = s[0].norm;
+                        item.GoodsCode = s[0].goodscode;
+                        item.SalePrice = s[0].saleprice;
+                        item.DiscountRate = Math.Round(a.Price/decimal.Parse(item.SalePrice),2).ToString();
+                        item.img = s[0].img;
+                        item.Weight = s[0].weight;
+                        item.TotalWeight = (a.Qty * decimal.Parse(s[0].weight)).ToString();
+                        item.IsGift = false;
+                        TotalWeight = TotalWeight + decimal.Parse(item.TotalWeight);
+                    }
+                    orderitem.Add(item);
+                }
+                //处理付款资料
+                var PayList= new List<PayInfo>();
+                foreach(var a in Order.Pay)
+                {
+                    var pay = new PayInfo();
+                    pay.PayNbr = a.PayNbr;
+                    pay.RecName = Order.RecName;
+                    pay.SoID = Order.SoID;
+                    pay.Payment = a.Payment;
+                    pay.PayAccount = a.PayAccount;
+                    pay.SellerAccount = a.SellerAccount;
+                    pay.Platform = a.Platform;
+                    pay.PayDate = a.PayDate;
+                    pay.Bank = a.Bank;
+                    pay.BankName= a.BankName;
+                    pay.Title = a.Title;
+                    pay.Name = a.Name;
+                    pay.Amount = a.Amount;
+                    pay.PayAmount = a.PayAmount;
+                    pay.DataSource = 0;
+                    pay.Status = 1;
+                    pay.CoID = CoID;
+                    pay.Creator = UserName;
+                    pay.CreateDate = DateTime.Now;
+                    pay.Confirmer = UserName;
+                    pay.ConfirmDate= DateTime.Now;
+                    PayList.Add(pay);
+                }
+                //产生订单资料
+                var ord = new Order();
+                ord.Type = Order.Type;
+                ord.DealerType = 0;
+                if(!string.IsNullOrEmpty(Order.Distributor))
+                {
+                    ord.DealerType = 1;
+                }
+                if(!string.IsNullOrEmpty(Order.SupDistributor))
+                {
+                    ord.DealerType = 2;
+                }
+                ord.OSource = Order.OSource;
+                ord.ODate = Order.ODate;
+                ord.CoID = CoID;
+                ord.BuyerShopID = Order.BuyerShopID;
+                ord.ShopID = shopid;
+                ord.ShopName = Order.ShopName;
+                ord.ShopSit = shopsit;
+                ord.SoID = Order.SoID;
+                ord.OrdQty = Qty;
+                ord.Amount = Order.Amount;
+                ord.SkuAmount = Amount.ToString();
+                ord.PaidAmount = Order.PaidAmount.ToString();
+                ord.PayAmount = Order.PayAmount.ToString();
+                ord.ExAmount = Order.ExAmount.ToString();
+                ord.IsInvoice = Order.IsInvoice;
+                ord.InvoiceType = Order.InvoiceType;
+                ord.InvoiceTitle = Order.InvoiceTitle;
+                ord.InvoiceDate = Order.InvoiceDate;
+                if(ord.Amount == ord.PaidAmount)
+                {
+                    ord.IsPaid = true;
+                    ord.Status = 1;
+                }
+                else
+                {
+                    ord.IsPaid = false;
+                    ord.Status = 0;
+                }
+                if(PayList.Count > 0)
+                {
+                    ord.PayDate = PayList[0].PayDate;
+                    ord.PayNbr = PayList[0].PayNbr;
+                }
+                ord.IsCOD = Order.IsCOD;
+                ord.AbnormalStatus = 0;
+                ord.StatusDec = "";
+                ord.ShopStatus = Order.ShopStatus;
+                ord.RecName = Order.RecName;
+                ord.RecLogistics = Order.RecLogistics;
+                ord.RecCity = Order.RecCity;
+                ord.RecDistrict = Order.RecDistrict;
+                ord.RecAddress = Order.RecAddress;
+                ord.RecZip = Order.RecZip;
+                ord.RecTel = Order.RecTel;
+                ord.RecPhone = Order.RecPhone;
+                ord.RecMessage = Order.RecMessage;
+                ord.ExWeight = TotalWeight.ToString();
+                ord.Distributor = Order.Distributor;
+                ord.SupDistributor = Order.SupDistributor;
+                ord.Creator = UserName;
+                ord.CreateDate = DateTime.Now;
+                ord.Modifier = UserName;
+                ord.ModifyDate = DateTime.Now;
+                //标记异常
+                if(IsSku == false)
+                {
+                    int reasonid = GetReasonID("商品编码缺失",CoID).s;
+                    if(reasonid == -1)
+                    {
+                        result.s = -1;
+                        result.d = "请先设定【商品编码缺失】的异常";
+                        return result;
+                    }
+                    ord.Status = 7;
+                    ord.AbnormalStatus = reasonid;
+                    ord.StatusDec = "商品编码缺失";
+                }
+                else
+                {
+                    //检查订单是否符合合并的条件
+                    var res = isCheckMerge(ord);
+                    int reasonid = 0;
+                    if(res.s == 1)
+                    {
+                        isMerge = true;
+                        idlist = res.d as List<int>;
+                        reasonid = GetReasonID("等待订单合并",CoID).s;
+                        if(reasonid == -1)
+                        {
+                            result.s = -1;
+                            result.d = "请先设定【等待订单合并】的异常";
+                            return result;
+                        }
+                        ord.Status = 7;
+                        ord.AbnormalStatus = reasonid;
+                        ord.StatusDec = "等待订单合并";
+                    }
+                }
+                //检查收货人是否存在
+                sqlcommand = "select id from recinfo where coid = " + CoID + " and buyerid = '" + Order.BuyerShopID + "' and receiver = '" + Order.RecName + 
+                                "' and address = '" + Order.RecAddress + "' and logistics = '" + Order.RecLogistics + "' and city = '" + Order.RecCity + 
+                                "' and district = '" + Order.RecDistrict + "'";
+                int u = CoreDBconn.QueryFirst<int>(sqlcommand);
+                if(u > 0)
+                {
+                    ord.BuyerID = u;
+                    foreach(var p in PayList)
+                    {
+                        p.RecID = u;
+                    }
+                }
+                else
+                {
+                    isRecExsit = false;
+                    rec.BuyerId = ord.BuyerShopID;
+                    rec.Receiver = ord.RecName;
+                    rec.Tel = ord.RecTel;
+                    rec.Phone = ord.RecPhone;
+                    rec.Logistics = ord.RecLogistics;
+                    rec.City = ord.RecCity;
+                    rec.District = ord.RecDistrict;
+                    rec.Address = ord.RecAddress;
+                    rec.ZipCode = ord.RecZip;
+                    rec.Express = ord.Express;
+                    rec.ExID = ord.ExID;
+                    rec.CoID = CoID;
+                    rec.Creator = UserName;
+                    rec.ShopSit = ord.ShopSit;
+                }
+                //更新收货人信息
+                int count =0;
+                if(isRecExsit == false)
+                {
+                    sqlcommand = @"INSERT INTO recinfo(BuyerId,Receiver,Tel,Phone,Logistics,City,District,Address,ZipCode,Express,ExID,CoID,Creator,ShopSit) VALUES(
+                            @BuyerId,@Receiver,@Tel,@Phone,@Logistics,@City,@District,@Address,@ZipCode,@Express,@ExID,@CoID,@Creator,@ShopSit)";
+                    count =CoreDBconn.Execute(sqlcommand,rec,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3002;
+                        return result;
+                    }
+                    else
+                    {
+                        int rtn = CoreDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
+                        ord.BuyerID = rtn;
+                        foreach(var p in PayList)
+                        {
+                            p.RecID = rtn;
+                        }
+                        rec.ID = rtn;
+                    }
+                }
+                //新增订单资料
+                sqlcommand = @"INSERT INTO `order`(Type,DealerType,OSource,ODate,CoID,BuyerID,BuyerShopID,ShopID,ShopName,ShopSit,SoID,OrdQty,Amount,SkuAmount,PaidAmount,PayAmount,
+                                                   ExAmount,IsInvoice,InvoiceType,InvoiceTitle,InvoiceDate,IsPaid,Status,PayDate,PayNbr,IsCOD,AbnormalStatus,StatusDec,ShopStatus,
+                                                   RecName,RecLogistics,RecCity,RecDistrict,RecAddress,RecZip,RecTel,RecPhone,RecMessage,ExWeight,Distributor,SupDistributor,Creator,Modifier) 
+                                            VALUES(@Type,@DealerType,@OSource,@ODate,@CoID,@BuyerID,@BuyerShopID,@ShopID,@ShopName,@ShopSit,@SoID,@OrdQty,@Amount,@SkuAmount,@PaidAmount,@PayAmount,
+                                                   @ExAmount,@IsInvoice,@InvoiceType,@InvoiceTitle,@InvoiceDate,@IsPaid,@Status,@PayDate,@PayNbr,@IsCOD,@AbnormalStatus,@StatusDec,@ShopStatus,
+                                                   @RecName,@RecLogistics,@RecCity,@RecDistrict,@RecAddress,@RecZip,@RecTel,@RecPhone,@RecMessage,@ExWeight,@Distributor,@SupDistributor,@Creator,@Modifier)";
+                count =CoreDBconn.Execute(sqlcommand,ord,TransCore);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                else
+                {
+                    int rtn = CoreDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
+                    rec.OID=rtn;
+                    ord.ID = rtn;
+                    foreach(var i in orderitem)
+                    {
+                        i.OID = rtn;
+                    }
+                    foreach(var p in PayList)
+                    {
+                        p.OID = rtn;
+                    }
+                }
+                //新增日志
+                var log = new Log();
+                log.OID = ord.ID;
+                log.SoID = ord.SoID;
+                log.Type = 0;
+                log.LogDate = DateTime.Now;
+                log.UserName = UserName;
+                log.Title = "接单时间";
+                log.Remark = "接口下载订单时间";
+                log.CoID = CoID;
+                logs.Add(log);
+                if(ord.Status == 7)
+                {
+                    log = new Log();
+                    log.OID = ord.ID;
+                    log.SoID = ord.SoID;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "标记异常";
+                    log.Remark = ord.StatusDec;
+                    log.CoID = CoID;
+                    logs.Add(log);
+                }
+                //新增订单明细
+                sqlcommand = @"INSERT INTO orderitem(oid,soid,coid,skuautoid,skuid,skuname,norm,GoodsCode,qty,saleprice,realprice,amount,DiscountRate,img,
+                                                     weight,totalweight,IsGift,Remark,creator,modifier) 
+                                              VALUES(@OID,@Soid,@Coid,@Skuautoid,@Skuid,@Skuname,@Norm,@GoodsCode,@Qty,@Saleprice,@Realprice,@Amount,@DiscountRate,@Img,
+                                                     @Weight,@Totalweight,@IsGift,@Remark,@Creator,@Creator)";
+                count = CoreDBconn.Execute(sqlcommand, orderitem, TransCore);
+                if (count <= 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                //新增付款资料
+                sqlcommand = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SOID,Payment,PayAccount,SellerAccount,Platform,PayDate,Bank,BankName,Title,Name,Amount,
+                                                   PayAmount,DataSource,Status,CoID,Creator,CreateDate,Confirmer,ConfirmDate) 
+                                           VALUES(@PayNbr,@RecID,@RecName,@OID,@SOID,@Payment,@PayAccount,@SellerAccount,@Platform,@PayDate,@Bank,@BankName,@Title,@Name,@Amount,
+                                                  @PayAmount,@DataSource,@Status,@CoID,@Creator,@CreateDate,@Confirmer,@ConfirmDate)";
+                count = CoreDBconn.Execute(sqlcommand,PayList,TransCore);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                //待合并资料更新
+                if(isMerge == true)
+                {
+                    string querySql = "select id,soid from `order` where id in @ID and coid = @Coid and status <> 7";
+                    var v = CoreDBconn.Query<Order>(querySql,new{ID = idlist,Coid = CoID}).AsList();
+                    if(v.Count > 0)
+                    {
+                        sqlcommand = @"update `order` set status = 7,abnormalstatus = @Abnormalstatus,statusdec = '等待订单合并' where id in @ID and coid = @Coid and status <> 7";
+                        count =CoreDBconn.Execute(sqlcommand,new {Abnormalstatus = ord.AbnormalStatus,ID = idlist,Coid = CoID},TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3003;
+                            return result;
+                        }
+                        foreach(var c in v)
+                        {
+                            log = new Log();
+                            log.OID = c.ID;
+                            log.SoID = c.SoID;
+                            log.Type = 0;
+                            log.LogDate = DateTime.Now;
+                            log.UserName = UserName;
+                            log.Title = "标记异常";
+                            log.Remark = "等待订单合并";
+                            log.CoID = CoID;
+                            logs.Add(log);
+                        }
+                    }
+                }
+                //更新日志
+                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                   VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                count =CoreDBconn.Execute(loginsert,logs,TransCore);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                //更新收货人资料
+                if(isRecExsit == false)
+                {
+                    sqlcommand = @"update recinfo set OID = @OID where id = @ID and coid = @Coid";
+                    count =CoreDBconn.Execute(sqlcommand,rec,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                }
+                result.d = ord.ID;
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
             return result;
         }
         ///<summary>
@@ -3661,8 +4170,6 @@ namespace CoreData.CoreCore
             }
             return result;
         }
-
-
         ///<summary>
         ///抓取快递List
         ///</summary>
