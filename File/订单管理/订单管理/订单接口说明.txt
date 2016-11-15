@@ -238,3 +238,11 @@ input:  None
 output: OrdStatus             订单状态计数
         OrdAbnormalStatus     异常状态计数
 参考:output jason 文件:GetStatusCount_output.json
+
+22.ImportOrderInsert()接口订单新增
+路由:http://localhost:5000/Core/Order/ImportOrderInsert
+input:OID         List<int>   内部订单号
+      Freight     decimal     修改后运费
+output: s=1成功 else 错误代码
+参考:input jason 文件:ImportOrderInsert_input.json
+参考:output jason 文件:ImportOrderInsert_output.json
