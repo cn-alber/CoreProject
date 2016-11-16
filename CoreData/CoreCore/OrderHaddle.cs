@@ -4596,120 +4596,121 @@ namespace CoreData.CoreCore
         ///<summary>
         ///订单明细换货
         ///</summary>
-        public static DataResult ChangeOrderDetail(int id,int skuid,int skuidNew,int CoID,string Username,bool IsGift)
-        {
-            var result = new DataResult(1,null);  
-            var logs = new List<Log>();
-            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
-            CoreDBconn.Open();
-            var TransCore = CoreDBconn.BeginTransaction();
-            try
-            {
-                string wheresql = "select status,soid from `order` where id =" + id  + " and coid =" + CoID;
-                var u = CoreDBconn.Query<Order>(wheresql).AsList();
-                if (u.Count == 0)
-                {
-                    result.s = -1;
-                    result.d = "此订单不存在!";
-                    return result;
-                }
-                else
-                {
-                    if (u[0].Status != 0 && u[0].Status != 1 && u[0].Status != 7)
-                    {
-                        result.s = -1;
-                        result.d = "只有待付款/已付款待审核/异常的订单才可以换货!";
-                        return result;
-                    }
-                }
-                string skusql = "select skuid,skuname,norm,img,goodscode,enable,saleprice,weight from coresku where id =" + skuidNew + " and coid =" + CoID;
-                var s = CoreDBconn.Query<SkuInsert>(skusql).AsList();
-                if (s.Count == 0)
-                {
-                    result.s = -1;
-                    result.d = "换货的商品不存在!";
-                    return result;
-                }
-                if (s[0].enable == false)
-                {
-                    result.s = -1;
-                    result.d = "换货的商品已停用!";
-                    return result;
-                }
-                string sqlCommandText = "select count(id) from orderitem where oid = @ID and coid = @Coid and SkuAutoID = @Sku and IsGift = @IsGift";
-                int count = CoreDBconn.QueryFirst<int>(sqlCommandText,new{ID = id,Coid = CoID,Sku=skuidNew,IsGift=IsGift});
-                if(count > 0)
-                {
-                    result.s = -1;
-                    result.d = "换货的商品已经存在于订单明细!";
-                    return result;
-                }
-                sqlCommandText = "select * from orderitem where oid = @ID and coid = @Coid and SkuAutoID = @Sku and IsGift = @IsGift";
-                var item = CoreDBconn.Query<OrderItem>(sqlCommandText,new{ID = id,Coid = CoID,Sku=skuid,IsGift=IsGift}).AsList();
-                decimal weight = decimal.Parse(item[0].TotalWeight);
-                int qty = item[0].Qty;
-                sqlCommandText = @"update orderitem set SkuAutoID=@SkuAutoID,SkuID=@SkuID,SkuName=@SkuName,Norm=@Norm,GoodsCode=@GoodsCode,img=@img,
-                                   Weight=@Weight,TotalWeight = Weight * Qty,Modifier =@Modifier,ModifyDate = @ModifyDate where oid = @ID and 
-                                   coid = @Coid and SkuAutoID = @Sku and IsGift = @IsGift";
-                var args = new{SkuAutoID =skuidNew,SkuID=s[0].skuid, SkuName=s[0].skuname, Norm=s[0].norm, GoodsCode=s[0].goodscode, img =s[0].img,Weight=s[0].weight,
-                               Modifier = Username, ModifyDate=DateTime.Now, ID=id, Coid=CoID, Sku = skuid, IsGift = IsGift};
-                count = CoreDBconn.Execute(sqlCommandText,args,TransCore);
-                if (count < 0)
-                {
-                    result.s = -3003;
-                    return result;
-                }
-                var log = new Log();
-                log.OID = id;
-                log.SoID = u[0].SoID;
-                log.Type = 0;
-                log.LogDate = DateTime.Now;
-                log.UserName = Username;
-                log.Title = "更改商品";
-                log.Remark = skuid + "=>" + skuidNew;
-                log.CoID = CoID;
+        // public static DataResult ChangeOrderDetail(int id,int oid,int skuidNew,int CoID,string Username)
+        // {
+        //     var result = new DataResult(1,null);  
+        //     var sin = new SingleOrderItem();
+        //     var logs = new List<Log>();
+        //     var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+        //     CoreDBconn.Open();
+        //     var TransCore = CoreDBconn.BeginTransaction();
+        //     try
+        //     {
+        //         string wheresql = "select status,soid from `order` where id =" + oid  + " and coid =" + CoID;
+        //         var u = CoreDBconn.Query<Order>(wheresql).AsList();
+        //         if (u.Count == 0)
+        //         {
+        //             result.s = -1;
+        //             result.d = "此订单不存在!";
+        //             return result;
+        //         }
+        //         else
+        //         {
+        //             if (u[0].Status != 0 && u[0].Status != 1 && u[0].Status != 7)
+        //             {
+        //                 result.s = -1;
+        //                 result.d = "只有待付款/已付款待审核/异常的订单才可以换货!";
+        //                 return result;
+        //             }
+        //         }
+        //         string skusql = "select skuid,skuname,norm,img,goodscode,enable,saleprice,weight from coresku where id =" + skuidNew + " and coid =" + CoID;
+        //         var s = CoreDBconn.Query<SkuInsert>(skusql).AsList();
+        //         if (s.Count == 0)
+        //         {
+        //             result.s = -1;
+        //             result.d = "换货的商品不存在!";
+        //             return result;
+        //         }
+        //         if (s[0].enable == false)
+        //         {
+        //             result.s = -1;
+        //             result.d = "换货的商品已停用!";
+        //             return result;
+        //         }
+        //         string sqlCommandText = "select count(id) from orderitem where oid = @ID and coid = @Coid and SkuAutoID = @Sku and IsGift = @IsGift";
+        //         int count = CoreDBconn.QueryFirst<int>(sqlCommandText,new{ID = id,Coid = CoID,Sku=skuidNew,IsGift=IsGift});
+        //         if(count > 0)
+        //         {
+        //             result.s = -1;
+        //             result.d = "换货的商品已经存在于订单明细!";
+        //             return result;
+        //         }
+        //         sqlCommandText = "select * from orderitem where oid = @ID and coid = @Coid and SkuAutoID = @Sku and IsGift = @IsGift";
+        //         var item = CoreDBconn.Query<OrderItem>(sqlCommandText,new{ID = id,Coid = CoID,Sku=skuid,IsGift=IsGift}).AsList();
+        //         decimal weight = decimal.Parse(item[0].TotalWeight);
+        //         int qty = item[0].Qty;
+        //         sqlCommandText = @"update orderitem set SkuAutoID=@SkuAutoID,SkuID=@SkuID,SkuName=@SkuName,Norm=@Norm,GoodsCode=@GoodsCode,img=@img,
+        //                            Weight=@Weight,TotalWeight = Weight * Qty,Modifier =@Modifier,ModifyDate = @ModifyDate where oid = @ID and 
+        //                            coid = @Coid and SkuAutoID = @Sku and IsGift = @IsGift";
+        //         var args = new{SkuAutoID =skuidNew,SkuID=s[0].skuid, SkuName=s[0].skuname, Norm=s[0].norm, GoodsCode=s[0].goodscode, img =s[0].img,Weight=s[0].weight,
+        //                        Modifier = Username, ModifyDate=DateTime.Now, ID=id, Coid=CoID, Sku = skuid, IsGift = IsGift};
+        //         count = CoreDBconn.Execute(sqlCommandText,args,TransCore);
+        //         if (count < 0)
+        //         {
+        //             result.s = -3003;
+        //             return result;
+        //         }
+        //         var log = new Log();
+        //         log.OID = id;
+        //         log.SoID = u[0].SoID;
+        //         log.Type = 0;
+        //         log.LogDate = DateTime.Now;
+        //         log.UserName = Username;
+        //         log.Title = "更改商品";
+        //         log.Remark = skuid + "=>" + skuidNew;
+        //         log.CoID = CoID;
 
-                sqlCommandText = @"update `order` set ExWeight = ExWeight - @ExWeight + @ExWeightNew,Modifier=@Modifier,ModifyDate=@ModifyDate 
-                                    where ID = @ID and CoID = @CoID";
-                count = CoreDBconn.Execute(sqlCommandText, new { ExWeight = weight, ExWeightNew = qty * decimal.Parse(s[0].weight) ,Modifier = Username, ModifyDate = DateTime.Now, ID = id, CoID = CoID }, TransCore);
-                if (count < 0)
-                {
-                    result.s = -3003;
-                    return result;
-                }
-                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
-                                            VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
-                int r = CoreDBconn.Execute(loginsert,log, TransCore);
-                if (r < 0)
-                {
-                    result.s = -3002;
-                    return result;
-                }
+        //         sqlCommandText = @"update `order` set ExWeight = ExWeight - @ExWeight + @ExWeightNew,Modifier=@Modifier,ModifyDate=@ModifyDate 
+        //                             where ID = @ID and CoID = @CoID";
+        //         count = CoreDBconn.Execute(sqlCommandText, new { ExWeight = weight, ExWeightNew = qty * decimal.Parse(s[0].weight) ,Modifier = Username, ModifyDate = DateTime.Now, ID = id, CoID = CoID }, TransCore);
+        //         if (count < 0)
+        //         {
+        //             result.s = -3003;
+        //             return result;
+        //         }
+        //         string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+        //                                     VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+        //         int r = CoreDBconn.Execute(loginsert,log, TransCore);
+        //         if (r < 0)
+        //         {
+        //             result.s = -3002;
+        //             return result;
+        //         }
 
-                TransCore.Commit();
-            }
-            catch (Exception e)
-            {
-                TransCore.Rollback();
-                TransCore.Dispose();
-                result.s = -1;
-                result.d = e.Message;
-            }
-            finally
-            {
-                TransCore.Dispose();
-                CoreDBconn.Dispose();
-            }
-            var ff = GetSingleOrdItem(id,CoID);
-            if(ff.s == -1)
-            {
-                result.s = -1;
-                result.d = ff.d;
-                return result;
-            }
-            result.d = ff.d;
-            return result;
-        }
+        //         TransCore.Commit();
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         TransCore.Rollback();
+        //         TransCore.Dispose();
+        //         result.s = -1;
+        //         result.d = e.Message;
+        //     }
+        //     finally
+        //     {
+        //         TransCore.Dispose();
+        //         CoreDBconn.Dispose();
+        //     }
+        //     var ff = GetSingleOrdItem(id,CoID);
+        //     if(ff.s == -1)
+        //     {
+        //         result.s = -1;
+        //         result.d = ff.d;
+        //         return result;
+        //     }
+        //     result.d = ff.d;
+        //     return result;
+        // }
 
 
 

@@ -606,5 +606,8 @@ namespace CoreWebApi
             var data = OrderHaddle.InsertGift(id,skuid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        // int id = int.Parse(co["ID"].ToString());
+        //     int oid = int.Parse(co["OID"].ToString());
     }
 }  
