@@ -2,18 +2,9 @@
     "s": 1,
     "d": {
         "successIDs": [
-            8
+            2
         ],
-        "failIDs": [
-            {
-                "id": 2,
-                "reason": null
-            },
-            {
-                "id": 3,
-                "reason": null
-            }
-        ],
+        "failIDs": null,
         "SkuList": [
             {
                 "SkuAutoID": 3,
@@ -73,6 +64,21 @@
                 "ShopSkuID": null,
                 "IsGift": false,
                 "Weight": "1.50",
+                "InvQty": 0
+            },
+            {
+                "SkuAutoID": 2,
+                "Img": "",
+                "Qty": 1,
+                "GoodsCode": "test123456",
+                "SkuID": "test1234560004007",
+                "SkuName": "南极人2016男装夹克",
+                "Norm": "红色1;43",
+                "RealPrice": "0.00",
+                "Amount": "0.00",
+                "ShopSkuID": null,
+                "IsGift": true,
+                "Weight": "0.50",
                 "InvQty": 0
             }
         ]

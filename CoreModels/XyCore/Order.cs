@@ -447,6 +447,7 @@ namespace CoreModels.XyCore
     {
         public List<int> successIDs {get;set;}
         public List<InsertFailReason> failIDs {get;set;}
+        public List<SkuList> SkuList{get;set;}
     }
     public class OrderItem
     {
