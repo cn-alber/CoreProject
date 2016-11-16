@@ -7,10 +7,11 @@ using System.Text;
 using System.Data;
 using CoreModels.XyCore;
 using CoreModels.XyComm;
+using CoreModels.Enum;
 using CoreData.CoreComm;
 using MySql.Data.MySqlClient;
-using System.Linq;
-using System.Threading.Tasks;
+// using System.Linq;
+// using System.Threading.Tasks;
 
 namespace CoreData.CoreCore
 {
@@ -63,9 +64,9 @@ namespace CoreData.CoreCore
                     }
                     if (!string.IsNullOrEmpty(IParam.Skuautoid))
                     {
-                        querycount.Append(" AND ID in (SELECT distinct ParentID FROM sfc_item WHERE sfc_item.CoID= sfc_main.CoID AND sfc_item.Skuautoid LIKE @Skuautoid ))");
-                        querysql.Append(" AND ID in (SELECT distinct ParentID FROM sfc_item WHERE sfc_item.CoID= sfc_main.CoID AND sfc_item.Skuautoid LIKE @Skuautoid ))");
-                        p.Add("@Skuautoid", IParam.Skuautoid);
+                        querycount.Append(" AND ID in (SELECT distinct ParentID FROM sfc_item WHERE sfc_item.CoID= sfc_main.CoID AND sfc_item.ParentID=sfc_main.ID AND sfc_item.Skuautoid LIKE @Skuautoid ))");
+                        querysql.Append(" AND ID in (SELECT distinct ParentID FROM sfc_item WHERE sfc_item.CoID= sfc_main.CoID AND sfc_item.ParentID=sfc_main.ID AND sfc_item.Skuautoid LIKE @Skuautoid ))");
+                        p.Add("@Skuautoid", "%" + IParam.Skuautoid + "%");
                     }
                     if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
                     {
@@ -140,24 +141,43 @@ namespace CoreData.CoreCore
         ///<summary>
         ///库存盘点-新增-盘点主表
         ///</summary>
-        public static DataResult InsertStockTakeMain(string WhID, string Parent_WhID, string CoID, string UserName)
+        public static DataResult InsertStockTakeMain(string WhID, string Parent_WhID, int Type, string CoID, string UserName)
         {
             var result = new DataResult(1, null);
             var conn = new MySqlConnection(DbBase.CoreConnectString);
             conn.Open();
+            string TypeName = Enum.GetName(typeof(InvE.SfcMainTypeE), Type).ToString();
             var Trans = conn.BeginTransaction();
             try
             {
-                var main = new Sfc_main();
-                main.CoID = CoID;
-                main.Creator = UserName;
-                main.CreateDate = DateTime.Now.ToString();
-                main.Type = 2;
-                main.WhID = WhID;
-                main.Parent_WhID = Parent_WhID;
-                conn.Execute(AddSfcMainSql(), main, Trans);
-                Trans.Commit();
-                CoreUser.LogComm.InsertUserLog("新增库存盘点", "sfc_main", "新增盘点单" + WhID.ToString(), main.Creator, int.Parse(CoID), DateTime.Now);
+                var res = WarehouseHaddle.wareSettingGet(CoID);
+                if (res.s == 1)
+                {
+                    var ware = res.d as ware_m_setting;
+                    if (ware.IsPositionAccurate == "1")//库存精确化管理
+                    {
+                        result.s = -3011;
+                    }
+                    else
+                    {
+                        var main = new Sfc_main();
+                        main.CoID = CoID;
+                        main.Creator = UserName;
+                        main.CreateDate = DateTime.Now.ToString();
+                        main.Type = Type;
+                        main.WhID = WhID;
+                        main.Parent_WhID = Parent_WhID;
+                        conn.Execute(AddSfcMainSql(), main, Trans);
+                        Trans.Commit();
+                        CoreUser.LogComm.InsertUserLog("新增库存" + TypeName, "sfc_main", "新增" + TypeName + ":" + WhID.ToString(), main.Creator, int.Parse(CoID), DateTime.Now);
+                    }
+                }
+                else
+                {
+                    result.s = res.s;
+                    result.d = res.d;
+                }
+
             }
             catch (Exception e)
             {
@@ -177,25 +197,26 @@ namespace CoreData.CoreCore
         #endregion
 
         #region 库存盘点-新增-盘点子表
-        public static DataResult InsertStockTakeItem(string ParentID, List<int> SkuIDLst, string CoID, string UserName)
+        public static DataResult InsertStockTakeItem(string ParentID, List<int> SkuIDLst, int Type, string CoID, string UserName)
         {
             var result = new DataResult(1, null);
             var conn = new MySqlConnection(DbBase.CoreConnectString);
             conn.Open();
+            string TypeName = Enum.GetName(typeof(InvE.SfcMainTypeE), Type).ToString();
             var Trans = conn.BeginTransaction();
             try
             {
-                string sql = @"SELECT WhID,Parent_WhID FROM sfc_main WHERE CoID=@CoID AND ID=@ParentID";
-                string itemsql = @"SELECT Skuautoid FROM sfc_item WHERE CoID=@CoID AND ParentID=@ParentID";
-                var main = conn.QueryFirst<Sfc_main>(sql, new { CoID = CoID, ParentID = ParentID });
-                var Old_SkuIDLst = conn.Query<int>(itemsql, new { CoID = CoID, ParentID = ParentID }).AsList();
+                string sql = @"SELECT WhID,Parent_WhID FROM sfc_main WHERE CoID=@CoID AND ID=@ParentID AND Type=@Type";
+                string itemsql = @"SELECT Skuautoid FROM sfc_item WHERE CoID=@CoID AND ParentID=@ParentID AND Type=@Type";
+                var main = conn.QueryFirst<Sfc_main>(sql, new { CoID = CoID, ParentID = ParentID, Type = Type });
+                var Old_SkuIDLst = conn.Query<int>(itemsql, new { CoID = CoID, ParentID = ParentID, Type = Type }).AsList();
                 var ItemLst = SkuIDLst.Where(a => !Old_SkuIDLst.Contains(a)).Select(a => new Sfc_item
                 {
                     WhID = main.WhID,
                     ParentID = ParentID,
                     Parent_WhID = main.Parent_WhID,
                     Skuautoid = a.ToString(),
-                    Type = 2,
+                    Type = Type,
                     CoID = CoID,
                     Creator = UserName,
                     CreateDate = DateTime.Now.ToString()
@@ -204,7 +225,7 @@ namespace CoreData.CoreCore
                 {
                     conn.Execute(AddSfcItemSql(), ItemLst, Trans);
                     Trans.Commit();
-                    CoreUser.LogComm.InsertUserLog("新增库存盘点明细", "sfc_main", "新增盘点" + string.Join(",", SkuIDLst.ToArray()), main.Creator, int.Parse(CoID), DateTime.Now);
+                    CoreUser.LogComm.InsertUserLog("新增库存" + TypeName + "明细", "sfc_main", "新增" + TypeName + string.Join(",", SkuIDLst.ToArray()), main.Creator, int.Parse(CoID), DateTime.Now);
                 }
             }
             catch (Exception e)
@@ -232,9 +253,19 @@ namespace CoreData.CoreCore
             var Trans = conn.BeginTransaction();
             try
             {
-                string sql = "UPDATE sfc_item SET InvQty = @InvQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID=@ID";
-                conn.Execute(sql, new { InvQty = InvQty, CoID = CoID, ID = ID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
-                Trans.Commit();
+                string contents = string.Empty;
+                var itemOld = conn.QueryFirst<Sfc_item_Init_view>("SELECT ID,Skuautoid,InvQty,Price FROM sfc_item WHERE CoID=@CoID AND ID=@ID", new { CoID = CoID, ID = ID });
+                if (int.Parse(itemOld.InvQty) != int.Parse(InvQty))
+                {
+                    contents = contents + "数量:" + itemOld.InvQty + "=>" + InvQty + ";";
+                }
+                if (string.IsNullOrEmpty(contents))
+                {
+                    string sql = "UPDATE sfc_item SET InvQty = @InvQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID=@ID";
+                    conn.Execute(sql, new { InvQty = InvQty, CoID = CoID, ID = ID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                    Trans.Commit();
+                    CoreUser.LogComm.InsertUserLog("修改期初明细", "sfc_item", "商品ID" + itemOld.Skuautoid + " " + contents, UserName, int.Parse(CoID), DateTime.Now);
+                }
             }
             catch (Exception e)
             {
@@ -293,7 +324,6 @@ namespace CoreData.CoreCore
                         inv.Creator = UserName;
                         inv.CreateDate = DateTime.Now.ToString();
                         inv.CoID = CoID;
-                        conn.Execute(InventoryHaddle.AddInvinoutSql(), inv, Trans);
                         //交易明细
                         var invitemLst = new List<Invinoutitem>();
                         if (InvSkuLst.Count > 0)
@@ -392,6 +422,7 @@ namespace CoreData.CoreCore
                         conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, WarehouseID = Parent_WhID, SkuIDLst = SkuIDLst }, Trans);
                         conn.Execute("UPDATE sfc_item SET Qty=@Qty WHERE ID = @ID", itemLst, Trans);
                         Trans.Commit();
+                        CoreUser.LogComm.InsertUserLog("盘点单据-确认生效", "sfc_item", "单据ID" + ID, UserName, int.Parse(CoID), DateTime.Now);
                     }
                     else
                     {
@@ -417,11 +448,12 @@ namespace CoreData.CoreCore
         #endregion
 
         #region 库存盘点 - 作废盘点单
-        public static DataResult UnCheckStockTake(string ID, string CoID, string UserName)
+        public static DataResult UnCheckStockTake(string ID,int Type, string CoID, string UserName)
         {
             var result = new DataResult(1, null);
             var conn = new MySqlConnection(DbBase.CoreConnectString);
             conn.Open();
+            string TypeName = Enum.GetName(typeof(InvE.SfcMainTypeE), Type).ToString();
             var Trans = conn.BeginTransaction();
             try
             {
@@ -444,8 +476,10 @@ namespace CoreData.CoreCore
                     //更新仓库库存
                     conn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = CoID, WarehouseID = WhID, SkuIDLst = SkuIDLst }, Trans);
                     conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, WarehouseID = WhID, SkuIDLst = SkuIDLst }, Trans);
+                    Trans.Commit();
+                    CoreUser.LogComm.InsertUserLog(TypeName+"单据-作废", "sfc_item", "单据ID" + ID, UserName, int.Parse(CoID), DateTime.Now);
+
                 }
-                Trans.Commit();
             }
             catch (Exception e)
             {
@@ -524,6 +558,7 @@ namespace CoreData.CoreCore
             return sql;
         }
         #endregion
+
     }
 
 }

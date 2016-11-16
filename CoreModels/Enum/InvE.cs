@@ -2,7 +2,7 @@ namespace CoreModels.Enum
 {
     public class InvE
     {
-        public enum InvType
+        public enum InvType //库存交易出入类型
         {
             采购进货 = 1101,
             采购退货 = 1102,
@@ -20,6 +20,13 @@ namespace CoreModels.Enum
             加工进仓 = 1901,
             加工出仓 = 1902,
             发票 = 2001
+        }
+
+        public enum SfcMainTypeE //单据类型
+        {
+            期初 = 1,
+            盘点 = 2,
+            调拨 = 3
         }
     }
 }

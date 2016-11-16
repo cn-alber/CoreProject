@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 namespace CoreWebApi
 {
-    // [AllowAnonymous]
+    [AllowAnonymous]
     public class WarehouseController : ControllBase
     {
         [HttpPostAttribute("/Core/Warehouse/InsertWarehouse")]

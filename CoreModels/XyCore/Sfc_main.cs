@@ -75,6 +75,14 @@ namespace CoreModels.XyCore
         public string Type { get; set; }
     }
 
+    public class Sfc_item_Init_view
+    {
+        public int ID { get; set; }
+        public string Skuautoid { get; set; }
+        public string InvQty { get; set; }
+        public string Price { get; set; }
+        public string Amount { get; set; }
+    }
     public class Sfc_main_query
     {
         public int DataCount { get; set; } //总行数
@@ -84,7 +92,10 @@ namespace CoreModels.XyCore
     }
 
     public class Sfc_item_query
-    { 
+    {
+        public int DataCount { get; set; } //总行数
+        public int PageCount { get; set; }//总页数
+        public List<Sfc_item_Init_view> InitItemLst { get; set; }
         public List<Sfc_item_view> ItemLst { get; set; }
         public Dictionary<string, object> DicSku { get; set; }
     }
@@ -102,6 +113,8 @@ namespace CoreModels.XyCore
         public string DateT { get; set; }//单据日期讫
         public string Status { get; set; }//盘点状态
         public string Skuautoid { get; set; }//商品编号
+        public int Type { get; set; }//单据类型(1.期初，2.盘点，3.调拨)
+        public int ParentID { get; set; }//主表sfc_main.ID
         public string CoID
         {
             get { return _CoID; }

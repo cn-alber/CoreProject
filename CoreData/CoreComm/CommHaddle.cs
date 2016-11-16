@@ -236,22 +236,49 @@ namespace CoreData.CoreComm
             {
                 try
                 {
-                    Dictionary<string,object> DicSku = new Dictionary<string,object>();
+                    Dictionary<string, object> DicSku = new Dictionary<string, object>();
                     string Sql = @"SELECT ID,SkuID,SkuName,Norm,Img FROM coresku WHERE CoID=@CoID AND ID in @IDLst";
                     var SkuLst = conn.Query<CoreSkuView>(Sql, new { CoID = CoID, IDLst = IDLst }).AsList();
-                    foreach(var sku in SkuLst)
+                    foreach (var sku in SkuLst)
                     {
-                        DicSku.Add(sku.ID,sku);
+                        DicSku.Add(sku.ID, sku);
                     }
                 }
                 catch (Exception e)
                 {
                     result.s = -1;
                     result.d = e.Message;
-                }               
+                }
             }
             return result;
         }
+        #endregion
+
+
+
+        #region 公用方法 - 判断仓库是否启用 精细化管理
+        public static DataResult IsPositionAccurate(string CoID)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                { 
+                    string sql = @"SELECT IsPositionAccurate FROM ware_setting WHERE CoID=@CoID";
+                    var ispost = conn.Query(sql,new{CoID=CoID}).AsList();
+                    // if
+
+
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+
         #endregion
     }
 }
