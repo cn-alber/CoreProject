@@ -1394,7 +1394,7 @@ namespace CoreData.CoreCore
         ///<summary>
         ///删除订单明细
         ///</summary>
-        public static DataResult DeleteOrderDetail(int id,int skuid,int CoID,string Username,bool IsGift)
+        public static DataResult DeleteOrderDetail(int id,int oid,int CoID,string Username)
         {
             var result = new DataResult(1,null);  
             var logs = new List<Log>();
@@ -1404,7 +1404,7 @@ namespace CoreData.CoreCore
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
-                string wheresql = "select status,soid,amount,PaidAmount from `order` where id =" + id + " and coid =" + CoID;
+                string wheresql = "select status,soid,amount,PaidAmount from `order` where id =" + oid + " and coid =" + CoID;
                 var u = CoreDBconn.Query<Order>(wheresql).AsList();
                 if (u.Count == 0)
                 {
@@ -1422,8 +1422,7 @@ namespace CoreData.CoreCore
                     }
                 }
                 decimal amt = 0, weight = 0,qty = 0;
-                wheresql = @"select id,skuid,realprice,qty,amount,totalweight from orderitem where oid = " + id + " and coid =" + CoID + 
-                            " and skuautoid = " + skuid + " and isgift = " + IsGift;
+                wheresql = @"select id,skuid,realprice,qty,amount,totalweight from orderitem where oid = " + oid + " and coid =" + CoID + " and id = " + id;
                 var x = CoreDBconn.Query<OrderItem>(wheresql).AsList();
                 if (x.Count > 0)
                 {
@@ -1431,7 +1430,7 @@ namespace CoreData.CoreCore
                     amt += decimal.Parse(x[0].Amount);
                     weight += decimal.Parse(x[0].TotalWeight);
                     var log = new Log();
-                    log.OID = id;
+                    log.OID = oid;
                     log.SoID = u[0].SoID;
                     log.Type = 0;
                     log.LogDate = DateTime.Now;
@@ -1441,8 +1440,8 @@ namespace CoreData.CoreCore
                     log.CoID = CoID;
                     logs.Add(log);
                 }
-                string sqlCommandText = @"delete from orderitem where oid = @OID and coid = @CoID and skuautoid = @Sku and isgift = @IsGift";
-                int count = CoreDBconn.Execute(sqlCommandText,new {OID=id,CoID=CoID,Sku = skuid,IsGift = IsGift}, TransCore);
+                string sqlCommandText = @"delete from orderitem where oid = @OID and coid = @CoID and id = @ID";
+                int count = CoreDBconn.Execute(sqlCommandText,new {OID=oid,CoID=CoID,ID = id}, TransCore);
                 if (count < 0)
                 {
                     result.s = -3004;
@@ -1470,7 +1469,7 @@ namespace CoreData.CoreCore
                 sqlCommandText = @"update `order` set SkuAmount = SkuAmount - @SkuAmount,Amount = SkuAmount + ExAmount,ExWeight = ExWeight - @ExWeight,
                                   OrdQty = OrdQty - @OrdQty, Modifier=@Modifier,ModifyDate=@ModifyDate,IsPaid=@IsPaid,status=@Status  where ID = @ID and CoID = @CoID";
                 count = CoreDBconn.Execute(sqlCommandText, new { SkuAmount = amt, ExWeight = weight, OrdQty = qty,Modifier = Username, ModifyDate = DateTime.Now, 
-                                            IsPaid=IsPaid,Status=status,ID = id, CoID = CoID }, TransCore);
+                                            IsPaid=IsPaid,Status=status,ID = oid, CoID = CoID }, TransCore);
                 if (count < 0)
                 {
                     result.s = -3003;
@@ -1486,7 +1485,7 @@ namespace CoreData.CoreCore
                     return result;
                 }
                 TransCore.Commit();
-                wheresql = "select status,amount,ExWeight from `order` where id =" + id + " and coid =" + CoID;
+                wheresql = "select status,amount,ExWeight from `order` where id =" + oid + " and coid =" + CoID;
                 u = CoreDBconn.Query<Order>(wheresql).AsList();
                 sin.Amount = u[0].Amount;
                 sin.Status = u[0].Status;
@@ -1505,7 +1504,7 @@ namespace CoreData.CoreCore
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
             }
-            var ff = GetSingleOrdItem(id,CoID);
+            var ff = GetSingleOrdItem(oid,CoID);
             if(ff.s == -1)
             {
                 result.s = -1;
@@ -1519,7 +1518,7 @@ namespace CoreData.CoreCore
         ///<summary>
         ///更新订单明细
         ///</summary>
-        public static DataResult UpdateOrderDetail(int id,int skuid,int CoID,string Username,decimal price,int qty,string SkuName,bool IsGift)
+        public static DataResult UpdateOrderDetail(int id,int oid,int CoID,string Username,decimal price,int qty,string SkuName)
         {
             var result = new DataResult(1,null);  
             var logs = new List<Log>();
@@ -1529,7 +1528,7 @@ namespace CoreData.CoreCore
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
-                string wheresql = "select status,soid,amount,PaidAmount from `order` where id =" + id + " and coid =" + CoID;
+                string wheresql = "select status,soid,amount,PaidAmount from `order` where id =" + oid + " and coid =" + CoID;
                 var u = CoreDBconn.Query<Order>(wheresql).AsList();
                 if (u.Count == 0)
                 {
@@ -1550,7 +1549,7 @@ namespace CoreData.CoreCore
                 var p = new DynamicParameters();
                 decimal amt = 0, weight = 0,pricenew = 0,qtynew = 0;
                 wheresql = @"select id,skuid,realprice,qty,amount,totalweight,weight,saleprice,skuname from orderitem 
-                             where oid = " + id + " and coid =" + CoID + " and skuautoid = " + skuid + " and IsGift = " + IsGift;
+                             where oid = " + oid + " and coid =" + CoID + " and id = " + id;
                 var x = CoreDBconn.Query<OrderItem>(wheresql).AsList();
                 if (x.Count > 0)
                 {
@@ -1566,7 +1565,7 @@ namespace CoreData.CoreCore
                             sqlCommandText = sqlCommandText + "realprice = @Realprice,";
                             p.Add("@Realprice", price);
                             var log = new Log();
-                            log.OID = id;
+                            log.OID = oid;
                             log.SoID = u[0].SoID;
                             log.Type = 0;
                             log.LogDate = DateTime.Now;
@@ -1585,7 +1584,7 @@ namespace CoreData.CoreCore
                             sqlCommandText = sqlCommandText + "qty = @Qty,";
                             p.Add("@Qty", qty);
                             var log = new Log();
-                            log.OID = id;
+                            log.OID = oid;
                             log.SoID = u[0].SoID;
                             log.Type = 0;
                             log.LogDate = DateTime.Now;
@@ -1603,7 +1602,7 @@ namespace CoreData.CoreCore
                             sqlCommandText = sqlCommandText + "SkuName = @SkuName,";
                             p.Add("@SkuName", SkuName);
                             var log = new Log();
-                            log.OID = id;
+                            log.OID = oid;
                             log.SoID = u[0].SoID;
                             log.Type = 0;
                             log.LogDate = DateTime.Now;
@@ -1615,16 +1614,15 @@ namespace CoreData.CoreCore
                         }
                     }
                     sqlCommandText = sqlCommandText + "amount = @Amount,DiscountRate = @DiscountRate,TotalWeight=@TotalWeight,modifier=@Modifier,ModifyDate=@ModifyDate " + 
-                                                       "where oid = @Oid and coid = @Coid and skuautoid = @Sku and IsGift = @IsGift";
+                                                       "where oid = @Oid and coid = @Coid and id = @ID";
                     p.Add("@Amount", pricenew * qtynew);
                     p.Add("@DiscountRate", pricenew/decimal.Parse(x[0].SalePrice));
                     p.Add("@TotalWeight", qtynew * decimal.Parse(x[0].Weight));
                     p.Add("@Modifier", Username);
                     p.Add("@ModifyDate", DateTime.Now);
-                    p.Add("@Oid", id);
+                    p.Add("@Oid", oid);
                     p.Add("@Coid", CoID);
-                    p.Add("@Sku", skuid);
-                    p.Add("@IsGift", IsGift);
+                    p.Add("@ID", id);
                     int count = CoreDBconn.Execute(sqlCommandText, p, TransCore);
                     if (count < 0)
                     {
@@ -1653,7 +1651,7 @@ namespace CoreData.CoreCore
                                         ordqty = ordqty + @Ordqty ,Modifier=@Modifier,ModifyDate=@ModifyDate,IsPaid=@IsPaid,status=@Status 
                                         where ID = @ID and CoID = @CoID";
                     count = CoreDBconn.Execute(sqlCommandText, new { SkuAmount = pricenew * qtynew - amt, ExWeight = qtynew * decimal.Parse(x[0].Weight) - weight,
-                                                Ordqty = qtynew - x[0].Qty, Modifier = Username, ModifyDate = DateTime.Now,IsPaid=IsPaid,Status=status, ID = id, CoID = CoID }, TransCore);
+                                                Ordqty = qtynew - x[0].Qty, Modifier = Username, ModifyDate = DateTime.Now,IsPaid=IsPaid,Status=status, ID = oid, CoID = CoID }, TransCore);
                     if (count < 0)
                     {
                         result.s = -3003;
@@ -1669,7 +1667,7 @@ namespace CoreData.CoreCore
                     }
                 }
                 TransCore.Commit();
-                wheresql = "select status,amount,ExWeight from `order` where id =" + id + " and coid =" + CoID;
+                wheresql = "select status,amount,ExWeight from `order` where id =" + oid + " and coid =" + CoID;
                 u = CoreDBconn.Query<Order>(wheresql).AsList();
                 sin.Amount = u[0].Amount;
                 sin.Status = u[0].Status;
@@ -1688,7 +1686,7 @@ namespace CoreData.CoreCore
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
             }
-            var ff = GetSingleOrdItem(id,CoID);
+            var ff = GetSingleOrdItem(oid,CoID);
             if(ff.s == -1)
             {
                 result.s = -1;

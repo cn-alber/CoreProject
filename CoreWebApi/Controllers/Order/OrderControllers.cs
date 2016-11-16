@@ -341,27 +341,19 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/DeleteOrderDetail")]
         public ResponseResult DeleteOrderDetail([FromBodyAttribute]JObject co)
         {   
-            int id = int.Parse(co["OID"].ToString());
-            // long soid = long.Parse(co["SoID"].ToString());
-            int skuid = int.Parse(co["SkuID"].ToString());
+            int id = int.Parse(co["ID"].ToString());
+            int oid = int.Parse(co["OID"].ToString());
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
-            string isgift = co["IsGift"].ToString();
-            bool IsGift = false;
-            if(isgift.ToUpper() == "TRUE")
-            {
-                IsGift = true;
-            }
-            var data = OrderHaddle.DeleteOrderDetail(id,skuid,CoID,username,IsGift);
+            var data = OrderHaddle.DeleteOrderDetail(id,oid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
         [HttpPostAttribute("/Core/Order/UpdateOrderDetail")]
         public ResponseResult UpdateOrderDetail([FromBodyAttribute]JObject co)
         {   
-            int id = int.Parse(co["OID"].ToString());
-            // long soid = long.Parse(co["SoID"].ToString());
-            int skuid = int.Parse(co["SkuAutoID"].ToString());
+            int id = int.Parse(co["ID"].ToString());
+            int oid = int.Parse(co["OID"].ToString());
             decimal price = -1;
             int qty = -1;
             if(!string.IsNullOrEmpty(co["Price"].ToString()))
@@ -375,13 +367,7 @@ namespace CoreWebApi
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             string SkuName = co["SkuName"].ToString();
-            string isgift = co["IsGift"].ToString();
-            bool IsGift = false;
-            if(isgift.ToUpper() == "TRUE")
-            {
-                IsGift = true;
-            }
-            var data = OrderHaddle.UpdateOrderDetail(id,skuid,CoID,username,price,qty,SkuName,IsGift);
+            var data = OrderHaddle.UpdateOrderDetail(id,oid,CoID,username,price,qty,SkuName);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
