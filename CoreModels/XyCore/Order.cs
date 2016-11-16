@@ -468,6 +468,7 @@ namespace CoreModels.XyCore
         public string Weight{get;set;}
         public string TotalWeight{get;set;}
         public bool IsGift{get;set;}
+        public string ShopSkuID{get;set;}
         public string Remark{get;set;}
         public string Creator{get;set;}
         public DateTime CreateDate{get;set;}
@@ -604,6 +605,11 @@ namespace CoreModels.XyCore
         public string SkuName{get;set;}
         public string Norm{get;set;}
         public string RealPrice{get;set;}
+        public string Amount{get;set;}
+        public string ShopSkuID{get;set;}
+        public bool IsGift{get;set;}
+        public string Weight{get;set;}
+        public int InvQty{get;set;}
     }
     public class StatusCount
     {
@@ -654,6 +660,7 @@ namespace CoreModels.XyCore
         public decimal Price{get;set;}//必输
         public decimal Amount{get;set;}//必输
         public string Remark{get;set;}
+        public string ShopSkuID{get;set;}
     }
     public class ImportPayinfo
     {
@@ -669,5 +676,11 @@ namespace CoreModels.XyCore
         public string Name{get;set;}
         public string Amount{get;set;}
         public string PayAmount{get;set;}//必输
+    }
+    public class ImportOrderUpdate
+    {
+        public long SoID{get;set;}//必输
+        public string ShopStatus{get;set;}
+        public List<ImportPayinfo> Pay{get;set;}
     }
 }

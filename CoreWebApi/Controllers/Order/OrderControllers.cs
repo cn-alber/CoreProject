@@ -586,5 +586,15 @@ namespace CoreWebApi
             var data = OrderHaddle.ImportOrderInsert(order,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Order/ImportOrderUpdate")]
+        public ResponseResult ImportOrderUpdate([FromBodyAttribute]JObject co)
+        {   
+            ImportOrderUpdate order = Newtonsoft.Json.JsonConvert.DeserializeObject<ImportOrderUpdate>(co["Order"].ToString());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid()); 
+            var data = OrderHaddle.ImportOrderUpdate(order,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }  

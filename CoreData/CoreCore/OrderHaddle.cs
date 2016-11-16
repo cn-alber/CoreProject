@@ -300,9 +300,13 @@ namespace CoreData.CoreCore
                             }
                             a.SoIDList = soid;
                         }
-                        sqlcommand = "select SkuAutoID,Img,Qty,GoodsCode,SkuID,SkuName,Norm,RealPrice from orderitem where oid = " + a.ID + " and coid =" + cp.CoID;
+                        sqlcommand = "select SkuAutoID,Img,Qty,GoodsCode,SkuID,SkuName,Norm,RealPrice,Amount,ShopSkuID,IsGift,Weight from orderitem where oid = " + a.ID + " and coid =" + cp.CoID;
                         var item = conn.Query<SkuList>(sqlcommand).AsList();
                         a.SkuList = item;
+                        foreach(var i in item)
+                        {
+                            i.InvQty = GetInvQty(cp.CoID,i.SkuAutoID);
+                        }
                     }
                     result.d = res;             
                 }catch(Exception ex){
@@ -312,6 +316,23 @@ namespace CoreData.CoreCore
                 }
             }           
             return result;
+        }
+        ///<summary>
+        ///根据Sku查询库存
+        ///</summary>
+        public static int GetInvQty(int CoID,int skuid)
+        {
+            int invqty = 0;
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string wheresql = "select ifnull(sum(StockQty - LockQty + VirtualQty),0) from inventory where coid = " + CoID + " and WarehouseID = 0 and Skuautoid = " + skuid;
+                    invqty = conn.QueryFirst<int>(wheresql);
+                }catch(Exception ex){
+                    invqty = 0;
+                    conn.Dispose();
+                }
+            } 
+            return invqty;
         }
         ///<summary>
         ///新增订单
@@ -3785,7 +3806,7 @@ namespace CoreData.CoreCore
                     item.CreateDate = DateTime.Now;
                     item.Modifier = UserName;
                     item.ModifyDate= DateTime.Now;
-
+                    item.ShopSkuID = a.ShopSkuID;
                     Amount = Amount + a.Amount;
                     Qty = Qty + a.Qty;
                     int i = CoreDBconn.QueryFirst<int>("select count(id) from coresku where skuid = '" + a.SkuID + "' and coid = " + CoID);
@@ -4051,9 +4072,9 @@ namespace CoreData.CoreCore
                 }
                 //新增订单明细
                 sqlcommand = @"INSERT INTO orderitem(oid,soid,coid,skuautoid,skuid,skuname,norm,GoodsCode,qty,saleprice,realprice,amount,DiscountRate,img,
-                                                     weight,totalweight,IsGift,Remark,creator,modifier) 
+                                                     weight,totalweight,IsGift,Remark,creator,modifier,ShopSkuID) 
                                               VALUES(@OID,@Soid,@Coid,@Skuautoid,@Skuid,@Skuname,@Norm,@GoodsCode,@Qty,@Saleprice,@Realprice,@Amount,@DiscountRate,@Img,
-                                                     @Weight,@Totalweight,@IsGift,@Remark,@Creator,@Creator)";
+                                                     @Weight,@Totalweight,@IsGift,@Remark,@Creator,@Creator,@ShopSkuID)";
                 count = CoreDBconn.Execute(sqlcommand, orderitem, TransCore);
                 if (count <= 0)
                 {
@@ -4140,12 +4161,110 @@ namespace CoreData.CoreCore
         ///<summary>
         ///平台订单更新入口
         ///</summary>
-        public static DataResult ImportOrderUpdate(ImportOrderInsert Order,int CoID,string UserName)
+        public static DataResult ImportOrderUpdate(ImportOrderUpdate Order,int CoID,string UserName)
         {
             var result = new DataResult(1,null);
-
-
-
+            string sqlcommand = "select id,soid,coid,recname,amount,PaidAmount,PayAmount,status,IsPaid,PayDate,PayNbr,ShopStatus from `order` where soid = " + Order.SoID + " and coid = " + CoID;
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                var ord = CoreDBconn.Query<Order>(sqlcommand).AsList();
+                //处理付款资料
+                var PayList= new List<PayInfo>();
+                decimal amount = 0;
+                bool isUpdate = false;
+                foreach(var a in Order.Pay)
+                {
+                    sqlcommand = "select count(id) from payinfo where oid = " + ord[0].ID + " and coid = " + CoID + " and PayNbr = '" + a.PayNbr + "'";
+                    int i = CoreDBconn.QueryFirst<int>(sqlcommand);
+                    if (i > 0) continue;
+                    var pay = new PayInfo();
+                    pay.PayNbr = a.PayNbr;
+                    pay.RecName = ord[0].RecName;
+                    pay.OID = ord[0].ID;
+                    pay.SoID = ord[0].SoID;
+                    pay.Payment = a.Payment;
+                    pay.PayAccount = a.PayAccount;
+                    pay.SellerAccount = a.SellerAccount;
+                    pay.Platform = a.Platform;
+                    pay.PayDate = a.PayDate;
+                    pay.Bank = a.Bank;
+                    pay.BankName= a.BankName;
+                    pay.Title = a.Title;
+                    pay.Name = a.Name;
+                    pay.Amount = a.Amount;
+                    pay.PayAmount = a.PayAmount;
+                    pay.DataSource = 0;
+                    pay.Status = 1;
+                    pay.CoID = CoID;
+                    pay.Creator = UserName;
+                    pay.CreateDate = DateTime.Now;
+                    pay.Confirmer = UserName;
+                    pay.ConfirmDate= DateTime.Now;
+                    PayList.Add(pay);
+                    amount = amount + decimal.Parse(pay.PayAmount);
+                }
+                if(amount > 0 && (ord[0].Status ==1 || ord[0].Status==0 ||ord[0].Status == 7))
+                {
+                    ord[0].PaidAmount = (decimal.Parse(ord[0].PaidAmount) + amount).ToString();
+                    ord[0].PayAmount = (decimal.Parse(ord[0].PayAmount) + amount).ToString();
+                    if(ord[0].PaidAmount == ord[0].Amount)
+                    {
+                        ord[0].IsPaid = true;
+                        if(ord[0].Status != 7)
+                        {
+                            ord[0].Status = 1;
+                        }
+                    }
+                    else
+                    {
+                        ord[0].IsPaid = false;
+                        if(ord[0].Status != 7)
+                        {
+                            ord[0].Status = 0;
+                        }
+                    }
+                    if(string.IsNullOrEmpty(ord[0].PayNbr))
+                    {
+                        ord[0].PayNbr = PayList[0].PayNbr;
+                        ord[0].PayDate = PayList[0].PayDate;
+                    }
+                    isUpdate = true;
+                }
+                if(Order.ShopStatus != ord[0].ShopStatus)
+                {
+                    ord[0].ShopStatus = Order.ShopStatus;
+                    isUpdate = true;
+                }
+                if(isUpdate == true)
+                {
+                    ord[0].Modifier = UserName;
+                    ord[0].ModifyDate = DateTime.Now;
+                    sqlcommand = @"update `order` set PaidAmount = @PaidAmount,PayAmount =@PayAmount,IsPaid=@IsPaid,Status=@Status,ShopStatus=@ShopStatus,PayNbr=@PayNbr,
+                                   PayDate=@PayDate,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
+                    int count = CoreDBconn.Execute(sqlcommand,ord[0],TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
             return result;
         }
         ///<summary>
