@@ -157,16 +157,7 @@ namespace CoreWebApi.Base
             return CoreResult.NewResponse(res.s,res.d,"Api");
         }
 
-        [HttpGetAttribute("/Core/Shop/getShopEnum")]
-        public ResponseResult getShopEnum()
-        {          
-            var res = new DataResult(1,null);                            
-            string Coid = GetCoid();            
-            res.d = ShopHaddle.getShopEnum(Coid);
-            return CoreResult.NewResponse(res.s,res.d,"Api");
-        }
-
-
+        
 
 
 

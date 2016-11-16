@@ -447,6 +447,7 @@ namespace CoreModels.XyCore
     {
         public List<int> successIDs {get;set;}
         public List<InsertFailReason> failIDs {get;set;}
+        public SingleOrderItem Order{get;set;}
     }
     public class OrderItem
     {
@@ -468,6 +469,7 @@ namespace CoreModels.XyCore
         public string Weight{get;set;}
         public string TotalWeight{get;set;}
         public bool IsGift{get;set;}
+        public string ShopSkuID{get;set;}
         public string Remark{get;set;}
         public string Creator{get;set;}
         public DateTime CreateDate{get;set;}
@@ -596,6 +598,7 @@ namespace CoreModels.XyCore
     }
     public class SkuList
     {
+        public int ID{get;set;}
         public int SkuAutoID{get;set;}
         public string Img{get;set;}
         public int Qty{get;set;}
@@ -604,6 +607,11 @@ namespace CoreModels.XyCore
         public string SkuName{get;set;}
         public string Norm{get;set;}
         public string RealPrice{get;set;}
+        public string Amount{get;set;}
+        public string ShopSkuID{get;set;}
+        public bool IsGift{get;set;}
+        public string Weight{get;set;}
+        public int InvQty{get;set;}
     }
     public class StatusCount
     {
@@ -617,13 +625,13 @@ namespace CoreModels.XyCore
     }
     public class ImportOrderInsert
     {
-        public int Type{get;set;}
-        public int OSource{get;set;}
-        public DateTime ODate{get;set;}
-        public string BuyerShopID{get;set;}
-        public string ShopName{get;set;}
-        public long SoID{get;set;}
-        public string Amount{get;set;}
+        public int Type{get;set;}//必输
+        public int OSource{get;set;}//必输
+        public DateTime ODate{get;set;}//必输
+        public string BuyerShopID{get;set;}//必输
+        public string ShopName{get;set;}//必输
+        public long SoID{get;set;}//必输
+        public string Amount{get;set;}//必输
         public string PaidAmount{get;set;}
         public string PayAmount{get;set;}
         public string ExAmount{get;set;}
@@ -631,43 +639,58 @@ namespace CoreModels.XyCore
         public string InvoiceType{get;set;}
         public string InvoiceTitle{get;set;}
         public DateTime InvoiceDate{get;set;}
-        public bool IsCOD{get;set;}
+        public bool IsCOD{get;set;}//必输
         public string ShopStatus{get;set;}
-        public string RecName{get;set;}
-        public string RecLogistics{get;set;}
-        public string RecCity{get;set;}
-        public string RecDistrict{get;set;}
-        public string RecAddress{get;set;}
+        public string RecName{get;set;}//必输
+        public string RecLogistics{get;set;}//必输
+        public string RecCity{get;set;}//必输
+        public string RecDistrict{get;set;}//必输
+        public string RecAddress{get;set;}//必输
         public string RecZip{get;set;}
         public string RecTel{get;set;}
-        public string RecPhone{get;set;}
+        public string RecPhone{get;set;}//必输
         public string RecMessage{get;set;}
         public string Distributor{get;set;}
         public string SupDistributor{get;set;}
-        public List<ImportOrderItemDetail> Item{get;set;}
+        public List<ImportOrderItemDetail> Item{get;set;}//必输
         public List<ImportPayinfo> Pay{get;set;}
     }
     public class ImportOrderItemDetail
     {
-        public string SkuID{get;set;}
-        public int Qty{get;set;}
-        public decimal Price{get;set;}
-        public decimal Amount{get;set;}
+        public string SkuID{get;set;}//必输
+        public int Qty{get;set;}//必输
+        public decimal Price{get;set;}//必输
+        public decimal Amount{get;set;}//必输
         public string Remark{get;set;}
+        public string ShopSkuID{get;set;}
     }
     public class ImportPayinfo
     {
-        public string PayNbr{get;set;}
-        public string Payment{get;set;}
+        public string PayNbr{get;set;}//必输
+        public string Payment{get;set;}//必输
         public string PayAccount{get;set;}
         public string SellerAccount{get;set;}
         public string Platform{get;set;}
-        public DateTime PayDate{get;set;}
+        public DateTime PayDate{get;set;}//必输
         public string Bank{get;set;}
         public string BankName{get;set;}
         public string Title{get;set;}
         public string Name{get;set;}
         public string Amount{get;set;}
-        public string PayAmount{get;set;}
+        public string PayAmount{get;set;}//必输
+    }
+    public class ImportOrderUpdate
+    {
+        public long SoID{get;set;}//必输
+        public string ShopStatus{get;set;}
+        public List<ImportPayinfo> Pay{get;set;}
+    }
+    public class SingleOrderItem
+    {
+        public string Amount{get;set;}
+        public int Status{get;set;}
+        public string StatusDec{get;set;}
+        public string Weight{get;set;}
+        public List<SkuList> SkuList{get;set;}
     }
 }

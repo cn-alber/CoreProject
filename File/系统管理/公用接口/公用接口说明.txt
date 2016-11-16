@@ -81,3 +81,12 @@ InPut:
 OutPut:
     Lst                 List<wareLst>           仓储列表
 接口路径：CoreWebApi\Controllers\Base\WareLst_output.json   
+
+8.getShopEnum() //获取店铺列表
+接口路径：CoreWebApi\Controllers\Base\shopControllers.cs
+路由：/Core/Shop/getShopEnum
+InPut:
+     
+OutPut:
+    参见：GetShopEnum.json
+  

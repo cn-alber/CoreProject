@@ -232,6 +232,21 @@ namespace CoreWebApi
         }
         #endregion
 
+        [HttpGetAttribute("/Core/Shop/getShopEnum")]
+        public ResponseResult getShopEnum()
+        {          
+            var res = new DataResult(1,null);                            
+            string Coid = GetCoid();         
+            var r = ShopHaddle.getShopEnum(Coid);
+            r.Add(new shopEnum{
+                value = 0,
+                label = "{线下}"
+            });  
+            res.d = r;
+            return CoreResult.NewResponse(res.s,res.d,"Api");
+        }
+
+
 
     }
 }
