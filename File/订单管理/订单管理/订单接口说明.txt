@@ -85,7 +85,6 @@ OutPut:     Datacnt             int             资料总笔数
 5.InsertOrderDetail()订单新增明细
 路由:http://localhost:5000/Core/Order/InsertOrderDetail
 input:OID         int       内部订单号
-      SoID        int       线上订单号
       SkuIDList   List<int> 商品auto id list    
 output: s=1成功 else 错误代码
 参考:input jason 文件:InsertOrderDetail_input.json
@@ -94,8 +93,8 @@ output: s=1成功 else 错误代码
 6.DeleteOrderDetail()订单删除明细
 路由:http://localhost:5000/Core/Order/DeleteOrderDetail
 input:OID         int       内部订单号
-      SoID        int       线上订单号
-      SkuIDList   List<int> 商品auto id list    
+      SkuID       int       商品auto id  
+      IsGift      bool      是否为赠品
 output: s=1成功 else 错误代码
 参考:input jason 文件:DeleteOrderDetail_input.json
 参考:output jason 文件:DeleteOrderDetail_output.json
@@ -103,10 +102,11 @@ output: s=1成功 else 错误代码
 7.UpdateOrderDetail()订单更新明细
 路由:http://localhost:5000/Core/Order/UpdateOrderDetail
 input:OID         int       内部订单号
-      SoID        int       线上订单号
       SkuAutoID   int       商品auto id
       Price       string    修改后单价
       Qty         string    修改后数量
+      SkuName     string    商品名称
+      IsGift      bool      是否为赠品
 output: s=1成功 else 错误代码
 参考:input jason 文件:UpdateOrderDetail_input.json
 参考:output jason 文件:UpdateOrderDetail_output.json
@@ -245,3 +245,18 @@ input:Module ImportOrderInsert
 output: s=1成功 else 错误代码
 参考:input jason 文件:ImportOrderInsert_input.json
 参考:output jason 文件:ImportOrderInsert_output.json
+
+23.ImportOrderUpdate()接口订单更新
+路由:http://localhost:5000/Core/Order/ImportOrderUpdate
+input:Module ImportOrderUpdate
+output: s=1成功 else 错误代码
+参考:input jason 文件:ImportOrderUpdate_input.json
+参考:output jason 文件:ImportOrderUpdate_output.json
+
+24.InsertGift()订单添加赠品
+路由:http://localhost:5000/Core/Order/InsertGift
+input:OID         int       内部订单号
+      SkuID       int       商品auto id 
+output: s=1成功 else 错误代码
+参考:input jason 文件:InsertGift_input.json
+参考:output jason 文件:InsertGift_output.json
