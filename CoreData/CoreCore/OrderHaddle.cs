@@ -424,12 +424,16 @@ namespace CoreData.CoreCore
                     }
                     if(ord.BuyerShopID != null && ord.RecName != null && ord.RecLogistics != null && ord.RecCity != null && ord.RecDistrict != null && ord.RecAddress != null)
                     {
-                        string wheresql = "select id from recinfo where coid = " + CoID + " and buyerid = '" + ord.BuyerShopID + "' and receiver = '" + ord.RecName + 
+                        string wheresql = "select count(id) from recinfo where coid = " + CoID + " and buyerid = '" + ord.BuyerShopID + "' and receiver = '" + ord.RecName + 
                                            "' and address = '" + ord.RecAddress + "' and logistics = '" + ord.RecLogistics + "' and city = '" + ord.RecCity + 
                                            "' and district = '" + ord.RecDistrict + "'";
                         int u = conn.QueryFirst<int>(wheresql);
                         if(u > 0)
                         {
+                            wheresql = "select id from recinfo where coid = " + CoID + " and buyerid = '" + ord.BuyerShopID + "' and receiver = '" + ord.RecName + 
+                                           "' and address = '" + ord.RecAddress + "' and logistics = '" + ord.RecLogistics + "' and city = '" + ord.RecCity + 
+                                           "' and district = '" + ord.RecDistrict + "'";
+                            u = conn.QueryFirst<int>(wheresql);
                             ord.BuyerID = u;
                         }
                         else
@@ -3154,6 +3158,7 @@ namespace CoreData.CoreCore
                         return result;
                     }
                     //新明细
+                    p.CoID = CoID;
                     p.OID = rtn;
                     p.SoID = ordNew.SoID;
                     p.Amount = Math.Round(amtNew/(amt + amtNew) * Amount,2).ToString();
@@ -3741,7 +3746,7 @@ namespace CoreData.CoreCore
             List<int> idlist = new List<int>();
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try{
-                    string wheresql = "select * from Shop where ShopName =" + Order.ShopName + " and coid =" + CoID;
+                    string wheresql = "select * from Shop where ShopName ='" + Order.ShopName + "' and coid =" + CoID;
                     var u = conn.Query<Shop>(wheresql).AsList();
                     if(u.Count > 0)
                     {
@@ -3936,12 +3941,16 @@ namespace CoreData.CoreCore
                     }
                 }
                 //检查收货人是否存在
-                sqlcommand = "select id from recinfo where coid = " + CoID + " and buyerid = '" + Order.BuyerShopID + "' and receiver = '" + Order.RecName + 
+                sqlcommand = "select count(id) from recinfo where coid = " + CoID + " and buyerid = '" + Order.BuyerShopID + "' and receiver = '" + Order.RecName + 
                                 "' and address = '" + Order.RecAddress + "' and logistics = '" + Order.RecLogistics + "' and city = '" + Order.RecCity + 
                                 "' and district = '" + Order.RecDistrict + "'";
                 int u = CoreDBconn.QueryFirst<int>(sqlcommand);
                 if(u > 0)
                 {
+                    sqlcommand = "select id from recinfo where coid = " + CoID + " and buyerid = '" + Order.BuyerShopID + "' and receiver = '" + Order.RecName + 
+                                "' and address = '" + Order.RecAddress + "' and logistics = '" + Order.RecLogistics + "' and city = '" + Order.RecCity + 
+                                "' and district = '" + Order.RecDistrict + "'";
+                    u = CoreDBconn.QueryFirst<int>(sqlcommand);
                     ord.BuyerID = u;
                     foreach(var p in PayList)
                     {
@@ -4126,6 +4135,17 @@ namespace CoreData.CoreCore
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
             }
+            return result;
+        }
+        ///<summary>
+        ///平台订单更新入口
+        ///</summary>
+        public static DataResult ImportOrderUpdate(ImportOrderInsert Order,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+
+
+
             return result;
         }
         ///<summary>
