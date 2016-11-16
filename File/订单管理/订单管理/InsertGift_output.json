@@ -2,86 +2,117 @@
     "s": 1,
     "d": {
         "successIDs": [
-            2
+            2,
+            3,
+            11
         ],
-        "failIDs": null,
-        "SkuList": [
-            {
-                "SkuAutoID": 3,
-                "Img": "",
-                "Qty": 10,
-                "GoodsCode": "test123456",
-                "SkuID": "test1234560004014",
-                "SkuName": "南极人2016男装夹克",
-                "Norm": "红色1;46",
-                "RealPrice": "8.00",
-                "Amount": "80.00",
-                "ShopSkuID": null,
-                "IsGift": false,
-                "Weight": "1.00",
-                "InvQty": 0
-            },
-            {
-                "SkuAutoID": 15,
-                "Img": "",
-                "Qty": 10,
-                "GoodsCode": "test456",
-                "SkuID": "test4560007014",
-                "SkuName": "南极人2016男装休闲西裤",
-                "Norm": "棕色;46",
-                "RealPrice": "9.00",
-                "Amount": "90.00",
-                "ShopSkuID": null,
-                "IsGift": false,
-                "Weight": "2.00",
-                "InvQty": 0
-            },
-            {
-                "SkuAutoID": 2,
-                "Img": "",
-                "Qty": 10,
-                "GoodsCode": "test123456",
-                "SkuID": "test1234560004007",
-                "SkuName": "南极人2016男装夹克",
-                "Norm": "红色1;43",
-                "RealPrice": "10.00",
-                "Amount": "100.00",
-                "ShopSkuID": null,
-                "IsGift": false,
-                "Weight": "0.50",
-                "InvQty": 0
-            },
-            {
-                "SkuAutoID": 8,
-                "Img": "",
-                "Qty": 1,
-                "GoodsCode": "test251",
-                "SkuID": "test2510002007",
-                "SkuName": "南极人2016男装夹克休闲版",
-                "Norm": "白色;43",
-                "RealPrice": "12.00",
-                "Amount": "12.00",
-                "ShopSkuID": null,
-                "IsGift": false,
-                "Weight": "1.50",
-                "InvQty": 0
-            },
-            {
-                "SkuAutoID": 2,
-                "Img": "",
-                "Qty": 1,
-                "GoodsCode": "test123456",
-                "SkuID": "test1234560004007",
-                "SkuName": "南极人2016男装夹克",
-                "Norm": "红色1;43",
-                "RealPrice": "0.00",
-                "Amount": "0.00",
-                "ShopSkuID": null,
-                "IsGift": true,
-                "Weight": "0.50",
-                "InvQty": 0
-            }
-        ]
+        "failIDs": [
+            
+        ],
+        "Order": {
+            "Amount": "280.00",
+            "Status": 1,
+            "StatusDec": "已付款待审核",
+            "Weight": "59.00",
+            "SkuList": [
+                {
+                    "ID": 18961,
+                    "SkuAutoID": 3,
+                    "Img": "",
+                    "Qty": 20,
+                    "GoodsCode": "test123456",
+                    "SkuID": "test1234560004014",
+                    "SkuName": "南极人2016男装夹克333333",
+                    "Norm": "红色1;46",
+                    "RealPrice": "5.00",
+                    "Amount": "100.00",
+                    "ShopSkuID": null,
+                    "IsGift": false,
+                    "Weight": "1.00",
+                    "InvQty": 0
+                },
+                {
+                    "ID": 18962,
+                    "SkuAutoID": 15,
+                    "Img": "",
+                    "Qty": 10,
+                    "GoodsCode": "test456",
+                    "SkuID": "test4560007014",
+                    "SkuName": "南极人2016男装休闲西裤",
+                    "Norm": "棕色;46",
+                    "RealPrice": "9.00",
+                    "Amount": "90.00",
+                    "ShopSkuID": null,
+                    "IsGift": false,
+                    "Weight": "2.00",
+                    "InvQty": 0
+                },
+                {
+                    "ID": 18964,
+                    "SkuAutoID": 8,
+                    "Img": "",
+                    "Qty": 10,
+                    "GoodsCode": "test251",
+                    "SkuID": "test2510002007",
+                    "SkuName": "南极人2016男装夹克333333",
+                    "Norm": "白色;43",
+                    "RealPrice": "8.00",
+                    "Amount": "80.00",
+                    "ShopSkuID": null,
+                    "IsGift": false,
+                    "Weight": "1.50",
+                    "InvQty": 0
+                },
+                {
+                    "ID": 18965,
+                    "SkuAutoID": 2,
+                    "Img": "",
+                    "Qty": 2,
+                    "GoodsCode": "test123456",
+                    "SkuID": "test1234560004007",
+                    "SkuName": "南极人2016男装夹克",
+                    "Norm": "红色1;43",
+                    "RealPrice": "0.00",
+                    "Amount": "0.00",
+                    "ShopSkuID": null,
+                    "IsGift": true,
+                    "Weight": "0.50",
+                    "InvQty": 0
+                },
+                {
+                    "ID": 18967,
+                    "SkuAutoID": 11,
+                    "Img": "",
+                    "Qty": 2,
+                    "GoodsCode": "test251",
+                    "SkuID": "test2510010007",
+                    "SkuName": "南极人2016男装夹克休闲版",
+                    "Norm": "绿色;43",
+                    "RealPrice": "0.00",
+                    "Amount": "0.00",
+                    "ShopSkuID": null,
+                    "IsGift": true,
+                    "Weight": "0.50",
+                    "InvQty": 0
+                },
+                {
+                    "ID": 18973,
+                    "SkuAutoID": 3,
+                    "Img": "",
+                    "Qty": 2,
+                    "GoodsCode": "test123456",
+                    "SkuID": "test1234560004014",
+                    "SkuName": "南极人2016男装夹克",
+                    "Norm": "红色1;46",
+                    "RealPrice": "0.00",
+                    "Amount": "0.00",
+                    "ShopSkuID": null,
+                    "IsGift": true,
+                    "Weight": "1.00",
+                    "InvQty": 0
+                }
+            ]
+        }
     },
     "m": ""
 }

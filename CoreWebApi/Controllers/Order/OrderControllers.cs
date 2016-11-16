@@ -360,7 +360,7 @@ namespace CoreWebApi
         public ResponseResult UpdateOrderDetail([FromBodyAttribute]JObject co)
         {   
             int id = int.Parse(co["OID"].ToString());
-            long soid = long.Parse(co["SoID"].ToString());
+            // long soid = long.Parse(co["SoID"].ToString());
             int skuid = int.Parse(co["SkuAutoID"].ToString());
             decimal price = -1;
             int qty = -1;
@@ -374,7 +374,14 @@ namespace CoreWebApi
             }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
-            var data = OrderHaddle.UpdateOrderDetail(id,soid,skuid,CoID,username,price,qty);
+            string SkuName = co["SkuName"].ToString();
+            string isgift = co["IsGift"].ToString();
+            bool IsGift = false;
+            if(isgift.ToUpper() == "TRUE")
+            {
+                IsGift = true;
+            }
+            var data = OrderHaddle.UpdateOrderDetail(id,skuid,CoID,username,price,qty,SkuName,IsGift);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -607,7 +614,7 @@ namespace CoreWebApi
         public ResponseResult InsertGift([FromBodyAttribute]JObject co)
         {   
             int id = int.Parse(co["OID"].ToString());
-            int skuid = int.Parse(co["SkuID"].ToString());
+            List<int> skuid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["SkuIDList"].ToString());
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.InsertGift(id,skuid,CoID,username);

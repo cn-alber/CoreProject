@@ -447,7 +447,7 @@ namespace CoreModels.XyCore
     {
         public List<int> successIDs {get;set;}
         public List<InsertFailReason> failIDs {get;set;}
-        public List<SkuList> SkuList{get;set;}
+        public SingleOrderItem Order{get;set;}
     }
     public class OrderItem
     {
@@ -598,6 +598,7 @@ namespace CoreModels.XyCore
     }
     public class SkuList
     {
+        public int ID{get;set;}
         public int SkuAutoID{get;set;}
         public string Img{get;set;}
         public int Qty{get;set;}
@@ -683,5 +684,13 @@ namespace CoreModels.XyCore
         public long SoID{get;set;}//必输
         public string ShopStatus{get;set;}
         public List<ImportPayinfo> Pay{get;set;}
+    }
+    public class SingleOrderItem
+    {
+        public string Amount{get;set;}
+        public int Status{get;set;}
+        public string StatusDec{get;set;}
+        public string Weight{get;set;}
+        public List<SkuList> SkuList{get;set;}
     }
 }

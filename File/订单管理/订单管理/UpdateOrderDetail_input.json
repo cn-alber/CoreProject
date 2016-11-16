@@ -1,7 +1,8 @@
 {
-    "OID":10860,
-    "SoID":63613076331,
+    "OID":10873,
+    "SkuName":"南极人2016男装夹克333333",
     "SkuAutoID":3,
-    "Price":"",
-    "Qty":"15"
+    "Price":"5",
+    "Qty":"20",
+    "IsGift":"false"
 }
