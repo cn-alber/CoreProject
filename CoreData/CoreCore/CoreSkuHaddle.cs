@@ -318,6 +318,12 @@ namespace CoreData.CoreCore
                         cs.itemprops = conn.Query<goods_item_props>(itempropsql, p).AsList();
                         cs.skuprops = conn.Query<goods_sku_props>(skupropsql, p).AsList();
                         result.d = cs;
+                        var res1 = CommHaddle.GetBrandByID(CoID,main.Brand);//品牌
+                        var res2 = CommHaddle.GetScoNameByID(CoID,main.ScoID);//供应商
+                        var res3 = CommHaddle.GetScoNameByID(CoID,main.KindID);//商品名称
+                        cs.DicBrand = res1.d as Dictionary<string,object>;
+                        cs.DicSco = res2.d as Dictionary<string,object>;
+                        cs.DicKind = res3.d as Dictionary<string,object>;
                     }
                 }
                 catch (Exception e)
@@ -1288,8 +1294,20 @@ namespace CoreData.CoreCore
                     querysql.Append(" LIMIT @ls , @le");
                     p.Add("@ls", dataindex);
                     p.Add("@le", IParam.PageSize);
+                    //商品明细
                     var SkuLst = CoreData.DbBase.CoreDB.Query<SkuQuery>(querysql.ToString(), p).AsList();
                     cs.SkuLst = SkuLst;
+                    //品牌列表
+                    if(SkuLst.Count>0)
+                    {
+                        var BrandIDLst = SkuLst.Select(a=>a.Brand).Distinct().AsList();
+                        res = CommHaddle.GetBrandSByID(IParam.CoID.ToString(),BrandIDLst);
+                        if(res.s==1)
+                        {
+                            var DicBrand = res.d as Dictionary<string, object>;
+                            cs.BrandLst = DicBrand;
+                        }
+                    }
                     res.d = cs;
                 }
             }

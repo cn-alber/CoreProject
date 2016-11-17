@@ -36,6 +36,8 @@ namespace CoreModels.XyCore
         public string CreateDate { get; set; }
         public string Modifier { get; set; }
         public string ModifyDate { get; set; }
+        public Dictionary<string, object> DicSco { get; set; }
+        public Dictionary<string, object> DicBrand { get; set; }
     }
     #endregion
     #region 商品属性表

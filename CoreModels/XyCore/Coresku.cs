@@ -229,6 +229,10 @@ namespace CoreModels.XyCore
         public List<goods_item_props> itemprops { get; set; }//货品item属性
         public List<goods_sku_props> skuprops { get; set; }//货品Sku属性
         public List<CoreSkuItem> items { get; set; }
+        public Dictionary<string, object> DicSco { get; set; }//供应商资料
+        public Dictionary<string, object> DicBrand { get; set; }//品牌名称
+        public Dictionary<string, object> DicKind { get; set; }//类目名称
+        
     }
     #endregion
     #region 商品维护 - Sku明细列表

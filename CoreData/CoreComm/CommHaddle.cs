@@ -243,6 +243,7 @@ namespace CoreData.CoreComm
                     {
                         DicSku.Add(sku.ID, sku);
                     }
+                    result.d = DicSku;
                 }
                 catch (Exception e)
                 {
@@ -256,19 +257,144 @@ namespace CoreData.CoreComm
 
 
 
-        #region 公用方法 - 判断仓库是否启用 精细化管理
-        public static DataResult IsPositionAccurate(string CoID)
+        #region 公用方法 - 获取品牌名称
+        public static DataResult GetBrandSByID(string CoID, List<string> BrandIDLst)
         {
             var result = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CommConnectString))
             {
                 try
-                { 
-                    string sql = @"SELECT IsPositionAccurate FROM ware_setting WHERE CoID=@CoID";
-                    var ispost = conn.Query(sql,new{CoID=CoID}).AsList();
-                    // if
+                {
+                    Dictionary<string, object> DicBrand = new Dictionary<string, object>();
+                    var BrandLst = conn.Query<BrandDDLB>("SELECT ID,Name,Intro FROM Brand WHERE CoID=@CoID AND ID IN @IDLST", new { CoID = CoID, IDLST = BrandIDLst }).AsList();
+                    foreach (var b in BrandLst)
+                    {
+                        DicBrand.Add(b.ID, b);
+                    }
+                    result.d = DicBrand;
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
 
+        public static DataResult GetBrandByID(string CoID, string BrandID)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    Dictionary<string, object> DicBrand = new Dictionary<string, object>();
+                    var BrandLst = conn.Query<BrandDDLB>("SELECT ID,Name,Intro FROM Brand WHERE CoID=@CoID AND ID = @ID", new { CoID = CoID, ID = BrandID }).AsList();
+                    if (BrandLst.Count > 0)
+                    {
+                        DicBrand.Add(BrandLst[0].ID, BrandLst[0]);
+                    }
+                    result.d = DicBrand;
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+        #endregion
 
+        #region 公用方法 - 获取公司名称
+        public static DataResult GetScoNameSByID(string CoID, List<string> ScoIDLst)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    Dictionary<string, object> DicSco = new Dictionary<string, object>();
+                    var SCoLst = conn.Query<BrandDDLB>("SELECT id,scocode,scosimple FROM supplycompany WHERE CoID=@CoID AND id IN @IDLST", new { CoID = CoID, IDLST = ScoIDLst }).AsList();
+                    foreach (var S in SCoLst)
+                    {
+                        DicSco.Add(S.ID, S);
+                    }
+                    result.d = DicSco;
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+
+        public static DataResult GetScoNameByID(string CoID, string ScoID)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    Dictionary<string, object> DicSco = new Dictionary<string, object>();
+                    var SCoLst = conn.Query<BrandDDLB>("SELECT id,scocode,scosimple FROM supplycompany WHERE CoID=@CoID AND id = @ID", new { CoID = CoID, ID = ScoID }).AsList();
+                    if (SCoLst.Count > 0)
+                    {
+                        DicSco.Add(SCoLst[0].ID, SCoLst[0]);
+                    }
+                    result.d = DicSco;
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+        #endregion
+
+        #region 公用方法 - 获取商品类目名称
+        public static DataResult GetCoreKindsByID(string CoID, List<string> KindIDLst)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    Dictionary<string, object> DicKind = new Dictionary<string, object>();
+                    var KindLst = conn.Query<BrandDDLB>("SELECT ID AS KindID,KindName FROM customkind WHERE ID in @KindIDLst AND CoID=@CoID", new { CoID = CoID, IDLST = KindIDLst }).AsList();
+                    foreach (var k in KindLst)
+                    {
+                        DicKind.Add(k.ID, k);
+                    }
+                    result.d = DicKind;
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+        public static DataResult GetCoreKindByID(string CoID, string KindID)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    Dictionary<string, object> DicKind = new Dictionary<string, object>();
+                    var KindLst = conn.Query<BrandDDLB>("SELECT ID AS KindID,KindName FROM customkind WHERE ID =@ID AND CoID=@CoID", new { CoID = CoID, ID = KindID }).AsList();
+                    if (KindLst.Count > 0)
+                    {
+                        DicKind.Add(KindLst[0].ID, KindLst[0]);
+                    }
+                    result.d = DicKind;
                 }
                 catch (Exception e)
                 {
