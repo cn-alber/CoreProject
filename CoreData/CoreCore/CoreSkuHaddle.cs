@@ -317,13 +317,13 @@ namespace CoreData.CoreCore
                         cs.items = conn.Query<CoreSkuItem>(itemsql, p).AsList();
                         cs.itemprops = conn.Query<goods_item_props>(itempropsql, p).AsList();
                         cs.skuprops = conn.Query<goods_sku_props>(skupropsql, p).AsList();
-                        result.d = cs;
                         var res1 = CommHaddle.GetBrandByID(CoID,main.Brand);//品牌
                         var res2 = CommHaddle.GetScoNameByID(CoID,main.ScoID);//供应商
                         var res3 = CommHaddle.GetScoNameByID(CoID,main.KindID);//商品名称
                         main.Brand = res1.d as string;
                         main.ScoName = res2.d as string;
                         main.KindName = res3.d as string;
+                        result.d = cs;
                     }
                 }
                 catch (Exception e)
