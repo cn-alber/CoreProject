@@ -23,7 +23,8 @@ namespace CoreModels.XyCore
         public string PurPrice { get; set; }
         public string SalePrice { get; set; }
         public string MarketPrice { get; set; }
-        public string TempShopID { get; set; }
+        public string TempShopID { get; set; }        
+        public string TempShopName { get; set; }
         public string TempID { get; set; }
         public string Remark { get; set; }
         public string Img { get; set; }
@@ -38,8 +39,6 @@ namespace CoreModels.XyCore
         public string CreateDate { get; set; }
         public string Modifier { get; set; }
         public string ModifyDate { get; set; }
-        public Dictionary<string, object> DicSco { get; set; }
-        public Dictionary<string, object> DicBrand { get; set; }
     }
     #endregion
     #region 商品属性表

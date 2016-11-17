@@ -309,7 +309,7 @@ namespace CoreData.CoreComm
         public static DataResult GetScoNameSByID(string CoID, List<string> ScoIDLst)
         {
             var result = new DataResult(1, null);
-            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
             {
                 try
                 {
@@ -333,7 +333,7 @@ namespace CoreData.CoreComm
         public static DataResult GetScoNameByID(string CoID, string ScoID)
         {
             var result = new DataResult(1, null);
-            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
             {
                 try
                 {
@@ -399,6 +399,30 @@ namespace CoreData.CoreComm
             return result;
         }
 
+        #endregion
+
+        #region 获取店铺名称
+        public static DataResult GetShopNameByID(string CoID, string ShopID)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    var Lst = conn.Query<string>("SELECT ShopName FROM shop WHERE ID =@ID AND CoID=@CoID", new { CoID = CoID, ID = ShopID }).AsList();
+                    if (Lst.Count > 0)
+                    {
+                        result.d =Lst[0];
+                    }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
         #endregion
     }
 }
