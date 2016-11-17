@@ -52,10 +52,11 @@ namespace CoreWebApi.XyCore
 
         #region 库存期初 - 查询 - 子表
         [HttpGetAttribute("Core/XyCore/StockInit/StockInitItemLst")]
-        public ResponseResult StockInitItemLst(string Skuautoid, string PageIndex, string PageSize, string SortField, string SortDirection)
+        public ResponseResult StockInitItemLst(string ParentID, string PageIndex, string PageSize, string SortField, string SortDirection)
         {
-            var cp = new Sfc_item_param();
+            var res = new DataResult(1, null);
             int x;
+            var cp = new Sfc_item_param();
             if (int.TryParse(PageIndex, out x))
             {
                 cp.PageIndex = int.Parse(PageIndex);
@@ -64,10 +65,19 @@ namespace CoreWebApi.XyCore
             {
                 cp.PageSize = int.Parse(PageSize);
             }
-            cp.CoID = GetCoid();
-            cp.Type = 1;//单据类型(1.期初，2.盘点，3.调拨)
-            var Result = StockInitHaddle.GetStockInitItem(cp);
-            return CoreResult.NewResponse(Result.s, Result.d, "General");
+            if (int.TryParse(ParentID, out x))
+            {
+                cp.ParentID = int.Parse(ParentID);
+                cp.CoID = GetCoid();
+                cp.Type = 1;//单据类型(1.期初，2.盘点，3.调拨)
+                res = StockInitHaddle.GetStockInitItem(cp);
+            }
+            else
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
 
@@ -118,6 +128,31 @@ namespace CoreWebApi.XyCore
         #endregion
 
         #region 库存期初 - 修改 - 保存期初数量
+        [HttpPostAttribute("Core/XyCore/StockInit/SaveInitPrice")]
+        public ResponseResult SaveInitPrice([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            int x;
+            Decimal y;
+            var ID = obj["ID"].ToString();
+            var strPrice = obj["Price"].ToString();
+            if (!(int.TryParse(ID, out x) && int.TryParse(strPrice, out x)))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                string CoID = GetCoid();
+                string UserName = GetUname();
+                var Price = int.Parse(strPrice);
+                res = StockInitHaddle.SaveStockInitPrice(ID, Price, CoID, UserName);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 库存期初 - 修改 - 保存期初单价
         [HttpPostAttribute("Core/XyCore/StockInit/SaveInitQty")]
         public ResponseResult SaveInitQty([FromBodyAttribute]JObject obj)
         {
@@ -126,8 +161,7 @@ namespace CoreWebApi.XyCore
             Decimal y;
             var ID = obj["ID"].ToString();
             var InvQty = obj["InvQty"].ToString();
-            var strPrice = obj["Price"].ToString();
-            if (!(int.TryParse(ID, out x) && int.TryParse(InvQty, out x) && decimal.TryParse(strPrice, out y)))
+            if (!(int.TryParse(ID, out x) && int.TryParse(InvQty, out x)))
             {
                 res.s = -1;
                 res.d = "无效参数";
@@ -137,8 +171,7 @@ namespace CoreWebApi.XyCore
                 string CoID = GetCoid();
                 string UserName = GetUname();
                 var qty = int.Parse(InvQty);
-                var Price = int.Parse(strPrice);
-                res = StockInitHaddle.SaveStockInitQty(ID, qty, Price, CoID, UserName);
+                res = StockInitHaddle.SaveStockInitQty(ID, qty, CoID, UserName);
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
@@ -182,7 +215,7 @@ namespace CoreWebApi.XyCore
             {
                 string CoID = GetCoid();
                 string UserName = GetUname();
-                res = StockTakeHaddle.UnCheckStockTake(ID,1, CoID, UserName);
+                res = StockTakeHaddle.UnCheckStockTake(ID, 1, CoID, UserName);
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
