@@ -268,7 +268,41 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/InsertOrder")]
         public ResponseResult InsertOrd([FromBodyAttribute]JObject co)
         {   
-            var ord = Newtonsoft.Json.JsonConvert.DeserializeObject<Order>(co["Ord"].ToString());
+            var ord = new Order();
+            ord.BuyerShopID = co["BuyerShopID"].ToString();
+            ord.RecName = co["RecName"].ToString();
+            ord.RecLogistics = co["RecLogistics"].ToString();
+            ord.RecCity = co["RecCity"].ToString();
+            ord.RecDistrict = co["RecDistrict"].ToString();
+            ord.RecAddress = co["RecAddress"].ToString();
+            ord.RecPhone = co["RecPhone"].ToString();
+            ord.RecTel = co["RecTel"].ToString();
+            ord.RecMessage = co["RecMessage"].ToString();
+            ord.SendMessage = co["SendMessage"].ToString();
+            string text = co["ODate"].ToString();
+            DateTime x;
+            if (DateTime.TryParse(text, out x))
+            {
+                ord.ODate = DateTime.Parse(text);
+            }
+            text = co["SoID"].ToString();
+            long y;
+            if (long.TryParse(text, out y))
+            {
+                ord.SoID = long.Parse(text);
+            }
+            text = co["ExAmount"].ToString();
+            decimal z;
+            if (decimal.TryParse(text, out z))
+            {
+                ord.ExAmount = text;
+            }
+            text = co["ShopID"].ToString();
+            int i;
+            if (int.TryParse(text, out i))
+            {
+                ord.ShopID = int.Parse(text);
+            }       
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             string FaceToFace = co["IsFaceToFace"].ToString();

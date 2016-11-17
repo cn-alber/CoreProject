@@ -55,8 +55,21 @@ OutPut:     Datacnt             int             资料总笔数
 
 2.InsertOrder()订单新增
 路由:http://localhost:5000/Core/Order/InsertOrder
-input:Ord           Order      订单资料
-      IsFaceToFace  string     是否现场取货true/false    
+input:ODate             datetime    订单日期
+      BuyerShopID       string      买家账号
+      ShopID            int         店铺ID 
+      SoID              long        线上订单号
+      ExAmount          string      运费
+      RecName           string      收货人
+      RecLogistics      string      省
+      RecCity           string      市
+      RecDistrict       string      县
+      RecAddress        string      地址
+      RecTel            string      电话
+      RecPhone          string      手机
+      RecMessage        string      买家留言
+      SendMessage       string      卖家备注
+      IsFaceToFace      string      是否现场取货true/false   
 output: s=1成功 else 错误代码
 参考:input jason 文件:InsertOrder_input.json
 参考:output jason 文件:InsertOrder_output.json
