@@ -63,7 +63,17 @@ output: s=1成功 else 错误代码
 
 3.UpdateOrder()订单修改
 路由:http://localhost:5000/Core/Order/UpdateOrder
-input:Ord           Order      订单资料    
+input:OID               int         内部订单号    
+      ExAmount          decimal     运费
+      SendMessage       string      卖家备注
+      InvoiceTitle      string      发票抬头
+      RecLogistics      string      省
+      RecCity           string      市
+      RecDistrict       string      县
+      RecAddress        string      地址
+      RecName           string      收货人
+      RecTel            string      电话
+      RecPhone          string      手机
 output: s=1成功 else 错误代码
 参考:input jason 文件:UpdateOrder_input.json
 参考:output jason 文件:UpdateOrder_output.json
@@ -86,6 +96,7 @@ OutPut:     Datacnt             int             资料总笔数
 路由:http://localhost:5000/Core/Order/InsertOrderDetail
 input:OID         int       内部订单号
       SkuIDList   List<int> 商品auto id list    
+      isQuick     bool      是否快捷方式
 output: s=1成功 else 错误代码
 参考:input jason 文件:InsertOrderDetail_input.json
 参考:output jason 文件:InsertOrderDetail_output.json
@@ -94,6 +105,7 @@ output: s=1成功 else 错误代码
 路由:http://localhost:5000/Core/Order/DeleteOrderDetail
 input:OID         int       内部订单号
       ID          int       订单明细auto id  
+      isQuick     bool      是否快捷方式
 output: s=1成功 else 错误代码
 参考:input jason 文件:DeleteOrderDetail_input.json
 参考:output jason 文件:DeleteOrderDetail_output.json
@@ -105,6 +117,7 @@ input:OID         int       内部订单号
       Price       string    修改后单价
       Qty         string    修改后数量
       SkuName     string    商品名称
+      isQuick     bool      是否快捷方式
 output: s=1成功 else 错误代码
 参考:input jason 文件:UpdateOrderDetail_input.json
 参考:output jason 文件:UpdateOrderDetail_output.json
@@ -112,7 +125,6 @@ output: s=1成功 else 错误代码
 8.InsertManualPay()手工支付
 路由:http://localhost:5000/Core/Order/InsertManualPay
 input:OID         int       内部订单号
-      SoID        int       线上订单号
       Payment     string    支付方式
       PayDate     string    支付日期
       PayNbr      string    支付单号
@@ -125,7 +137,6 @@ output: s=1成功 else 错误代码
 9.CancleConfirmPay()取消核准支付
 路由:http://localhost:5000/Core/Order/CancleConfirmPay
 input:OID         int       内部订单号
-      SoID        int       线上订单号
       PayID       int       付款id
 output: s=1成功 else 错误代码
 参考:input jason 文件:CancleConfirmPay_input.json
@@ -134,7 +145,6 @@ output: s=1成功 else 错误代码
 10.ConfirmPay()核准支付
 路由:http://localhost:5000/Core/Order/ConfirmPay
 input:OID         int       内部订单号
-      SoID        int       线上订单号
       PayID       int       付款id
 output: s=1成功 else 错误代码
 参考:input jason 文件:ConfirmPay_input.json
@@ -143,7 +153,6 @@ output: s=1成功 else 错误代码
 11.CanclePay()作废支付
 路由:http://localhost:5000/Core/Order/CanclePay
 input:OID         int       内部订单号
-      SoID        int       线上订单号
       PayID       int       付款id
 output: s=1成功 else 错误代码
 参考:input jason 文件:CanclePay_input.json
@@ -152,7 +161,6 @@ output: s=1成功 else 错误代码
 12.QuickPay()快速支付
 路由:http://localhost:5000/Core/Order/QuickPay
 input:OID         int       内部订单号
-      SoID        int       线上订单号
 output: s=1成功 else 错误代码
 参考:input jason 文件:QuickPay_input.json
 参考:output jason 文件:QuickPay_output.json
@@ -267,3 +275,21 @@ input:OID         int             内部订单号
 output: s=1成功 else 错误代码
 参考:input jason 文件:ChangeOrderDetail_input.json
 参考:output jason 文件:ChangeOrderDetail_output.json
+
+26.GetOrderSingle()查询订单详情
+路由:http://localhost:5000/Core/Order/GetOrderSingle
+input:OID         int             内部订单号
+output: Order     订单资料
+        Pay       付款资料
+        OrderItem 订单明细
+        Log       日志
+参考:output jason 文件:GetOrderSingle_output.json
+
+27.ModifyRemark()更换商品
+路由:http://localhost:5000/Core/Order/ModifyRemark
+input:OID         int             内部订单号
+      SendMessage string          修改后卖家备注
+output: s=1成功 else 错误代码
+参考:input jason 文件:ModifyRemark_input.json
+参考:output jason 文件:ModifyRemark_output.json
+

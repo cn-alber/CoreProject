@@ -692,4 +692,99 @@ namespace CoreModels.XyCore
         public string Weight{get;set;}
         public List<SkuList> SkuList{get;set;}
     }
+    public class OrderSingle
+    {
+        public OrderEdit Order{get;set;}
+        public List<OrderPay> Pay{get;set;}
+        public List<OrderItemEdit> OrderItem{get;set;}
+        public List<OrderLog> Log{get;set;}
+    }
+    public class OrderEdit
+    {
+        public int ID {get;set;}
+        public string ShopName{get;set;}
+        public string ODate{get;set;}
+        public string OSource{get;set;}
+        public long SoID{get;set;}
+        public string PayDate{get;set;}
+        public string BuyerShopID{get;set;}
+        public string ExAmount{get;set;}
+        public string Express{get;set;}
+        public string ExCode{get;set;}
+        public string RecMessage{get;set;}
+        public string SendMessage{get;set;}
+        public string InvoiceTitle{get;set;}
+        public string RecLogistics{get;set;}
+        public string RecCity{get;set;}
+        public string RecDistrict{get;set;}
+        public string RecAddress{get;set;}
+        public string RecName{get;set;}
+        public string RecTel{get;set;}
+        public string RecPhone{get;set;}
+        public int Status{get;set;}
+        public string StatusDec{get;set;}
+        public int AbnormalStatus{get;set;}
+        public string AbnormalStatusDec{get;set;}
+    }
+    public class OrderPay
+    {
+        public int ID{get;set;}
+        public string PayNbr{get;set;}
+        public string Payment{get;set;}
+        public string PayDate{get;set;}
+        public string PayAmount{get;set;}
+        public int Status{get;set;}
+    }
+    public class OrderItemEdit
+    {
+        public int ID{get;set;}
+        public int SkuAutoID{get;set;}
+        public string SkuID{get;set;}
+        public string SkuName{get;set;}
+        public string Norm{get;set;}
+        public string GoodsCode{get;set;}
+        public int Qty{get;set;}
+        public string SalePrice{get;set;}
+        public string RealPrice{get;set;}
+        public string Amount{get;set;}
+        public string img{get;set;}
+        public bool IsGift{get;set;}
+        public string ShopSkuID{get;set;}
+        public int InvQty{get;set;}
+    }
+    public class OrderLog
+    {
+        public string LogDate{get;set;}
+        public string UserName{get;set;}
+        public string Title{get;set;}
+        public string Remark{get;set;}
+    }
+    public class UpdateOrd
+    {
+        public OrderEdit Order{get;set;}
+        public List<OrderLog> Log{get;set;}
+    }
+    public class UpdatePay
+    {
+        public OrderEdit Order{get;set;}
+        public List<OrderPay> Pay{get;set;}
+        public List<OrderLog> Log{get;set;}
+    }
+    public class CanclePay
+    {
+        public List<OrderPay> Pay{get;set;}
+        public List<OrderLog> Log{get;set;}
+    }
+    public class RefreshItem
+    {
+        public OrderEdit Order{get;set;}
+        public List<OrderItemEdit> OrderItem{get;set;}
+        public List<OrderLog> Log{get;set;}
+    }
+    public class OrderDetailInsertI
+    {
+        public List<int> successIDs {get;set;}
+        public List<InsertFailReason> failIDs {get;set;}
+        public RefreshItem Order{get;set;}
+    }
 }

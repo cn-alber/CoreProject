@@ -1,15 +1,33 @@
 {
     "s": 1,
     "d": {
+        "Order": {
+            "ID": 10873,
+            "ShopName": "京东南极人羽绒服旗舰店",
+            "ODate": "2016-11-15 12:00:00",
+            "OSource": "移动端订单",
+            "SoID": 201611151001,
+            "PayDate": "2016-11-15 12:00:00",
+            "BuyerShopID": "xiayun",
+            "ExAmount": "10.00",
+            "Express": "",
+            "ExCode": "",
+            "RecMessage": "测试",
+            "SendMessage": "",
+            "InvoiceTitle": null,
+            "RecLogistics": "江苏省",
+            "RecCity": "苏州市",
+            "RecDistrict": "常熟市",
+            "RecAddress": "可美大厦",
+            "RecName": "xiayun",
+            "RecTel": null,
+            "RecPhone": "158974335",
+            "Status": 0,
+            "StatusDec": "待付款",
+            "AbnormalStatus": 0,
+            "AbnormalStatusDec": ""
+        },
         "Pay": [
-            {
-                "ID": 14822,
-                "PayNbr": "j20161101253488888",
-                "Payment": "支付宝",
-                "PayDate": "2016-11-07 00:00:00",
-                "PayAmount": "100.00",
-                "Status": 1
-            },
             {
                 "ID": 14821,
                 "PayNbr": "201611150001",
@@ -17,6 +35,72 @@
                 "PayDate": "2016-11-15 12:00:00",
                 "PayAmount": "280.00",
                 "Status": 1
+            }
+        ],
+        "OrderItem": [
+            {
+                "ID": 18961,
+                "SkuAutoID": 3,
+                "SkuID": "test1234560004014",
+                "SkuName": "南极人2016男装夹克",
+                "Norm": "红色1;46",
+                "GoodsCode": "test123456",
+                "Qty": 20,
+                "SalePrice": "11.00",
+                "RealPrice": "15.00",
+                "Amount": "300.00",
+                "img": "",
+                "IsGift": false,
+                "ShopSkuID": null,
+                "InvQty": 0
+            },
+            {
+                "ID": 18962,
+                "SkuAutoID": 19,
+                "SkuID": "test4560011024",
+                "SkuName": "南极人2016男装休闲西裤",
+                "Norm": "蓝色;48",
+                "GoodsCode": "test456",
+                "Qty": 10,
+                "SalePrice": "6.00",
+                "RealPrice": "9.00",
+                "Amount": "90.00",
+                "img": "",
+                "IsGift": false,
+                "ShopSkuID": null,
+                "InvQty": 0
+            },
+            {
+                "ID": 18964,
+                "SkuAutoID": 8,
+                "SkuID": "test2510002007",
+                "SkuName": "南极人2016男装夹克333333",
+                "Norm": "白色;43",
+                "GoodsCode": "test251",
+                "Qty": 10,
+                "SalePrice": "12.00",
+                "RealPrice": "8.00",
+                "Amount": "80.00",
+                "img": "",
+                "IsGift": false,
+                "ShopSkuID": null,
+                "InvQty": 0
+            },
+            {
+                "ID": 18965,
+                "SkuAutoID": 63,
+                "SkuID": "test1234560003014",
+                "SkuName": "南极人2016男装夹克",
+                "Norm": "黄色;46",
+                "GoodsCode": "test123456",
+                "Qty": 3,
+                "SalePrice": "10.00",
+                "RealPrice": "0.00",
+                "Amount": "0.00",
+                "img": "",
+                "IsGift": true,
+                "ShopSkuID": null,
+                "InvQty": 0
             }
         ],
         "Log": [
@@ -205,144 +289,6 @@
                 "UserName": "管理员",
                 "Title": "更改商品",
                 "Remark": "test4560007024=>test4560011024"
-            },
-            {
-                "LogDate": "2016-11-17 10:41:07",
-                "UserName": "管理员",
-                "Title": "手动修改运费",
-                "Remark": "运费10.00 => 20"
-            },
-            {
-                "LogDate": "2016-11-17 10:41:07",
-                "UserName": "管理员",
-                "Title": "手动修改电话",
-                "Remark": "电话 => "
-            },
-            {
-                "LogDate": "2016-11-17 10:41:07",
-                "UserName": "管理员",
-                "Title": "手动修改卖家备注",
-                "Remark": "备注 => 测试1117"
-            },
-            {
-                "LogDate": "2016-11-17 10:41:07",
-                "UserName": "管理员",
-                "Title": "手动修改发票抬头",
-                "Remark": "发票抬头 => 个人"
-            },
-            {
-                "LogDate": "2016-11-17 10:49:05",
-                "UserName": "管理员",
-                "Title": "手动修改运费",
-                "Remark": "运费20.00 => 10"
-            },
-            {
-                "LogDate": "2016-11-17 11:01:28",
-                "UserName": "管理员",
-                "Title": "添加支付",
-                "Remark": "支付宝100"
-            },
-            {
-                "LogDate": "2016-11-17 11:01:28",
-                "UserName": "管理员",
-                "Title": "判断金额不符",
-                "Remark": "标记部分付款"
-            },
-            {
-                "LogDate": "2016-11-17 11:01:28",
-                "UserName": "管理员",
-                "Title": "支付单确认",
-                "Remark": null
-            },
-            {
-                "LogDate": "2016-11-17 11:03:00",
-                "UserName": "管理员",
-                "Title": "添加支付",
-                "Remark": "支付宝100"
-            },
-            {
-                "LogDate": "2016-11-17 11:03:00",
-                "UserName": "管理员",
-                "Title": "取消异常标记",
-                "Remark": "部分付款"
-            },
-            {
-                "LogDate": "2016-11-17 11:03:00",
-                "UserName": "管理员",
-                "Title": "支付单确认",
-                "Remark": null
-            },
-            {
-                "LogDate": "2016-11-17 11:15:46",
-                "UserName": "管理员",
-                "Title": "支付单取消确认",
-                "Remark": null
-            },
-            {
-                "LogDate": "2016-11-17 11:17:07",
-                "UserName": "管理员",
-                "Title": "支付单取消确认",
-                "Remark": null
-            },
-            {
-                "LogDate": "2016-11-17 11:17:15",
-                "UserName": "管理员",
-                "Title": "支付单取消确认",
-                "Remark": null
-            },
-            {
-                "LogDate": "2016-11-17 11:17:15",
-                "UserName": "管理员",
-                "Title": "取消异常标记",
-                "Remark": "部分付款"
-            },
-            {
-                "LogDate": "2016-11-17 11:22:34",
-                "UserName": "管理员",
-                "Title": "支付单确认",
-                "Remark": null
-            },
-            {
-                "LogDate": "2016-11-17 11:22:34",
-                "UserName": "管理员",
-                "Title": "判断金额不符",
-                "Remark": "标记部分付款"
-            },
-            {
-                "LogDate": "2016-11-17 11:22:56",
-                "UserName": "管理员",
-                "Title": "支付单确认",
-                "Remark": null
-            },
-            {
-                "LogDate": "2016-11-17 11:23:10",
-                "UserName": "管理员",
-                "Title": "支付单确认",
-                "Remark": null
-            },
-            {
-                "LogDate": "2016-11-17 11:23:10",
-                "UserName": "管理员",
-                "Title": "取消异常标记",
-                "Remark": "部分付款"
-            },
-            {
-                "LogDate": "2016-11-17 11:27:12",
-                "UserName": "管理员",
-                "Title": "支付单取消确认",
-                "Remark": null
-            },
-            {
-                "LogDate": "2016-11-17 11:27:12",
-                "UserName": "管理员",
-                "Title": "判断金额不符",
-                "Remark": "标记部分付款"
-            },
-            {
-                "LogDate": "2016-11-17 11:27:34",
-                "UserName": "管理员",
-                "Title": "支付单作废",
-                "Remark": null
             }
         ]
     },

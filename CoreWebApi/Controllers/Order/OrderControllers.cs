@@ -284,10 +284,20 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/UpdateOrder")]
         public ResponseResult UpdateOrder([FromBodyAttribute]JObject co)
         {   
-            var ord = Newtonsoft.Json.JsonConvert.DeserializeObject<Order>(co["Ord"].ToString());
+            decimal ExAmount = decimal.Parse(co["ExAmount"].ToString());
+            string Remark = co["SendMessage"].ToString();
+            string InvTitle = co["InvoiceTitle"].ToString();
+            string Logistics = co["RecLogistics"].ToString();
+            string City = co["RecCity"].ToString();
+            string District = co["RecDistrict"].ToString();
+            string Address = co["RecAddress"].ToString();
+            string Name = co["RecName"].ToString();
+            string tel = co["RecTel"].ToString();
+            string phone = co["RecPhone"].ToString();
+            int OID = int.Parse(co["OID"].ToString());
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
-            var data = OrderHaddle.UpdateOrder(ord,username,CoID);
+            var data = OrderHaddle.UpdateOrder(ExAmount,Remark,InvTitle,Logistics,City,District,Address,Name,tel,phone,OID,username,CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -332,9 +342,22 @@ namespace CoreWebApi
             int id = int.Parse(co["OID"].ToString());
             // long soid = long.Parse(co["SoID"].ToString());
             List<int> skuid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["SkuIDList"].ToString());
+            var data = new DataResult(1,null);
+            bool isQuick;
+            string isquick = co["isQuick"].ToString();
+            if(isquick.ToUpper() != "TRUE" && isquick.ToUpper() != "FALSE")
+            {
+                data.s = -1;
+                data.d = "参数无效!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            else
+            {
+                isQuick = bool.Parse(isquick);
+            }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
-            var data = OrderHaddle.InsertOrderDetail(id,skuid,CoID,username);
+            data = OrderHaddle.InsertOrderDetail(id,skuid,CoID,username,isQuick);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -345,7 +368,20 @@ namespace CoreWebApi
             int oid = int.Parse(co["OID"].ToString());
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
-            var data = OrderHaddle.DeleteOrderDetail(id,oid,CoID,username);
+            var data = new DataResult(1,null);
+            bool isQuick;
+            string isquick = co["isQuick"].ToString();
+            if(isquick.ToUpper() != "TRUE" && isquick.ToUpper() != "FALSE")
+            {
+                data.s = -1;
+                data.d = "参数无效!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            else
+            {
+                isQuick = bool.Parse(isquick);
+            }
+            data = OrderHaddle.DeleteOrderDetail(id,oid,CoID,username,isQuick);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -367,7 +403,20 @@ namespace CoreWebApi
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             string SkuName = co["SkuName"].ToString();
-            var data = OrderHaddle.UpdateOrderDetail(id,oid,CoID,username,price,qty,SkuName);
+            var data = new DataResult(1,null);
+            bool isQuick;
+            string isquick = co["isQuick"].ToString();
+            if(isquick.ToUpper() != "TRUE" && isquick.ToUpper() != "FALSE")
+            {
+                data.s = -1;
+                data.d = "参数无效!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            else
+            {
+                isQuick = bool.Parse(isquick);
+            }
+            data = OrderHaddle.UpdateOrderDetail(id,oid,CoID,username,price,qty,SkuName,isQuick);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -400,7 +449,6 @@ namespace CoreWebApi
                 pay.PayNbr = co["PayNbr"].ToString();
             }
             pay.OID = int.Parse(co["OID"].ToString());
-            pay.SoID = long.Parse(co["SoID"].ToString());
             if(!string.IsNullOrEmpty(co["PayAccount"].ToString()))
             {
                 pay.PayAccount = co["PayAccount"].ToString();
@@ -436,11 +484,10 @@ namespace CoreWebApi
         public ResponseResult CancleConfirmPay([FromBodyAttribute]JObject co)
         {   
             int OID = int.Parse(co["OID"].ToString());
-            long SoID = long.Parse(co["SoID"].ToString());
             int payid = int.Parse(co["PayID"].ToString());
             string username = GetUname();
             int CoID =  int.Parse(GetCoid());
-            var data = OrderHaddle.CancleConfirmPay(OID,SoID,payid,CoID,username);
+            var data = OrderHaddle.CancleConfirmPay(OID,payid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -448,11 +495,10 @@ namespace CoreWebApi
         public ResponseResult ConfirmPay([FromBodyAttribute]JObject co)
         {   
             int OID = int.Parse(co["OID"].ToString());
-            long SoID = long.Parse(co["SoID"].ToString());
             int payid = int.Parse(co["PayID"].ToString());
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
-            var data = OrderHaddle.ConfirmPay(OID,SoID,payid,CoID,username);
+            var data = OrderHaddle.ConfirmPay(OID,payid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -460,11 +506,10 @@ namespace CoreWebApi
         public ResponseResult CanclePay([FromBodyAttribute]JObject co)
         {   
             int OID = int.Parse(co["OID"].ToString());
-            long SoID = long.Parse(co["SoID"].ToString());
             int payid = int.Parse(co["PayID"].ToString());
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
-            var data = OrderHaddle.CanclePay(OID,SoID,payid,CoID,username);
+            var data = OrderHaddle.CanclePay(OID,payid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -472,10 +517,9 @@ namespace CoreWebApi
         public ResponseResult QuickPay([FromBodyAttribute]JObject co)
         {   
             int OID = int.Parse(co["OID"].ToString());
-            long SoID = long.Parse(co["SoID"].ToString());
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
-            var data = OrderHaddle.QuickPay(OID,SoID,CoID,username);
+            var data = OrderHaddle.QuickPay(OID,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -619,5 +663,35 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
         
+        [HttpGetAttribute("/Core/Order/GetOrderSingle")]
+        public ResponseResult GetOrderSingle(string OID)
+        {   
+            int x,oid = 0;
+            var data = new DataResult(1,null);
+            if (int.TryParse(OID, out x))
+            {
+                oid = int.Parse(OID);
+            }
+            else
+            {
+                data.s = -1;
+                data.d = "参数无效!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            int CoID = int.Parse(GetCoid());
+            data = OrderHaddle.GetOrderSingle(oid,CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/ModifyRemark")]
+        public ResponseResult ModifyRemark([FromBodyAttribute]JObject co)
+        {   
+            int oid = int.Parse(co["OID"].ToString());
+            string Remark = co["SendMessage"].ToString();
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.ModifyRemark(oid,CoID,username,Remark);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }  
