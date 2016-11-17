@@ -747,7 +747,8 @@ namespace CoreData.CoreCore
         ///<summary>
         ///更新订单
         ///</summary>
-        public static DataResult UpdateOrder(Order ord,string UserName,int CoID)
+        public static DataResult UpdateOrder(decimal ExAmount,string Remark,string InvTitle,string Logistics,string City,string District,string Address,string Name,
+                                            string tel,string phone,int OID,string UserName,int CoID)
         {
             var result = new DataResult(1,null);   
             var logs = new List<Log>();
@@ -762,7 +763,7 @@ namespace CoreData.CoreCore
             string querySql = "select * from `order` where id = @ID and coid = @Coid";
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{
-                    var u = conn.Query<Order>(querySql,new{ID = ord.ID,Coid = CoID}).AsList();
+                    var u = conn.Query<Order>(querySql,new{ID = OID,Coid = CoID}).AsList();
                     if(u.Count == 0)
                     {
                         result.s = -1;
@@ -777,60 +778,45 @@ namespace CoreData.CoreCore
                     RecName = OrdOlder.RecName;
                     if(OrdOlder.Status == 0 || OrdOlder.Status == 1 || OrdOlder.Status == 7)
                     {
-                        if(ord.ExAmount != null)
+                        if(OrdOlder.ExAmount != ExAmount.ToString())
                         {
-                            if(OrdOlder.ExAmount != ord.ExAmount)
-                            {
-                                var log = new Log();
-                                log.OID = OrdOlder.ID;
-                                log.SoID = OrdOlder.SoID;
-                                log.Type = 0;
-                                log.LogDate = DateTime.Now;
-                                log.UserName = UserName;
-                                log.Title = "手动修改运费";
-                                log.Remark = "运费" + OrdOlder.ExAmount + " => " + ord.ExAmount;
-                                log.CoID = CoID;
-                                logs.Add(log);
-                                OrdOlder.ExAmount = ord.ExAmount;
-                                x++;
-                            }
+                            var log = new Log();
+                            log.OID = OrdOlder.ID;
+                            log.SoID = OrdOlder.SoID;
+                            log.Type = 0;
+                            log.LogDate = DateTime.Now;
+                            log.UserName = UserName;
+                            log.Title = "手动修改运费";
+                            log.Remark = "运费" + OrdOlder.ExAmount + " => " + ExAmount;
+                            log.CoID = CoID;
+                            logs.Add(log);
+                            OrdOlder.ExAmount = ExAmount.ToString();
+                            x++;
                         }
                         string addressOlder = OrdOlder.RecLogistics + OrdOlder.RecCity + OrdOlder.RecDistrict + OrdOlder.RecAddress;
-                        if(ord.RecLogistics != null)
+                        if(OrdOlder.RecLogistics != Logistics)
                         {
-                            if(OrdOlder.RecLogistics != ord.RecLogistics)
-                            {
-                                OrdOlder.RecLogistics = ord.RecLogistics;
-                                x++;
-                                z++;
-                            }
+                            OrdOlder.RecLogistics = Logistics;
+                            x++;
+                            z++;
                         }
-                        if(ord.RecCity != null)
+                        if(OrdOlder.RecCity != City)
                         {
-                            if(OrdOlder.RecCity != ord.RecCity)
-                            {
-                                OrdOlder.RecCity = ord.RecCity;
-                                x++;
-                                z++;
-                            }
+                            OrdOlder.RecCity = City;
+                            x++;
+                            z++;
                         }
-                        if(ord.RecDistrict != null)
+                        if(OrdOlder.RecDistrict != District)
                         {
-                            if(OrdOlder.RecDistrict != ord.RecDistrict)
-                            {
-                                OrdOlder.RecDistrict = ord.RecDistrict;
-                                x++;
-                                z++;
-                            }
+                            OrdOlder.RecDistrict = District;
+                            x++;
+                            z++;
                         }
-                        if(ord.RecAddress != null)
+                        if(OrdOlder.RecAddress != Address)
                         {
-                            if(OrdOlder.RecAddress != ord.RecAddress)
-                            {
-                                OrdOlder.RecAddress = ord.RecAddress;
-                                x++;
-                                z++;
-                            }
+                            OrdOlder.RecAddress = Address;
+                            x++;
+                            z++;
                         }
                         if(z > 0)
                         {
@@ -845,65 +831,7 @@ namespace CoreData.CoreCore
                             log.CoID = CoID;
                             logs.Add(log);
                         }
-                        if(ord.RecName != null)
-                        {
-                            if(OrdOlder.RecName != ord.RecName)
-                            {
-                                var log = new Log();
-                                log.OID = OrdOlder.ID;
-                                log.SoID = OrdOlder.SoID;
-                                log.Type = 0;
-                                log.LogDate = DateTime.Now;
-                                log.UserName = UserName;
-                                log.Title = "手动修改收货人";
-                                log.Remark = "收货人" + OrdOlder.RecName + " => " + ord.RecName;
-                                log.CoID = CoID;
-                                logs.Add(log);
-                                OrdOlder.RecName = ord.RecName;
-                                x++;
-                                z++;
-                            }
-                        }
-                        if(ord.RecTel != null)
-                        {
-                            if(OrdOlder.RecTel != ord.RecTel)
-                            {
-                                var log = new Log();
-                                log.OID = OrdOlder.ID;
-                                log.SoID = OrdOlder.SoID;
-                                log.Type = 0;
-                                log.LogDate = DateTime.Now;
-                                log.UserName = UserName;
-                                log.Title = "手动修改电话";
-                                log.Remark = "电话" + OrdOlder.RecTel + " => " + ord.RecTel;
-                                log.CoID = CoID;
-                                logs.Add(log);
-                                OrdOlder.RecTel = ord.RecTel;
-                                x++;
-                            }
-                        }
-                        if(ord.RecPhone != null)
-                        {
-                            if(OrdOlder.RecPhone != ord.RecPhone)
-                            {
-                                var log = new Log();
-                                log.OID = OrdOlder.ID;
-                                log.SoID = OrdOlder.SoID;
-                                log.Type = 0;
-                                log.LogDate = DateTime.Now;
-                                log.UserName = UserName;
-                                log.Title = "手动修改手机";
-                                log.Remark = "手机" + OrdOlder.RecPhone + " => " + ord.RecPhone;
-                                log.CoID = CoID;
-                                logs.Add(log);
-                                OrdOlder.RecPhone = ord.RecPhone;
-                                x++;
-                            }
-                        }
-                    }
-                    if(ord.SendMessage != null)
-                    {
-                        if(OrdOlder.SendMessage != ord.SendMessage)
+                        if(OrdOlder.RecName != Name)
                         {
                             var log = new Log();
                             log.OID = OrdOlder.ID;
@@ -911,18 +839,15 @@ namespace CoreData.CoreCore
                             log.Type = 0;
                             log.LogDate = DateTime.Now;
                             log.UserName = UserName;
-                            log.Title = "手动修改卖家备注";
-                            log.Remark = "备注" + OrdOlder.SendMessage + " => " + ord.SendMessage;
+                            log.Title = "手动修改收货人";
+                            log.Remark = "收货人" + OrdOlder.RecName + " => " + Name;
                             log.CoID = CoID;
                             logs.Add(log);
-                            OrdOlder.SendMessage = ord.SendMessage;
+                            OrdOlder.RecName = Name;
                             x++;
-                            y++;
+                            z++;
                         }
-                    }
-                    if(ord.InvoiceTitle != null)
-                    {
-                        if(OrdOlder.InvoiceTitle != ord.InvoiceTitle)
+                        if(OrdOlder.RecTel != tel)
                         {
                             var log = new Log();
                             log.OID = OrdOlder.ID;
@@ -930,14 +855,60 @@ namespace CoreData.CoreCore
                             log.Type = 0;
                             log.LogDate = DateTime.Now;
                             log.UserName = UserName;
-                            log.Title = "手动修改发票抬头";
-                            log.Remark = "发票抬头" + OrdOlder.InvoiceTitle + " => " + ord.InvoiceTitle;
+                            log.Title = "手动修改电话";
+                            log.Remark = "电话" + OrdOlder.RecTel + " => " + tel;
                             log.CoID = CoID;
                             logs.Add(log);
-                            OrdOlder.InvoiceTitle = ord.InvoiceTitle;
+                            OrdOlder.RecTel = tel;
                             x++;
-                            y++;
                         }
+                        if(OrdOlder.RecPhone != phone)
+                        {
+                            var log = new Log();
+                            log.OID = OrdOlder.ID;
+                            log.SoID = OrdOlder.SoID;
+                            log.Type = 0;
+                            log.LogDate = DateTime.Now;
+                            log.UserName = UserName;
+                            log.Title = "手动修改手机";
+                            log.Remark = "手机" + OrdOlder.RecPhone + " => " + phone;
+                            log.CoID = CoID;
+                            logs.Add(log);
+                            OrdOlder.RecPhone = phone;
+                            x++;
+                        }
+                    }
+                    if(OrdOlder.SendMessage != Remark)
+                    {
+                        var log = new Log();
+                        log.OID = OrdOlder.ID;
+                        log.SoID = OrdOlder.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "手动修改卖家备注";
+                        log.Remark = "备注" + OrdOlder.SendMessage + " => " + Remark;
+                        log.CoID = CoID;
+                        logs.Add(log);
+                        OrdOlder.SendMessage = Remark;
+                        x++;
+                        y++;
+                    }
+                    if(OrdOlder.InvoiceTitle != InvTitle)
+                    {
+                        var log = new Log();
+                        log.OID = OrdOlder.ID;
+                        log.SoID = OrdOlder.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "手动修改发票抬头";
+                        log.Remark = "发票抬头" + OrdOlder.InvoiceTitle + " => " + InvTitle;
+                        log.CoID = CoID;
+                        logs.Add(log);
+                        OrdOlder.InvoiceTitle = InvTitle;
+                        x++;
+                        y++;
                     }
                     //检查订单是否符合合并的条件
                     if(z > 0)
@@ -965,7 +936,7 @@ namespace CoreData.CoreCore
                             }
                             OrdOlder.AbnormalStatus = 0;
                             OrdOlder.StatusDec="";
-                            var ck = isCheckCancleMerge(OrdOlder,OrdOlder.BuyerShopID,RecName,RecLogistics,RecCity,RecDistrict,RecAddress);
+                            var ck = isCheckCancleMerge(OID,CoID,OrdOlder.BuyerShopID,RecName,RecLogistics,RecCity,RecDistrict,RecAddress);
                             if(ck.s == 1)
                             {
                                 int oid = int.Parse(ck.d.ToString());
@@ -1051,9 +1022,6 @@ namespace CoreData.CoreCore
                     conn.Dispose();
                 }
             } 
-            ord.CoID = CoID;
-            ord.ModifyDate = DateTime.Now;
-            ord.Modifier = UserName;
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
             var TransCore = CoreDBconn.BeginTransaction();
@@ -1061,11 +1029,29 @@ namespace CoreData.CoreCore
             {
                 string sqlCommandText = string.Empty;
                 int count =0;
+                OrdOlder.Modifier = UserName;
+                OrdOlder.ModifyDate = DateTime.Now;
                 if(x > 0)
                 {
+                    if(decimal.Parse(OrdOlder.SkuAmount) + ExAmount == decimal.Parse(OrdOlder.Amount))
+                    {
+                        OrdOlder.IsPaid = true;
+                        if(OrdOlder.Status != 7)
+                        {
+                            OrdOlder.Status = 1;
+                        }
+                    }
+                    else
+                    {
+                        OrdOlder.IsPaid = false;
+                        if(OrdOlder.Status != 7)
+                        {
+                            OrdOlder.Status = 0;
+                        }
+                    }
                     sqlCommandText = @"update `order` set ExAmount = @ExAmount,Amount = ExAmount + SkuAmount,RecLogistics=@RecLogistics,RecCity=@RecCity,RecDistrict=@RecDistrict,
                                         RecAddress=@RecAddress,RecName=@RecName,RecTel=@RecTel,RecPhone=@RecPhone,SendMessage=@SendMessage,InvoiceTitle=@InvoiceTitle,Status=@Status,
-                                        AbnormalStatus=@AbnormalStatus,StatusDec=@StatusDec,Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and CoID = @CoID";
+                                        AbnormalStatus=@AbnormalStatus,StatusDec=@StatusDec,IsPaid=@IsPaid,Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and CoID = @CoID";
                     count =CoreDBconn.Execute(sqlCommandText,OrdOlder,TransCore);
                     if(count < 0)
                     {
@@ -1127,17 +1113,35 @@ namespace CoreData.CoreCore
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
             }
+            var ress = new UpdateOrd();
+            var aa = GetOrderEdit(OID,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            ress.Order = aa.d as OrderEdit;
+            aa = GetOrderLog(OID,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            ress.Log = aa.d as List<OrderLog>;
+            result.d = ress;
             return  result;
         }
         ///<summary>
         ///检查订单是否需取消等待合并
         ///</summary>
-        public static DataResult isCheckCancleMerge(Order ord,string BuyerShopID,string RecName,string RecLogistics,string RecCity,string RecDistrict,string RecAddress)
+        public static DataResult isCheckCancleMerge(int OID,int CoID,string BuyerShopID,string RecName,string RecLogistics,string RecCity,string RecDistrict,string RecAddress)
         {
             var result = new DataResult(1,null);   
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{
-                    string wheresql = "select id from `order` where coid = " + ord.CoID + " and id != "+ ord.ID + " and buyershopid = '" + BuyerShopID + "' and recname = '" + RecName + 
+                    string wheresql = "select id from `order` where coid = " + CoID + " and id != "+ OID + " and buyershopid = '" + BuyerShopID + "' and recname = '" + RecName + 
                                       "' and reclogistics = '" + RecLogistics + "' and reccity = '" + RecCity + "' and recdistrict = '" + RecDistrict + 
                                       "' and recaddress = '" + RecAddress + "' and status = 7 and statusdec = '等待订单合并'";
                     var u = conn.Query<Order>(wheresql).AsList();
@@ -1210,11 +1214,11 @@ namespace CoreData.CoreCore
         ///<summary>
         ///新增订单明细
         ///</summary>
-        public static DataResult InsertOrderDetail(int id,List<int> skuid,int CoID,string Username)
+        public static DataResult InsertOrderDetail(int id,List<int> skuid,int CoID,string Username,bool IsQuick)
         {
             var result = new DataResult(1,null);  
             var res = new OrderDetailInsert();
-            var sin = new SingleOrderItem();
+            // var sin = new SingleOrderItem();
             var logs = new List<Log>();
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
@@ -1360,12 +1364,12 @@ namespace CoreData.CoreCore
                     TransCore.Commit();
                 }
 
-                wheresql = "select status,amount,ExWeight from `order` where id =" + id + " and coid =" + CoID;
-                u = CoreDBconn.Query<Order>(wheresql).AsList();
-                sin.Amount = u[0].Amount;
-                sin.Status = u[0].Status;
-                sin.StatusDec = Enum.GetName(typeof(OrdStatus), u[0].Status);
-                sin.Weight = u[0].ExWeight;
+                // wheresql = "select status,amount,ExWeight from `order` where id =" + id + " and coid =" + CoID;
+                // u = CoreDBconn.Query<Order>(wheresql).AsList();
+                // sin.Amount = u[0].Amount;
+                // sin.Status = u[0].Status;
+                // sin.StatusDec = Enum.GetName(typeof(OrdStatus), u[0].Status);
+                // sin.Weight = u[0].ExWeight;
             }
             catch (Exception e)
             {
@@ -1379,26 +1383,44 @@ namespace CoreData.CoreCore
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
             }
-            var ff = GetSingleOrdItem(id,CoID);
-            if(ff.s == -1)
+            if(IsQuick == true)
             {
-                result.s = -1;
-                result.d = ff.d;
-                return result;
+                var ff = RefreshOrderItemQuick(id,CoID);
+                if(ff.s == -1)
+                {
+                    result.s = -1;
+                    result.d = ff.d;
+                    return result;
+                }
+                res.Order = ff.d as SingleOrderItem;
+                result.d = res;
             }
-            sin.SkuList = ff.d as List<SkuList>;
-            res.Order = sin;
-            result.d = res;
+            else
+            {
+                var ress = new OrderDetailInsertI();
+                ress.successIDs = res.successIDs;
+                ress.failIDs = res.failIDs;
+                var ff = RefreshOrderItem(id,CoID);
+                if(ff.s == -1)
+                {
+                    result.s = -1;
+                    result.d = ff.d;
+                    return result;
+                }
+                ress.Order = ff.d as RefreshItem;
+                result.d = ress;
+            }
+            
             return result;
         }
         ///<summary>
         ///删除订单明细
         ///</summary>
-        public static DataResult DeleteOrderDetail(int id,int oid,int CoID,string Username)
+        public static DataResult DeleteOrderDetail(int id,int oid,int CoID,string Username,bool IsQuick)
         {
             var result = new DataResult(1,null);  
             var logs = new List<Log>();
-            var sin = new SingleOrderItem();
+            // var sin = new SingleOrderItem();
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
             var TransCore = CoreDBconn.BeginTransaction();
@@ -1485,12 +1507,12 @@ namespace CoreData.CoreCore
                     return result;
                 }
                 TransCore.Commit();
-                wheresql = "select status,amount,ExWeight from `order` where id =" + oid + " and coid =" + CoID;
-                u = CoreDBconn.Query<Order>(wheresql).AsList();
-                sin.Amount = u[0].Amount;
-                sin.Status = u[0].Status;
-                sin.StatusDec = Enum.GetName(typeof(OrdStatus), u[0].Status);
-                sin.Weight = u[0].ExWeight;
+                // wheresql = "select status,amount,ExWeight from `order` where id =" + oid + " and coid =" + CoID;
+                // u = CoreDBconn.Query<Order>(wheresql).AsList();
+                // sin.Amount = u[0].Amount;
+                // sin.Status = u[0].Status;
+                // sin.StatusDec = Enum.GetName(typeof(OrdStatus), u[0].Status);
+                // sin.Weight = u[0].ExWeight;
             }
             catch (Exception e)
             {
@@ -1504,25 +1526,38 @@ namespace CoreData.CoreCore
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
             }
-            var ff = GetSingleOrdItem(oid,CoID);
-            if(ff.s == -1)
+            if(IsQuick == true)
             {
-                result.s = -1;
+                var ff = RefreshOrderItemQuick(oid,CoID);
+                if(ff.s == -1)
+                {
+                    result.s = -1;
+                    result.d = ff.d;
+                    return result;
+                }
                 result.d = ff.d;
-                return result;
             }
-            sin.SkuList = ff.d as List<SkuList>;
-            result.d = sin;
+            else
+            {
+                var ff = RefreshOrderItem(oid,CoID);
+                if(ff.s == -1)
+                {
+                    result.s = -1;
+                    result.d = ff.d;
+                    return result;
+                }
+                result.d = ff.d;
+            }
             return result;
         }
         ///<summary>
         ///更新订单明细
         ///</summary>
-        public static DataResult UpdateOrderDetail(int id,int oid,int CoID,string Username,decimal price,int qty,string SkuName)
+        public static DataResult UpdateOrderDetail(int id,int oid,int CoID,string Username,decimal price,int qty,string SkuName,bool IsQuick)
         {
             var result = new DataResult(1,null);  
             var logs = new List<Log>();
-            var sin = new SingleOrderItem();
+            // var sin = new SingleOrderItem();
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
             var TransCore = CoreDBconn.BeginTransaction();
@@ -1667,12 +1702,12 @@ namespace CoreData.CoreCore
                     }
                 }
                 TransCore.Commit();
-                wheresql = "select status,amount,ExWeight from `order` where id =" + oid + " and coid =" + CoID;
-                u = CoreDBconn.Query<Order>(wheresql).AsList();
-                sin.Amount = u[0].Amount;
-                sin.Status = u[0].Status;
-                sin.StatusDec = Enum.GetName(typeof(OrdStatus), u[0].Status);
-                sin.Weight = u[0].ExWeight;
+                // wheresql = "select status,amount,ExWeight from `order` where id =" + oid + " and coid =" + CoID;
+                // u = CoreDBconn.Query<Order>(wheresql).AsList();
+                // sin.Amount = u[0].Amount;
+                // sin.Status = u[0].Status;
+                // sin.StatusDec = Enum.GetName(typeof(OrdStatus), u[0].Status);
+                // sin.Weight = u[0].ExWeight;
             }
             catch (Exception e)
             {
@@ -1686,15 +1721,28 @@ namespace CoreData.CoreCore
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
             }
-            var ff = GetSingleOrdItem(oid,CoID);
-            if(ff.s == -1)
+            if(IsQuick == true)
             {
-                result.s = -1;
+                var ff = RefreshOrderItemQuick(oid,CoID);
+                if(ff.s == -1)
+                {
+                    result.s = -1;
+                    result.d = ff.d;
+                    return result;
+                }
                 result.d = ff.d;
-                return result;
             }
-            sin.SkuList = ff.d as List<SkuList>;
-            result.d = sin;
+            else
+            {
+                var ff = RefreshOrderItem(oid,CoID);
+                if(ff.s == -1)
+                {
+                    result.s = -1;
+                    result.d = ff.d;
+                    return result;
+                }
+                result.d = ff.d;
+            }
             return result;
         }
         ///<summary>
@@ -1709,7 +1757,7 @@ namespace CoreData.CoreCore
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
-                string wheresql = "select * from `order` where id =" + pay.OID + " and soid = " + pay.SoID + " and coid =" + CoID;
+                string wheresql = "select * from `order` where id =" + pay.OID + " and coid =" + CoID;
                 var u = CoreDBconn.Query<Order>(wheresql).AsList();
                 var ord = new Order();
                 if (u.Count == 0)
@@ -1728,6 +1776,7 @@ namespace CoreData.CoreCore
                         return result;
                     }
                 }
+                pay.SoID = ord.SoID;
                 decimal PaidAmount=0,PayAmount=0,Amount=0;
                 if(!string.IsNullOrEmpty(ord.PaidAmount))
                 {
@@ -1767,24 +1816,8 @@ namespace CoreData.CoreCore
                 log.Remark = pay.Payment + pay.PayAmount;
                 log.CoID = CoID;
                 logs.Add(log);
-                if(PaidAmount + decimal.Parse(pay.PayAmount) != Amount &&　ord.StatusDec != "部分付款")
+                if(PaidAmount + decimal.Parse(pay.PayAmount) != Amount &&　ord.Status != 7 )
                 {
-                    if(ord.Status == 7 )
-                    {
-                        log = new Log();
-                        log.OID = pay.OID;
-                        log.SoID = pay.SoID;
-                        log.Type = 0;
-                        log.LogDate = DateTime.Now;
-                        log.UserName = UserName;
-                        log.Title = "取消异常标记";
-                        log.Remark = ord.StatusDec;
-                        log.CoID = CoID;
-                        logs.Add(log);
-                        ord.Status = 0;
-                        ord.AbnormalStatus = 0;
-                        ord.StatusDec = "";
-                    }
                     log = new Log();
                     log.OID = pay.OID;
                     log.SoID = pay.SoID;
@@ -1795,6 +1828,16 @@ namespace CoreData.CoreCore
                     log.Remark = "标记部分付款";
                     log.CoID = CoID;
                     logs.Add(log);
+                    ord.Status = 7;
+                    var rss = GetReasonID("部分付款",CoID);
+                    if(rss.s == -1)
+                    {
+                        result.s = -1;
+                        result.d = rss.d;
+                        return result;
+                    }
+                    ord.AbnormalStatus = rss.s;
+                    ord.StatusDec = "部分付款";
                 }
                 if(PaidAmount + decimal.Parse(pay.PayAmount) == Amount &&　ord.StatusDec == "部分付款" && ord.Status == 7)
                 {
@@ -1808,6 +1851,9 @@ namespace CoreData.CoreCore
                     log.Remark = ord.StatusDec;
                     log.CoID = CoID;
                     logs.Add(log);
+                    ord.Status = 1;
+                    ord.AbnormalStatus = 0;
+                    ord.StatusDec = "";
                 }
                 log = new Log();
                 log.OID = pay.OID;
@@ -1841,26 +1887,22 @@ namespace CoreData.CoreCore
                 if(ord.PaidAmount == ord.Amount)
                 {
                     ord.IsPaid = true;
-                    ord.Status = 1;
-                    ord.AbnormalStatus = 0;
-                    ord.StatusDec = "";
+                    if(ord.Status != 7)
+                    {
+                        ord.Status = 1;
+                        ord.AbnormalStatus = 0;
+                        ord.StatusDec = "";
+                    }
                 }
                 else
                 {
-                    if(ord.Status != 7 && ord.StatusDec != "部分付款")
+                    ord.IsPaid = false;
+                    if(ord.Status != 7)
                     {
-                        ord.IsPaid = false;
-                        ord.Status = 7;
-                        var rss = GetReasonID("部分付款",CoID);
-                        if(rss.s == -1)
-                        {
-                            result.s = -1;
-                            result.d = rss.d;
-                            return result;
-                        }
-                        ord.AbnormalStatus = rss.s;
-                        ord.StatusDec = "部分付款";
-                    }   
+                        ord.Status = 0;
+                        ord.AbnormalStatus = 0;
+                        ord.StatusDec = "";
+                    }
                 }
                 ord.Modifier = UserName;
                 ord.ModifyDate = DateTime.Now;
@@ -1894,13 +1936,40 @@ namespace CoreData.CoreCore
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
             }
-            
+            var res = new UpdatePay();
+            var aa = GetOrderEdit(pay.OID,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.Order = aa.d as OrderEdit;
+
+            aa = GetOrderPay(pay.OID,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.Pay = aa.d as List<OrderPay>;
+
+            aa = GetOrderLog(pay.OID,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.Log = aa.d as List<OrderLog>;
+            result.d = res;
             return result;
         }
         ///<summary>
         ///取消支付审核
         ///</summary>
-        public static DataResult CancleConfirmPay(int oid,long soid,int payid,int CoID,string UserName)
+        public static DataResult CancleConfirmPay(int oid,int payid,int CoID,string UserName)
         {
             var result = new DataResult(1,null);
             var logs = new List<Log>();
@@ -1909,7 +1978,7 @@ namespace CoreData.CoreCore
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
-                string wheresql = "select * from `order` where id =" + oid + " and soid = " + soid + " and coid =" + CoID;
+                string wheresql = "select * from `order` where id =" + oid  + " and coid =" + CoID;
                 var u = CoreDBconn.Query<Order>(wheresql).AsList();
                 var ord = new Order();
                 if (u.Count == 0)
@@ -1943,7 +2012,7 @@ namespace CoreData.CoreCore
                 }
                 var log = new Log();
                 log.OID = oid;
-                log.SoID = soid;
+                log.SoID = ord.SoID;
                 log.Type = 0;
                 log.LogDate = DateTime.Now;
                 log.UserName = UserName;
@@ -1968,27 +2037,11 @@ namespace CoreData.CoreCore
                     }
                 }
                 decimal pay = decimal.Parse(payinfo[0].PayAmount);
-                if(PaidAmount - pay > 0 &&　ord.StatusDec != "部分付款")
+                if(PaidAmount - pay != Amount && PaidAmount - pay > 0 &&　ord.Status != 7)
                 {
-                    if(ord.Status == 7 )
-                    {
-                        log = new Log();
-                        log.OID = oid;
-                        log.SoID = soid;
-                        log.Type = 0;
-                        log.LogDate = DateTime.Now;
-                        log.UserName = UserName;
-                        log.Title = "取消异常标记";
-                        log.Remark = ord.StatusDec;
-                        log.CoID = CoID;
-                        logs.Add(log);
-                        ord.Status = 0;
-                        ord.AbnormalStatus = 0;
-                        ord.StatusDec = "";
-                    }
                     log = new Log();
                     log.OID = oid;
-                    log.SoID = soid;
+                    log.SoID = ord.SoID;
                     log.Type = 0;
                     log.LogDate = DateTime.Now;
                     log.UserName = UserName;
@@ -1996,12 +2049,22 @@ namespace CoreData.CoreCore
                     log.Remark = "标记部分付款";
                     log.CoID = CoID;
                     logs.Add(log);
+                    ord.Status = 7;
+                    var rss = GetReasonID("部分付款",CoID);
+                    if(rss.s == -1)
+                    {
+                        result.s = -1;
+                        result.d = rss.d;
+                        return result;
+                    }
+                    ord.AbnormalStatus = rss.s;
+                    ord.StatusDec = "部分付款";
                 }
                 if(PaidAmount - pay == 0 &&　ord.StatusDec == "部分付款" && ord.Status == 7)
                 {
                     log = new Log();
                     log.OID = oid;
-                    log.SoID = soid;
+                    log.SoID = ord.SoID;
                     log.Type = 0;
                     log.LogDate = DateTime.Now;
                     log.UserName = UserName;
@@ -2010,6 +2073,22 @@ namespace CoreData.CoreCore
                     log.CoID = CoID;
                     logs.Add(log);
                     ord.Status = 0;
+                    ord.AbnormalStatus = 0;
+                    ord.StatusDec = "";
+                }
+                if(PaidAmount - pay == Amount &&　ord.StatusDec == "部分付款" && ord.Status == 7)
+                {
+                    log = new Log();
+                    log.OID = oid;
+                    log.SoID = ord.SoID;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "取消异常标记";
+                    log.Remark = ord.StatusDec;
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    ord.Status = 1;
                     ord.AbnormalStatus = 0;
                     ord.StatusDec = "";
                 }
@@ -2030,27 +2109,25 @@ namespace CoreData.CoreCore
                     ord.PayDate = new DateTime();
                     ord.PayNbr = null;
                 }
-                if(decimal.Parse(ord.PaidAmount) == 0 && ord.Status != 7)
+                if(ord.PaidAmount == ord.Amount)
                 {
-                    ord.Status = 0;
-                    ord.AbnormalStatus = 0;
-                    ord.StatusDec = "";
-                }
-                if(decimal.Parse(ord.PaidAmount) > 0)
-                {
-                    if(ord.Status != 7 && ord.StatusDec != "部分付款")
+                    ord.IsPaid = true;
+                    if(ord.Status != 7)
                     {
-                        ord.Status = 7;
-                        var rss = GetReasonID("部分付款",CoID);
-                        if(rss.s == -1)
-                        {
-                            result.s = -1;
-                            result.d = rss.d;
-                            return result;
-                        }
-                        ord.AbnormalStatus = rss.s;
-                        ord.StatusDec = "部分付款";
-                    }   
+                        ord.Status = 1;
+                        ord.AbnormalStatus = 0;
+                        ord.StatusDec = "";
+                    }
+                }
+                else
+                {
+                    ord.IsPaid = false;
+                    if(ord.Status != 7)
+                    {
+                        ord.Status = 0;
+                        ord.AbnormalStatus = 0;
+                        ord.StatusDec = "";
+                    }
                 }
                 ord.Modifier = UserName;
                 ord.ModifyDate = DateTime.Now;
@@ -2085,12 +2162,41 @@ namespace CoreData.CoreCore
                 CoreDBconn.Dispose();
             }
             
+            var res = new UpdatePay();
+            var aa = GetOrderEdit(oid,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.Order = aa.d as OrderEdit;
+
+            aa = GetOrderPay(oid,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.Pay = aa.d as List<OrderPay>;
+
+            aa = GetOrderLog(oid,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.Log = aa.d as List<OrderLog>;
+            result.d = res;
+
             return result;
         }
         ///<summary>
         ///支付审核
         ///</summary>
-        public static DataResult ConfirmPay(int oid,long soid,int payid,int CoID,string UserName)
+        public static DataResult ConfirmPay(int oid,int payid,int CoID,string UserName)
         {
             var result = new DataResult(1,null);
             var logs = new List<Log>();
@@ -2099,7 +2205,7 @@ namespace CoreData.CoreCore
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
-                string wheresql = "select * from `order` where id =" + oid + " and soid = " + soid + " and coid =" + CoID;
+                string wheresql = "select * from `order` where id =" + oid  + " and coid =" + CoID;
                 var u = CoreDBconn.Query<Order>(wheresql).AsList();
                 var ord = new Order();
                 if (u.Count == 0)
@@ -2139,7 +2245,7 @@ namespace CoreData.CoreCore
                 }
                 var log = new Log();
                 log.OID = oid;
-                log.SoID = soid;
+                log.SoID = ord.SoID;
                 log.Type = 0;
                 log.LogDate = DateTime.Now;
                 log.UserName = UserName;
@@ -2164,27 +2270,11 @@ namespace CoreData.CoreCore
                     }
                 }
                 decimal pay = decimal.Parse(payinfo[0].PayAmount);
-                if(PaidAmount +  pay != Amount &&　ord.StatusDec != "部分付款")
+                if(PaidAmount +  pay != Amount &&　ord.Status != 7)
                 {
-                    if(ord.Status == 7 )
-                    {
-                        log = new Log();
-                        log.OID = oid;
-                        log.SoID = soid;
-                        log.Type = 0;
-                        log.LogDate = DateTime.Now;
-                        log.UserName = UserName;
-                        log.Title = "取消异常标记";
-                        log.Remark = ord.StatusDec;
-                        log.CoID = CoID;
-                        logs.Add(log);
-                        ord.Status = 0;
-                        ord.AbnormalStatus = 0;
-                        ord.StatusDec = "";
-                    }
                     log = new Log();
                     log.OID = oid;
-                    log.SoID = soid;
+                    log.SoID = ord.SoID;
                     log.Type = 0;
                     log.LogDate = DateTime.Now;
                     log.UserName = UserName;
@@ -2192,12 +2282,22 @@ namespace CoreData.CoreCore
                     log.Remark = "标记部分付款";
                     log.CoID = CoID;
                     logs.Add(log);
+                    ord.Status = 7;
+                    var rss = GetReasonID("部分付款",CoID);
+                    if(rss.s == -1)
+                    {
+                        result.s = -1;
+                        result.d = rss.d;
+                        return result;
+                    }
+                    ord.AbnormalStatus = rss.s;
+                    ord.StatusDec = "部分付款";
                 }
                 if(PaidAmount + pay == Amount &&　ord.StatusDec == "部分付款" && ord.Status == 7)
                 {
                     log = new Log();
                     log.OID = oid;
-                    log.SoID = soid;
+                    log.SoID = ord.SoID;
                     log.Type = 0;
                     log.LogDate = DateTime.Now;
                     log.UserName = UserName;
@@ -2205,6 +2305,9 @@ namespace CoreData.CoreCore
                     log.Remark = ord.StatusDec;
                     log.CoID = CoID;
                     logs.Add(log);
+                    ord.Status = 1;
+                    ord.AbnormalStatus = 0;
+                    ord.StatusDec = "";
                 }
                 //更新支付单资料
                 string sqlCommandText = @"update payinfo set Status = 1,Confirmer=@Confirmer,ConfirmDate = @ConfirmDate where id = @ID and coid = @Coid";
@@ -2228,26 +2331,22 @@ namespace CoreData.CoreCore
                 if(ord.PaidAmount == ord.Amount)
                 {
                     ord.IsPaid = true;
-                    ord.Status = 1;
-                    ord.AbnormalStatus = 0;
-                    ord.StatusDec = "";
+                    if(ord.Status != 7)
+                    {
+                        ord.Status = 1;
+                        ord.AbnormalStatus = 0;
+                        ord.StatusDec = "";
+                    }
                 }
                 else
                 {
-                    if(ord.Status != 7 && ord.StatusDec != "部分付款")
+                    ord.IsPaid = false;
+                    if(ord.Status != 7)
                     {
-                        ord.IsPaid = false;
-                        ord.Status = 7;
-                        var rss = GetReasonID("部分付款",CoID);
-                        if(rss.s == -1)
-                        {
-                            result.s = -1;
-                            result.d = rss.d;
-                            return result;
-                        }
-                        ord.AbnormalStatus = rss.s;
-                        ord.StatusDec = "部分付款";
-                    }   
+                        ord.Status = 0;
+                        ord.AbnormalStatus = 0;
+                        ord.StatusDec = "";
+                    }
                 }
                 ord.Modifier = UserName;
                 ord.ModifyDate = DateTime.Now;
@@ -2281,13 +2380,40 @@ namespace CoreData.CoreCore
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
             }
-            
+            var res = new UpdatePay();
+            var aa = GetOrderEdit(oid,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.Order = aa.d as OrderEdit;
+
+            aa = GetOrderPay(oid,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.Pay = aa.d as List<OrderPay>;
+
+            aa = GetOrderLog(oid,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.Log = aa.d as List<OrderLog>;
+            result.d = res;
             return result;
         }
         ///<summary>
         ///支付作废
         ///</summary>
-        public static DataResult CanclePay(int oid,long soid,int payid,int CoID,string UserName)
+        public static DataResult CanclePay(int oid,int payid,int CoID,string UserName)
         {
             var result = new DataResult(1,null);
             var logs = new List<Log>();
@@ -2296,7 +2422,7 @@ namespace CoreData.CoreCore
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
-                string wheresql = "select status from `order` where id =" + oid + " and soid = " + soid + " and coid =" + CoID;
+                string wheresql = "select status,soid from `order` where id =" + oid + " and coid =" + CoID;
                 var u = CoreDBconn.Query<Order>(wheresql).AsList();
                 if (u.Count == 0)
                 {
@@ -2315,7 +2441,7 @@ namespace CoreData.CoreCore
                 }
                 var log = new Log();
                 log.OID = oid;
-                log.SoID = soid;
+                log.SoID = u[0].SoID;
                 log.Type = 0;
                 log.LogDate = DateTime.Now;
                 log.UserName = UserName;
@@ -2369,13 +2495,31 @@ namespace CoreData.CoreCore
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
             }
-            
+            var res = new CanclePay();
+            var aa = GetOrderPay(oid,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.Pay = aa.d as List<OrderPay>;
+
+            aa = GetOrderLog(oid,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.Log = aa.d as List<OrderLog>;
+            result.d = res;
             return result;
         }
         ///<summary>
         ///快速支付
         ///</summary>
-        public static DataResult QuickPay(int id,long soid,int CoID,string UserName)
+        public static DataResult QuickPay(int id,int CoID,string UserName)
         {
             var result = new DataResult(1,null);
             var logs = new List<Log>();
@@ -2385,7 +2529,7 @@ namespace CoreData.CoreCore
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
-                string wheresql = "select * from `order` where id =" + id + " and soid = " + soid + " and coid =" + CoID;
+                string wheresql = "select * from `order` where id =" + id + " and coid =" + CoID;
                 var u = CoreDBconn.Query<Order>(wheresql).AsList();
                 var ord = new Order();
                 if (u.Count == 0)
@@ -2430,7 +2574,7 @@ namespace CoreData.CoreCore
                 pay.Status = 1;
                 pay.CoID = CoID;
                 pay.OID = id;
-                pay.SoID = soid;
+                pay.SoID = u[0].SoID;
                 pay.Payment = "快速支付";
                 pay.PayNbr = "S" + DateTime.Now.Ticks.ToString().Substring(0,12);
                 pay.PayDate = DateTime.Now;
@@ -2462,6 +2606,9 @@ namespace CoreData.CoreCore
                     log.Remark = ord.StatusDec;
                     log.CoID = CoID;
                     logs.Add(log);
+                    ord.Status = 1;
+                    ord.AbnormalStatus = 0;
+                    ord.StatusDec = "";
                 }
                 log = new Log();
                 log.OID = pay.OID;
@@ -2493,9 +2640,6 @@ namespace CoreData.CoreCore
                     ord.PayNbr = pay.PayNbr;
                 }
                 ord.IsPaid = true;
-                ord.Status = 1;
-                ord.AbnormalStatus = 0;
-                ord.StatusDec = "";
                 ord.Modifier = UserName;
                 ord.ModifyDate = DateTime.Now;
                 sqlCommandText = @"update `order` set PaidAmount = @PaidAmount,PayAmount = @PayAmount,PayDate =@PayDate,PayNbr = @PayNbr,IsPaid=@IsPaid,Status=@Status,AbnormalStatus=@AbnormalStatus,
@@ -2528,6 +2672,34 @@ namespace CoreData.CoreCore
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
             }
+            var res = new UpdatePay();
+            var aa = GetOrderEdit(pay.OID,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.Order = aa.d as OrderEdit;
+
+            aa = GetOrderPay(pay.OID,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.Pay = aa.d as List<OrderPay>;
+
+            aa = GetOrderLog(pay.OID,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.Log = aa.d as List<OrderLog>;
+            result.d = res;
             return result;
         }
         ///<summary>
@@ -4418,13 +4590,83 @@ namespace CoreData.CoreCore
             return result;
         }
         ///<summary>
+        ///快捷修改明细资料刷新
+        ///</summary>
+        public static DataResult RefreshOrderItemQuick(int id,int CoID)
+        {
+            var result = new DataResult(1,null);
+            var sin = new SingleOrderItem();
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{  
+                        string wheresql = "select status,amount,ExWeight from `order` where id =" + id + " and coid =" + CoID;
+                        var u = conn.Query<Order>(wheresql).AsList();
+                        sin.Amount = u[0].Amount;
+                        sin.Status = u[0].Status;
+                        sin.StatusDec = Enum.GetName(typeof(OrdStatus), u[0].Status);
+                        sin.Weight = u[0].ExWeight;
+                    }
+                    catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+            var ff = GetSingleOrdItem(id,CoID);
+            if(ff.s == -1)
+            {
+                result.s = -1;
+                result.d = ff.d;
+                return result;
+            }
+            sin.SkuList = ff.d as List<SkuList>;
+            result.d = sin;
+            return result;
+        }
+        ///<summary>
+        ///修改明细资料刷新
+        ///</summary>
+        public static DataResult RefreshOrderItem(int id,int CoID)
+        {
+            var result = new DataResult(1,null);
+            var res = new RefreshItem();
+            var aa = GetOrderEdit(id,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.Order = aa.d as OrderEdit;
+
+            aa = GetOrderItem(id,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.OrderItem = aa.d as List<OrderItemEdit>;
+
+            aa = GetOrderLog(id,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.Log = aa.d as List<OrderLog>;
+
+            result.d = res;
+            return result;
+        }
+        ///<summary>
         ///新增赠品
         ///</summary>
         public static DataResult InsertGift(int id,List<int> skuid,int CoID,string Username)
         {
             var result = new DataResult(1,null);  
             var res = new OrderDetailInsert();
-            var sin = new SingleOrderItem();
+            // var sin = new SingleOrderItem();
             var logs = new List<Log>();
             string sqlCommandText = string.Empty;
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
@@ -4562,12 +4804,12 @@ namespace CoreData.CoreCore
                 {
                     TransCore.Commit();
                 }
-                wheresql = "select status,amount,ExWeight from `order` where id =" + id + " and coid =" + CoID;
-                u = CoreDBconn.Query<Order>(wheresql).AsList();
-                sin.Amount = u[0].Amount;
-                sin.Status = u[0].Status;
-                sin.StatusDec = Enum.GetName(typeof(OrdStatus), u[0].Status);
-                sin.Weight = u[0].ExWeight;
+                // wheresql = "select status,amount,ExWeight from `order` where id =" + id + " and coid =" + CoID;
+                // u = CoreDBconn.Query<Order>(wheresql).AsList();
+                // sin.Amount = u[0].Amount;
+                // sin.Status = u[0].Status;
+                // sin.StatusDec = Enum.GetName(typeof(OrdStatus), u[0].Status);
+                // sin.Weight = u[0].ExWeight;
             }
             catch (Exception e)
             {
@@ -4581,15 +4823,15 @@ namespace CoreData.CoreCore
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
             }
-            var ff = GetSingleOrdItem(id,CoID);
+            var ff = RefreshOrderItemQuick(id,CoID);
             if(ff.s == -1)
             {
                 result.s = -1;
                 result.d = ff.d;
                 return result;
             }
-            sin.SkuList = ff.d as List<SkuList>;
-            res.Order = sin;
+            res.Order = ff.d as SingleOrderItem;
+            // res.Order = sin;
             result.d = res;
             return result;
         }
@@ -4599,7 +4841,7 @@ namespace CoreData.CoreCore
         public static DataResult ChangeOrderDetail(int id,int oid,int skuidNew,int CoID,string Username)
         {
             var result = new DataResult(1,null);  
-            var sin = new SingleOrderItem();
+            // var sin = new SingleOrderItem();
             var logs = new List<Log>();
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
@@ -4689,12 +4931,12 @@ namespace CoreData.CoreCore
                 }
 
                 TransCore.Commit();
-                wheresql = "select status,amount,ExWeight from `order` where id =" + oid + " and coid =" + CoID;
-                u = CoreDBconn.Query<Order>(wheresql).AsList();
-                sin.Amount = u[0].Amount;
-                sin.Status = u[0].Status;
-                sin.StatusDec = Enum.GetName(typeof(OrdStatus), u[0].Status);
-                sin.Weight = u[0].ExWeight;
+                // wheresql = "select status,amount,ExWeight from `order` where id =" + oid + " and coid =" + CoID;
+                // u = CoreDBconn.Query<Order>(wheresql).AsList();
+                // sin.Amount = u[0].Amount;
+                // sin.Status = u[0].Status;
+                // sin.StatusDec = Enum.GetName(typeof(OrdStatus), u[0].Status);
+                // sin.Weight = u[0].ExWeight;
             }
             catch (Exception e)
             {
@@ -4708,33 +4950,217 @@ namespace CoreData.CoreCore
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
             }
-            var ff = GetSingleOrdItem(oid,CoID);
+            var ff = RefreshOrderItemQuick(oid,CoID);
             if(ff.s == -1)
             {
                 result.s = -1;
                 result.d = ff.d;
                 return result;
             }
-            sin.SkuList = ff.d as List<SkuList>;
-            result.d = sin;
+            // sin.SkuList = 
+            result.d = ff.d as SingleOrderItem;
             return result;
         }
         ///<summary>
-        ///订单详情
+        ///抓取单笔订单资料
         ///</summary>
-        public static DataResult GetOrderSingle(int id,int CoID)
+        public static DataResult GetOrderEdit(int id,int CoID)
         {
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{  
-                    
-
+                        string sqlcommand = @"select ID,ShopName,ODate,OSource,SoID,PayDate,BuyerShopID,ExAmount,Express,ExCode,RecMessage,SendMessage,InvoiceTitle,RecLogistics,
+                                            RecCity,RecDistrict,RecAddress,RecName,RecTel,RecPhone,Status,AbnormalStatus,StatusDec as AbnormalStatusDec From `order` where
+                                            id = @ID and coid = @Coid";
+                        var order = conn.Query<OrderEdit>(sqlcommand,new{ID=id,Coid=CoID}).AsList();
+                        if(order.Count == 0)
+                        {
+                            result.s = -1;
+                            result.d = "订单单号无效!";
+                            return result;
+                        }
+                        order[0].OSource = Enum.GetName(typeof(OrdSource), int.Parse(order[0].OSource));
+                        order[0].StatusDec = Enum.GetName(typeof(OrdStatus), order[0].Status);
+                        result.d = order[0];
                     }
                     catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
                     conn.Dispose();
                 }
+            }
+            return result;
+        }
+        ///<summary>
+        ///抓取单笔订单的付款资料
+        ///</summary>
+        public static DataResult GetOrderPay(int id,int CoID)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{  
+                        string sqlcommand = @"select ID,PayNbr,Payment,PayDate,PayAmount,Status From payinfo where
+                                            oid = @ID and coid = @Coid and Status != 2 order by PayDate Asc";
+                        var pay = conn.Query<OrderPay>(sqlcommand,new{ID=id,Coid=CoID}).AsList();
+                        result.d = pay;
+                    }
+                    catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+        ///<summary>
+        ///抓取单笔订单的订单明细
+        ///</summary>
+        public static DataResult GetOrderItem(int id,int CoID)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{  
+                        string sqlcommand = @"select ID,SkuAutoID,SkuID,SkuName,Norm,GoodsCode,Qty,SalePrice,RealPrice,Amount,img,IsGift,ShopSkuID From orderitem where
+                                            oid = @ID and coid = @Coid";
+                        var item = conn.Query<OrderItemEdit>(sqlcommand,new{ID=id,Coid=CoID}).AsList();
+                        foreach(var i in item)
+                        {
+                            i.InvQty = GetInvQty(CoID,i.SkuAutoID);
+                        }
+                        result.d = item;
+                    }
+                    catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+        ///<summary>
+        ///抓取单笔订单的日志
+        ///</summary>
+        public static DataResult GetOrderLog(int id,int CoID)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{  
+                        string sqlcommand = @"select LogDate,UserName,Title,Remark From orderlog where
+                                            oid = @ID and coid = @Coid and type = 0 order by LogDate Asc";
+                        var Log = conn.Query<OrderLog>(sqlcommand,new{ID=id,Coid=CoID}).AsList();
+                        result.d = Log;
+                    }
+                    catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+        ///<summary>
+        ///返回订单详情
+        ///</summary>
+        public static DataResult GetOrderSingle(int id,int CoID)
+        {
+            var result = new DataResult(1,null);
+            var res = new OrderSingle();
+            var aa = GetOrderEdit(id,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.Order = aa.d as OrderEdit;
+
+            aa = GetOrderPay(id,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.Pay = aa.d as List<OrderPay>;
+
+            aa = GetOrderItem(id,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.OrderItem = aa.d as List<OrderItemEdit>;
+
+            aa = GetOrderLog(id,CoID);
+            if(aa.s == -1)
+            {
+                result.s = -1;
+                result.d = aa.d;
+                return result;
+            }
+            res.Log = aa.d as List<OrderLog>;
+            result.d = res;
+            return result;
+        }
+        ///<summary>
+        ///修改备注
+        ///</summary>
+        public static DataResult ModifyRemark(int id,int CoID,string Username,string Remark)
+        {
+            var result = new DataResult(1,null);
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlcommand = @"select soid,SendMessage from `order` where id = " + id + " and coid = " + CoID;
+                var order = CoreDBconn.Query<Order>(sqlcommand).AsList();
+                if(order.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "订单无效!";
+                    return result;
+                }
+                var log = new Log();
+                log.OID = id;
+                log.SoID = order[0].SoID;
+                log.Type = 0;
+                log.LogDate = DateTime.Now;
+                log.UserName = Username;
+                log.Title = "修改备注";
+                log.Remark = order[0].SendMessage + "=>" + Remark;
+                log.CoID = CoID;
+
+                sqlcommand = @"update `order` set SendMessage = @SendMessage,Modifier=@Modifier,ModifyDate=@ModifyDate 
+                               where ID = @ID and CoID = @CoID";
+                int count = CoreDBconn.Execute(sqlcommand, new {SendMessage = Remark,Modifier = Username,ModifyDate = DateTime.Now,ID = id,CoID = CoID},TransCore);
+                if (count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }
+                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                            VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                count = CoreDBconn.Execute(loginsert,log, TransCore);
+                if (count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
             }
             return result;
         }

@@ -1,6 +1,13 @@
 {
-    "Ord": {
-        "id":10867,
-        "RecName": "测试1026name"
-    }
+    "ExAmount": "20",
+    "SendMessage": "测试1117",
+    "InvoiceTitle": "个人",
+    "RecLogistics": "江苏省",
+    "RecCity": "苏州市",
+    "RecDistrict": "常熟市",
+    "RecAddress": "可美大厦",
+    "RecName": "xiayun",
+    "RecTel": "",
+    "RecPhone": "158974335",
+    "OID": 10873
 }

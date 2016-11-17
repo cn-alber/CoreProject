@@ -1,9 +1,8 @@
 {
-    "OID":10860,
-    "SoID":63613076331,
+    "OID":10873,
     "Payment":"支付宝",
-    "PayDate":"2016-11-01",
-    "PayNbr":"j2016110125348",
-    "PayAmount":"65",
+    "PayDate":"2016-11-07",
+    "PayNbr":"j20161101253488888",
+    "PayAmount":"100",
     "PayAccount":""
 }
