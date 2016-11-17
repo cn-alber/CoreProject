@@ -690,8 +690,8 @@ namespace CoreData.CoreComm
                     {
                         string strName =Enum.GetName(typeof(ShopSit), myCode);//获取名称
                         //string strVaule = myCode.ToString();//获取值
-                        site.id = myCode;
-                        site.title = strName;
+                        site.value = myCode;
+                        site.label = strName;
                         siteList.Add(site);
                         site = new siteTree();
                     }

@@ -77,8 +77,8 @@ namespace CoreModels.XyComm
     }
 
     public  class siteTree{
-        public int id{get;set;}
-        public string title{get;set;}
+        public int value{get;set;}
+        public string label{get;set;}
     }
 
     public class shopApi{
