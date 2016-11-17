@@ -317,10 +317,10 @@ namespace CoreData.CoreCore
                         cs.items = conn.Query<CoreSkuItem>(itemsql, p).AsList();
                         cs.itemprops = conn.Query<goods_item_props>(itempropsql, p).AsList();
                         cs.skuprops = conn.Query<goods_sku_props>(skupropsql, p).AsList();
-                        var res1 = CommHaddle.GetBrandByID(CoID,main.Brand);//品牌
-                        var res2 = CommHaddle.GetScoNameByID(CoID,main.ScoID);//供应商
-                        var res3 = CommHaddle.GetBrandByID(CoID,main.KindID);//类目名称
-                        var res4 = CommHaddle.GetShopNameByID(CoID,main.TempShopID);
+                        var res1 = CommHaddle.GetBrandByID(CoID, main.Brand);//品牌
+                        var res2 = CommHaddle.GetScoNameByID(CoID, main.ScoID);//供应商
+                        var res3 = CommHaddle.GetBrandByID(CoID, main.KindID);//类目名称
+                        var res4 = CommHaddle.GetShopNameByID(CoID, main.TempShopID);
                         main.BrandName = res1.d as string;
                         main.ScoName = res2.d as string;
                         main.KindName = res3.d as string;
@@ -372,6 +372,7 @@ namespace CoreData.CoreCore
                         // wareployContain("", GoodsLst, CoID, 1);
                     });
                 }
+                Trans.Commit();
             }
             catch (Exception e)
             {
@@ -1298,17 +1299,55 @@ namespace CoreData.CoreCore
                     p.Add("@le", IParam.PageSize);
                     //商品明细
                     var SkuLst = CoreData.DbBase.CoreDB.Query<SkuQuery>(querysql.ToString(), p).AsList();
-                    cs.SkuLst = SkuLst;
                     //品牌列表
-                    if(SkuLst.Count>0)
+                    if (SkuLst.Count > 0)
                     {
-                        var BrandIDLst = SkuLst.Select(a=>a.Brand).Distinct().AsList();
-                        res = CommHaddle.GetBrandSByID(IParam.CoID.ToString(),BrandIDLst);
-                        if(res.s==1)
+                        var BrandIDLst = SkuLst.Select(a => a.Brand).Distinct().AsList();
+                        res = CommHaddle.GetBrandsByID(IParam.CoID.ToString(), BrandIDLst);
+                        if (res.s == 1)
                         {
-                            var DicBrand = res.d as Dictionary<string, object>;
-                            cs.BrandLst = DicBrand;
+                            var BrandLst = res.d as List<BrandDDLB>;
+                            SkuLst = (from a in SkuLst
+                                      join b in BrandLst
+                                      on new { Brand = a.Brand } equals new { Brand = b.ID }
+                                      group new { a, b } by new
+                                      {
+                                          a.ID,
+                                          a.GoodsCode,
+                                          a.GoodsName,
+                                          a.SkuID,
+                                          a.SkuName,
+                                          a.Norm,
+                                          a.GBCode,
+                                          a.Brand,
+                                          b.Name,
+                                          a.CostPrice,
+                                          a.SalePrice,
+                                          a.Enable,
+                                          a.Img,
+                                          a.Creator,
+                                          a.CreateDate
+                                      } into c
+                                      select new SkuQuery
+                                      {
+                                          ID = c.Key.ID,
+                                          GoodsCode = c.Key.GoodsCode,
+                                          GoodsName = c.Key.GoodsName,
+                                          SkuID = c.Key.SkuID,
+                                          SkuName = c.Key.SkuName,
+                                          Norm = c.Key.Norm,
+                                          GBCode = c.Key.GBCode,
+                                          Brand = c.Key.Brand,
+                                          BrandName = c.Key.Name,
+                                          CostPrice = c.Key.CostPrice,
+                                          SalePrice = c.Key.SalePrice,
+                                          Enable = c.Key.Enable,
+                                          Img = c.Key.Img,
+                                          Creator = c.Key.Creator,
+                                          CreateDate = c.Key.CreateDate
+                                      }).AsList();
                         }
+                        cs.SkuLst = SkuLst;
                     }
                     res.d = cs;
                 }
