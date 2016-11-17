@@ -61,7 +61,7 @@ function说明
         ID              int                     单据明细ID(*必填项*)
         InvQty          int                     Sku之实盘数量(*必填项*)
     OutPut:
-        新增盘点单明细 - 返回操作信息
+        更新盘点数量 - 返回操作信息
     参考：input json 文件：SaveStockTakeQty_input.json
 
 6.CheckTake()//库存盘点 - 确认生效

@@ -24,8 +24,8 @@ namespace CoreData.CoreCore
             StringBuilder querysql = new StringBuilder();
             StringBuilder querycount = new StringBuilder();
             var p = new DynamicParameters();
-            querycount.Append("SELECT count(ID) FROM coresku_main where Type = @Type");
-            querysql.Append("select ID,GoodsCode,GoodsName,KindID,KindName,Enable,SalePrice,ScoGoodsCode from coresku_main where Type = @Type");
+            querycount.Append("SELECT count(ID) FROM coresku_main where Type = @Type AND IsDelete=0");
+            querysql.Append("select ID,GoodsCode,GoodsName,KindID,KindName,Enable,SalePrice,ScoGoodsCode from coresku_main where Type = @Type AND IsDelete=0");
             p.Add("@Type", IParam.Type);
             if (IParam.CoID != 1)
             {
@@ -528,6 +528,7 @@ namespace CoreData.CoreCore
                 var Trans = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
                 try
                 {
+                    main.CostPrice = main.PurPrice;
                     conn.Execute(AddCoresku_Main_Sql(), main, Trans);//新增商品主资料
                     long MainID = conn.QueryFirst<long>("select LAST_INSERT_ID()", Trans);//获取新增id
                     var itemPropValLst = itemprops.Select(a => new coresku_item_props
@@ -602,6 +603,7 @@ namespace CoreData.CoreCore
                         sku.SkuName = item.SkuName;
                         sku.SkuSimple = item.SkuSimple;
                         sku.PurPrice = item.PurPrice;
+                        sku.CostPrice = item.PurPrice;
                         sku.SalePrice = item.SalePrice;
                         sku.Weight = item.Weight;
                         sku.pid1 = item.pid1;
@@ -743,8 +745,8 @@ namespace CoreData.CoreCore
                     }
                     if (main.PurPrice != main_Old.PurPrice)
                     {
-                        contents = contents + "采购成本:" + main_Old.PurPrice + "=>" + main.PurPrice + ";";
-                        UptMainSql = UptMainSql + " ,PurPrice=@PurPrice";
+                        contents = contents + "采购成本:" + main_Old.PurPrice + "=>" + main.PurPrice + ";";                        
+                        UptMainSql = UptMainSql + " ,PurPrice=@PurPrice,CostPrice=@PurPrice";//还未涉及加工成本，故成本价默认为采购价
                     }
                     if (main.SalePrice != main_Old.SalePrice)
                     {
@@ -1226,8 +1228,8 @@ namespace CoreData.CoreCore
             StringBuilder querysql = new StringBuilder();
             StringBuilder querycount = new StringBuilder();
             var p = new DynamicParameters();
-            querycount.Append("SELECT count(GoodsCode) FROM coresku where 1=1");
-            querysql.Append("select ID,GoodsCode,GoodsName,SkuID,SkuName,Norm,GBCode,Brand,CostPrice,SalePrice,Enable,Img,Creator,CreateDate from coresku where 1=1");
+            querycount.Append("SELECT count(GoodsCode) FROM coresku where 1=1 AND IsDelete=0");
+            querysql.Append("select ID,GoodsCode,GoodsName,SkuID,SkuName,Norm,GBCode,Brand,CostPrice,SalePrice,Enable,Img,Creator,CreateDate from coresku where 1=1 AND IsDelete=0");
             if (!string.IsNullOrEmpty(IParam.Type))
             {
                 querycount.Append(" AND Type = @Type");

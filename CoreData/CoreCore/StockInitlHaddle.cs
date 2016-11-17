@@ -104,6 +104,10 @@ namespace CoreData.CoreCore
                     p.Add("@CoID", IParam.CoID);
                     p.Add("@Type", IParam.Type);
                     p.Add("@ParentID", IParam.ParentID);
+                    if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
+                    {
+                        querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
+                    }
                     var DataCount = conn.QueryFirst<int>(querycount.ToString(), p);
                     if (DataCount < 0)
                     {
@@ -142,7 +146,7 @@ namespace CoreData.CoreCore
 
 
         #region 库存期初 - 修改保存 - 期初数量/成本单价/成本金额
-        public static DataResult SaveStockInitQty(string ID, int InvQty, Decimal Price, string CoID, string UserName)
+        public static DataResult SaveStockInitQty(string ID, int InvQty, string CoID, string UserName)
         {
             var result = new DataResult(1, null);
             var conn = new MySqlConnection(DbBase.CoreConnectString);
@@ -155,15 +159,49 @@ namespace CoreData.CoreCore
                 if (int.Parse(itemOld.InvQty) != InvQty)
                 {
                     contents = contents + "数量:" + itemOld.InvQty + "=>" + InvQty + ";";
+                }               
+                if (string.IsNullOrEmpty(contents))
+                {
+                    string sql = "UPDATE sfc_item SET InvQty = @InvQty,Amount=@InvQty*Price,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID=@ID";
+                    conn.Execute(sql, new { InvQty = InvQty, CoID = CoID, ID = ID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                    Trans.Commit();
+                    CoreUser.LogComm.InsertUserLog("修改期初明细", "sfc_item", "商品ID" + itemOld.Skuautoid + " " + contents, UserName, int.Parse(CoID), DateTime.Now);
                 }
+            }
+            catch (Exception e)
+            {
+                Trans.Rollback();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                Trans.Dispose();
+                conn.Dispose();
+                conn.Close();
+            }
+            return result;
+        }
+        #endregion
+         #region 库存期初 - 修改保存 - 期初数量/成本单价/成本金额
+        public static DataResult SaveStockInitPrice(string ID, Decimal Price, string CoID, string UserName)
+        {
+            var result = new DataResult(1, null);
+            var conn = new MySqlConnection(DbBase.CoreConnectString);
+            conn.Open();
+            var Trans = conn.BeginTransaction();
+            try
+            {
+                string contents = string.Empty;
+                var itemOld = conn.QueryFirst<Sfc_item_Init_view>("SELECT ID,Skuautoid,InvQty,Price FROM sfc_item WHERE CoID=@CoID AND ID=@ID", new { CoID = CoID, ID = ID });
                 if (int.Parse(itemOld.Price) != Price)
                 {
                     contents = contents + "单价:" + itemOld.Price + "=>" + Price + ";";
                 }
                 if (string.IsNullOrEmpty(contents))
                 {
-                    string sql = "UPDATE sfc_item SET InvQty = @InvQty,Price=@Price,Amount=@InvQty*@Price,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID=@ID";
-                    conn.Execute(sql, new { InvQty = InvQty, Price = Price, CoID = CoID, ID = ID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                    string sql = "UPDATE sfc_item SET Price=@Price,Amount=InvQty*@Price,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID=@ID";
+                    conn.Execute(sql, new { Price = Price, CoID = CoID, ID = ID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
                     Trans.Commit();
                     CoreUser.LogComm.InsertUserLog("修改期初明细", "sfc_item", "商品ID" + itemOld.Skuautoid + " " + contents, UserName, int.Parse(CoID), DateTime.Now);
                 }

@@ -1,0 +1,88 @@
+接口名称：StockInitControllers
+路径：..\CoreProject\CoreWebApi\Controllers\ItemSku\StockInitControllers.cs
+function说明
+1.StockInitMainLst()//库存期初 - 查询期初单据主表资料
+    方法：Get
+    路由：http://192.168.30.211:5000/Core/XyCore/StockInit/StockInitMainLst?Skuautoid=&PageIndex=1&PageSize=&SortField=&SortDirection=
+    参数: CoreModels.XyCore.Sfc_item_param
+    InPut:
+        Skuautoid       string      查询匹配(商品Sku编码autoid,Default:null)
+        PageIndex       int         当前页码(ex.第一页就给1)
+        PageSize        int         每页显示资料笔数(Default:20)
+        SortField       string      排序字段(Default:CreateDate)
+        SortDirection   string      排序方向(DESC|ASC,Default:DESC)
+    OutPut:       
+        PageCount       int                             总页数
+        DataCount       int                             资料总笔数
+        MainLst         List<Sfc_main_view>             期初主资料列表
+        DicWh           Dictionary<string, object>      仓库资料列表
+
+2.StockInitItemLst()//库存盘点-商品sku明细查询
+    方法：Get
+    路由：http://192.168.30.211:5000/Core/XyCore/StockInit/StockInitItemLst?ParentID=&PageIndex=1&PageSize=&SortField=&SortDirection=
+    参数:
+    InPut:
+        ParentID        int         期初单主表ID(*必填项*)
+        PageIndex       int         当前页码(ex.第一页就给1)
+        PageSize        int         每页显示资料笔数(Default:20)
+        SortField       string      排序字段(Default:null)
+        SortDirection   string      排序方向(DESC|ASC,Default:ASC)
+    OutPut:
+        ItemLst         List<Sfc_item_view>             盘点单明细列表
+        DicSku          Dictionary<string, object>      盘点商品Sku列表
+
+3.InsertTakeMain()//库存期初-新增-期初主表
+    方法：Post
+    路由：http://192.168.30.211:5000/Core/XyCore/StockInit/InsertInitMain
+    参数：
+    InPut:
+        WhID            int         本公司分仓仓库ID(*必填项*)
+        Parent_WhID     int         本公司主仓仓库ID(*必填项*)
+    OutPut:
+        新增盘点单主表 - 返回操作信息
+    参考：input json 文件：InsertInitMain_input.json
+4.InsertInitItem()//库存期初 - 新增期初子表
+    方法：Post
+    路由：http://192.168.30.211:5000/Core/XyCore/StockInit/InsertInitItem
+    参数：
+    InPut:
+        ParentID        int                     单据主表ID(*必填项*)
+        SkuIDLst        List<int>               所需期初Sku之autoid(*必填项*)
+    OutPut:
+        新增盘点单明细 - 返回操作信息
+    参考：input json 文件：InsertInitItem_input.json
+5.SaveInitQty()//库存期初 - 修改保存期初数量(单笔)
+    方法：Post
+    路由：http://192.168.30.211:5000/Core/XyCore/StockInit/SaveInitQty
+    参数：
+    InPut:
+        ID              int                     单据明细ID(*必填项*)
+        InvQty          int                     Sku之期初数量(*必填项*)
+    OutPut:
+        更新期初 - 返回操作信息
+    参考：input json 文件：SaveStockInitQty_input.json
+6.CheckInit()//库存期初 - 确认生效
+    方法：Post
+    路由：http://192.168.30.211:5000/Core/XyCore/StockInit/CheckInit
+    参数：
+    InPut:
+        ID              int                     单据明细ID(*必填项*)
+    OutPut:
+        确认期初单 - 更新商品库存
+    参考：
+    {
+    "ID":4
+    }
+
+7.UnCheckInit()//库存期初 - 确认生效
+    方法：Post
+    路由：http://192.168.30.211:5000/Core/XyCore/StockInit/UnCheckInit
+    参数：
+    InPut:
+        ID              int                     单据明细ID(*必填项*)
+    OutPut:
+        作废期初单 - 更新商品库存
+    参考：
+    {
+    "ID":4
+    }

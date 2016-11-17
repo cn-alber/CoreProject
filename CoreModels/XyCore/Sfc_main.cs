@@ -106,8 +106,8 @@ namespace CoreModels.XyCore
         private string _CoID;//公司编号
         private int _PageSize = 20;//每页笔数
         private int _PageIndex = 1;//页码
-        private string _SortField = "CreateDate";//排序字段
-        private string _SortDirection = "DESC";//DESC,ASC
+        private string _SortField;//排序字段
+        private string _SortDirection = "ASC";//DESC,ASC
         public string WhID { get; set; }//仓库id
         public string DateF { get; set; }//单据日期起
         public string DateT { get; set; }//单据日期讫

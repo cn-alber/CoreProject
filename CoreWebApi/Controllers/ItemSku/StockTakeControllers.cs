@@ -62,6 +62,11 @@ namespace CoreWebApi.XyCore
                     }
                 }
             }
+            else
+            {
+                cp.SortField = "CreatDate";
+                cp.SortDirection = "DESC";
+            }
             cp.CoID = GetCoid();
             var Result = StockTakeHaddle.GetStockTakeMain(cp);
             return CoreResult.NewResponse(Result.s, Result.d, "General");
