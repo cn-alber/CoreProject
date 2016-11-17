@@ -91,6 +91,7 @@ namespace CoreModels.XyCore
         public string Norm { get; set; }
         public string GBCode { get; set; }
         public string Brand { get; set; }
+        public string BrandName { get; set; }
         public string PurPrice { get; set; }
         public string MarketPrice { get; set; }
         public string CostPrice { get; set; }
@@ -229,7 +230,7 @@ namespace CoreModels.XyCore
         public List<goods_item_props> itemprops { get; set; }//货品item属性
         public List<goods_sku_props> skuprops { get; set; }//货品Sku属性
         public List<CoreSkuItem> items { get; set; }
-        
+
     }
     #endregion
     #region 商品维护 - Sku明细列表
@@ -273,7 +274,7 @@ namespace CoreModels.XyCore
     {
         public string ID { get; set; }
         public string SkuID { get; set; }
-        public string SkuName { get; set; }        
+        public string SkuName { get; set; }
         public string Norm { get; set; }
         public string Img { get; set; }
 

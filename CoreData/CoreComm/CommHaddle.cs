@@ -258,20 +258,20 @@ namespace CoreData.CoreComm
 
 
         #region 公用方法 - 获取品牌名称
-        public static DataResult GetBrandSByID(string CoID, List<string> BrandIDLst)
+        public static DataResult GetBrandsByID(string CoID, List<string> BrandIDLst)
         {
             var result = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CommConnectString))
             {
                 try
                 {
-                    Dictionary<string, object> DicBrand = new Dictionary<string, object>();
+                    // Dictionary<string, object> DicBrand = new Dictionary<string, object>();
                     var BrandLst = conn.Query<BrandDDLB>("SELECT ID,Name,Intro FROM Brand WHERE CoID=@CoID AND ID IN @IDLST", new { CoID = CoID, IDLST = BrandIDLst }).AsList();
-                    foreach (var b in BrandLst)
-                    {
-                        DicBrand.Add(b.ID, b);
-                    }
-                    result.d = DicBrand;
+                    // foreach (var b in BrandLst)
+                    // {
+                    //     DicBrand.Add(b.ID, b);
+                    // }
+                    result.d = BrandLst;
                 }
                 catch (Exception e)
                 {
@@ -306,20 +306,20 @@ namespace CoreData.CoreComm
         #endregion
 
         #region 公用方法 - 获取公司名称
-        public static DataResult GetScoNameSByID(string CoID, List<string> ScoIDLst)
+        public static DataResult GetScoNamesByID(string CoID, List<string> ScoIDLst)
         {
             var result = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CoreConnectString))
             {
                 try
                 {
-                    Dictionary<string, object> DicSco = new Dictionary<string, object>();
+                    // Dictionary<string, object> DicSco = new Dictionary<string, object>();
                     var SCoLst = conn.Query<BrandDDLB>("SELECT id,scocode,scosimple FROM supplycompany WHERE CoID=@CoID AND id IN @IDLST", new { CoID = CoID, IDLST = ScoIDLst }).AsList();
-                    foreach (var S in SCoLst)
-                    {
-                        DicSco.Add(S.ID, S);
-                    }
-                    result.d = DicSco;
+                    // foreach (var S in SCoLst)
+                    // {
+                    //     DicSco.Add(S.ID, S);
+                    // }
+                    result.d = SCoLst;
                 }
                 catch (Exception e)
                 {
@@ -361,13 +361,13 @@ namespace CoreData.CoreComm
             {
                 try
                 {
-                    Dictionary<string, object> DicKind = new Dictionary<string, object>();
+                    // Dictionary<string, object> DicKind = new Dictionary<string, object>();
                     var KindLst = conn.Query<BrandDDLB>("SELECT ID AS KindID,KindName FROM customkind WHERE ID in @KindIDLst AND CoID=@CoID", new { CoID = CoID, IDLST = KindIDLst }).AsList();
-                    foreach (var k in KindLst)
-                    {
-                        DicKind.Add(k.ID, k);
-                    }
-                    result.d = DicKind;
+                    // foreach (var k in KindLst)
+                    // {
+                    //     DicKind.Add(k.ID, k);
+                    // }
+                    result.d = KindLst;
                 }
                 catch (Exception e)
                 {
