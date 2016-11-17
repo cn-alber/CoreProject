@@ -693,5 +693,22 @@ namespace CoreWebApi
             var data = OrderHaddle.ModifyRemark(oid,CoID,username,Remark);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Order/ModifyAddress")]
+        public ResponseResult ModifyAddress([FromBodyAttribute]JObject co)
+        {   
+            string Logistics = co["RecLogistics"].ToString();
+            string City = co["RecCity"].ToString();
+            string District = co["RecDistrict"].ToString();
+            string Address = co["RecAddress"].ToString();
+            string Name = co["RecName"].ToString();
+            string tel = co["RecTel"].ToString();
+            string phone = co["RecPhone"].ToString();
+            int OID = int.Parse(co["OID"].ToString());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.ModifyAddress(Logistics,City,District,Address,Name,tel,phone,OID,username,CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }  

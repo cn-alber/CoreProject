@@ -285,7 +285,7 @@ output: Order     订单资料
         Log       日志
 参考:output jason 文件:GetOrderSingle_output.json
 
-27.ModifyRemark()更换商品
+27.ModifyRemark()修改备注
 路由:http://localhost:5000/Core/Order/ModifyRemark
 input:OID         int             内部订单号
       SendMessage string          修改后卖家备注
@@ -293,3 +293,16 @@ output: s=1成功 else 错误代码
 参考:input jason 文件:ModifyRemark_input.json
 参考:output jason 文件:ModifyRemark_output.json
 
+28.ModifyAddress()修改收货地址
+路由:http://localhost:5000/Core/Order/ModifyAddress
+input:OID               int         内部订单号    
+      RecLogistics      string      省
+      RecCity           string      市
+      RecDistrict       string      县
+      RecAddress        string      地址
+      RecName           string      收货人
+      RecTel            string      电话
+      RecPhone          string      手机
+output: s=1成功 else 错误代码
+参考:input jason 文件:ModifyAddress_input.json
+参考:output jason 文件:ModifyAddress_output.json
