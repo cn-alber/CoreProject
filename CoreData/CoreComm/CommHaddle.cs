@@ -289,13 +289,11 @@ namespace CoreData.CoreComm
             {
                 try
                 {
-                    Dictionary<string, object> DicBrand = new Dictionary<string, object>();
-                    var BrandLst = conn.Query<BrandDDLB>("SELECT ID,Name,Intro FROM Brand WHERE CoID=@CoID AND ID = @ID", new { CoID = CoID, ID = BrandID }).AsList();
-                    if (BrandLst.Count > 0)
+                    var BrandNameLst = conn.Query<string>("SELECT Name FROM Brand WHERE CoID=@CoID AND ID = @ID", new { CoID = CoID, ID = BrandID }).AsList();
+                    if (BrandNameLst.Count > 0)
                     {
-                        DicBrand.Add(BrandLst[0].ID, BrandLst[0]);
+                        result.d = BrandNameLst[0];
                     }
-                    result.d = DicBrand;
                 }
                 catch (Exception e)
                 {
@@ -339,13 +337,11 @@ namespace CoreData.CoreComm
             {
                 try
                 {
-                    Dictionary<string, object> DicSco = new Dictionary<string, object>();
-                    var SCoLst = conn.Query<BrandDDLB>("SELECT id,scocode,scosimple FROM supplycompany WHERE CoID=@CoID AND id = @ID", new { CoID = CoID, ID = ScoID }).AsList();
+                    var SCoLst = conn.Query<string>("SELECT ScoName FROM supplycompany WHERE CoID=@CoID AND id = @ID", new { CoID = CoID, ID = ScoID }).AsList();
                     if (SCoLst.Count > 0)
                     {
-                        DicSco.Add(SCoLst[0].ID, SCoLst[0]);
+                        result.d = SCoLst[0];
                     }
-                    result.d = DicSco;
                 }
                 catch (Exception e)
                 {
@@ -388,13 +384,11 @@ namespace CoreData.CoreComm
             {
                 try
                 {
-                    Dictionary<string, object> DicKind = new Dictionary<string, object>();
-                    var KindLst = conn.Query<BrandDDLB>("SELECT ID AS KindID,KindName FROM customkind WHERE ID =@ID AND CoID=@CoID", new { CoID = CoID, ID = KindID }).AsList();
+                    var KindLst = conn.Query<string>("SELECT KindName FROM customkind WHERE ID =@ID AND CoID=@CoID", new { CoID = CoID, ID = KindID }).AsList();
                     if (KindLst.Count > 0)
                     {
-                        DicKind.Add(KindLst[0].ID, KindLst[0]);
+                        result.d = KindLst[0];
                     }
-                    result.d = DicKind;
                 }
                 catch (Exception e)
                 {

@@ -11,9 +11,11 @@ namespace CoreModels.XyCore
         public string GoodsCode { get; set; }
         public string GoodsName { get; set; }
         public string Brand { get; set; }
+        public string BrandName { get; set; }
         public string KindID { get; set; }
         public string KindName { get; set; }
         public string ScoID { get; set; }
+        public string ScoName { get; set; }
         public string ScoGoodsCode { get; set; }
         public string ScoSku { get; set; }
         public string Weight { get; set; }

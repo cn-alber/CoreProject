@@ -321,9 +321,9 @@ namespace CoreData.CoreCore
                         var res1 = CommHaddle.GetBrandByID(CoID,main.Brand);//品牌
                         var res2 = CommHaddle.GetScoNameByID(CoID,main.ScoID);//供应商
                         var res3 = CommHaddle.GetScoNameByID(CoID,main.KindID);//商品名称
-                        cs.DicBrand = res1.d as Dictionary<string,object>;
-                        cs.DicSco = res2.d as Dictionary<string,object>;
-                        cs.DicKind = res3.d as Dictionary<string,object>;
+                        main.Brand = res1.d as string;
+                        main.ScoName = res2.d as string;
+                        main.KindName = res3.d as string;
                     }
                 }
                 catch (Exception e)
