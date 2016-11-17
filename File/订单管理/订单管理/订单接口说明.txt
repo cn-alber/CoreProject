@@ -258,3 +258,12 @@ input:OID         int             内部订单号
 output: s=1成功 else 错误代码
 参考:input jason 文件:InsertGift_input.json
 参考:output jason 文件:InsertGift_output.json
+
+25.ChangeOrderDetail()更换商品
+路由:http://localhost:5000/Core/Order/ChangeOrderDetail
+input:OID         int             内部订单号
+      ID          int             订单明细自增ID
+      SkuID       int             换货商品auto id
+output: s=1成功 else 错误代码
+参考:input jason 文件:ChangeOrderDetail_input.json
+参考:output jason 文件:ChangeOrderDetail_output.json

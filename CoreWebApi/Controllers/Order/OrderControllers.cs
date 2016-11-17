@@ -607,7 +607,17 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-        // int id = int.Parse(co["ID"].ToString());
-        //     int oid = int.Parse(co["OID"].ToString());
+        [HttpPostAttribute("/Core/Order/ChangeOrderDetail")]
+        public ResponseResult ChangeOrderDetail([FromBodyAttribute]JObject co)
+        {   
+            int id = int.Parse(co["ID"].ToString());
+            int oid = int.Parse(co["OID"].ToString());
+            int Skuid = int.Parse(co["SkuID"].ToString());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.ChangeOrderDetail(id,oid,Skuid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+        
     }
 }  
