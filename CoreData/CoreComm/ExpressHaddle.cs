@@ -275,7 +275,26 @@ namespace CoreData.CoreComm
             }
             return result;
         }
-        
+        ///<summary>
+        ///抓取快递List
+        ///</summary>
+        public static DataResult GetExpressSimple(int CoID)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{  
+                    //快递公司
+                    string sqlcommand = "select ID,ExpName as Name from express where coid =" + CoID + " and enable = true";
+                    var Express = conn.Query<ExpressSimple>(sqlcommand).AsList();
+                    result.d = Express;   
+                    }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }    
+            return result;
+        }
         // ///<summary>
         // ///查询运费设定资料List
         // ///</summary>

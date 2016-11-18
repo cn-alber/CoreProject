@@ -271,5 +271,12 @@ namespace CoreWebApi
             data = ExpressHaddle.UpdateExpress(CoID,exp,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+        [HttpGetAttribute("/Core/Express/GetExpressSimple")]
+        public ResponseResult GetExpressSimple(string ID)
+        {   
+            int CoID = int.Parse(GetCoid());
+            var data = ExpressHaddle.GetExpressSimple(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }

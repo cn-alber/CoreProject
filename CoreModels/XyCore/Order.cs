@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CoreModels.XyComm;
 namespace CoreModels.XyCore
 {
     public class OrderParm
@@ -789,5 +790,19 @@ namespace CoreModels.XyCore
     {
         public int Skuautoid{get;set;}
         public int InvQty{get;set;}
+    }
+    public class SetExp
+    {
+        public List<ExpressSimple> Express;
+        public List<LogisticsNetwork> LogisticsNetwork;
+    }
+    public class LogisticsNetwork
+    {
+        public string kd_name{get;set;}
+        public string cp_name_raw{get;set;}
+        public string cp_location{get;set;}
+        public string delivery_contact{get;set;}
+        public string delivery_area_1{get;set;}
+        public string delivery_area_0{get;set;}
     }
 }
