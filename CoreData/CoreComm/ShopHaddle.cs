@@ -778,7 +778,7 @@ namespace CoreData.CoreComm
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
                 {
-                    string sql = @"SELECT ID as value ,ShopName as label FROM shop WHERE CoID="+CoID+";";
+                    string sql = @"SELECT ID as value ,ShopName as label FROM shop WHERE CoID="+CoID+" AND Enable=TRUE AND Deleted=FALSE ;";
                     res = conn.Query<shopEnum>(sql).AsList();                                  
                 }
                 catch
