@@ -19,7 +19,6 @@ function说明
         PageCount       int                             总页数
         DataCount       int                             资料总笔数
         MainLst         List<Sfc_main_view>             盘点资料列表
-        DicWh           Dictionary<string, object>      仓库资料列表
 
 2.StockTakeItemLst()//库存盘点-商品sku明细查询
     方法：Get

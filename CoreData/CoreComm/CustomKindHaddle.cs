@@ -275,7 +275,7 @@ namespace CoreData.CoreComm
                 try
                 {
                     int count = conn.Execute(AddKindSql(), kind,Trans);
-                    kind.ID = conn.QueryFirst<int>("select LAST_INSERT_ID()");
+                    kind.ID = conn.QueryFirst<int>("select LAST_INSERT_ID()",Trans);
                     if (count < 0)
                     {
                         result.s = -3002;

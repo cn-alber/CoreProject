@@ -55,6 +55,7 @@ namespace CoreModels.XyCore
         private int _Status = 0;//0:待确认;1:生效;2.作废
         public int ID { get; set; }
         public string WhID { get; set; }
+        public string WhName { get; set; }
         public string Remark { get; set; }
         public int Status
         {
@@ -88,6 +89,7 @@ namespace CoreModels.XyCore
         public string Price { get; set; }
         public string Amount { get; set; }
         public string Img { get; set; }
+        public string ParentID { get; set; }
     }
     public class Sfc_main_query
     {

@@ -201,21 +201,45 @@ namespace CoreData.CoreComm
             }
             return result;
         }
-        public static DataResult GetWhViewByID(string CoID, List<String> IDLst)
+        public static DataResult GetWhViewLstByID(string CoID, List<String> IDLst)
         {
             var result = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CommConnectString))
             {
                 try
                 {
-                    Dictionary<string, object> DicWh = new Dictionary<string, object>();
+                    // Dictionary<string, object> DicWh = new Dictionary<string, object>();
                     string Sql = @"SELECT ID,WarehouseName AS WhName FROM warehouse WHERE CoID=@CoID AND ID in @IDLst";
                     var WhLst = conn.Query<Warehouse_view>(Sql, new { CoID = CoID, IDLst = IDLst }).AsList();
-                    foreach (var wh in WhLst)
-                    {
-                        DicWh.Add(wh.ID, wh);
-                    }
-                    result.d = DicWh;
+                    // foreach (var wh in WhLst)
+                    // {
+                    //     DicWh.Add(wh.ID, wh);
+                    // }
+                    result.d = WhLst;
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+        public static DataResult GetWhViewByID(string CoID, string WhID)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    // Dictionary<string, object> DicWh = new Dictionary<string, object>();
+                    string Sql = @"SELECT ID,WarehouseName AS WhName FROM warehouse WHERE CoID=@CoID AND ID =@WhID";
+                    var WhLst = conn.Query<Warehouse_view>(Sql, new { CoID = CoID, WhID = WhID }).AsList();
+                    // foreach (var wh in WhLst)
+                    // {
+                    //     DicWh.Add(wh.ID, wh);
+                    // }
+                    result.d = WhLst[0];
                 }
                 catch (Exception e)
                 {
@@ -237,7 +261,7 @@ namespace CoreData.CoreComm
                 try
                 {
                     // Dictionary<string, object> DicSku = new Dictionary<string, object>();
-                    string Sql = @"SELECT ID,SkuID,SkuName,Norm,Img FROM coresku WHERE CoID=@CoID AND ID in @IDLst";
+                    string Sql = @"SELECT ID,GoodsCode,SkuID,SkuName,Norm,Img FROM coresku WHERE CoID=@CoID AND ID in @IDLst";
                     var SkuLst = conn.Query<CoreSkuView>(Sql, new { CoID = CoID, IDLst = IDLst }).AsList();
                     // foreach (var sku in SkuLst)
                     // {
@@ -412,7 +436,7 @@ namespace CoreData.CoreComm
                     var Lst = conn.Query<string>("SELECT ShopName FROM shop WHERE ID =@ID AND CoID=@CoID", new { CoID = CoID, ID = ShopID }).AsList();
                     if (Lst.Count > 0)
                     {
-                        result.d =Lst[0];
+                        result.d = Lst[0];
                     }
                 }
                 catch (Exception e)

@@ -154,6 +154,7 @@ namespace CoreModels.XyCore
     {
         public int ID { get; set; }
         public string Skuautoid { get; set; }
+        public string SkuID { get; set; }
         public int StockQty { get; set; }
 
     }

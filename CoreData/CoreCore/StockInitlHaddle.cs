@@ -6,7 +6,7 @@ using System;
 using System.Text;
 using System.Data;
 using CoreModels.XyCore;
-// using CoreModels.XyComm;
+using CoreModels.XyComm;
 using CoreData.CoreComm;
 using MySql.Data.MySqlClient;
 // using System.Linq;
@@ -69,8 +69,23 @@ namespace CoreData.CoreCore
                         if (mainLst.Count > 0)
                         {
                             var WhIDLst = mainLst.Select(a => a.WhID).Distinct().AsList();
-                            var res = CommHaddle.GetWhViewByID(IParam.CoID, WhIDLst);
-                            cs.DicWh = res.d as Dictionary<string, object>;//获取仓库List资料
+                            var res = CommHaddle.GetWhViewLstByID(IParam.CoID, WhIDLst);
+                            var WhViewLst = res.d as List<Warehouse_view>;
+                            // cs.DicWh = res.d as Dictionary<string, object>;//获取仓库List资料
+                            mainLst = (from a in mainLst
+                                       join b in WhViewLst on a.WhID equals b.ID into data
+                                       from c in data.DefaultIfEmpty()
+                                       select new Sfc_main_view
+                                       {
+                                           ID = a.ID,
+                                           WhID = a.WhID,
+                                           WhName = c == null ? "" : c.WhName,
+                                           Remark = a.Remark,
+                                           Status = a.Status,
+                                           Creator = a.Creator,
+                                           CreateDate = a.CreateDate
+                                       }).AsList();
+                            // ID,WhID,Remark,Status,Creator,CreateDate
                             cs.MainLst = mainLst;
                         }
                         result.d = cs;
@@ -129,31 +144,44 @@ namespace CoreData.CoreCore
                             var res = CommHaddle.GetSkuViewByID(IParam.CoID, SkuIDLst);
                             var SkuViewLst = res.d as List<CoreSkuView>;//获取商品Sku资料
                             ItemLst = (from a in ItemLst
-                                      join b in SkuViewLst
-                                      on new { Skuautoid = a.Skuautoid } equals new { Skuautoid = b.ID } 
-                                      group new {a,b} by new
-                                      {
-                                          a.ID,
-                                          a.Skuautoid,
-                                          a.InvQty,
-                                          a.Price,
-                                          a.Amount,
-                                          b.SkuID,
-                                          b.SkuName,
-                                          b.Norm,
-                                          b.Img
-                                      } into c
-                                      select new Sfc_item_Init_view{
-                                            ID = c.Key.ID,
-                                          Skuautoid = c.Key.Skuautoid,
-                                          InvQty = c.Key.InvQty,
-                                          Price = c.Key.Price,
-                                          Amount = c.Key.Amount,
-                                          SkuID = c.Key.SkuID,
-                                          SkuName = c.Key.SkuName,
-                                          Norm = c.Key.Norm,
-                                          Img = c.Key.Img
-                                      }).AsList();
+                                       join b in SkuViewLst on a.Skuautoid equals b.ID into data
+                                       from c in data.DefaultIfEmpty()
+                                       select new Sfc_item_Init_view
+                                       {
+                                           ID = a.ID,
+                                           Skuautoid = a.Skuautoid,
+                                           InvQty = a.InvQty,
+                                           Price = a.Price,
+                                           Amount = a.Amount,
+                                           SkuID = c == null ? "" : c.SkuID,
+                                           SkuName = c == null ? "" : c.SkuName,
+                                           Norm = c == null ? "" : c.Norm,
+                                           Img = c == null ? "" : c.Img
+                                       }).AsList();
+                            //   on new { Skuautoid = a.Skuautoid } equals new { Skuautoid = b.ID } 
+                            //   group new {a,b} by new
+                            //   {
+                            //       a.ID,
+                            //       a.Skuautoid,
+                            //       a.InvQty,
+                            //       a.Price,
+                            //       a.Amount,
+                            //       b.SkuID,
+                            //       b.SkuName,
+                            //       b.Norm,
+                            //       b.Img
+                            //   } into c
+                            //   select new Sfc_item_Init_view{
+                            //         ID = c.Key.ID,
+                            //       Skuautoid = c.Key.Skuautoid,
+                            //       InvQty = c.Key.InvQty,
+                            //       Price = c.Key.Price,
+                            //       Amount = c.Key.Amount,
+                            //       SkuID = c.Key.SkuID,
+                            //       SkuName = c.Key.SkuName,
+                            //       Norm = c.Key.Norm,
+                            //       Img = c.Key.Img
+                            //   }).AsList();
                             cs.InitItemLst = ItemLst;
                         }
                         result.d = cs;
@@ -171,7 +199,7 @@ namespace CoreData.CoreCore
         #endregion
 
 
-        #region 库存期初 - 修改保存 - 期初数量/成本单价/成本金额
+        #region 库存期初 - 修改保存 - 期初数量
         public static DataResult SaveStockInitQty(string ID, int InvQty, string CoID, string UserName)
         {
             var result = new DataResult(1, null);
@@ -181,17 +209,47 @@ namespace CoreData.CoreCore
             try
             {
                 string contents = string.Empty;
-                var itemOld = conn.QueryFirst<Sfc_item_Init_view>("SELECT ID,Skuautoid,InvQty,Price FROM sfc_item WHERE CoID=@CoID AND ID=@ID", new { CoID = CoID, ID = ID });
-                if (int.Parse(itemOld.InvQty) != InvQty)
+                var itemOld = conn.QueryFirst<Sfc_item_Init_view>("SELECT ID,Skuautoid,InvQty,Price,ParentID FROM sfc_item WHERE CoID=@CoID AND ID=@ID", new { CoID = CoID, ID = ID });
+                if (itemOld != null)
                 {
-                    contents = contents + "数量:" + itemOld.InvQty + "=>" + InvQty + ";";
-                }
-                if (!string.IsNullOrEmpty(contents))
-                {
-                    string sql = "UPDATE sfc_item SET InvQty = @InvQty,Amount=@InvQty*Price,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID=@ID";
-                    conn.Execute(sql, new { InvQty = InvQty, CoID = CoID, ID = ID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
-                    Trans.Commit();
-                    CoreUser.LogComm.InsertUserLog("修改期初明细", "sfc_item", "商品ID" + itemOld.Skuautoid + " " + contents, UserName, int.Parse(CoID), DateTime.Now);
+                    var main = conn.QueryFirst<Sfc_main>("SELECT `Status`,Parent_WhID FROM sfc_main WHERE CoID=@CoID AND ID=@ID", new { CoID = CoID, ID = itemOld.ParentID });
+                    if (int.Parse(itemOld.InvQty) != InvQty)
+                    {
+                        contents = contents + "数量:" + itemOld.InvQty + "=>" + InvQty + ";";
+                    }
+                    if (!string.IsNullOrEmpty(contents))
+                    {
+                        string sql = @"UPDATE sfc_item
+                                        SET InvQty = @InvQty,
+                                        Amount =@InvQty * Price,
+                                        Modifier =@Modifier,
+                                        ModifyDate =@ModifyDate
+                                        WHERE
+                                            CoID =@CoID
+                                        AND ID =@ID";
+                        conn.Execute(sql, new { InvQty = InvQty, CoID = CoID, ID = ID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                        if (main.Status == 1)//对于已生效的期初单据，需要重新计算库存数量
+                        {
+                            //更新交易
+                            string uptiosql = @"UPDATE Invinoutitem
+                                                SET Qty =@Qty
+                                                WHERE
+                                                    CoID =@CoID
+                                                AND RefID =@RefID
+                                                AND Skuautoid =@Skuautoid,
+                                                Modifier =@Modifier,
+                                                ModifyDate =@ModifyDate";
+                            conn.Execute(uptiosql, new { CoID = CoID, RefID = itemOld.ParentID, Skuautoid = itemOld.Skuautoid, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+
+                            //重算库存
+                            var SkuIDLst = new List<string>();
+                            SkuIDLst.Add(itemOld.Skuautoid);
+                            conn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = CoID, WarehouseID = main.Parent_WhID, SkuIDLst = SkuIDLst }, Trans);
+                            conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, WarehouseID = main.Parent_WhID, SkuIDLst = SkuIDLst }, Trans);
+                        }
+                        Trans.Commit();
+                        CoreUser.LogComm.InsertUserLog("修改期初明细", "sfc_item", "商品ID" + itemOld.Skuautoid + " " + contents, UserName, int.Parse(CoID), DateTime.Now);
+                    }
                 }
             }
             catch (Exception e)
@@ -209,7 +267,7 @@ namespace CoreData.CoreCore
             return result;
         }
         #endregion
-        #region 库存期初 - 修改保存 - 期初数量/成本单价/成本金额
+        #region 库存期初 - 修改保存 - 成本单价
         public static DataResult SaveStockInitPrice(string ID, Decimal Price, string CoID, string UserName)
         {
             var result = new DataResult(1, null);
@@ -220,16 +278,19 @@ namespace CoreData.CoreCore
             {
                 string contents = string.Empty;
                 var itemOld = conn.QueryFirst<Sfc_item_Init_view>("SELECT ID,Skuautoid,InvQty,Price FROM sfc_item WHERE CoID=@CoID AND ID=@ID", new { CoID = CoID, ID = ID });
-                if (Convert.ToDecimal(itemOld.Price) != Price)
+                if (itemOld != null)
                 {
-                    contents = contents + "单价:" + itemOld.Price + "=>" + Price + ";";
-                }
-                if (!string.IsNullOrEmpty(contents))
-                {
-                    string sql = "UPDATE sfc_item SET Price=@Price,Amount=InvQty*@Price,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID=@ID";
-                    conn.Execute(sql, new { Price = Price, CoID = CoID, ID = ID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
-                    Trans.Commit();
-                    CoreUser.LogComm.InsertUserLog("修改期初明细", "sfc_item", "商品ID" + itemOld.Skuautoid + " " + contents, UserName, int.Parse(CoID), DateTime.Now);
+                    if (Convert.ToDecimal(itemOld.Price) != Price)
+                    {
+                        contents = contents + "单价:" + itemOld.Price + "=>" + Price + ";";
+                    }
+                    if (!string.IsNullOrEmpty(contents))
+                    {
+                        string sql = "UPDATE sfc_item SET Price=@Price,Amount=InvQty*@Price,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID=@ID";
+                        conn.Execute(sql, new { Price = Price, CoID = CoID, ID = ID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                        Trans.Commit();
+                        CoreUser.LogComm.InsertUserLog("修改期初明细", "sfc_item", "商品ID" + itemOld.Skuautoid + " " + contents, UserName, int.Parse(CoID), DateTime.Now);
+                    }
                 }
             }
             catch (Exception e)
