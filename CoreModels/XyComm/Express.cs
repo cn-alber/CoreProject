@@ -74,4 +74,20 @@ namespace CoreModels.XyComm
         public string UseProbability { get; set; }
         public bool OnlineOrder { get; set; }
     }
+    // public class ExpFeeQuery
+    // {
+    //     public int ID { get; set; }
+    //     public string ExpName { get; set; }
+    // }
+    // public class ExpFeeDetailQuery
+    // {
+    //     public int ID{get;set;}
+    //     public string Destination{get;set;}
+    //     public string WeightStart{get;set;}
+    //     public string WeightEnd{get;set;}
+    //     public string WeightFirst{get;set;}
+    //     public string AmtFirst{get;set;}
+    //     public string WeightAdd{get;set;}
+    //     public string AmtAdd{get;set;}
+    // }
 }

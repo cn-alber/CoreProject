@@ -595,6 +595,7 @@ namespace CoreModels.XyCore
     public class SkuList
     {
         public int ID{get;set;}
+        public int OID{get;set;}
         public int SkuAutoID{get;set;}
         public string Img{get;set;}
         public int Qty{get;set;}
@@ -783,5 +784,10 @@ namespace CoreModels.XyCore
         public List<int> successIDs {get;set;}
         public List<InsertFailReason> failIDs {get;set;}
         public RefreshItem Order{get;set;}
+    }
+    public class Inv
+    {
+        public int Skuautoid{get;set;}
+        public int InvQty{get;set;}
     }
 }

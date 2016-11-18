@@ -276,6 +276,26 @@ namespace CoreData.CoreComm
             return result;
         }
         
+        // ///<summary>
+        // ///查询运费设定资料List
+        // ///</summary>
+        // public static DataResult GetExpFeeList(int CoID,int id)
+        // {
+        //     var result = new DataResult(1,null);
+        //     var parent = CacheBase.Get<ExpressEdit>("express" + id.ToString());  
+        //     using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+        //         try{  
+        //                 string sqlcommand = @"";
+        //                 var u = conn.Query<ExpressEdit>(sqlcommand).AsList();  
+        //             }
+        //             catch(Exception ex){
+        //             result.s = -1;
+        //             result.d = ex.Message;
+        //             conn.Dispose();
+        //         }
+        //     }
+        //     return result;
+        // }
     }
 }
        
