@@ -19,7 +19,7 @@ namespace CoreData.CoreCore
             string sqlcount = "select count(id) from `order` where 1=1";
             string sqlcommand = @"select ID,Type,DealerType,IsMerge,IsSplit,OSource,SoID,ODate,PayDate,BuyerShopID,ShopName,Amount,PaidAmount,ExAmount,IsCOD,Status,AbnormalStatus,
                                   StatusDec,RecMessage,SendMessage,Express,RecLogistics,RecCity,RecDistrict,RecAddress,RecName,ExWeight,Distributor,SupDistributor,InvoiceTitle,
-                                  PlanDate,SendWarehouse,SendDate,ExCode,Creator from `order` where 1=1"; 
+                                  PlanDate,SendWarehouse,SendDate,ExCode,Creator,RecTel,RecPhone from `order` where 1=1"; 
             string wheresql = string.Empty;
             if(cp.CoID != 1)//公司编号
             {
@@ -279,6 +279,8 @@ namespace CoreData.CoreCore
                     res.Pagecnt = pagecnt;
                     res.Ord = u;
                     //订单资料
+                    List<int> ItemID = new List<int>();
+                    List<int> MID = new List<int>();
                     foreach(var a in res.Ord)
                     {
                         a.TypeString = GetTypeName(a.Type);
@@ -290,24 +292,63 @@ namespace CoreData.CoreCore
                         }
                         if(a.IsMerge == true)
                         {
+                            MID.Add(a.ID);
+                        }
+                        ItemID.Add(a.ID);
+                    }
+                    //处理soid
+                    var y = new List<Order>();
+                    if(MID.Count > 0)
+                    {
+                        sqlcommand = "select MergeOID,soid from `order` where coid = @Coid and MergeOID in @ID";
+                        y = conn.Query<Order>(sqlcommand,new{Coid = cp.CoID,ID = MID}).AsList();
+                    }
+                    sqlcommand = @"select id,oid,SkuAutoID,Img,Qty,GoodsCode,SkuID,SkuName,Norm,RealPrice,Amount,ShopSkuID,IsGift,Weight from orderitem 
+                                        where oid in @ID and coid = @Coid";
+                    var item = conn.Query<SkuList>(sqlcommand,new{ID = ItemID,Coid = cp.CoID}).AsList();
+                    List<int> skuid = new List<int>();
+                    foreach(var i in item)
+                    {
+                        skuid.Add(i.SkuAutoID);
+                    }
+                    sqlcommand = "select Skuautoid,(StockQty - LockQty + VirtualQty) as InvQty from inventory where coid = @Coid and WarehouseID = 0 and Skuautoid in @Skuid";
+                    var inv = conn.Query<Inv>(sqlcommand,new{Coid=cp.CoID,Skuid = skuid}).AsList();
+                    foreach(var i in item)
+                    {
+                        i.InvQty = 0;
+                        foreach(var j in inv)
+                        {
+                            if(i.SkuAutoID == j.Skuautoid)
+                            {
+                                i.InvQty = j.InvQty;
+                                break;
+                            }
+                        }
+                    }
+                    foreach(var a in res.Ord)
+                    {
+                        if(a.IsMerge == true)
+                        {
                             var soid = new List<long>();
                             soid.Add(a.SoID);
-                            sqlcommand = "select soid from `order` where coid = " + cp.CoID + " and MergeOID = " + a.ID;
-                            var y = conn.Query<Order>(sqlcommand).AsList();
                             foreach(var b in y)
                             {
-                                soid.Add(b.SoID);
+                                if(a.ID == b.MergeOID)
+                                {
+                                    soid.Add(b.SoID);
+                                }
                             }
                             a.SoIDList = soid;
                         }
-                        var ff = GetSingleOrdItem(a.ID,cp.CoID);
-                        if(ff.s == -1)
+                        var sd = new List<SkuList>();
+                        foreach(var i in item)
                         {
-                            result.s = -1;
-                            result.d = ff.d;
-                            return result;
+                            if(a.ID == i.OID)
+                            {
+                                sd.Add(i);
+                            }
                         }
-                        a.SkuList = ff.d as List<SkuList>;
+                        a.SkuList = sd;
                     }
                     result.d = res;             
                 }catch(Exception ex){
