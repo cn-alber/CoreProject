@@ -74,6 +74,11 @@ namespace CoreModels.XyComm
         public string UseProbability { get; set; }
         public bool OnlineOrder { get; set; }
     }
+    public class ExpressSimple
+    {
+        public string ID {get;set;}
+        public string Name{get;set;}
+    }
     // public class ExpFeeQuery
     // {
     //     public int ID { get; set; }

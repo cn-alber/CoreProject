@@ -744,5 +744,34 @@ namespace CoreWebApi
             var data = OrderHaddle.ModifyAddress(Logistics,City,District,Address,Name,tel,phone,OID,username,CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpGetAttribute("/Core/Order/GetExp")]
+        public ResponseResult GetExp(string IsQuick,string Logistics,string City,string District)
+        {   
+            var data = new DataResult(1,null);
+            bool isquick;
+            if(IsQuick.ToUpper() == "TRUE" || IsQuick.ToUpper() == "FALSE")
+            {
+                isquick = bool.Parse(IsQuick);
+                if(isquick == true)
+                {
+                    if(string.IsNullOrEmpty(Logistics) || string.IsNullOrEmpty(City) || string.IsNullOrEmpty(District))
+                    {
+                        data.s = -1;
+                        data.d = "参数无效!";
+                        return CoreResult.NewResponse(data.s, data.d, "General"); 
+                    }
+                }
+            }
+            else
+            {
+                data.s = -1;
+                data.d = "参数无效!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            int CoID = int.Parse(GetCoid());
+            data = OrderHaddle.GetExp(CoID,isquick,Logistics,City,District);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }  

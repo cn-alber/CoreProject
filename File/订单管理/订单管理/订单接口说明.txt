@@ -330,3 +330,13 @@ input:OID               int         内部订单号
 output: s=1成功 else 错误代码
 参考:input jason 文件:ModifyAddress_input.json
 参考:output jason 文件:ModifyAddress_output.json
+
+29.GetExp()订单快递设定开启
+路由:http://localhost:5000/Core/Order/GetExp
+input:IsQuick     bool        是否快捷方式设定
+      Logistics   string      省(IsQuick= true时，必输)
+      City        string      市(IsQuick= true时，必输)
+      District    string      县(IsQuick= true时，必输)
+output: ExpressSimple         快递列表
+        LogisticsNetwork      网点资料
+参考:output jason 文件:GetExp_output.json

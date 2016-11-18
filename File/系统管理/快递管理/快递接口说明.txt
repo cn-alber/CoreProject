@@ -49,3 +49,9 @@ input:ID                string  快递ID
 output: s=1成功 else 错误代码
 参考:input jason 文件:UpdateExpress_input.json
 参考:output jason 文件:UpdateExpress_output.json
+
+5.GetExpressSimple() //查询简单express资料
+  路由:http://localhost:5000/Core/Express/GetExpressSimple
+input:  none
+OutPut: Express资料
+参考:output jason 文件:GetExpressSimple_output.json

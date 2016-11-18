@@ -3921,12 +3921,12 @@ namespace CoreData.CoreCore
             }
             res.Shop = ff;  
             //快递Lsit
-            var Express = GetExpress(CoID).d as List<AbnormalReason>;
+            var Express = CoreComm.ExpressHaddle.GetExpressSimple(CoID).d as List<ExpressSimple>;
             ff = new List<Filter>();
             foreach(var t in Express)
             {
                 f = new Filter();
-                f.value = t.ID.ToString();
+                f.value = t.ID;
                 f.label = t.Name;
                 ff.Add(f);
             }
@@ -5505,26 +5505,61 @@ namespace CoreData.CoreCore
             return  result;
         }
         ///<summary>
-        ///抓取快递List
+        ///设定快递显示
         ///</summary>
-        public static DataResult GetExpress(int CoID)
+        public static DataResult GetExp(int CoID,bool IsQuick,string Logistics,string City,string District)
         {
             var result = new DataResult(1,null);
-            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
-                try{  
-                    //快递公司
-                    string sqlcommand = "select ID,ExpName as Name from express where coid =" + CoID + " and enable = true";
-                    var Express = conn.Query<AbnormalReason>(sqlcommand).AsList();
-                    result.d = Express;   
-                    }catch(Exception ex){
-                    result.s = -1;
-                    result.d = ex.Message;
-                    conn.Dispose();
+            var res = new SetExp();
+            if(IsQuick == true)
+            {
+                using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                    try{  
+                            string sqlcommand = "select id from area where Name = '" + Logistics + "' and LevelType = 1";
+                            int id = conn.QueryFirst<int>(sqlcommand);
+                            sqlcommand = "select id from area where Name = '" + City + "' and LevelType = 2 and ParentId = " + id;
+                            id = conn.QueryFirst<int>(sqlcommand);
+                            sqlcommand = "select id from area where Name = '" + District + "' and LevelType = 3 and ParentId = " + id;
+                            id = conn.QueryFirst<int>(sqlcommand);
+                            sqlcommand = @"select kd_name,cp_name_raw,cp_location,delivery_contact,delivery_area_1,delivery_area_0 From kd_cj_02 where
+                                           city_id_raw = " + id + " and kd_id_sys > 0 order by kd_name";
+                            var u = conn.Query<LogisticsNetwork>(sqlcommand).AsList();
+                            res.LogisticsNetwork = u;
+                        }
+                        catch(Exception ex){
+                        result.s = -1;
+                        result.d = ex.Message;
+                        conn.Dispose();
+                    }
                 }
-            }    
+            }
+            var Express = CoreComm.ExpressHaddle.GetExpressSimple(CoID).d as List<ExpressSimple>;
+            var a = new ExpressSimple();
+            a.ID = "A";
+            a.Name= "{清空已设快递}";
+            Express.Add(a);
+            a = new ExpressSimple();
+            a.ID = "B";
+            a.Name= "{让系统自动计算}";
+            Express.Add(a);
+            a = new ExpressSimple();
+            a.ID = "C";
+            a.Name= "{菜鸟智选物流}";
+            Express.Add(a);
+            res.Express = Express;
+            result.d = res;
             return result;
         }
+        ///<summary>
+        ///设定快递更新
+        ///</summary>
+        public static DataResult SetExp(List<int> oid,int CoID,int ExpID,string ExpName,string UserName)
+        {
+            var result = new DataResult(1,null);
+            
 
+            return result;
+        }
 
 
 
