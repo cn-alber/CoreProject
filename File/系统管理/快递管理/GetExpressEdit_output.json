@@ -1,0 +1,24 @@
+{
+    "s": 1,
+    "d": {
+        "ID": 7,//自增ID
+        "ExpName": "圆通速递",//快递名称
+        "Enable": true,//是否启用
+        "Priority": "1",//优先级
+        "PriorityLogistics": "",//优先省份
+        "PrioritySku": "",//优先商品
+        "FreightFirst": "1",//运费优先
+        "OrdAmtStart": null,//订单定额大于等于
+        "OrdAmtEnd": null,//订单金额小于等于
+        "IsCOD": false,//是否支持货到付款
+        "LimitedShop": "",//限定店铺
+        "LimitedWarehouse": "",//限定仓库
+        "DisableArea": "",//禁发地区
+        "DisableSku": "",//禁发商品
+        "IgnoreArrival": false,//忽略到达判断
+        "ExpCalMethod": "0",//计算方式
+        "UseProbability": null,//采用概率
+        "OnlineOrder": false //支持在线下单
+    },
+    "m": ""
+}

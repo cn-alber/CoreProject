@@ -1,0 +1,51 @@
+接口名称:CoreWebApi/Controllers/Express/ExpressControllers
+
+function说明
+1.GetExpressList() //查询table express资料
+  路由:http://localhost:5000/Core/Express/GetExpressList
+input:      SortField           string          排序栏位名称 default null
+            SortDirection       string          排序方式 default null
+            PageIndex           string          资料页数(ex.第一页就给1) default 1
+            NumPerPage          string          每页显示资料笔数 default 20
+OutPut:     Datacnt             int             资料总笔数
+            Pagecnt             decimal         总页数
+            Express             List<Express>   Express 资料
+参考:output jason 文件:GetExpressList_output.json
+
+2.InsertExpress()绑定新的物流公司
+路由:http://localhost:5000/Core/Express/InsertExpress
+input:ExpID   string  快递公司编号
+      ExpName string  快递公司名称
+output: s=1成功 else 错误代码
+参考:input jason 文件:InsertExpress_input.json
+参考:output jason 文件:InsertExpress_output.json
+
+3.GetExpressEdit() //查询单笔table express资料
+  路由:http://localhost:5000/Core/Express/GetExpressEdit
+input:  ID      string  快递自增ID
+OutPut: Express Express Express 资料
+参考:output jason 文件:GetExpressEdit_output.json
+
+4.UpdateExpress()更新快递资料
+路由:http://localhost:5000/Core/Express/UpdateExpress
+input:ID                string  快递ID
+      ExpName           string  快递公司名称
+      Enable            bool    启用状态
+      Priority          string  优先级
+      PriorityLogistics string  优先省份
+      PrioritySku       string  优先商品
+      FreightFirst      string  运费优先
+      OrdAmtStart       string  订单金额大于等于
+      OrdAmtEnd         string  订单金额小于等于
+      IsCOD             bool    支持货到付款
+      LimitedShop       string  限定店铺
+      LimitedWarehouse  string  限定仓库
+      DisableArea       string  禁止发送地区
+      DisableSku        string  禁止发送商品
+      IgnoreArrival     bool    忽略到达判断
+      ExpCalMethod      string  自动配快递计算方式
+      UseProbability    string  采用概率
+      OnlineOrder       bool    在线下单
+output: s=1成功 else 错误代码
+参考:input jason 文件:UpdateExpress_input.json
+参考:output jason 文件:UpdateExpress_output.json
