@@ -29,7 +29,6 @@ function说明
         SortDirection   string      排序方向(DESC|ASC,Default:ASC)
     OutPut:
         ItemLst         List<Sfc_item_view>             盘点单明细列表
-        DicSku          Dictionary<string, object>      盘点商品Sku列表
 
 3.InsertTakeMain()//库存期初-新增-期初主表
     方法：Post
@@ -51,7 +50,7 @@ function说明
     OutPut:
         新增盘点单明细 - 返回操作信息
     参考：input json 文件：InsertInitItem_input.json
-5.SaveInitQty()//库存期初 - 修改保存期初数量(单笔)
+5.1 SaveInitQty()//库存期初 - 修改保存期初数量(单笔)
     方法：Post
     路由：http://192.168.30.211:5000/Core/XyCore/StockInit/SaveInitQty
     参数：
@@ -61,6 +60,16 @@ function说明
     OutPut:
         更新期初 - 返回操作信息
     参考：input json 文件：SaveStockInitQty_input.json
+5.2 SaveInitPrice()//库存期初 - 修改保存期初单价(单笔)
+    方法：Post
+    路由：http://192.168.30.211:5000/Core/XyCore/StockInit/SaveInitPrice
+    参数：
+    InPut:
+        ID              int                     单据明细ID(*必填项*)
+        Price           decimal                 Sku之期初单价(*必填项*)
+    OutPut:
+        更新期初 - 返回操作信息
+    参考：input json 文件：SaveStockInitPrice_input.json
 6.CheckInit()//库存期初 - 确认生效
     方法：Post
     路由：http://192.168.30.211:5000/Core/XyCore/StockInit/CheckInit

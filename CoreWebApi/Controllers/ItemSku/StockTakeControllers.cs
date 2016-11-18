@@ -11,7 +11,7 @@ using CoreModels;
 namespace CoreWebApi.XyCore
 
 {
-    [AllowAnonymous]
+    // [AllowAnonymous]
     public class StockTakeControllers : ControllBase
     {
         #region 库存盘点-表头查询

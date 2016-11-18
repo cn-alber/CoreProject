@@ -127,7 +127,7 @@ namespace CoreWebApi.XyCore
         }
         #endregion
 
-        #region 库存期初 - 修改 - 保存期初数量
+        #region 库存期初 - 修改 - 保存期初单价
         [HttpPostAttribute("Core/XyCore/StockInit/SaveInitPrice")]
         public ResponseResult SaveInitPrice([FromBodyAttribute]JObject obj)
         {
@@ -136,7 +136,7 @@ namespace CoreWebApi.XyCore
             Decimal y;
             var ID = obj["ID"].ToString();
             var strPrice = obj["Price"].ToString();
-            if (!(int.TryParse(ID, out x) && int.TryParse(strPrice, out x)))
+            if (!(int.TryParse(ID, out x) && decimal.TryParse(strPrice, out y)))
             {
                 res.s = -1;
                 res.d = "无效参数";
@@ -145,20 +145,19 @@ namespace CoreWebApi.XyCore
             {
                 string CoID = GetCoid();
                 string UserName = GetUname();
-                var Price = int.Parse(strPrice);
+                var Price = decimal.Parse(strPrice);
                 res = StockInitHaddle.SaveStockInitPrice(ID, Price, CoID, UserName);
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
 
-        #region 库存期初 - 修改 - 保存期初单价
+        #region 库存期初 - 修改 - 保存期初数量
         [HttpPostAttribute("Core/XyCore/StockInit/SaveInitQty")]
         public ResponseResult SaveInitQty([FromBodyAttribute]JObject obj)
         {
             var res = new DataResult(1, null);
             int x;
-            Decimal y;
             var ID = obj["ID"].ToString();
             var InvQty = obj["InvQty"].ToString();
             if (!(int.TryParse(ID, out x) && int.TryParse(InvQty, out x)))

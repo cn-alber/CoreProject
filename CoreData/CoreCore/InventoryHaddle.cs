@@ -29,26 +29,24 @@ namespace CoreData.CoreCore
                                         FROM
                                             inventory
                                         WHERE
-                                            CoID = @CoID";
-                    string sql = @"SELECT
-                                inventory.GoodsCode,
-                                inventory.SkuID,
-                                inventory.`Name`,
-                                inventory.Norm,
-                                inventory.Pic,
-                                SUM(inventory.StockQty) AS StockQty,
-                                SUM(inventory.LockQty) AS LockQty,
-                                SUM(inventory.PickQty) AS PickQty,
-                                SUM(inventory.WaitInQty) AS WaitInQty,
-                                SUM(inventory.ReturnQty) AS ReturnQty,
-                                SUM(inventory.SafeQty) AS SafeQty,
-                                SUM(inventory.DefectiveQty) AS DefectiveQty,
-                                SUM(inventory.VirtualQty) AS VirtualQty,
-                                SUM(inventory.PurchaseQty) AS PurchaseQty
+                                            CoID = @CoID AND WarehouseID=0";
+                    string sql = @"inventory.ID,
+                                    inventory.GoodsCode,
+                                    inventory.Skuautoid,
+                                    inventory.StockQty,
+                                    inventory.LockQty,
+                                    inventory.PickQty,
+                                    inventory.WaitInQty,
+                                    inventory.SaleRetuQty,
+                                    inventory.SafeQty,
+                                    inventory.DefectiveQty,
+                                    inventory.VirtualQty,
+                                    inventory.PurchaseQty,
+                                    inventory.CoID
                             FROM
                                 inventory
                             WHERE
-                                CoID = @CoID";
+                                CoID = @CoID AND WarehouseID=0";
                     querycount.Append(countsql);
                     querysql.Append(sql);
                     p.Add("@CoID", IParam.CoID);
@@ -156,13 +154,11 @@ namespace CoreData.CoreCore
                     StringBuilder querycount = new StringBuilder();
                     StringBuilder querysql = new StringBuilder();
                     var p = new DynamicParameters();
-                    string countsql = @"SELECT count(ID) FROM inventory WHERE CoID = @CoID AND Type=0 AND WarehouseID>0";
+                    string countsql = @"SELECT count(ID) FROM inventory WHERE CoID = @CoID AND WarehouseID>0";
                     string sql = @"SELECT
                                     inventory.ID,
                                     inventory.GoodsCode,
-                                    inventory.SkuID,
-                                    inventory.`Name`,
-                                    inventory.Norm,
+                                    inventory.Skuautoid,
                                     inventory.StockQty,
                                     inventory.LockQty,
                                     inventory.PickQty,
@@ -172,11 +168,10 @@ namespace CoreData.CoreCore
                                     inventory.DefectiveQty,
                                     inventory.VirtualQty,
                                     inventory.PurchaseQty,
-                                    inventory.Pic,
                                     inventory.CoID
                                    FROM
                                     inventory
-                                   WHERE CoID = @CoID AND Type=0 AND WarehouseID>0";
+                                   WHERE CoID = @CoID AND WarehouseID>0";
                     querycount.Append(countsql);
                     querysql.Append(sql);
                     p.Add("@CoID", IParam.CoID);

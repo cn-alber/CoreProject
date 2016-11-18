@@ -29,7 +29,7 @@ function说明
         ParentID        int                             盘点单主表ID(*必填项*)
     OutPut:
         ItemLst         List<Sfc_item_view>             盘点单明细列表
-        DicSku          Dictionary<string, object>      盘点商品Sku列表
+    参考：output json 文件：StockTakeItemLst_output.json
 
 3.InsertTakeMain()//库存盘点-新增-盘点主表
     方法：Post

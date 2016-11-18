@@ -236,14 +236,14 @@ namespace CoreData.CoreComm
             {
                 try
                 {
-                    Dictionary<string, object> DicSku = new Dictionary<string, object>();
+                    // Dictionary<string, object> DicSku = new Dictionary<string, object>();
                     string Sql = @"SELECT ID,SkuID,SkuName,Norm,Img FROM coresku WHERE CoID=@CoID AND ID in @IDLst";
                     var SkuLst = conn.Query<CoreSkuView>(Sql, new { CoID = CoID, IDLst = IDLst }).AsList();
-                    foreach (var sku in SkuLst)
-                    {
-                        DicSku.Add(sku.ID, sku);
-                    }
-                    result.d = DicSku;
+                    // foreach (var sku in SkuLst)
+                    // {
+                    //     DicSku.Add(sku.ID, sku);
+                    // }
+                    result.d = SkuLst;
                 }
                 catch (Exception e)
                 {

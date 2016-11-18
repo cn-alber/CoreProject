@@ -1,0 +1,32 @@
+{
+    "s": 1,
+    "d": {
+        "DataCount": 0,
+        "PageCount": 0,
+        "InitItemLst": null,
+        "ItemLst": [
+            {
+                "ID": 3,
+                "Skuautoid": "17593",
+                "SkuID": "ABCTST2002002",
+                "SkuName": "ABC测试红色1M",
+                "Norm": "红色1;M",
+                "Qty": "50",
+                "InvQty": "50",
+                "Img": null
+            },
+            {
+                "ID": 4,
+                "Skuautoid": "17596",
+                "SkuID": "ABCTST2003002",
+                "SkuName": "ABC测试红色1L",
+                "Norm": "红色1;L",
+                "Qty": "51",
+                "InvQty": "51",
+                "Img": null
+            }
+        ],
+        "DicSku": null
+    },
+    "m": ""
+}

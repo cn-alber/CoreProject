@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace CoreWebApi.XyCore
 {
-    // [AllowAnonymous]
+    [AllowAnonymous]
     public class InventoryController : ControllBase
     {
 
