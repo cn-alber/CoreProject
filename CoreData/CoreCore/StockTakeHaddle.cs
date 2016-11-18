@@ -90,8 +90,22 @@ namespace CoreData.CoreCore
                         if (mainLst.Count > 0)
                         {
                             var WhIDLst = mainLst.Select(a => a.WhID).Distinct().AsList();
-                            var res = CommHaddle.GetWhViewByID(IParam.CoID, WhIDLst);
-                            cs.DicWh = res.d as Dictionary<string, object>;//获取仓库List资料
+                            var res = CommHaddle.GetWhViewLstByID(IParam.CoID, WhIDLst);
+                            var WhViewLst = res.d as List<Warehouse_view>;
+                            // cs.DicWh = res.d as Dictionary<string, object>;//获取仓库List资料
+                            mainLst = (from a in mainLst
+                                       join b in WhViewLst on a.WhID equals b.ID into data
+                                       from c in data.DefaultIfEmpty()
+                                       select new Sfc_main_view
+                                       {
+                                           ID = a.ID,
+                                           WhID = a.WhID,
+                                           WhName = c == null ? "" : c.WhName,
+                                           Remark = a.Remark,
+                                           Status = a.Status,
+                                           Creator = a.Creator,
+                                           CreateDate = a.CreateDate
+                                       }).AsList();
                             cs.MainLst = mainLst;
                         }
                         result.d = cs;
@@ -124,30 +138,44 @@ namespace CoreData.CoreCore
                         var res = CommHaddle.GetSkuViewByID(CoID, SkuIDLst);
                         var SkuViewLst = res.d as List<CoreSkuView>;//获取商品Sku资料,拼接Lst显示
                         ItemLst = (from a in ItemLst
-                                   join b in SkuViewLst
-                                   on new { Skuautoid = a.Skuautoid } equals new { Skuautoid = b.ID }
-                                   group new { a, b } by new
-                                   {
-                                       a.ID,
-                                       a.Skuautoid,
-                                       a.InvQty,
-                                       a.Qty,
-                                       b.SkuID,
-                                       b.SkuName,
-                                       b.Norm,
-                                       b.Img
-                                   } into c
+                                   join b in SkuViewLst on a.Skuautoid equals b.ID into data
+                                   from c in data.DefaultIfEmpty()
                                    select new Sfc_item_view
                                    {
-                                       ID = c.Key.ID,
-                                       Skuautoid = c.Key.Skuautoid,
-                                       InvQty = c.Key.InvQty,
-                                       Qty = c.Key.Qty,
-                                       SkuID = c.Key.SkuID,
-                                       SkuName = c.Key.SkuName,
-                                       Norm = c.Key.Norm,
-                                       Img = c.Key.Img
+                                       ID = a.ID,
+                                       Skuautoid = a.Skuautoid,
+                                       InvQty = a.InvQty,
+                                       Qty = a.Qty,
+                                       SkuID = c == null ? "" : c.SkuID,
+                                       SkuName = c == null ? "" : c.SkuName,
+                                       Norm = c == null ? "" : c.Norm,
+                                       Img = c == null ? "" : c.Img
                                    }).AsList();
+                        // ItemLst = (from a in ItemLst
+                        //            join b in SkuViewLst                                   
+                        //    on new { Skuautoid = a.Skuautoid } equals new { Skuautoid = b.ID }
+                        //    group new { a, b } by new
+                        //    {
+                        //        a.ID,
+                        //        a.Skuautoid,
+                        //        a.InvQty,
+                        //        a.Qty,
+                        //        b.SkuID,
+                        //        b.SkuName,
+                        //        b.Norm,
+                        //        b.Img
+                        //    } into c
+                        //    select new Sfc_item_view
+                        //    {
+                        //        ID = c.Key.ID,
+                        //        Skuautoid = c.Key.Skuautoid,
+                        //        InvQty = c.Key.InvQty,
+                        //        Qty = c.Key.Qty,
+                        //        SkuID = c.Key.SkuID,
+                        //        SkuName = c.Key.SkuName,
+                        //        Norm = c.Key.Norm,
+                        //        Img = c.Key.Img
+                        //    }).AsList();
                         Item.ItemLst = ItemLst;
                     }
                     result.d = Item;

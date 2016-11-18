@@ -16,7 +16,7 @@ namespace CoreModels.XyCore
         public int Qty { get; set; }
         public string WhID { get; set; }
         public string WhName { get; set; }
-        public string Unit { get; set; }
+        // public string Unit { get; set; }
         public string CoID { get; set; }
         public string Img { get; set; }
         public string Creator { get; set; }
@@ -25,7 +25,8 @@ namespace CoreModels.XyCore
         // public string LinkWhName { get; set; }
         // public string LinkIoID { get; set; }
         // public bool IsUpdate { get; set; }
-        public string RefID{get;set;}//相关单据编号(来源ID)
+        public string RefID { get; set; }//相关单据编号(来源ID)
+        public string OID { get; set; }//内部订单号
     }
     public class InvItemData
     {

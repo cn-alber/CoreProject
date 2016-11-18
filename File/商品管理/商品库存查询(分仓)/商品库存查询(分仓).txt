@@ -23,4 +23,41 @@ function说明
         DataCount       int         资料总笔数
         InvLst          List<Inventory>  商品库存(Inventory)
     参考:output json 文件:InventQueryByWh_output.json
+#############################################################
+2.InvDetailQuery()//查询商品交易明细
+    方法：Get
+    路由：http://192.168.30.211:5000/Core/XyCore/Inventory/InvDetailQuery?SkuautoID=&WarehouseID=&DocType=&DocDateB=&DocDateE=&PageIndex=1&PageSize=&SortField=&SortDirection=
+    InPut:
+        SkuautoID       string      查询匹配(商品autoID,Default:null)
+        WarehouseID     int         商品仓库ID(Default:0)
+        DocType         string      交易类型(Default:null) (参考：CoreModels.Enum.InvType)
+        DocDateB        DateTime    单据日期起(Default:1999/01/01)
+        DocDateE        DateTime    单据日期迄(Default:DateTime.Now)
+        PageIndex       int         当前页码(ex.第一页就给1)
+        PageSize        int         每页显示资料笔数(Default:20)
+        SortField       string      排序字段(Default:ID)
+        SortDirection   string      排序方向(DESC|ASC,Default:DESC)
+    OutPut:       
+        PageCount       int         总页数
+        DataCount       int         资料总笔数
+        InvItemLst      List<Invinoutitem>  商品交易明细(Invinoutitem)
+############################################################
+3.InventorySingle()//直接修改现有库存-查询单笔库存明细
+    方法：Get
+    路由：http://192.168.30.211:5000/Core/XyCore/Inventory/InventorySingle?ID=262428
+    InPut:
+        ID              int         商品库存ID
+    OutPut:
+        Inv             Sfc_InvStock   单笔商品库存(Inventory)
+    参考:output json 文件:InventorySingle_output.json
+4.UptStockQtySingle()//修改现有库存 - 产生盘点|采购交易
+    方法：POST
+    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/UptStockQtySingle
+    InPut:
+        ID              int         商品库存ID(inventory.ID)
+        InvQty          int         库存修改数量
+        Type            int         修改类型(1.盘点 2.采购入库-暂未实现)
+    OutPut:
+        成功：返回请求成功信息(s=1)
+        失败：返回错误信息
 ############################################################

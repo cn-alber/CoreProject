@@ -145,15 +145,15 @@ namespace CoreWebApi.XyCore
         #endregion
         #region 库存管理-商品库存查询 - 库存明细查询
         [HttpGetAttribute("Core/XyCore/Inventory/InvDetailQuery")]
-        public ResponseResult InvDetailQuery(string SkuID, string WarehouseID, string DocType, string DocDateB, string DocDateE, string PageIndex, string PageSize, string SortField, string SortDirection)
+        public ResponseResult InvDetailQuery(string SkuautoID, string WarehouseID, string DocType, string DocDateB, string DocDateE, string PageIndex, string PageSize, string SortField, string SortDirection)
         {
 
             var cp = new InvQueryParam();
             int x;
             DateTime date;
-            if (!string.IsNullOrEmpty(SkuID))//商品编码
+            if (!string.IsNullOrEmpty(SkuautoID))//商品编码
             {
-                cp.SkuID = SkuID;
+                cp.SkuID = SkuautoID;
             }
             if (!string.IsNullOrEmpty(WarehouseID) && int.TryParse(WarehouseID, out x))//商品仓库
             {
@@ -192,6 +192,11 @@ namespace CoreWebApi.XyCore
                     }
                 }
             }
+            else
+            {
+                cp.SortField = "ID";
+                cp.SortDirection = "DESC";
+            }
             cp.CoID = int.Parse(GetCoid());
             var Result = InventoryHaddle.GetInvDetailQuery(cp);
             return CoreResult.NewResponse(Result.s, Result.d, "General");
@@ -210,15 +215,9 @@ namespace CoreWebApi.XyCore
             }
             if (invID > 0)
             {
-                int CoID = int.Parse(GetCoid());
+                string CoID = GetCoid();
                 res = InventoryHaddle.GetInventorySingle(invID, CoID);
             }
-            // int wid=0;
-            // if (!string.IsNullOrEmpty(WarehouseID) && int.TryParse(WarehouseID, out wid))//商品仓库
-            // {
-            //     wid = int.Parse(WarehouseID);
-            // } 
-            // var res = InventoryHaddle.GetInventorySingle(SkuID,wid,CoID);
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
@@ -227,21 +226,28 @@ namespace CoreWebApi.XyCore
         [HttpPostAttribute("Core/XyCore/Inventory/UptStockQtySingle")]
         public ResponseResult UptStockQtySingle([FromBodyAttribute]JObject obj)
         {
-            int ID = 0, SetQty = 0;
+            int ID = 0, InvQty = 0, Type = 0;
             var res = new DataResult(1, null);
-            if (!string.IsNullOrEmpty(obj["ID"].ToString()) && int.TryParse(obj["ID"].ToString(), out ID))
+            if (!string.IsNullOrEmpty(obj["ID"].ToString()) && int.TryParse(obj["ID"].ToString(), out ID) &&
+            !string.IsNullOrEmpty(obj["InvQty"].ToString()) && int.TryParse(obj["InvQty"].ToString(), out InvQty) &&
+            !string.IsNullOrEmpty(obj["Type"].ToString()) && int.TryParse(obj["Type"].ToString(), out ID))
             {
                 ID = int.Parse(obj["ID"].ToString());
+                InvQty = int.Parse(obj["InvQty"].ToString());
+                Type = int.Parse(obj["Type"].ToString());
+                string CoID = GetCoid();
+                string UserName = GetUname();
+                if (ID > 0 && Type == 1)
+                {
+                    int sfc_type = 2;
+                    int inv_type = 1401;
+                    res = InventoryHaddle.SetTakeStockQty(ID, sfc_type, inv_type, InvQty, CoID, UserName);
+                }
             }
-            if (!string.IsNullOrEmpty(obj["SetQty"].ToString()) && int.TryParse(obj["SetQty"].ToString(), out SetQty))
+            else
             {
-                SetQty = int.Parse(obj["SetQty"].ToString());
-            }
-            string CoID = GetCoid();
-            string UserName = GetUname();
-            if (ID > 0)
-            {
-                res = InventoryHaddle.SetStockQtySingle(ID, SetQty, CoID, UserName);
+                res.s = -1;
+                res.d = "";
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
@@ -315,61 +321,7 @@ namespace CoreWebApi.XyCore
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
-        #endregion
-
-        #region 商品明细查询
-        [HttpGetAttribute("Core/XyCore/Inventory/InvInOutQuery")]
-        public ResponseResult InvInOutQuery(string SkuID, string SkuName, string RecordID, string DocDateB, string DocDateE, string PageIndex, string PageSize, string SortField, string SortDirection)
-        {
-            var cp = new InvQueryParam();
-            int x;
-            DateTime date;
-            if (!string.IsNullOrEmpty(SkuID))//商品编码
-            {
-                cp.SkuID = SkuID;
-            }
-            if (!string.IsNullOrEmpty(SkuName))//商品名称
-            {
-                cp.SkuName = SkuName;
-            }
-            if (!string.IsNullOrEmpty(RecordID))//单据编号
-            {
-                cp.DocType = RecordID;
-            }
-            if (!string.IsNullOrEmpty(DocDateB) && (DateTime.TryParse(DocDateB, out date)))//单据日期起
-            {
-                cp.DocDateB = DateTime.Parse(DocDateB);
-            }
-            if (!string.IsNullOrEmpty(DocDateE) && (DateTime.TryParse(DocDateE, out date)))//单据日期迄
-            {
-                cp.DocDateE = DateTime.Parse(DocDateE);
-            }
-            if (int.TryParse(PageIndex, out x))//页码
-            {
-                cp.PageIndex = int.Parse(PageIndex);
-            }
-            if (int.TryParse(PageSize, out x))//每页笔数
-            {
-                cp.PageSize = int.Parse(PageSize);
-            }
-            //排序参数赋值
-            if (!string.IsNullOrEmpty(SortField))
-            {
-                var res = CommHaddle.SysColumnExists(DbBase.CoreConnectString, "invinoutitem", SortField);
-                if (res.s == 1)
-                {
-                    cp.SortField = SortField;
-                    if (!string.IsNullOrEmpty(SortDirection) && (SortDirection.ToUpper() == "DESC" || SortDirection.ToUpper() == "ASC"))
-                    {
-                        cp.SortDirection = SortDirection.ToUpper();
-                    }
-                }
-            }
-            cp.CoID = int.Parse(GetCoid());
-            var Result = InventoryHaddle.GetInvDetailQuery(cp);
-            return CoreResult.NewResponse(Result.s, Result.d, "General");
-        }
-        #endregion    
+        #endregion         
 
         #region 商品库存盘点----測試
         [HttpPostAttribute("Core/XyCore/Inventory/SetInvQty")]
