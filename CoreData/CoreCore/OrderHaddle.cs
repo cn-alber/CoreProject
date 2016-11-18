@@ -19,7 +19,7 @@ namespace CoreData.CoreCore
             string sqlcount = "select count(id) from `order` where 1=1";
             string sqlcommand = @"select ID,Type,DealerType,IsMerge,IsSplit,OSource,SoID,ODate,PayDate,BuyerShopID,ShopName,Amount,PaidAmount,ExAmount,IsCOD,Status,AbnormalStatus,
                                   StatusDec,RecMessage,SendMessage,Express,RecLogistics,RecCity,RecDistrict,RecAddress,RecName,ExWeight,Distributor,SupDistributor,InvoiceTitle,
-                                  PlanDate,SendWarehouse,SendDate,ExCode,Creator from `order` where 1=1"; 
+                                  PlanDate,SendWarehouse,SendDate,ExCode,Creator,RecTel,RecPhone from `order` where 1=1"; 
             string wheresql = string.Empty;
             if(cp.CoID != 1)//公司编号
             {

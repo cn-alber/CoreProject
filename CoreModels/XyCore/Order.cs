@@ -566,6 +566,8 @@ namespace CoreModels.XyCore
         public string PaidAmount{get;set;}
         public string ExAmount{get;set;}
         public bool IsCOD{get;set;}
+        public string RecTel{get;set;}
+        public string RecPhone{get;set;}
         public int Status{get;set;}
         public string StatusDec{get;set;}
         public int AbnormalStatus{get;set;}
