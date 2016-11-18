@@ -1,16 +1,17 @@
 {
-    "Ord": {
-        "ODate": "2016-10-26",
-        "BuyerShopID": "测试1026",
-        "ShopID": 2,
-        "RecName": "测试1026name",
-        "RecLogistics": "江苏省",
-        "RecCity": "苏州市",
-        "RecDistrict": "常熟市",
-        "RecAddress": "可美国际大厦",
-        "RecPhone": "123456789",
-        "RecMessage": "RecMessage1026",
-        "SendMessage": "SendMessage"
-    },
+    "ODate": "2016-10-26",
+    "BuyerShopID": "测试1026",
+    "ShopID": 2,
+    "SoID":"",//线上订单号
+    "ExAmount":0,//运费
+    "RecName": "测试1026name",
+    "RecLogistics": "江苏省",
+    "RecCity": "苏州市",
+    "RecDistrict": "常熟市",
+    "RecAddress": "可美国际大厦",
+    "RecTel":"",//联系电话
+    "RecPhone": "123456789",
+    "RecMessage": "RecMessage1026",
+    "SendMessage": "SendMessage",
     "IsFaceToFace": "false"
 }
