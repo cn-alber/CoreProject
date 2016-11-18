@@ -112,7 +112,7 @@ namespace CoreData.CoreCore
         {
             var result = new DataResult(1, null);
             var Item = new Sfc_item_query();
-            string sql = @"SELECT ID,Skuautoid,Qty,InvQty,ParentID,Type FROM sfc_item WHERE CoID = @CoID AND ParentID=@ParentID AND Type = 2";
+            string sql = @"SELECT ID,Skuautoid,Qty,InvQty FROM sfc_item WHERE CoID = @CoID AND ParentID=@ParentID AND Type = 2";
             using (var conn = new MySqlConnection(DbBase.CoreConnectString))
             {
                 try
@@ -122,7 +122,32 @@ namespace CoreData.CoreCore
                     {
                         var SkuIDLst = ItemLst.Select(a => a.Skuautoid).Distinct().AsList();
                         var res = CommHaddle.GetSkuViewByID(CoID, SkuIDLst);
-                        Item.DicSku = res.d as Dictionary<string, object>;//获取商品Sku资料
+                        var SkuViewLst = res.d as List<CoreSkuView>;//获取商品Sku资料,拼接Lst显示
+                        ItemLst = (from a in ItemLst
+                                   join b in SkuViewLst
+                                   on new { Skuautoid = a.Skuautoid } equals new { Skuautoid = b.ID }
+                                   group new { a, b } by new
+                                   {
+                                       a.ID,
+                                       a.Skuautoid,
+                                       a.InvQty,
+                                       a.Qty,
+                                       b.SkuID,
+                                       b.SkuName,
+                                       b.Norm,
+                                       b.Img
+                                   } into c
+                                   select new Sfc_item_view
+                                   {
+                                       ID = c.Key.ID,
+                                       Skuautoid = c.Key.Skuautoid,
+                                       InvQty = c.Key.InvQty,
+                                       Qty = c.Key.Qty,
+                                       SkuID = c.Key.SkuID,
+                                       SkuName = c.Key.SkuName,
+                                       Norm = c.Key.Norm,
+                                       Img = c.Key.Img
+                                   }).AsList();
                         Item.ItemLst = ItemLst;
                     }
                     result.d = Item;
@@ -448,7 +473,7 @@ namespace CoreData.CoreCore
         #endregion
 
         #region 库存盘点 - 作废盘点单
-        public static DataResult UnCheckStockTake(string ID,int Type, string CoID, string UserName)
+        public static DataResult UnCheckStockTake(string ID, int Type, string CoID, string UserName)
         {
             var result = new DataResult(1, null);
             var conn = new MySqlConnection(DbBase.CoreConnectString);
@@ -477,7 +502,7 @@ namespace CoreData.CoreCore
                     conn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = CoID, WarehouseID = WhID, SkuIDLst = SkuIDLst }, Trans);
                     conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, WarehouseID = WhID, SkuIDLst = SkuIDLst }, Trans);
                     Trans.Commit();
-                    CoreUser.LogComm.InsertUserLog(TypeName+"单据-作废", "sfc_item", "单据ID" + ID, UserName, int.Parse(CoID), DateTime.Now);
+                    CoreUser.LogComm.InsertUserLog(TypeName + "单据-作废", "sfc_item", "单据ID" + ID, UserName, int.Parse(CoID), DateTime.Now);
 
                 }
             }

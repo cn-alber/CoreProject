@@ -21,7 +21,7 @@ namespace CoreModels.XyCore
         public decimal DefectiveQty { get; set; }
         public decimal VirtualQty { get; set; }
         public decimal PurchaseQty { get; set; }
-        public string Pic { get; set; }
+        public string Img { get; set; }
         public string CoID { get; set; }
     }
 

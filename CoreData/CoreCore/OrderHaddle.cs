@@ -19,7 +19,7 @@ namespace CoreData.CoreCore
             string sqlcount = "select count(id) from `order` where 1=1";
             string sqlcommand = @"select ID,Type,DealerType,IsMerge,IsSplit,OSource,SoID,ODate,PayDate,BuyerShopID,ShopName,Amount,PaidAmount,ExAmount,IsCOD,Status,AbnormalStatus,
                                   StatusDec,RecMessage,SendMessage,Express,RecLogistics,RecCity,RecDistrict,RecAddress,RecName,ExWeight,Distributor,SupDistributor,InvoiceTitle,
-                                  PlanDate,SendWarehouse,SendDate,ExCode,Creator from `order` where 1=1"; 
+                                  PlanDate,SendWarehouse,SendDate,ExCode,Creator,RecTel,RecPhone from `order` where 1=1"; 
             string wheresql = string.Empty;
             if(cp.CoID != 1)//公司编号
             {
@@ -5164,6 +5164,331 @@ namespace CoreData.CoreCore
             }
             return result;
         }
+        ///<summary>
+        ///修改收货地址
+        ///</summary>
+        public static DataResult ModifyAddress(string Logistics,string City,string District,string Address,string Name,string tel,string phone,int OID,string UserName,int CoID)
+        {
+            var result = new DataResult(1,null);   
+            var logs = new List<Log>();
+            var OrdOlder = new Order();
+            var CancleOrdAb = new Order();
+            int reasonid = 0;
+            List<int> idlist = new List<int>();
+            int x = 0;//资料修改标记
+            int z = 0;//地址修改标记
+            string RecLogistics="",RecCity="",RecDistrict="",RecAddress="",RecName="";
+            string querySql = "select * from `order` where id = @ID and coid = @Coid";
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    var u = conn.Query<Order>(querySql,new{ID = OID,Coid = CoID}).AsList();
+                    if(u.Count == 0)
+                    {
+                        result.s = -1;
+                        result.d = "参数无效";
+                        return result;
+                    }
+                    else
+                    {
+                        if(u[0].Status != 0 && u[0].Status != 1 && u[0].Status != 7)
+                        {
+                            result.s = -1;
+                            result.d = "只有待审核/已付款待审核/异常的订单才可以修改收货地址!";
+                            return result;
+                        }
+                    }
+                    OrdOlder = u[0] as Order;
+                    RecLogistics = OrdOlder.RecLogistics;
+                    RecCity = OrdOlder.RecCity;
+                    RecDistrict = OrdOlder.RecDistrict;
+                    RecAddress = OrdOlder.RecAddress;
+                    RecName = OrdOlder.RecName;
+                    string addressOlder = RecLogistics + RecCity + RecDistrict + RecAddress;
+                    if(OrdOlder.RecLogistics != Logistics)
+                    {
+                        OrdOlder.RecLogistics = Logistics;
+                        x++;
+                        z++;
+                    }
+                    if(OrdOlder.RecCity != City)
+                    {
+                        OrdOlder.RecCity = City;
+                        x++;
+                        z++;
+                    }
+                    if(OrdOlder.RecDistrict != District)
+                    {
+                        OrdOlder.RecDistrict = District;
+                        x++;
+                        z++;
+                    }
+                    if(OrdOlder.RecAddress != Address)
+                    {
+                        OrdOlder.RecAddress = Address;
+                        x++;
+                        z++;
+                    }
+                    if(z > 0)
+                    {
+                        var log = new Log();
+                        log.OID = OrdOlder.ID;
+                        log.SoID = OrdOlder.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "手动修改收货地址";
+                        log.Remark = "收货地址" + addressOlder + " => " + OrdOlder.RecLogistics + OrdOlder.RecCity + OrdOlder.RecDistrict + OrdOlder.RecAddress;
+                        log.CoID = CoID;
+                        logs.Add(log);
+                    }
+                    if(OrdOlder.RecName != Name)
+                    {
+                        var log = new Log();
+                        log.OID = OrdOlder.ID;
+                        log.SoID = OrdOlder.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "手动修改收货人";
+                        log.Remark = "收货人" + OrdOlder.RecName + " => " + Name;
+                        log.CoID = CoID;
+                        logs.Add(log);
+                        OrdOlder.RecName = Name;
+                        x++;
+                        z++;
+                    }
+                    if(OrdOlder.RecTel != tel)
+                    {
+                        var log = new Log();
+                        log.OID = OrdOlder.ID;
+                        log.SoID = OrdOlder.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "手动修改电话";
+                        log.Remark = "电话" + OrdOlder.RecTel + " => " + tel;
+                        log.CoID = CoID;
+                        logs.Add(log);
+                        OrdOlder.RecTel = tel;
+                        x++;
+                    }
+                    if(OrdOlder.RecPhone != phone)
+                    {
+                        var log = new Log();
+                        log.OID = OrdOlder.ID;
+                        log.SoID = OrdOlder.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "手动修改手机";
+                        log.Remark = "手机" + OrdOlder.RecPhone + " => " + phone;
+                        log.CoID = CoID;
+                        logs.Add(log);
+                        OrdOlder.RecPhone = phone;
+                        x++;
+                    }
+                    //检查订单是否符合合并的条件
+                    if(z > 0)
+                    {
+                        //若订单本身是等待合并时，先判断是否需要还原资料
+                        if(OrdOlder.Status == 7 && OrdOlder.StatusDec == "等待订单合并")
+                        {
+                            var log = new Log();
+                            log.OID = OrdOlder.ID;
+                            log.SoID = OrdOlder.SoID;
+                            log.Type = 0;
+                            log.LogDate = DateTime.Now;
+                            log.UserName = UserName;
+                            log.Title = "取消异常标记";
+                            log.Remark = "等待订单合并(自动)";
+                            log.CoID = CoID;
+                            logs.Add(log);
+                            if(OrdOlder.IsPaid == true)
+                            {
+                                OrdOlder.Status = 1;
+                            }
+                            else
+                            {
+                                OrdOlder.Status = 0;
+                            }
+                            OrdOlder.AbnormalStatus = 0;
+                            OrdOlder.StatusDec="";
+                            var ck = isCheckCancleMerge(OID,CoID,OrdOlder.BuyerShopID,RecName,RecLogistics,RecCity,RecDistrict,RecAddress);
+                            if(ck.s == 1)
+                            {
+                                int oid = int.Parse(ck.d.ToString());
+                                querySql = "select * from `order` where id = " + oid + " and coid = " + CoID;
+                                var v = conn.Query<Order>(querySql).AsList();
+                                CancleOrdAb = v[0] as Order;
+                                log = new Log();
+                                log.OID = CancleOrdAb.ID;
+                                log.SoID = CancleOrdAb.SoID;
+                                log.Type = 0;
+                                log.LogDate = DateTime.Now;
+                                log.UserName = UserName;
+                                log.Title = "取消异常标记";
+                                log.Remark = "等待订单合并(自动)";
+                                log.CoID = CoID;
+                                logs.Add(log);
+                                if(CancleOrdAb.IsPaid == true)
+                                {
+                                    CancleOrdAb.Status = 1;
+                                }
+                                else
+                                {
+                                    CancleOrdAb.Status = 0;
+                                }
+                                CancleOrdAb.AbnormalStatus = 0;
+                                CancleOrdAb.StatusDec="";
+                                CancleOrdAb.Modifier = UserName;
+                                CancleOrdAb.ModifyDate = DateTime.Now;
+                            }
+                        }
+                        //检查订单是否符合合并的条件
+                        var res = isCheckMerge(OrdOlder);
+                        if(res.s == 1)
+                        {
+                            reasonid = GetReasonID("等待订单合并",CoID).s;
+                            if(reasonid == -1)
+                            {
+                                result.s = -1;
+                                result.d = "请先设定【等待订单合并】的异常";
+                                return result;
+                            }
+                            OrdOlder.Status = 7;
+                            OrdOlder.AbnormalStatus = reasonid;
+                            OrdOlder.StatusDec="等待订单合并";
+                            var log = new Log();
+                            log.OID = OrdOlder.ID;
+                            log.SoID = OrdOlder.SoID;
+                            log.Type = 0;
+                            log.LogDate = DateTime.Now;
+                            log.UserName = UserName;
+                            log.Title = "标记异常";
+                            log.Remark = "等待订单合并(自动)";
+                            log.CoID = CoID;
+                            logs.Add(log);
+                            idlist = res.d as List<int>;
+                            querySql = "select id,soid from `order` where id in @ID and coid = @Coid and status <> 7";
+                            var v = conn.Query<Order>(querySql,new{ID = idlist,Coid = CoID}).AsList();
+                            if(v.Count > 0)
+                            {
+                                foreach(var c in v)
+                                {
+                                    log = new Log();
+                                    log.OID = c.ID;
+                                    log.SoID = c.SoID;
+                                    log.Type = 0;
+                                    log.LogDate = DateTime.Now;
+                                    log.UserName = UserName;
+                                    log.Title = "标记异常";
+                                    log.Remark = "等待订单合并(自动)";
+                                    log.CoID = CoID;
+                                    logs.Add(log);
+                                }
+                            }
+                            else
+                            {
+                                idlist = new List<int>();
+                            }
+                        }   
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlCommandText = string.Empty;
+                int count =0;
+                OrdOlder.Modifier = UserName;
+                OrdOlder.ModifyDate = DateTime.Now;
+                if(x > 0)
+                {
+                    sqlCommandText = @"update `order` set RecLogistics=@RecLogistics,RecCity=@RecCity,RecDistrict=@RecDistrict,RecAddress=@RecAddress,RecName=@RecName,
+                                       RecTel=@RecTel,RecPhone=@RecPhone,Status=@Status,AbnormalStatus=@AbnormalStatus,StatusDec=@StatusDec,Modifier=@Modifier,
+                                       ModifyDate=@ModifyDate where ID = @ID and CoID = @CoID";
+                    count =CoreDBconn.Execute(sqlCommandText,OrdOlder,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                    if(CancleOrdAb.ID > 0)
+                    {
+                        sqlCommandText = @"update `order` set Status=@Status,AbnormalStatus=@AbnormalStatus,StatusDec=@StatusDec,Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and CoID = @CoID";
+                        count =CoreDBconn.Execute(sqlCommandText,CancleOrdAb,TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3003;
+                            return result;
+                        }
+                    }
+                    if(idlist.Count > 0)
+                    {
+                        sqlCommandText = @"update `order` set status = 7,abnormalstatus = @Abnormalstatus,statusdec = '等待订单合并' where id in @ID and coid = @Coid and status <> 7";
+                        count =CoreDBconn.Execute(sqlCommandText,new {Abnormalstatus = reasonid,ID = idlist,Coid = CoID},TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3003;
+                            return result;
+                        }
+                    }
+                    string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                    count =CoreDBconn.Execute(loginsert,logs,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3002;
+                        return result;
+                    }         
+                }       
+                TransCore.Commit();
+            }catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            return  result;
+        }
+        ///<summary>
+        ///抓取快递List
+        ///</summary>
+        public static DataResult GetExpress(int CoID)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{  
+                    //快递公司
+                    string sqlcommand = "select ID,ExpName as Name from express where coid =" + CoID + " and enable = true";
+                    var Express = conn.Query<AbnormalReason>(sqlcommand).AsList();
+                    result.d = Express;   
+                    }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }    
+            return result;
+        }
+
+
+
+
+
+
 
 
 
@@ -5209,26 +5534,7 @@ namespace CoreData.CoreCore
             }
             return result;
         }
-        ///<summary>
-        ///抓取快递List
-        ///</summary>
-        public static DataResult GetExpress(int CoID)
-        {
-            var result = new DataResult(1,null);
-            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
-                try{  
-                    //快递公司
-                    string sqlcommand = "select ID,ExpName as Name from express where coid =" + CoID + " and enable = true";
-                    var Express = conn.Query<AbnormalReason>(sqlcommand).AsList();
-                    result.d = Express;   
-                    }catch(Exception ex){
-                    result.s = -1;
-                    result.d = ex.Message;
-                    conn.Dispose();
-                }
-            }    
-            return result;
-        }
+        
         ///<summary>
         ///设定快递
         ///</summary>

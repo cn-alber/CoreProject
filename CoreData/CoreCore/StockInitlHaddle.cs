@@ -127,7 +127,33 @@ namespace CoreData.CoreCore
                         {
                             var SkuIDLst = ItemLst.Select(a => a.Skuautoid).Distinct().AsList();
                             var res = CommHaddle.GetSkuViewByID(IParam.CoID, SkuIDLst);
-                            cs.DicSku = res.d as Dictionary<string, object>;//获取商品Sku资料
+                            var SkuViewLst = res.d as List<CoreSkuView>;//获取商品Sku资料
+                            ItemLst = (from a in ItemLst
+                                      join b in SkuViewLst
+                                      on new { Skuautoid = a.Skuautoid } equals new { Skuautoid = b.ID } 
+                                      group new {a,b} by new
+                                      {
+                                          a.ID,
+                                          a.Skuautoid,
+                                          a.InvQty,
+                                          a.Price,
+                                          a.Amount,
+                                          b.SkuID,
+                                          b.SkuName,
+                                          b.Norm,
+                                          b.Img
+                                      } into c
+                                      select new Sfc_item_Init_view{
+                                            ID = c.Key.ID,
+                                          Skuautoid = c.Key.Skuautoid,
+                                          InvQty = c.Key.InvQty,
+                                          Price = c.Key.Price,
+                                          Amount = c.Key.Amount,
+                                          SkuID = c.Key.SkuID,
+                                          SkuName = c.Key.SkuName,
+                                          Norm = c.Key.Norm,
+                                          Img = c.Key.Img
+                                      }).AsList();
                             cs.InitItemLst = ItemLst;
                         }
                         result.d = cs;
@@ -159,8 +185,8 @@ namespace CoreData.CoreCore
                 if (int.Parse(itemOld.InvQty) != InvQty)
                 {
                     contents = contents + "数量:" + itemOld.InvQty + "=>" + InvQty + ";";
-                }               
-                if (string.IsNullOrEmpty(contents))
+                }
+                if (!string.IsNullOrEmpty(contents))
                 {
                     string sql = "UPDATE sfc_item SET InvQty = @InvQty,Amount=@InvQty*Price,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID=@ID";
                     conn.Execute(sql, new { InvQty = InvQty, CoID = CoID, ID = ID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
@@ -183,7 +209,7 @@ namespace CoreData.CoreCore
             return result;
         }
         #endregion
-         #region 库存期初 - 修改保存 - 期初数量/成本单价/成本金额
+        #region 库存期初 - 修改保存 - 期初数量/成本单价/成本金额
         public static DataResult SaveStockInitPrice(string ID, Decimal Price, string CoID, string UserName)
         {
             var result = new DataResult(1, null);
@@ -194,11 +220,11 @@ namespace CoreData.CoreCore
             {
                 string contents = string.Empty;
                 var itemOld = conn.QueryFirst<Sfc_item_Init_view>("SELECT ID,Skuautoid,InvQty,Price FROM sfc_item WHERE CoID=@CoID AND ID=@ID", new { CoID = CoID, ID = ID });
-                if (int.Parse(itemOld.Price) != Price)
+                if (Convert.ToDecimal(itemOld.Price) != Price)
                 {
                     contents = contents + "单价:" + itemOld.Price + "=>" + Price + ";";
                 }
-                if (string.IsNullOrEmpty(contents))
+                if (!string.IsNullOrEmpty(contents))
                 {
                     string sql = "UPDATE sfc_item SET Price=@Price,Amount=InvQty*@Price,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID=@ID";
                     conn.Execute(sql, new { Price = Price, CoID = CoID, ID = ID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);

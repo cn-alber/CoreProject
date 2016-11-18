@@ -1,0 +1,146 @@
+{
+    "s": 1,
+    "d": {
+        "Datacnt": 8,
+        "Pagecnt": 1,
+        "Exp": [
+            {
+                "ID": 1,//自增ID
+                "ExpID": "OTHER.DOOR",//快递编号
+                "ExpName": "现场取货",//快递名称
+                "Priority": 7,//优先级
+                "PriorityLogistics": "",//优先省份
+                "FreightFirst": 0,//运费优先
+                "OrdAmtStart": 0,//订单定额大于等于
+                "OrdAmtEnd": 0,//订单金额小于等于
+                "PrioritySku": "",//优先商品
+                "DisableArea": "",//禁发地区
+                "ExpCalMethod": 0,//计算方式
+                "IgnoreArrival": false,//忽略到达判断
+                "Enable": true,//是否启用
+                "IsCOD": false,//是否支持货到付款
+                "ModifyDate": "2016-11-17 16:53:30"//修改时间
+            },
+            {
+                "ID": 2,
+                "ExpID": "YUNDA",
+                "ExpName": "韵达快运",
+                "Priority": 2,
+                "PriorityLogistics": "",
+                "FreightFirst": 1,
+                "OrdAmtStart": 0,
+                "OrdAmtEnd": 0,
+                "PrioritySku": "",
+                "DisableArea": "",
+                "ExpCalMethod": 0,
+                "IgnoreArrival": false,
+                "Enable": true,
+                "IsCOD": false,
+                "ModifyDate": "2016-11-17 16:53:30"
+            },
+            {
+                "ID": 3,
+                "ExpID": "JD",
+                "ExpName": "京东快递",
+                "Priority": 3,
+                "PriorityLogistics": "",
+                "FreightFirst": 0,
+                "OrdAmtStart": 0,
+                "OrdAmtEnd": 0,
+                "PrioritySku": "",
+                "DisableArea": "",
+                "ExpCalMethod": 0,
+                "IgnoreArrival": false,
+                "Enable": true,
+                "IsCOD": false,
+                "ModifyDate": "2016-11-17 16:53:30"
+            },
+            {
+                "ID": 4,
+                "ExpID": "EMS",
+                "ExpName": "EMS",
+                "Priority": 4,
+                "PriorityLogistics": "",
+                "FreightFirst": 0,
+                "OrdAmtStart": 0,
+                "OrdAmtEnd": 0,
+                "PrioritySku": "",
+                "DisableArea": "",
+                "ExpCalMethod": 0,
+                "IgnoreArrival": false,
+                "Enable": true,
+                "IsCOD": false,
+                "ModifyDate": "2016-11-17 16:53:30"
+            },
+            {
+                "ID": 5,
+                "ExpID": "SF",
+                "ExpName": "顺丰速运",
+                "Priority": 5,
+                "PriorityLogistics": "",
+                "FreightFirst": 0,
+                "OrdAmtStart": 0,
+                "OrdAmtEnd": 0,
+                "PrioritySku": "",
+                "DisableArea": "",
+                "ExpCalMethod": 0,
+                "IgnoreArrival": false,
+                "Enable": true,
+                "IsCOD": false,
+                "ModifyDate": "2016-11-17 16:53:30"
+            },
+            {
+                "ID": 6,
+                "ExpID": "STO",
+                "ExpName": "申通E物流",
+                "Priority": 6,
+                "PriorityLogistics": "",
+                "FreightFirst": 0,
+                "OrdAmtStart": 0,
+                "OrdAmtEnd": 0,
+                "PrioritySku": "",
+                "DisableArea": "",
+                "ExpCalMethod": 0,
+                "IgnoreArrival": false,
+                "Enable": true,
+                "IsCOD": false,
+                "ModifyDate": "2016-11-17 16:53:30"
+            },
+            {
+                "ID": 7,
+                "ExpID": "YTO",
+                "ExpName": "圆通速递",
+                "Priority": 1,
+                "PriorityLogistics": "",
+                "FreightFirst": 1,
+                "OrdAmtStart": 0,
+                "OrdAmtEnd": 0,
+                "PrioritySku": "",
+                "DisableArea": "",
+                "ExpCalMethod": 0,
+                "IgnoreArrival": false,
+                "Enable": true,
+                "IsCOD": false,
+                "ModifyDate": "2016-11-17 16:53:30"
+            },
+            {
+                "ID": 8,
+                "ExpID": "GTO",
+                "ExpName": "国通快递",
+                "Priority": 8,
+                "PriorityLogistics": "",
+                "FreightFirst": 0,
+                "OrdAmtStart": 0,
+                "OrdAmtEnd": 0,
+                "PrioritySku": "",
+                "DisableArea": "",
+                "ExpCalMethod": 0,
+                "IgnoreArrival": false,
+                "Enable": true,
+                "IsCOD": false,
+                "ModifyDate": "2016-11-17 16:53:30"
+            }
+        ]
+    },
+    "m": ""
+}

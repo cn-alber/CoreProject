@@ -508,11 +508,6 @@ namespace CoreModels.XyCore
         public int ID{get;set;}
         public string Name{get;set;}
     }
-    public class Express
-    {
-        public int ID{get;set;}
-        public string ExpName{get;set;}
-    }
     public class MergerOrd
     {
         public string type{get;set;}//H高风险;M中风险;L推荐项;A主订单
@@ -571,6 +566,8 @@ namespace CoreModels.XyCore
         public string PaidAmount{get;set;}
         public string ExAmount{get;set;}
         public bool IsCOD{get;set;}
+        public string RecTel{get;set;}
+        public string RecPhone{get;set;}
         public int Status{get;set;}
         public string StatusDec{get;set;}
         public int AbnormalStatus{get;set;}

@@ -745,7 +745,7 @@ namespace CoreData.CoreCore
                     }
                     if (main.PurPrice != main_Old.PurPrice)
                     {
-                        contents = contents + "采购成本:" + main_Old.PurPrice + "=>" + main.PurPrice + ";";                        
+                        contents = contents + "采购成本:" + main_Old.PurPrice + "=>" + main.PurPrice + ";";
                         UptMainSql = UptMainSql + " ,PurPrice=@PurPrice,CostPrice=@PurPrice";//还未涉及加工成本，故成本价默认为采购价
                     }
                     if (main.SalePrice != main_Old.SalePrice)
@@ -1309,45 +1309,31 @@ namespace CoreData.CoreCore
                         if (res.s == 1)
                         {
                             var BrandLst = res.d as List<BrandDDLB>;
-                            SkuLst = (from a in SkuLst
-                                      join b in BrandLst
-                                      on new { Brand = a.Brand } equals new { Brand = b.ID }
-                                      group new { a, b } by new
-                                      {
-                                          a.ID,
-                                          a.GoodsCode,
-                                          a.GoodsName,
-                                          a.SkuID,
-                                          a.SkuName,
-                                          a.Norm,
-                                          a.GBCode,
-                                          a.Brand,
-                                          b.Name,
-                                          a.CostPrice,
-                                          a.SalePrice,
-                                          a.Enable,
-                                          a.Img,
-                                          a.Creator,
-                                          a.CreateDate
-                                      } into c
-                                      select new SkuQuery
-                                      {
-                                          ID = c.Key.ID,
-                                          GoodsCode = c.Key.GoodsCode,
-                                          GoodsName = c.Key.GoodsName,
-                                          SkuID = c.Key.SkuID,
-                                          SkuName = c.Key.SkuName,
-                                          Norm = c.Key.Norm,
-                                          GBCode = c.Key.GBCode,
-                                          Brand = c.Key.Brand,
-                                          BrandName = c.Key.Name,
-                                          CostPrice = c.Key.CostPrice,
-                                          SalePrice = c.Key.SalePrice,
-                                          Enable = c.Key.Enable,
-                                          Img = c.Key.Img,
-                                          Creator = c.Key.Creator,
-                                          CreateDate = c.Key.CreateDate
-                                      }).AsList();
+                            if (BrandLst.Count > 0)
+                            {
+                                SkuLst = (from a in SkuLst
+                                          join b in BrandLst on a.Brand equals b.ID into data 
+                                          from c in data.DefaultIfEmpty()
+                                          select new SkuQuery
+                                          {
+                                              ID = a.ID,
+                                              GoodsCode = a.GoodsCode,
+                                              GoodsName = a.GoodsName,
+                                              SkuID = a.SkuID,
+                                              SkuName = a.SkuName,
+                                              Norm = a.Norm,
+                                              GBCode = a.GBCode,
+                                              Brand = a.Brand,
+                                              BrandName =c==null? "":c.Name,
+                                              CostPrice = a.CostPrice,
+                                              SalePrice = a.SalePrice,
+                                              Enable = a.Enable,
+                                              Img = a.Img,
+                                              Creator = a.Creator,
+                                              CreateDate = a.CreateDate
+                                          }).AsList();
+                            }
+
                         }
                         cs.SkuLst = SkuLst;
                     }

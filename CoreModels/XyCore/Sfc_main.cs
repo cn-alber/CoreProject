@@ -69,19 +69,25 @@ namespace CoreModels.XyCore
     {
         public int ID { get; set; }
         public string Skuautoid { get; set; }
+        public string SkuID { get; set; }
+        public string SkuName { get; set; }
+        public string Norm { get; set; }
         public string Qty { get; set; }
         public string InvQty { get; set; }
-        public string ParentID { get; set; }
-        public string Type { get; set; }
+        public string Img { get; set; }
     }
 
     public class Sfc_item_Init_view
     {
         public int ID { get; set; }
         public string Skuautoid { get; set; }
+        public string SkuID { get; set; }
+        public string SkuName { get; set; }
+        public string Norm { get; set; }
         public string InvQty { get; set; }
         public string Price { get; set; }
         public string Amount { get; set; }
+        public string Img { get; set; }
     }
     public class Sfc_main_query
     {
@@ -97,7 +103,6 @@ namespace CoreModels.XyCore
         public int PageCount { get; set; }//总页数
         public List<Sfc_item_Init_view> InitItemLst { get; set; }
         public List<Sfc_item_view> ItemLst { get; set; }
-        public Dictionary<string, object> DicSku { get; set; }
     }
 
 
