@@ -825,4 +825,26 @@ namespace CoreModels.XyCore
         public int Payment{get;set;}
         public int CoID{get;set;}
     }
+    public class OrdSum
+    {
+        public int QtyTot{get;set;}
+        public decimal AmtTot{get;set;}
+        public decimal WeightTot{get;set;}
+    }
+    public class TransferNormalReturnSuccess
+    {
+        public int ID{get;set;}
+        public int Status{get;set;}
+        public string  StatusDec{get;set;}
+    }
+    public class TransferNormalReturnFail
+    {
+        public int ID{get;set;}
+        public string Reason{get;set;}
+    }
+    public class TransferNormalReturn
+    {
+        public List<TransferNormalReturnSuccess> SuccessIDs{get;set;}
+        public List<TransferNormalReturnFail> FailIDs{get;set;}
+    }
 }
