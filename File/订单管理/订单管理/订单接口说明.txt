@@ -11,6 +11,7 @@
 7:新增订单明细,修改订单明细,删除订单明细,新增赠品,订单明细换货,修改订单(运费/卖家备注/发票抬头/收货人信息),手工支付,快速支付,审核支付,取消审核支付,作废支付,修改备注,设定快递,修改收货地址,
   订单转正常单,合并订单,拆分订单,修改运费
 */
+待补充方法:系统自动指定快递/菜鸟智选快递
 function说明
 1.OrderList() //查询table order 资料(效能待测试)
   路由:http://localhost:5000/Core/Order/OrderList
@@ -340,3 +341,32 @@ input:IsQuick     bool        是否快捷方式设定
 output: ExpressSimple         快递列表
         LogisticsNetwork      网点资料
 参考:output jason 文件:GetExp_output.json
+
+30.SetExp()设定快递保存
+路由:http://localhost:5000/Core/Order/SetExp
+input:OID         List<int>   内部订单号    
+      ExpID       string      快递ID
+      ExpName     string      快递名称
+output: s=1成功 else 错误代码
+参考:input jason 文件:SetExp_input.json
+参考:output jason 文件:SetExp_output.json
+
+31.InsertOrdWhStrategy()新增订单仓库分配策略
+路由:http://localhost:5000/Core/Order/InsertOrdWhStrategy
+input:StrategyName      string      策略名称    
+      Priority          string      优先级
+      WarehouseID       string      仓库代号
+      WarehouseName     string      仓库名称
+      LimitLogistics    string      限制省份
+      LimitShop         string      限制店铺
+      Distributor       string      分销商
+      ContainSkuID      string      包含商品
+      ExcludeSkuID      string      排除商品
+      ContainGoodsCode  string      包含商品款式
+      ExcludeGoodsCode  string      排除商品款式
+      MinOrdQty         string      最小数量
+      MaxOrdQty         string      最大数量
+      LoanType          string      贷款方式
+output: s=1成功 else 错误代码
+参考:input jason 文件:InsertOrdWhStrategy_input.json
+参考:output jason 文件:InsertOrdWhStrategy_output.json

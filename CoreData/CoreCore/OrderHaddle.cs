@@ -5553,15 +5553,139 @@ namespace CoreData.CoreCore
         ///<summary>
         ///设定快递更新
         ///</summary>
-        public static DataResult SetExp(List<int> oid,int CoID,int ExpID,string ExpName,string UserName)
-        {
+        public static DataResult SetExp(List<int> oid,int CoID,string ExpID,string ExpName,string UserName)
+        {            
             var result = new DataResult(1,null);
-            
-
+            string title = "手工指定快递";
+            if(ExpID == "A")
+            {
+                title = "手工清空快递";
+            }
+            if(ExpID == "B")
+            {
+                title = "自动计算快递";
+                var res = new DataResult(1,"圆通速递");//待新增方法
+                if(res.s == -1)
+                {
+                    result.s = -1;
+                    result.d = res.d;
+                    return result;
+                }
+                ExpID = res.s.ToString();
+                ExpName = res.d.ToString();
+            }
+            if(ExpID == "C")
+            {
+                title = "菜鸟智选快递";
+                var res = new DataResult(1,"圆通速递");//待新增方法
+                if(res.s == -1)
+                {
+                    result.s = -1;
+                    result.d = res.d;
+                    return result;
+                }
+                ExpID = res.s.ToString();
+                ExpName = res.d.ToString();
+            }
+            var logs = new List<Log>();
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlcommand = "select id,soid,Express from `order` where id in @ID and coid = @Coid and status in (0,1,7)";
+                var u = CoreDBconn.Query<Order>(sqlcommand,new{id = oid,Coid = CoID}).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "无符合条件的订单!";
+                    return result;
+                }
+                foreach(var a in u)
+                {
+                    var log = new Log();
+                    log.OID = a.ID;
+                    log.SoID = a.SoID;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = title;
+                    if(ExpID == "A")
+                    {
+                        log.Remark = a.Express;
+                    }
+                    else
+                    {
+                        log.Remark = ExpName;
+                    }
+                    log.CoID = CoID;
+                    logs.Add(log);
+                }
+                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                int count =CoreDBconn.Execute(loginsert,logs,TransCore);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }     
+                if(ExpID == "A")
+                {
+                    ExpID = null;
+                    ExpName = null;
+                }
+                sqlcommand = @"update `order` set ExID=@ExID,Express =@Express,Modifier=@Modifier,ModifyDate=@ModifyDate where id in @ID and coid = @Coid and status in (0,1,7)";
+                count =CoreDBconn.Execute(sqlcommand,new{ExID=ExpID,Express=ExpName,Modifier=UserName,ModifyDate=DateTime.Now,id = oid,Coid = CoID},TransCore);
+                if(count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }     
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
             return result;
         }
-
-
+        ///<summary>
+        ///新增订单仓库分配策略
+        ///</summary>
+        public static DataResult InsertOrdWhStrategy(OrdWhStrategy s)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{  
+                        string sqlcommand = @"INSERT INTO ord_wh_strategy(StrategyName,Priority,WarehouseID,WarehouseName,LimitLogistics,LimitShop,Distributor,ContainSkuID,ExcludeSkuID,
+                                                                          ContainGoodsCode,ExcludeGoodsCode,MinOrdQty,MaxOrdQty,LoanType,CoID,Creator,Modifier) 
+                                                            VALUES(@StrategyName,@Priority,@WarehouseID,@WarehouseName,@LimitLogistics,@LimitShop,@Distributor,@ContainSkuID,@ExcludeSkuID,
+                                                                   @ContainGoodsCode,@ExcludeGoodsCode,@MinOrdQty,@MaxOrdQty,@LoanType,@CoID,@Creator,@Modifier)";
+                        int count = conn.Execute(sqlcommand,s);
+                        if(count <= 0)
+                        {
+                            result.s = -3002;
+                            return result;
+                        }
+                        int rtn = conn.QueryFirst<int>("select LAST_INSERT_ID()");
+                        result.d = rtn;
+                    }
+                    catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
 
 
 
@@ -5611,9 +5735,6 @@ namespace CoreData.CoreCore
             return result;
         }
         
-        ///<summary>
-        ///设定快递
-        ///</summary>
         public static DataResult SetExpress()
         {
             var result = new DataResult(1,null);

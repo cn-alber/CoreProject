@@ -805,4 +805,27 @@ namespace CoreModels.XyCore
         public string delivery_area_1{get;set;}
         public string delivery_area_0{get;set;}
     }
+    public class OrdWhStrategy
+    {
+        public int ID{get;set;}
+        public string StrategyName{get;set;}
+        public string Priority{get;set;}
+        public string WarehouseID{get;set;}
+        public string WarehouseName{get;set;}
+        public string LimitLogistics{get;set;}
+        public string LimitShop{get;set;}
+        public string Distributor{get;set;}
+        public string ContainSkuID{get;set;}
+        public string ExcludeSkuID{get;set;}
+        public string ContainGoodsCode{get;set;}
+        public string ExcludeGoodsCode{get;set;}
+        public string MinOrdQty{get;set;}
+        public string MaxOrdQty{get;set;}
+        public int LoanType{get;set;}
+        public int CoID{get;set;}
+        public string Creator{get;set;}
+        public DateTime CreateDate{get;set;}
+        public string Modifier{get;set;}
+        public DateTime ModifyDate{get;set;}
+    }
 }
