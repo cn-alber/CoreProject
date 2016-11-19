@@ -588,6 +588,7 @@ namespace CoreModels.XyCore
         public string PlanDate{get;set;}
         public string SendWarehouse{get;set;}
         public string SendDate{get;set;}
+        public int ExID{get;set;}
         public string ExCode{get;set;}
         public string Creator{get;set;}
         public List<long> SoIDList{get;set;}
@@ -804,5 +805,24 @@ namespace CoreModels.XyCore
         public string delivery_contact{get;set;}
         public string delivery_area_1{get;set;}
         public string delivery_area_0{get;set;}
+    }
+    public class OrdWhStrategy
+    {
+        public int ID{get;set;}
+        public string Name{get;set;}
+        public string Level{get;set;}
+        public string Wid{get;set;}
+        public string Wname{get;set;}
+        public string Province{get;set;}
+        public string Shopid{get;set;}
+        public string Did{get;set;}
+        public string ContainSkus{get;set;}
+        public string RemoveSkus{get;set;}
+        public string ContainGoods{get;set;}
+        public string RemoveGoods{get;set;}
+        public string MinNum{get;set;}
+        public string MaxNum{get;set;}
+        public int Payment{get;set;}
+        public int CoID{get;set;}
     }
 }

@@ -773,5 +773,36 @@ namespace CoreWebApi
             data = OrderHaddle.GetExp(CoID,isquick,Logistics,City,District);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Order/SetExp")]
+        public ResponseResult SetExp([FromBodyAttribute]JObject co)
+        {   
+            List<int> OID = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            string ExpID = co["ExpID"].ToString();
+            string ExpName = co["ExpName"].ToString();
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.SetExp(OID,CoID,ExpID,ExpName,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Order/GetWarehouse")]
+        public ResponseResult GetWarehouse(string ID)
+        {   
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.GetWarehouse(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/SetWarehouse")]
+        public ResponseResult SetWarehouse([FromBodyAttribute]JObject co)
+        {   
+            List<int> OID = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            string WhID = co["WarehouseID"].ToString();
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.SetWarehouse(OID,CoID,WhID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }  

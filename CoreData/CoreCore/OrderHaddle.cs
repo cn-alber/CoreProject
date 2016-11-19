@@ -19,7 +19,7 @@ namespace CoreData.CoreCore
             string sqlcount = "select count(id) from `order` where 1=1";
             string sqlcommand = @"select ID,Type,DealerType,IsMerge,IsSplit,OSource,SoID,ODate,PayDate,BuyerShopID,ShopName,Amount,PaidAmount,ExAmount,IsCOD,Status,AbnormalStatus,
                                   StatusDec,RecMessage,SendMessage,Express,RecLogistics,RecCity,RecDistrict,RecAddress,RecName,ExWeight,Distributor,SupDistributor,InvoiceTitle,
-                                  PlanDate,SendWarehouse,SendDate,ExCode,Creator,RecTel,RecPhone from `order` where 1=1"; 
+                                  PlanDate,SendWarehouse,SendDate,ExCode,Creator,RecTel,RecPhone,ExID from `order` where 1=1"; 
             string wheresql = string.Empty;
             if(cp.CoID != 1)//公司编号
             {
@@ -5534,18 +5534,18 @@ namespace CoreData.CoreCore
                 }
             }
             var Express = CoreComm.ExpressHaddle.GetExpressSimple(CoID).d as List<ExpressSimple>;
-            var a = new ExpressSimple();
-            a.ID = "A";
-            a.Name= "{清空已设快递}";
-            Express.Add(a);
-            a = new ExpressSimple();
-            a.ID = "B";
-            a.Name= "{让系统自动计算}";
-            Express.Add(a);
-            a = new ExpressSimple();
-            a.ID = "C";
-            a.Name= "{菜鸟智选物流}";
-            Express.Add(a);
+            // var a = new ExpressSimple();
+            // a.ID = "A";
+            // a.Name= "{清空已设快递}";
+            // Express.Add(a);
+            // a = new ExpressSimple();
+            // a.ID = "B";
+            // a.Name= "{让系统自动计算}";
+            // Express.Add(a);
+            // a = new ExpressSimple();
+            // a.ID = "C";
+            // a.Name= "{菜鸟智选物流}";
+            // Express.Add(a);
             res.Express = Express;
             result.d = res;
             return result;
@@ -5553,21 +5553,539 @@ namespace CoreData.CoreCore
         ///<summary>
         ///设定快递更新
         ///</summary>
-        public static DataResult SetExp(List<int> oid,int CoID,int ExpID,string ExpName,string UserName)
-        {
+        public static DataResult SetExp(List<int> oid,int CoID,string ExpID,string ExpName,string UserName)
+        {            
             var result = new DataResult(1,null);
-            
-
+            string title = "手工指定快递";
+            if(ExpID == "A")
+            {
+                title = "手工清空快递";
+            }
+            if(ExpID == "B")
+            {
+                title = "自动计算快递";
+                var res = new DataResult(1,"圆通速递");//待新增方法
+                if(res.s == -1)
+                {
+                    result.s = -1;
+                    result.d = res.d;
+                    return result;
+                }
+                ExpID = res.s.ToString();
+                ExpName = res.d.ToString();
+            }
+            if(ExpID == "C")
+            {
+                title = "菜鸟智选快递";
+                var res = new DataResult(1,"圆通速递");//待新增方法
+                if(res.s == -1)
+                {
+                    result.s = -1;
+                    result.d = res.d;
+                    return result;
+                }
+                ExpID = res.s.ToString();
+                ExpName = res.d.ToString();
+            }
+            var logs = new List<Log>();
+            var re = new List<int>();
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlcommand = "select id,soid,Express from `order` where id in @ID and coid = @Coid and status in (0,1,7)";
+                var u = CoreDBconn.Query<Order>(sqlcommand,new{id = oid,Coid = CoID}).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "无符合条件的订单!";
+                    return result;
+                }
+                foreach(var a in u)
+                {
+                    var log = new Log();
+                    log.OID = a.ID;
+                    log.SoID = a.SoID;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = title;
+                    if(ExpID == "A")
+                    {
+                        log.Remark = a.Express;
+                    }
+                    else
+                    {
+                        log.Remark = ExpName;
+                    }
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    re.Add(a.ID);
+                }
+                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                int count =CoreDBconn.Execute(loginsert,logs,TransCore);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }     
+                if(ExpID == "A")
+                {
+                    ExpID = null;
+                    ExpName = null;
+                }
+                sqlcommand = @"update `order` set ExID=@ExID,Express =@Express,Modifier=@Modifier,ModifyDate=@ModifyDate where id in @ID and coid = @Coid and status in (0,1,7)";
+                count =CoreDBconn.Execute(sqlcommand,new{ExID=ExpID,Express=ExpName,Modifier=UserName,ModifyDate=DateTime.Now,id = oid,Coid = CoID},TransCore);
+                if(count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }     
+                result.d = re;
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
             return result;
         }
-
-
-
-
-
-
-
-
+        ///<summary>
+        ///设定仓库基本显示
+        ///</summary>
+        public static DataResult GetWarehouse(int CoID)
+        {
+            var result = new DataResult(1,null);
+            var wh = new List<Filter>();
+            var w = CoreComm.WarehouseHaddle.getWarelist(CoID.ToString());
+            foreach(var h in w)
+            {
+                var a = new Filter();
+                a.value = h.id.ToString();
+                a.label = h.warename;
+                wh.Add(a);
+            }
+            var b = new Filter();
+            b.value = "0";
+            b.label = "(本仓)";
+            wh.Add(b);
+            b = new Filter();
+            b.value = "A";
+            b.label = "{依照订单分配策略自动计算}";
+            wh.Add(b);
+            result.d = wh;
+            return result;
+        }
+        ///<summary>
+        ///订单策略挑选仓库
+        ///</summary>
+        public static DataResult StrategyWarehouse(Order ord,List<OrderItem> itemm,int CoID)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{  
+                        string sqlcommand = @"select * from wareploy where coid = " + CoID;
+                        var u = conn.Query<OrdWhStrategy>(sqlcommand).AsList();
+                        if(u.Count == 0)
+                        {
+                            result.s = 0;
+                            return result;
+                        }
+                        //将符合订单条件的资料筛选出来
+                        var lst = new List<OrdWhStrategy>();
+                        foreach(var a in u)
+                        {
+                            //限定省份
+                            if(!string.IsNullOrEmpty(a.Province))
+                            {
+                                sqlcommand = @"select ID from area where LevelType = 1 and Name = '" +ord.RecLogistics + "'";
+                                int p = conn.QueryFirst<int>(sqlcommand);
+                                if(!a.Province.Contains(p.ToString()))
+                                {
+                                    continue;
+                                }
+                            }
+                            //限定店铺
+                            if(!string.IsNullOrEmpty(a.Shopid))
+                            {
+                                string[] shopid = a.Shopid.Split(',');
+                                int p = 0;
+                                foreach(var s in shopid)
+                                {
+                                    if(s == ord.ShopID.ToString())
+                                    {
+                                        p++;
+                                        break;
+                                    }
+                                }
+                                if(p == 0)
+                                {
+                                    continue;
+                                }
+                            }
+                            //分销商
+                            // if(!string.IsNullOrEmpty(a.Did))
+                            // {
+                            //     if(!string.IsNullOrEmpty(ord.Distributor))
+                            //     {
+                            //         if(!a.Distributor.Contains(ord.Distributor))
+                            //         {
+                            //             continue;
+                            //         }
+                            //     }
+                            //     else
+                            //     {
+                            //         if(!a.Distributor.Contains("(自营)"))
+                            //         {
+                            //             continue;
+                            //         }
+                            //     }
+                            // }
+                            //包含商品
+                            if(!string.IsNullOrEmpty(a.ContainSkus))
+                            {
+                                bool ischeck = false;
+                                foreach(var i in itemm)
+                                {
+                                    if(i.IsGift == true) continue;
+                                    if(string.IsNullOrEmpty(a.MinNum) && string.IsNullOrEmpty(a.MaxNum))
+                                    {
+                                        if(a.ContainSkus.Contains(i.SkuID))
+                                        {
+                                            ischeck = true;
+                                            break;
+                                        }
+                                    }
+                                    if(string.IsNullOrEmpty(a.MinNum) && !string.IsNullOrEmpty(a.MaxNum))
+                                    {
+                                        if(a.ContainSkus.Contains(i.SkuID) && i.Qty <= int.Parse(a.MaxNum))
+                                        {
+                                            ischeck = true;
+                                            break;
+                                        }
+                                    }
+                                    if(!string.IsNullOrEmpty(a.MinNum) && string.IsNullOrEmpty(a.MaxNum))
+                                    {
+                                        if(a.ContainSkus.Contains(i.SkuID) && i.Qty >= int.Parse(a.MinNum))
+                                        {
+                                            ischeck = true;
+                                            break;
+                                        }
+                                    }
+                                    if(!string.IsNullOrEmpty(a.MinNum) && !string.IsNullOrEmpty(a.MaxNum))
+                                    {
+                                        if(a.ContainSkus.Contains(i.SkuID) && i.Qty >= int.Parse(a.MinNum) && i.Qty <= int.Parse(a.MaxNum))
+                                        {
+                                            ischeck = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if(ischeck == false)
+                                {
+                                    continue;
+                                }
+                            }
+                            //包含款式
+                            if(!string.IsNullOrEmpty(a.ContainGoods))
+                            {
+                                bool ischeck = false;
+                                foreach(var i in itemm)
+                                {
+                                    if(i.IsGift == true) continue;
+                                    if(string.IsNullOrEmpty(a.MinNum) && string.IsNullOrEmpty(a.MaxNum))
+                                    {
+                                        if(a.ContainGoods.Contains(i.GoodsCode))
+                                        {
+                                            ischeck = true;
+                                            break;
+                                        }
+                                    }
+                                    if(string.IsNullOrEmpty(a.MinNum) && !string.IsNullOrEmpty(a.MaxNum))
+                                    {
+                                        if(a.ContainGoods.Contains(i.GoodsCode) && i.Qty <= int.Parse(a.MaxNum))
+                                        {
+                                            ischeck = true;
+                                            break;
+                                        }
+                                    }
+                                    if(!string.IsNullOrEmpty(a.MinNum) && string.IsNullOrEmpty(a.MaxNum))
+                                    {
+                                        if(a.ContainGoods.Contains(i.GoodsCode) && i.Qty >= int.Parse(a.MinNum))
+                                        {
+                                            ischeck = true;
+                                            break;
+                                        }
+                                    }
+                                    if(!string.IsNullOrEmpty(a.MinNum) && !string.IsNullOrEmpty(a.MaxNum))
+                                    {
+                                        if(a.ContainGoods.Contains(i.GoodsCode) && i.Qty >= int.Parse(a.MinNum) && i.Qty <= int.Parse(a.MaxNum))
+                                        {
+                                            ischeck = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if(ischeck == false)
+                                {
+                                    continue;
+                                }
+                            }
+                            //排除商品
+                            if(!string.IsNullOrEmpty(a.RemoveSkus))
+                            {
+                                bool ischeck = false;
+                                foreach(var i in itemm)
+                                {
+                                    if(i.IsGift == true) continue;
+                                    if(string.IsNullOrEmpty(a.MinNum) && string.IsNullOrEmpty(a.MaxNum))
+                                    {
+                                        if(a.RemoveSkus.Contains(i.SkuID))
+                                        {
+                                            ischeck = true;
+                                            break;
+                                        }
+                                    }
+                                    if(string.IsNullOrEmpty(a.MinNum) && !string.IsNullOrEmpty(a.MaxNum))
+                                    {
+                                        if(a.RemoveSkus.Contains(i.SkuID) && i.Qty <= int.Parse(a.MaxNum))
+                                        {
+                                            ischeck = true;
+                                            break;
+                                        }
+                                    }
+                                    if(!string.IsNullOrEmpty(a.MinNum) && string.IsNullOrEmpty(a.MaxNum))
+                                    {
+                                        if(a.RemoveSkus.Contains(i.SkuID) && i.Qty >= int.Parse(a.MinNum))
+                                        {
+                                            ischeck = true;
+                                            break;
+                                        }
+                                    }
+                                    if(!string.IsNullOrEmpty(a.MinNum) && !string.IsNullOrEmpty(a.MaxNum))
+                                    {
+                                        if(a.RemoveSkus.Contains(i.SkuID) && i.Qty >= int.Parse(a.MinNum) && i.Qty <= int.Parse(a.MaxNum))
+                                        {
+                                            ischeck = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if(ischeck == true)
+                                {
+                                    continue;
+                                }
+                            }
+                             //排除款式
+                            if(!string.IsNullOrEmpty(a.RemoveGoods))
+                            {
+                                bool ischeck = false;
+                                foreach(var i in itemm)
+                                {
+                                    if(i.IsGift == true) continue;
+                                    if(string.IsNullOrEmpty(a.MinNum) && string.IsNullOrEmpty(a.MaxNum))
+                                    {
+                                        if(a.RemoveGoods.Contains(i.GoodsCode))
+                                        {
+                                            ischeck = true;
+                                            break;
+                                        }
+                                    }
+                                    if(string.IsNullOrEmpty(a.MinNum) && !string.IsNullOrEmpty(a.MaxNum))
+                                    {
+                                        if(a.RemoveGoods.Contains(i.GoodsCode) && i.Qty <= int.Parse(a.MaxNum))
+                                        {
+                                            ischeck = true;
+                                            break;
+                                        }
+                                    }
+                                    if(!string.IsNullOrEmpty(a.MinNum) && string.IsNullOrEmpty(a.MaxNum))
+                                    {
+                                        if(a.RemoveGoods.Contains(i.GoodsCode) && i.Qty >= int.Parse(a.MinNum))
+                                        {
+                                            ischeck = true;
+                                            break;
+                                        }
+                                    }
+                                    if(!string.IsNullOrEmpty(a.MinNum) && !string.IsNullOrEmpty(a.MaxNum))
+                                    {
+                                        if(a.RemoveGoods.Contains(i.GoodsCode) && i.Qty >= int.Parse(a.MinNum) && i.Qty <= int.Parse(a.MaxNum))
+                                        {
+                                            ischeck = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if(ischeck == true)
+                                {
+                                    continue;
+                                }
+                            }
+                            //贷款方式
+                            if(a.Payment == 2 && ord.IsCOD == false)
+                            {
+                                continue;
+                            }
+                            if(a.Payment == 3 && ord.IsCOD == true)
+                            {
+                                continue;
+                            }
+                            lst.Add(a);
+                        }
+                        if(lst.Count == 0)
+                        {
+                            result.s = 0;
+                            return result;
+                        }
+                        //取得优先级最小的资料
+                        int Priority = 10000;
+                        foreach(var a in lst)
+                        {
+                            if(Priority > int.Parse(a.Level))
+                            {
+                                Priority = int.Parse(a.Level);
+                                result.s = int.Parse(a.Wid);
+                            }
+                        }
+                    }
+                    catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+        ///<summary>
+        ///设定仓库更新
+        ///</summary>
+        public static DataResult SetWarehouse(List<int> oid,int CoID,string WhID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            string Remark = "手工指定仓库:";
+            if(WhID == "A")
+            {
+                Remark = "系统自动指定仓库:";
+            }
+            string WhName = "";
+            string Name = "";
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{  
+                    string sqlcommand = "select WarehouseName from Warehouse where coid =" + CoID + " and enable = true and type = 0";
+                    Name = conn.QueryFirst<string>(sqlcommand);
+                    if(string.IsNullOrEmpty(Name))
+                    {
+                        result.s = -1;
+                        result.d = "请先设定本仓资料!";
+                        return result;
+                    }
+                    }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }  
+            var w = CoreComm.WarehouseHaddle.getWarelist(CoID.ToString());
+            var logs = new List<Log>();
+            var re = new List<int>();
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlcommand = "select * from `order` where id in @ID and coid = @Coid and status in (0,1,7) and DealerType != 1";
+                var u = CoreDBconn.Query<Order>(sqlcommand,new{ID = oid,Coid = CoID}).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "无符合条件的订单!";
+                    return result;
+                }
+                foreach(var a in u)
+                {
+                    if(WhID == "A")
+                    {
+                        sqlcommand = "select * from orderitem where oid = @ID and coid = @Coid";
+                        var item = CoreDBconn.Query<OrderItem>(sqlcommand,new{ID = a.ID,Coid = CoID}).AsList();
+                        var res = StrategyWarehouse(a,item,CoID);
+                        if(res.s == -1)
+                        {
+                            result.s = -1;
+                            result.d = res.d;
+                            return result;
+                        }
+                        WhID = res.s.ToString();
+                        WhName = res.d.ToString();
+                    }
+                    if(WhID == "0")
+                    {
+                        WhName = Name;
+                    }
+                    else
+                    {
+                        foreach(var h in w)
+                        {
+                            if(WhID == h.id.ToString())
+                            {
+                                WhName = h.warename;
+                                break;
+                            }
+                        }
+                    }
+                    sqlcommand = @"update `order` set SendWarehouse=@SendWarehouse,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
+                    int g =CoreDBconn.Execute(sqlcommand,new{SendWarehouse=WhName,Modifier=UserName,ModifyDate=DateTime.Now,ID=a.ID,Coid=CoID},TransCore);
+                    if(g < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }     
+                    var log = new Log();
+                    log.OID = a.ID;
+                    log.SoID = a.SoID;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "修改发货仓库";
+                    log.Remark = Remark + WhName;
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    re.Add(a.ID);
+                }
+                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                int count =CoreDBconn.Execute(loginsert,logs,TransCore);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }   
+                result.d = re;  
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            return result;
+        }
         ///<summary>
         ///修改商品
         ///</summary>
@@ -5575,23 +6093,187 @@ namespace CoreData.CoreCore
                                             decimal AddQty,string AddType,int CoID,string UserName)
         {
             var result = new DataResult(1,null);
+            var logs = new List<Log>();
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
-                foreach(var i in oid)
+                string sqlcommand = "select * from `order` where id in @ID and coid = @Coid and status in (0,1,7)";
+                var ord = CoreDBconn.Query<Order>(sqlcommand,new{ID = oid,Coid = CoID}).AsList();
+                if(ord.Count == 0)
                 {
-                   string sqlcommand = "select id,soid from `order` where id = "+ i + " and coid = " + CoID;
-                   var u = CoreDBconn.Query<Order>(sqlcommand).AsList();
-                //    if()
-                   sqlcommand = "select count(id) from orderitem where oid = " + i + " and coid = " + CoID + " and skuautoid = " + ModifySku;
-                   int count = CoreDBconn.QueryFirst<int>(sqlcommand);
-                   if (count > 0)
-                   {
-                       sqlcommand = "update orderitem set RealPrice=@RealPrice,Amount=RealPrice*Qty,";
-                   } 
+                    result.s = -1;
+                    result.d = "没有符合条件的订单!";
+                    return result;
+                }
+                int count = 0;
+                foreach(var i in ord)
+                {
+                    int j = 0;//订单明细修改记录
+                    //修改商品单价
+                    if(ModifySku > 0)
+                    {
+                        sqlcommand = "select * from orderitem where oid = " + i.ID + " and coid = " + CoID + " and skuautoid = " + ModifySku + " and IsGift = false";
+                        var d = CoreDBconn.Query<OrderItem>(sqlcommand).AsList();
+                        if (d.Count > 0)
+                        {
+                            sqlcommand = @"update orderitem set RealPrice=@RealPrice,Amount=RealPrice*Qty,DiscountRate=RealPrice/SalePrice,Modifier=@Modifier,
+                                           ModifyDate = @ModifyDate where oid = @ID and coid = @Coid and skuautoid = @Sku and IsGift = false";
+                            count = CoreDBconn.Execute(sqlcommand,new{RealPrice = ModifyPrice,Modifier=UserName,ModifyDate=DateTime.Now,ID=i.ID,Coid=CoID,Sku=ModifySku},TransCore);
+                            if(count <= 0)
+                            {
+                                result.s = -3003;
+                                return result;
+                            }
+                            else
+                            {
+                                j ++;
+                            }
+                            var log = new Log();
+                            log.OID = i.ID;
+                            log.SoID = i.SoID;
+                            log.Type = 0;
+                            log.LogDate = DateTime.Now;
+                            log.UserName = UserName;
+                            log.Title = "修改单价";
+                            log.Remark = d[0].SkuID + ":" + d[0].RealPrice + "=>" + ModifyPrice;
+                            log.CoID = CoID;
+                            logs.Add(log);
+                        } 
+                    }
+                    //删除商品
+                    if(DeleteSku > 0)
+                    {
+                        sqlcommand = "select * from orderitem where oid = " + i.ID + " and coid = " + CoID + " and skuautoid = " + DeleteSku;
+                        var d = CoreDBconn.Query<OrderItem>(sqlcommand).AsList();
+                        if (d.Count > 0)
+                        {
+                            sqlcommand = @"delete from orderitem where oid = @ID and coid = @Coid and skuautoid = @Sku";
+                            count = CoreDBconn.Execute(sqlcommand,new{ID=i.ID,Coid=CoID,Sku=DeleteSku},TransCore);
+                            if(count <= 0)
+                            {
+                                result.s = -3004;
+                                return result;
+                            }
+                            else
+                            {
+                                j ++;
+                            }
+                            var log = new Log();
+                            log.OID = i.ID;
+                            log.SoID = i.SoID;
+                            log.Type = 0;
+                            log.LogDate = DateTime.Now;
+                            log.UserName = UserName;
+                            log.Title = "删除商品";
+                            log.Remark = d[0].SkuID + "(" + d[0].RealPrice + "*" + d[0].Qty + ")";
+                            log.CoID = CoID;
+                            logs.Add(log);
+                        } 
+                    }
+                    //新增商品
+                    if(AddSku > 0)
+                    {
+                        sqlcommand = "select * from orderitem where oid = " + i.ID + " and coid = " + CoID + " and skuautoid = " + AddSku + " and IsGift = false";
+                        var d = CoreDBconn.Query<OrderItem>(sqlcommand).AsList();
+                        if(d.Count == 0)
+                        {
+                            sqlcommand = "select skuid,skuname,norm,img,goodscode,enable,saleprice,weight from coresku where id =" + AddSku + " and coid =" + CoID;
+                            var s = CoreDBconn.Query<SkuInsert>(sqlcommand).AsList();
+                            if (s.Count == 0)
+                            {
+                                result.s = -1;
+                                result.d = "添加的商品不存在!";
+                                return result;
+                            }
+                            else
+                            {
+                                if (s[0].enable == false)
+                                {
+                                    result.s = -1;
+                                    result.d = "添加的商品已经停用!";
+                                    return result;
+                                }
+                            }
+                            sqlcommand = @"INSERT INTO orderitem(oid,soid,coid,skuautoid,skuid,skuname,norm,GoodsCode,qty,saleprice,realprice,amount,img,weight,totalweight,
+                                                                DiscountRate,creator,modifier) 
+                                            VALUES(@OID,@Soid,@Coid,@Skuautoid,@Skuid,@Skuname,@Norm,@GoodsCode,@Qty,@Saleprice,@Realprice,@Amount,@Img,@Weight,@Totalweight,
+                                                  @DiscountRate,@Creator,@Creator)";
+                            var args = new
+                            {
+                                OID = i.ID,
+                                Soid = i.SoID,
+                                Skuautoid = AddSku,
+                                Skuid = s[0].skuid,
+                                Skuname = s[0].skuname,
+                                Norm = s[0].norm,
+                                GoodsCode = s[0].goodscode,
+                                Qty = AddQty,
+                                Saleprice = s[0].saleprice,
+                                Realprice = AddPrice,
+                                Amount = AddPrice * AddQty,
+                                Img = s[0].img,
+                                Weight = s[0].weight,
+                                Totalweight =  AddQty * decimal.Parse(s[0].weight),
+                                DiscountRate = AddPrice/decimal.Parse(s[0].saleprice),
+                                Coid = CoID,
+                                Creator = UserName
+                            };
+                            count = CoreDBconn.Execute(sqlcommand, args, TransCore);
+                            if (count <= 0)
+                            {
+                                result.s = -3002;
+                                return result;
+                            }
+                            else
+                            {
+                                j++;
+                            }
+                            var log = new Log();
+                            log.OID = i.ID;
+                            log.SoID = i.SoID;
+                            log.Type = 0;
+                            log.LogDate = DateTime.Now;
+                            log.UserName = UserName;
+                            log.Title = "添加商品";
+                            log.Remark = d[0].SkuID;
+                            log.CoID = CoID;
+                            logs.Add(log);
+                        }
+                        else
+                        {
+                            if(AddType == "B")
+                            {
+                                sqlcommand = @"update orderitem set Qty=Qty + @Qty,Amount=RealPrice*Qty,TotalWeight=Weight*Qty,Modifier=@Modifier,
+                                               ModifyDate = @ModifyDate where oid = @ID and coid = @Coid and skuautoid = @Sku and IsGift = false";
+                                count = CoreDBconn.Execute(sqlcommand,new{Qty = AddQty,Modifier=UserName,ModifyDate=DateTime.Now,ID=i.ID,Coid=CoID,Sku=AddSku},TransCore);
+                                if(count <= 0)
+                                {
+                                    result.s = -3003;
+                                    return result;
+                                }
+                                else
+                                {
+                                    j ++;
+                                }
+                                var log = new Log();
+                                log.OID = i.ID;
+                                log.SoID = i.SoID;
+                                log.Type = 0;
+                                log.LogDate = DateTime.Now;
+                                log.UserName = UserName;
+                                log.Title = "修改商品数量";
+                                log.Remark = d[0].SkuID + ":" + d[0].Qty + "=>" + AddQty;
+                                log.CoID = CoID;
+                                logs.Add(log);
+                            }
+                        } 
+                    }
+                    if(j > 0)
+                    {
 
+                    }
                 }
 
                 TransCore.Commit();
@@ -5611,9 +6293,6 @@ namespace CoreData.CoreCore
             return result;
         }
         
-        ///<summary>
-        ///设定快递
-        ///</summary>
         public static DataResult SetExpress()
         {
             var result = new DataResult(1,null);
