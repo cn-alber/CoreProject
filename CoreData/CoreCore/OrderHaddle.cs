@@ -5534,18 +5534,18 @@ namespace CoreData.CoreCore
                 }
             }
             var Express = CoreComm.ExpressHaddle.GetExpressSimple(CoID).d as List<ExpressSimple>;
-            var a = new ExpressSimple();
-            a.ID = "A";
-            a.Name= "{清空已设快递}";
-            Express.Add(a);
-            a = new ExpressSimple();
-            a.ID = "B";
-            a.Name= "{让系统自动计算}";
-            Express.Add(a);
-            a = new ExpressSimple();
-            a.ID = "C";
-            a.Name= "{菜鸟智选物流}";
-            Express.Add(a);
+            // var a = new ExpressSimple();
+            // a.ID = "A";
+            // a.Name= "{清空已设快递}";
+            // Express.Add(a);
+            // a = new ExpressSimple();
+            // a.ID = "B";
+            // a.Name= "{让系统自动计算}";
+            // Express.Add(a);
+            // a = new ExpressSimple();
+            // a.ID = "C";
+            // a.Name= "{菜鸟智选物流}";
+            // Express.Add(a);
             res.Express = Express;
             result.d = res;
             return result;
@@ -5911,12 +5911,90 @@ namespace CoreData.CoreCore
         ///<summary>
         ///订单策略挑选仓库
         ///</summary>
-        public static DataResult StrategyWarehouse(Order ord,List<OrderItem> item)
+        public static DataResult StrategyWarehouse(Order ord,List<OrderItem> itemm,int CoID)
         {
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{  
-                        
+                        string sqlcommand = @"select * from ord_wh_strategy where coid = " + CoID;
+                        var u = conn.Query<OrdWhStrategy>(sqlcommand).AsList();
+                        if(u.Count == 0)
+                        {
+                            result.s = 0;
+                            return result;
+                        }
+                        //将符合订单条件的资料筛选出来
+                        var lst = new List<OrdWhStrategy>();
+                        foreach(var a in u)
+                        {
+                            //限定省份
+                            if(!string.IsNullOrEmpty(a.LimitLogistics))
+                            {
+                                if(!a.LimitLogistics.Contains(ord.RecLogistics))
+                                {
+                                    continue;
+                                }
+                            }
+                            //限定店铺
+                            if(!string.IsNullOrEmpty(a.LimitShop))
+                            {
+                                if(!a.LimitShop.Contains(ord.ShopName))
+                                {
+                                    continue;
+                                }
+                            }
+                            //分销商
+                            if(!string.IsNullOrEmpty(a.Distributor))
+                            {
+                                if(!string.IsNullOrEmpty(ord.Distributor))
+                                {
+                                    if(!a.Distributor.Contains(ord.Distributor))
+                                    {
+                                        continue;
+                                    }
+                                }
+                                else
+                                {
+                                    if(!a.Distributor.Contains("(自营)"))
+                                    {
+                                        continue;
+                                    }
+                                }
+                            }
+                            //包含商品
+                            if(!string.IsNullOrEmpty(a.Distributor))
+                            {
+                                
+                            }
+
+
+                            //贷款方式
+                            if(a.LoanType == 1 && ord.IsCOD == false)
+                            {
+                                continue;
+                            }
+                            if(a.LoanType == 2 && ord.IsCOD == true)
+                            {
+                                continue;
+                            }
+                            lst.Add(a);
+                        }
+                        if(lst.Count == 0)
+                        {
+                            result.s = 0;
+                            return result;
+                        }
+                        //取得优先级最小的资料
+                        int Priority = 10000;
+                        foreach(var a in lst)
+                        {
+                            if(Priority > int.Parse(a.Priority))
+                            {
+                                Priority = int.Parse(a.Priority);
+                                result.s = int.Parse(a.WarehouseID);
+                                result.d = a.WarehouseName;
+                            }
+                        }
                     }
                     catch(Exception ex){
                     result.s = -1;
