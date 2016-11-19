@@ -23,6 +23,11 @@ namespace CoreModels.XyCore
         public decimal PurchaseQty { get; set; }
         public string Img { get; set; }
         public string CoID { get; set; }
+        public string Creator { get; set; }
+        public string CreateDate { get; set; }
+        public string Modifier { get; set; }
+        public string ModifyDate { get; set; }
+
     }
 
     public class InvQueryParam
@@ -160,8 +165,14 @@ namespace CoreModels.XyCore
     }
     public class InventParams
     {
+        public string CoID { get; set; }
         public int ID { get; set; }
-        public decimal SafeQty { get; set; }
+        public decimal SafeQty { get; set; }//安全库存下限
+        public decimal UpSafeQty { get; set; }//安全库存上限
+        public decimal VirtualQty { get; set; }
+        public string Modifier { get; set; }
+        public string ModifyDate { get; set; }
+        public int Type { get; set; }
     }
 
     //盘点库存导出模板excel,顺序不可调

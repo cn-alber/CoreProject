@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using System.Text;
+using System.Data;
 using CoreModels.XyCore;
 using CoreModels.XyComm;
 using CoreModels.Enum;
@@ -49,7 +50,7 @@ namespace CoreData.CoreCore
                             FROM
                                 inventory
                             WHERE
-                                CoID = @CoID AND WarehouseID=0";
+                                CoID = @CoID AND WarehouseID=0 AND IsDelete=0";
                     querycount.Append(countsql);
                     querysql.Append(sql);
                     p.Add("@CoID", IParam.CoID);
@@ -191,7 +192,7 @@ namespace CoreData.CoreCore
                                     inventory.CoID
                                    FROM
                                     inventory
-                                   WHERE CoID = @CoID AND WarehouseID>0";
+                                   WHERE CoID = @CoID AND WarehouseID>0 AND IsDelete=0";
                     querycount.Append(countsql);
                     querysql.Append(sql);
                     p.Add("@CoID", IParam.CoID);
@@ -416,7 +417,7 @@ namespace CoreData.CoreCore
         }
         #endregion
 
-        #region 商品库存查询 - 修改现有库存-查询单笔库存明细
+        #region 商品库存查询 - 修改现有库存-查询单笔库存明细（主仓|分仓共用）
         public static DataResult GetInventorySingle(int ID, string CoID)
         {
             var result = new DataResult(1, null);
@@ -474,7 +475,7 @@ namespace CoreData.CoreCore
         #endregion
 
 
-        #region 商品库存查询 - 修改现有库存-产生盘点交易
+        #region 商品库存查询 - 修改现有库存-产生盘点交易(分仓)
         public static DataResult SetTakeStockQty(int ID, int sfc_type, int inv_type, int InvQty, string CoID, string UserName)
         {
             var result = new DataResult(1, null);
@@ -484,7 +485,7 @@ namespace CoreData.CoreCore
             string CusType = Enum.GetName(typeof(InvE.InvType), inv_type).ToString();//交易类型
             var RecordID = "INV" + CommHaddle.GetRecordID(int.Parse(CoID));
             int Status = 1;//(0:待审核;1.审核通过;2.作废)       
-            var Trans = conn.BeginTransaction();
+            var Trans = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
             try
             {
                 var res = WarehouseHaddle.wareSettingGet(CoID);
@@ -498,12 +499,12 @@ namespace CoreData.CoreCore
                     else
                     {
                         StringBuilder querysql = new StringBuilder();
-                        string sql = @"SELECT ID,Skuautoid,StockQty,WhID FROM inventory WHERE CoID=@CoID AND ID=@ID";
+                        string sql = @"SELECT ID,Skuautoid,StockQty,WarehouseID FROM inventory WHERE CoID=@CoID AND ID=@ID";
                         var p = new DynamicParameters();
                         querysql.Append(sql);
                         p.Add("@CoID", CoID);
                         p.Add("@ID", ID);
-                        var wh_inv = CoreData.DbBase.CoreDB.QueryFirst<Inventory>(querysql.ToString(), p);
+                        var wh_inv = conn.QueryFirst<Inventory>(querysql.ToString(), p);
                         //盘点主表
                         var main = new Sfc_main();
                         main.CoID = CoID;
@@ -524,6 +525,7 @@ namespace CoreData.CoreCore
                         item.Type = sfc_type;
                         item.WhID = wh_inv.WarehouseID;
                         item.Parent_WhID = wh_inv.WarehouseID;
+                        item.Skuautoid = wh_inv.Skuautoid;
                         item.InvQty = InvQty;//盘点数量
                         item.Qty = InvQty - Convert.ToInt32(wh_inv.StockQty);//交易数量                       
                         conn.Execute(StockTakeHaddle.AddSfcItemSql(), item, Trans);
@@ -549,23 +551,25 @@ namespace CoreData.CoreCore
                         inv_item.Status = Status;
                         inv_item.WhID = wh_inv.WarehouseID;
                         inv_item.LinkWhID = wh_inv.WarehouseID;
+                        inv_item.Skuautoid = wh_inv.Skuautoid;
+                        inv_item.Qty = InvQty - Convert.ToInt32(wh_inv.StockQty);//交易数量 
                         inv_item.Creator = UserName;
                         inv_item.CreateDate = DateTime.Now.ToString();
                         inv_item.CoID = CoID;
-                        inv_item.Qty = InvQty - Convert.ToInt32(wh_inv.StockQty);//交易数量   
                         conn.Execute(AddInvinoutitemSql(), inv_item, Trans);
                         //更新库存数量                   
                         var SkuIDLst = new List<string>();
                         SkuIDLst.Add(inv_item.Skuautoid);
-                        conn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = CoID, WarehouseID = wh_inv.WarehouseID, SkuIDLst = SkuIDLst }, Trans);
-                        conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, WarehouseID = wh_inv.WarehouseID, SkuIDLst = SkuIDLst }, Trans);
+                        conn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = CoID, WarehouseID = wh_inv.WarehouseID, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                        conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, WarehouseID = wh_inv.WarehouseID, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
                         Trans.Commit();
                         CoreUser.LogComm.InsertUserLog("修改库存数量-盘点数量", "Inventory", "单据ID" + ParentID, UserName, int.Parse(CoID), DateTime.Now);
                     }
                 }
                 else
                 {
-
+                    result.s = res.s;
+                    result.d = res.d;
                 }
             }
             catch (Exception e)
@@ -580,73 +584,192 @@ namespace CoreData.CoreCore
                 conn.Dispose();
                 conn.Close();
             }
+            return result;
+        }
+        #endregion
 
 
+        #region 商品库存查询 - 库存清零(分仓)
+        public static DataResult ClearInvQty(List<int> IDLst, int sfc_type, int inv_type, string CoID, string UserName)
+        {
+            var result = new DataResult(1, null);
+            var conn = new MySqlConnection(DbBase.CoreConnectString);
+            conn.Open();
+            //参数定义
+            string sfc_TypeName = Enum.GetName(typeof(InvE.SfcMainTypeE), sfc_type).ToString();//单据类型
+            string CusType = Enum.GetName(typeof(InvE.InvType), inv_type).ToString();//交易类型
+            var RecordID = "INV" + CommHaddle.GetRecordID(int.Parse(CoID));
+            int Status = 1;//(0:待审核;1.审核通过;2.作废)      
+            var Trans = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
+            try
+            {
+                var res = WarehouseHaddle.wareSettingGet(CoID);
+                if (res.s == 1)
+                {
+                    var ware = res.d as ware_m_setting;
+                    if (ware.IsPositionAccurate == "1")//库存精确化管理
+                    {
+                        result.s = -3011;
+                    }
+                    else
+                    {
+                        StringBuilder querysql = new StringBuilder();
+                        string sql = @"SELECT ID,Skuautoid,StockQty,WarehouseID FROM inventory WHERE CoID=@CoID AND WarehouseID>0 AND IsDelete=0 AND StockQty>0";
+                        var p = new DynamicParameters();
+                        querysql.Append(sql);
+                        p.Add("@CoID", CoID);
+                        if (IDLst.Count > 0)
+                        {
+                            querysql.Append(" AND ID in @IDLst");
+                            p.Add("@IDLst", IDLst);
+                        }
+                        var wh_invLst = conn.Query<Inventory>(querysql.ToString(), p).AsList();
+                        if (wh_invLst.Count > 0)
+                        {
+                            //盘点主表
+                            var main = new Sfc_main();
+                            main.CoID = CoID;
+                            main.Creator = UserName;
+                            main.CreateDate = DateTime.Now.ToString();
+                            main.Type = sfc_type;
+                            main.Status = Status;//已确认生效
+                            main.WhID = wh_invLst[0].WarehouseID;
+                            main.Parent_WhID = wh_invLst[0].WarehouseID;
+                            conn.Execute(StockTakeHaddle.AddSfcMainSql(), main, Trans);
+                            var ParentID = conn.QueryFirst<string>("select LAST_INSERT_ID()", Trans);
+                            //盘点子表
+                            var itemLst = new List<Sfc_item>();
+                            foreach (var w in wh_invLst)
+                            {
+                                var item = new Sfc_item();
+                                item.ParentID = ParentID;
+                                item.CoID = CoID;
+                                item.Creator = UserName;
+                                item.CreateDate = DateTime.Now.ToString();
+                                item.Type = sfc_type;
+                                item.WhID = w.WarehouseID;
+                                item.Parent_WhID = w.WarehouseID;
+                                item.Skuautoid = w.Skuautoid;
+                                item.InvQty = 0;//盘点数量
+                                item.Qty = 0 - Convert.ToInt32(w.StockQty);//交易数量   
+                                itemLst.Add(item);
+                            }
+                            conn.Execute(StockTakeHaddle.AddSfcItemSql(), itemLst, Trans);
+                            //交易主表
+                            var inv = new Invinout();
+                            inv.RefID = ParentID;
+                            inv.RecordID = RecordID;
+                            inv.Type = inv_type;
+                            inv.CusType = CusType;
+                            inv.Status = Status;
+                            inv.WhID = wh_invLst[0].WarehouseID;
+                            inv.LinkWhID = wh_invLst[0].WarehouseID;
+                            inv.Creator = UserName;
+                            inv.CreateDate = DateTime.Now.ToString();
+                            inv.CoID = CoID;
+                            conn.Execute(AddInvinoutSql(), inv, Trans);
+                            //交易子表
+                            var inv_itemLst = new List<Invinoutitem>();
+                            foreach (var w in wh_invLst)
+                            {
+                                var inv_item = new Invinoutitem();
+                                inv_item.RefID = ParentID;
+                                inv_item.IoID = RecordID;
+                                inv_item.Type = inv_type;
+                                inv_item.CusType = CusType;
+                                inv_item.Status = Status;
+                                inv_item.WhID = w.WarehouseID;
+                                inv_item.LinkWhID = w.WarehouseID;
+                                inv_item.Skuautoid = w.Skuautoid;
+                                inv_item.Qty = 0 - Convert.ToInt32(w.StockQty);//交易数量 
+                                inv_item.Creator = UserName;
+                                inv_item.CreateDate = DateTime.Now.ToString();
+                                inv_item.CoID = CoID;
+                                inv_itemLst.Add(inv_item);
+                            }
+                            conn.Execute(AddInvinoutitemSql(), inv_itemLst, Trans);
+                            //更新库存数量       
+                            var WhIDLst = wh_invLst.Select(a => a.ID).AsList();
+                            string clearsql = @"UPDATE inventory SET StockQty = 0,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID = @CoID AND IsDelete=0 AND ID in @IDLst";
+                            int count3 = conn.Execute(clearsql, new { CoID = CoID, Modifier = UserName, ModifyDate = DateTime.Now.ToString(), IDLst = WhIDLst });
+                            var SkuIDLst = wh_invLst.Select(a => a.Skuautoid).AsList();
+                            // conn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = CoID, WarehouseID = wh_invLst[0].WarehouseID, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                            conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, WarehouseID = wh_invLst[0].WarehouseID, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                            Trans.Commit();
+                            CoreUser.LogComm.InsertUserLog("清空库存数量-盘点数量", "Inventory", "单据ID" + ParentID, UserName, int.Parse(CoID), DateTime.Now);
+                        }
+                    }
+                }
+                else
+                {
+                    result.s = res.s;
+                    result.d = res.d;
+                }
+            }
+            catch (Exception e)
+            {
+                Trans.Rollback();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                Trans.Dispose();
+                conn.Dispose();
+                conn.Close();
+            }
+            return result;
+        }
+        #endregion
 
-
-
-
-
-            // var inoutAuto = new InvinoutAuto();
-            // inoutAuto.CoID = CoID;
-            // inoutAuto.UserName = UserName;
-            // using (var conn = new MySqlConnection(DbBase.CoreConnectString))
-            // {
-            //     conn.Open();
-            //     var TransCore = conn.BeginTransaction();
-            //     try
-            //     {
-            //         var invsql = "SELECT * FROM inventory WHERE ID = @ID";
-            //         var args = new { ID = ID };
-            //         var inv = conn.QueryFirst<Inventory>(invsql, args);
-            //         if (inv == null)
-            //         {
-            //             res.s = -1;
-            //             res.d = "获取库存失败";
-            //         }
-            //         else
-            //         {
-            //             inoutAuto.inv = inv;
-            //             inoutAuto.Qty = SetQty - inv.StockQty;
-            //             if (inoutAuto.Qty > 0)
-            //             {
-            //                 inoutAuto.CusType = "盘盈";
-            //                 inoutAuto.Type = 1;
-            //             }
-            //             else
-            //             {
-            //                 inoutAuto.CusType = "盘亏";
-            //                 inoutAuto.Type = 2;
-            //             }
-            //             inoutAuto.RecordID = CommHaddle.GetRecordID(int.Parse(CoID));
-            //             int count1 = conn.Execute(AddInvinoutSql(), AddInvinout(inoutAuto), TransCore);
-            //             int count2 = conn.Execute(AddInvinoutitemSql(), AddInvinoutitem(inoutAuto), TransCore);
-            //             string sql = @"UPDATE inventory SET StockQty = @StockQty WHERE ID=@ID ";
-            //             int count3 = conn.Execute(sql, new { StockQty = SetQty, ID = ID });
-            //             if (count1 < 0 || count2 < 0 || count3 < 0)
-            //             {
-            //                 res.s = -3002;//资料新增失败
-            //             }
-            //             else
-            //             {
-            //                 TransCore.Commit();
-            //                 CoreUser.LogComm.InsertUserLog("新增交易", "invinout", inoutAuto.CusType + inoutAuto.inv.SkuID + " " + inoutAuto.Qty.ToString(), UserName, int.Parse(CoID), DateTime.Now);
-            //             }
-            //         }
-
-            //     }
-            //     catch (Exception e)
-            //     {
-            //         TransCore.Rollback();
-            //         res.s = -1;
-            //         res.d = e.Message;
-            //     }
-            //     finally
-            //     {
-            //         TransCore.Dispose();
-            //         conn.Dispose();
-            //     }
-            // }
+        #region 清除零库存资料(分仓|主仓共用)
+        public static DataResult DelZeroSku(List<int> IDLst, int whType, string CoID, string UserName)
+        {
+            var result = new DataResult(1, null);
+            var conn = new MySqlConnection(DbBase.CoreConnectString);
+            conn.Open();
+            var Trans = conn.BeginTransaction();
+            try
+            {
+                string content = string.Empty;
+                StringBuilder querysql = new StringBuilder();
+                string sql = "UPDATE inventory SET IsDelete=1,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND IsDelete=0 AND StockQty=0";
+                var p = new DynamicParameters();
+                querysql.Append(sql);
+                p.Add("@CoID", CoID);
+                p.Add("@Modifier", UserName);
+                p.Add("@ModifyDate", DateTime.Now.ToString());
+                if (IDLst.Count > 0)
+                {
+                    querysql.Append(" AND ID in @IDLst");
+                    p.Add("@IDLst", IDLst);
+                }
+                if (whType == 1)//1.分仓，2.主仓
+                {
+                    querysql.Append(" AND WarehouseID >0");
+                    content = "清除分仓零库存";
+                }
+                else if (whType == 2)
+                {
+                    querysql.Append(" AND WarehouseID =0");
+                    content = "清除主仓零库存";
+                }
+                conn.Execute(sql, new { CoID = CoID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                Trans.Commit();
+                CoreUser.LogComm.InsertUserLog("清除零库存资料", "Inventory", content, UserName, int.Parse(CoID), DateTime.Now);
+            }
+            catch (Exception e)
+            {
+                Trans.Rollback();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                Trans.Dispose();
+                conn.Dispose();
+                conn.Close();
+            }
             return result;
         }
         #endregion
@@ -698,36 +821,228 @@ namespace CoreData.CoreCore
         }
         #endregion
 
-        #region  商品库存查询 - 修改安全库存 - 更新安全库存
-        public static DataResult UptInvSafeQty(List<InventParams> invLst, int CoID, string UserName)
+        #region 商品库存查询 - 修改安全库存 - 单笔        
+        //Type: 0.全部更新，1.安全库存下限，2.安全库存上限
+        public static DataResult UptSafeQty(InventParams inv)
         {
             var res = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CoreConnectString))
             {
                 conn.Open();
-                var TransCore = conn.BeginTransaction();
+                var Trans = conn.BeginTransaction();
                 try
                 {
-                    string sql = @"UPDATE inventory SET SafeQty = @SafeQty WHERE ID = @ID";
-                    int Count = conn.Execute(sql, invLst, TransCore);
-                    if (Count < 0)
+                    string sql = string.Empty;
+                    string content = string.Empty;
+                    // if (inv.Type == 0)
+                    // {
+                    //     sql = @"UPDATE inventory SET SafeQty = @SafeQty,UpSaveQty=@UpSaveQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID = @ID";
+                    // }
+                    // else 
+                    var invOld = conn.QueryFirst<InventParams>("SELECT ID,SafeQty,UpSafeQty FROM inventory WHERE CoID = @CoID AND ID=@ID", new { CoID = inv.CoID, ID = inv.ID });
+                    if (invOld != null)
                     {
-                        res.s = -3003;
+                        if (inv.Type == 1 && inv.SafeQty != invOld.SafeQty)
+                        {
+                            content = "安全库存下限：" + invOld.SafeQty + "=>" + inv.SafeQty;
+                            sql = @"UPDATE inventory SET SafeQty = @SafeQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID = @ID";
+                        }
+                        else if (inv.Type == 2 && inv.UpSafeQty != invOld.UpSafeQty)
+                        {
+                            content = "安全库存上限：" + invOld.UpSafeQty + "=>" + inv.UpSafeQty;
+                            sql = @"UPDATE inventory SET UpSafeQty=@UpSafeQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID = @ID";
+                        }
+                        if (!string.IsNullOrEmpty(sql))
+                        {
+                            conn.Execute(sql, inv, Trans);
+                            Trans.Commit();
+                            CoreUser.LogComm.InsertUserLog("修改安全库存", "Inventory", content, inv.Modifier, int.Parse(inv.CoID), DateTime.Now);
+                        }
                     }
-                    else
-                    {
-                        TransCore.Commit();
-                        CoreUser.LogComm.InsertUserLog("更新安全库存", "Inventory", "", UserName, CoID, DateTime.Now);
-                    }
+
                 }
                 catch (Exception e)
                 {
+                    Trans.Rollback();
                     res.s = -1;
                     res.d = e.Message;
                 }
                 finally
                 {
+                    Trans.Dispose();
                     conn.Dispose();
+                    conn.Close();
+                }
+            }
+
+            return res;
+        }
+
+        #endregion
+
+        #region 商品库存查询 - 修改安全库存 - 多笔
+        public static DataResult UptLstSafeQty(List<InventParams> InvLst, string CoID, string UserName)
+        {
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                conn.Open();
+                var Trans = conn.BeginTransaction();
+                try
+                {
+                    InvLst = InvLst.Select(a => new InventParams
+                    {
+                        ID = a.ID,
+                        SafeQty = a.SafeQty,
+                        UpSafeQty = a.UpSafeQty,
+                        Modifier = UserName,
+                        ModifyDate = DateTime.Now.ToString(),
+                        CoID = CoID
+                    }).AsList();
+                    if (InvLst.Count > 0)
+                    {
+                        string sql = @"UPDATE inventory SET SafeQty = @SafeQty,UpSafeQty=@UpSafeQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID = @ID";
+                        conn.Execute(sql, InvLst, Trans);
+                        Trans.Commit();
+                        var InvIDLst = InvLst.Select(a => a.ID).AsList();
+                        CoreUser.LogComm.InsertUserLog("修改安全库存", "Inventory", "库存ID：" + string.Join(",", InvIDLst.ToArray()), UserName, int.Parse(CoID), DateTime.Now);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Trans.Rollback();
+                    res.s = -1;
+                    res.d = e.Message;
+                }
+                finally
+                {
+                    Trans.Dispose();
+                    conn.Dispose();
+                    conn.Close();
+                }
+            }
+
+            return res;
+        }
+        #endregion
+
+        #region 商品库存查询 - 清空安全库存 - 所有
+        public static DataResult ClearSafeQty(string CoID, string UserName)
+        {
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                conn.Open();
+                var Trans = conn.BeginTransaction();
+                try
+                {
+                    string sql = @"UPDATE inventory SET SafeQty = 0,UpSafeQty=0,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID";
+                    conn.Execute(sql, new { CoID = CoID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                    Trans.Commit();
+                    CoreUser.LogComm.InsertUserLog("修改安全库存", "Inventory", "清空所有商品安全库存", UserName, int.Parse(CoID), DateTime.Now);
+                }
+                catch (Exception e)
+                {
+                    Trans.Rollback();
+                    res.s = -1;
+                    res.d = e.Message;
+                }
+                finally
+                {
+                    Trans.Dispose();
+                    conn.Dispose();
+                    conn.Close();
+                }
+            }
+            return res;
+        }
+
+        #endregion
+
+        #region  商品库存查询 - 修改虚拟库存 - 更新虚拟库存(单笔)
+        public static DataResult UptVirtualQty(InventParams inv)
+        {
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                conn.Open();
+                var Trans = conn.BeginTransaction();
+                try
+                {
+                    string sql = string.Empty;
+                    string content = string.Empty;
+                    var invOld = conn.QueryFirst<InventParams>("SELECT ID,VirtualQty FROM inventory WHERE CoID = @CoID AND ID=@ID", new { CoID = inv.CoID, ID = inv.ID });
+                    if (invOld != null)
+                    {
+                        if (inv.VirtualQty != invOld.VirtualQty)
+                        {
+                            content = "虚拟库存：" + invOld.VirtualQty + "=>" + inv.VirtualQty;
+                            sql = @"UPDATE inventory SET VirtualQty = @VirtualQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID = @ID";
+                        }
+                        if (!string.IsNullOrEmpty(sql))
+                        {
+                            conn.Execute(sql, inv, Trans);
+                            Trans.Commit();
+                            CoreUser.LogComm.InsertUserLog("修改虚拟库存", "Inventory", content, inv.Modifier, int.Parse(inv.CoID), DateTime.Now);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Trans.Rollback();
+                    res.s = -1;
+                    res.d = e.Message;
+                }
+                finally
+                {
+                    Trans.Dispose();
+                    conn.Dispose();
+                    conn.Close();
+                }
+            }
+
+            return res;
+        }
+        #endregion
+
+        #region  商品库存查询 - 修改虚拟库存 - 更新虚拟库存(多笔)
+        public static DataResult UptLstVirtualQty(List<InventParams> InvLst, string CoID, string UserName)
+        {
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                conn.Open();
+                var Trans = conn.BeginTransaction();
+                try
+                {
+                    InvLst = InvLst.Select(a => new InventParams
+                    {
+                        ID = a.ID,
+                        VirtualQty = a.VirtualQty,
+                        Modifier = UserName,
+                        ModifyDate = DateTime.Now.ToString(),
+                        CoID = CoID
+                    }).AsList();
+                    if (InvLst.Count > 0)
+                    {
+                        string sql = @"UPDATE inventory SET VirtualQty = @VirtualQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID = @ID";
+                        conn.Execute(sql, InvLst, Trans);
+                        Trans.Commit();
+                        var InvIDLst = InvLst.Select(a => a.ID).AsList();
+                        CoreUser.LogComm.InsertUserLog("修改虚拟库存", "Inventory", "库存ID：" + string.Join(",", InvIDLst.ToArray()), UserName, int.Parse(CoID), DateTime.Now);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Trans.Rollback();
+                    res.s = -1;
+                    res.d = e.Message;
+                }
+                finally
+                {
+                    Trans.Dispose();
+                    conn.Dispose();
+                    conn.Close();
                 }
             }
 
@@ -776,91 +1091,7 @@ namespace CoreData.CoreCore
             }
             return res;
         }
-        #endregion
-
-        #region 商品库存查询 - 库存清零
-        public static DataResult ClearSku(List<int> IDLst, string CoID, string UserName)
-        {
-            var res = new DataResult(1, null);
-            var InvLst = DbBase.CoreDB.Query<Inventory>("SELECT * FROM inventory WHERE ID IN @IDLst", new { IDLst = IDLst }).AsList();
-            // var cp = new InvinoutAuto();
-            // cp.CoID = CoID;
-            // cp.RecordID = CommHaddle.GetRecordID(CoID);
-            string CusType = "库存清零";
-            // cp.InvLst = InvLst;
-            // var inoutLst = AddInvinoutLst(cp);
-            // var itemLst = AddInvinoutitemLst(cp);
-            var InoutLst = new List<Invinout>();
-            var ItemLst = new List<Invinoutitem>();
-            List<string> RecIDLst = new List<string>();
-            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
-            {
-                conn.Open();
-                var TransCore = conn.BeginTransaction();
-                try
-                {
-                    foreach (var inv in InvLst)
-                    {
-                        string RecordID = CommHaddle.GetRecordID(int.Parse(CoID));
-                        var inout = new Invinout();
-                        var item = new Invinoutitem();
-                        inout.CoID = inv.CoID.ToString();
-                        inout.Status = 1;
-                        inout.CusType = CusType;
-                        if (inv.StockQty > 0)
-                        {
-                            inout.Type = 2;
-                        }
-                        else
-                        {
-                            inout.Type = 1;
-                        }
-                        inout.RecordID = RecordID;
-                        inout.WhID = inv.WarehouseID.ToString();
-                        inout.Creator = UserName;
-                        inout.CreateDate = DateTime.Now.ToString();
-                        inout.IsExport = false;
-                        item.CoID = CoID;
-                        item.CusType = CusType;
-                        item.IoID = RecordID;
-                        item.WhID = inv.WarehouseID.ToString();
-                        item.SkuID = inv.SkuID;
-                        item.SkuName = inv.Name;
-                        item.Qty = Convert.ToInt32(0 - inv.StockQty);
-                        item.Creator = UserName;
-                        item.CreateDate = DateTime.Now.ToString();
-                        InoutLst.Add(inout);
-                        ItemLst.Add(item);
-                        RecIDLst.Add(RecordID);
-                    }
-                    int count1 = conn.Execute(AddInvinoutSql(), InoutLst, TransCore);
-                    int count2 = conn.Execute(AddInvinoutitemSql(), ItemLst, TransCore);
-                    string sql = @"UPDATE inventory SET StockQty = 0 WHERE ID in @IDLst ";
-                    int count3 = conn.Execute(sql, new { IDLst = IDLst });
-                    if (count1 < 0 || count2 < 0 || count3 < 0)
-                    {
-                        res.s = -1;
-                        res.d = "库存清空失败";
-                    }
-                    else
-                    {
-                        TransCore.Commit();
-                        CoreUser.LogComm.InsertUserLog("新增库存清零交易", "invinout", "单据编号:" + string.Join(",", RecIDLst.ToArray()), UserName, int.Parse(CoID), DateTime.Now);
-                    }
-                }
-                catch (Exception e)
-                {
-                    res.s = -1;
-                    res.d = e.Message;
-                }
-                finally
-                {
-                    conn.Dispose();
-                }
-                return res;
-            }
-        }
-        #endregion
+        #endregion       
 
         #region 商品库存盘点 - 从EXCEL模板导入(自动保存) -Create临时表导入盘点库存
         public static DataResult CreateInvSetTemp(List<SetInvQtyExcel> InvLst, int CoID, string UserName)
@@ -1607,7 +1838,6 @@ namespace CoreData.CoreCore
                                 SkuName,
                                 Norm,
                                 Qty,
-                                Unit,
                                 WhID,
                                 WhName,
                                 LinkWhID,
@@ -1624,7 +1854,6 @@ namespace CoreData.CoreCore
                                 @SkuName,
                                 @Norm,
                                 @Qty,
-                                @Unit,
                                 @WhID,
                                 @WhName,
                                 @LinkWhID,
@@ -1651,7 +1880,9 @@ namespace CoreData.CoreCore
                             DefectiveQty,
                             VirtualQty,
                             PurchaseQty,
-                            CoID
+                            CoID,
+                            Creator,
+                            CreateDate
                         ) VALUES(
                             @Skuautoid,
                             @WarehouseID,
@@ -1664,7 +1895,9 @@ namespace CoreData.CoreCore
                             @DefectiveQty,
                             @VirtualQty,
                             @PurchaseQty,
-                            @CoID
+                            @CoID,
+                            @Creator,
+                            @CreateDate
                         )";
             return sql;
         }
@@ -1683,7 +1916,7 @@ namespace CoreData.CoreCore
 	                                            AND invinoutitem.CoID = inventory.CoID
                                                 AND invinoutitem.`Status` = 1
                                                 AND invinoutitem.Skuautoid in @SkuIDLst
-                                            )
+                                            ),IsDelete=0,Modifier=@Modifier,ModifyDate=@ModifyDate
                                             WHERE
 	                                            inventory.CoID =@CoID
                                             AND inventory.WarehouseID = @WarehouseID 
@@ -1696,7 +1929,7 @@ namespace CoreData.CoreCore
         public static string UptInvMainStockQtySql()
         {
             string sql = @"UPDATE inventory,inventory a 
-                    SET inventory.StockQty = a.StockQty
+                    SET inventory.StockQty = a.StockQty,inventory.IsDelete=0,inventory.Modifier=@Modifier,inventory.ModifyDate=@ModifyDate
                     WHERE 
                     inventory.CoID=@CoID
                     AND inventory.Skuautoid IN @SkuIDLst

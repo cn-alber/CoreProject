@@ -203,7 +203,7 @@ namespace CoreWebApi.XyCore
         }
         #endregion
 
-        #region 商品库存查询 - 修改现有库存-查询单笔库存明细
+        #region 商品库存查询 - 修改现有库存-查询单笔库存明细(分仓)
         [HttpGetAttribute("Core/XyCore/Inventory/InventorySingle")]
         public ResponseResult InventorySingle(string ID)
         {
@@ -222,7 +222,7 @@ namespace CoreWebApi.XyCore
         }
         #endregion
 
-        #region 商品库存查询 - 修改现有库存 - 产生盘点交易
+        #region 商品库存查询 - 修改现有库存 - 产生盘点交易(分仓)
         [HttpPostAttribute("Core/XyCore/Inventory/UptStockQtySingle")]
         public ResponseResult UptStockQtySingle([FromBodyAttribute]JObject obj)
         {
@@ -247,11 +247,69 @@ namespace CoreWebApi.XyCore
             else
             {
                 res.s = -1;
-                res.d = "";
+                res.d = "无效参数";
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
+
+        #region 商品库存查询 - 批量操作 - 库存清理(分仓)
+        [HttpPostAttribute("Core/XyCore/Inventory/ClearInvStockQty")]
+        public ResponseResult ClearInvStockQty([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            var IDLst = new List<int>();
+            if (!string.IsNullOrEmpty(obj["IDLst"].ToString()))
+            {
+                IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
+            }
+            string CoID = GetCoid();
+            string UserName = GetUname();
+            int sfc_type = 2;
+            int inv_type = 1401;
+            res = InventoryHaddle.ClearInvQty(IDLst, sfc_type, inv_type, CoID, UserName);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region  商品库存查询 - 批量操作 - 清除零库存资料(分仓) 
+        [HttpPostAttribute("Core/XyCore/Inventory/DeleteZeroSkuD")]
+        public ResponseResult DeleteZeroSkuD([FromBodyAttribute]JObject obj)
+        {
+            string CoID = GetCoid();
+            string UserName = GetUname();
+            var IDLst = new List<int>();
+            if (!string.IsNullOrEmpty(obj["IDLst"].ToString()))
+            {
+                IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
+            }
+            var res = InventoryHaddle.DelZeroSku(IDLst, 1, CoID, UserName);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region  商品库存查询 - 批量操作 - 清除零库存资料(主仓) 
+        [HttpPostAttribute("Core/XyCore/Inventory/DeleteZeroSkuM")]
+        public ResponseResult DeleteZeroSkuM([FromBodyAttribute]JObject obj)
+        {
+            string CoID = GetCoid();
+            string UserName = GetUname();
+            var IDLst = new List<int>();
+            if (!string.IsNullOrEmpty(obj["IDLst"].ToString()))
+            {
+                IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
+            }
+            var res = InventoryHaddle.DelZeroSku(IDLst, 1, CoID, UserName);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region  商品库存查询 - 修改安全库存-单笔(主仓)
+
+        #endregion
+
+
+
 
         #region 商品库存查询 - 修改安全库存 - 查询库存明细
         [HttpGetAttribute("Core/XyCore/Inventory/InvSafeQtyLst")]
@@ -278,47 +336,100 @@ namespace CoreWebApi.XyCore
         }
         #endregion
 
-        #region 商品库存查询 - 修改安全库存 - 保存商品库存
+        #region 商品库存查询 - 修改安全库存 - 单笔
         [HttpPostAttribute("Core/XyCore/Inventory/UptInvSafeQty")]
         public ResponseResult UptInvSafeQty([FromBodyAttribute]JObject obj)
         {
             var res = new DataResult(1, null);
-            var invLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<InventParams>>(obj["InvLst"].ToString());
-            int CoID = int.Parse(GetCoid());
-            string UserName = GetUname();
-            res = InventoryHaddle.UptInvSafeQty(invLst, CoID, UserName);
+            var inv = Newtonsoft.Json.JsonConvert.DeserializeObject<InventParams>(obj.ToString());
+            if (inv.Type <= 0)
+            {
+                res.s = -1;
+                res.d = "参数异常";
+            }
+            else
+            {
+                inv.CoID = GetCoid();
+                inv.Modifier = GetUname();
+                inv.ModifyDate = DateTime.Now.ToString();
+                res = InventoryHaddle.UptSafeQty(inv);
+            }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
 
-        #region 商品库存查询 - 更新商品名称
+        #region 商品库存查询 - 修改安全库存 - 多笔
+        [HttpPostAttribute("Core/XyCore/Inventory/UptInvLstSafeQty")]
+        public ResponseResult UptInvLstSafeQty([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            var InvLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<InventParams>>(obj["InvLst"].ToString());
+            string CoID= GetCoid();
+            string UserName = GetUname();
+            res = InventoryHaddle.UptLstSafeQty(InvLst,CoID,UserName);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 商品库存查询 - 清空安全库存 - 所有商品        
+        [HttpPostAttribute("Core/XyCore/Inventory/ClearInvSafeQty")]
+        public ResponseResult ClearInvSafeQty([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            string CoID= GetCoid();
+            string UserName = GetUname();
+            res = InventoryHaddle.ClearSafeQty(CoID,UserName);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 商品库存查询 - 修改虚拟库存 - 单笔
+         [HttpPostAttribute("Core/XyCore/Inventory/UptInvVirtualQty")]
+        public ResponseResult UptInvVirtualQty([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            var inv = Newtonsoft.Json.JsonConvert.DeserializeObject<InventParams>(obj.ToString());
+            if (inv.VirtualQty < 0)
+            {
+                res.s = -1;
+                res.d = "参数异常";
+            }
+            else
+            {
+                inv.CoID = GetCoid();
+                inv.Modifier = GetUname();
+                inv.ModifyDate = DateTime.Now.ToString();
+                res = InventoryHaddle.UptVirtualQty(inv);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 商品库存查询 - 修改虚拟库存 - 多笔
+        [HttpPostAttribute("Core/XyCore/Inventory/UptInvLstVirtualQty")]
+        public ResponseResult UptInvLstVirtualQty([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            var InvLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<InventParams>>(obj["InvLst"].ToString());
+            string CoID= GetCoid();
+            string UserName = GetUname();
+            res = InventoryHaddle.UptLstVirtualQty(InvLst,CoID,UserName);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+
+        #endregion
+
+
+
+
+
+        #region 商品库存查询 - 更新商品名称--【停用，商品名称直接根据skuautoid获取，不需要更新】
         [HttpPostAttribute("Core/XyCore/Inventory/UpdateInvSkuName")]
         public ResponseResult UpdateInvSkuName()
         {
             int CoID = int.Parse(GetCoid());
             string UserName = GetUname();
             var res = InventoryHaddle.UptInvSkuName(CoID, UserName);
-            return CoreResult.NewResponse(res.s, res.d, "General");
-        }
-        #endregion
-
-        #region 商品库存查询 - 批量操作 - 库存清理
-        [HttpPostAttribute("Core/XyCore/Inventory/ClearInvSku")]
-        public ResponseResult ClearInvSku([FromBodyAttribute]JObject obj)
-        {
-            var res = new DataResult(1, null);
-            var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
-            if (IDLst.Count == 0)
-            {
-                res.s = -1;
-                res.d = "请先选中明细";
-            }
-            else
-            {
-                string CoID = GetCoid();
-                string UserName = GetUname();
-                res = InventoryHaddle.ClearSku(IDLst, CoID, UserName);
-            }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion         

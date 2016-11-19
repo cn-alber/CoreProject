@@ -52,7 +52,7 @@ function说明
     参考:output json 文件:InventorySingle_output.json
 4.UptStockQtySingle()//修改现有库存 - 产生盘点|采购交易
     方法：POST
-    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/UptStockQtySingle
+    路由：http://192.168.30.211:5000/Core/XyCore/Inventory/UptStockQtySingle
     InPut:
         ID              int         商品库存ID(inventory.ID)
         InvQty          int         库存修改数量
@@ -60,4 +60,25 @@ function说明
     OutPut:
         成功：返回请求成功信息(s=1)
         失败：返回错误信息
+    参考:input json 文件:UptStockQtySingle_input.json    
 ############################################################
+5.ClearInvStockQty()//批量操作 - 库存清理
+    方法：POST
+    路由：http://192.168.30.211:5000/Core/XyCore/Inventory/ClearInvStockQty
+    InPut:
+        IDLst           List<int>   分仓库存ID(inventory.ID)==>如果不传，就全部sku都清零
+    OutPut:
+        成功：返回请求成功信息(s=1)
+        失败：返回错误信息  
+############################################################
+6.DeleteZeroSkuD()//批量操作 - 清除零库存Sku    
+    方法：POST
+    路由：http://192.168.30.211:5000/Core/XyCore/Inventory/DeleteZeroSkuD
+    InPut:
+        IDLst           List<int>   分仓库存ID(inventory.ID)==>如果不传，就全部分仓零库存商品IsDelete=1
+    OutPut:
+        成功：返回请求成功信息(s=1)
+        失败：返回错误信息  
+
+
+
