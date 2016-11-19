@@ -437,7 +437,9 @@ namespace CoreData.CoreCore
                                                 Skuautoid = a.Skuautoid,
                                                 WarehouseID = a.Parent_WhID,
                                                 StockQty = a.InvQty,
-                                                CoID = CoID
+                                                CoID = CoID,
+                                                Creator=UserName,
+                                                CreateDate = DateTime.Now.ToString()
                                             }).AsList();
                         var NewMainInvLst = itemLst.Where(a => !InvSkuLst
                                                             .Select(b => b.Skuautoid)
@@ -471,8 +473,8 @@ namespace CoreData.CoreCore
                         //更新确认生效标记&更新库存数量&回填盘点差异
                         conn.Execute(checksql, new { CoID = CoID, ID = ID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);//确认生效
                         //更新库存数量                                                                              
-                        conn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = CoID, WarehouseID = Parent_WhID, SkuIDLst = SkuIDLst }, Trans);
-                        conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, WarehouseID = Parent_WhID, SkuIDLst = SkuIDLst }, Trans);
+                        conn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = CoID, WarehouseID = Parent_WhID, SkuIDLst = SkuIDLst , Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                        conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, WarehouseID = Parent_WhID, SkuIDLst = SkuIDLst , Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
                         conn.Execute("UPDATE sfc_item SET Qty=@Qty WHERE ID = @ID", itemLst, Trans);
                         Trans.Commit();
                         CoreUser.LogComm.InsertUserLog("盘点单据-确认生效", "sfc_item", "单据ID" + ID, UserName, int.Parse(CoID), DateTime.Now);
@@ -527,8 +529,8 @@ namespace CoreData.CoreCore
                     conn.Execute(invinoutsql, p, Trans);
                     conn.Execute(invinoutitemsql, p, Trans);
                     //更新仓库库存
-                    conn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = CoID, WarehouseID = WhID, SkuIDLst = SkuIDLst }, Trans);
-                    conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, WarehouseID = WhID, SkuIDLst = SkuIDLst }, Trans);
+                    conn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = CoID, WarehouseID = WhID, SkuIDLst = SkuIDLst , Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                    conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, WarehouseID = WhID, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
                     Trans.Commit();
                     CoreUser.LogComm.InsertUserLog(TypeName + "单据-作废", "sfc_item", "单据ID" + ID, UserName, int.Parse(CoID), DateTime.Now);
 

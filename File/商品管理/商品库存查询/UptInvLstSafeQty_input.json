@@ -1,0 +1,28 @@
+
+// ID              int             商品库存ID（*必填项*）
+// SafeQty         int             安全库存下限（*必填项*）
+// UpSafeQty       int             安全库存上限（*必填项*）
+{
+    "InvLst": [
+        {
+            "ID": 262429,
+            "SafeQty": 10,
+            "UpSafeQty": 100
+        },
+        {
+            "ID": 262430,
+            "SafeQty": 20,
+            "UpSafeQty": 200
+        },
+        {
+            "ID": 262431,
+            "SafeQty": 30,
+            "UpSafeQty": 300
+        },
+        {
+            "ID": 262432,
+            "SafeQty": 40,
+            "UpSafeQty": 100
+        }
+    ]
+}

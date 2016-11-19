@@ -1,0 +1,23 @@
+
+// ID              int             商品库存ID（*必填项*）
+// VirtualQty      int             虚拟库存（*必填项*）
+{
+    "InvLst": [
+        {
+            "ID": 262429,
+            "VirtualQty": 10
+        },
+        {
+            "ID": 262430,
+            "VirtualQty": 20
+        },
+        {
+            "ID": 262431,
+            "VirtualQty": 30
+        },
+        {
+            "ID": 262432,
+            "VirtualQty": 40
+        }
+    ]
+}
