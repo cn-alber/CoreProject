@@ -1,15 +1,15 @@
 接口名称:CoreWebApi/Controllers/Order/OrderControllers
 /*
 0:新增订单明细,修改订单明细,删除订单明细,新增赠品,订单明细换货,修改订单(运费/卖家备注/发票抬头/收货人信息),手工支付,快速支付,审核支付,取消审核支付,作废支付,修改备注,设定快递,修改收货地址,
-  修改运费
+  修改运费,修改发货仓库(非分销订单)
 1:新增订单明细,修改订单明细,删除订单明细,新增赠品,订单明细换货,修改订单(运费/卖家备注/发票抬头/收货人信息),手工支付,快速支付,审核支付,取消审核支付,作废支付,修改备注,设定快递,修改收货地址,
-  合并订单,拆分订单,修改运费
+  合并订单,拆分订单,修改运费,修改发货仓库(非分销订单)
 2:修改订单(卖家备注/发票抬头)
 3:修改订单(卖家备注/发票抬头)
 4:修改订单(卖家备注/发票抬头)
 5:修改订单(卖家备注/发票抬头)
 7:新增订单明细,修改订单明细,删除订单明细,新增赠品,订单明细换货,修改订单(运费/卖家备注/发票抬头/收货人信息),手工支付,快速支付,审核支付,取消审核支付,作废支付,修改备注,设定快递,修改收货地址,
-  订单转正常单,合并订单,拆分订单,修改运费
+  订单转正常单,合并订单,拆分订单,修改运费,修改发货仓库(非分销订单)
 */
 待补充方法:系统自动指定快递/菜鸟智选快递
 function说明
@@ -351,68 +351,16 @@ output: s=1成功 else 错误代码
 参考:input jason 文件:SetExp_input.json
 参考:output jason 文件:SetExp_output.json
 
-31.InsertOrdWhStrategy()新增订单仓库分配策略
-路由:http://localhost:5000/Core/Order/InsertOrdWhStrategy
-input:StrategyName      string      策略名称    
-      Priority          string      优先级
-      WarehouseID       string      仓库代号
-      WarehouseName     string      仓库名称
-      LimitLogistics    string      限制省份
-      LimitShop         string      限制店铺
-      Distributor       string      分销商
-      ContainSkuID      string      包含商品
-      ExcludeSkuID      string      排除商品
-      ContainGoodsCode  string      包含商品款式
-      ExcludeGoodsCode  string      排除商品款式
-      MinOrdQty         string      最小数量
-      MaxOrdQty         string      最大数量
-      LoanType          string      贷款方式
-output: s=1成功 else 错误代码
-参考:input jason 文件:InsertOrdWhStrategy_input.json
-参考:output jason 文件:InsertOrdWhStrategy_output.json
-
-32.OrdWhStrategyEdit()查询单笔订单仓库策略资料
-路由:http://localhost:5000/Core/Order/OrdWhStrategyEdit
-input:ID    string      策略资料ID
-output: 策略资料
-参考:output jason 文件:OrdWhStrategyEdit_output.json
-
-33.UpdateOrdWhStrategy()更新订单仓库分配策略
-路由:http://localhost:5000/Core/Order/UpdateOrdWhStrategy
-input:ID                int         策略ID
-      StrategyName      string      策略名称    
-      Priority          string      优先级
-      WarehouseID       string      仓库代号
-      WarehouseName     string      仓库名称
-      LimitLogistics    string      限制省份
-      LimitShop         string      限制店铺
-      Distributor       string      分销商
-      ContainSkuID      string      包含商品
-      ExcludeSkuID      string      排除商品
-      ContainGoodsCode  string      包含商品款式
-      ExcludeGoodsCode  string      排除商品款式
-      MinOrdQty         string      最小数量
-      MaxOrdQty         string      最大数量
-      LoanType          string      贷款方式
-output: s=1成功 else 错误代码
-参考:input jason 文件:UpdateOrdWhStrategy_input.json
-参考:output jason 文件:UpdateOrdWhStrategy_output.json
-
-34.DeleteOrdWhStrategy()删除订单仓库分配策略
-路由:http://localhost:5000/Core/Order/DeleteOrdWhStrategy
-input:ID                int         策略ID
-output: s=1成功 else 错误代码
-参考:input jason 文件:DeleteOrdWhStrategy_input.json
-参考:output jason 文件:DeleteOrdWhStrategy_output.json
-
-35.OrdWhStrategyInit()订单仓库策略初始资料
-路由:http://localhost:5000/Core/Order/OrdWhStrategyInit
-input: none
-output: 策略资料，仓库，省份，店铺，分销商资料
-参考:output jason 文件:OrdWhStrategyInit_output.json
-
-36.GetWarehouse()设定仓库显示
+31.GetWarehouse()设定仓库显示
 路由:http://localhost:5000/Core/Order/GetWarehouse
 input: none
 output: 仓库List
 参考:output jason 文件:GetWarehouse_output.json
+
+32.SetWarehouse()设定仓库保存
+路由:http://localhost:5000/Core/Order/SetWarehouse
+input:OID               List<int>   内部订单号    
+      WarehouseID       string      仓库ID
+output: s=1成功 else 错误代码
+参考:input jason 文件:SetWarehouse_input.json
+参考:output jason 文件:SetWarehouse_output.json
