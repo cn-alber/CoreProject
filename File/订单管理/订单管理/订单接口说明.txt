@@ -370,3 +370,49 @@ input:StrategyName      string      策略名称
 output: s=1成功 else 错误代码
 参考:input jason 文件:InsertOrdWhStrategy_input.json
 参考:output jason 文件:InsertOrdWhStrategy_output.json
+
+32.OrdWhStrategyEdit()查询单笔订单仓库策略资料
+路由:http://localhost:5000/Core/Order/OrdWhStrategyEdit
+input:ID    string      策略资料ID
+output: 策略资料
+参考:output jason 文件:OrdWhStrategyEdit_output.json
+
+33.UpdateOrdWhStrategy()更新订单仓库分配策略
+路由:http://localhost:5000/Core/Order/UpdateOrdWhStrategy
+input:ID                int         策略ID
+      StrategyName      string      策略名称    
+      Priority          string      优先级
+      WarehouseID       string      仓库代号
+      WarehouseName     string      仓库名称
+      LimitLogistics    string      限制省份
+      LimitShop         string      限制店铺
+      Distributor       string      分销商
+      ContainSkuID      string      包含商品
+      ExcludeSkuID      string      排除商品
+      ContainGoodsCode  string      包含商品款式
+      ExcludeGoodsCode  string      排除商品款式
+      MinOrdQty         string      最小数量
+      MaxOrdQty         string      最大数量
+      LoanType          string      贷款方式
+output: s=1成功 else 错误代码
+参考:input jason 文件:UpdateOrdWhStrategy_input.json
+参考:output jason 文件:UpdateOrdWhStrategy_output.json
+
+34.DeleteOrdWhStrategy()删除订单仓库分配策略
+路由:http://localhost:5000/Core/Order/DeleteOrdWhStrategy
+input:ID                int         策略ID
+output: s=1成功 else 错误代码
+参考:input jason 文件:DeleteOrdWhStrategy_input.json
+参考:output jason 文件:DeleteOrdWhStrategy_output.json
+
+35.OrdWhStrategyInit()订单仓库策略初始资料
+路由:http://localhost:5000/Core/Order/OrdWhStrategyInit
+input: none
+output: 策略资料，仓库，省份，店铺，分销商资料
+参考:output jason 文件:OrdWhStrategyInit_output.json
+
+36.GetWarehouse()设定仓库显示
+路由:http://localhost:5000/Core/Order/GetWarehouse
+input: none
+output: 仓库List
+参考:output jason 文件:GetWarehouse_output.json

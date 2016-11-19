@@ -19,7 +19,7 @@ namespace CoreData.CoreCore
             string sqlcount = "select count(id) from `order` where 1=1";
             string sqlcommand = @"select ID,Type,DealerType,IsMerge,IsSplit,OSource,SoID,ODate,PayDate,BuyerShopID,ShopName,Amount,PaidAmount,ExAmount,IsCOD,Status,AbnormalStatus,
                                   StatusDec,RecMessage,SendMessage,Express,RecLogistics,RecCity,RecDistrict,RecAddress,RecName,ExWeight,Distributor,SupDistributor,InvoiceTitle,
-                                  PlanDate,SendWarehouse,SendDate,ExCode,Creator,RecTel,RecPhone from `order` where 1=1"; 
+                                  PlanDate,SendWarehouse,SendDate,ExCode,Creator,RecTel,RecPhone,ExID from `order` where 1=1"; 
             string wheresql = string.Empty;
             if(cp.CoID != 1)//公司编号
             {
@@ -5675,8 +5675,9 @@ namespace CoreData.CoreCore
                             result.s = -3002;
                             return result;
                         }
-                        int rtn = conn.QueryFirst<int>("select LAST_INSERT_ID()");
-                        result.d = rtn;
+                        sqlcommand = "select ID,StrategyName from ord_wh_strategy where coid =" + s.CoID;
+                        var u = conn.Query<OrdWhStrategySimple>(sqlcommand).AsList();
+                        result.d = u;
                     }
                     catch(Exception ex){
                     result.s = -1;
@@ -5686,6 +5687,249 @@ namespace CoreData.CoreCore
             }
             return result;
         }
+        ///<summary>
+        ///查询单笔策略资料
+        ///</summary>
+        public static DataResult OrdWhStrategyEdit(int ID,int CoID)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{  
+                        string sqlcommand = @"select ID,StrategyName,Priority,WarehouseID,WarehouseName,LimitLogistics,LimitShop,Distributor,ContainSkuID,ExcludeSkuID,
+                                              ContainGoodsCode,ExcludeGoodsCode,MinOrdQty,MaxOrdQty,LoanType,CoID,Creator,Modifier from ord_wh_strategy where id = " + 
+                                              ID + " and Coid = " + CoID;
+                        var u = conn.Query<OrdWhStrategyEdit>(sqlcommand).AsList();
+                        if(u.Count <= 0)
+                        {
+                            result.s = -1;
+                            result.d = "参数异常";
+                            return result;
+                        }
+                        result.d = u[0];
+                    }
+                    catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+        ///<summary>
+        ///保存修改后策略资料
+        ///</summary>
+        public static DataResult UpdateOrdWhStrategy(OrdWhStrategy s,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{  
+                        string sqlcommand = @"select * from ord_wh_strategy where id = " + s.ID + " and coid = " + CoID;
+                        var u = conn.Query<OrdWhStrategy>(sqlcommand).AsList();
+                        if(u.Count == 0)
+                        {
+                            result.s = -1;
+                            result.d = "参数异常";
+                            return result;
+                        }
+                        u[0].StrategyName = s.StrategyName;
+                        u[0].Priority = s.Priority;
+                        u[0].WarehouseID = s.WarehouseID;
+                        u[0].WarehouseName = s.WarehouseName;
+                        u[0].LimitLogistics = s.LimitLogistics;
+                        u[0].LimitShop = s.LimitShop;
+                        u[0].Distributor = s.Distributor;
+                        u[0].ExcludeSkuID = s.ExcludeSkuID;
+                        u[0].ContainSkuID = s.ContainSkuID;
+                        u[0].ContainGoodsCode = s.ContainGoodsCode;
+                        u[0].ExcludeGoodsCode = s.ExcludeGoodsCode;
+                        u[0].MinOrdQty = s.MinOrdQty;
+                        u[0].MaxOrdQty = s.MaxOrdQty;
+                        u[0].LoanType = s.LoanType;
+                        u[0].Modifier = UserName;
+                        u[0].ModifyDate = DateTime.Now;
+                        sqlcommand = @"update ord_wh_strategy set StrategyName=@StrategyName,Priority=@Priority,WarehouseID=@WarehouseID,WarehouseName=@WarehouseName,
+                                       LimitLogistics=@LimitLogistics,LimitShop=@LimitShop,Distributor=@Distributor,ContainSkuID=@ContainSkuID,ExcludeSkuID=@ExcludeSkuID,
+                                       ContainGoodsCode=@ContainGoodsCode,ExcludeGoodsCode=@ExcludeGoodsCode,MinOrdQty=@MinOrdQty,MaxOrdQty=@MaxOrdQty,LoanType=@LoanType,
+                                       Modifier=@Modifier,ModifyDate=@ModifyDate WHERE id = @ID and Coid = @Coid";
+                        int count = conn.Execute(sqlcommand,u[0]);
+                        if(count <= 0)
+                        {
+                            result.s = -3003;
+                            return result;
+                        }
+                        sqlcommand = "select ID,StrategyName from ord_wh_strategy where coid =" + CoID;
+                        var t = conn.Query<OrdWhStrategySimple>(sqlcommand).AsList();
+                        result.d = t;
+                    }
+                    catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+        ///<summary>
+        ///删除策略资料
+        ///</summary>
+        public static DataResult DeleteOrdWhStrategy(int ID,int CoID)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{  
+                        string sqlcommand = @"delete from ord_wh_strategy WHERE id = " + ID + " and Coid = " + CoID;
+                        int count = conn.Execute(sqlcommand);
+                        if(count <= 0)
+                        {
+                            result.s = -3004;
+                            return result;
+                        }
+                        sqlcommand = "select ID,StrategyName from ord_wh_strategy where coid =" + CoID;
+                        var u = conn.Query<OrdWhStrategySimple>(sqlcommand).AsList();
+                        result.d = u;
+                    }
+                    catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+        ///<summary>
+        ///策略初始资料
+        ///</summary>
+        public static DataResult OrdWhStrategyInit(int CoID)
+        {
+            var result = new DataResult(1,null);
+            var res = new OrdWhStrategyInit();
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{  
+                        //策略List
+                        string sqlcommand = "select ID,StrategyName from ord_wh_strategy where coid =" + CoID;
+                        var u = conn.Query<OrdWhStrategySimple>(sqlcommand).AsList();
+                        res.Strategy = u;
+                        //分销商
+                        sqlcommand = "select ID as value,DistributorName as label from distributor where coid =" + CoID + " and enable = true";
+                        var Distributor = conn.Query<Filter>(sqlcommand).AsList();
+                        var d = new Filter();
+                        d.value = "0";
+                        d.label = "(自营)";
+                        Distributor.Add(d);
+                        res.Distributor = Distributor;
+                    }
+                    catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{  
+                        //省份List
+                        string sqlcommand = "select ID as value,Name as label from area where LevelType = 1";
+                        var u = conn.Query<Filter>(sqlcommand).AsList();
+                        res.Logistics = u;
+                    }
+                    catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+            //仓库资料
+            var wh = new List<Filter>();
+            var a = new Filter();
+            a.value = "0";
+            a.label = "(本仓)";
+            wh.Add(a);
+            var w = CoreComm.WarehouseHaddle.getWarelist(CoID.ToString());
+            foreach(var h in w)
+            {
+                a = new Filter();
+                a.value = h.id.ToString();
+                a.label = h.warename;
+                wh.Add(a);
+            }
+            res.Warehouse = wh;
+            //贷款资料
+            var ff = new List<Filter>();
+            var f = new Filter();
+            f.value = "0";
+            f.label = "--不限定--";
+            ff.Add(f);
+            f = new Filter();
+            f.value = "1";
+            f.label = "货到付款";
+            ff.Add(f);
+            f = new Filter();
+            f.value = "2";
+            f.label = "排除货到付款(即限定在线支付或线下打款)";
+            ff.Add(f);
+            res.Loan = ff;
+            //获取店铺List
+            var shop = CoreComm.ShopHaddle.getShopEnum(CoID.ToString()) as List<shopEnum>;
+            ff = new List<Filter>();
+            foreach(var t in shop)
+            {
+                f = new Filter();
+                f.value = t.value.ToString();
+                f.label = t.label;
+                ff.Add(f);
+            }
+            res.Shop = ff;  
+
+            result.d = res;
+            return result;
+        }
+        ///<summary>
+        ///设定仓库基本显示
+        ///</summary>
+        public static DataResult GetWarehouse(int CoID)
+        {
+            var result = new DataResult(1,null);
+            var wh = new List<Filter>();
+            var w = CoreComm.WarehouseHaddle.getWarelist(CoID.ToString());
+            foreach(var h in w)
+            {
+                var a = new Filter();
+                a.value = h.id.ToString();
+                a.label = h.warename;
+                wh.Add(a);
+            }
+            var b = new Filter();
+            b.value = "0";
+            b.label = "(本仓)";
+            wh.Add(b);
+            b = new Filter();
+            b.value = "A";
+            b.label = "{依照订单分配策略自动计算}";
+            wh.Add(b);
+            result.d = wh;
+            return result;
+        }
+        ///<summary>
+        ///订单策略挑选仓库
+        ///</summary>
+        public static DataResult StrategyWarehouse(Order ord,List<OrderItem> item)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{  
+                        
+                    }
+                    catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
+
+
+
 
 
 

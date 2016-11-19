@@ -588,6 +588,7 @@ namespace CoreModels.XyCore
         public string PlanDate{get;set;}
         public string SendWarehouse{get;set;}
         public string SendDate{get;set;}
+        public int ExID{get;set;}
         public string ExCode{get;set;}
         public string Creator{get;set;}
         public List<long> SoIDList{get;set;}
@@ -827,5 +828,37 @@ namespace CoreModels.XyCore
         public DateTime CreateDate{get;set;}
         public string Modifier{get;set;}
         public DateTime ModifyDate{get;set;}
+    }
+    public class OrdWhStrategyEdit
+    {
+        public int ID{get;set;}
+        public string StrategyName{get;set;}
+        public string Priority{get;set;}
+        public string WarehouseID{get;set;}
+        public string WarehouseName{get;set;}
+        public string LimitLogistics{get;set;}
+        public string LimitShop{get;set;}
+        public string Distributor{get;set;}
+        public string ContainSkuID{get;set;}
+        public string ExcludeSkuID{get;set;}
+        public string ContainGoodsCode{get;set;}
+        public string ExcludeGoodsCode{get;set;}
+        public string MinOrdQty{get;set;}
+        public string MaxOrdQty{get;set;}
+        public int LoanType{get;set;}
+    }
+    public class OrdWhStrategySimple
+    {
+        public int ID{get;set;}
+        public string StrategyName{get;set;}
+    }
+    public class OrdWhStrategyInit
+    {
+        public List<OrdWhStrategySimple> Strategy{get;set;}
+        public List<Filter> Warehouse{get;set;}
+        public List<Filter> Logistics{get;set;}
+        public List<Filter> Shop{get;set;}
+        public List<Filter> Distributor{get;set;}
+        public List<Filter> Loan{get;set;}
     }
 }

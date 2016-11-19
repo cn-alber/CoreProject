@@ -907,5 +907,220 @@ namespace CoreWebApi
             data = OrderHaddle.InsertOrdWhStrategy(s);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpGetAttribute("/Core/Order/OrdWhStrategyEdit")]
+        public ResponseResult OrdWhStrategyEdit(string ID)
+        {   
+            var data = new DataResult(1,null);
+            int id,x;
+            if(string.IsNullOrEmpty(ID))
+            {
+                data.s = -1;
+                data.d = "参数异常!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            else
+            {
+                if (int.TryParse(ID, out x))
+                {
+                    id = int.Parse(ID);
+                }
+                else
+                {
+                    data.s = -1;
+                    data.d = "参数异常!";
+                    return CoreResult.NewResponse(data.s, data.d, "General"); 
+                }
+            }
+            int CoID = int.Parse(GetCoid());
+            data = OrderHaddle.OrdWhStrategyEdit(id,CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/UpdateOrdWhStrategy")]
+        public ResponseResult UpdateOrdWhStrategy([FromBodyAttribute]JObject co)
+        {   
+            var s = new OrdWhStrategy();
+            string username = GetUname();
+            var data = new DataResult(1,null);
+            int x;
+            string Text = co["ID"].ToString();
+            if(string.IsNullOrEmpty(Text))
+            {
+                data.s = -1;
+                data.d = "ID必须输入!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            else
+            {
+                if (int.TryParse(Text, out x))
+                {
+                    s.ID = int.Parse(Text);
+                }
+                else
+                {
+                    data.s = -1;
+                    data.d = "ID参数异常!";
+                    return CoreResult.NewResponse(data.s, data.d, "General"); 
+                }
+            }
+            Text = co["StrategyName"].ToString();
+            if(string.IsNullOrEmpty(Text))
+            {
+                data.s = -1;
+                data.d = "策略名称必须输入!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            else
+            {
+                s.StrategyName = Text;
+            }
+            Text = co["Priority"].ToString();
+            if(string.IsNullOrEmpty(Text))
+            {
+                data.s = -1;
+                data.d = "优先级必须输入!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            else
+            {
+                if (int.TryParse(Text, out x))
+                {
+                    s.Priority = Text;
+                }
+                else
+                {
+                    data.s = -1;
+                    data.d = "优先级参数异常!";
+                    return CoreResult.NewResponse(data.s, data.d, "General"); 
+                }
+            }
+            Text = co["WarehouseID"].ToString();
+            if(string.IsNullOrEmpty(Text))
+            {
+                data.s = -1;
+                data.d = "指定仓库必须输入!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            else
+            {
+                if (int.TryParse(Text, out x))
+                {
+                    s.WarehouseID = Text;
+                }
+                else
+                {
+                    data.s = -1;
+                    data.d = "指定仓库参数异常!";
+                    return CoreResult.NewResponse(data.s, data.d, "General"); 
+                }
+            }
+            Text = co["WarehouseName"].ToString();
+            if(string.IsNullOrEmpty(Text))
+            {
+                data.s = -1;
+                data.d = "指定仓库必须输入!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            else
+            {
+                s.WarehouseName = Text;
+            }
+            s.LimitLogistics = co["LimitLogistics"].ToString();
+            s.LimitShop = co["LimitShop"].ToString();
+            s.Distributor = co["Distributor"].ToString();
+            s.ContainSkuID = co["ContainSkuID"].ToString();
+            s.ExcludeSkuID = co["ExcludeSkuID"].ToString();
+            s.ContainGoodsCode = co["ContainGoodsCode"].ToString();
+            s.ExcludeGoodsCode = co["ExcludeGoodsCode"].ToString();
+            Text = co["MinOrdQty"].ToString();
+            if(!string.IsNullOrEmpty(Text))
+            {
+                if (int.TryParse(Text, out x))
+                {
+                    s.MinOrdQty = Text;
+                }
+                else
+                {
+                    data.s = -1;
+                    data.d = "最小数量参数异常!";
+                    return CoreResult.NewResponse(data.s, data.d, "General"); 
+                }
+            }
+            if(!string.IsNullOrEmpty(Text))
+            {
+                Text = co["MaxOrdQty"].ToString();
+                if (int.TryParse(Text, out x))
+                {
+                    s.MaxOrdQty = Text;
+                }
+                else
+                {
+                    data.s = -1;
+                    data.d = "最大数量参数异常!";
+                    return CoreResult.NewResponse(data.s, data.d, "General"); 
+                }
+            }
+            Text = co["LoanType"].ToString();
+            if(Text== "0" || Text== "1" ||Text== "2")
+            {
+                s.LoanType = int.Parse(Text);
+            }
+            else
+            {
+                data.s = -1;
+                data.d = "贷款方式参数异常!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            int CoID = int.Parse(GetCoid());
+            data = OrderHaddle.UpdateOrdWhStrategy(s,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/DeleteOrdWhStrategy")]
+        public ResponseResult DeleteOrdWhStrategy([FromBodyAttribute]JObject co)
+        {   
+            var data = new DataResult(1,null);
+            int x,id;
+            string Text = co["ID"].ToString();
+            if(string.IsNullOrEmpty(Text))
+            {
+                data.s = -1;
+                data.d = "ID必须输入!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            else
+            {
+                if (int.TryParse(Text, out x))
+                {
+                    id = int.Parse(Text);
+                }
+                else
+                {
+                    data.s = -1;
+                    data.d = "ID参数异常!";
+                    return CoreResult.NewResponse(data.s, data.d, "General"); 
+                }
+            }
+            int CoID = int.Parse(GetCoid());
+            data = OrderHaddle.DeleteOrdWhStrategy(id,CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Order/OrdWhStrategyInit")]
+        public ResponseResult OrdWhStrategyInit(string ID)
+        {   
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.OrdWhStrategyInit(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Order/GetWarehouse")]
+        public ResponseResult GetWarehouse(string ID)
+        {   
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.GetWarehouse(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }  
