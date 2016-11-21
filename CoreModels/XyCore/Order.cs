@@ -847,4 +847,39 @@ namespace CoreModels.XyCore
         public List<TransferNormalReturnSuccess> SuccessIDs{get;set;}
         public List<TransferNormalReturnFail> FailIDs{get;set;}
     }
+    public class ModifyFreightSuccess
+    {
+        public int ID{get;set;}
+        public int Status{get;set;}
+        public string  StatusDec{get;set;}
+        public int AbnormalStatus{get;set;}
+        public string AbnormalStatusDec{get;set;}
+        public string ExAmount{get;set;}
+        public string Amount{get;set;}
+    }
+    public class ModifyFreightReturn
+    {
+        public List<ModifyFreightSuccess> SuccessIDs{get;set;}
+        public List<TransferNormalReturnFail> FailIDs{get;set;}
+    }
+    public class SetExpSuccess
+    {
+        public int ID{get;set;}
+        public string  Express{get;set;}
+    }
+    public class SetExpReturn
+    {
+        public List<SetExpSuccess> SuccessIDs{get;set;}
+        public List<TransferNormalReturnFail> FailIDs{get;set;}
+    }
+    public class SetWarehouseSuccess
+    {
+        public int ID{get;set;}
+        public string  Warehouse{get;set;}
+    }
+    public class SetWarehouseReturn
+    {
+        public List<SetWarehouseSuccess> SuccessIDs{get;set;}
+        public List<TransferNormalReturnFail> FailIDs{get;set;}
+    }
 }
