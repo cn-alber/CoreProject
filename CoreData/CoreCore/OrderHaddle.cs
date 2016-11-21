@@ -6569,6 +6569,58 @@ namespace CoreData.CoreCore
                         logs.Add(log);
                         continue;
                     }
+                    //快递为空时,自动计算快递
+                    if(string.IsNullOrEmpty(a.Express))
+                    {
+                        var ss = new DataResult(1,"圆通速递");//待新增方法
+                        if(ss.s == -1)
+                        {
+                            a.Status = 2;
+                            var logn = new Log();
+                            logn.OID = a.ID;
+                            logn.SoID = a.SoID;
+                            logn.Type = 0;
+                            logn.LogDate = DateTime.Now;
+                            logn.UserName = UserName;
+                            logn.Title = "审核确认";
+                            logn.CoID = CoID;
+                            logs.Add(logn);
+                            continue;
+                        }
+                        a.ExID = ss.s;
+                        a.Express = ss.d.ToString();
+
+                        var log = new Log();
+                        log.OID = a.ID;
+                        log.SoID = a.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "自动计算快递";
+                        log.Remark = a.Express;
+                        log.CoID = CoID;
+                        logs.Add(log);
+
+                        log = new Log();
+                        log.OID = a.ID;
+                        log.SoID = a.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "自动计算快递";
+                        log.CoID = CoID;
+                        logs.Add(log);
+
+                        log = new Log();
+                        log.OID = a.ID;
+                        log.SoID = a.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "自动计算快递";
+                        log.CoID = CoID;
+                        logs.Add(log);
+                    }
                 }
 
                 TransCore.Commit();
@@ -6785,7 +6837,7 @@ namespace CoreData.CoreCore
                     }
                     if(j > 0)
                     {
-                        re.Add(i.ID);
+                        // re.Add(i.ID);
                         sqlcommand = "select sum(Qty) as QtyTot,sum(Amount) as AmtTot,sum(TotalWeight) as WeightTot from orderitem where oid = " + i.ID + " and coid = " + CoID;
                         var su = CoreDBconn.Query<OrdSum>(sqlcommand).AsList();
                         i.OrdQty = su[0].QtyTot;
@@ -6829,7 +6881,7 @@ namespace CoreData.CoreCore
                     result.s = -3002;
                     return result;
                 }   
-                result.d = re;
+                // result.d = re;
                 TransCore.Commit();
             }
             catch (Exception e)
