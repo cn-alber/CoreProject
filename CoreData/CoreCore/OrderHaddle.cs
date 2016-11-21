@@ -5954,6 +5954,7 @@ namespace CoreData.CoreCore
                     logs.Add(log);
                     var ss = new SetExpSuccess();
                     ss.ID = a.ID;
+                    ss.ExID = ExpID;
                     ss.Express = ExpName;
                     su.Add(ss);
                 }
@@ -6480,6 +6481,7 @@ namespace CoreData.CoreCore
         {
             var result = new DataResult(1,null);
             var logs = new List<Log>();
+            var log = new Log();
             var res = new TransferNormalReturn();
             var su = new List<TransferNormalReturnSuccess>();
             var fa = new List<TransferNormalReturnFail>();
@@ -6514,7 +6516,7 @@ namespace CoreData.CoreCore
                             continue;
                         }
                         a.SendWarehouse = ss.d.ToString();
-                        var log = new Log();
+                        log = new Log();
                         log.OID = a.ID;
                         log.SoID = a.SoID;
                         log.Type = 0;
@@ -6548,7 +6550,7 @@ namespace CoreData.CoreCore
                         a.Status = 7;
                         a.AbnormalStatus = reasonid;
                         a.StatusDec="缺货";
-                        var log = new Log();
+                        log = new Log();
                         log.OID = a.ID;
                         log.SoID = a.SoID;
                         log.Type = 0;
@@ -6576,21 +6578,21 @@ namespace CoreData.CoreCore
                         if(ss.s == -1)
                         {
                             a.Status = 2;
-                            var logn = new Log();
-                            logn.OID = a.ID;
-                            logn.SoID = a.SoID;
-                            logn.Type = 0;
-                            logn.LogDate = DateTime.Now;
-                            logn.UserName = UserName;
-                            logn.Title = "审核确认";
-                            logn.CoID = CoID;
-                            logs.Add(logn);
+                            log = new Log();
+                            log.OID = a.ID;
+                            log.SoID = a.SoID;
+                            log.Type = 0;
+                            log.LogDate = DateTime.Now;
+                            log.UserName = UserName;
+                            log.Title = "审核确认";
+                            log.CoID = CoID;
+                            logs.Add(log);
                             continue;
                         }
                         a.ExID = ss.s;
                         a.Express = ss.d.ToString();
 
-                        var log = new Log();
+                        log = new Log();
                         log.OID = a.ID;
                         log.SoID = a.SoID;
                         log.Type = 0;
@@ -6600,27 +6602,9 @@ namespace CoreData.CoreCore
                         log.Remark = a.Express;
                         log.CoID = CoID;
                         logs.Add(log);
-
-                        log = new Log();
-                        log.OID = a.ID;
-                        log.SoID = a.SoID;
-                        log.Type = 0;
-                        log.LogDate = DateTime.Now;
-                        log.UserName = UserName;
-                        log.Title = "自动计算快递";
-                        log.CoID = CoID;
-                        logs.Add(log);
-
-                        log = new Log();
-                        log.OID = a.ID;
-                        log.SoID = a.SoID;
-                        log.Type = 0;
-                        log.LogDate = DateTime.Now;
-                        log.UserName = UserName;
-                        log.Title = "自动计算快递";
-                        log.CoID = CoID;
-                        logs.Add(log);
                     }
+                    if(a.Status == 2) continue;
+
                 }
 
                 TransCore.Commit();

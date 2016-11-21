@@ -865,6 +865,7 @@ namespace CoreModels.XyCore
     public class SetExpSuccess
     {
         public int ID{get;set;}
+        public string ExID{get;set;}
         public string  Express{get;set;}
     }
     public class SetExpReturn
