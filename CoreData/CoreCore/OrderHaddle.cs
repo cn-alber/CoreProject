@@ -5954,6 +5954,7 @@ namespace CoreData.CoreCore
                     logs.Add(log);
                     var ss = new SetExpSuccess();
                     ss.ID = a.ID;
+                    ss.ExID = ExpID;
                     ss.Express = ExpName;
                     su.Add(ss);
                 }
@@ -6474,6 +6475,166 @@ namespace CoreData.CoreCore
             return result;
         }
         ///<summary>
+        ///订单审核
+        ///</summary>
+        public static DataResult ConfirmOrder(List<int> oid,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var logs = new List<Log>();
+            var log = new Log();
+            var res = new TransferNormalReturn();
+            var su = new List<TransferNormalReturnSuccess>();
+            var fa = new List<TransferNormalReturnFail>();
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlcommand = @"select * from `Order` where id in @ID and coid = @Coid";
+                var u = CoreDBconn.Query<Order>(sqlcommand,new{ID = oid,Coid = CoID}).AsList();
+                foreach(var a in u)
+                {
+                    if(a.Status != 1)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "只有已付款待审核的订单才可以审核!";
+                        fa.Add(ff);
+                    }
+                    sqlcommand = "select * from orderitem where oid = @ID and coid = @Coid";
+                    var item = CoreDBconn.Query<OrderItem>(sqlcommand,new{ID = a.ID,Coid = CoID}).AsList();
+                    //仓库为空时，选择仓库
+                    if(string.IsNullOrEmpty(a.SendWarehouse))
+                    {
+                        var ss = StrategyWarehouse(a,item,CoID);
+                        if(ss.s == -1)
+                        {
+                            var ff = new TransferNormalReturnFail();
+                            ff.ID = a.ID;
+                            ff.Reason = ss.d.ToString();
+                            fa.Add(ff);
+                            continue;
+                        }
+                        a.SendWarehouse = ss.d.ToString();
+                        log = new Log();
+                        log.OID = a.ID;
+                        log.SoID = a.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "修改发货仓库";
+                        log.Remark = "审核时自动计算:" + a.SendWarehouse;
+                        log.CoID = CoID;
+                        logs.Add(log);
+                    }
+                    bool IsCheckInv = false;
+                    //检查订单是否缺货
+                    foreach(var i in item)
+                    {
+                        int invqty = GetInvQty(CoID,i.SkuAutoID);
+                        if(invqty < i.Qty)
+                        {
+                            IsCheckInv = true;
+                            break;
+                        }
+                    }
+                    if(IsCheckInv == true)
+                    {
+                        int reasonid = GetReasonID("缺货",CoID).s;
+                        if(reasonid == -1)
+                        {
+                            result.s = -1;
+                            result.d = "请先设定【缺货】的异常";
+                            return result;
+                        }
+                        a.Status = 7;
+                        a.AbnormalStatus = reasonid;
+                        a.StatusDec="缺货";
+                        log = new Log();
+                        log.OID = a.ID;
+                        log.SoID = a.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "审核确认";
+                        log.CoID = CoID;
+                        logs.Add(log);
+                        log = new Log();
+                        log.OID = a.ID;
+                        log.SoID = a.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "标记异常";
+                        log.Remark = "缺货";
+                        log.CoID = CoID;
+                        logs.Add(log);
+                        continue;
+                    }
+                    //快递为空时,自动计算快递
+                    if(string.IsNullOrEmpty(a.Express))
+                    {
+                        var ss = new DataResult(1,"圆通速递");//待新增方法
+                        if(ss.s == -1)
+                        {
+                            a.Status = 2;
+                            log = new Log();
+                            log.OID = a.ID;
+                            log.SoID = a.SoID;
+                            log.Type = 0;
+                            log.LogDate = DateTime.Now;
+                            log.UserName = UserName;
+                            log.Title = "审核确认";
+                            log.CoID = CoID;
+                            logs.Add(log);
+                            continue;
+                        }
+                        a.ExID = ss.s;
+                        a.Express = ss.d.ToString();
+
+                        log = new Log();
+                        log.OID = a.ID;
+                        log.SoID = a.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "自动计算快递";
+                        log.Remark = a.Express;
+                        log.CoID = CoID;
+                        logs.Add(log);
+                    }
+                    if(a.Status == 2) continue;
+
+                }
+
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+
+
+            return result;
+        }
+
+
+
+
+
+
+
+
+
+        ///<summary>
         ///修改商品
         ///</summary>
         public static DataResult ModifySku(List<int> oid,int ModifySku,decimal ModifyPrice,int DeleteSku,int AddSku,decimal AddPrice,
@@ -6481,7 +6642,7 @@ namespace CoreData.CoreCore
         {
             var result = new DataResult(1,null);
             var logs = new List<Log>();
-            var re = new List<int>();
+            // var re = new List<int>();
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
             var TransCore = CoreDBconn.BeginTransaction();
@@ -6660,7 +6821,7 @@ namespace CoreData.CoreCore
                     }
                     if(j > 0)
                     {
-                        re.Add(i.ID);
+                        // re.Add(i.ID);
                         sqlcommand = "select sum(Qty) as QtyTot,sum(Amount) as AmtTot,sum(TotalWeight) as WeightTot from orderitem where oid = " + i.ID + " and coid = " + CoID;
                         var su = CoreDBconn.Query<OrdSum>(sqlcommand).AsList();
                         i.OrdQty = su[0].QtyTot;
@@ -6704,7 +6865,7 @@ namespace CoreData.CoreCore
                     result.s = -3002;
                     return result;
                 }   
-                result.d = re;
+                // result.d = re;
                 TransCore.Commit();
             }
             catch (Exception e)
@@ -6721,19 +6882,7 @@ namespace CoreData.CoreCore
             }
             return result;
         }
-         ///<summary>
-        ///订单审核
-        ///</summary>
-        public static DataResult ConfirmOrder()
-        {
-            var result = new DataResult(1,null);
-
-
-
-
-            return result;
-        }
-
+        
 
 
 
