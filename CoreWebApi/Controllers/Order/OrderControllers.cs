@@ -222,10 +222,10 @@ namespace CoreWebApi
             if(!string.IsNullOrEmpty(SendWarehouse))
             {
                 string[] a = SendWarehouse.Split(',');
-                List<string> s = new List<string>();
+                List<int> s = new List<int>();
                 foreach(var i in a)
                 {
-                    s.Add(i);
+                    s.Add(int.Parse(i));
                 }
                 cp.SendWarehouse = s;
             }
@@ -804,6 +804,18 @@ namespace CoreWebApi
             var data = OrderHaddle.SetWarehouse(OID,CoID,WhID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Order/ConfirmOrder")]
+        public ResponseResult ConfirmOrder([FromBodyAttribute]JObject co)
+        {   
+            List<int> oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.ConfirmOrder(oid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+
         [HttpPostAttribute("/Core/Order/ModifySku")]
         public ResponseResult ModifySku([FromBodyAttribute]JObject co)
         {   

@@ -45,7 +45,7 @@ namespace CoreModels.XyCore
         public bool _IsDisSelectAll = false;//分销商是否全部选中
         public List<string> _Distributor=null;//分销商
         public List<int> _ExID = null;//快递公司
-        public List<string> _SendWarehouse = null;//仓库
+        public List<int> _SendWarehouse = null;//仓库
         public List<int> _Others = null;//其他 add 2016-11-12
         public string _SortField = "id";//排序栏位
         public string _SortDirection = "DESC";//排序方式
@@ -251,7 +251,7 @@ namespace CoreModels.XyCore
             get { return _ExID; }
             set { this._ExID = value;}
         }
-        public List<string> SendWarehouse
+        public List<int> SendWarehouse
         {
             get { return _SendWarehouse; }
             set { this._SendWarehouse = value;}
@@ -339,6 +339,7 @@ namespace CoreModels.XyCore
         public string Distributor{get;set;}
         public string SupDistributor{get;set;}
         public DateTime PlanDate{get;set;}
+        public string WarehouseID{get;set;}
         public string SendWarehouse{get;set;}
         public DateTime SendDate{get;set;}
         public string Creator{get;set;}
@@ -882,5 +883,62 @@ namespace CoreModels.XyCore
     {
         public List<SetWarehouseSuccess> SuccessIDs{get;set;}
         public List<TransferNormalReturnFail> FailIDs{get;set;}
+    }
+    public class SaleOutInsert
+    {
+        public int ID{get;set;}
+        public int OID{get;set;}
+        public long SoID{get;set;}
+        public DateTime DocDate{get;set;}
+        public int Status{get;set;}
+        public string ExpName{get;set;}
+        public string ExCode{get;set;}
+        public string RecMessage{get;set;}
+        public string RecLogistics{get;set;}
+        public string RecDistrict{get;set;}
+        public string RecCity{get;set;}
+        public string RecAddress{get;set;}
+        public string RecZip{get;set;}
+        public string RecName{get;set;}
+        public string RecPhone{get;set;}
+        public string ExWeight{get;set;}
+        public string RealWeight{get;set;}
+        public string ExCost{get;set;}
+        public string Amount{get;set;}
+        public int OrdQty{get;set;}
+        public string Remark{get;set;}
+        public string SendWarehouse{get;set;}
+        public DateTime PayDate{get;set;}
+        public string SendMessage{get;set;}
+        public int CoID{get;set;}
+        public string Creator{get;set;}
+        public string Modifier{get;set;}
+        public int ExID{get;set;}
+        public int ShopID{get;set;}
+    }
+    public class SaleOutItemInsert
+    {
+        public int ID{get;set;}
+        public int OID{get;set;}
+        public long SoID{get;set;}
+        public int SkuAutoID{get;set;}
+        public string SkuID{get;set;}
+        public string SkuName{get;set;}
+        public string Norm{get;set;}
+        public string GoodsCode{get;set;}
+        public int Qty{get;set;}
+        public string SalePrice{get;set;}
+        public string RealPrice{get;set;}
+        public string Amount{get;set;}
+        public string DiscountRate{get;set;}
+        public string img{get;set;}
+        public string ShopSkuID{get;set;}
+        public string Weight{get;set;}
+        public string TotalWeight{get;set;}
+        public bool IsGift{get;set;}
+        public string Remark{get;set;}
+        public int CoID{get;set;}
+        public string Creator{get;set;}
+        public string Modifier{get;set;}
     }
 }

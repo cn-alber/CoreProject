@@ -232,13 +232,7 @@ namespace CoreData.CoreCore
             }
             if(cp.SendWarehouse != null)
             {
-                string sendwarehouse = string.Empty;
-                foreach(var x in cp.SendWarehouse)
-                {
-                    sendwarehouse = sendwarehouse + "'" + x + "',";
-                }
-                sendwarehouse = sendwarehouse.Substring(0,sendwarehouse.Length - 1);
-                wheresql = wheresql + " AND sendwarehouse in (" +  sendwarehouse + ")";
+                wheresql = wheresql + " AND WarehouseID in ("+ string.Join(",", cp.SendWarehouse) + ")" ;
             }
             if(cp.Others != null)
             {
@@ -392,7 +386,7 @@ namespace CoreData.CoreCore
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{
-                    string wheresql = "select ifnull(sum(StockQty - LockQty + VirtualQty),0) from inventory where coid = " + CoID + " and WarehouseID = 0 and Skuautoid = " + skuid;
+                    string wheresql = "select ifnull(StockQty - LockQty + VirtualQty,0) from inventory_sale where coid = " + CoID + " and Skuautoid = " + skuid;
                     invqty = conn.QueryFirst<int>(wheresql);
                 }catch(Exception ex){
                     result.d  = ex.Message;
@@ -2838,6 +2832,12 @@ namespace CoreData.CoreCore
                     ord.AbnormalStatus = 0;
                     ord.StatusDec = "";
                 }
+                if(ord.Status != 7)
+                {
+                    ord.Status = 1;
+                    ord.AbnormalStatus = 0;
+                    ord.StatusDec = "";
+                }
                 log = new Log();
                 log.OID = pay.OID;
                 log.SoID = pay.SoID;
@@ -4028,21 +4028,6 @@ namespace CoreData.CoreCore
             }   
             //仓库资料
             List<Filter> wh = new List<Filter>();
-            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
-                try{  
-                    var h = new Filter();
-                    string sqlcommand = "select WarehouseName from Warehouse where coid =" + CoID + " and enable = true and type = 0";
-                    string name = conn.QueryFirst<string>(sqlcommand);
-                    h.value = "0";
-                    h.label = name;
-                    wh.Add(h);
-                    }catch(Exception ex){
-                    result.s = -1;
-                    result.d = ex.Message;
-                    conn.Dispose();
-                }
-            }  
-            //分仓
             var w = CoreComm.WarehouseHaddle.getWarelist(CoID.ToString());
             foreach(var h in w)
             {
@@ -6001,10 +5986,6 @@ namespace CoreData.CoreCore
                 wh.Add(a);
             }
             var b = new Filter();
-            b.value = "0";
-            b.label = "(本仓)";
-            wh.Add(b);
-            b = new Filter();
             b.value = "A";
             b.label = "{依照订单分配策略自动计算}";
             wh.Add(b);
@@ -6018,13 +5999,17 @@ namespace CoreData.CoreCore
         {
             var result = new DataResult(1,null);
             var lst = new List<OrdWhStrategy>();
+            int rtn = 0;
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try{  
-                        string sqlcommand = @"select * from wareploy where coid = " + CoID;
+                        //抓取本仓的代号
+                        string sqlcommand = @"select ID from ware_third_party where coid = " + CoID + " and enable in (0,2) and itcoid = 0";
+                        rtn = conn.QueryFirst<int>(sqlcommand);
+                        sqlcommand = @"select * from wareploy where coid = " + CoID;
                         var u = conn.Query<OrdWhStrategy>(sqlcommand).AsList();
                         if(u.Count == 0)
                         {
-                            result.s = 0;
+                            result.s = rtn;
                             return result;
                         }
                         //将符合订单条件的资料筛选出来
@@ -6251,7 +6236,7 @@ namespace CoreData.CoreCore
                         }
                         if(lst.Count == 0)
                         {
-                            result.s = 0;
+                            result.s = rtn;
                             return result;
                         }
                     }
@@ -6305,7 +6290,7 @@ namespace CoreData.CoreCore
                         lst = u;
                         if(lst.Count == 0)
                         {
-                            result.s = 0;
+                            result.s = rtn;
                             return result;
                         }
                         
@@ -6343,26 +6328,19 @@ namespace CoreData.CoreCore
                 Remark = "系统自动指定仓库:";
             }
             string WhName = "";
-            string Name = "";
-            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
-                try{  
-                    string sqlcommand = "select WarehouseName from Warehouse where coid =" + CoID + " and enable = true and type = 0";
-                    Name = conn.QueryFirst<string>(sqlcommand);
-                    if(string.IsNullOrEmpty(Name))
-                    {
-                        result.s = -1;
-                        result.d = "请先设定本仓资料!";
-                        return result;
-                    }
-                    }catch(Exception ex){
-                    result.s = -1;
-                    result.d = ex.Message;
-                    conn.Dispose();
-                }
-            }  
             var w = CoreComm.WarehouseHaddle.getWarelist(CoID.ToString());
+            if(WhID !="A")
+            {
+                foreach(var a in w)
+                {
+                    if(WhID == a.id.ToString())
+                    {
+                        WhName = a.warename;
+                        break;
+                    }
+                }
+            }
             var logs = new List<Log>();
-            // var re = new List<int>();
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
             var TransCore = CoreDBconn.BeginTransaction();
@@ -6370,12 +6348,6 @@ namespace CoreData.CoreCore
             {
                 string sqlcommand = "select * from `order` where id in @ID and coid = @Coid and status in (0,1,7) and DealerType != 1";
                 var u = CoreDBconn.Query<Order>(sqlcommand,new{ID = oid,Coid = CoID}).AsList();
-                // if(u.Count == 0)
-                // {
-                //     result.s = -1;
-                //     result.d = "无符合条件的订单!";
-                //     return result;
-                // }
                 foreach(var a in u)
                 {
                     if(a.Status != 0 && a.Status != 1 && a.Status != 7)
@@ -6408,25 +6380,17 @@ namespace CoreData.CoreCore
                             continue;
                         }
                         WhID = res.s.ToString();
-                        WhName = res.d.ToString();
-                    }
-                    if(WhID == "0")
-                    {
-                        WhName = Name;
-                    }
-                    else
-                    {
-                        foreach(var h in w)
+                        foreach(var t in w)
                         {
-                            if(WhID == h.id.ToString())
+                            if(WhID == t.id.ToString())
                             {
-                                WhName = h.warename;
+                                WhName = t.warename;
                                 break;
                             }
                         }
                     }
-                    sqlcommand = @"update `order` set SendWarehouse=@SendWarehouse,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
-                    int g =CoreDBconn.Execute(sqlcommand,new{SendWarehouse=WhName,Modifier=UserName,ModifyDate=DateTime.Now,ID=a.ID,Coid=CoID},TransCore);
+                    sqlcommand = @"update `order` set WarehouseID=@WarehouseID,SendWarehouse=@SendWarehouse,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
+                    int g =CoreDBconn.Execute(sqlcommand,new{WarehouseID=WhID,SendWarehouse=WhName,Modifier=UserName,ModifyDate=DateTime.Now,ID=a.ID,Coid=CoID},TransCore);
                     if(g < 0)
                     {
                         result.s = -3003;
@@ -6480,26 +6444,39 @@ namespace CoreData.CoreCore
         public static DataResult ConfirmOrder(List<int> oid,int CoID,string UserName)
         {
             var result = new DataResult(1,null);
-            var logs = new List<Log>();
-            var log = new Log();
             var res = new TransferNormalReturn();
             var su = new List<TransferNormalReturnSuccess>();
             var fa = new List<TransferNormalReturnFail>();
-            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
-            CoreDBconn.Open();
-            var TransCore = CoreDBconn.BeginTransaction();
-            try
+            var w = CoreComm.WarehouseHaddle.getWarelist(CoID.ToString());
+            foreach(var o in oid)
             {
-                string sqlcommand = @"select * from `Order` where id in @ID and coid = @Coid";
-                var u = CoreDBconn.Query<Order>(sqlcommand,new{ID = oid,Coid = CoID}).AsList();
-                foreach(var a in u)
+                var logs = new List<Log>();
+                var log = new Log();
+                string ExCode = string.Empty;
+                int count = 0;
+                var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+                CoreDBconn.Open();
+                var TransCore = CoreDBconn.BeginTransaction();
+                try
                 {
+                    string sqlcommand = @"select * from `order` where id = " + o + " and coid = " + CoID;
+                    var u = CoreDBconn.Query<Order>(sqlcommand,new{ID = oid,Coid = CoID}).AsList();
+                    if(u.Count == 0)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = o;
+                        ff.Reason = "订单不存在!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    var a = u[0] as Order;
                     if(a.Status != 1)
                     {
                         var ff = new TransferNormalReturnFail();
                         ff.ID = a.ID;
                         ff.Reason = "只有已付款待审核的订单才可以审核!";
                         fa.Add(ff);
+                        continue;
                     }
                     sqlcommand = "select * from orderitem where oid = @ID and coid = @Coid";
                     var item = CoreDBconn.Query<OrderItem>(sqlcommand,new{ID = a.ID,Coid = CoID}).AsList();
@@ -6515,7 +6492,15 @@ namespace CoreData.CoreCore
                             fa.Add(ff);
                             continue;
                         }
-                        a.SendWarehouse = ss.d.ToString();
+                        a.WarehouseID = ss.s.ToString();
+                        foreach(var y in w)
+                        {
+                            if(a.WarehouseID == y.id.ToString())
+                            {
+                                a.SendWarehouse = y.warename;
+                                break;
+                            }
+                        }
                         log = new Log();
                         log.OID = a.ID;
                         log.SoID = a.SoID;
@@ -6566,7 +6551,7 @@ namespace CoreData.CoreCore
                         log.LogDate = DateTime.Now;
                         log.UserName = UserName;
                         log.Title = "标记异常";
-                        log.Remark = "缺货";
+                        log.Remark = "缺货(提交仓库时判断)";
                         log.CoID = CoID;
                         logs.Add(log);
                         continue;
@@ -6604,31 +6589,220 @@ namespace CoreData.CoreCore
                         logs.Add(log);
                     }
                     if(a.Status == 2) continue;
+                    log = new Log();
+                    log.OID = a.ID;
+                    log.SoID = a.SoID;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "审核确认";
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    log = new Log();
+                    log.OID = a.ID;
+                    log.SoID = a.SoID;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "提交仓库发货";
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    //获取电子面单
+                    if(a.Express != "现场取货")
+                    {
+                        sqlcommand = "select ExpNo from expnounused where CoID = " + CoID + " and Express = " + a.ExID;
+                        ExCode = CoreDBconn.QueryFirst<string>(sqlcommand);
+                        if(string.IsNullOrEmpty(ExCode))
+                        {
+                            int reasonid = GetReasonID("获取电子面单错误",CoID).s;
+                            if(reasonid == -1)
+                            {
+                                result.s = -1;
+                                result.d = "请先设定【获取电子面单错误】的异常";
+                                return result;
+                            }
+                            a.Status = 7;
+                            a.AbnormalStatus = reasonid;
+                            a.StatusDec="获取电子面单错误";
+                            log = new Log();
+                            log.OID = a.ID;
+                            log.SoID = a.SoID;
+                            log.Type = 0;
+                            log.LogDate = DateTime.Now;
+                            log.UserName = UserName;
+                            log.Title = "标记异常";
+                            log.Remark = "获取电子面单错误";
+                            log.CoID = CoID;
+                            logs.Add(log);
+                            continue;
+                        }
+                        else
+                        {
+                            log = new Log();
+                            log.OID = a.ID;
+                            log.SoID = a.SoID;
+                            log.Type = 0;
+                            log.LogDate = DateTime.Now;
+                            log.UserName = UserName;
+                            log.Title = "获取电子面单";
+                            log.Remark = ExCode;
+                            log.CoID = CoID;
+                            logs.Add(log);
+                            //快递单号处理
+                            sqlcommand = "delete from expnounused where CoID = " + CoID + " and Express = " + a.ExID + " and ExpNo = '" + ExCode + "'";
+                            count = CoreDBconn.Execute(sqlcommand,TransCore);
+                            if(count < 0)
+                            {
+                                result.s = -3004;
+                                return result;
+                            }
+                            sqlcommand = @"INSERT INTO expnoused(CoID,Express,ExpNo) VALUES(@CoID,@Express,@ExpNo)";
+                            count = CoreDBconn.Execute(sqlcommand,new{CoID=CoID,Express=a.ExID,ExpNo=ExCode},TransCore);
+                            if(count < 0)
+                            {
+                                result.s = -3002;
+                                return result;
+                            }
+                        }
+                    }
+                    a.Status = 3;
+                    a.ExCode = "0";//待新增方法
+                    a.Modifier = UserName;
+                    a.ModifyDate = DateTime.Now;
+                    //更新订单
+                    sqlcommand = @"update `order` set WarehouseID =@WarehouseID,SendWarehouse=@SendWarehouse,ExID=@ExID,Express=@Express,Status=@Status,AbnormalStatus=@AbnormalStatus,
+                                   StatusDec=@StatusDec,Modifier=@Modifier,ModifyDate=@ModifyDate,ExCode=@ExCode where id = @ID and coid = @Coid";
+                    count = CoreDBconn.Execute(sqlcommand,a,TransCore);     
+                    if(count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                    var wa = CoreComm.WarehouseHaddle.wareInfoByID(a.WarehouseID.ToString(),CoID.ToString()).d as wareInfo;
+                    int ItCoid = 0;
+                    if(wa.itcoid == 0)
+                    {
+                        ItCoid = wa.coid;
+                    }
+                    else
+                    {
+                        ItCoid = wa.itcoid;
+                    }
+                    //更新库存资料
+                    foreach(var i in item)
+                    {
+                        sqlcommand = @"update inventory_sale set PickQty = PickQty + @Qty,Modifier=@Modifier,ModifyDate=@ModifyDate where Skuautoid = @ID and coid = @Coid";
+                        count = CoreDBconn.Execute(sqlcommand,new{Qty=i.Qty,Modifier=UserName,ModifyDate=DateTime.Now,ID=i.SkuAutoID,Coid=CoID},TransCore);     
+                        if(count < 0)
+                        {
+                            result.s = -3003;
+                            return result;
+                        }
+                        sqlcommand = @"update inventory set PickQty =PickQty + @Qty,Modifier=@Modifier,ModifyDate=@ModifyDate where Skuautoid = @ID and coid = @Coid";
+                        count = CoreDBconn.Execute(sqlcommand,new{Qty=i.Qty,Modifier=UserName,ModifyDate=DateTime.Now,ID=i.SkuAutoID,Coid=ItCoid},TransCore);     
+                        if(count < 0)
+                        {
+                            result.s = -3003;
+                            return result;
+                        }
+                        var saleoutitem = new SaleOutItemInsert();
+                        saleoutitem.OID = i.OID;
+                        saleoutitem.SoID = i.SoID;
+                        saleoutitem.SkuAutoID = i.SkuAutoID;
+                        saleoutitem.SkuID = i.SkuID;
+                        saleoutitem.SkuName = i.SkuName;
+                        saleoutitem.Norm = i.Norm;
+                        saleoutitem.GoodsCode = i.GoodsCode;
+                        saleoutitem.Qty = i.Qty;
+                        saleoutitem.SalePrice = i.SalePrice;
+                        saleoutitem.RealPrice = i.RealPrice;
+                        saleoutitem.Amount = i.Amount;
+                        saleoutitem.DiscountRate = i.DiscountRate;
+                        saleoutitem.img = i.img;
+                        saleoutitem.ShopSkuID = i.ShopSkuID;
+                        saleoutitem.Weight = i.Weight;
+                        saleoutitem.TotalWeight = i.TotalWeight;
+                        saleoutitem.IsGift = i.IsGift;
+                        saleoutitem.CoID = i.CoID;
+                        saleoutitem.Creator = UserName;
+                        saleoutitem.Modifier = UserName;
+                        sqlcommand = @"INSERT INTO saleoutitem(OID,SoID,SkuAutoID,SkuID,SkuName,Norm,GoodsCode,Qty,SalePrice,RealPrice,Amount,DiscountRate,img,
+                                                               ShopSkuID,Weight,TotalWeight,IsGift,CoID,Creator,Modifier) 
+                                                        VALUES(@OID,@SoID,@SkuAutoID,@SkuID,@SkuName,@Norm,@GoodsCode,@Qty,@SalePrice,@RealPrice,@Amount,@DiscountRate,@img,
+                                                               @ShopSkuID,@Weight,@TotalWeight,@IsGift,@CoID,@Creator,@Modifier)";
+                        count = CoreDBconn.Execute(sqlcommand,saleoutitem,TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3002;
+                            return result;
+                        }
+                    }
+                    //投递资料处理
+                    var saleout = new SaleOutInsert();
+                    saleout.OID = a.ID;
+                    saleout.SoID = a.SoID;
+                    saleout.DocDate = DateTime.Now;
+                    saleout.Status = 0;
+                    saleout.ExpName = a.Express;
+                    saleout.ExCode = ExCode;
+                    saleout.RecMessage = a.RecMessage;
+                    saleout.RecLogistics = a.RecLogistics;
+                    saleout.RecDistrict = a.RecDistrict;
+                    saleout.RecCity = a.RecCity;
+                    saleout.RecAddress = a.RecAddress;
+                    saleout.RecZip = a.RecZip;
+                    saleout.RecName = a.RecName;
+                    saleout.RecPhone = a.RecPhone;
+                    saleout.ExWeight = a.ExWeight;
+                    saleout.ExCost = a.ExCost;
+                    saleout.Amount = a.Amount;
+                    saleout.OrdQty = a.OrdQty;
+                    saleout.SendWarehouse = a.SendWarehouse;
+                    saleout.PayDate = a.PayDate;
+                    saleout.SendMessage = a.SendMessage;
+                    saleout.CoID = CoID;
+                    saleout.Creator = UserName;
+                    saleout.Modifier = UserName;
+                    saleout.ExID = a.ExID;
+                    saleout.ShopID = a.ShopID;
 
+                    sqlcommand = @"INSERT INTO saleout(OID,SoID,DocDate,Status,ExpName,ExCode,RecMessage,RecLogistics,RecDistrict,RecCity,RecAddress,RecZip,RecName,
+                                                            RecPhone,ExWeight,ExCost,Amount,OrdQty,SendWarehouse,PayDate,SendMessage,CoID,Creator,Modifier,ExID,ShopID) 
+                                                    VALUES(@OID,@SoID,@DocDate,@Status,@ExpName,@ExCode,@RecMessage,@RecLogistics,@RecDistrict,@RecCity,@RecAddress,@RecZip,@RecName,
+                                                            @RecPhone,@ExWeight,@ExCost,@Amount,@OrdQty,@SendWarehouse,@PayDate,@SendMessage,@CoID,@Creator,@Modifier,@ExID,@ShopID)";
+                    count = CoreDBconn.Execute(sqlcommand,saleout,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3002;
+                        return result;
+                    }
+                    
+                    var sr = new TransferNormalReturnSuccess();
+                    sr.ID = a.ID;
+                    sr.Status = a.Status;
+                    sr.StatusDec = Enum.GetName(typeof(OrdStatus), a.Status);;
+                    su.Add(sr);
+                    TransCore.Commit();
                 }
-
-                TransCore.Commit();
-            }
-            catch (Exception e)
-            {
-                TransCore.Rollback();
-                TransCore.Dispose();
-                result.s = -1;
-                result.d = e.Message;
-            }
-            finally
-            {
-                TransCore.Dispose();
-                CoreDBconn.Dispose();
-            }
-
+                catch (Exception e)
+                {
+                    TransCore.Rollback();
+                    TransCore.Dispose();
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+                finally
+                {
+                    TransCore.Dispose();
+                    CoreDBconn.Dispose();
+                }
+            }    
+            res.SuccessIDs = su;
+            res.FailIDs = fa;
+            result.d = res;
 
             return result;
         }
-
-
-
-
 
 
 
