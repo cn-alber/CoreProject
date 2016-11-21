@@ -325,7 +325,6 @@ namespace CoreWebApi
         }
 
 
-
         [HttpPostAttribute("/Core/Warehouse/modifyWareSetting")]
         public ResponseResult modifyWareSetting([FromBodyAttribute]JObject co)
         {   

@@ -391,6 +391,30 @@ namespace CoreData.CoreComm
             return result;
         }
 
+        public static DataResult InsertWareThird(string coid,string warename){
+            var result = new DataResult(1,null);   
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{
+                    string wheresql = @"INSERT ware_third_party SET ware_third_party.CoID = "+coid+@",ware_third_party.ApplyCoid = "+coid+
+                                            @", ware_third_party.ItCoid = 0,ware_third_party.WareName = '"+warename+
+                                            "',ware_third_party.Cdate = NOW()" ;
+                    int u = conn.Execute(wheresql);            
+                    if (u > 0)
+                    {
+                        result.d = true;                 
+                    }
+                    else
+                    {
+                        result.d = false;   
+                    }              
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return  result;
+        }
 
 
         ///<summary>
@@ -1076,7 +1100,7 @@ namespace CoreData.CoreComm
 
 
                     sql =@"SELECT 
-                            w.ID,w.WareName,w.myremark,w.itremark,w.Enable,w.Source ,w.ItName,w.Mdate,w.CoID,w.ItCoid,w.ApplyCoid
+                            w.ID,w.WareName,w.myremark,w.itremark,w.Enable,w.ItName,w.Mdate,w.CoID,w.ItCoid,w.ApplyCoid
                            FROM 
                             ware_third_party as w "+wh+c+s;
                     Console.WriteLine(sql);                                                      
@@ -1111,7 +1135,7 @@ namespace CoreData.CoreComm
                             w.ID,w.WareName,w.CoID
                            FROM 
                             ware_third_party as w 
-                           WHERE w.Enable = 2 AND   w.CoID ="+CoID;                                                                     
+                           WHERE (w.Enable = 2 OR w.ItCoid=0) AND   w.CoID ="+CoID;                                                                     
                     var storageLst = conn.Query<wareLst>(sql).AsList();                    
         
                     result.d = new {
@@ -1128,6 +1152,35 @@ namespace CoreData.CoreComm
             return result;
         }
 
+        ///<summary>
+        /// 根据ID 获取分仓关系表信息
+        ///</summary>
+         public static DataResult wareInfoByID(string id,string CoID){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {                                             
+                    string sql ="";                                                          
+                    sql =@"SELECT 
+                            w.ItCoid,w.WareName,w.CoID
+                           FROM 
+                            ware_third_party as w 
+                           WHERE w.ID = "+id+" AND   w.CoID ="+CoID;                                                                     
+                    var storageLst = conn.Query<wareLst>(sql).AsList();                    
+        
+                    result.d = new {
+                        Lst = storageLst,             
+                    };
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
 
 
 
