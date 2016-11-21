@@ -90,3 +90,10 @@ InPut:
 OutPut:
     参见：GetShopEnum.json
   
+9.getDisEnum() //获取店铺列表
+接口路径：CoreWebApi\Controllers\Base\CommControllers.cs
+路由：/Core/Distributor/getDisEnum
+InPut:
+     
+OutPut:
+    参见：GetShopEnum.json  
