@@ -232,6 +232,7 @@ namespace CoreWebApi
         }
         #endregion
 
+        #region 获取店铺接口
         [HttpGetAttribute("/Core/Shop/getShopEnum")]
         public ResponseResult getShopEnum()
         {          
@@ -245,6 +246,23 @@ namespace CoreWebApi
             res.d = r;
             return CoreResult.NewResponse(res.s,res.d,"Api");
         }
+        #endregion
+
+        #region 获取分销列表接口
+        [HttpGetAttribute("/Core/Distributor/getDisEnum")]
+        public ResponseResult getDisEnum()
+        {          
+            var res = new DataResult(1,null);                            
+            string Coid = GetCoid();         
+            var r = DistributorHaddle.getDisEnum(Coid);
+            r.Add(new distributorEnum{
+                value = 0,
+                label = "{自营}"
+            });  
+            res.d = r;
+            return CoreResult.NewResponse(res.s,res.d,"Api");
+        }
+        #endregion
 
 
 

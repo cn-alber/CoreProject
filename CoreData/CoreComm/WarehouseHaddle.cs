@@ -9,6 +9,7 @@ using CoreData.CoreUser;
 using System.Threading.Tasks;
 using CoreModels.XyCore;
 using System.Linq;
+using CoreData.CoreCore;
 
 namespace CoreData.CoreComm
 {
@@ -1423,21 +1424,26 @@ namespace CoreData.CoreComm
         var result = new DataResult(1,null);
         var province = new List<AreaAll>();
         var shop = new List<shopEnum>();
+        var distributor = new List<distributorEnum>();
         using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
             try
             {
-                Task[] tasks = new Task[2];
+                Task[] tasks = new Task[3];
                 tasks[0] =   Task.Factory.StartNew(()=>{
                     province = getAreaAll();
                 }); 
                 tasks[1] =  Task.Factory.StartNew(()=>{
                     shop = ShopHaddle.getShopEnum(CoID);
                 });
+                tasks[2] = Task.Factory.StartNew(()=>{
+                    distributor = DistributorHaddle.getDisEnum(CoID);
+                });
                 
                 Task.WaitAll(tasks);
                 result.d = new{
                     province = province,
-                    shop = shop
+                    shop = shop,
+                    distributor = distributor
                 };
 
             }
@@ -1455,12 +1461,16 @@ namespace CoreData.CoreComm
             var result = new DataResult(1,null);
             var province = new List<AreaAll>();
             var shop = new List<shopEnum>();
-            Task[] tasks = new Task[2];
+            var distributor = new List<distributorEnum>();
+            Task[] tasks = new Task[3];
             tasks[0] =   Task.Factory.StartNew(()=>{
                 province = getAreaAll();
             }); 
             tasks[1] =  Task.Factory.StartNew(()=>{
                 shop = ShopHaddle.getShopEnum(CoID);
+            });
+            tasks[2] = Task.Factory.StartNew(()=>{
+                distributor = DistributorHaddle.getDisEnum(CoID);
             });
               
             Task.WaitAll(tasks);
@@ -1486,7 +1496,8 @@ namespace CoreData.CoreComm
                             }
                             result.d = new{
                                 province = province,
-                                shop = shop,                                
+                                shop = shop,
+                                distributor = distributor,                                
                                 ploy = new {
                                     ID = p.ID,                                    
                                     Name = p.Name,
@@ -1508,7 +1519,8 @@ namespace CoreData.CoreComm
                         }else{
                             result.d = new{
                                 province = province,
-                                shop = shop
+                                shop = shop,
+                                distributor = distributor
                             };
                         }
 
