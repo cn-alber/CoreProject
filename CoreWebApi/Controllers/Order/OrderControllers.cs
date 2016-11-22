@@ -1249,6 +1249,52 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
+        [HttpGetAttribute("/Core/Order/GetOrderListSingle")]
+        public ResponseResult GetOrderListSingle(string OID)
+        {   
+            int x,oid = 0;
+            var data = new DataResult(1,null);
+            if (int.TryParse(OID, out x))
+            {
+                oid = int.Parse(OID);
+            }
+            else
+            {
+                data.s = -1;
+                data.d = "参数无效!";
+                return CoreResult.NewResponse(data.s, data.d, "General"); 
+            }
+            int CoID = int.Parse(GetCoid());
+            data = OrderHaddle.GetOrderListSingle(oid,CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         [HttpPostAttribute("/Core/Order/ModifySku")]
         public ResponseResult ModifySku([FromBodyAttribute]JObject co)

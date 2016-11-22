@@ -1,0 +1,73 @@
+{
+    "s": 1,
+    "d": {
+        "Datacnt": 1,
+        "Pagecnt": 1,
+        "Ord": [
+            {
+                "ID": 10875,
+                "Type": 0,
+                "TypeString": "普通订单",
+                "DealerType": 0,
+                "IsMerge": false,
+                "IsSplit": false,
+                "OSource": 3,
+                "SoID": 63615344340,
+                "ODate": "2016-11-21 00:00:00",
+                "PayDate": "2016-11-22 00:00:00",
+                "BuyerShopID": "测试1121",
+                "ShopName": "京东南极人羽绒服旗舰店",
+                "Amount": "219.00",
+                "PaidAmount": "219.00",
+                "ExAmount": "20.00",
+                "IsCOD": false,
+                "RecTel": "",
+                "RecPhone": "158974335",
+                "Status": 3,
+                "StatusDec": "发货中",
+                "AbnormalStatus": 0,
+                "AbnormalStatusDec": "",
+                "RecMessage": "RecMessage1026",
+                "SendMessage": "测试1117",
+                "Express": "圆通速递",
+                "RecLogistics": "江苏省",
+                "RecCity": "苏州市",
+                "RecDistrict": "常熟市",
+                "RecAddress": "可美大厦",
+                "RecName": "xiayun",
+                "ExWeight": "0.50",
+                "Distributor": "",
+                "SupDistributor": "",
+                "InvoiceTitle": "个人",
+                "PlanDate": null,
+                "SendWarehouse": "南极云商",
+                "SendDate": null,
+                "ExID": 1,
+                "ExpNamePinyin": "yuantong",
+                "ExCode": "0",
+                "Creator": "管理员",
+                "SoIDList": null,
+                "SkuList": [
+                    {
+                        "ID": 19085,
+                        "OID": 10875,
+                        "SkuAutoID": 2,
+                        "Img": "",
+                        "Qty": 1,
+                        "GoodsCode": "test123456",
+                        "SkuID": "test1234560004007",
+                        "SkuName": "南极人2016男装夹克",
+                        "Norm": "红色1;43",
+                        "RealPrice": "199.00",
+                        "Amount": "199.00",
+                        "ShopSkuID": null,
+                        "IsGift": false,
+                        "Weight": "0.50",
+                        "InvQty": 0
+                    }
+                ]
+            }
+        ]
+    },
+    "m": ""
+}

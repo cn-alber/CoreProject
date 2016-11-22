@@ -2,36 +2,44 @@
     "s": 1,
     "d": [
         {
-            "ID": 1,
-            "Name": "等待订单合并"
+            "value": "1",
+            "label": "等待订单合并",
+            "iscustom": false
         },
         {
-            "ID": 2,
-            "Name": "等待订单拆分"
+            "value": "2",
+            "label": "等待订单拆分",
+            "iscustom": false
         },
         {
-            "ID": 3,
-            "Name": "缺货"
+            "value": "3",
+            "label": "缺货",
+            "iscustom": false
         },
         {
-            "ID": 4,
-            "Name": "获取电子面单错误"
+            "value": "4",
+            "label": "获取电子面单错误",
+            "iscustom": false
         },
         {
-            "ID": 5,
-            "Name": "等待卖家收货"
+            "value": "5",
+            "label": "等待卖家收货",
+            "iscustom": false
         },
         {
-            "ID": 6,
-            "Name": "商品编码缺失"
+            "value": "6",
+            "label": "商品编码缺失",
+            "iscustom": false
         },
         {
-            "ID": 7,
-            "Name": "部分付款"
+            "value": "7",
+            "label": "部分付款",
+            "iscustom": false
         },
         {
-            "ID": 8,
-            "Name": "测试"
+            "value": "8",
+            "label": "测试",
+            "iscustom": true
         }
     ],
     "m": ""

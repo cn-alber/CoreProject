@@ -953,4 +953,10 @@ namespace CoreModels.XyCore
     {
         public string ExCode{get;set;}
     }
+    public class OrderAbnormal
+    {
+        public string value{get;set;}
+        public string label{get;set;}
+        public bool iscustom{get;set;}
+    }
 }
