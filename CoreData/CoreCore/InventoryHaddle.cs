@@ -24,15 +24,45 @@ namespace CoreData.CoreCore
             {
                 try
                 {
+                    //获取本公司商品Skuautoid - 提供资料过滤
+                    StringBuilder queryskusql = new StringBuilder();
                     StringBuilder querycount = new StringBuilder();
                     StringBuilder querysql = new StringBuilder();
+                    bool is_subsql = false;
+                    string skusql = @"SELECT ID FROM coresku WHERE CoID=@CoID AND Type<2 ";
+                    queryskusql.Append(skusql);
                     var p = new DynamicParameters();
+                    p.Add("@CoID", IParam.CoID);
+                    if (!string.IsNullOrEmpty(IParam.GoodsCode))//款式编号
+                    {
+                        queryskusql.Append(" AND coresku.GoodsCode like @GoodsCode");
+                        p.Add("@GoodsCode", "%" + IParam.GoodsCode + "%");
+                        is_subsql = true;
+                    }
+                    if (!string.IsNullOrEmpty(IParam.SkuID))//商品编号
+                    {
+                        queryskusql.Append(" AND coresku.SkuID like @SkuID");
+                        p.Add("@SkuID", "%" + IParam.SkuID + "%");
+                        is_subsql = true;
+                    }
+                    if (!string.IsNullOrEmpty(IParam.SkuName))//商品名称
+                    {
+                        queryskusql.Append(" AND coresku.SkuName like @SkuName");
+                        p.Add("@SkuName", "%" + IParam.SkuName + "%");
+                        is_subsql = true;
+                    }
+                    if (!string.IsNullOrEmpty(IParam.Norm))//商品名称
+                    {
+                        queryskusql.Append(" AND coresku.Norm like @Norm");
+                        p.Add("@Norm", "%" + IParam.Norm + "%");
+                        is_subsql = true;
+                    }
                     string countsql = @"SELECT
                                             count(ID)
                                         FROM
-                                            inventory
+                                            inventory_sale
                                         WHERE
-                                            CoID = @CoID AND WarehouseID=0";
+                                            CoID = @CoID";
                     string sql = @"SELECT
                                     inventory.ID,
                                     inventory.GoodsCode,
@@ -50,34 +80,9 @@ namespace CoreData.CoreCore
                             FROM
                                 inventory
                             WHERE
-                                CoID = @CoID AND WarehouseID=0 AND IsDelete=0";
+                                CoID = @CoID AND IsDelete=0";
                     querycount.Append(countsql);
                     querysql.Append(sql);
-                    p.Add("@CoID", IParam.CoID);
-                    if (!string.IsNullOrEmpty(IParam.GoodsCode))//款式编号
-                    {
-                        querycount.Append(" AND inventory.GoodsCode like @GoodsCode");
-                        querysql.Append(" AND inventory.GoodsCode like @GoodsCode");
-                        p.Add("@GoodsCode", "%" + IParam.GoodsCode + "%");
-                    }
-                    if (!string.IsNullOrEmpty(IParam.SkuID))//商品编号
-                    {
-                        querycount.Append(" AND inventory.SkuID like @SkuID");
-                        querysql.Append(" AND inventory.SkuID like @SkuID");
-                        p.Add("@SkuID", "%" + IParam.SkuID + "%");
-                    }
-                    if (!string.IsNullOrEmpty(IParam.SkuName))//商品名称
-                    {
-                        querycount.Append(" AND inventory.SkuName like @SkuName");
-                        querysql.Append(" AND inventory.SkuName like @SkuName");
-                        p.Add("@SkuName", "%" + IParam.SkuName + "%");
-                    }
-                    if (!string.IsNullOrEmpty(IParam.Norm))//商品名称
-                    {
-                        querycount.Append(" AND inventory.Norm like @Norm");
-                        querysql.Append(" AND inventory.Norm like @Norm");
-                        p.Add("@Norm", "%" + IParam.Norm + "%");
-                    }
                     if (IParam.StockQtyb < IParam.StockQtye && IParam.StockQtyb > 0)
                     {
                         querycount.Append(" AND inventory.StockQty > @StockQtyb AND inventory.StockQty < @StockQtye");
@@ -98,12 +103,17 @@ namespace CoreData.CoreCore
                             querysql.Append(" AND inventory.StockQty<inventory.SafeQty");
                         }
                     }
+                    if (is_subsql)
+                    {
+                        querycount.Append(" AND Skuautoid in (" + queryskusql + ") ");
+                        querysql.Append(" AND Skuautoid in (" + queryskusql + ") ");
+                    }
                     //排序
                     if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
                     {
                         querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                     }
-                    var DataCount = CoreData.DbBase.CoreDB.QueryFirst<int>(countsql, p);
+                    var DataCount = CoreData.DbBase.CoreDB.QueryFirst<int>(querycount.ToString(), p);
                     if (DataCount < 0)
                     {
                         res.s = -3001;
@@ -117,7 +127,7 @@ namespace CoreData.CoreCore
                         querysql.Append(" LIMIT @ls , @le");
                         p.Add("@ls", dataindex);
                         p.Add("@le", IParam.PageSize);
-                        var InvLst = CoreData.DbBase.CoreDB.Query<Inventory>(querysql.ToString(), p).AsList();
+                        var InvLst = CoreData.DbBase.CoreDB.Query<Inventory_sale>(querysql.ToString(), p).AsList();
                         if (InvLst.Count > 0)
                         {
                             var SkuIDLst = InvLst.Select(a => a.Skuautoid).Distinct().AsList();
@@ -126,7 +136,7 @@ namespace CoreData.CoreCore
                             InvLst = (from a in InvLst
                                       join b in SkuViewLst on a.Skuautoid equals b.ID into data
                                       from c in data.DefaultIfEmpty()
-                                      select new Inventory
+                                      select new Inventory_sale
                                       {
                                           ID = a.ID,
                                           Skuautoid = a.Skuautoid,
@@ -136,7 +146,6 @@ namespace CoreData.CoreCore
                                           SaleRetuQty = a.SaleRetuQty,
                                           WaitInQty = a.WaitInQty,
                                           VirtualQty = a.VirtualQty,
-                                          WarehouseID = a.WarehouseID,
                                           CoID = a.CoID,
                                           GoodsCode = c == null ? "" : c.GoodsCode,
                                           SkuID = c == null ? "" : c.SkuID,
@@ -145,7 +154,7 @@ namespace CoreData.CoreCore
                                           Img = c == null ? "" : c.Img,
                                       }).AsList();
                         }
-                        inv.InvLst = InvLst;
+                        inv.InvMainLst = InvLst;
                         res.d = inv;
                     }
                 }
@@ -171,13 +180,38 @@ namespace CoreData.CoreCore
             {
                 try
                 {
+                    //获取本公司商品Skuautoid - 提供资料过滤
+                    StringBuilder queryskusql = new StringBuilder();
                     StringBuilder querycount = new StringBuilder();
                     StringBuilder querysql = new StringBuilder();
+                    string skusql = @"SELECT ID FROM coresku WHERE CoID=@CoID AND Type<2 ";
+                    queryskusql.Append(skusql);
                     var p = new DynamicParameters();
-                    string countsql = @"SELECT count(ID) FROM inventory WHERE CoID = @CoID AND WarehouseID>0";
+                    p.Add("@CoID", IParam.CoID);
+                    if (!string.IsNullOrEmpty(IParam.GoodsCode))//款式编号
+                    {
+                        queryskusql.Append(" AND coresku.GoodsCode like @GoodsCode");
+                        p.Add("@GoodsCode", "%" + IParam.GoodsCode + "%");
+                    }
+                    if (!string.IsNullOrEmpty(IParam.SkuID))//商品编号
+                    {
+                        queryskusql.Append(" AND coresku.SkuID like @SkuID");
+                        p.Add("@SkuID", "%" + IParam.SkuID + "%");
+                    }
+                    if (!string.IsNullOrEmpty(IParam.SkuName))//商品名称
+                    {
+                        queryskusql.Append(" AND coresku.SkuName like @SkuName");
+                        p.Add("@SkuName", "%" + IParam.SkuName + "%");
+                    }
+                    if (!string.IsNullOrEmpty(IParam.Norm))//商品名称
+                    {
+                        queryskusql.Append(" AND coresku.Norm like @Norm");
+                        p.Add("@Norm", "%" + IParam.Norm + "%");
+                    }
+                    // var SkuautoidLst = conn.Query(queryskusql+" ORDER BY ID", p1).AsList();//本仓商品autoid
+                    string countsql = @"SELECT count(ID) FROM inventory WHERE CoID in @CoIDLst AND Skuautoid in (" + queryskusql + " ORDER BY ID)";
                     string sql = @"SELECT
                                     inventory.ID,
-                                    inventory.GoodsCode,
                                     inventory.Skuautoid,
                                     inventory.StockQty,
                                     inventory.LockQty,
@@ -192,112 +226,97 @@ namespace CoreData.CoreCore
                                     inventory.CoID
                                    FROM
                                     inventory
-                                   WHERE CoID = @CoID AND WarehouseID>0 AND IsDelete=0";
+                                   WHERE CoID in @CoIDLst AND Skuautoid in (" + queryskusql + " ORDER BY ID)";
                     querycount.Append(countsql);
                     querysql.Append(sql);
-                    p.Add("@CoID", IParam.CoID);
-                    if (!string.IsNullOrEmpty(IParam.GoodsCode))//款式编号
+                    //获取第三方仓公司ID
+                    var res = CommHaddle.GetWareCoidList(IParam.CoID.ToString());
+                    var CoIDLst = res.d as List<string>;
+                    if (CoIDLst.Count > 0)
                     {
-                        querycount.Append(" AND inventory.GoodsCode like @GoodsCode");
-                        querysql.Append(" AND inventory.GoodsCode like @GoodsCode");
-                        p.Add("@GoodsCode", "%" + IParam.GoodsCode + "%");
-                    }
-                    if (!string.IsNullOrEmpty(IParam.SkuID))//商品编号
-                    {
-                        querycount.Append(" AND inventory.SkuID like @SkuID");
-                        querysql.Append(" AND inventory.SkuID like @SkuID");
-                        p.Add("@SkuID", "%" + IParam.SkuID + "%");
-                    }
-                    if (!string.IsNullOrEmpty(IParam.SkuName))//商品名称
-                    {
-                        querycount.Append(" AND inventory.SkuName like @SkuName");
-                        querysql.Append(" AND inventory.SkuName like @SkuName");
-                        p.Add("@SkuName", "%" + IParam.SkuName + "%");
-                    }
-                    if (!string.IsNullOrEmpty(IParam.Norm))//商品名称
-                    {
-                        querycount.Append(" AND inventory.Norm like @Norm");
-                        querysql.Append(" AND inventory.Norm like @Norm");
-                        p.Add("@Norm", "%" + IParam.Norm + "%");
-                    }
-                    if (IParam.StockQtyb < IParam.StockQtye && IParam.StockQtyb > 0)
-                    {
-                        querycount.Append(" AND inventory.StockQty > @StockQtyb AND inventory.StockQty < @StockQtye");
-                        querysql.Append(" AND inventory.StockQty > @StockQtyb AND inventory.StockQty < @StockQtye");
-                        p.Add("@StockQtyb", IParam.StockQtyb);
-                        p.Add("@StockQtye", IParam.StockQtye);
-                    }
-                    if (IParam.WarehouseID > 0)
-                    {
-                        querycount.Append(" AND inventory.WarehouseID = @WarehouseID");
-                        querysql.Append(" AND inventory.WarehouseID = @WarehouseID");
-                        p.Add("@WarehouseID", IParam.WarehouseID);
-                    }
-                    if (IParam.Status > 0)//库存状态:0.全部,1.充足,2.预警
-                    {
-                        if (IParam.Status == 1)
+                        // var p2 = new DynamicParameters();
+                        p.Add("@CoIDLst", CoIDLst);
+                        if (IParam.StockQtyb < IParam.StockQtye && IParam.StockQtyb > 0)
                         {
-                            querycount.Append(" AND inventory.StockQty>=inventory.SafeQty");
-                            querysql.Append(" AND inventory.StockQty>=inventory.SafeQty");
+                            querycount.Append(" AND inventory.StockQty > @StockQtyb AND inventory.StockQty < @StockQtye");
+                            querysql.Append(" AND inventory.StockQty > @StockQtyb AND inventory.StockQty < @StockQtye");
+                            p.Add("@StockQtyb", IParam.StockQtyb);
+                            p.Add("@StockQtye", IParam.StockQtye);
+                        }
+                        if (IParam.WarehouseID > 0)
+                        {
+                            querycount.Append(" AND inventory.CoID = @WarehouseID");
+                            querysql.Append(" AND inventory.CoID = @WarehouseID");
+                            p.Add("@WarehouseID", IParam.WarehouseID);
+                        }
+                        if (IParam.Status > 0)//库存状态:0.全部,1.充足,2.预警
+                        {
+                            if (IParam.Status == 1)
+                            {
+                                querycount.Append(" AND inventory.StockQty>=inventory.SafeQty");
+                                querysql.Append(" AND inventory.StockQty>=inventory.SafeQty");
+                            }
+                            else
+                            {
+                                querycount.Append(" AND inventory.StockQty<inventory.SafeQty");
+                                querysql.Append(" AND inventory.StockQty<inventory.SafeQty");
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
+                        {
+                            querycount.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
+                            querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
+                        }
+                        var DataCount = CoreData.DbBase.CoreDB.QueryFirst<int>(querycount.ToString(), p);
+                        if (DataCount < 0)
+                        {
+                            result.s = -3001;
                         }
                         else
                         {
-                            querycount.Append(" AND inventory.StockQty<inventory.SafeQty");
-                            querysql.Append(" AND inventory.StockQty<inventory.SafeQty");
+                            inv.DataCount = DataCount;
+                            decimal pagecnt = Math.Ceiling(decimal.Parse(inv.DataCount.ToString()) / decimal.Parse(IParam.PageSize.ToString()));
+                            inv.PageCount = Convert.ToInt32(pagecnt);
+                            int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
+                            querysql.Append(" LIMIT @ls , @le");
+                            p.Add("@ls", dataindex);
+                            p.Add("@le", IParam.PageSize);
+                            var InvLst = CoreData.DbBase.CoreDB.Query<Inventory>(querysql.ToString(), p).AsList();
+                            if (InvLst.Count > 0)
+                            {
+                                var SkuIDLst = InvLst.Select(a => a.Skuautoid).Distinct().AsList();
+                                var res1 = CommHaddle.GetSkuViewByID(IParam.CoID.ToString(), SkuIDLst);
+                                var res2 = CommHaddle.GetWareThirdList(IParam.CoID.ToString()); ;
+                                var WhLst = res2.d as List<Warehouse_view>;
+                                var SkuViewLst = res1.d as List<CoreSkuView>;//获取商品Sku资料,拼接Lst显示
+                                InvLst = (from a in InvLst
+                                          join b in SkuViewLst on a.Skuautoid equals b.ID into data
+                                          from c in data.DefaultIfEmpty()
+                                          join w in WhLst on a.CoID equals w.CoID into enddata
+                                          from e in enddata.DefaultIfEmpty()
+                                          select new Inventory
+                                          {
+                                              ID = a.ID,
+                                              Skuautoid = a.Skuautoid,
+                                              StockQty = a.StockQty,
+                                              SafeQty = a.SafeQty,
+                                              LockQty = a.LockQty,
+                                              SaleRetuQty = a.SaleRetuQty,
+                                              WaitInQty = a.WaitInQty,
+                                              VirtualQty = a.VirtualQty,
+                                              WarehouseID = e == null ? "" : e.CoID,
+                                              WarehouseName = e == null ? "" : e.WhName,
+                                              CoID = a.CoID,
+                                              GoodsCode = c == null ? "" : c.GoodsCode,
+                                              SkuID = c == null ? "" : c.SkuID,
+                                              Name = c == null ? "" : c.SkuName,
+                                              Norm = c == null ? "" : c.Norm,
+                                              Img = c == null ? "" : c.Img
+                                          }).AsList();
+                            }
+                            inv.InvLst = InvLst;
+                            result.d = inv;
                         }
-                    }
-                    if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
-                    {
-                        querycount.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
-                        querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
-                    }
-                    var DataCount = CoreData.DbBase.CoreDB.QueryFirst<int>(querycount.ToString(), p);
-                    if (DataCount < 0)
-                    {
-                        result.s = -3001;
-                    }
-                    else
-                    {
-                        inv.DataCount = DataCount;
-                        decimal pagecnt = Math.Ceiling(decimal.Parse(inv.DataCount.ToString()) / decimal.Parse(IParam.PageSize.ToString()));
-                        inv.PageCount = Convert.ToInt32(pagecnt);
-                        int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
-                        querysql.Append(" LIMIT @ls , @le");
-                        p.Add("@ls", dataindex);
-                        p.Add("@le", IParam.PageSize);
-                        var InvLst = CoreData.DbBase.CoreDB.Query<Inventory>(querysql.ToString(), p).AsList();
-                        if (InvLst.Count > 0)
-                        {
-                            var SkuIDLst = InvLst.Select(a => a.Skuautoid).Distinct().AsList();
-                            var res1 = CommHaddle.GetSkuViewByID(IParam.CoID.ToString(), SkuIDLst);
-                            var res2 = CommHaddle.GetWhViewByID(IParam.CoID.ToString(), InvLst[0].WarehouseID);
-                            var Wh = res2.d as Warehouse_view;
-                            var SkuViewLst = res1.d as List<CoreSkuView>;//获取商品Sku资料,拼接Lst显示
-                            InvLst = (from a in InvLst
-                                      join b in SkuViewLst on a.Skuautoid equals b.ID into data
-                                      from c in data.DefaultIfEmpty()
-                                      select new Inventory
-                                      {
-                                          ID = a.ID,
-                                          Skuautoid = a.Skuautoid,
-                                          StockQty = a.StockQty,
-                                          SafeQty = a.SafeQty,
-                                          LockQty = a.LockQty,
-                                          SaleRetuQty = a.SaleRetuQty,
-                                          WaitInQty = a.WaitInQty,
-                                          VirtualQty = a.VirtualQty,
-                                          WarehouseID = a.WarehouseID,
-                                          WarehouseName = Wh.WhName,
-                                          CoID = a.CoID,
-                                          GoodsCode = c == null ? "" : c.GoodsCode,
-                                          SkuID = c == null ? "" : c.SkuID,
-                                          Name = c == null ? "" : c.SkuName,
-                                          Norm = c == null ? "" : c.Norm,
-                                          Img = c == null ? "" : c.Img,
-                                      }).AsList();
-                        }
-                        inv.InvLst = InvLst;
-                        result.d = inv;
                     }
                 }
                 catch (Exception e)
@@ -318,7 +337,7 @@ namespace CoreData.CoreCore
         public static DataResult GetInvDetailQuery(InvQueryParam IParam)
         {
             var inv = new InvItemData();
-            var res = new DataResult(1, null);
+            var result = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CoreConnectString))
             {
                 try
@@ -326,7 +345,7 @@ namespace CoreData.CoreCore
                     StringBuilder querycount = new StringBuilder();
                     StringBuilder querysql = new StringBuilder();
                     var p = new DynamicParameters();
-                    string countsql = @"SELECT count(ID) FROM invinoutitem WHERE CoID = @CoID AND Status = 1";
+                    string countsql = @"SELECT count(ID) FROM invinoutitem WHERE CoID IN @CoIDLst AND Status = 1";
                     string sql = @"
                                    SELECT
                                         Invinoutitem.ID,
@@ -345,10 +364,15 @@ namespace CoreData.CoreCore
                                         invinoutitem.OID
                                    FROM
                                         invinoutitem
-                                   WHERE CoID = @CoID AND Status = 1";
+                                   WHERE CoID IN @CoIDLst AND Status = 1";
                     querycount.Append(countsql);
                     querysql.Append(sql);
-                    p.Add("@CoID", IParam.CoID);
+                    // p.Add("@CoID", IParam.CoID);
+                    //获取第三方仓公司ID
+                    var res = CommHaddle.GetWareCoidList(IParam.CoID.ToString());
+                    var CoIDLst = res.d as List<string>;
+                    p.Add("@CoIDLst", CoIDLst);
+
                     if (!string.IsNullOrEmpty(IParam.SkuID))//商品编号
                     {
                         querycount.Append(" AND Skuautoid = @SkuID");
@@ -357,8 +381,8 @@ namespace CoreData.CoreCore
                     }
                     if (IParam.WarehouseID > 0)//仓库编号
                     {
-                        querycount.Append(" AND WhID = @WarehouseID");
-                        querysql.Append(" AND WhID = @WarehouseID");
+                        querycount.Append(" AND CoID = @WarehouseID");
+                        querysql.Append(" AND CoID = @WarehouseID");
                         p.Add("@WarehouseID", IParam.WarehouseID);
                     }
                     if (!string.IsNullOrEmpty(IParam.DocType))//单据类型
@@ -387,7 +411,7 @@ namespace CoreData.CoreCore
                     var DataCount = CoreData.DbBase.CoreDB.QueryFirst<int>(querycount.ToString(), p);
                     if (DataCount < 0)
                     {
-                        res.s = -3001;
+                        result.s = -3001;
                     }
                     else
                     {
@@ -400,24 +424,24 @@ namespace CoreData.CoreCore
                         p.Add("@le", IParam.PageSize);
                         var InvItemLst = CoreData.DbBase.CoreDB.Query<Invinoutitem>(querysql.ToString(), p).AsList();
                         inv.InvitemLst = InvItemLst;
-                        res.d = inv;
+                        result.d = inv;
                     }
                 }
                 catch (Exception e)
                 {
-                    res.s = -1;
-                    res.d = e.Message;
+                    result.s = -1;
+                    result.d = e.Message;
                 }
                 finally
                 {
                     conn.Dispose();
                 }
             }
-            return res;
+            return result;
         }
         #endregion
 
-        #region 商品库存查询 - 修改现有库存-查询单笔库存明细（主仓|分仓共用）
+        #region 商品库存查询 - 修改现有库存-查询单笔库存明细
         public static DataResult GetInventorySingle(int ID, string CoID)
         {
             var result = new DataResult(1, null);
@@ -441,16 +465,16 @@ namespace CoreData.CoreCore
                             querysql.Append(sql);
                             p.Add("@CoID", CoID);
                             p.Add("@ID", ID);
-                            var inv = CoreData.DbBase.CoreDB.QueryFirst<Sfc_InvStock>(querysql.ToString(), p);
-                            if (inv == null)
+                            var invLst = CoreData.DbBase.CoreDB.Query<Sfc_InvStock>(querysql.ToString(), p).AsList();
+                            if (invLst.Count == 0)
                             {
                                 result.s = -3001;
                             }
                             else
                             {
-                                string skuid = conn.QueryFirst<string>("SELECT SkuID FROM coresku WHERE CoID=@CoID AND ID = @ID", new { CoID = CoID, ID = inv.Skuautoid });
-                                inv.SkuID = skuid;
-                                result.d = inv;
+                                string skuid = conn.QueryFirst<string>("SELECT SkuID FROM coresku WHERE CoID=@CoID AND ID = @ID", new { CoID = CoID, ID = invLst[0].Skuautoid });
+                                invLst[0].SkuID = skuid;
+                                result.d = invLst[0];
                             }
                         }
                     }
@@ -560,8 +584,11 @@ namespace CoreData.CoreCore
                         //更新库存数量                   
                         var SkuIDLst = new List<string>();
                         SkuIDLst.Add(inv_item.Skuautoid);
-                        conn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = CoID, WarehouseID = wh_inv.WarehouseID, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
-                        conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, WarehouseID = wh_inv.WarehouseID, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                        conn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = CoID, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                        //获取第三方仓公司ID
+                        res = CommHaddle.GetWareCoidList(CoID);
+                        var CoIDLst = res.d as List<string>;
+                        conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, CoIDLst = CoIDLst, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
                         Trans.Commit();
                         CoreUser.LogComm.InsertUserLog("修改库存数量-盘点数量", "Inventory", "单据ID" + ParentID, UserName, int.Parse(CoID), DateTime.Now);
                     }
@@ -614,7 +641,7 @@ namespace CoreData.CoreCore
                     else
                     {
                         StringBuilder querysql = new StringBuilder();
-                        string sql = @"SELECT ID,Skuautoid,StockQty,WarehouseID FROM inventory WHERE CoID=@CoID AND WarehouseID>0 AND IsDelete=0 AND StockQty>0";
+                        string sql = @"SELECT ID,Skuautoid,StockQty,WarehouseID FROM inventory WHERE CoID=@CoID AND IsDelete=0 AND StockQty>0";
                         var p = new DynamicParameters();
                         querysql.Append(sql);
                         p.Add("@CoID", CoID);
@@ -693,8 +720,10 @@ namespace CoreData.CoreCore
                             string clearsql = @"UPDATE inventory SET StockQty = 0,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID = @CoID AND IsDelete=0 AND ID in @IDLst";
                             int count3 = conn.Execute(clearsql, new { CoID = CoID, Modifier = UserName, ModifyDate = DateTime.Now.ToString(), IDLst = WhIDLst });
                             var SkuIDLst = wh_invLst.Select(a => a.Skuautoid).AsList();
-                            // conn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = CoID, WarehouseID = wh_invLst[0].WarehouseID, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
-                            conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, WarehouseID = wh_invLst[0].WarehouseID, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                            //获取第三方仓公司ID
+                            res = CommHaddle.GetWareCoidList(CoID);
+                            var CoIDLst = res.d as List<string>;
+                            conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, CoIDLst = CoIDLst, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
                             Trans.Commit();
                             CoreUser.LogComm.InsertUserLog("清空库存数量-盘点数量", "Inventory", "单据ID" + ParentID, UserName, int.Parse(CoID), DateTime.Now);
                         }
@@ -733,9 +762,8 @@ namespace CoreData.CoreCore
             {
                 string content = string.Empty;
                 StringBuilder querysql = new StringBuilder();
-                string sql = "UPDATE inventory SET IsDelete=1,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND IsDelete=0 AND StockQty=0";
+                string sql = string.Empty;
                 var p = new DynamicParameters();
-                querysql.Append(sql);
                 p.Add("@CoID", CoID);
                 p.Add("@Modifier", UserName);
                 p.Add("@ModifyDate", DateTime.Now.ToString());
@@ -746,14 +774,15 @@ namespace CoreData.CoreCore
                 }
                 if (whType == 1)//1.分仓，2.主仓
                 {
-                    querysql.Append(" AND WarehouseID >0");
-                    content = "清除分仓零库存";
+                    content = "清除本仓零库存";
+                    sql = "UPDATE inventory SET IsDelete=1,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND IsDelete=0 AND StockQty=0";
                 }
                 else if (whType == 2)
                 {
-                    querysql.Append(" AND WarehouseID =0");
                     content = "清除主仓零库存";
+                    sql = "UPDATE inventory_sale SET IsDelete=1,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND IsDelete=0 AND StockQty=0";
                 }
+                querysql.Append(sql);
                 conn.Execute(sql, new { CoID = CoID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
                 Trans.Commit();
                 CoreUser.LogComm.InsertUserLog("清除零库存资料", "Inventory", content, UserName, int.Parse(CoID), DateTime.Now);
@@ -821,9 +850,54 @@ namespace CoreData.CoreCore
         }
         #endregion
 
-        #region 商品库存查询 - 修改安全库存 - 单笔        
+        #region 商品库存查询 - 修改安全库存 - 单笔(分仓)      
         //Type: 0.全部更新，1.安全库存下限，2.安全库存上限
         public static DataResult UptSafeQty(InventParams inv)
+        {
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                conn.Open();
+                var Trans = conn.BeginTransaction();
+                try
+                {
+                    string sql = string.Empty;
+                    string content = string.Empty;
+                    var invOld = conn.QueryFirst<InventParams>("SELECT ID,SafeQty FROM inventory WHERE CoID = @CoID AND ID=@ID", new { CoID = inv.CoID, ID = inv.ID });
+                    if (invOld != null)
+                    {
+                        if (inv.SafeQty != invOld.SafeQty)
+                        {
+                            content = "安全库存：" + invOld.SafeQty + "=>" + inv.SafeQty;
+                            sql = @"UPDATE inventory SET SafeQty = @SafeQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID = @ID";
+                            conn.Execute(sql, inv, Trans);
+                            Trans.Commit();
+                            CoreUser.LogComm.InsertUserLog("修改安全库存", "inventory", content, inv.Modifier, int.Parse(inv.CoID), DateTime.Now);
+                        }                       
+                    }
+                }
+                catch (Exception e)
+                {
+                    Trans.Rollback();
+                    res.s = -1;
+                    res.d = e.Message;
+                }
+                finally
+                {
+                    Trans.Dispose();
+                    conn.Dispose();
+                    conn.Close();
+                }
+            }
+
+            return res;
+        }
+
+        #endregion
+
+        #region 商品库存查询 - 修改安全库存 - 单笔(主仓)      
+        //Type: 0.全部更新，1.安全库存下限，2.安全库存上限
+        public static DataResult UptMainSafeQty(InventParams inv)
         {
             var res = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CoreConnectString))
@@ -839,24 +913,24 @@ namespace CoreData.CoreCore
                     //     sql = @"UPDATE inventory SET SafeQty = @SafeQty,UpSaveQty=@UpSaveQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID = @ID";
                     // }
                     // else 
-                    var invOld = conn.QueryFirst<InventParams>("SELECT ID,SafeQty,UpSafeQty FROM inventory WHERE CoID = @CoID AND ID=@ID", new { CoID = inv.CoID, ID = inv.ID });
+                    var invOld = conn.QueryFirst<InventParams>("SELECT ID,SafeQty,UpSafeQty FROM inventory_sale WHERE CoID = @CoID AND ID=@ID", new { CoID = inv.CoID, ID = inv.ID });
                     if (invOld != null)
                     {
                         if (inv.Type == 1 && inv.SafeQty != invOld.SafeQty)
                         {
                             content = "安全库存下限：" + invOld.SafeQty + "=>" + inv.SafeQty;
-                            sql = @"UPDATE inventory SET SafeQty = @SafeQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID = @ID";
+                            sql = @"UPDATE inventory_sale SET SafeQty = @SafeQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID = @ID";
                         }
                         else if (inv.Type == 2 && inv.UpSafeQty != invOld.UpSafeQty)
                         {
                             content = "安全库存上限：" + invOld.UpSafeQty + "=>" + inv.UpSafeQty;
-                            sql = @"UPDATE inventory SET UpSafeQty=@UpSafeQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID = @ID";
+                            sql = @"UPDATE inventory_sale SET UpSafeQty=@UpSafeQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID = @ID";
                         }
                         if (!string.IsNullOrEmpty(sql))
                         {
                             conn.Execute(sql, inv, Trans);
                             Trans.Commit();
-                            CoreUser.LogComm.InsertUserLog("修改安全库存", "Inventory", content, inv.Modifier, int.Parse(inv.CoID), DateTime.Now);
+                            CoreUser.LogComm.InsertUserLog("修改安全库存", "inventory_sale", content, inv.Modifier, int.Parse(inv.CoID), DateTime.Now);
                         }
                     }
 
@@ -880,8 +954,8 @@ namespace CoreData.CoreCore
 
         #endregion
 
-        #region 商品库存查询 - 修改安全库存 - 多笔
-        public static DataResult UptLstSafeQty(List<InventParams> InvLst, string CoID, string UserName)
+        #region 商品库存查询 - 修改安全库存 - 多笔(主仓)  
+        public static DataResult UptMainLstSafeQty(List<InventParams> InvLst, string CoID, string UserName)
         {
             var res = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CoreConnectString))
@@ -901,11 +975,11 @@ namespace CoreData.CoreCore
                     }).AsList();
                     if (InvLst.Count > 0)
                     {
-                        string sql = @"UPDATE inventory SET SafeQty = @SafeQty,UpSafeQty=@UpSafeQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID = @ID";
+                        string sql = @"UPDATE inventory_sale SET SafeQty = @SafeQty,UpSafeQty=@UpSafeQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID = @ID";
                         conn.Execute(sql, InvLst, Trans);
                         Trans.Commit();
                         var InvIDLst = InvLst.Select(a => a.ID).AsList();
-                        CoreUser.LogComm.InsertUserLog("修改安全库存", "Inventory", "库存ID：" + string.Join(",", InvIDLst.ToArray()), UserName, int.Parse(CoID), DateTime.Now);
+                        CoreUser.LogComm.InsertUserLog("修改安全库存", "inventory_sale", "库存ID：" + string.Join(",", InvIDLst.ToArray()), UserName, int.Parse(CoID), DateTime.Now);
                     }
                 }
                 catch (Exception e)
@@ -926,6 +1000,7 @@ namespace CoreData.CoreCore
         }
         #endregion
 
+
         #region 商品库存查询 - 清空安全库存 - 所有
         public static DataResult ClearSafeQty(string CoID, string UserName)
         {
@@ -936,10 +1011,10 @@ namespace CoreData.CoreCore
                 var Trans = conn.BeginTransaction();
                 try
                 {
-                    string sql = @"UPDATE inventory SET SafeQty = 0,UpSafeQty=0,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID";
+                    string sql = @"UPDATE inventory_sale SET SafeQty = 0,UpSafeQty=0,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID";
                     conn.Execute(sql, new { CoID = CoID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
                     Trans.Commit();
-                    CoreUser.LogComm.InsertUserLog("修改安全库存", "Inventory", "清空所有商品安全库存", UserName, int.Parse(CoID), DateTime.Now);
+                    CoreUser.LogComm.InsertUserLog("修改安全库存", "inventory_sale", "清空所有商品安全库存", UserName, int.Parse(CoID), DateTime.Now);
                 }
                 catch (Exception e)
                 {
@@ -971,19 +1046,19 @@ namespace CoreData.CoreCore
                 {
                     string sql = string.Empty;
                     string content = string.Empty;
-                    var invOld = conn.QueryFirst<InventParams>("SELECT ID,VirtualQty FROM inventory WHERE CoID = @CoID AND ID=@ID", new { CoID = inv.CoID, ID = inv.ID });
+                    var invOld = conn.QueryFirst<InventParams>("SELECT ID,VirtualQty FROM inventory_sale WHERE CoID = @CoID AND ID=@ID", new { CoID = inv.CoID, ID = inv.ID });
                     if (invOld != null)
                     {
                         if (inv.VirtualQty != invOld.VirtualQty)
                         {
                             content = "虚拟库存：" + invOld.VirtualQty + "=>" + inv.VirtualQty;
-                            sql = @"UPDATE inventory SET VirtualQty = @VirtualQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID = @ID";
+                            sql = @"UPDATE inventory_sale SET VirtualQty = @VirtualQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID = @ID";
                         }
                         if (!string.IsNullOrEmpty(sql))
                         {
                             conn.Execute(sql, inv, Trans);
                             Trans.Commit();
-                            CoreUser.LogComm.InsertUserLog("修改虚拟库存", "Inventory", content, inv.Modifier, int.Parse(inv.CoID), DateTime.Now);
+                            CoreUser.LogComm.InsertUserLog("修改虚拟库存", "inventory_sale", content, inv.Modifier, int.Parse(inv.CoID), DateTime.Now);
                         }
                     }
                 }
@@ -1025,11 +1100,11 @@ namespace CoreData.CoreCore
                     }).AsList();
                     if (InvLst.Count > 0)
                     {
-                        string sql = @"UPDATE inventory SET VirtualQty = @VirtualQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID = @ID";
+                        string sql = @"UPDATE inventory_sale SET VirtualQty = @VirtualQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID = @ID";
                         conn.Execute(sql, InvLst, Trans);
                         Trans.Commit();
                         var InvIDLst = InvLst.Select(a => a.ID).AsList();
-                        CoreUser.LogComm.InsertUserLog("修改虚拟库存", "Inventory", "库存ID：" + string.Join(",", InvIDLst.ToArray()), UserName, int.Parse(CoID), DateTime.Now);
+                        CoreUser.LogComm.InsertUserLog("修改虚拟库存", "inventory_sale", "库存ID：" + string.Join(",", InvIDLst.ToArray()), UserName, int.Parse(CoID), DateTime.Now);
                     }
                 }
                 catch (Exception e)
@@ -1870,7 +1945,43 @@ namespace CoreData.CoreCore
             string sql = @"INSERT INTO inventory
                         (
                             Skuautoid,
-                            WarehouseID,
+                            StockQty,
+                            LockQty,
+                            PickQty,
+                            WaitInQty,
+                            SaleRetuQty,
+                            SafeQty,
+                            DefectiveQty,
+                            VirtualQty,
+                            PurchaseQty,
+                            CoID,
+                            Creator,
+                            CreateDate,
+                            WarehouseID
+                        ) VALUES(
+                            @Skuautoid,
+                            @StockQty,
+                            @LockQty,
+                            @PickQty,
+                            @WaitInQty,
+                            @SaleRetuQty,
+                            @SafeQty,
+                            @DefectiveQty,
+                            @VirtualQty,
+                            @PurchaseQty,
+                            @CoID,
+                            @Creator,
+                            @CreateDate,
+                            @WarehouseID
+                        )";
+            return sql;
+        }
+
+        public static string AddInventorySaleSql()
+        {
+            string sql = @"INSERT INTO inventory_sale
+                        (
+                            Skuautoid,
                             StockQty,
                             LockQty,
                             PickQty,
@@ -1885,7 +1996,6 @@ namespace CoreData.CoreCore
                             CreateDate
                         ) VALUES(
                             @Skuautoid,
-                            @WarehouseID,
                             @StockQty,
                             @LockQty,
                             @PickQty,
@@ -1901,26 +2011,117 @@ namespace CoreData.CoreCore
                         )";
             return sql;
         }
-
-        #region 更新库存数量
+        #region 更新总库存数量
         public static string UptInvStockQtySql()
         {
-            string sql = @"UPDATE inventory SET StockQty= (
-	                                            SELECT
-		                                            IFNULL(sum(Qty),0)
+            string sql = @"UPDATE inventory 
+                            SET StockQty= (SELECT IFNULL(sum(Qty),0)
 	                                            FROM
 		                                            invinoutitem
 	                                            WHERE
 		                                            invinoutitem.Skuautoid = inventory.Skuautoid
-	                                            AND invinoutitem.WhID = inventory.WarehouseID
 	                                            AND invinoutitem.CoID = inventory.CoID
                                                 AND invinoutitem.`Status` = 1
                                                 AND invinoutitem.Skuautoid in @SkuIDLst
                                             ),IsDelete=0,Modifier=@Modifier,ModifyDate=@ModifyDate
                                             WHERE
 	                                            inventory.CoID =@CoID
-                                            AND inventory.WarehouseID = @WarehouseID 
                                             AND Inventory.Skuautoid in @SkuIDLst";
+            return sql;
+        }
+        #endregion
+
+        #region 更新仓库待发库存
+        public static string UptInvMainPickQtySql()
+        {
+            string sql = @"UPDATE inventory_sale
+                            SET inventory_sale.PickQty = (
+                                SELECT
+                                    IFNULL(SUM(PickQty),0)
+                                FROM
+                                    inventory
+                                WHERE
+                                    inventory.CoID IN @CoIDLst
+                                AND inventory.Skuautoid = inventory_sale.Skuautoid
+                            ),IsDelete=0,Modifier=@Modifier,ModifyDate=@ModifyDate
+                            WHERE inventory_sale.CoID=@CoID
+                            AND inventory_sale.Skuautoid in @SkuIDLst";
+            return sql;
+        }
+        #endregion
+
+        #region 更新仓库安全库存
+        public static string UptInvMainSafeQtySql()
+        {
+            string sql = @"UPDATE inventory_sale
+                            SET inventory_sale.SafeQty = (
+                                SELECT                                
+                                    IFNULL(SUM(SafeQty),0)
+                                FROM
+                                    inventory
+                                WHERE
+                                    inventory.CoID IN @CoIDLst
+                                AND inventory.Skuautoid = inventory_sale.Skuautoid
+                            ),IsDelete=0,Modifier=@Modifier,ModifyDate=@ModifyDate
+                            WHERE inventory_sale.CoID=@CoID
+                            AND inventory_sale.Skuautoid in @SkuIDLst";
+            return sql;
+        }
+        #endregion
+
+        #region 更新仓库安全库存
+        public static string UptInvMainWaitInQtySql()
+        {
+            string sql = @"UPDATE inventory_sale
+                            SET inventory_sale.WaitInQty = (
+                                SELECT          
+                                    IFNULL(SUM(WaitInQty),0)
+                                FROM
+                                    inventory
+                                WHERE
+                                    inventory.CoID IN @CoIDLst
+                                AND inventory.Skuautoid = inventory_sale.Skuautoid
+                            ),IsDelete=0,Modifier=@Modifier,ModifyDate=@ModifyDate
+                            WHERE inventory_sale.CoID=@CoID
+                            AND inventory_sale.Skuautoid in @SkuIDLst";
+            return sql;
+        }
+        #endregion
+
+        #region 更新销退仓库存
+        public static string UptInvMainSaleRetuQtySql()
+        {
+            string sql = @"UPDATE inventory_sale
+                            SET inventory_sale.SaleRetuQty = (
+                                SELECT
+                                    IFNULL(SUM(SaleRetuQty),0)
+                                FROM
+                                    inventory
+                                WHERE
+                                    inventory.CoID IN @CoIDLst
+                                AND inventory.Skuautoid = inventory_sale.Skuautoid
+                            ),IsDelete=0,Modifier=@Modifier,ModifyDate=@ModifyDate
+                            WHERE inventory_sale.CoID=@CoID
+                            AND inventory_sale.Skuautoid in @SkuIDLst";
+            return sql;
+        }
+        #endregion
+
+        #region 更新采购仓库存
+        public static string UptInvMainPurchaseQtySql()
+        {
+            string sql = @"UPDATE inventory_sale
+                            SET inventory_sale.PurchaseQty = (
+                                SELECT
+                                    IFNULL(SUM(PurchaseQty),0)
+                                FROM
+                                    inventory
+                                WHERE
+                                    inventory.CoID IN @CoIDLst
+                                AND inventory.Skuautoid = inventory_sale.Skuautoid
+                            ),IsDelete=0,Modifier=@Modifier,ModifyDate=@ModifyDate
+                            WHERE inventory_sale.CoID=@CoID
+                            AND inventory_sale.Skuautoid in @SkuIDLst";
             return sql;
         }
         #endregion
@@ -1928,15 +2129,18 @@ namespace CoreData.CoreCore
         #region 
         public static string UptInvMainStockQtySql()
         {
-            string sql = @"UPDATE inventory,inventory a 
-                    SET inventory.StockQty = a.StockQty,inventory.IsDelete=0,inventory.Modifier=@Modifier,inventory.ModifyDate=@ModifyDate
-                    WHERE 
-                    inventory.CoID=@CoID
-                    AND inventory.Skuautoid IN @SkuIDLst
-                    AND inventory.CoID=a.CoID
-                    AND inventory.Skuautoid=a.Skuautoid
-                    AND inventory.WarehouseID=0
-                    AND a.WarehouseID=@WarehouseID  ";
+            string sql = @"UPDATE inventory_sale
+                            SET inventory_sale.StockQty = (
+                                SELECT
+                                    SUM(StockQty)
+                                FROM
+                                    inventory
+                                WHERE
+                                    inventory.CoID IN @CoIDLst
+                                AND inventory.Skuautoid = inventory_sale.Skuautoid
+                            ),IsDelete=0,Modifier=@Modifier,ModifyDate=@ModifyDate
+                            WHERE inventory_sale.CoID=@CoID
+                            AND inventory_sale.Skuautoid in @SkuIDLst";
             return sql;
         }
         #endregion

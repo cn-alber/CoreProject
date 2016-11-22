@@ -319,13 +319,13 @@ namespace CoreData.CoreCore
             try
             {
                 string checksql = "UPDATE sfc_main SET Status = 1,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID=@ID";//(0:待确认;1:生效;2.作废)
-                string querymainsql = @"SELECT ID,WhID,Parent_WhID,Status FROM sfc_main WHERE CoID=@CoID AND ID=@ID";
+                string querymainsql = @"SELECT ID,WhID,Parent_WhID,Status,Type FROM sfc_main WHERE CoID=@CoID AND ID=@ID";
                 string querysql = @"SELECT ID,Skuautoid,WhID,InvQty,Parent_WhID FROM sfc_item WHERE CoID=@CoID AND ParentID=@ID";
-                string InvQuerySql = @"SELECT ID,Skuautoid,StockQty FROM Inventory WHERE CoID=@CoID AND WarehouseID=@WarehouseID AND Skuautoid in @SkuIDLst";
-                string InvMQuerySql = @"SELECT ID,Skuautoid,StockQty FROM Inventory WHERE CoID=@CoID AND WarehouseID=0 AND Skuautoid in @SkuIDLst";
+                string InvQuerySql = @"SELECT ID,Skuautoid,StockQty FROM Inventory WHERE CoID=@CoID AND Skuautoid in @SkuIDLst";
+                string InvMQuerySql = @"SELECT ID,Skuautoid,StockQty FROM Inventory_sale WHERE CoID=@CoID AND Skuautoid in @SkuIDLst";
                 var main = conn.QueryFirst<Sfc_main>(querymainsql, new { CoID = CoID, ID = ID });
                 var itemLst = conn.Query<Sfc_item>(querysql, new { CoID = CoID, ID = ID }).AsList();
-                if (main.Status == 0)
+                if (main.Status == 0 && main.Type == 1)//1.期初 2.盘点 3.调拨
                 {
                     if (itemLst.Count > 0)
                     {
@@ -382,12 +382,14 @@ namespace CoreData.CoreCore
                         var NewMainInvLst = itemLst.Where(a => !InvSkuLst
                                                             .Select(b => b.Skuautoid)
                                                             .Contains(a.Skuautoid))
-                                            .Select(a => new Inventory
+                                            .Select(a => new Inventory_sale
                                             {
                                                 Skuautoid = a.Skuautoid,
-                                                WarehouseID = "0",
+                                                // WarehouseID = "0",
                                                 StockQty = a.InvQty,
-                                                CoID = CoID
+                                                CoID = CoID,
+                                                Creator = UserName,
+                                                CreateDate = DateTime.Now.ToString()
                                             }).AsList();
                         //新增交易表头
                         conn.Execute(InventoryHaddle.AddInvinoutSql(), inv, Trans);
@@ -400,13 +402,16 @@ namespace CoreData.CoreCore
                         }
                         if (NewMainInvLst.Count > 0)
                         {
-                            conn.Execute(InventoryHaddle.AddInventorySql(), NewMainInvLst, Trans);//Sku库存新增
+                            conn.Execute(InventoryHaddle.AddInventorySaleSql(), NewMainInvLst, Trans);//Sku库存新增
                         }
                         //更新确认生效标记&更新库存数量
                         conn.Execute(checksql, new { CoID = CoID, ID = ID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);//确认生效
                         //更新库存数量                                                                              
-                        conn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = CoID, WarehouseID = Parent_WhID, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
-                        conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, WarehouseID = Parent_WhID, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                        conn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = CoID, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                        //更新总库存数量
+                        var res = CommHaddle.GetWareCoidList(CoID);
+                        var CoIDLst = res.d as List<string>;
+                        conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, CoIDLst = CoIDLst, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
                         Trans.Commit();
                         CoreUser.LogComm.InsertUserLog("期初单据-确认生效", "sfc_item", "单据ID" + ID, UserName, int.Parse(CoID), DateTime.Now);
                     }

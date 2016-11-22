@@ -11,7 +11,7 @@ using CoreModels;
 namespace CoreWebApi.XyCore
 
 {
-    // [AllowAnonymous]
+    [AllowAnonymous]
     public class StockTakeControllers : ControllBase
     {
         #region 库存盘点-表头查询
@@ -100,18 +100,26 @@ namespace CoreWebApi.XyCore
         {
             var res = new DataResult(1, null);
             int x;
-            string WhID = obj["WhID"].ToString();
-            string Parent_WhID = obj["Parent_WhID"].ToString();
-            if (!int.TryParse(WhID, out x) && !int.TryParse(Parent_WhID, out x))
+            if (obj["WhID"] != null && obj["Parent_WhID"] != null)
             {
-                res.s = -1;
-                res.d = "无效参数";
+                string WhID = obj["WhID"].ToString();
+                string Parent_WhID = obj["Parent_WhID"].ToString();
+                if (!int.TryParse(WhID, out x) && !int.TryParse(Parent_WhID, out x))
+                {
+                    res.s = -1;
+                    res.d = "无效参数";
+                }
+                else
+                {
+                    string CoID = GetCoid();
+                    string UserName = GetUname();
+                    res = StockTakeHaddle.InsertStockTakeMain(WhID, Parent_WhID, 2, CoID, UserName);
+                }
             }
             else
             {
-                string CoID = GetCoid();
-                string UserName = GetUname();
-                res = StockTakeHaddle.InsertStockTakeMain(WhID, Parent_WhID,2, CoID, UserName);
+                res.s = -1;
+                res.d = "无效参数";
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
@@ -123,19 +131,28 @@ namespace CoreWebApi.XyCore
         {
             var res = new DataResult(1, null);
             int x;
-            var ParentID = obj["ParentID"].ToString();
-            var SkuIDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["SkuIDLst"].ToString());
-            if (!int.TryParse(ParentID, out x))
+            if (obj["ParentID"] != null && obj["SkuIDLst"] != null)
+            {
+                var ParentID = obj["ParentID"].ToString();
+                var SkuIDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["SkuIDLst"].ToString());
+                if (!int.TryParse(ParentID, out x))
+                {
+                    res.s = -1;
+                    res.d = "无效参数";
+                }
+                else
+                {
+                    string CoID = GetCoid();
+                    string UserName = GetUname();
+                    res = StockTakeHaddle.InsertStockTakeItem(ParentID, SkuIDLst, 2, CoID, UserName);
+                }
+            }
+            else
             {
                 res.s = -1;
                 res.d = "无效参数";
             }
-            else
-            {
-                string CoID = GetCoid();
-                string UserName = GetUname();
-                res = StockTakeHaddle.InsertStockTakeItem(ParentID, SkuIDLst,2, CoID, UserName);
-            }
+
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
@@ -146,15 +163,15 @@ namespace CoreWebApi.XyCore
         {
             var res = new DataResult(1, null);
             int x;
-            var ID = obj["ID"].ToString();
-            var InvQty = obj["InvQty"].ToString();
-            if (!(int.TryParse(ID, out x) && int.TryParse(InvQty, out x)))
+            if (!(obj["ID"] != null && obj["InvQty"] != null && int.TryParse(obj["ID"].ToString(), out x) && int.TryParse(obj["InvQty"].ToString(), out x)))
             {
                 res.s = -1;
                 res.d = "无效参数";
             }
             else
             {
+                string ID = obj["ID"].ToString();
+                string InvQty = obj["InvQty"].ToString();
                 string CoID = GetCoid();
                 string UserName = GetUname();
                 res = StockTakeHaddle.SaveStockTakeQty(ID, InvQty, CoID, UserName);
@@ -169,8 +186,7 @@ namespace CoreWebApi.XyCore
         {
             var res = new DataResult(1, null);
             int x;
-            var ID = obj["ID"].ToString();
-            if (!int.TryParse(ID, out x))
+            if (!(obj["ID"] != null && int.TryParse(obj["ID"].ToString(), out x)))
             {
                 res.s = -1;
                 res.d = "无效参数";
@@ -179,6 +195,7 @@ namespace CoreWebApi.XyCore
             {
                 string CoID = GetCoid();
                 string UserName = GetUname();
+                string ID = obj["ID"].ToString();
                 res = StockTakeHaddle.CheckStockTake(ID, CoID, UserName);
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
@@ -191,8 +208,7 @@ namespace CoreWebApi.XyCore
         {
             var res = new DataResult(1, null);
             int x;
-            var ID = obj["ID"].ToString();
-            if (!int.TryParse(ID, out x))
+            if (!(obj["ID"] != null && int.TryParse(obj["ID"].ToString(), out x)))
             {
                 res.s = -1;
                 res.d = "无效参数";
@@ -201,7 +217,8 @@ namespace CoreWebApi.XyCore
             {
                 string CoID = GetCoid();
                 string UserName = GetUname();
-                res = StockTakeHaddle.UnCheckStockTake(ID,1, CoID, UserName);
+                string ID = obj["ID"].ToString();
+                res = StockTakeHaddle.UnCheckStockTake(ID, 1, CoID, UserName);
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
