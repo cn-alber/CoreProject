@@ -590,6 +590,7 @@ namespace CoreModels.XyCore
         public string SendWarehouse{get;set;}
         public string SendDate{get;set;}
         public int ExID{get;set;}
+        public string ExpNamePinyin{get;set;}
         public string ExCode{get;set;}
         public string Creator{get;set;}
         public List<long> SoIDList{get;set;}
@@ -726,6 +727,11 @@ namespace CoreModels.XyCore
         public string StatusDec{get;set;}
         public int AbnormalStatus{get;set;}
         public string AbnormalStatusDec{get;set;}
+        public int ExID{get;set;}
+        public string ExpNamePinyin{get;set;}
+        public string SkuAmount{get;set;}
+        public string Amount{get;set;}
+        public string PaidAmount{get;set;}
     }
     public class OrderPay
     {
@@ -868,6 +874,7 @@ namespace CoreModels.XyCore
         public int ID{get;set;}
         public string ExID{get;set;}
         public string  Express{get;set;}
+        public string ExpNamePinyin{get;set;}
     }
     public class SetExpReturn
     {
