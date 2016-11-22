@@ -269,47 +269,100 @@ namespace CoreWebApi
         public ResponseResult InsertOrd([FromBodyAttribute]JObject co)
         {   
             var ord = new Order();
-            ord.BuyerShopID = co["BuyerShopID"].ToString();
-            ord.RecName = co["RecName"].ToString();
-            ord.RecLogistics = co["RecLogistics"].ToString();
-            ord.RecCity = co["RecCity"].ToString();
-            ord.RecDistrict = co["RecDistrict"].ToString();
-            ord.RecAddress = co["RecAddress"].ToString();
-            ord.RecPhone = co["RecPhone"].ToString();
-            ord.RecTel = co["RecTel"].ToString();
-            ord.RecMessage = co["RecMessage"].ToString();
-            ord.SendMessage = co["SendMessage"].ToString();
-            string text = co["ODate"].ToString();
-            DateTime x;
-            if (DateTime.TryParse(text, out x))
+            if(co["BuyerShopID"] != null)
             {
-                ord.ODate = DateTime.Parse(text);
+                ord.BuyerShopID = co["BuyerShopID"].ToString();
             }
-            text = co["SoID"].ToString();
-            long y;
-            if (long.TryParse(text, out y))
+            if(co["RecName"] != null)
             {
-                ord.SoID = long.Parse(text);
+                ord.RecName = co["RecName"].ToString();
             }
-            text = co["ExAmount"].ToString();
-            decimal z;
-            if (decimal.TryParse(text, out z))
+            if(co["RecLogistics"] != null)
             {
-                ord.ExAmount = text;
+                ord.RecLogistics = co["RecLogistics"].ToString();
             }
-            text = co["ShopID"].ToString();
-            int i;
-            if (int.TryParse(text, out i))
+            if(co["RecCity"] != null)
             {
-                ord.ShopID = int.Parse(text);
-            }       
+                ord.RecCity = co["RecCity"].ToString();
+            }
+            if(co["RecDistrict"] != null)
+            {
+                ord.RecDistrict = co["RecDistrict"].ToString();
+            }
+            if(co["RecAddress"] != null)
+            {
+                ord.RecAddress = co["RecAddress"].ToString();
+            }
+            if(co["RecPhone"] != null)
+            {
+                ord.RecPhone = co["RecPhone"].ToString();
+            }
+            if(co["RecTel"] != null)
+            {
+                ord.RecTel = co["RecTel"].ToString();
+            }
+            if(co["RecMessage"] != null)
+            {
+                ord.RecMessage = co["RecMessage"].ToString();
+            }
+            if(co["SendMessage"] != null)
+            {
+                ord.SendMessage = co["SendMessage"].ToString();
+            }
+            if(co["ODate"] != null)
+            {
+                string text = co["ODate"].ToString();
+                DateTime x;
+                if (DateTime.TryParse(text, out x))
+                {
+                    ord.ODate = DateTime.Parse(text);
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单日期必填", "General"); 
+            }
+            if(co["SoID"] != null)
+            {
+                string text = co["SoID"].ToString();
+                long y;
+                if (long.TryParse(text, out y))
+                {
+                    ord.SoID = long.Parse(text);
+                }
+            }   
+            if(co["ExAmount"] != null)
+            {
+                string text = co["ExAmount"].ToString();
+                decimal z;
+                if (decimal.TryParse(text, out z))
+                {
+                    ord.ExAmount = text;
+                }
+            }
+            if(co["ShopID"] != null)
+            {
+                string text = co["ShopID"].ToString();
+                int i;
+                if (int.TryParse(text, out i))
+                {
+                    ord.ShopID = int.Parse(text);
+                }     
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "店铺必填", "General"); 
+            }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
-            string FaceToFace = co["IsFaceToFace"].ToString();
             bool IsFaceToFace = false;
-            if(FaceToFace.ToUpper() == "TRUE")
+            if(co["IsFaceToFace"] != null)
             {
-                IsFaceToFace = true;
+                string FaceToFace = co["IsFaceToFace"].ToString();
+                if(FaceToFace.ToUpper() == "TRUE")
+                {
+                    IsFaceToFace = true;
+                }
             }
             var data = OrderHaddle.InsertOrder(ord,username,CoID,IsFaceToFace);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
@@ -318,17 +371,56 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/UpdateOrder")]
         public ResponseResult UpdateOrder([FromBodyAttribute]JObject co)
         {   
-            decimal ExAmount = decimal.Parse(co["ExAmount"].ToString());
-            string Remark = co["SendMessage"].ToString();
-            string InvTitle = co["InvoiceTitle"].ToString();
-            string Logistics = co["RecLogistics"].ToString();
-            string City = co["RecCity"].ToString();
-            string District = co["RecDistrict"].ToString();
-            string Address = co["RecAddress"].ToString();
-            string Name = co["RecName"].ToString();
-            string tel = co["RecTel"].ToString();
-            string phone = co["RecPhone"].ToString();
-            int OID = int.Parse(co["OID"].ToString());
+            string ExAmount = null,Remark=null,InvTitle=null,Logistics=null,City=null,District=null,Address=null,Name=null,tel=null,phone=null;
+            int OID = 0;
+            if(co["ExAmount"] != null)
+            {
+                ExAmount = co["ExAmount"].ToString();
+            }
+            if(co["SendMessage"] != null)
+            {
+                Remark = co["SendMessage"].ToString();
+            }
+            if(co["InvoiceTitle"] != null)
+            {
+                InvTitle = co["InvoiceTitle"].ToString();
+            }
+            if(co["RecLogistics"] != null)
+            {
+                Logistics = co["RecLogistics"].ToString();
+            }
+            if(co["RecCity"] != null)
+            {
+                City = co["RecCity"].ToString();
+            }
+            if(co["RecDistrict"] != null)
+            {
+                District = co["RecDistrict"].ToString();
+            }
+            if(co["RecAddress"] != null)
+            {
+                Address = co["RecAddress"].ToString();
+            }
+            if(co["RecName"] != null)
+            {
+                Name = co["RecName"].ToString();
+            }
+            if(co["RecTel"] != null)
+            {
+                tel = co["RecTel"].ToString();
+            }
+            if(co["RecPhone"] != null)
+            {
+                phone = co["RecPhone"].ToString();
+            }
+            if(co["OID"] != null)
+            {
+                OID = int.Parse(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.UpdateOrder(ExAmount,Remark,InvTitle,Logistics,City,District,Address,Name,tel,phone,OID,username,CoID);
@@ -373,21 +465,43 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/InsertOrderDetail")]
         public ResponseResult InsertOrderDetail([FromBodyAttribute]JObject co)
         {   
-            int id = int.Parse(co["OID"].ToString());
-            // long soid = long.Parse(co["SoID"].ToString());
-            List<int> skuid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["SkuIDList"].ToString());
+            int id = 0;
+            var skuid = new List<int>();
             var data = new DataResult(1,null);
-            bool isQuick;
-            string isquick = co["isQuick"].ToString();
-            if(isquick.ToUpper() != "TRUE" && isquick.ToUpper() != "FALSE")
+            if(co["OID"] != null)
             {
-                data.s = -1;
-                data.d = "参数无效!";
-                return CoreResult.NewResponse(data.s, data.d, "General"); 
+                id = int.Parse(co["OID"].ToString());
             }
             else
             {
-                isQuick = bool.Parse(isquick);
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }
+            if(co["SkuIDList"] != null)
+            {
+                skuid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["SkuIDList"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "商品ID必填", "General");
+            }
+            bool isQuick;
+            if(co["isQuick"] != null)
+            {
+                string isquick = co["isQuick"].ToString();
+                if(isquick.ToUpper() != "TRUE" && isquick.ToUpper() != "FALSE")
+                {
+                    data.s = -1;
+                    data.d = "明细新增方式参数无效!";
+                    return CoreResult.NewResponse(data.s, data.d, "General"); 
+                }
+                else
+                {
+                    isQuick = bool.Parse(isquick);
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "明细新增方式必填", "General");
             }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
@@ -398,22 +512,44 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/DeleteOrderDetail")]
         public ResponseResult DeleteOrderDetail([FromBodyAttribute]JObject co)
         {   
-            int id = int.Parse(co["ID"].ToString());
-            int oid = int.Parse(co["OID"].ToString());
+            int id=0,oid=0;
+            if(co["ID"] != null)
+            {
+                id = int.Parse(co["ID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "明细ID必填", "General");
+            }
+            if(co["OID"] != null)
+            {
+                oid = int.Parse(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = new DataResult(1,null);
             bool isQuick;
-            string isquick = co["isQuick"].ToString();
-            if(isquick.ToUpper() != "TRUE" && isquick.ToUpper() != "FALSE")
+            if(co["isQuick"] != null)
             {
-                data.s = -1;
-                data.d = "参数无效!";
-                return CoreResult.NewResponse(data.s, data.d, "General"); 
+                string isquick = co["isQuick"].ToString();
+                if(isquick.ToUpper() != "TRUE" && isquick.ToUpper() != "FALSE")
+                {
+                    data.s = -1;
+                    data.d = "明细删除方式参数无效!";
+                    return CoreResult.NewResponse(data.s, data.d, "General"); 
+                }
+                else
+                {
+                    isQuick = bool.Parse(isquick);
+                }
             }
             else
             {
-                isQuick = bool.Parse(isquick);
+                return CoreResult.NewResponse(-1, "明细删除方式必填", "General");
             }
             data = OrderHaddle.DeleteOrderDetail(id,oid,CoID,username,isQuick);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
@@ -422,33 +558,66 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/UpdateOrderDetail")]
         public ResponseResult UpdateOrderDetail([FromBodyAttribute]JObject co)
         {   
-            int id = int.Parse(co["ID"].ToString());
-            int oid = int.Parse(co["OID"].ToString());
             decimal price = -1;
-            int qty = -1;
-            if(!string.IsNullOrEmpty(co["Price"].ToString()))
+            int qty = -1,id=0,oid=0;
+            if(co["ID"] != null)
             {
-                price = decimal.Parse(co["Price"].ToString());
-            }
-            if(!string.IsNullOrEmpty(co["Qty"].ToString()))
-            {
-                qty = int.Parse(co["Qty"].ToString());
-            }
-            string username = GetUname();
-            int CoID = int.Parse(GetCoid());
-            string SkuName = co["SkuName"].ToString();
-            var data = new DataResult(1,null);
-            bool isQuick;
-            string isquick = co["isQuick"].ToString();
-            if(isquick.ToUpper() != "TRUE" && isquick.ToUpper() != "FALSE")
-            {
-                data.s = -1;
-                data.d = "参数无效!";
-                return CoreResult.NewResponse(data.s, data.d, "General"); 
+                id = int.Parse(co["ID"].ToString());
             }
             else
             {
-                isQuick = bool.Parse(isquick);
+                return CoreResult.NewResponse(-1, "订单明细ID必填", "General");
+            }
+            if(co["OID"] != null)
+            {
+                oid = int.Parse(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }
+            if(co["Price"] != null)
+            {
+                price = decimal.Parse(co["Price"].ToString());
+                if(price < 0)
+                {
+                    return CoreResult.NewResponse(-1, "单价必须大于等于0", "General");
+                }
+            }
+            if(co["Qty"] != null)
+            {
+                qty = int.Parse(co["Qty"].ToString());
+                if(qty < 0)
+                {
+                    return CoreResult.NewResponse(-1, "数量必须大于等于0", "General");
+                }
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            string SkuName = null;
+            if(co["SkuName"] != null)
+            {
+                SkuName = co["SkuName"].ToString();
+            }
+            var data = new DataResult(1,null);
+            bool isQuick;
+            if(co["isQuick"] != null)
+            {
+                string isquick = co["isQuick"].ToString();
+                if(isquick.ToUpper() != "TRUE" && isquick.ToUpper() != "FALSE")
+                {
+                    data.s = -1;
+                    data.d = "明细修改方式参数无效!";
+                    return CoreResult.NewResponse(data.s, data.d, "General"); 
+                }
+                else
+                {
+                    isQuick = bool.Parse(isquick);
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "明细修改方式必填", "General");
             }
             data = OrderHaddle.UpdateOrderDetail(id,oid,CoID,username,price,qty,SkuName,isQuick);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
@@ -459,49 +628,49 @@ namespace CoreWebApi
         {   
             var data = new DataResult(1,null);
             var pay = new PayInfo();
-            if(string.IsNullOrEmpty(co["Payment"].ToString()))
-            {
-                data.s = -1;
-                data.d = "支付方式必须有值!";
-                return CoreResult.NewResponse(data.s, data.d, "General"); 
-            }
-            else
+            if(co["Payment"] != null)
             {
                 pay.Payment = co["Payment"].ToString();
             }
-            if(string.IsNullOrEmpty(co["PayNbr"].ToString()))
-            {
-                if(pay.Payment != "现金支付")
-                {
-                    data.s = -1;
-                    data.d = "支付单号必须有值!";
-                    return CoreResult.NewResponse(data.s, data.d, "General"); 
-                }
-            }
             else
+            {
+                return CoreResult.NewResponse(-1, "支付方式必填", "General");
+            }
+            if(co["PayNbr"] != null)
             {
                 pay.PayNbr = co["PayNbr"].ToString();
             }
-            pay.OID = int.Parse(co["OID"].ToString());
-            if(!string.IsNullOrEmpty(co["PayAccount"].ToString()))
+            else
+            {
+                if(pay.Payment != "现金支付")
+                {
+                    return CoreResult.NewResponse(-1, "支付单号必填", "General");
+                }
+                
+            }
+            if(co["OID"] != null)
+            {
+                pay.OID = int.Parse(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }
+            if(co["PayAccount"] != null)
             {
                 pay.PayAccount = co["PayAccount"].ToString();
             }
-            if(string.IsNullOrEmpty(co["PayDate"].ToString()))
+            if(co.GetValue("PayDate") == null)
             {
-                data.s = -1;
-                data.d = "支付日期必须有值!";
-                return CoreResult.NewResponse(data.s, data.d, "General"); 
+                return CoreResult.NewResponse(-1, "支付日期必填", "General");
             }
             else
             {
                 pay.PayDate = DateTime.Parse(co["PayDate"].ToString());
             }
-            if(string.IsNullOrEmpty(co["PayAmount"].ToString()))
+            if(co.GetValue("PayAmount") == null)
             {
-                data.s = -1;
-                data.d = "支付金额必须有值!";
-                return CoreResult.NewResponse(data.s, data.d, "General"); 
+                return CoreResult.NewResponse(-1, "支付金额必填", "General");
             }
             else
             {
@@ -517,8 +686,23 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/CancleConfirmPay")]
         public ResponseResult CancleConfirmPay([FromBodyAttribute]JObject co)
         {   
-            int OID = int.Parse(co["OID"].ToString());
-            int payid = int.Parse(co["PayID"].ToString());
+            int OID = 0,payid = 0;
+            if(co["OID"] != null)
+            {
+                OID = int.Parse(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }
+            if(co["PayID"] != null)
+            {
+                payid = int.Parse(co["PayID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "付款ID必填", "General");
+            }
             string username = GetUname();
             int CoID =  int.Parse(GetCoid());
             var data = OrderHaddle.CancleConfirmPay(OID,payid,CoID,username);
@@ -528,8 +712,23 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/ConfirmPay")]
         public ResponseResult ConfirmPay([FromBodyAttribute]JObject co)
         {   
-            int OID = int.Parse(co["OID"].ToString());
-            int payid = int.Parse(co["PayID"].ToString());
+            int OID = 0,payid = 0;
+            if(co["OID"] != null)
+            {
+                OID = int.Parse(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }
+            if(co["PayID"] != null)
+            {
+                payid = int.Parse(co["PayID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "付款ID必填", "General");
+            }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.ConfirmPay(OID,payid,CoID,username);
@@ -539,8 +738,23 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/CanclePay")]
         public ResponseResult CanclePay([FromBodyAttribute]JObject co)
         {   
-            int OID = int.Parse(co["OID"].ToString());
-            int payid = int.Parse(co["PayID"].ToString());
+            int OID = 0,payid = 0;
+            if(co["OID"] != null)
+            {
+                OID = int.Parse(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }
+            if(co["PayID"] != null)
+            {
+                payid = int.Parse(co["PayID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "付款ID必填", "General");
+            }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.CanclePay(OID,payid,CoID,username);
@@ -550,7 +764,15 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/QuickPay")]
         public ResponseResult QuickPay([FromBodyAttribute]JObject co)
         {   
-            int OID = int.Parse(co["OID"].ToString());
+            int OID = 0;
+            if(co["OID"] != null)
+            {
+                OID = int.Parse(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.QuickPay(OID,CoID,username);
@@ -568,7 +790,15 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/TransferNormal")]
         public ResponseResult TransferNormal([FromBodyAttribute]JObject co)
         {   
-            List<int> oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            var oid = new List<int>();
+            if(co["OID"] != null)
+            {
+                oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.TransferNormal(oid,CoID,username);
@@ -598,8 +828,24 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/OrdMerger")]
         public ResponseResult OrdMerger([FromBodyAttribute]JObject co)
         {   
-            int oid = int.Parse(co["OID"].ToString());
-            List<int> merid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["MerID"].ToString());
+            int oid = 0;
+            var merid = new  List<int>();
+            if(co["OID"] != null)
+            {
+                oid = int.Parse(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "主订单号必填", "General");
+            }
+            if(co["MerID"] != null)
+            {
+                merid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["MerID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "合并子订单号必填", "General");
+            }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.OrdMerger(oid,merid,CoID,username);
@@ -609,7 +855,11 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/CancleOrdMerge")]
         public ResponseResult CancleOrdMerge([FromBodyAttribute]JObject co)
         {   
-            List<int> oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            var oid = new List<int>();
+            if(co["OID"] != null)
+            {
+                oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.CancleOrdMerge(oid,CoID,username);
@@ -619,8 +869,24 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/OrdSplit")]
         public ResponseResult OrdSplit([FromBodyAttribute]JObject co)
         {   
-            int oid = int.Parse(co["OID"].ToString());
-            List<SplitOrd> splitOrd = Newtonsoft.Json.JsonConvert.DeserializeObject<List<SplitOrd>>(co["SplitOrd"].ToString());
+            int oid = 0;
+            var splitOrd = new List<SplitOrd>();
+            if(co["OID"] != null)
+            {
+                oid = int.Parse(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }
+            if(co["SplitOrd"] != null)
+            {
+                splitOrd = Newtonsoft.Json.JsonConvert.DeserializeObject<List<SplitOrd>>(co["SplitOrd"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "拆分订单明细必填", "General");
+            }
             string username = GetUname();
             int CoID = int.Parse(GetCoid()); 
             var data = OrderHaddle.OrdSplit(oid,splitOrd,CoID,username);
@@ -630,8 +896,20 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/ModifyFreight")]
         public ResponseResult ModifyFreight([FromBodyAttribute]JObject co)
         {   
-            decimal freight = decimal.Parse(co["Freight"].ToString());
-            List<int> oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            decimal freight = 0;
+            var oid = new List<int>();
+            if(co["Freight"] != null)
+            {
+                freight = decimal.Parse(co["Freight"].ToString());
+            }
+            if(co["OID"] != null)
+            {
+                oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }
             string username = GetUname();
             int CoID = int.Parse(GetCoid()); 
             var data = OrderHaddle.ModifyFreight(oid,freight,CoID,username);
@@ -657,7 +935,11 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/ImportOrderInsert")]
         public ResponseResult ImportOrderInsert([FromBodyAttribute]JObject co)
         {   
-            ImportOrderInsert order = Newtonsoft.Json.JsonConvert.DeserializeObject<ImportOrderInsert>(co["Order"].ToString());
+            var order = new ImportOrderInsert();
+            if(co.GetValue("Order") != null)
+            {
+                order = Newtonsoft.Json.JsonConvert.DeserializeObject<ImportOrderInsert>(co["Order"].ToString());
+            }   
             string username = GetUname();
             int CoID = int.Parse(GetCoid()); 
             var data = OrderHaddle.ImportOrderInsert(order,CoID,username);
@@ -667,7 +949,11 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/ImportOrderUpdate")]
         public ResponseResult ImportOrderUpdate([FromBodyAttribute]JObject co)
         {   
-            ImportOrderUpdate order = Newtonsoft.Json.JsonConvert.DeserializeObject<ImportOrderUpdate>(co["Order"].ToString());
+            var order = new ImportOrderUpdate();
+            if(co.GetValue("Order") != null)
+            {
+                order = Newtonsoft.Json.JsonConvert.DeserializeObject<ImportOrderUpdate>(co["Order"].ToString());
+            }
             string username = GetUname();
             int CoID = int.Parse(GetCoid()); 
             var data = OrderHaddle.ImportOrderUpdate(order,CoID,username);
@@ -677,8 +963,24 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/InsertGift")]
         public ResponseResult InsertGift([FromBodyAttribute]JObject co)
         {   
-            int id = int.Parse(co["OID"].ToString());
-            List<int> skuid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["SkuIDList"].ToString());
+            int id = 0;
+            var skuid = new List<int>();
+            if(co["OID"] != null)
+            {
+                id = id = int.Parse(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }
+            if(co["SkuIDList"] != null)
+            {
+                skuid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["SkuIDList"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "商品ID必填", "General");
+            } 
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.InsertGift(id,skuid,CoID,username);
@@ -688,9 +990,32 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/ChangeOrderDetail")]
         public ResponseResult ChangeOrderDetail([FromBodyAttribute]JObject co)
         {   
-            int id = int.Parse(co["ID"].ToString());
-            int oid = int.Parse(co["OID"].ToString());
-            int Skuid = int.Parse(co["SkuID"].ToString());
+            int id = 0,oid = 0,Skuid = 0;
+            if(co["ID"] != null)
+            {
+                id = int.Parse(co["ID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单明细ID必填", "General");
+            } 
+            if(co["OID"] != null)
+            {
+                oid = int.Parse(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            } 
+            if(co["SkuID"] != null)
+            {
+                Skuid = int.Parse(co["SkuID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "商品ID必填", "General");
+            } 
+            
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.ChangeOrderDetail(id,oid,Skuid,CoID,username);
@@ -720,8 +1045,20 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/ModifyRemark")]
         public ResponseResult ModifyRemark([FromBodyAttribute]JObject co)
         {   
-            int oid = int.Parse(co["OID"].ToString());
-            string Remark = co["SendMessage"].ToString();
+            int oid = 0;
+            if(co["OID"] != null)
+            {
+                oid = int.Parse(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            } 
+            string Remark = "";
+            if(co["SendMessage"] != null)
+            {
+                Remark = co["SendMessage"].ToString();
+            }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.ModifyRemark(oid,CoID,username,Remark);
@@ -731,14 +1068,64 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/ModifyAddress")]
         public ResponseResult ModifyAddress([FromBodyAttribute]JObject co)
         {   
-            string Logistics = co["RecLogistics"].ToString();
-            string City = co["RecCity"].ToString();
-            string District = co["RecDistrict"].ToString();
-            string Address = co["RecAddress"].ToString();
-            string Name = co["RecName"].ToString();
-            string tel = co["RecTel"].ToString();
-            string phone = co["RecPhone"].ToString();
-            int OID = int.Parse(co["OID"].ToString());
+            string Logistics = "",City = "",District = "",Address = "",Name = "",tel = "",phone = "";
+            if(co["RecLogistics"] != null)
+            {
+                Logistics = co["RecLogistics"].ToString();
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "省份必填", "General");
+            } 
+            if(co["RecCity"] != null)
+            {
+                City = co["RecCity"].ToString();
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "市区必填", "General");
+            } 
+            if(co["RecDistrict"] != null)
+            {
+                District = co["RecDistrict"].ToString();
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "县级市必填", "General");
+            } 
+            if(co["RecAddress"] != null)
+            {
+                Address = co["RecAddress"].ToString();
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "地址必填", "General");
+            } 
+            if(co["RecName"] != null)
+            {
+                Name = co["RecName"].ToString();
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "收货人必填", "General");
+            } 
+            if(co["RecTel"] != null)
+            {
+                tel = co["RecTel"].ToString();
+            }
+            if(co["RecPhone"] != null)
+            {
+                phone = co["RecPhone"].ToString();
+            }
+            int OID = 0;
+            if(co["OID"] != null)
+            {
+                OID = int.Parse(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }                       
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.ModifyAddress(Logistics,City,District,Address,Name,tel,phone,OID,username,CoID);
@@ -777,9 +1164,32 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/SetExp")]
         public ResponseResult SetExp([FromBodyAttribute]JObject co)
         {   
-            List<int> OID = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
-            string ExpID = co["ExpID"].ToString();
-            string ExpName = co["ExpName"].ToString();
+            var OID = new List<int>();
+            if(co["OID"] != null)
+            {
+                OID = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }   
+            string ExpID = "",ExpName="";     
+            if(co["ExpID"] != null)
+            {
+                ExpID = co["ExpID"].ToString();
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "快递ID必填", "General");
+            }        
+            if(co["ExpName"] != null)
+            {
+                ExpName = co["ExpName"].ToString();
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "快递名必填", "General");
+            }        
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.SetExp(OID,CoID,ExpID,ExpName,username);
@@ -797,8 +1207,24 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/SetWarehouse")]
         public ResponseResult SetWarehouse([FromBodyAttribute]JObject co)
         {   
-            List<int> OID = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
-            string WhID = co["WarehouseID"].ToString();
+            var OID = new List<int>();
+            if(co["OID"] != null)
+            {
+                OID = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }   
+            string WhID = "";
+            if(co["WarehouseID"] != null)
+            {
+                WhID = co["WarehouseID"].ToString();
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "仓库ID必填", "General");
+            }   
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.SetWarehouse(OID,CoID,WhID,username);
@@ -808,7 +1234,15 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/Order/ConfirmOrder")]
         public ResponseResult ConfirmOrder([FromBodyAttribute]JObject co)
         {   
-            List<int> oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            var oid = new List<int>();
+            if(co["OID"] != null)
+            {
+                oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }   
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.ConfirmOrder(oid,CoID,username);

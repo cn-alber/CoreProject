@@ -805,7 +805,7 @@ namespace CoreData.CoreCore
         ///<summary>
         ///更新订单
         ///</summary>
-        public static DataResult UpdateOrder(decimal ExAmount,string Remark,string InvTitle,string Logistics,string City,string District,string Address,string Name,
+        public static DataResult UpdateOrder(string ExAmount,string Remark,string InvTitle,string Logistics,string City,string District,string Address,string Name,
                                             string tel,string phone,int OID,string UserName,int CoID)
         {
             var result = new DataResult(1,null);   
@@ -836,7 +836,7 @@ namespace CoreData.CoreCore
                     RecName = OrdOlder.RecName;
                     if(OrdOlder.Status == 0 || OrdOlder.Status == 1 || OrdOlder.Status == 7)
                     {
-                        if(OrdOlder.ExAmount != ExAmount.ToString())
+                        if(ExAmount != null && OrdOlder.ExAmount != ExAmount)
                         {
                             var log = new Log();
                             log.OID = OrdOlder.ID;
@@ -848,29 +848,29 @@ namespace CoreData.CoreCore
                             log.Remark = "运费" + OrdOlder.ExAmount + " => " + ExAmount;
                             log.CoID = CoID;
                             logs.Add(log);
-                            OrdOlder.ExAmount = ExAmount.ToString();
+                            OrdOlder.ExAmount = ExAmount;
                             x++;
                         }
                         string addressOlder = OrdOlder.RecLogistics + OrdOlder.RecCity + OrdOlder.RecDistrict + OrdOlder.RecAddress;
-                        if(OrdOlder.RecLogistics != Logistics)
+                        if(Logistics != null && OrdOlder.RecLogistics != Logistics)
                         {
                             OrdOlder.RecLogistics = Logistics;
                             x++;
                             z++;
                         }
-                        if(OrdOlder.RecCity != City)
+                        if(City != null && OrdOlder.RecCity != City)
                         {
                             OrdOlder.RecCity = City;
                             x++;
                             z++;
                         }
-                        if(OrdOlder.RecDistrict != District)
+                        if(District != null && OrdOlder.RecDistrict != District)
                         {
                             OrdOlder.RecDistrict = District;
                             x++;
                             z++;
                         }
-                        if(OrdOlder.RecAddress != Address)
+                        if(Address != null && OrdOlder.RecAddress != Address)
                         {
                             OrdOlder.RecAddress = Address;
                             x++;
@@ -889,7 +889,7 @@ namespace CoreData.CoreCore
                             log.CoID = CoID;
                             logs.Add(log);
                         }
-                        if(OrdOlder.RecName != Name)
+                        if(Name != null && OrdOlder.RecName != Name)
                         {
                             var log = new Log();
                             log.OID = OrdOlder.ID;
@@ -905,7 +905,7 @@ namespace CoreData.CoreCore
                             x++;
                             z++;
                         }
-                        if(OrdOlder.RecTel != tel)
+                        if(tel != null && OrdOlder.RecTel != tel)
                         {
                             var log = new Log();
                             log.OID = OrdOlder.ID;
@@ -920,7 +920,7 @@ namespace CoreData.CoreCore
                             OrdOlder.RecTel = tel;
                             x++;
                         }
-                        if(OrdOlder.RecPhone != phone)
+                        if(phone != null && OrdOlder.RecPhone != phone)
                         {
                             var log = new Log();
                             log.OID = OrdOlder.ID;
@@ -936,7 +936,7 @@ namespace CoreData.CoreCore
                             x++;
                         }
                     }
-                    if(OrdOlder.SendMessage != Remark)
+                    if(Remark != null && OrdOlder.SendMessage != Remark)
                     {
                         var log = new Log();
                         log.OID = OrdOlder.ID;
@@ -952,7 +952,7 @@ namespace CoreData.CoreCore
                         x++;
                         y++;
                     }
-                    if(OrdOlder.InvoiceTitle != InvTitle)
+                    if(InvTitle != null && OrdOlder.InvoiceTitle != InvTitle)
                     {
                         var log = new Log();
                         log.OID = OrdOlder.ID;
@@ -1104,7 +1104,7 @@ namespace CoreData.CoreCore
                 OrdOlder.ModifyDate = DateTime.Now;
                 if(x > 0)
                 {
-                    if(decimal.Parse(OrdOlder.SkuAmount) + ExAmount == decimal.Parse(OrdOlder.PaidAmount))
+                    if(decimal.Parse(OrdOlder.SkuAmount) + decimal.Parse(ExAmount) == decimal.Parse(OrdOlder.PaidAmount))
                     {
                         OrdOlder.IsPaid = true;
                         if(OrdOlder.Status != 7)
@@ -1831,7 +1831,7 @@ namespace CoreData.CoreCore
                             logs.Add(log);
                         }
                     }
-                    if(!string.IsNullOrEmpty(SkuName))
+                    if(SkuName != null)
                     {
                         if(SkuName != x[0].SkuName)
                         {
@@ -6657,7 +6657,7 @@ namespace CoreData.CoreCore
                     //获取电子面单
                     if(a.Express != "现场取货" && a.Status != 2 &&　a.Status != 7)
                     {
-                        sqlcommand = "select ExpNo from expnounused where CoID = " + CoID + " and Express = " + a.ExID;
+                        sqlcommand = "select ExpNo as ExCode from expnounused where CoID = " + CoID + " and Express = " + a.ExID;
                         var e = CoreDBconn.Query<ExpnoUnused>(sqlcommand).AsList();
                         if(e.Count == 0)
                         {
@@ -6716,9 +6716,9 @@ namespace CoreData.CoreCore
                     {
                         a.Status = 3;
                         a.ExCode = "0";//待新增方法
-                        a.Modifier = UserName;
-                        a.ModifyDate = DateTime.Now;
                     }
+                    a.Modifier = UserName;
+                    a.ModifyDate = DateTime.Now;
                     //更新订单
                     sqlcommand = @"update `order` set WarehouseID =@WarehouseID,SendWarehouse=@SendWarehouse,ExID=@ExID,Express=@Express,Status=@Status,AbnormalStatus=@AbnormalStatus,
                                    StatusDec=@StatusDec,Modifier=@Modifier,ModifyDate=@ModifyDate,ExCode=@ExCode where id = @ID and coid = @Coid";
@@ -6730,15 +6730,16 @@ namespace CoreData.CoreCore
                     }
                     if(a.Status != 2 &&　a.Status != 7)
                     {
-                        var wa = CoreComm.WarehouseHaddle.wareInfoByID(a.WarehouseID.ToString(),CoID.ToString()).d as wareInfo;
+                        var  ru = CoreComm.WarehouseHaddle.wareInfoByID(a.WarehouseID.ToString(),CoID.ToString()).d as dynamic;;
+                        var wa = ru.Lst as List<wareInfo>;
                         int ItCoid = 0;
-                        if(wa.itcoid == 0)
+                        if(wa[0].itcoid == 0)
                         {
-                            ItCoid = wa.coid;
+                            ItCoid = wa[0].coid;
                         }
                         else
                         {
-                            ItCoid = wa.itcoid;
+                            ItCoid = wa[0].itcoid;
                         }
                         //更新库存资料
                         foreach(var i in item)
