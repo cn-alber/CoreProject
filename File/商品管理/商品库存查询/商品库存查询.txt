@@ -20,7 +20,7 @@ function说明
     OutPut:       
         PageCount       int         总页数
         DataCount       int         资料总笔数
-        InvLst          List<Inventory>  商品库存(Inventory)
+        InvMainLst      List<Inventory_sale>  商品库存(Inventory)
     参考:output json 文件:InventQuery_output.json
 ############################################################
 2.InvDetailQuery()//查询商品交易明细
@@ -28,7 +28,7 @@ function说明
     路由：http://192.168.30.211:5000/Core/XyCore/Inventory/InvDetailQuery?SkuautoID=&WarehouseID=&DocType=&DocDateB=&DocDateE=&PageIndex=1&PageSize=&SortField=&SortDirection=
     InPut:
         SkuautoID       string      查询匹配(商品autoID,Default:null)
-        WarehouseID     int         商品仓库ID(Default:0)
+        WarehouseID     int         分仓公司编号CoID(Default:0)
         DocType         string      交易类型(Default:null) (参考：CoreModels.Enum.InvType)
         DocDateB        DateTime    单据日期起(Default:1999/01/01)
         DocDateE        DateTime    单据日期迄(Default:DateTime.Now)
@@ -42,9 +42,9 @@ function说明
         InvItemLst      List<Invinoutitem>  商品交易明细(Invinoutitem)
     参考:output json 文件:InvDetailQuery_output.json
 ############################################################
-3.UptInvSafeQty()//修改安全库存 - 单笔
+3.UptInvMainSafeQty()//修改安全库存 - 单笔
     方法：POST
-    路由：http://192.168.30.211:5000/Core/XyCore/Inventory/UptInvSafeQty
+    路由：http://192.168.30.211:5000/Core/XyCore/Inventory/UptInvMainSafeQty
     InPut:
         ID              int             商品库存ID（*必填项*）
         SafeQty         int             安全库存下限
@@ -53,21 +53,21 @@ function说明
     OutPut:
         成功：返回请求成功信息(s=1)
         失败：返回错误信息
-    参考:input json 文件:UptInvSafeQty_input.json
+    参考:input json 文件:UptInvMainSafeQty_input.json
 
 4.UptInvSafeQty()//修改安全库存 - 多笔
     方法：POST
-    路由：http://192.168.30.211:5000/Core/XyCore/Inventory/UptInvLstSafeQty
+    路由：http://192.168.30.211:5000/Core/XyCore/Inventory/UptInvMainLstSafeQty
     InPut:
         InvLst          List<InventParams>      商品-安全库存修改参数
     OutPut:
         成功：返回请求成功信息(s=1)
         失败：返回错误信息
-    参考:input json 文件:UptInvLstSafeQty_input.json
+    参考:input json 文件:UptInvMainLstSafeQty_input.json
 
 5.ClearInvSafeQty()//清空安全库存 - 所有商品  
     方法：POST
-    路由：http://192.168.30.211:5000/Core/XyCore/Inventory/ClearInvSafeQty
+    路由：http://192.168.30.211:5000/Core/XyCore/Inventory/ClearInvMainSafeQty
     InPut:
         null
     OutPut:
@@ -77,7 +77,7 @@ function说明
 ############################################################
 6.UptInvVirtualQty()//修改虚拟库存 - 单笔
     方法：POST
-    路由：http://192.168.30.211:5000/Core/XyCore/Inventory/UptInvVirtualQty
+    路由：http://192.168.30.211:5000/Core/XyCore/Inventory/UptInvMainVirtualQty
     InPut:
         ID              int             商品库存ID（*必填项*）
         VirtualQty      int             虚拟库存（*必填项*）
@@ -88,7 +88,7 @@ function说明
 
 7.UptInvVirtualQty()//修改虚拟库存 - 多笔
     方法：POST
-    路由：http://192.168.30.211:5000/Core/XyCore/Inventory/UptInvLstVirtualQty
+    路由：http://192.168.30.211:5000/Core/XyCore/Inventory/UptInvMainLstVirtualQty
     InPut:
         InvLst          List<InventParams>      商品-虚拟库存修改参数
     OutPut:

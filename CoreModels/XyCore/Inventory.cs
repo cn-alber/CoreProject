@@ -30,6 +30,32 @@ namespace CoreModels.XyCore
 
     }
 
+    public class Inventory_sale
+    {
+        public int ID { get; set; }
+        public string GoodsCode { get; set; }
+        public string Skuautoid { get; set; }
+        public string SkuID { get; set; }
+        public string Name { get; set; }
+        public string Norm { get; set; }
+        public decimal StockQty { get; set; }
+        public decimal LockQty { get; set; }
+        public decimal PickQty { get; set; }
+        public decimal WaitInQty { get; set; }
+        public decimal SaleRetuQty { get; set; }
+        public decimal SafeQty { get; set; }
+        public decimal DefectiveQty { get; set; }
+        public decimal VirtualQty { get; set; }
+        public decimal PurchaseQty { get; set; }
+        public string Img { get; set; }
+        public string CoID { get; set; }
+        public string Creator { get; set; }
+        public string CreateDate { get; set; }
+        public string Modifier { get; set; }
+        public string ModifyDate { get; set; }
+
+    }
+
     public class InvQueryParam
     {
         private int _CoID;//公司编号
@@ -153,6 +179,7 @@ namespace CoreModels.XyCore
         public int PageCount { get; set; }//总页数
         public int DataCount { get; set; } //总行数
         public List<Inventory> InvLst { get; set; }//返回查询结果
+        public List<Inventory_sale> InvMainLst { get; set; }
     }
 
     public class Sfc_InvStock

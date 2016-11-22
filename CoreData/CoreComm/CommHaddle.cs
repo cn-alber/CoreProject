@@ -251,6 +251,78 @@ namespace CoreData.CoreComm
         }
         #endregion
 
+        #region 公用方法 - 获取本仓&第三方仓储List
+        public static DataResult GetWareThirdList(string CoID)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    string sql = @"
+                                    SELECT
+                                        w.ID,
+                                        w.WareName AS WhName,
+                                        w.CoID
+                                    FROM
+                                        ware_third_party AS w
+                                    WHERE
+                                        w. ENABLE = 0
+                                    AND w.CoID = @CoID
+                                UNION
+                                    SELECT
+                                        w.ID,
+                                        w.WareName,
+                                        w.ItCoid AS CoID
+                                    FROM
+                                        ware_third_party AS w
+                                    WHERE
+                                        w. ENABLE = 2
+                                    AND w.CoID = @CoID";
+                    var WhLst = conn.Query<Warehouse_view>(sql, new { CoID = CoID }).AsList();
+                    result.d = WhLst;
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+        #endregion
+
+        #region 公用方法 - 获取本仓&第三方仓储CoIDLst
+         public static DataResult GetWareCoidList(string CoID)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    string sql = @"
+                                   SELECT @CoID as CoID
+                                UNION
+                                    SELECT
+                                        w.ItCoid AS CoID
+                                    FROM
+                                        ware_third_party AS w
+                                    WHERE
+                                        w. ENABLE = 2
+                                    AND w.CoID = @CoID";
+                    var CoidLst = conn.Query<string>(sql, new { CoID = CoID }).AsList();
+                    result.d = CoidLst;
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+        #endregion
+
 
         #region 公用方法——获取商品编号&名称&规格&图片
         public static DataResult GetSkuViewByID(string CoID, List<String> IDLst)
