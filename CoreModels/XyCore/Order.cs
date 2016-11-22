@@ -761,6 +761,7 @@ namespace CoreModels.XyCore
     }
     public class OrderLog
     {
+        public string ID{get;set;}
         public string LogDate{get;set;}
         public string UserName{get;set;}
         public string Title{get;set;}
@@ -947,5 +948,9 @@ namespace CoreModels.XyCore
         public int CoID{get;set;}
         public string Creator{get;set;}
         public string Modifier{get;set;}
+    }
+    public class ExpnoUnused
+    {
+        public string ExCode{get;set;}
     }
 }
