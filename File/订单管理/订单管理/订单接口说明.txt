@@ -1,15 +1,18 @@
 接口名称:CoreWebApi/Controllers/Order/OrderControllers
 /*
+0:待付款;1:已付款待审核;2.已审核待配快递;3.发货中;4.已发货;5.被合并;6.已取消;7.异常
+
 0:新增订单明细,修改订单明细,删除订单明细,新增赠品,订单明细换货,修改订单(运费/卖家备注/发票抬头/收货人信息),手工支付,快速支付,审核支付,取消审核支付,作废支付,修改备注,设定快递,修改收货地址,
   修改运费,修改发货仓库(非分销订单)
 1:新增订单明细,修改订单明细,删除订单明细,新增赠品,订单明细换货,修改订单(运费/卖家备注/发票抬头/收货人信息),手工支付,快速支付,审核支付,取消审核支付,作废支付,修改备注,设定快递,修改收货地址,
   合并订单,拆分订单,修改运费,修改发货仓库(非分销订单)
-2:修改订单(卖家备注/发票抬头)
+2:修改订单(卖家备注/发票抬头),修改备注,设定快递,修改收货地址,合并订单,拆分订单
 3:修改订单(卖家备注/发票抬头)
-4:修改订单(卖家备注/发票抬头)
+4:修改订单(卖家备注/发票抬头)          
 5:修改订单(卖家备注/发票抬头)
+6:修改订单(卖家备注/发票抬头)
 7:新增订单明细,修改订单明细,删除订单明细,新增赠品,订单明细换货,修改订单(运费/卖家备注/发票抬头/收货人信息),手工支付,快速支付,审核支付,取消审核支付,作废支付,修改备注,设定快递,修改收货地址,
-  订单转正常单,合并订单,拆分订单,修改运费,修改发货仓库(非分销订单)
+  订单转正常单,修改运费,修改发货仓库(非分销订单)
 */
 待补充方法:系统自动指定快递/菜鸟智选快递
 function说明
@@ -196,7 +199,7 @@ input:      None
 OutPut:     List<AbnormalReason>   异常原因List
 参考:output jason 文件:GetAbnormalList_output.json
 
-14.TransferNormal()转正常单
+*14.TransferNormal()转正常单
 路由:http://localhost:5000/Core/Order/TransferNormal
 input:OID    List<int>      内部订单号
 output: s=1成功 else 错误代码
@@ -237,7 +240,7 @@ output: s=1成功 else 错误代码
 参考:input jason 文件:OrdSplit_input.json
 参考:output jason 文件:OrdSplit_output.json
 
-19.ModifyFreight()修改运费
+*19.ModifyFreight()修改运费
 路由:http://localhost:5000/Core/Order/ModifyFreight
 input:OID         List<int>   内部订单号
       Freight     decimal     修改后运费
@@ -342,11 +345,12 @@ output: ExpressSimple         快递列表
         LogisticsNetwork      网点资料
 参考:output jason 文件:GetExp_output.json
 
-30.SetExp()设定快递保存
+*30.SetExp()设定快递保存
 路由:http://localhost:5000/Core/Order/SetExp
-input:OID         List<int>   内部订单号    
-      ExpID       string      快递ID
-      ExpName     string      快递名称
+input:OID               List<int>   内部订单号    
+      ExpID             string      快递ID
+      ExpName           string      快递名称
+      ExpNamePinyin     string      快递名称拼音
 output: s=1成功 else 错误代码
 参考:input jason 文件:SetExp_input.json
 参考:output jason 文件:SetExp_output.json
@@ -357,7 +361,7 @@ input: none
 output: 仓库List
 参考:output jason 文件:GetWarehouse_output.json
 
-32.SetWarehouse()设定仓库保存
+*32.SetWarehouse()设定仓库保存
 路由:http://localhost:5000/Core/Order/SetWarehouse
 input:OID               List<int>   内部订单号    
       WarehouseID       string      仓库ID

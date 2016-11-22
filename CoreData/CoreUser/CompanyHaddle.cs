@@ -259,6 +259,9 @@ namespace CoreData.CoreUser
                 System.Threading.Tasks.Task.Factory.StartNew(()=>{
                     WarehouseHaddle.createWareSetting(rtn);
                 });
+                System.Threading.Tasks.Task.Factory.StartNew(()=>{
+                    WarehouseHaddle.InsertWareThird(rtn.ToString(), com.name);
+                });
 
                 com.id = rtn;
                 CacheBase.Set<Company>("company" + rtn.ToString(), com);      
