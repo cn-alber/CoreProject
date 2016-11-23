@@ -453,7 +453,7 @@ namespace CoreData.CoreComm
             {
                 try
                 {
-                    string sql = "SELECT pid,name FROM customkind_props WHERE kindid=@ID AND CoID=@CoID AND IsDelete = 0 AND Enable = 1";
+                    string sql = "SELECT pid,name,is_input_prop FROM customkind_props WHERE kindid=@ID AND CoID=@CoID AND IsDelete = 0 AND Enable = 1";
                     var p = new DynamicParameters();
                     p.Add("@ID", KindID);
                     p.Add("@CoID",CoID);

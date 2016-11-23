@@ -23,7 +23,7 @@ namespace CoreModels.XyCore
         public string PurPrice { get; set; }
         public string SalePrice { get; set; }
         public string MarketPrice { get; set; }
-        public string TempShopID { get; set; }        
+        public string TempShopID { get; set; }
         public string TempShopName { get; set; }
         public string TempID { get; set; }
         public string Remark { get; set; }

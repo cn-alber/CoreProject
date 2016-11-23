@@ -319,7 +319,7 @@ namespace CoreData.CoreCore
                         cs.skuprops = conn.Query<goods_sku_props>(skupropsql, p).AsList();
                         var res1 = CommHaddle.GetBrandByID(CoID, main.Brand);//品牌
                         var res2 = CommHaddle.GetScoNameByID(CoID, main.ScoID);//供应商
-                        var res3 = CommHaddle.GetBrandByID(CoID, main.KindID);//类目名称
+                        var res3 = CommHaddle.GetCoreKindByID(CoID, main.KindID);//类目名称
                         var res4 = CommHaddle.GetShopNameByID(CoID, main.TempShopID);
                         main.BrandName = res1.d as string;
                         main.ScoName = res2.d as string;
