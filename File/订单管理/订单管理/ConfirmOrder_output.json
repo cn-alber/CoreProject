@@ -1,0 +1,16 @@
+{
+    "s": 1,
+    "d": {
+        "SuccessIDs": [
+            {
+                "ID": 10867,
+                "Status": 3,
+                "StatusDec": "发货中"
+            }
+        ],
+        "FailIDs": [
+            
+        ]
+    },
+    "m": ""
+}

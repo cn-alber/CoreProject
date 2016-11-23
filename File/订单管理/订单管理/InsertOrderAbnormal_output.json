@@ -40,6 +40,16 @@
             "value": "8",
             "label": "测试",
             "iscustom": true
+        },
+        {
+            "value": "9",
+            "label": "测试1",
+            "iscustom": true
+        },
+        {
+            "value": "10",
+            "label": "测试2",
+            "iscustom": true
         }
     ],
     "m": ""
