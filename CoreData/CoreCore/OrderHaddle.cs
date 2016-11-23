@@ -7472,9 +7472,17 @@ namespace CoreData.CoreCore
         ///<summary>
         ///取消订单
         ///</summary>
-        public static DataResult CancleOrder(List<int> oid,int CoID,string UserName,string StatusDec,string Remark)
+        public static DataResult CancleOrder(List<int> oid,int CoID,string UserName,int reasonID,string Remark)
         {
             var result = new DataResult(1,null);
+            var yy = GetReasonName(reasonID,CoID,6);
+            if(yy.s == -1)
+            {
+                result.s = -1;
+                result.d = "取消原因参数异常!";
+                return result;
+            }
+            string StatusDec = yy.d.ToString();
             var logs = new List<Log>();
             var res = new TransferAbnormalReturn();
             var su = new List<TransferAbnormalSuccess>();

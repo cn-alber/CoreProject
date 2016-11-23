@@ -1341,10 +1341,10 @@ namespace CoreWebApi
             {
                 return CoreResult.NewResponse(-1, "订单号必填", "General");
             }   
-            string CancleReason = "";
+            int CancleReason = 0;
             if(co["CancleReason"] != null)
             {
-                CancleReason = co["CancleReason"].ToString();
+                CancleReason = int.Parse(co["CancleReason"].ToString());
             }
             else
             {

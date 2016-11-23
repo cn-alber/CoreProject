@@ -1,5 +1,5 @@
 {
     "OID":[10869,10868],
-    "CancleReason":"重复订单",
+    "CancleReason":15,
     "Remark":"测试"
 }

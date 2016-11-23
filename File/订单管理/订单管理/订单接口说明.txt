@@ -393,8 +393,7 @@ output: 异常说明List
 路由:http://localhost:5000/Core/Order/TransferAbnormal
 input:OID               List<int>   订单号
       AbnormalStatus    int         异常ID
-      AbnormalStatusDec string      异常说明   
-      Remark            string      异常描述
+      AbnormalStatusDec string      异常描述   
 output: 成功和失败的订单号
 参考:input jason 文件:TransferAbnormal_input.json
 参考:output jason 文件:TransferAbnormal_output.json
@@ -408,7 +407,7 @@ OutPut:     List<AbnormalReason>   取消原因List
 38.CancleOrder()订单取消
 路由:http://localhost:5000/Core/Order/CancleOrder
 input:OID               List<int>   订单号
-      CancleReason      string      取消原因
+      CancleReason      int         取消原因ID
       Remark            string      取消原因说明   
 output: 成功和失败的订单号
 参考:input jason 文件:CancleOrder_input.json
