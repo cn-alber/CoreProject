@@ -50,10 +50,9 @@ function说明
     路由：http://localhost:5000/Core/XyCore/CoreSku/GoodsQuery
     参数: 
     InPut:
-        GoodsCode       string          货号
+        ID              string          货号表ID (Coresku_main.ID)
     OutPut:
         main            CoreSkuAuto     单笔货品详情
-    参考：input json 文件:GoodsQuery_input.json
     参考：output json 文件:GoodsQuery_output.json
 4.UptGoodsDel()//Update商品删除标记
     方法：POST
