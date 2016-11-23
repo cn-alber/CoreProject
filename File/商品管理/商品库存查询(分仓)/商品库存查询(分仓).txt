@@ -12,7 +12,7 @@ function说明
         Norm            string      查询匹配(颜色及规格,Default:null)
         StockQtyb       int         主仓实际库存数量起(Default:0)
         StockQtye       int         主仓实际库存数量起(Default:999999999)
-        WarehouseID     int         商品仓库ID(Default:0)
+        WarehouseID     int         分仓公司编号CoID(Default:0)
         Status          int         库存状态:0.全部,1.充足,2.预警
         PageIndex       int         当前页码(ex.第一页就给1)
         PageSize        int         每页显示资料笔数(Default:20)
@@ -29,7 +29,7 @@ function说明
     路由：http://192.168.30.211:5000/Core/XyCore/Inventory/InvDetailQuery?SkuautoID=&WarehouseID=&DocType=&DocDateB=&DocDateE=&PageIndex=1&PageSize=&SortField=&SortDirection=
     InPut:
         SkuautoID       string      查询匹配(商品autoID,Default:null)
-        WarehouseID     int         商品仓库ID(Default:0)
+        WarehouseID     int         分仓公司编号CoID(Default:0)
         DocType         string      交易类型(Default:null) (参考：CoreModels.Enum.InvType)
         DocDateB        DateTime    单据日期起(Default:1999/01/01)
         DocDateE        DateTime    单据日期迄(Default:DateTime.Now)
@@ -62,7 +62,18 @@ function说明
         失败：返回错误信息
     参考:input json 文件:UptStockQtySingle_input.json    
 ############################################################
-5.ClearInvStockQty()//批量操作 - 库存清理
+5.UptInvMainSafeQty()//修改安全库存 - 单笔
+    方法：POST
+    路由：http://192.168.30.211:5000/Core/XyCore/Inventory/UptInvSafeQty
+    InPut:
+        ID              int             商品库存ID（*必填项*）
+        SafeQty         int             安全库存下限
+    OutPut:
+        成功：返回请求成功信息(s=1)
+        失败：返回错误信息
+    参考:input json 文件:UptInvSafeQty_input.json
+############################################################
+6.ClearInvStockQty()//批量操作 - 库存清理
     方法：POST
     路由：http://192.168.30.211:5000/Core/XyCore/Inventory/ClearInvStockQty
     InPut:
@@ -71,7 +82,7 @@ function说明
         成功：返回请求成功信息(s=1)
         失败：返回错误信息  
 ############################################################
-6.DeleteZeroSkuD()//批量操作 - 清除零库存Sku    
+7.DeleteZeroSkuD()//批量操作 - 清除零库存Sku    
     方法：POST
     路由：http://192.168.30.211:5000/Core/XyCore/Inventory/DeleteZeroSkuD
     InPut:

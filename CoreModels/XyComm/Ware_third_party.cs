@@ -27,7 +27,7 @@ namespace CoreModels.XyComm
 
     public class wareInfo{
         public int coid{get;set;}
-        public string itcoid{get;set;}
+        public int itcoid{get;set;}
         public string warename{get;set;}
 
     }

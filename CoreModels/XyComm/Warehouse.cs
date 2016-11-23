@@ -60,5 +60,6 @@ namespace CoreModels.XyComm
     {
         public string ID { get; set; }
         public string WhName { get; set; }
+        public string CoID{get;set;}
     }
 }

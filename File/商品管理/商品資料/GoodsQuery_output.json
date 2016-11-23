@@ -4,19 +4,22 @@
         "main": {
             "ID": 7,
             "GoodsCode": "ABCTST2",
-            "GoodsName": "ABC测试2",
+            "GoodsName": "ABC测试2tt",
             "Brand": "1",
+            "BrandName": "南极人",
             "KindID": "365",
             "KindName": "自定义类目测试1",
             "ScoID": "1",
+            "ScoName": "携云供应链管理",
             "ScoGoodsCode": "scotest",
             "ScoSku": null,
-            "Weight": "0.80",
+            "Weight": "0.00",
             "CostPrice": null,
             "PurPrice": "100.00",
             "SalePrice": "120.00",
             "MarketPrice": null,
             "TempShopID": "11",
+            "TempShopName": "京东Core测试1",
             "TempID": "0",
             "Remark": "Remarktest1",
             "Img": null,
@@ -25,39 +28,15 @@
             "Type": 0,
             "Creator": "管理员",
             "CreateDate": "2016/11/9 15:38:41",
-            "Modifier": "",
-            "ModifyDate": null
+            "Modifier": "2016-11-11 15:08:14.766772",
+            "ModifyDate": "2016/11/11 15:08:15"
         },
         "itemprops_base": [
-            {
-                "pid": "122216507",
-                "name": "厚薄",
-                "itemprops_values": [
-                    {
-                        "pid": "122216507",
-                        "id": "13061",
-                        "name": "薄款"
-                    },
-                    {
-                        "pid": "122216507",
-                        "id": "13062",
-                        "name": "厚"
-                    },
-                    {
-                        "pid": "122216507",
-                        "id": "13063",
-                        "name": "加厚"
-                    },
-                    {
-                        "pid": "122216507",
-                        "id": "13064",
-                        "name": "常规"
-                    }
-                ]
-            },
+            {},
             {
                 "pid": "42722636",
                 "name": "基础风格",
+                "is_input_prop": "0",
                 "itemprops_values": [
                     {
                         "pid": "42722636",
@@ -84,6 +63,7 @@
             {
                 "pid": "100016110755910",
                 "name": "属性测试",
+                "is_input_prop": "1",
                 "itemprops_values": [
                     {
                         "pid": "100016110755910",
@@ -140,6 +120,12 @@
                         "id": 1166,
                         "mapping": "003",
                         "name": "L"
+                    },
+                    {
+                        "pid": "100016110114201",
+                        "id": 1168,
+                        "mapping": "005",
+                        "name": "XL"
                     }
                 ]
             }
@@ -164,7 +150,7 @@
                 "pid": "100016110755910",
                 "val_id": "13069",
                 "val_name": "测试1",
-                "Enable": 1
+                "Enable": 0
             }
         ],
         "skuprops": [
@@ -184,7 +170,7 @@
                 "val_name": "红色1",
                 "mapping": "002",
                 "IsOther": 0,
-                "Enable": 1
+                "Enable": 0
             },
             {
                 "ID": 11,
@@ -203,78 +189,18 @@
                 "mapping": "002",
                 "IsOther": 0,
                 "Enable": 1
+            },
+            {
+                "ID": 15,
+                "pid": "100016110114201",
+                "val_id": "1166",
+                "val_name": "L",
+                "mapping": "003",
+                "IsOther": 0,
+                "Enable": 1
             }
         ],
-        "items": [
-            {
-                "ID": 17590,
-                "SkuID": "ABCTST2001001",
-                "SkuName": "ABC测试白色1S",
-                "SkuSimple": "ABC测试白色1S",
-                "Norm": "白色1;S",
-                "ParentID": "7",
-                "pid1": "100016110114201",
-                "val_id1": "11",
-                "pid2": "100016110194735",
-                "val_id2": "9",
-                "pid3": null,
-                "val_id3": null,
-                "PurPrice": "100.00",
-                "SalePrice": "120.00",
-                "Weight": "0.80"
-            },
-            {
-                "ID": 17591,
-                "SkuID": "ABCTST2001002",
-                "SkuName": "ABC测试红色1S",
-                "SkuSimple": "ABC测试红色1S",
-                "Norm": "红色1;S",
-                "ParentID": "7",
-                "pid1": "100016110114201",
-                "val_id1": "11",
-                "pid2": "100016110194735",
-                "val_id2": "10",
-                "pid3": null,
-                "val_id3": null,
-                "PurPrice": "100.00",
-                "SalePrice": "120.00",
-                "Weight": "0.80"
-            },
-            {
-                "ID": 17592,
-                "SkuID": "ABCTST2002001",
-                "SkuName": "ABC测试白色1M",
-                "SkuSimple": "ABC测试白色1M",
-                "Norm": "白色1;M",
-                "ParentID": "7",
-                "pid1": "100016110114201",
-                "val_id1": "12",
-                "pid2": "100016110194735",
-                "val_id2": "9",
-                "pid3": null,
-                "val_id3": null,
-                "PurPrice": "100.00",
-                "SalePrice": "120.00",
-                "Weight": "0.80"
-            },
-            {
-                "ID": 17593,
-                "SkuID": "ABCTST2002002",
-                "SkuName": "ABC测试红色1M",
-                "SkuSimple": "ABC测试红色1M",
-                "Norm": "红色1;M",
-                "ParentID": "7",
-                "pid1": "100016110114201",
-                "val_id1": "12",
-                "pid2": "100016110194735",
-                "val_id2": "10",
-                "pid3": null,
-                "val_id3": null,
-                "PurPrice": "100.00",
-                "SalePrice": "120.00",
-                "Weight": "0.80"
-            }
-        ]
+        "items": []
     },
     "m": ""
 }

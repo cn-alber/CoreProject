@@ -85,6 +85,7 @@ namespace CoreModels.XyComm
         // public int id { get; set; }
         public string pid { get; set; }
         public string name { get; set; }
+        public string is_input_prop { get; set; }//是否可输入
         public List<itemprops_value> itemprops_values { get; set; }
     }
 

@@ -1166,7 +1166,7 @@ namespace CoreData.CoreComm
                            FROM 
                             ware_third_party as w 
                            WHERE w.ID = "+id+" AND   w.CoID ="+CoID;                                                                     
-                    var storageLst = conn.Query<wareLst>(sql).AsList();                    
+                    var storageLst = conn.Query<wareInfo>(sql).AsList();                    
         
                     result.d = new {
                         Lst = storageLst,             
@@ -1411,7 +1411,7 @@ namespace CoreData.CoreComm
                             w.ID,w.WareName,w.CoID
                         FROM 
                             ware_third_party as w 
-                        WHERE w.Enable = 2 AND w.CoID ="+CoID; 
+                        WHERE w.Enable in(0,2) AND w.CoID ="+CoID; 
                     res = conn.Query<wareLst>(sql).AsList();                                  
                 }
                 catch

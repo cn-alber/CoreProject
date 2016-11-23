@@ -1,5 +1,19 @@
 {
     "s": 1,
-    "d": null,
+    "d": {
+        "SuccessIDs": [
+            {
+                "ID": 1,
+                "Warehouse": "南极云商"
+            },
+            {
+                "ID": 2,
+                "Warehouse": "南极云商"
+            }
+        ],
+        "FailIDs": [
+            
+        ]
+    },
     "m": ""
 }
