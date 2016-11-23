@@ -1,6 +1,6 @@
 接口名称:CoreWebApi/Controllers/Order/OrderControllers
 /*
-0:待付款;1:已付款待审核;2.已审核待配快递;3.发货中;4.已发货;5.被合并;6.已取消;7.异常
+0:待付款;1:已付款待审核;2.已审核待配快递;3.发货中;4.已发货;5.被合并;6.已取消;7.异常;8.等供销商发货
 
 0:新增订单明细,修改订单明细,删除订单明细,新增赠品,订单明细换货,修改订单(运费/卖家备注/发票抬头/收货人信息),手工支付,快速支付,审核支付,取消审核支付,作废支付,修改备注,设定快递,修改收货地址,
   修改运费,修改发货仓库(非分销订单),订单转异常,订单取消,分销付款
@@ -13,6 +13,7 @@
 6:修改订单(卖家备注/发票抬头),反取消订单
 7:新增订单明细,修改订单明细,删除订单明细,新增赠品,订单明细换货,修改订单(运费/卖家备注/发票抬头/收货人信息),手工支付,快速支付,审核支付,取消审核支付,作废支付,修改备注,设定快递,修改收货地址,
   订单转正常单,修改运费,修改发货仓库(非分销订单),订单转异常,订单取消,分销付款
+8:修改订单(卖家备注/发票抬头),订单转异常,订单取消
 */
 待补充方法:系统自动指定快递/菜鸟智选快递
 function说明
@@ -440,3 +441,10 @@ input:      OID         List<int>   订单号
 OutPut:     成功和失败的ID
 参考:input jason 文件:ModifySku_input.json
 参考:output jason 文件:ModifySku_output.json
+
+42.CancleConfirmOrder() //取消审核订单
+  路由:http://localhost:5000/Core/Order/CancleConfirmOrder
+input:      OID               List<int>   订单号
+OutPut:     成功和失败的ID
+参考:input jason 文件:CancleConfirmOrder_input.json
+参考:output jason 文件:CancleConfirmOrder_output.json

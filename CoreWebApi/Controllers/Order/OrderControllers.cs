@@ -1310,7 +1310,7 @@ namespace CoreWebApi
             {
                 return CoreResult.NewResponse(-1, "异常原因ID必填", "General");
             }   
-            string AbnormalStatusDec = "",Remark = "";
+            string AbnormalStatusDec = "";
             if(co["AbnormalStatusDec"] != null)
             {
                 AbnormalStatusDec = co["AbnormalStatusDec"].ToString();
@@ -1409,8 +1409,8 @@ namespace CoreWebApi
             {
                 return CoreResult.NewResponse(-1, "订单号必填", "General");
             }   
-            int ModifySku = 0,DeleteSku = 0,AddSku = 0,AddQty = 1,x;
-            decimal ModifyPrice = 0,AddPrice = 0,y;
+            int ModifySku = 0,DeleteSku = 0,AddSku = 0,AddQty = 1;
+            decimal ModifyPrice = 0,AddPrice = 0;
             string AddType = string.Empty;
             if(co["ModifySku"] != null)
             {
@@ -1455,6 +1455,24 @@ namespace CoreWebApi
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.ModifySku(oid,ModifySku,ModifyPrice,DeleteSku,AddSku,AddPrice,AddQty,AddType,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/CancleConfirmOrder")]
+        public ResponseResult CancleConfirmOrder([FromBodyAttribute]JObject co)
+        {   
+            var oid = new List<int>();
+            if(co["OID"] != null)
+            {
+                oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }   
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.CancleConfirmOrder(oid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     }

@@ -3130,7 +3130,7 @@ namespace CoreData.CoreCore
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
-                string wheresql = "select id,soid,StatusDec,IsPaid,coid,status from `order` where id in @ID and coid = @Coid";
+                string wheresql = "select id,soid,StatusDec,IsPaid,coid,status,Type from `order` where id in @ID and coid = @Coid";
                 var u = CoreDBconn.Query<Order>(wheresql,new {ID = oid,Coid = CoID}).AsList();
                 foreach(var a in u)
                 {
@@ -3156,9 +3156,18 @@ namespace CoreData.CoreCore
                     ss.ID = a.ID;
                     if(a.IsPaid == true)
                     {
-                        a.Status = 1;
-                        ss.Status = 1;
-                        ss.StatusDec = "已付款待审核";
+                        if(a.Type == 3)
+                        {
+                            a.Status = 8;
+                            ss.Status = 8;
+                            ss.StatusDec = "等供销商发货";
+                        }
+                        else
+                        {
+                            a.Status = 1;
+                            ss.Status = 1;
+                            ss.StatusDec = "已付款待审核";
+                        }
                     }
                     else
                     {
@@ -5621,12 +5630,18 @@ namespace CoreData.CoreCore
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
-                string sqlcommand = @"select soid,SendMessage from `order` where id = " + id + " and coid = " + CoID;
+                string sqlcommand = @"select soid,SendMessage,status from `order` where id = " + id + " and coid = " + CoID;
                 var order = CoreDBconn.Query<Order>(sqlcommand).AsList();
                 if(order.Count == 0)
                 {
                     result.s = -1;
                     result.d = "订单无效!";
+                    return result;
+                }
+                if(order[0].Status == 8)
+                {
+                    result.s = -1;
+                    result.d = "等供销商发货的订单不可以改备注!";
                     return result;
                 }
                 var log = new Log();
@@ -6061,7 +6076,7 @@ namespace CoreData.CoreCore
                 var u = CoreDBconn.Query<Order>(sqlcommand,new{id = oid,Coid = CoID}).AsList();
                 foreach(var a in u)
                 {
-                    if(a.Status == 3 || a.Status == 4 || a.Status == 5 || a.Status == 6)
+                    if(a.Status == 3 || a.Status == 4 || a.Status == 5 || a.Status == 6 || a.Status == 8)
                     {
                         var ff = new TransferNormalReturnFail();
                         ff.ID = a.ID;
@@ -6747,7 +6762,7 @@ namespace CoreData.CoreCore
                         fa.Add(ff);
                         continue;
                     }   
-                    if(a.DealerType == 1)
+                    if(a.DealerType == 1 || a.Type == 3)
                     {
                         var ff = new TransferNormalReturnFail();
                         ff.ID = a.ID;
@@ -7332,7 +7347,7 @@ namespace CoreData.CoreCore
                     {
                         var ff = new TransferNormalReturnFail();
                         ff.ID = a.ID;
-                        ff.Reason = "待付款/已付款待审核/已审核待配快递/发货中/异常的订单才可以转异常";
+                        ff.Reason = "待付款/已付款待审核/已审核待配快递/发货中/异常/等供销商发货的订单才可以转异常";
                         fa.Add(ff);
                         continue;
                     }
@@ -7502,7 +7517,7 @@ namespace CoreData.CoreCore
                     {
                         var ff = new TransferNormalReturnFail();
                         ff.ID = a.ID;
-                        ff.Reason = "待付款/已付款待审核/已审核待配快递/发货中/异常的订单才可以取消";
+                        ff.Reason = "待付款/已付款待审核/已审核待配快递/发货中/异常/等供销商发货的订单才可以取消";
                         fa.Add(ff);
                         continue;
                     }
@@ -7841,7 +7856,7 @@ namespace CoreData.CoreCore
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
-                sqlCommandText = "select id,soid,Amount,status,PaidAmount,coid from `order` where id in @ID and coid = @Coid";
+                sqlCommandText = "select id,soid,Amount,status,PaidAmount,coid,Type from `order` where id in @ID and coid = @Coid";
                 var u = CoreDBconn.Query<Order>(sqlCommandText,new {ID = oid,Coid = CoID}).AsList();
                 foreach(var a in u)
                 {
@@ -7865,7 +7880,14 @@ namespace CoreData.CoreCore
                     
                     if(a.Amount == a.PaidAmount)
                     {
-                        a.Status = 1;
+                        if(a.Type == 3)
+                        {
+                            a.Status = 8;
+                        }
+                        else
+                        {
+                            a.Status = 1;
+                        }
                     }
                     else
                     {
@@ -7941,7 +7963,7 @@ namespace CoreData.CoreCore
                 }
                 foreach(var i in ord)
                 {
-                    if(i.Status  == 3 || i.Status  == 4 || i.Status  == 5|| i.Status  == 6 || i.Type  == 3)
+                    if(i.Status  == 3 || i.Status  == 4 || i.Status  == 5|| i.Status  == 6 || i.Status  == 8 || i.Type  == 3)
                     {
                         var ff = new TransferNormalReturnFail();
                         ff.ID = i.ID;
@@ -8186,7 +8208,95 @@ namespace CoreData.CoreCore
             result.d = res;
             return result;
         }
-        
+        ///<summary>
+        ///取消审核
+        ///</summary>
+        public static DataResult CancleConfirmOrder(List<int> oid,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var logs = new List<Log>();
+            var res = new TransferNormalReturn();
+            var su = new List<TransferNormalReturnSuccess>();
+            var fa = new List<TransferNormalReturnFail>();
+            string sqlCommandText = string.Empty;
+            int count = 0;
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                sqlCommandText = "select id,soid,status,coid,Type from `order` where id in @ID and coid = @Coid";
+                var u = CoreDBconn.Query<Order>(sqlCommandText,new {ID = oid,Coid = CoID}).AsList();
+                foreach(var a in u)
+                {
+                    if(a.Status != 2)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "已审核待配快递的订单才可以取消审核";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    var log = new Log();
+                    log.OID = a.ID;
+                    log.SoID = a.SoID;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "取消审核";
+                    log.CoID  = CoID;
+                    logs.Add(log);
+                    if(a.Type == 3)
+                    {
+                        a.Status = 8;
+                    }
+                    else
+                    {
+                        a.Status = 1;
+                    }
+                    a.Modifier = UserName;
+                    a.ModifyDate = DateTime.Now;
+                    sqlCommandText = @"update `order` set Status=@Status,Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and CoID = @CoID";
+                    count = CoreDBconn.Execute(sqlCommandText,a,TransCore);
+                    if (count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                    var ss = new TransferNormalReturnSuccess();
+                    ss.ID =a.ID;
+                    ss.Status =a.Status;
+                    ss.StatusDec = Enum.GetName(typeof(OrdStatus), a.Status);;
+                    
+                    su.Add(ss);
+                }                
+                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                        VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                int j = CoreDBconn.Execute(loginsert,logs, TransCore);
+                if (j < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                res.SuccessIDs = su;
+                res.FailIDs = fa;
+                result.d = res;
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            return result;
+        }
 
 
         public static DataResult SetExpress()
