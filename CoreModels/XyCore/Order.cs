@@ -969,8 +969,8 @@ namespace CoreModels.XyCore
     }
     public class TransferAbnormalReturn
     {
-        public List<TransferAbnormalSuccess> successIDs {get;set;}
-        public List<TransferNormalReturnFail> failIDs {get;set;}
+        public List<TransferAbnormalSuccess> SuccessIDs {get;set;}
+        public List<TransferNormalReturnFail> FailIDs {get;set;}
     }
     public class DistributionPaySuccess
     {
@@ -984,13 +984,13 @@ namespace CoreModels.XyCore
     }
     public class DistributionPayReturn
     {
-        public List<DistributionPaySuccess> successIDs {get;set;}
-        public List<TransferNormalReturnFail> failIDs {get;set;}
+        public List<DistributionPaySuccess> SuccessIDs {get;set;}
+        public List<TransferNormalReturnFail> FailIDs {get;set;}
     }
 
     public class ModifySkuReturn
     {
-        public OrderData successIDs {get;set;}
-        public List<TransferNormalReturnFail> failIDs {get;set;}
+        public OrderData SuccessIDs {get;set;}
+        public List<TransferNormalReturnFail> FailIDs {get;set;}
     }
 }

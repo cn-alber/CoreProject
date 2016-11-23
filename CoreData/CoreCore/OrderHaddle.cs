@@ -7450,8 +7450,8 @@ namespace CoreData.CoreCore
                     result.s = -3002;
                     return result;
                 }
-                res.successIDs = su;
-                res.failIDs = fa;
+                res.SuccessIDs = su;
+                res.FailIDs = fa;
                 result.d = res;
                 TransCore.Commit();
             }
@@ -7620,8 +7620,8 @@ namespace CoreData.CoreCore
                     result.s = -3002;
                     return result;
                 }
-                res.successIDs = su;
-                res.failIDs = fa;
+                res.SuccessIDs = su;
+                res.FailIDs = fa;
                 result.d = res;
                 TransCore.Commit();
             }
@@ -7819,8 +7819,8 @@ namespace CoreData.CoreCore
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
             }
-            res.successIDs = su;
-            res.failIDs = fa;
+            res.SuccessIDs = su;
+            res.FailIDs = fa;
             result.d = res;
             return result;
         }
@@ -8177,11 +8177,11 @@ namespace CoreData.CoreCore
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
             }
-            res.failIDs = fa;
+            res.FailIDs = fa;
             if(ss.Count > 0)
             {
                 var rr = GetOrderListSingle(ss,CoID);
-                res.successIDs = rr.d as OrderData;
+                res.SuccessIDs = rr.d as OrderData;
             }
             result.d = res;
             return result;
