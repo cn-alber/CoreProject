@@ -1269,6 +1269,60 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
+        [HttpPostAttribute("/Core/Order/InsertOrderAbnormal")]
+        public ResponseResult InsertOrderAbnormal([FromBodyAttribute]JObject co)
+        {   
+            string OrderAbnormal = "";
+            if(co["OrderAbnormal"] != null)
+            {
+                OrderAbnormal = co["OrderAbnormal"].ToString();
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "异常说明必填", "General");
+            }   
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.InsertOrderAbnormal(OrderAbnormal,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/TransferAbnormal")]
+        public ResponseResult TransferAbnormal([FromBodyAttribute]JObject co)
+        {   
+            var oid = new List<int>();
+            if(co["OID"] != null)
+            {
+                oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }   
+            int AbnormalStatus = 0;
+            if(co["AbnormalStatus"] != null)
+            {
+                AbnormalStatus = int.Parse(co["AbnormalStatus"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "异常原因ID必填", "General");
+            }   
+            string AbnormalStatusDec = "";
+            if(co["AbnormalStatusDec"] != null)
+            {
+                AbnormalStatusDec = co["AbnormalStatusDec"].ToString();
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "异常说明必填", "General");
+            }   
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.TransferAbnormal(oid,CoID,username,AbnormalStatus,AbnormalStatusDec);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
 
 
 

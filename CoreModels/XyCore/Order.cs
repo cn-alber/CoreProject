@@ -959,4 +959,9 @@ namespace CoreModels.XyCore
         public string label{get;set;}
         public bool iscustom{get;set;}
     }
+    public class TransferAbnormalReturn
+    {
+        public List<int> successIDs {get;set;}
+        public List<TransferNormalReturnFail> failIDs {get;set;}
+    }
 }

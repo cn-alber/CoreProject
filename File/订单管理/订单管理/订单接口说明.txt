@@ -3,16 +3,16 @@
 0:待付款;1:已付款待审核;2.已审核待配快递;3.发货中;4.已发货;5.被合并;6.已取消;7.异常
 
 0:新增订单明细,修改订单明细,删除订单明细,新增赠品,订单明细换货,修改订单(运费/卖家备注/发票抬头/收货人信息),手工支付,快速支付,审核支付,取消审核支付,作废支付,修改备注,设定快递,修改收货地址,
-  修改运费,修改发货仓库(非分销订单)
+  修改运费,修改发货仓库(非分销订单),订单转异常
 1:新增订单明细,修改订单明细,删除订单明细,新增赠品,订单明细换货,修改订单(运费/卖家备注/发票抬头/收货人信息),手工支付,快速支付,审核支付,取消审核支付,作废支付,修改备注,设定快递,修改收货地址,
-  合并订单,拆分订单,修改运费,修改发货仓库(非分销订单),订单审核,
-2:修改订单(卖家备注/发票抬头),修改备注,设定快递,修改收货地址,合并订单,拆分订单
-3:修改订单(卖家备注/发票抬头)
+  合并订单,拆分订单,修改运费,修改发货仓库(非分销订单),订单审核,订单转异常
+2:修改订单(卖家备注/发票抬头),修改备注,设定快递,修改收货地址,合并订单,拆分订单,订单转异常
+3:修改订单(卖家备注/发票抬头),订单转异常
 4:修改订单(卖家备注/发票抬头)          
 5:修改订单(卖家备注/发票抬头)
 6:修改订单(卖家备注/发票抬头)
 7:新增订单明细,修改订单明细,删除订单明细,新增赠品,订单明细换货,修改订单(运费/卖家备注/发票抬头/收货人信息),手工支付,快速支付,审核支付,取消审核支付,作废支付,修改备注,设定快递,修改收货地址,
-  订单转正常单,修改运费,修改发货仓库(非分销订单)
+  订单转正常单,修改运费,修改发货仓库(非分销订单),订单转异常
 */
 待补充方法:系统自动指定快递/菜鸟智选快递
 function说明
@@ -381,3 +381,19 @@ output: s=1成功 else 错误代码
 input:OID         int             内部订单号
 output: Order     订单资料
 参考:output jason 文件:GetOrderListSingle_output.json
+
+35.InsertOrderAbnormal()新增异常说明
+路由:http://localhost:5000/Core/Order/InsertOrderAbnormal
+input:OrderAbnormal    string   异常说明    
+output: 异常说明List
+参考:input jason 文件:InsertOrderAbnormal_input.json
+参考:output jason 文件:InsertOrderAbnormal_output.json
+
+36.TransferAbnormal()订单转异常
+路由:http://localhost:5000/Core/Order/TransferAbnormal
+input:OID               List<int>   订单号
+      AbnormalStatus    int         异常ID
+      AbnormalStatusDec string      异常说明   
+output: 成功和失败的订单号
+参考:input jason 文件:TransferAbnormal_input.json
+参考:output jason 文件:TransferAbnormal_output.json

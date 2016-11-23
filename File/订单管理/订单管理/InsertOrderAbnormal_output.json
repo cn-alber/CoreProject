@@ -1,0 +1,56 @@
+{
+    "s": 1,
+    "d": [
+        {
+            "value": "1",
+            "label": "等待订单合并",
+            "iscustom": false
+        },
+        {
+            "value": "2",
+            "label": "等待订单拆分",
+            "iscustom": false
+        },
+        {
+            "value": "3",
+            "label": "缺货",
+            "iscustom": false
+        },
+        {
+            "value": "4",
+            "label": "获取电子面单错误",
+            "iscustom": false
+        },
+        {
+            "value": "5",
+            "label": "等待卖家收货",
+            "iscustom": false
+        },
+        {
+            "value": "6",
+            "label": "商品编码缺失",
+            "iscustom": false
+        },
+        {
+            "value": "7",
+            "label": "部分付款",
+            "iscustom": false
+        },
+        {
+            "value": "8",
+            "label": "测试",
+            "iscustom": true
+        },
+        {
+            "value": "9",
+            "label": "测试1",
+            "iscustom": true
+        },
+        {
+            "value": "10",
+            "label": "测试2",
+            "iscustom": true
+        }
+    ],
+    "m": ""
+}
