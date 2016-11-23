@@ -892,6 +892,33 @@ namespace CoreData.CoreCore
             return result;
         }
         ///<summary>
+        ///根据异常id获取名称
+        ///</summary>
+        public static DataResult GetReasonName(int ReasonID,int CoID,int OrdStatus)
+        {
+            var result = new DataResult(1,null);   
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string wheresql = "select name from orderabnormal where coid = " + CoID + " and id = '" + ReasonID + "' and OrdStatus = " + OrdStatus;
+                    string u = conn.QueryFirst<string>(wheresql);
+                    if(!string.IsNullOrEmpty(u))
+                    {
+                        result.s = 1;
+                        result.d = u;
+                    }
+                    else
+                    {
+                        result.s = -1;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return result;
+        }
+        ///<summary>
         ///根据快递名称抓取ID
         ///</summary>
         public static DataResult GetExpID(string Express,int CoID)
@@ -7275,9 +7302,17 @@ namespace CoreData.CoreCore
         ///<summary>
         ///单据转异常
         ///</summary>
-        public static DataResult TransferAbnormal(List<int> oid,int CoID,string UserName,int AbnormalStatus,string StatusDec,string Remark)
+        public static DataResult TransferAbnormal(List<int> oid,int CoID,string UserName,int AbnormalStatus,string Remark)
         {
             var result = new DataResult(1,null);
+            var yy = GetReasonName(AbnormalStatus,CoID,7);
+            if(yy.s == -1)
+            {
+                result.s = -1;
+                result.d = "异常原因参数异常!";
+                return result;
+            }
+            string StatusDec = yy.d.ToString();
             var logs = new List<Log>();
             var res = new TransferAbnormalReturn();
             var su = new List<TransferAbnormalSuccess>();

@@ -1315,17 +1315,9 @@ namespace CoreWebApi
             {
                 AbnormalStatusDec = co["AbnormalStatusDec"].ToString();
             }
-            else
-            {
-                return CoreResult.NewResponse(-1, "异常说明必填", "General");
-            }   
-            if(co["Remark"] != null)
-            {
-                Remark = co["Remark"].ToString();
-            }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
-            var data = OrderHaddle.TransferAbnormal(oid,CoID,username,AbnormalStatus,AbnormalStatusDec,Remark);
+            var data = OrderHaddle.TransferAbnormal(oid,CoID,username,AbnormalStatus,AbnormalStatusDec);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
