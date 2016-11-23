@@ -959,9 +959,38 @@ namespace CoreModels.XyCore
         public string label{get;set;}
         public bool iscustom{get;set;}
     }
+    public class TransferAbnormalSuccess
+    {
+        public int ID{get;set;}
+        public int Status{get;set;}
+        public string  StatusDec{get;set;}
+        public int AbnormalStatus{get;set;}
+        public string AbnormalStatusDec{get;set;}
+    }
     public class TransferAbnormalReturn
     {
-        public List<int> successIDs {get;set;}
+        public List<TransferAbnormalSuccess> successIDs {get;set;}
+        public List<TransferNormalReturnFail> failIDs {get;set;}
+    }
+    public class DistributionPaySuccess
+    {
+        public int ID{get;set;}
+        public string  PayDate{get;set;}
+        public string  PaidAmount{get;set;}
+        public int Status{get;set;}
+        public string StatusDec{get;set;}
+        public int AbnormalStatus{get;set;}
+        public string AbnormalStatusDec{get;set;}
+    }
+    public class DistributionPayReturn
+    {
+        public List<DistributionPaySuccess> successIDs {get;set;}
+        public List<TransferNormalReturnFail> failIDs {get;set;}
+    }
+
+    public class ModifySkuReturn
+    {
+        public OrderData successIDs {get;set;}
         public List<TransferNormalReturnFail> failIDs {get;set;}
     }
 }

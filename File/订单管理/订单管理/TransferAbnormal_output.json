@@ -2,8 +2,20 @@
     "s": 1,
     "d": {
         "successIDs": [
-            10867,
-            10868
+            {
+                "ID": 10868,
+                "Status": 7,
+                "StatusDec": "异常",
+                "AbnormalStatus": 3,
+                "AbnormalStatusDec": "缺货"
+            },
+            {
+                "ID": 10869,
+                "Status": 7,
+                "StatusDec": "异常",
+                "AbnormalStatus": 3,
+                "AbnormalStatusDec": "缺货"
+            }
         ],
         "failIDs": [
             

@@ -1,0 +1,95 @@
+{
+    "s": 1,
+    "d": {
+        "successIDs": {
+            "Datacnt": 1,
+            "Pagecnt": 1.0,
+            "Ord": [
+                {
+                    "ID": 10860,
+                    "Type": 0,
+                    "TypeString": "普通订单",
+                    "DealerType": 0,
+                    "IsMerge": false,
+                    "IsSplit": true,
+                    "OSource": 3,
+                    "SoID": 63613076331,
+                    "ODate": "2016-10-26 00:00:00",
+                    "PayDate": "2016-11-01 14:47:15",
+                    "BuyerShopID": "测试1026",
+                    "ShopName": "京东南极人羽绒服旗舰店",
+                    "Amount": "56.00",
+                    "PaidAmount": "124.00",
+                    "ExAmount": "0.00",
+                    "IsCOD": false,
+                    "RecTel": null,
+                    "RecPhone": "123456789",
+                    "Status": 0,
+                    "StatusDec": "待付款",
+                    "AbnormalStatus": 0,
+                    "AbnormalStatusDec": "",
+                    "RecMessage": "RecMessage1026RecMessage1026",
+                    "SendMessage": "SendMessageSendMessage",
+                    "Express": "顺丰速运",
+                    "RecLogistics": "江苏省",
+                    "RecCity": "苏州市",
+                    "RecDistrict": "常熟市",
+                    "RecAddress": "可美国际大厦",
+                    "RecName": "测试1026name2",
+                    "ExWeight": "7.00",
+                    "Distributor": "",
+                    "SupDistributor": "",
+                    "InvoiceTitle": "",
+                    "PlanDate": null,
+                    "SendWarehouse": "携云科技",
+                    "SendDate": null,
+                    "ExID": 5,
+                    "ExpNamePinyin": "shunfeng",
+                    "ExCode": "",
+                    "Creator": "管理员",
+                    "SoIDList": null,
+                    "SkuList": [
+                        {
+                            "ID": 18944,
+                            "OID": 10860,
+                            "SkuAutoID": 3,
+                            "Img": "",
+                            "Qty": 4,
+                            "GoodsCode": "",
+                            "SkuID": "test1234560004014",
+                            "SkuName": "南极人2016男装夹克",
+                            "Norm": "红色1;46",
+                            "RealPrice": "5.00",
+                            "Amount": "20.00",
+                            "ShopSkuID": null,
+                            "IsGift": false,
+                            "Weight": "1.00",
+                            "InvQty": 0
+                        },
+                        {
+                            "ID": 19101,
+                            "OID": 10860,
+                            "SkuAutoID": 2,
+                            "Img": "",
+                            "Qty": 6,
+                            "GoodsCode": "test123456",
+                            "SkuID": "test1234560004007",
+                            "SkuName": "南极人2016男装夹克",
+                            "Norm": "红色1;43",
+                            "RealPrice": "6.00",
+                            "Amount": "36.00",
+                            "ShopSkuID": null,
+                            "IsGift": false,
+                            "Weight": "0.50",
+                            "InvQty": 0
+                        }
+                    ]
+                }
+            ]
+        },
+        "failIDs": [
+            
+        ]
+    },
+    "m": ""
+}

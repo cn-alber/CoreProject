@@ -783,7 +783,7 @@ namespace CoreWebApi
         public ResponseResult GetAbnormalList()
         {   
             int CoID = int.Parse(GetCoid());
-            var data = OrderHaddle.GetAbnormalList(CoID);
+            var data = OrderHaddle.GetAbnormalList(CoID,7);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -1264,8 +1264,10 @@ namespace CoreWebApi
                 data.d = "参数无效!";
                 return CoreResult.NewResponse(data.s, data.d, "General"); 
             }
+            var oidList = new List<int>();
+            oidList.Add(oid);
             int CoID = int.Parse(GetCoid());
-            data = OrderHaddle.GetOrderListSingle(oid,CoID);
+            data = OrderHaddle.GetOrderListSingle(oidList,CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -1279,7 +1281,7 @@ namespace CoreWebApi
             }
             else
             {
-                return CoreResult.NewResponse(-1, "异常说明必填", "General");
+                OrderAbnormal = null;
             }   
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
@@ -1308,7 +1310,7 @@ namespace CoreWebApi
             {
                 return CoreResult.NewResponse(-1, "异常原因ID必填", "General");
             }   
-            string AbnormalStatusDec = "";
+            string AbnormalStatusDec = "",Remark = "";
             if(co["AbnormalStatusDec"] != null)
             {
                 AbnormalStatusDec = co["AbnormalStatusDec"].ToString();
@@ -1317,163 +1319,150 @@ namespace CoreWebApi
             {
                 return CoreResult.NewResponse(-1, "异常说明必填", "General");
             }   
+            if(co["Remark"] != null)
+            {
+                Remark = co["Remark"].ToString();
+            }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
-            var data = OrderHaddle.TransferAbnormal(oid,CoID,username,AbnormalStatus,AbnormalStatusDec);
+            var data = OrderHaddle.TransferAbnormal(oid,CoID,username,AbnormalStatus,AbnormalStatusDec,Remark);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
+        [HttpGetAttribute("/Core/Order/GetCancleList")]
+        public ResponseResult GetCancleList()
+        {   
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.GetAbnormalList(CoID,6);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
 
+        [HttpPostAttribute("/Core/Order/CancleOrder")]
+        public ResponseResult CancleOrder([FromBodyAttribute]JObject co)
+        {   
+            var oid = new List<int>();
+            if(co["OID"] != null)
+            {
+                oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }   
+            string CancleReason = "";
+            if(co["CancleReason"] != null)
+            {
+                CancleReason = co["CancleReason"].ToString();
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "取消原因必填", "General");
+            }   
+            string Remark = "";
+            if(co["Remark"] != null)
+            {
+                Remark = co["Remark"].ToString();
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.CancleOrder(oid,CoID,username,CancleReason,Remark);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
 
+        [HttpPostAttribute("/Core/Order/DistributionPay")]
+        public ResponseResult DistributionPay([FromBodyAttribute]JObject co)
+        {   
+            var oid = new List<int>();
+            if(co["OID"] != null)
+            {
+                oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }   
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.DistributionPay(oid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        [HttpPostAttribute("/Core/Order/RestoreCancleOrder")]
+        public ResponseResult RestoreCancleOrder([FromBodyAttribute]JObject co)
+        {   
+            var oid = new List<int>();
+            if(co["OID"] != null)
+            {
+                oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }   
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.RestoreCancleOrder(oid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
 
         [HttpPostAttribute("/Core/Order/ModifySku")]
         public ResponseResult ModifySku([FromBodyAttribute]JObject co)
         {   
-            List<int> OID = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
-            var data = new DataResult(1,null);
-            int ModifySku = 0,DeleteSku = 0,AddSku = 0,AddQty = 1,x;
-            decimal ModifyPrice = 0,AddPrice = 0,y;
-            string AddType = string.Empty;
-            string Text = co["ModifySku"].ToString();
-            if(!string.IsNullOrEmpty(Text))
+            var oid = new List<int>();
+            if(co["OID"] != null)
             {
-                if (int.TryParse(Text, out x))
-                {
-                    ModifySku = int.Parse(Text);
-                }
-                else
-                {
-                    data.s = -1;
-                    data.d = "修改的商品ID参数无效!";
-                    return CoreResult.NewResponse(data.s, data.d, "General"); 
-                }
-            }   
-            if(ModifySku > 0)
-            {
-                Text = co["ModifyPrice"].ToString();
-                if(string.IsNullOrEmpty(Text))
-                {
-                    data.s = -1;
-                    data.d = "修改的商品单价必须有值!";
-                    return CoreResult.NewResponse(data.s, data.d, "General"); 
-                }
-                else
-                {
-                    if (decimal.TryParse(Text, out y))
-                    {
-                        ModifyPrice = decimal.Parse(Text);
-                    }
-                    else
-                    {
-                        data.s = -1;
-                        data.d = "修改的商品单价参数无效!";
-                        return CoreResult.NewResponse(data.s, data.d, "General"); 
-                    }
-                }   
-            }
-            Text = co["DeleteSku"].ToString();
-            if(!string.IsNullOrEmpty(Text))
-            {
-                if (int.TryParse(Text, out x))
-                {
-                    DeleteSku = int.Parse(Text);
-                }
-                else
-                {
-                    data.s = -1;
-                    data.d = "删除的商品ID参数无效!";
-                    return CoreResult.NewResponse(data.s, data.d, "General"); 
-                }
-            }   
-            Text = co["AddSku"].ToString();
-            if(!string.IsNullOrEmpty(Text))
-            {
-                if (int.TryParse(Text, out x))
-                {
-                    AddSku = int.Parse(Text);
-                }
-                else
-                {
-                    data.s = -1;
-                    data.d = "新增的商品ID参数无效!";
-                    return CoreResult.NewResponse(data.s, data.d, "General"); 
-                }
-            }   
-            if(AddSku > 0)
-            {
-                Text = co["AddQty"].ToString();
-                if(!string.IsNullOrEmpty(Text))
-                {
-                    if (int.TryParse(Text, out x))
-                    {
-                        AddQty = int.Parse(Text);
-                    }
-                    else
-                    {
-                        data.s = -1;
-                        data.d = "新增的商品数量参数无效!";
-                        return CoreResult.NewResponse(data.s, data.d, "General"); 
-                    }
-                }   
-                Text = co["AddPrice"].ToString();
-                if(string.IsNullOrEmpty(Text))
-                {
-                    data.s = -1;
-                    data.d = "新增的商品单价必须有值!";
-                    return CoreResult.NewResponse(data.s, data.d, "General"); 
-                }
-                else
-                {
-                    if (decimal.TryParse(Text, out y))
-                    {
-                        AddPrice = decimal.Parse(Text);
-                    }
-                    else
-                    {
-                        data.s = -1;
-                        data.d = "新增的商品单价参数无效!";
-                        return CoreResult.NewResponse(data.s, data.d, "General"); 
-                    }
-                }   
-            }
-            Text = co["AddType"].ToString();
-            if(Text.ToUpper() == "A" || Text.ToUpper() == "B")
-            {
-                AddType = Text;
+                oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
             }
             else
             {
-                data.s = -1;
-                data.d = "添加商品规则参数无效!";
-                return CoreResult.NewResponse(data.s, data.d, "General"); 
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }   
+            int ModifySku = 0,DeleteSku = 0,AddSku = 0,AddQty = 1,x;
+            decimal ModifyPrice = 0,AddPrice = 0,y;
+            string AddType = string.Empty;
+            if(co["ModifySku"] != null)
+            {
+                ModifySku =int.Parse(co["ModifySku"].ToString());
+                if(co["ModifyPrice"] != null)
+                {
+                    ModifyPrice = decimal.Parse(co["ModifyPrice"].ToString());
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "修改商品单价必填", "General");
+                }   
             }
+            if(co["DeleteSku"] != null)
+            {
+                DeleteSku =int.Parse(co["DeleteSku"].ToString());
+            }
+            if(co["AddSku"] != null)
+            {
+                AddSku =int.Parse(co["AddSku"].ToString());
+                if(co["AddPrice"] != null)
+                {
+                    AddPrice = decimal.Parse(co["AddPrice"].ToString());
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "新增商品单价必填", "General");
+                }   
+                if(co["AddQty"] != null)
+                {
+                    AddQty = int.Parse(co["AddQty"].ToString());
+                }
+            }
+            if(co["AddType"] != null)
+            {
+                AddType = co["AddType"].ToString();
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "添加商品规则必填", "General");
+            }   
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
-            data = OrderHaddle.ModifySku(OID,ModifySku,ModifyPrice,DeleteSku,AddSku,AddPrice,AddQty,AddType,CoID,username);
+            var data = OrderHaddle.ModifySku(oid,ModifySku,ModifyPrice,DeleteSku,AddSku,AddPrice,AddQty,AddType,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     }
