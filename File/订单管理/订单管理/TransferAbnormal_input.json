@@ -1,5 +1,6 @@
 {
     "OID":[10867,10868],
-    "AbnormalStatus":8,
-    "AbnormalStatusDec":"测试"
+    "AbnormalStatus":13,
+    "AbnormalStatusDec":"12",
+    "Remark":"测试"
 }

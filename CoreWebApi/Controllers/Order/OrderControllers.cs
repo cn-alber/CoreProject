@@ -783,7 +783,7 @@ namespace CoreWebApi
         public ResponseResult GetAbnormalList()
         {   
             int CoID = int.Parse(GetCoid());
-            var data = OrderHaddle.GetAbnormalList(CoID);
+            var data = OrderHaddle.GetAbnormalList(CoID,7);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -1279,7 +1279,7 @@ namespace CoreWebApi
             }
             else
             {
-                return CoreResult.NewResponse(-1, "异常说明必填", "General");
+                OrderAbnormal = null;
             }   
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
@@ -1308,7 +1308,7 @@ namespace CoreWebApi
             {
                 return CoreResult.NewResponse(-1, "异常原因ID必填", "General");
             }   
-            string AbnormalStatusDec = "";
+            string AbnormalStatusDec = "",Remark = "";
             if(co["AbnormalStatusDec"] != null)
             {
                 AbnormalStatusDec = co["AbnormalStatusDec"].ToString();
@@ -1317,9 +1317,13 @@ namespace CoreWebApi
             {
                 return CoreResult.NewResponse(-1, "异常说明必填", "General");
             }   
+            if(co["Remark"] != null)
+            {
+                Remark = co["Remark"].ToString();
+            }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
-            var data = OrderHaddle.TransferAbnormal(oid,CoID,username,AbnormalStatus,AbnormalStatusDec);
+            var data = OrderHaddle.TransferAbnormal(oid,CoID,username,AbnormalStatus,AbnormalStatusDec,Remark);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
