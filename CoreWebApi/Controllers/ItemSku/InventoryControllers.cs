@@ -304,13 +304,6 @@ namespace CoreWebApi.XyCore
         }
         #endregion
 
-        #region  商品库存查询 - 修改安全库存-单笔(分仓)
-
-
-        #endregion
-
-
-
         #region 商品库存查询 - 修改安全库存 - 查询库存明细
         [HttpGetAttribute("Core/XyCore/Inventory/InvSafeQtyLst")]
         public ResponseResult InvSafeQtyLst(string GoodsCode, string WarehouseID)
@@ -442,6 +435,48 @@ namespace CoreWebApi.XyCore
         #endregion
 
 
+        #region 商品库存查询 - 锁定库存 - 锁定单据查询
+        [HttpGetAttribute("Core/XyCore/Inventory/InvLockMainLst")]
+        public ResponseResult InvLockMainLst(string SkuID, string ShopType, string Name)
+        {
+            var res = new DataResult(1, null);
+            int x;
+            var cp = new InvLockParam();
+            if (!string.IsNullOrEmpty(SkuID))
+            {
+                cp.SkuID = SkuID;
+            }
+            if (!string.IsNullOrEmpty(ShopType))
+            {
+                if (int.TryParse(ShopType, out x))
+                {
+                    cp.ShopType = ShopType;
+                }
+                else
+                {
+                    res.s = -1;
+                    res.d = "无效参数";
+                }
+            }
+            if (!string.IsNullOrEmpty(Name))
+            {
+                cp.Name = Name;
+            }
+            if(res.s==1)
+            {
+                InvlockHaddle.GetInvLockMainLst(cp);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 商品库存查询 - 锁定库存 - 单据表头查询
+        [HttpGetAttribute("Core/XyCore/Inventory/InvLockMain")]
+        // public ResponseResult InvLockMain(string ID)
+        // {
+
+        // }
+        #endregion
 
 
 

@@ -1,6 +1,7 @@
 接口名称：StockTakeControllers
 路径：..\CoreProject\CoreWebApi\Controllers\ItemSku\StockTakeControllers.cs
 function说明
+############################################################
 1.StockTakeMainLst()//库存盘点 - 查询盘点单主表资料
     方法：Get
     路由：http://192.168.30.211:5000/Core/XyCore/StockTake/StockTakeMainLst?WhID=&DateF=&DateT=&Status=&Skuautoid=&PageIndex=1&PageSize=&SortField=&SortDirection=
@@ -19,6 +20,7 @@ function说明
         PageCount       int                             总页数
         DataCount       int                             资料总笔数
         MainLst         List<Sfc_main_view>             盘点资料列表
+############################################################
 
 2.StockTakeItemLst()//库存盘点-商品sku明细查询
     方法：Get
@@ -29,6 +31,7 @@ function说明
     OutPut:
         ItemLst         List<Sfc_item_view>             盘点单明细列表
     参考：output json 文件：StockTakeItemLst_output.json
+############################################################
 
 3.InsertTakeMain()//库存盘点-新增-盘点主表
     方法：Post
@@ -40,6 +43,7 @@ function说明
     OutPut:
         新增盘点单主表 - 返回操作信息
     参考：input json 文件：InsertTakeMain_input.json
+############################################################
 
 4.InsertTakeItem()//库存盘点 - 新增盘点子表
     方法：Post
@@ -51,6 +55,7 @@ function说明
     OutPut:
         新增盘点单明细 - 返回操作信息
     参考：input json 文件：InsertTakeItem_input.json
+############################################################
 
 5.SaveTakeQty()//库存盘点 - 修改保存盘点数量(单笔)
     方法：Post
@@ -62,6 +67,7 @@ function说明
     OutPut:
         更新盘点数量 - 返回操作信息
     参考：input json 文件：SaveStockTakeQty_input.json
+############################################################
 
 6.CheckTake()//库存盘点 - 确认生效
     方法：Post
@@ -75,6 +81,7 @@ function说明
     {
     "ID":4
     }
+############################################################
 
 7.UnCheckTake()//库存盘点 - 确认生效
     方法：Post
@@ -88,5 +95,17 @@ function说明
     {
     "ID":4
     }
+
+
+############################################################
+    SetInvQty()//商品库存盘点
+    方法：POST
+    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/SetInvQty
+    InPut:
+       从excel导入(目前功能缺失)---批量数据导入测试
+
+
+
+
     
     

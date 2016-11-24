@@ -1,6 +1,7 @@
 接口名称：StockInitControllers
 路径：..\CoreProject\CoreWebApi\Controllers\ItemSku\StockInitControllers.cs
 function说明
+############################################################
 1.StockInitMainLst()//库存期初 - 查询期初单据主表资料
     方法：Get
     路由：http://192.168.30.211:5000/Core/XyCore/StockInit/StockInitMainLst?Skuautoid=&PageIndex=1&PageSize=&SortField=&SortDirection=
@@ -15,6 +16,7 @@ function说明
         PageCount       int                             总页数
         DataCount       int                             资料总笔数
         MainLst         List<Sfc_main_view>             期初主资料列表
+############################################################
 
 2.StockInitItemLst()//库存盘点-商品sku明细查询
     方法：Get
@@ -28,6 +30,7 @@ function说明
         SortDirection   string      排序方向(DESC|ASC,Default:ASC)
     OutPut:
         ItemLst         List<Sfc_item_view>             盘点单明细列表
+############################################################
 
 3.InsertTakeMain()//库存期初-新增-期初主表
     方法：Post
@@ -39,6 +42,8 @@ function说明
     OutPut:
         新增盘点单主表 - 返回操作信息
     参考：input json 文件：InsertInitMain_input.json
+############################################################
+
 4.InsertInitItem()//库存期初 - 新增期初子表
     方法：Post
     路由：http://192.168.30.211:5000/Core/XyCore/StockInit/InsertInitItem
@@ -49,6 +54,8 @@ function说明
     OutPut:
         新增盘点单明细 - 返回操作信息
     参考：input json 文件：InsertInitItem_input.json
+############################################################
+
 5.1 SaveInitQty()//库存期初 - 修改保存期初数量(单笔)
     方法：Post
     路由：http://192.168.30.211:5000/Core/XyCore/StockInit/SaveInitQty
@@ -69,6 +76,8 @@ function说明
     OutPut:
         更新期初 - 返回操作信息
     参考：input json 文件：SaveStockInitPrice_input.json
+############################################################
+
 6.CheckInit()//库存期初 - 确认生效
     方法：Post
     路由：http://192.168.30.211:5000/Core/XyCore/StockInit/CheckInit
@@ -81,6 +90,7 @@ function说明
     {
     "ID":4
     }
+############################################################
 
 7.UnCheckInit()//库存期初 - 确认生效
     方法：Post
@@ -94,3 +104,10 @@ function说明
     {
     "ID":4
     }
+    
+############################################################
+ SetInvQty()//商品库存盘点
+    方法：POST
+    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/InvInit
+    InPut:
+       从excel导入(目前功能缺失)---批量数据导入测试

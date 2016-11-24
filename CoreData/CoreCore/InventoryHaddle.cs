@@ -113,7 +113,7 @@ namespace CoreData.CoreCore
                     {
                         querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                     }
-                    var DataCount = CoreData.DbBase.CoreDB.QueryFirst<int>(querycount.ToString(), p);
+                    var DataCount = conn.QueryFirst<int>(querycount.ToString(), p);
                     if (DataCount < 0)
                     {
                         res.s = -3001;
@@ -127,7 +127,7 @@ namespace CoreData.CoreCore
                         querysql.Append(" LIMIT @ls , @le");
                         p.Add("@ls", dataindex);
                         p.Add("@le", IParam.PageSize);
-                        var InvLst = CoreData.DbBase.CoreDB.Query<Inventory_sale>(querysql.ToString(), p).AsList();
+                        var InvLst = conn.Query<Inventory_sale>(querysql.ToString(), p).AsList();
                         if (InvLst.Count > 0)
                         {
                             var SkuIDLst = InvLst.Select(a => a.Skuautoid).Distinct().AsList();
@@ -267,7 +267,7 @@ namespace CoreData.CoreCore
                             querycount.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                             querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                         }
-                        var DataCount = CoreData.DbBase.CoreDB.QueryFirst<int>(querycount.ToString(), p);
+                        var DataCount = conn.QueryFirst<int>(querycount.ToString(), p);
                         if (DataCount < 0)
                         {
                             result.s = -3001;
@@ -281,7 +281,7 @@ namespace CoreData.CoreCore
                             querysql.Append(" LIMIT @ls , @le");
                             p.Add("@ls", dataindex);
                             p.Add("@le", IParam.PageSize);
-                            var InvLst = CoreData.DbBase.CoreDB.Query<Inventory>(querysql.ToString(), p).AsList();
+                            var InvLst = conn.Query<Inventory>(querysql.ToString(), p).AsList();
                             if (InvLst.Count > 0)
                             {
                                 var SkuIDLst = InvLst.Select(a => a.Skuautoid).Distinct().AsList();
@@ -1946,7 +1946,6 @@ namespace CoreData.CoreCore
                         (
                             Skuautoid,
                             StockQty,
-                            LockQty,
                             PickQty,
                             WaitInQty,
                             SaleRetuQty,
@@ -1961,7 +1960,6 @@ namespace CoreData.CoreCore
                         ) VALUES(
                             @Skuautoid,
                             @StockQty,
-                            @LockQty,
                             @PickQty,
                             @WaitInQty,
                             @SaleRetuQty,
