@@ -1,0 +1,23 @@
+{
+    "s": 1,
+    "d": {
+        "successIDs": [
+            {
+                "ID": 5,//订单号
+                "PayDate": "2016-06-21 13:45:30",//付款日期
+                "PaidAmount": "160.00",//付款金额
+                "Status": 1,//状态
+                "StatusDec": "已付款待审核",//状态说明
+                "AbnormalStatus": 0,//异常装填
+                "AbnormalStatusDec": ""//异常状态说明
+            }
+        ],
+        "failIDs": [
+            {
+                "ID": 6,
+                "Reason": "供销订单才可以使用分销付款!"
+            }
+        ]
+    },
+    "m": ""
+}

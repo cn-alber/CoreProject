@@ -1360,7 +1360,7 @@ namespace CoreData.CoreComm
                     var res = conn.Query<remarkSqlRes>(sql).AsList();
                     if(res.Count>0){
                         sql =@"UPDATE ware_third_party SET                               
-                                            ware_third_party.Enable = 0,
+                                            ware_third_party.Enable = 4,
                                             ware_third_party.EndMan = @endman,                                        
                                             ware_third_party.Mdate = Now()
                                         WHERE 

@@ -108,7 +108,8 @@ namespace CoreModels.Enum
             已发货 = 4,
             被合并 = 5,
             已取消 = 6,
-            异常 = 7
+            异常 = 7,
+            等供销商发货 = 8
         }
         public enum OrdSource
         {

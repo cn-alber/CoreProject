@@ -1,0 +1,36 @@
+{
+    "s": 1,
+    "d": [
+        {
+            "value": "16",
+            "label": "商品缺货",
+            "iscustom": false
+        },
+        {
+            "value": "17",
+            "label": "客户申请取消",
+            "iscustom": false
+        },
+        {
+            "value": "18",
+            "label": "测试订单",
+            "iscustom": false
+        },
+        {
+            "value": "19",
+            "label": "重复订单",
+            "iscustom": false
+        },
+        {
+            "value": "20",
+            "label": "逾期未支付",
+            "iscustom": false
+        },
+        {
+            "value": "21",
+            "label": "无效订单",
+            "iscustom": false
+        }
+    ],
+    "m": ""
+}

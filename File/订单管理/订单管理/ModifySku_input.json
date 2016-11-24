@@ -1,0 +1,10 @@
+{
+    "OID":[10860],
+    "ModifySku":3,
+    "ModifyPrice":6,
+    "DeleteSku":8,
+    "AddSku":2,
+    "AddPrice":6,
+    "AddQty":3,
+    "AddType":"B"
+}
