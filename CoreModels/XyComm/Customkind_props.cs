@@ -96,4 +96,10 @@ namespace CoreModels.XyComm
         public string name { get; set; }
     }
 
+    public class Base_ItemSkuProps
+    {
+        public List<itemprops> itemprops_base { get; set; }
+        public List<skuprops> skuprops_base { get; set; }
+    }
+
 }

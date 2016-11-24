@@ -456,15 +456,15 @@ namespace CoreData.CoreComm
                     string sql = "SELECT pid,name,is_input_prop FROM customkind_props WHERE kindid=@ID AND CoID=@CoID AND IsDelete = 0 AND Enable = 1";
                     var p = new DynamicParameters();
                     p.Add("@ID", KindID);
-                    p.Add("@CoID",CoID);
-                    var props = conn.Query<itemprops>(sql,p).AsList();
-                    if(props.Count>0)
+                    p.Add("@CoID", CoID);
+                    var props = conn.Query<itemprops>(sql, p).AsList();
+                    if (props.Count > 0)
                     {
                         string valsql = @"SELECT pid,id,name,`Order` FROM customkind_props_value WHERE kindid=@ID AND CoID=@CoID AND IsDelete=0 AND Enable = 1";
-                        var ValLst = conn.Query<Customkind_props_value>(valsql,p);
-                        foreach(var prop in props)
+                        var ValLst = conn.Query<Customkind_props_value>(valsql, p);
+                        foreach (var prop in props)
                         {
-                            prop.itemprops_values =  ValLst.Where(a => a.pid.ToString() == prop.pid).OrderBy(a => a.Order).AsList().Select(c => new itemprops_value{pid=c.pid.ToString(),name = c.name,id = c.id.ToString()}).AsList();
+                            prop.itemprops_values = ValLst.Where(a => a.pid.ToString() == prop.pid).OrderBy(a => a.Order).AsList().Select(c => new itemprops_value { pid = c.pid.ToString(), name = c.name, id = c.id.ToString() }).AsList();
                         }
                     }
                     res.d = props;
@@ -478,6 +478,84 @@ namespace CoreData.CoreComm
             return res;
         }
         #endregion
+
+        public static DataResult GetItemSkuPropsByKind(string KindID, string CoID)
+        {
+            var Base_props = new Base_ItemSkuProps();
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    //获取商品属性
+                    string sql = "SELECT pid,name,is_input_prop FROM customkind_props WHERE kindid=@ID AND CoID=@CoID AND IsDelete = 0 AND Enable = 1";
+                    var p = new DynamicParameters();
+                    p.Add("@ID", KindID);
+                    p.Add("@CoID", CoID);
+                    var props = conn.Query<itemprops>(sql, p).AsList();
+                    if (props.Count > 0)
+                    {
+                        string valsql = @"SELECT pid,id,name,`Order` FROM customkind_props_value WHERE kindid=@ID AND CoID=@CoID AND IsDelete=0 AND Enable = 1";
+                        var ValLst = conn.Query<Customkind_props_value>(valsql, p);
+                        foreach (var prop in props)
+                        {
+                            prop.itemprops_values = ValLst.Where(a => a.pid.ToString() == prop.pid).OrderBy(a => a.Order).AsList().Select(c => new itemprops_value { pid = c.pid.ToString(), name = c.name, id = c.id.ToString() }).AsList();
+                        }
+                    }
+                    Base_props.itemprops_base = props;
+                    //获取商品Sku属性
+                    string SkuPropSql = @"SELECT
+                                            customkind_skuprops.pid,
+                                            customkind_skuprops.`name`,
+                                            customkind.KindName AS KindNames
+                                        FROM
+                                            customkind_skuprops,
+                                            customkind
+                                        WHERE
+                                            customkind_skuprops.kindid = customkind.ID
+                                        AND customkind_skuprops.IsDelete = 0
+                                        AND customkind_skuprops.CoID = customkind.CoID
+                                        AND customkind_skuprops.CoID = @CoID
+                                        AND customkind.ID=@KindID";
+                    string PropValueSql = @"SELECT
+                                                pid,
+                                                id,
+                                                mapping,
+                                                NAME
+                                            FROM
+                                                customkind_skuprops_value
+                                            WHERE
+                                                CoID =@CoID
+                                            AND pid IN @PidLst
+                                            AND IsDelete = 0";
+                    var SkuProps = conn.Query<skuprops>(SkuPropSql, new { CoID = CoID, KindID = KindID }).AsList();
+                    var SkuPropLst = (from s in SkuProps
+                                      group s by new { s.pid, s.name } into g
+                                      select new skuprops
+                                      {
+                                          pid = g.Key.pid,
+                                          name = g.Key.name
+                                      }).AsList();
+                    if (SkuPropLst.Count > 0)
+                    {
+                        var SkuPropValues = conn.Query<skuprops_value>(PropValueSql, new { CoID = CoID, PidLst = SkuPropLst.Select(a => a.pid).AsList() }).AsList();
+                        foreach (var prop in SkuPropLst)
+                        {
+                            prop.skuprops_values = SkuPropValues.Where(a => a.pid == prop.pid).AsList();
+                            prop.KindNames = string.Join(",", SkuProps.Where(a => a.pid == prop.pid).Select(a => a.KindNames).AsList().ToArray());
+                        }
+                    }
+                    Base_props.skuprops_base = SkuPropLst;
+                    res.d = Base_props;
+                }
+                catch (Exception e)
+                {
+                    res.s = -1;
+                    res.d = e.Message;
+                }
+            }
+            return res;
+        }
 
     }
 }
