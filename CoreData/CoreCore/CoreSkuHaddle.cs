@@ -699,7 +699,7 @@ namespace CoreData.CoreCore
                 string contents = string.Empty;
                 var p = new DynamicParameters();
                 p.Add("@ID", main.ID);
-                p.Add("@CoID", main.ScoID);
+                p.Add("@CoID", main.CoID);
                 try
                 {
                     var main_Old = conn.QueryFirst<Coresku_main>(msql, p, Trans);
