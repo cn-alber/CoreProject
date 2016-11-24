@@ -274,6 +274,7 @@ namespace CoreWebApi.XyCore
             string CoID = GetCoid();
             string UserName = GetUname();
             string CreateDate = DateTime.Now.ToString();
+            main.CoID = CoID;
             var res = CoreSkuHaddle.EditCore(main,itemprops,skuprops,items,CoID,UserName);
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
