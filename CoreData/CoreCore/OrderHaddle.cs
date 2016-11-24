@@ -1280,7 +1280,7 @@ namespace CoreData.CoreCore
                         {
                             OrdOlder.Status = 1;
                         }
-                        if(OrdOlder.Status == 7 && OrdOlder.StatusDec=="部分付款")
+                        if(OrdOlder.Status == 7 && OrdOlder.StatusDec=="付款金额不等于应付金额")
                         {
                             OrdOlder.Status = 1;
                             OrdOlder.AbnormalStatus = 0;
@@ -1292,7 +1292,7 @@ namespace CoreData.CoreCore
                             log.LogDate = DateTime.Now;
                             log.UserName = UserName;
                             log.Title = "取消异常标记";
-                            log.Remark = "部分付款";
+                            log.Remark = "付款金额不等于应付金额";
                             log.CoID = CoID;
                             logs.Add(log);
                         }
@@ -1308,16 +1308,16 @@ namespace CoreData.CoreCore
                             }
                             else
                             {
-                                reasonid = GetReasonID("部分付款",CoID,7).s;
+                                reasonid = GetReasonID("付款金额不等于应付金额",CoID,7).s;
                                 if(reasonid == -1)
                                 {
                                     result.s = -1;
-                                    result.d = "请先设定【部分付款】的异常";
+                                    result.d = "请先设定【付款金额不等于应付金额】的异常";
                                     return result;
                                 }
                                 OrdOlder.Status = 7;
                                 OrdOlder.AbnormalStatus = reasonid;
-                                OrdOlder.StatusDec="部分付款";
+                                OrdOlder.StatusDec="付款金额不等于应付金额";
                                 var log = new Log();
                                 log.OID = OrdOlder.ID;
                                 log.SoID = OrdOlder.SoID;
@@ -1325,7 +1325,7 @@ namespace CoreData.CoreCore
                                 log.LogDate = DateTime.Now;
                                 log.UserName = UserName;
                                 log.Title = "标记异常";
-                                log.Remark = "部分付款";
+                                log.Remark = "付款金额不等于应付金额";
                                 log.CoID = CoID;
                                 logs.Add(log);
                             }                            
@@ -1612,7 +1612,7 @@ namespace CoreData.CoreCore
                         {
                             status = 1;
                         }
-                        if(status == 7 && StatusDec == "部分付款")
+                        if(status == 7 && StatusDec == "付款金额不等于应付金额")
                         {
                             status = 1;
                             AbnormalStatus = 0;
@@ -1624,7 +1624,7 @@ namespace CoreData.CoreCore
                             log.LogDate = DateTime.Now;
                             log.UserName = Username;
                             log.Title = "取消异常标记";
-                            log.Remark = "部分付款";
+                            log.Remark = "付款金额不等于应付金额";
                             log.CoID = CoID;
                             logs.Add(log);
                         }
@@ -1640,16 +1640,16 @@ namespace CoreData.CoreCore
                             }
                             else
                             {
-                                int reasonid = GetReasonID("部分付款",CoID,7).s;
+                                int reasonid = GetReasonID("付款金额不等于应付金额",CoID,7).s;
                                 if(reasonid == -1)
                                 {
                                     result.s = -1;
-                                    result.d = "请先设定【部分付款】的异常";
+                                    result.d = "请先设定【付款金额不等于应付金额】的异常";
                                     return result;
                                 }
                                 status = 7;
                                 AbnormalStatus = reasonid;
-                                StatusDec = "部分付款";
+                                StatusDec = "付款金额不等于应付金额";
                                 var log = new Log();
                                 log.OID = id;
                                 log.SoID = u[0].SoID;
@@ -1657,7 +1657,7 @@ namespace CoreData.CoreCore
                                 log.LogDate = DateTime.Now;
                                 log.UserName = Username;
                                 log.Title = "标记异常";
-                                log.Remark = "部分付款";
+                                log.Remark = "付款金额不等于应付金额";
                                 log.CoID = CoID;
                                 logs.Add(log);
                             }
@@ -1805,7 +1805,7 @@ namespace CoreData.CoreCore
                     {
                         status = 1;
                     }
-                    if(status == 7 && StatusDec == "部分付款")
+                    if(status == 7 && StatusDec == "付款金额不等于应付金额")
                     {
                         status = 1;
                         AbnormalStatus = 0;
@@ -1817,7 +1817,7 @@ namespace CoreData.CoreCore
                         log.LogDate = DateTime.Now;
                         log.UserName = Username;
                         log.Title = "取消异常标记";
-                        log.Remark = "部分付款";
+                        log.Remark = "付款金额不等于应付金额";
                         log.CoID = CoID;
                         logs.Add(log);
                     }
@@ -1833,16 +1833,16 @@ namespace CoreData.CoreCore
                         }
                         else
                         {
-                            int reasonid = GetReasonID("部分付款",CoID,7).s;
+                            int reasonid = GetReasonID("付款金额不等于应付金额",CoID,7).s;
                             if(reasonid == -1)
                             {
                                 result.s = -1;
-                                result.d = "请先设定【部分付款】的异常";
+                                result.d = "请先设定【付款金额不等于应付金额】的异常";
                                 return result;
                             }
                             status = 7;
                             AbnormalStatus = reasonid;
-                            StatusDec="部分付款";
+                            StatusDec="付款金额不等于应付金额";
                             var log = new Log();
                             log.OID = oid;
                             log.SoID = u[0].SoID;
@@ -1850,7 +1850,7 @@ namespace CoreData.CoreCore
                             log.LogDate = DateTime.Now;
                             log.UserName = Username;
                             log.Title = "标记异常";
-                            log.Remark = "部分付款";
+                            log.Remark = "付款金额不等于应付金额";
                             log.CoID = CoID;
                             logs.Add(log);
                         }
@@ -2044,7 +2044,7 @@ namespace CoreData.CoreCore
                         {
                             status = 1;
                         }
-                        if(status == 7 && StatusDec == "部分付款")
+                        if(status == 7 && StatusDec == "付款金额不等于应付金额")
                         {
                             status = 1;
                             AbnormalStatus = 0;
@@ -2056,7 +2056,7 @@ namespace CoreData.CoreCore
                             log.LogDate = DateTime.Now;
                             log.UserName = Username;
                             log.Title = "取消异常标记";
-                            log.Remark = "部分付款";
+                            log.Remark = "付款金额不等于应付金额";
                             log.CoID = CoID;
                             logs.Add(log);
                         }
@@ -2072,16 +2072,16 @@ namespace CoreData.CoreCore
                             }
                             else
                             {
-                                int reasonid = GetReasonID("部分付款",CoID,7).s;
+                                int reasonid = GetReasonID("付款金额不等于应付金额",CoID,7).s;
                                 if(reasonid == -1)
                                 {
                                     result.s = -1;
-                                    result.d = "请先设定【部分付款】的异常";
+                                    result.d = "请先设定【付款金额不等于应付金额】的异常";
                                     return result;
                                 }
                                 status = 7;
                                 AbnormalStatus = reasonid;
-                                StatusDec="部分付款";
+                                StatusDec="付款金额不等于应付金额";
                                 var log = new Log();
                                 log.OID = oid;
                                 log.SoID = u[0].SoID;
@@ -2089,7 +2089,7 @@ namespace CoreData.CoreCore
                                 log.LogDate = DateTime.Now;
                                 log.UserName = Username;
                                 log.Title = "标记异常";
-                                log.Remark = "部分付款";
+                                log.Remark = "付款金额不等于应付金额";
                                 log.CoID = CoID;
                                 logs.Add(log);
                             }
@@ -2239,11 +2239,11 @@ namespace CoreData.CoreCore
                     log.LogDate = DateTime.Now;
                     log.UserName = UserName;
                     log.Title = "判断金额不符";
-                    log.Remark = "标记部分付款";
+                    log.Remark = "标记付款金额不等于应付金额";
                     log.CoID = CoID;
                     logs.Add(log);
                     ord.Status = 7;
-                    var rss = GetReasonID("部分付款",CoID,7);
+                    var rss = GetReasonID("付款金额不等于应付金额",CoID,7);
                     if(rss.s == -1)
                     {
                         result.s = -1;
@@ -2251,9 +2251,9 @@ namespace CoreData.CoreCore
                         return result;
                     }
                     ord.AbnormalStatus = rss.s;
-                    ord.StatusDec = "部分付款";
+                    ord.StatusDec = "付款金额不等于应付金额";
                 }
-                if(PaidAmount + decimal.Parse(pay.PayAmount) == Amount &&　ord.StatusDec == "部分付款" && ord.Status == 7)
+                if(PaidAmount + decimal.Parse(pay.PayAmount) == Amount &&　ord.StatusDec == "付款金额不等于应付金额" && ord.Status == 7)
                 {
                     log = new Log();
                     log.OID = pay.OID;
@@ -2460,11 +2460,11 @@ namespace CoreData.CoreCore
                     log.LogDate = DateTime.Now;
                     log.UserName = UserName;
                     log.Title = "判断金额不符";
-                    log.Remark = "标记部分付款";
+                    log.Remark = "标记付款金额不等于应付金额";
                     log.CoID = CoID;
                     logs.Add(log);
                     ord.Status = 7;
-                    var rss = GetReasonID("部分付款",CoID,7);
+                    var rss = GetReasonID("付款金额不等于应付金额",CoID,7);
                     if(rss.s == -1)
                     {
                         result.s = -1;
@@ -2472,9 +2472,9 @@ namespace CoreData.CoreCore
                         return result;
                     }
                     ord.AbnormalStatus = rss.s;
-                    ord.StatusDec = "部分付款";
+                    ord.StatusDec = "付款金额不等于应付金额";
                 }
-                if(PaidAmount - pay == 0 &&　ord.StatusDec == "部分付款" && ord.Status == 7)
+                if(PaidAmount - pay == 0 &&　ord.StatusDec == "付款金额不等于应付金额" && ord.Status == 7)
                 {
                     log = new Log();
                     log.OID = oid;
@@ -2490,7 +2490,7 @@ namespace CoreData.CoreCore
                     ord.AbnormalStatus = 0;
                     ord.StatusDec = "";
                 }
-                if(PaidAmount - pay == Amount &&　ord.StatusDec == "部分付款" && ord.Status == 7)
+                if(PaidAmount - pay == Amount &&　ord.StatusDec == "付款金额不等于应付金额" && ord.Status == 7)
                 {
                     log = new Log();
                     log.OID = oid;
@@ -2693,11 +2693,11 @@ namespace CoreData.CoreCore
                     log.LogDate = DateTime.Now;
                     log.UserName = UserName;
                     log.Title = "判断金额不符";
-                    log.Remark = "标记部分付款";
+                    log.Remark = "标记付款金额不等于应付金额";
                     log.CoID = CoID;
                     logs.Add(log);
                     ord.Status = 7;
-                    var rss = GetReasonID("部分付款",CoID,7);
+                    var rss = GetReasonID("付款金额不等于应付金额",CoID,7);
                     if(rss.s == -1)
                     {
                         result.s = -1;
@@ -2705,9 +2705,9 @@ namespace CoreData.CoreCore
                         return result;
                     }
                     ord.AbnormalStatus = rss.s;
-                    ord.StatusDec = "部分付款";
+                    ord.StatusDec = "付款金额不等于应付金额";
                 }
-                if(PaidAmount + pay == Amount &&　ord.StatusDec == "部分付款" && ord.Status == 7)
+                if(PaidAmount + pay == Amount &&　ord.StatusDec == "付款金额不等于应付金额" && ord.Status == 7)
                 {
                     log = new Log();
                     log.OID = oid;
@@ -3008,7 +3008,7 @@ namespace CoreData.CoreCore
                 log.Remark = "快速支付" + pay.PayAmount;
                 log.CoID = CoID;
                 logs.Add(log);
-                if(ord.StatusDec == "部分付款" && ord.Status == 7)
+                if(ord.StatusDec == "付款金额不等于应付金额" && ord.Status == 7)
                 {
                     log = new Log();
                     log.OID = pay.OID;
@@ -3420,16 +3420,16 @@ namespace CoreData.CoreCore
                     }
                     else
                     {
-                        int reasonid = GetReasonID("部分付款",CoID,7).s;
+                        int reasonid = GetReasonID("付款金额不等于应付金额",CoID,7).s;
                         if(reasonid == -1)
                         {
                             result.s = -1;
-                            result.d = "请先设定【部分付款】的异常";
+                            result.d = "请先设定【付款金额不等于应付金额】的异常";
                             return result;
                         }
                         MainOrd.Status = 7;
                         MainOrd.AbnormalStatus = reasonid;
-                        MainOrd.StatusDec="部分付款";
+                        MainOrd.StatusDec="付款金额不等于应付金额";
                         var log = new Log();
                         log.OID = MainOrd.ID;
                         log.SoID = MainOrd.SoID;
@@ -3437,7 +3437,7 @@ namespace CoreData.CoreCore
                         log.LogDate = DateTime.Now;
                         log.UserName = UserName;
                         log.Title = "标记异常";
-                        log.Remark = "部分付款";
+                        log.Remark = "付款金额不等于应付金额";
                         log.CoID = CoID;
                         logs.Add(log);
                     }
@@ -4065,7 +4065,7 @@ namespace CoreData.CoreCore
                             ss.Status = 1;
                             ss.StatusDec = "已付款待审核";
                         }
-                        if(a.Status == 7 && a.StatusDec == "部分付款")
+                        if(a.Status == 7 && a.StatusDec == "付款金额不等于应付金额")
                         {
                             a.Status = 1;
                             a.AbnormalStatus = 0;
@@ -4081,7 +4081,7 @@ namespace CoreData.CoreCore
                             log.LogDate = DateTime.Now;
                             log.UserName = UserName;
                             log.Title = "取消异常标记";
-                            log.Remark = "部分付款";
+                            log.Remark = "付款金额不等于应付金额";
                             log.CoID = CoID;
                             logs.Add(log);
                         }
@@ -4101,16 +4101,16 @@ namespace CoreData.CoreCore
                         }
                         else
                         {
-                            int reasonid = GetReasonID("部分付款",CoID,7).s;
+                            int reasonid = GetReasonID("付款金额不等于应付金额",CoID,7).s;
                             if(reasonid == -1)
                             {
                                 result.s = -1;
-                                result.d = "请先设定【部分付款】的异常";
+                                result.d = "请先设定【付款金额不等于应付金额】的异常";
                                 return result;
                             }
                             a.Status = 7;
                             a.AbnormalStatus = reasonid;
-                            a.StatusDec="部分付款";
+                            a.StatusDec="付款金额不等于应付金额";
                             ss.Status = 7;
                             ss.StatusDec = "异常";
                             ss.AbnormalStatus = a.AbnormalStatus;
@@ -4122,7 +4122,7 @@ namespace CoreData.CoreCore
                             log.LogDate = DateTime.Now;
                             log.UserName = UserName;
                             log.Title = "标记异常";
-                            log.Remark = "部分付款";
+                            log.Remark = "付款金额不等于应付金额";
                             log.CoID = CoID;
                             logs.Add(log);
                         }
@@ -6997,7 +6997,7 @@ namespace CoreData.CoreCore
                     //快递为空时,自动计算快递
                     if(string.IsNullOrEmpty(a.Express) && a.Status !=7)
                     {
-                        var ss = new DataResult(-1,null);//待新增方法
+                        var ss = new DataResult(1,"圆通快递");//待新增方法
                         if(ss.s == -1)
                         {
                             a.Status = 2;
@@ -7774,7 +7774,7 @@ namespace CoreData.CoreCore
                     log.Remark = pay.PayAmount;
                     log.CoID = CoID;
                     logs.Add(log);
-                    if(ord.StatusDec == "部分付款" && ord.Status == 7)
+                    if(ord.StatusDec == "付款金额不等于应付金额" && ord.Status == 7)
                     {
                         log = new Log();
                         log.OID = pay.OID;
@@ -8230,7 +8230,8 @@ namespace CoreData.CoreCore
             if(ss.Count > 0)
             {
                 var rr = GetOrderListSingle(ss,CoID);
-                res.SuccessIDs = rr.d as OrderData;
+                var dd = rr.d as OrderData;
+                res.SuccessIDs = dd.Ord;
             }
             result.d = res;
             return result;
@@ -8332,9 +8333,7 @@ namespace CoreData.CoreCore
             var result = new DataResult(1,null);
             var logs = new List<Log>();
             var log = new Log();
-            var res = new TransferNormalReturn();
-            var su = new List<TransferNormalReturnSuccess>();
-            var fa = new List<TransferNormalReturnFail>();
+            var res = new DirectShipReturn();
             string sqlCommandText = string.Empty;
             int count = 0;
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
@@ -8634,8 +8633,16 @@ namespace CoreData.CoreCore
                         return result;
                     }   
                 }
-                res.SuccessIDs = su;
-                res.FailIDs = fa;
+                res.ID = u[0].ID;
+                res.Status = u[0].Status;
+                res.StatusDec = Enum.GetName(typeof(OrdStatus), u[0].Status);
+                res.ExID = u[0].ExID;
+                res.Express = u[0].Express;
+                if(!string.IsNullOrEmpty(u[0].ExID.ToString()))
+                {
+                    res.ExpNamePinyin = GetExpNamePinyin(CoID,u[0].ExID);
+                }
+                res.ExCode = u[0].ExCode;
                 result.d = res;
                 TransCore.Commit();
             }
@@ -8653,6 +8660,145 @@ namespace CoreData.CoreCore
             }
             return result;
         }
+        ///<summary>
+        ///直接发货
+        ///</summary>
+        public static DataResult CancleShip(int oid,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var logs = new List<Log>();
+            var log = new Log();
+            var res = new DirectShipReturn();
+            string sqlCommandText = string.Empty;
+            int count = 0;
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlCommand = "select * from `order` where id = " + oid + " and coid = " + CoID;
+                var u = CoreDBconn.Query<Order>(sqlCommand).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "订单单号参数异常";
+                    return result;
+                }
+                if(u[0].Status != 4 )
+                {
+                    result.s = -1;
+                    result.d = "已发货的订单才可以撤销发货!";
+                    return result;
+                }
+                
+                u[0].Status = 3;
+                u[0].ExCode = "";
+                u[0].Modifier = UserName;
+                u[0].ModifyDate = DateTime.Now;
+                sqlCommand = @"update `order` set Status=@Status,ExCode=@ExCode,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
+                count = CoreDBconn.Execute(sqlCommand,u[0],TransCore);     
+                if(count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }
+                log = new Log();
+                log.OID = u[0].ID;
+                log.SoID = u[0].SoID;
+                log.Type = 0;
+                log.LogDate = DateTime.Now;
+                log.UserName = UserName;
+                log.Title = "撤销发货";
+                log.CoID = CoID;
+                logs.Add(log);
+                var  ru = CoreComm.WarehouseHaddle.wareInfoByID(u[0].WarehouseID.ToString(),CoID.ToString()).d as dynamic;;
+                var wa = ru.Lst as List<wareInfo>;
+                int ItCoid = 0;
+                if(wa[0].itcoid == 0)
+                {
+                    ItCoid = wa[0].coid;
+                }
+                else
+                {
+                    ItCoid = wa[0].itcoid;
+                }
+                //更新库存资料
+                sqlCommand = "select * from orderitem where oid = " + oid + " and coid = " + CoID;
+                var item = CoreDBconn.Query<OrderItem>(sqlCommand).AsList();
+                foreach(var i in item)
+                {
+                    sqlCommand = @"update inventory_sale set PickQty=PickQty+@Qty,StockQty = StockQty + @Qty,LockQty = LockQty + @Qty,Modifier=@Modifier,
+                                    ModifyDate=@ModifyDate where Skuautoid = @ID and coid = @Coid";
+                    count = CoreDBconn.Execute(sqlCommand,new{Qty=i.Qty,Modifier=UserName,ModifyDate=DateTime.Now,ID=i.SkuAutoID,Coid=CoID},TransCore);     
+                    if(count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                    sqlCommand = @"update inventory set PickQty=PickQty+@Qty,StockQty = StockQty + @Qty,Modifier=@Modifier,
+                                    ModifyDate=@ModifyDate where Skuautoid = @ID and coid = @Coid";
+                    count = CoreDBconn.Execute(sqlCommand,new{Qty=i.Qty,Modifier=UserName,ModifyDate=DateTime.Now,ID=i.SkuAutoID,Coid=ItCoid},TransCore);     
+                    if(count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                }
+                //投递资料处理
+                sqlCommand = @"update saleout set Status=0,Modifier=@Modifier,ModifyDate=@ModifyDate where oid = @OID  and coid = @Coid and status in (1,2,3)";
+                count = CoreDBconn.Execute(sqlCommand,new{Modifier=UserName,ModifyDate=DateTime.Now,OID=oid,Coid=CoID},TransCore);     
+                if(count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }
+                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                            VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                count =CoreDBconn.Execute(loginsert,logs,TransCore);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }  
+                
+                res.ID = u[0].ID;
+                res.Status = u[0].Status;
+                res.StatusDec = Enum.GetName(typeof(OrdStatus), u[0].Status);
+                res.ExID = u[0].ExID;
+                res.Express = u[0].Express;
+                if(!string.IsNullOrEmpty(u[0].ExID.ToString()))
+                {
+                    res.ExpNamePinyin = GetExpNamePinyin(CoID,u[0].ExID);
+                }
+                res.ExCode = u[0].ExCode;
+                result.d = res;
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            return result;
+        }
+
+
+
+
+
+
+
+
+
+
+
         public static DataResult SetExpress()
         {
             var result = new DataResult(1,null);

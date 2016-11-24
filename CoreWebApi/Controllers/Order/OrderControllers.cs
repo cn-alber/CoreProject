@@ -1475,5 +1475,50 @@ namespace CoreWebApi
             var data = OrderHaddle.CancleConfirmOrder(oid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Order/DirectShip")]
+        public ResponseResult DirectShip([FromBodyAttribute]JObject co)
+        {   
+            int oid = 0;
+            if(co["OID"] != null)
+            {
+                oid = int.Parse(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }   
+            string ExCode = "";
+            if(co["ExCode"] != null)
+            {
+                ExCode = co["ExCode"].ToString();
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "快递单号必填", "General");
+            }   
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.DirectShip(oid,ExCode,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/CancleShip")]
+        public ResponseResult CancleShip([FromBodyAttribute]JObject co)
+        {   
+            int oid = 0;
+            if(co["OID"] != null)
+            {
+                oid = int.Parse(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }   
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.CancleShip(oid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }  

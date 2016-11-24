@@ -1,10 +1,8 @@
 {
     "s": 1,
     "d": {
-        "successIDs": {
-            "Datacnt": 1,
-            "Pagecnt": 1.0,
-            "Ord": [
+        "successIDs": 
+             [
                 {
                     "ID": 10860,
                     "Type": 0,
@@ -85,8 +83,7 @@
                         }
                     ]
                 }
-            ]
-        },
+            ],
         "failIDs": [
             
         ]
