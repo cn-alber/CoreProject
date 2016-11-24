@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace CoreWebApi.XyCore
 {
-    [AllowAnonymous]
+    // [AllowAnonymous]
     public class InventoryController : ControllBase
     {
 
@@ -470,13 +470,13 @@ namespace CoreWebApi.XyCore
         }
         #endregion
 
-        #region 商品库存查询 - 锁定库存 - 单据表头查询
-        [HttpGetAttribute("Core/XyCore/Inventory/InvLockMain")]
-        // public ResponseResult InvLockMain(string ID)
-        // {
+        // #region 商品库存查询 - 锁定库存 - 单据表头查询
+        // [HttpGetAttribute("Core/XyCore/Inventory/InvLockMain")]
+        // // public ResponseResult InvLockMain(string ID)
+        // // {
 
-        // }
-        #endregion
+        // // }
+        // #endregion
 
 
 
