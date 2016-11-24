@@ -896,6 +896,7 @@ namespace CoreModels.XyCore
     {
         public int ID{get;set;}
         public int OID{get;set;}
+        public int BatchID{get;set;}
         public long SoID{get;set;}
         public DateTime DocDate{get;set;}
         public int Status{get;set;}
@@ -952,6 +953,7 @@ namespace CoreModels.XyCore
     public class ExpnoUnused
     {
         public string ExCode{get;set;}
+        public int Express{get;set;}
     }
     public class OrderAbnormal
     {
