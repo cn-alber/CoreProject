@@ -1,0 +1,33 @@
+{
+    "s": 1,
+    "d": [
+        {
+            "ID": 4,
+            "Skuautoid": "2",
+            "SkuID": "test1234560004007",
+            "SkuName": "南极人2016男装夹克",
+            "Norm": "红色1;43",
+            "Qty": 80,
+            "StockQty": 0
+        },
+        {
+            "ID": 5,
+            "Skuautoid": "17590",
+            "SkuID": "ABCTST2001001",
+            "SkuName": "ABC测试白色1S",
+            "Norm": "白色1;S",
+            "Qty": 100,
+            "StockQty": 0
+        },
+        {
+            "ID": 6,
+            "Skuautoid": "17591",
+            "SkuID": "ABCTST2001002",
+            "SkuName": "ABC测试红色1S",
+            "Norm": "红色1;S",
+            "Qty": 106,
+            "StockQty": 0
+        }
+    ],
+    "m": ""
+}

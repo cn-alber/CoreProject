@@ -202,6 +202,16 @@ namespace CoreModels.XyCore
         public int Type { get; set; }
     }
 
+    public class InvavailQty //获取可用库存量实体
+    {
+        public string CoID { get; set; }
+        public string Skuautoid { get; set; }
+        public decimal StockQty { get; set; }
+        public decimal InvLockQty { get; set; }
+        public decimal LockQty { get; set; }
+        public decimal VirtualQty { get; set; }
+    }
+
     //盘点库存导出模板excel,顺序不可调
     public class SetInvQtyExcel
     {

@@ -464,7 +464,8 @@ namespace CoreWebApi.XyCore
             }
             if (res.s == 1)
             {
-                InvlockHaddle.GetInvLockMainLst(cp);
+                cp.CoID = GetCoid();
+                res = InvlockHaddle.GetInvLockMainLst(cp);
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
@@ -511,11 +512,12 @@ namespace CoreWebApi.XyCore
         #endregion
 
         #region 商品库存查询 - 锁定库存 - 筛选有可用库存的商品
-        [HttpPostAttribute("Core/XyCore/Inventory/CheckInvQty")]
-        public ResponseResult CheckInvQty([FromBodyAttribute]JObject obj)
+        [HttpPostAttribute("Core/XyCore/Inventory/CheckInvQtyByID")]
+        public ResponseResult CheckInvQtyByID([FromBodyAttribute]JObject obj)
         {
             var res = new DataResult(1, null);
-            if (obj["IDLst"] == null)
+            int x;
+            if (!(obj["IDLst"] != null && obj["Type"] != null&&int.TryParse(obj["Type"].ToString(),out x)))
             {
                 res.s = -1;
                 res.d = "无效参数";
@@ -524,8 +526,8 @@ namespace CoreWebApi.XyCore
             {
                 var SkuautoidLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(obj["IDLst"].ToString());
                 string CoID = GetCoid();
-                
-
+                int Type = int.Parse(obj["Type"].ToString());
+                res = InvlockHaddle.CheckQtyByID(SkuautoidLst,Type, CoID);
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
@@ -540,7 +542,7 @@ namespace CoreWebApi.XyCore
             {
                 res.s = -1;
                 res.d = "无效参数";
-            }
+            }            
             else
             {
                 var main = Newtonsoft.Json.JsonConvert.DeserializeObject<Invlock_main_view>(obj["main"].ToString());
@@ -549,7 +551,6 @@ namespace CoreWebApi.XyCore
                 string UserName = GetUname();
                 res = InvlockHaddle.InsertLock(main, itemLst, CoID, UserName);
             }
-
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
@@ -575,8 +576,6 @@ namespace CoreWebApi.XyCore
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
-
-
 
 
         #region 商品库存查询 - 更新商品名称--【停用，商品名称直接根据skuautoid获取，不需要更新】
