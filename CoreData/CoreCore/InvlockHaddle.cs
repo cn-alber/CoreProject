@@ -296,6 +296,29 @@ namespace CoreData.CoreCore
         }
         #endregion
 
+        #region 锁定单 - 检查可用库存
+        public static DataResult CheckQty(List<string> SkuautoLst, string CoID)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                try
+                {
+                    
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+                finally
+                {
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+        #endregion
 
         #region 锁定单 - 新增sql
         public static string AddLockMainSql()

@@ -510,6 +510,27 @@ namespace CoreWebApi.XyCore
         }
         #endregion
 
+        #region 商品库存查询 - 锁定库存 - 筛选有可用库存的商品
+        [HttpPostAttribute("Core/XyCore/Inventory/CheckInvQty")]
+        public ResponseResult CheckInvQty([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            if (obj["IDLst"] == null)
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var SkuautoidLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(obj["IDLst"].ToString());
+                string CoID = GetCoid();
+                
+
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
         #region 商品库存查询 - 锁定库存 - 新增
         [HttpPostAttribute("Core/XyCore/Inventory/InsertInvLock")]
         public ResponseResult InsertInvLock([FromBodyAttribute]JObject obj)
