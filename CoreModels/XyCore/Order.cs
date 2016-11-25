@@ -346,6 +346,7 @@ namespace CoreModels.XyCore
         public DateTime CreateDate{get;set;}
         public string Modifier{get;set;}
         public DateTime ModifyDate{get;set;}
+        public List<SkuMerge> Sku{get;set;}
     }
     public class OrderData
     {
@@ -1003,5 +1004,24 @@ namespace CoreModels.XyCore
         public string Express{get;set;}
         public string ExpNamePinyin{get;set;}
         public string ExCode{get;set;}
+    }
+    public class ComDisExchangeSuccess
+    {
+        public int ID{get;set;}
+        public int Type{get;set;}
+        public string TypeString{get;set;}
+        public int Status{get;set;}
+        public string StatusDec{get;set;}
+    }
+    public class ComDisExchangeReturn
+    {
+        public List<ComDisExchangeSuccess> SuccessIDs {get;set;}
+        public List<TransferNormalReturnFail> FailIDs {get;set;}
+    }
+    public class SkuMerge
+    {
+        public int ID{get;set;}
+        public string Img{get;set;}
+        public int Qty{get;set;}
     }
 }
