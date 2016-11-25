@@ -477,3 +477,27 @@ OutPut:若失败，返回 -1和错误讯息
                ExCode               快递单号
 参考:input jason 文件:CancleShip_input.json
 参考:output jason 文件:CancleShip_output.json
+
+45.InsertGiftMulti()订单添加赠品批次
+路由:http://localhost:5000/Core/Order/InsertGiftMulti
+input:OID         List<int>       内部订单号List
+      SkuIDList   List<int>       商品auto id List
+output: s=1成功 else 错误代码
+参考:input jason 文件:InsertGiftMulti_input.json
+参考:output jason 文件:InsertGiftMulti_output.json
+
+46.MarkCustomAbnormal()按商品信息标识自定义异常
+路由:http://localhost:5000/Core/Order/MarkCustomAbnormal
+input:Status            List<int>   状态List
+      OrdDateStart      datetime    开始日期
+      OrdDateEnd        datetime    结束日期
+      GoodsCode         string      货号
+      SkuID             string      商品编码
+      SkuName           string      商品名称关键字
+      Norm              string      规格关键字
+      RecMessage        string      买家留言关键字
+      SendMessage       string      卖家备注关键字
+      Abnormal          string      标记异常
+output: s=1成功 else 错误代码
+参考:input jason 文件:MarkCustomAbnormal_input.json
+参考:output jason 文件:MarkCustomAbnormal_output.json
