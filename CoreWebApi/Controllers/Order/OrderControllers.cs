@@ -967,7 +967,7 @@ namespace CoreWebApi
             var skuid = new List<int>();
             if(co["OID"] != null)
             {
-                id = id = int.Parse(co["OID"].ToString());
+                id = int.Parse(co["OID"].ToString());
             }
             else
             {
@@ -1518,6 +1518,121 @@ namespace CoreWebApi
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.CancleShip(oid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/InsertGiftMulti")]
+        public ResponseResult InsertGiftMulti([FromBodyAttribute]JObject co)
+        {   
+            var id = new List<int>();
+            var skuid = new List<int>();
+            if(co["OID"] != null)
+            {
+                id = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单号必填", "General");
+            }
+            if(co["SkuIDList"] != null)
+            {
+                skuid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["SkuIDList"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "商品ID必填", "General");
+            } 
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.InsertGiftMulti(id,skuid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/MarkCustomAbnormal")]
+        public ResponseResult MarkCustomAbnormal([FromBodyAttribute]JObject co)
+        {   
+            var Status = new List<int>();
+            if(co["Status"] != null)
+            {
+                Status = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["Status"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "状态必填", "General");
+            }
+            DateTime OrdDateStart,OrdDateEnd;
+            if(co["OrdDateStart"] != null)
+            {
+                string text = co["OrdDateStart"].ToString();
+                DateTime x;
+                if (DateTime.TryParse(text, out x))
+                {
+                    OrdDateStart = DateTime.Parse(text);
+                    OrdDateStart = OrdDateStart.AddDays(-1);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "订单开始日期参数异常", "General");
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单开始日期必填", "General");
+            } 
+            if(co["OrdDateEnd"] != null)
+            {
+                string text = co["OrdDateEnd"].ToString();
+                DateTime x;
+                if (DateTime.TryParse(text, out x))
+                {
+                    OrdDateEnd = DateTime.Parse(text);
+                    OrdDateEnd = OrdDateEnd.AddDays(1);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "订单结束日期参数异常", "General");
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单结束日期必填", "General");
+            } 
+            string GoodsCode="",SkuID="",SkuName="",Norm="",RecMessage="",SendMessage="",Abnormal="";
+            if(co["GoodsCode"] != null)
+            {
+                GoodsCode = co["GoodsCode"].ToString();
+            }
+            if(co["SkuID"] != null)
+            {
+                SkuID = co["SkuID"].ToString();
+            }
+            if(co["SkuName"] != null)
+            {
+                SkuName = co["SkuName"].ToString();
+            }
+            if(co["Norm"] != null)
+            {
+                Norm = co["Norm"].ToString();
+            }
+            if(co["RecMessage"] != null)
+            {
+                RecMessage = co["RecMessage"].ToString();
+            }
+            if(co["SendMessage"] != null)
+            {
+                SendMessage = co["SendMessage"].ToString();
+            }
+            if(co["Abnormal"] != null)
+            {
+                Abnormal = co["Abnormal"].ToString();
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "标记异常必填", "General");
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.MarkCustomAbnormal(Status,OrdDateStart,OrdDateEnd,GoodsCode,SkuID,SkuName,Norm,RecMessage,SendMessage,Abnormal,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     }
