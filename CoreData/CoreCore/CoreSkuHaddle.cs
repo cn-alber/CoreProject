@@ -513,6 +513,59 @@ namespace CoreData.CoreCore
                 return res;
             }
         }
+
+        public static DataResult ExistSkuByItem(IDbTransaction Trans,int ParentID, List<CoreSkuItem> itemLst, string CoID)
+        {
+            var res = new DataResult(1, null);
+            foreach (var item in itemLst)
+            {
+                res = ExistSkuByID(Trans,ParentID, item.ID, item.SkuID, CoID);
+                if (res.s < 1)
+                {
+                    break;
+                }
+            }
+            return res;
+        }
+
+        public static DataResult ExistSkuByID(IDbTransaction Trans,int ParentID, int ID, string SkuID, string CoID)
+        {
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                try
+                {
+                    StringBuilder querystr = new StringBuilder();
+                    querystr.Append("select ID from coresku where CoID = @CoID AND IsDelete=0 AND SkuID = @SkuID ");
+                    var p = new DynamicParameters();
+                    p.Add("@CoID", CoID);
+                    p.Add("@SkuID", SkuID);
+                    if (ID > 0)
+                    {
+                        querystr.Append(" and ID !=@ID");
+                        p.Add("@ID", ID);
+                    }
+                    if (ParentID > 0)
+                    {
+                        querystr.Append(" and ParentID = @ParentID");
+                        p.Add("@ParentID", ParentID);
+                    }
+                    var Lst = conn.Query<string>(querystr.ToString(), p).AsList();
+                    if (Lst.Count > 0)
+                    {
+                        res.s = -1;
+                        res.d = "商品编码已存在:" + string.Join(",", Lst.ToArray()); ;
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    res.s = -1;
+                    res.d = e.Message;
+                }
+                return res;
+            }
+        }
         #endregion
 
         #region 商品维护 - 新增
@@ -661,7 +714,17 @@ namespace CoreData.CoreCore
                             conn.Execute(UptValSql, new { CoID = main.CoID, ParentID = MainID }, Trans);
                         }
                     }
-                    Trans.Commit();
+
+                    string itemsql = @"SELECT * FROM coresku WHERE ParentID=@ID AND CoID = @CoID AND IsDelete=0";
+                    var p = new DynamicParameters();
+                    p.Add("@ID", MainID);
+                    p.Add("@CoID", main.CoID);
+                    var CheckitemLst = conn.Query<CoreSkuItem>(itemsql, p, Trans).AsList();
+                    res = ExistSkuByItem(Trans,int.Parse(MainID.ToString()), CheckitemLst, main.CoID);
+                    if (res.s == 1)
+                    {
+                        Trans.Commit();
+                    }
                 }
                 catch (Exception e)
                 {
@@ -1081,7 +1144,18 @@ namespace CoreData.CoreCore
                     }
                     #endregion
                     if (IsCommit)
-                        Trans.Commit();
+                    {
+                        string checkitemsql = @"SELECT * FROM coresku WHERE ParentID=@ID AND CoID = @CoID AND IsDelete=0";
+                        var p1 = new DynamicParameters();
+                        p1.Add("@ID", main.ID);
+                        p1.Add("@CoID", main.CoID);
+                        var CheckitemLst = conn.Query<CoreSkuItem>(checkitemsql, p, Trans).AsList();
+                        res = ExistSkuByItem(Trans,int.Parse(main.ID.ToString()), CheckitemLst, main.CoID);
+                        if (res.s == 1)
+                        {
+                            Trans.Commit();
+                        }
+                    }
                 }
                 catch (Exception e)
                 {
@@ -1312,7 +1386,7 @@ namespace CoreData.CoreCore
                             if (BrandLst.Count > 0)
                             {
                                 SkuLst = (from a in SkuLst
-                                          join b in BrandLst on a.Brand equals b.ID into data 
+                                          join b in BrandLst on a.Brand equals b.ID into data
                                           from c in data.DefaultIfEmpty()
                                           select new SkuQuery
                                           {
@@ -1324,7 +1398,7 @@ namespace CoreData.CoreCore
                                               Norm = a.Norm,
                                               GBCode = a.GBCode,
                                               Brand = a.Brand,
-                                              BrandName =c==null? "":c.Name,
+                                              BrandName = c == null ? "" : c.Name,
                                               CostPrice = a.CostPrice,
                                               SalePrice = a.SalePrice,
                                               Enable = a.Enable,

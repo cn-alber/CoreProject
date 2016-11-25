@@ -1,6 +1,7 @@
 接口名称：InventoryControllers
 function说明
 ############################################################
+
 1.InventQuery()//查询商品库存
     方法：Get
     路由：http://192.168.30.211:5000/Core/XyCore/Inventory/InventQuery?GoodsCode=&SkuID=&SkuName=&Norm=&StockQtyb=&StockQtye=&Status=&PageIndex=1&PageSize=&SortField=&SortDirection=
@@ -23,6 +24,7 @@ function说明
         InvMainLst      List<Inventory_sale>  商品库存(Inventory)
     参考:output json 文件:InventQuery_output.json
 ############################################################
+
 2.InvDetailQuery()//查询商品交易明细
     方法：Get
     路由：http://192.168.30.211:5000/Core/XyCore/Inventory/InvDetailQuery?SkuautoID=&WarehouseID=&DocType=&DocDateB=&DocDateE=&PageIndex=1&PageSize=&SortField=&SortDirection=
@@ -42,6 +44,7 @@ function说明
         InvItemLst      List<Invinoutitem>  商品交易明细(Invinoutitem)
     参考:output json 文件:InvDetailQuery_output.json
 ############################################################
+
 3.UptInvMainSafeQty()//修改安全库存 - 单笔
     方法：POST
     路由：http://192.168.30.211:5000/Core/XyCore/Inventory/UptInvMainSafeQty
@@ -64,6 +67,7 @@ function说明
         成功：返回请求成功信息(s=1)
         失败：返回错误信息
     参考:input json 文件:UptInvMainLstSafeQty_input.json
+############################################################
 
 5.ClearInvSafeQty()//清空安全库存 - 所有商品  
     方法：POST
@@ -75,6 +79,7 @@ function说明
         失败：返回错误信息
 
 ############################################################
+
 6.UptInvVirtualQty()//修改虚拟库存 - 单笔
     方法：POST
     路由：http://192.168.30.211:5000/Core/XyCore/Inventory/UptInvMainVirtualQty
@@ -97,6 +102,7 @@ function说明
     参考:input json 文件:UptInvLstVirtualQty_input.json
 
 ############################################################
+
 8.DeleteZeroSkuM()//批量操作 - 清除零库存Sku    
     方法：POST
     路由：http://192.168.30.211:5000/Core/XyCore/Inventory/DeleteZeroSkuM
@@ -105,9 +111,43 @@ function说明
     OutPut:
         成功：返回请求成功信息(s=1)
         失败：返回错误信息  
+############################################################
 
+9.InvLockMainLst()//库存锁定- 锁定单据查询
+    方法：Get
+    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/InvLockMainLst
+    InPut:
+        SkuID       string         商品编号
+        ShopType    int            店铺类型编号
+        Name        string         锁定名称
+10.InvLockMain()//库存锁定 - 单据表头查询
+    方法：Get
+    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/InvLockMain
+    InPut:
+        ID       string         单据ID
+11.InvLockItem()//锁定库存 - 单据明细查询
+    方法：Get
+    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/InvLockItem
+    InPut:
+        ParentID       string         单据主表ID
+12.InsertInvLock()//锁定库存 - 新增
+    方法：POST
+    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/InsertInvLock
+    InPut:
+        main            Invlock_main_view    表头资料
+        itemLst         List<Invlock_item_view>  明细资料
+    OutPut:
+        成功：返回请求成功信息(s=1)
+        失败：返回错误信息
+13.InsertInvLock()//锁定库存 - 手动解锁
+    方法：POST
+    路由：http://192.168.30.29:5000/Core/XyCore/Inventory/HandInvUnLock
+    InPut:
+        ParentID         int        单据主表ID
+    OutPut:
+        成功：返回请求成功信息(s=1)
+        失败：返回错误信息
 
-9.//库存锁定
 
 
 
