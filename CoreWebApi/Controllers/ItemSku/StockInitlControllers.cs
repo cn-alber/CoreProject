@@ -52,11 +52,19 @@ namespace CoreWebApi.XyCore
 
         #region 库存期初 - 查询 - 子表
         [HttpGetAttribute("Core/XyCore/StockInit/StockInitItemLst")]
-        public ResponseResult StockInitItemLst(string ParentID, string PageIndex, string PageSize, string SortField, string SortDirection)
+        public ResponseResult StockInitItemLst(string ParentID, string SkuID, string SkuName, string PageIndex, string PageSize, string SortField, string SortDirection)
         {
             var res = new DataResult(1, null);
             int x;
             var cp = new Sfc_item_param();
+            if (!string.IsNullOrEmpty(SkuID))//款式编号
+            {
+                cp.SkuID = SkuID;
+            }
+            if (!string.IsNullOrEmpty(SkuName))//款式名称
+            {
+                cp.SkuName = SkuName;
+            }
             if (int.TryParse(PageIndex, out x))
             {
                 cp.PageIndex = int.Parse(PageIndex);
@@ -175,7 +183,7 @@ namespace CoreWebApi.XyCore
         {
             var res = new DataResult(1, null);
             int x;
-            if (!(obj["ID"] != null && obj["InvQty"] != null && int.TryParse(obj["ID"].ToString(), out x) && int.TryParse(obj["InvQty"].ToString(), out x)))            
+            if (!(obj["ID"] != null && obj["InvQty"] != null && int.TryParse(obj["ID"].ToString(), out x) && int.TryParse(obj["InvQty"].ToString(), out x)))
             {
                 res.s = -1;
                 res.d = "无效参数";
@@ -199,7 +207,7 @@ namespace CoreWebApi.XyCore
         {
             var res = new DataResult(1, null);
             int x;
-            if (!(obj["ID"]!=null && int.TryParse(obj["ID"].ToString(), out x)))
+            if (!(obj["ID"] != null && int.TryParse(obj["ID"].ToString(), out x)))
             {
                 res.s = -1;
                 res.d = "无效参数";
@@ -207,7 +215,7 @@ namespace CoreWebApi.XyCore
             else
             {
                 string CoID = GetCoid();
-                string UserName = GetUname();                
+                string UserName = GetUname();
                 string ID = obj["ID"].ToString();
                 res = StockInitHaddle.CheckStockInit(ID, CoID, UserName);
             }
@@ -221,7 +229,7 @@ namespace CoreWebApi.XyCore
         {
             var res = new DataResult(1, null);
             int x;
-            if (!(obj["ID"]!=null && int.TryParse(obj["ID"].ToString(), out x)))
+            if (!(obj["ID"] != null && int.TryParse(obj["ID"].ToString(), out x)))
             {
                 res.s = -1;
                 res.d = "无效参数";
@@ -229,7 +237,7 @@ namespace CoreWebApi.XyCore
             else
             {
                 string CoID = GetCoid();
-                string UserName = GetUname();          
+                string UserName = GetUname();
                 string ID = obj["ID"].ToString();
                 res = StockTakeHaddle.UnCheckStockTake(ID, 1, CoID, UserName);
             }

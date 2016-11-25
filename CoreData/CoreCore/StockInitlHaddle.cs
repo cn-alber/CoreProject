@@ -40,13 +40,7 @@ namespace CoreData.CoreCore
                         querycount.Append(" AND Status = @Status");
                         querysql.Append(" AND Status = @Status");
                         p.Add("@Status", IParam.Status);
-                    }
-                    if (!string.IsNullOrEmpty(IParam.Skuautoid))
-                    {
-                        querycount.Append(" AND ID in (SELECT distinct ParentID FROM sfc_item WHERE sfc_item.CoID= sfc_main.CoID AND sfc_item.ParentID=sfc_main.ID AND sfc_item.Skuautoid LIKE @Skuautoid )");
-                        querysql.Append(" AND ID in (SELECT distinct ParentID FROM sfc_item WHERE sfc_item.CoID= sfc_main.CoID AND sfc_item.ParentID=sfc_main.ID AND sfc_item.Skuautoid LIKE @Skuautoid )");
-                        p.Add("@Skuautoid", "%" + IParam.Skuautoid + "%");
-                    }
+                    }         
                     if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
                     {
                         querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
@@ -119,6 +113,31 @@ namespace CoreData.CoreCore
                     p.Add("@CoID", IParam.CoID);
                     p.Add("@Type", IParam.Type);
                     p.Add("@ParentID", IParam.ParentID);
+
+                   
+                    //获取本公司商品Skuautoid - 提供资料过滤
+                    StringBuilder queryskusql = new StringBuilder();
+                    bool is_subsql = false;
+                    string skusql = @"SELECT ID FROM coresku WHERE CoID=@CoID AND Type<2 ";
+                    queryskusql.Append(skusql);
+                    if (!string.IsNullOrEmpty(IParam.SkuID))//商品编号
+                    {
+                        queryskusql.Append(" AND coresku.SkuID like @SkuID");
+                        p.Add("@SkuID", "%" + IParam.SkuID + "%");
+                        is_subsql = true;
+                    }
+                    if (!string.IsNullOrEmpty(IParam.SkuName))//商品名称
+                    {
+                        queryskusql.Append(" AND coresku.SkuName like @SkuName");
+                        p.Add("@SkuName", "%" + IParam.SkuName + "%");
+                        is_subsql = true;
+                    }
+                     if (is_subsql)
+                    {
+                        querycount.Append(" AND Skuautoid in (" + queryskusql + ") ");
+                        querysql.Append(" AND Skuautoid in (" + queryskusql + ") ");
+                    }
+
                     if (!string.IsNullOrEmpty(IParam.SortField) && !string.IsNullOrEmpty(IParam.SortDirection))//排序
                     {
                         querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
@@ -158,30 +177,6 @@ namespace CoreData.CoreCore
                                            Norm = c == null ? "" : c.Norm,
                                            Img = c == null ? "" : c.Img
                                        }).AsList();
-                            //   on new { Skuautoid = a.Skuautoid } equals new { Skuautoid = b.ID } 
-                            //   group new {a,b} by new
-                            //   {
-                            //       a.ID,
-                            //       a.Skuautoid,
-                            //       a.InvQty,
-                            //       a.Price,
-                            //       a.Amount,
-                            //       b.SkuID,
-                            //       b.SkuName,
-                            //       b.Norm,
-                            //       b.Img
-                            //   } into c
-                            //   select new Sfc_item_Init_view{
-                            //         ID = c.Key.ID,
-                            //       Skuautoid = c.Key.Skuautoid,
-                            //       InvQty = c.Key.InvQty,
-                            //       Price = c.Key.Price,
-                            //       Amount = c.Key.Amount,
-                            //       SkuID = c.Key.SkuID,
-                            //       SkuName = c.Key.SkuName,
-                            //       Norm = c.Key.Norm,
-                            //       Img = c.Key.Img
-                            //   }).AsList();
                             cs.InitItemLst = ItemLst;
                         }
                         result.d = cs;

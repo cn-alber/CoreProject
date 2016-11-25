@@ -20,10 +20,12 @@ function说明
 
 2.StockInitItemLst()//库存盘点-商品sku明细查询
     方法：Get
-    路由：http://192.168.30.211:5000/Core/XyCore/StockInit/StockInitItemLst?ParentID=&PageIndex=1&PageSize=&SortField=&SortDirection=
+    路由：http://192.168.30.211:5000/Core/XyCore/StockInit/StockInitItemLst?ParentID=&SkuID=&SkuName=&PageIndex=1&PageSize=&SortField=&SortDirection=
     参数:
     InPut:
         ParentID        int         期初单主表ID(*必填项*)
+        SkuID           string      查询匹配(商品编号,Default:null)
+        SkuName         string      查询匹配(商品名称,Default:null)
         PageIndex       int         当前页码(ex.第一页就给1)
         PageSize        int         每页显示资料笔数(Default:20)
         SortField       string      排序字段(Default:null)

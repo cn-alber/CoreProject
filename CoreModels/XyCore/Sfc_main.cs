@@ -122,6 +122,8 @@ namespace CoreModels.XyCore
         public string Skuautoid { get; set; }//商品编号
         public int Type { get; set; }//单据类型(1.期初，2.盘点，3.调拨)
         public int ParentID { get; set; }//主表sfc_main.ID
+        public string SkuID { get; set; }
+        public string SkuName { get; set; }
         public string CoID
         {
             get { return _CoID; }
