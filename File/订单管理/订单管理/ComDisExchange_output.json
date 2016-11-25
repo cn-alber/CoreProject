@@ -1,0 +1,18 @@
+{
+    "s": 1,
+    "d": {
+        "SuccessIDs": [
+            {
+                "ID": 10874,
+                "Type": 3,
+                "TypeString": "天猫分销",
+                "Status": 8,
+                "StatusDec": "等供销商发货"
+            }
+        ],
+        "FailIDs": [
+            
+        ]
+    },
+    "m": ""
+}

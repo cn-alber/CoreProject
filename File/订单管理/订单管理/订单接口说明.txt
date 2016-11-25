@@ -501,3 +501,11 @@ input:Status            List<int>   状态List
 output: s=1成功 else 错误代码
 参考:input jason 文件:MarkCustomAbnormal_input.json
 参考:output jason 文件:MarkCustomAbnormal_output.json
+
+47.ComDisExchange()普通订单与天猫分销订单相互转换
+路由:http://localhost:5000/Core/Order/ComDisExchange
+input:OID            List<int>   订单单号List
+output: s=1成功 else 错误代码
+参考:input jason 文件:ComDisExchange_input.json
+参考:output jason 文件:ComDisExchange_output.json
+

@@ -3308,6 +3308,9 @@ namespace CoreData.CoreCore
                     }
                     var rr = new MergerOrd();
                     rr.type = "A";
+                    sqlcommand = "select id,img,qty from orderitem  where oid = " + oid + " and coid = " + CoID;
+                    var sku = conn.Query<SkuMerge>(sqlcommand).AsList();
+                    u[0].Sku = sku;
                     rr.MOrd = u;
                     res.Add(rr);
                     //抓取推荐合并项
@@ -3317,6 +3320,15 @@ namespace CoreData.CoreCore
                     var tt = conn.Query<Order>(sqlcommand).AsList();
                     rr = new MergerOrd();
                     rr.type = "L";
+                    if(tt.Count > 0)
+                    {
+                        foreach(var a in tt)
+                        {
+                            sqlcommand = "select id,img,qty from orderitem  where oid = " + a.ID + " and coid = " + CoID;
+                            sku = conn.Query<SkuMerge>(sqlcommand).AsList();
+                            a.Sku = sku;
+                        }
+                    }
                     rr.MOrd = tt;
                     res.Add(rr);
                     //抓取中风险合并项
@@ -3330,6 +3342,15 @@ namespace CoreData.CoreCore
                     tt = conn.Query<Order>(sqlcommand).AsList();
                     rr = new MergerOrd();
                     rr.type = "M";
+                    if(tt.Count > 0)
+                    {
+                        foreach(var a in tt)
+                        {
+                            sqlcommand = "select id,img,qty from orderitem  where oid = " + a.ID + " and coid = " + CoID;
+                            sku = conn.Query<SkuMerge>(sqlcommand).AsList();
+                            a.Sku = sku;
+                        }
+                    }
                     rr.MOrd = tt;
                     res.Add(rr);
                     //抓取高风险合并项
@@ -3339,6 +3360,15 @@ namespace CoreData.CoreCore
                     tt = conn.Query<Order>(sqlcommand).AsList();
                     rr = new MergerOrd();
                     rr.type = "H";
+                    if(tt.Count > 0)
+                    {
+                        foreach(var a in tt)
+                        {
+                            sqlcommand = "select id,img,qty from orderitem  where oid = " + a.ID + " and coid = " + CoID;
+                            sku = conn.Query<SkuMerge>(sqlcommand).AsList();
+                            a.Sku = sku;
+                        }
+                    }
                     rr.MOrd = tt;
                     res.Add(rr);
                     
@@ -9188,15 +9218,132 @@ namespace CoreData.CoreCore
             }
             return result;
         }
-
-
-
-
-
-
-
-
-
+        ///<summary>
+        ///普通订单与天猫分销订单相互转换
+        ///</summary>
+        public static DataResult ComDisExchange(List<int> oid,int CoID,string Username)
+        {
+            var result = new DataResult(1,null);
+            var logs = new List<Log>();
+            var res = new ComDisExchangeReturn();
+            var su = new List<ComDisExchangeSuccess>();
+            var fa = new List<TransferNormalReturnFail>();
+            string sqlCommandText = string.Empty;
+            int count = 0;
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                sqlCommandText = "select id,soid,type,status,coid from `order` where id in @ID and coid = @Coid";
+                var ord = CoreDBconn.Query<Order>(sqlCommandText,new{ID = oid,Coid=CoID}).AsList();
+                if(ord.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "订单单号无效!";
+                    return result;
+                }
+                foreach(var a in ord)
+                {
+                    if(a.Type != 0 && a.Type != 3)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "只有未发货的普通订单&天猫分销订单才可以互相转换!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    if(a.Status == 3 && a.Status == 4 && a.Status == 5 && a.Status == 6)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "只有未发货的普通订单&天猫分销订单才可以互相转换!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    if(a.Type == 0)
+                    {
+                        a.Type = 3; 
+                        if(a.Status == 1 || a.Status == 2)
+                        {
+                            a.Status = 8;
+                        }
+                        var log = new Log();
+                        log.OID = a.ID;
+                        log.SoID = a.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = Username;
+                        log.Title = "转订单类型";
+                        log.Remark = "普通订单=>天猫分销";
+                        log.CoID = CoID;
+                        logs.Add(log);     
+                    }
+                    else
+                    {
+                        a.Type = 0; 
+                        if(a.Status == 8)
+                        {
+                            a.Status = 1;
+                        }
+                        var log = new Log();
+                        log.OID = a.ID;
+                        log.SoID = a.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = Username;
+                        log.Title = "转订单类型";
+                        log.Remark = "天猫分销=>普通订单";
+                        log.CoID = CoID;
+                        logs.Add(log);    
+                    }
+                    a.Modifier = Username;
+                    a.ModifyDate = DateTime.Now;
+                    sqlCommandText = "update `order` set Type=@Type,Status=@Status,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
+                    count = CoreDBconn.Execute(sqlCommandText,a,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -1;
+                        return result;
+                    }
+                    var ss = new ComDisExchangeSuccess();
+                    ss.ID = a.ID;
+                    ss.Type = a.Type;
+                    ss.TypeString = GetTypeName(a.Type);
+                    ss.Status = a.Status;
+                    ss.StatusDec = Enum.GetName(typeof(OrdStatus), a.Status);
+                    su.Add(ss);
+                }
+                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                count = CoreDBconn.Execute(loginsert,logs, TransCore);
+                if (count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                res.SuccessIDs = su;
+                res.FailIDs = fa;
+                result.d = res;
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            return result;
+        }
+        ///<summary>
+        ///转成分销+属性订单
+        ///</summary>
         public static DataResult SetExpress()
         {
             var result = new DataResult(1,null);
@@ -9230,5 +9377,44 @@ namespace CoreData.CoreCore
             }
             return result;
         }
+
+
+
+
+
+
+        // public static DataResult SetExpress()
+        // {
+        //     var result = new DataResult(1,null);
+        //     var logs = new List<Log>();
+        //     var res = new TransferNormalReturn();
+        //     var su = new List<TransferNormalReturnSuccess>();
+        //     var fa = new List<TransferNormalReturnFail>();
+        //     string sqlCommandText = string.Empty;
+        //     int count = 0;
+        //     var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+        //     CoreDBconn.Open();
+        //     var TransCore = CoreDBconn.BeginTransaction();
+        //     try
+        //     {
+        //         res.SuccessIDs = su;
+        //         res.FailIDs = fa;
+        //         result.d = res;
+        //         TransCore.Commit();
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         TransCore.Rollback();
+        //         TransCore.Dispose();
+        //         result.s = -1;
+        //         result.d = e.Message;
+        //     }
+        //     finally
+        //     {
+        //         TransCore.Dispose();
+        //         CoreDBconn.Dispose();
+        //     }
+        //     return result;
+        // }
     }
 }

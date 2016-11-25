@@ -1635,5 +1635,23 @@ namespace CoreWebApi
             var data = OrderHaddle.MarkCustomAbnormal(Status,OrdDateStart,OrdDateEnd,GoodsCode,SkuID,SkuName,Norm,RecMessage,SendMessage,Abnormal,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Order/ComDisExchange")]
+        public ResponseResult ComDisExchange([FromBodyAttribute]JObject co)
+        {   
+            var oid = new List<int>();
+            if(co["OID"] != null)
+            {
+                oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单单号必填", "General");
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.ComDisExchange(oid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }  
