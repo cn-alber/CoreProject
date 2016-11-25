@@ -989,10 +989,19 @@ namespace CoreModels.XyCore
         public List<DistributionPaySuccess> SuccessIDs {get;set;}
         public List<TransferNormalReturnFail> FailIDs {get;set;}
     }
-
     public class ModifySkuReturn
     {
-        public OrderData SuccessIDs {get;set;}
+        public List<OrderQuery> SuccessIDs {get;set;}
         public List<TransferNormalReturnFail> FailIDs {get;set;}
+    }
+    public class DirectShipReturn
+    {
+        public int ID{get;set;}
+        public int Status{get;set;}
+        public string  StatusDec{get;set;}
+        public int ExID{get;set;}
+        public string Express{get;set;}
+        public string ExpNamePinyin{get;set;}
+        public string ExCode{get;set;}
     }
 }

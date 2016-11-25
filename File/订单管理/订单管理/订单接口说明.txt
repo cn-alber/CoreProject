@@ -6,8 +6,8 @@
   修改运费,修改发货仓库(非分销订单),订单转异常,订单取消,分销付款,修改商品
 1:新增订单明细,修改订单明细,删除订单明细,新增赠品,订单明细换货,修改订单(运费/卖家备注/发票抬头/收货人信息),手工支付,快速支付,审核支付,取消审核支付,作废支付,修改备注,设定快递,修改收货地址,
   合并订单,拆分订单,修改运费,修改发货仓库(非分销订单),订单审核,订单转异常,订单取消,分销付款,修改商品
-2:修改订单(卖家备注/发票抬头),修改备注,设定快递,修改收货地址,合并订单,拆分订单,订单转异常,订单取消,取消审核订单
-3:修改订单(卖家备注/发票抬头),订单转异常,订单取消
+2:修改订单(卖家备注/发票抬头),修改备注,设定快递,修改收货地址,合并订单,拆分订单,订单转异常,订单取消,取消审核订单,直接发货
+3:修改订单(卖家备注/发票抬头),订单转异常,订单取消,直接发货
 4:修改订单(卖家备注/发票抬头)          
 5:修改订单(卖家备注/发票抬头)
 6:修改订单(卖家备注/发票抬头),反取消订单
@@ -448,3 +448,32 @@ input:      OID               List<int>   订单号
 OutPut:     成功和失败的ID
 参考:input jason 文件:CancleConfirmOrder_input.json
 参考:output jason 文件:CancleConfirmOrder_output.json
+
+43.DirectShip() //直接发货
+  路由:http://localhost:5000/Core/Order/DirectShip
+input:      OID      int      订单号
+            ExCode   string   快递单号
+OutPut:若失败，返回 -1和错误讯息
+       成功返回 ID                   订单号
+               Status               状态
+               StatusDec            状态说明
+               ExID                 快递ID
+               Express              快递名称
+               ExpNamePinyin        快递名称拼音
+               ExCode               快递单号
+参考:input jason 文件:DirectShip_input.json
+参考:output jason 文件:DirectShip_output.json
+
+44.CancleShip() //撤销发货
+  路由:http://localhost:5000/Core/Order/CancleShip
+input:      OID      int      订单号
+OutPut:若失败，返回 -1和错误讯息
+       成功返回 ID                   订单号
+               Status               状态
+               StatusDec            状态说明
+               ExID                 快递ID
+               Express              快递名称
+               ExpNamePinyin        快递名称拼音
+               ExCode               快递单号
+参考:input jason 文件:CancleShip_input.json
+参考:output jason 文件:CancleShip_output.json
