@@ -33,7 +33,7 @@ namespace CoreData.CoreCore
                                     Type,
                                     DeadLine,
                                     AutoUnlock,
-                                    UNLOCK
+                                    `Unlock`,Unlocker,UnlockDate
                                 FROM
                                     invlock_main
                                 WHERE
@@ -89,7 +89,7 @@ namespace CoreData.CoreCore
                         querysql.Append(" LIMIT @ls , @le");
                         p.Add("@ls", dataindex);
                         p.Add("@le", IParam.PageSize);
-                        var Lst = conn.Query<Invlock_main>(querysql.ToString(), p).AsList();
+                        var Lst = conn.Query<Invlock_main_query>(querysql.ToString(), p).AsList();
                         inv.LockMainLst = Lst;
                         result.d = inv;
                     }
@@ -225,9 +225,10 @@ namespace CoreData.CoreCore
                     {
                         ParentID = int.Parse(MainID.ToString()),
                         Skuautoid = a.Skuautoid,
-                        Qty = main.Type == 1 ? (a.StockQty * a.Qty / 100) : (main.Type == 2 ? a.Qty : 0),
+                        Qty = main.Type == 1 ? (a.StockQty * a.Qty / 100) : (main.Type == 2 ? (a.StockQty-a.Qty>0?a.Qty:a.StockQty) : 0),
                         Creator = UserName,
-                        CreateDate = DateTime.Now.ToString()
+                        CreateDate = DateTime.Now.ToString(),
+                        CoID=CoID
                     }).AsList();
                     conn.Execute(AddLockItemSql(), ItemLst_new, Trans);
                 }
@@ -261,12 +262,12 @@ namespace CoreData.CoreCore
             try
             {
                 string sql = @"UPDATE invlock_main
-                                SET UNLOCK = 1,
+                                SET `Unlock` = 1,
                                 Unlocker =@Modifier,
                                 UnlockDate =@ModifyDate,
                                 Modifier =@Modifier,
                                 ModifyDate =@ModifyDate
-                                WHERE
+                              WHERE
                                     CoID =@CoID
                                 AND ID =@ID";
                 var p = new DynamicParameters();
@@ -296,15 +297,51 @@ namespace CoreData.CoreCore
         }
         #endregion
 
-        #region 锁定单 - 检查可用库存
-        public static DataResult CheckQty(List<string> SkuautoLst, string CoID)
+        #region 锁定单 - 检查可用库存 - 商品Skuautoid
+        public static DataResult CheckQtyByID(List<string> SkuIDLst, int Type, string CoID)
         {
             var result = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CoreConnectString))
             {
                 try
                 {
-                    
+                    string sql = @"SELECT
+                                        ID,
+                                        Skuautoid,
+                                        StockQty,
+                                        InvLockQty,
+                                        LockQty,
+                                        VirtualQty
+                                    FROM
+                                        inventory_sale
+                                    WHERE
+                                        CoID =@CoID
+                                    AND Skuautoid IN @SkuIDLst
+                                    AND StockQty - InvLockQty - LockQty + VirtualQty > 0";
+                    var InvLst = conn.Query<InvavailQty>(sql, new { SkuIDLst = SkuIDLst, CoID = CoID }).AsList();
+                    if (InvLst.Count > 0)
+                    {
+                        var res = CommHaddle.GetSkuViewByID(CoID, SkuIDLst);
+                        var SkuViewLst = res.d as List<CoreSkuView>;//获取商品Sku资料,拼接Lst显示
+                        var items = (from a in InvLst
+                                     join b in SkuViewLst on a.Skuautoid equals b.ID into data
+                                     from c in data.DefaultIfEmpty()
+                                     select new Invlock_item_view
+                                     {
+                                         Skuautoid = a.Skuautoid,
+                                         SkuID = c == null ? "" : c.SkuID,
+                                         SkuName = c == null ? "" : c.SkuName,
+                                         Norm = c == null ? "" : c.Norm,
+                                         StockQty = Convert.ToInt32(a.StockQty - a.InvLockQty - a.LockQty + a.VirtualQty),
+                                         Qty = Type == 1 ? 100 : 0
+                                     }).AsList();
+                        result.d = items;
+                    }
+                    else
+                    {
+                        result.s=-1;
+                        result.d = "商品库存不足";
+                    }
                 }
                 catch (Exception e)
                 {
@@ -334,34 +371,34 @@ namespace CoreData.CoreCore
                 CreateDate,
                 CoID
             ) VALUES (
-                Name,
-                Type,
-                DeadLine,
-                AutoUnlock,
-                ShopID,
-                Unlock,
-                Creator,
-                CreateDate,
-                CoID
+                @Name,
+                @Type,
+                @DeadLine,
+                @AutoUnlock,
+                @ShopID,
+                @Unlock,
+                @Creator,
+                @CreateDate,
+                @CoID
             )";
             return sql;
         }
         public static string AddLockItemSql()
         {
             string sql = @"INSERT INTO invlock_item(
-                    @ParentID,
-                    @Skuautoid,
-                    @Qty,
-                    @Creator,
-                    @CreateDate,
-                    @CoID
-                ) VALUES (
                     ParentID,
                     Skuautoid,
                     Qty,
                     Creator,
                     CreateDate,
-                    CoID )";
+                    CoID 
+                ) VALUES (
+                    @ParentID,
+                    @Skuautoid,
+                    @Qty,
+                    @Creator,
+                    @CreateDate,
+                    @CoID)";
             return sql;
         }
         #endregion

@@ -1,10 +1,29 @@
 {
     "main": {
         "Name": "锁定测试",
-        "Type": "2",
+        "Type": "1",
         "DeadLine": "2016/11/24",
-        "AutoUnlock": "4",
+        "AutoUnlock": 1,
         "ShopID": "12"
     },
-"":{}
+"itemLst":[
+        {
+            "ID": 0,
+            "Skuautoid": "2",
+            "Qty": 100,
+            "StockQty": 80
+        },
+        {
+            "ID": 0,
+            "Skuautoid": "17590",
+            "Qty": 100,
+            "StockQty": 100
+        },
+        {
+            "ID": 0,
+            "Skuautoid": "17591",
+            "Qty": 100,
+            "StockQty": 106
+        }
+    ]
   }

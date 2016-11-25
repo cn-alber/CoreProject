@@ -1,0 +1,13 @@
+{
+    "s": 1,
+    "d": {
+        "ID": 2,
+        "Name": "锁定测试",
+        "Type": 1,
+        "DeadLine": "2016/11/24 0:00:00",
+        "AutoUnlock": true,
+        "ShopID": "12",
+        "ShopName": "京东Core测试2"
+    },
+    "m": ""
+}

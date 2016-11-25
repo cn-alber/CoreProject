@@ -9,7 +9,9 @@ namespace CoreModels.XyCore
         public int Type { get; set; }
         public string DeadLine { get; set; }
         public bool AutoUnlock { get; set; }
-        public bool Unlock { get; set; }
+        public string Unlock { get; set; }
+        public string Unlocker { get; set; }
+        public string UnlockDate { get; set; }
         public string ShopID { get; set; }
         public string CoID { get; set; }
         public string Creator { get; set; }
@@ -100,7 +102,19 @@ namespace CoreModels.XyCore
     {
         public int PageCount { get; set; }//总页数
         public int DataCount { get; set; } //总行数
-        public List<Invlock_main> LockMainLst { get; set; }//返回查询结果
+        public List<Invlock_main_query> LockMainLst { get; set; }//返回查询结果
+    }
+
+     public class Invlock_main_query
+    {
+        public int ID { get; set; }
+        public string Name { get; set; }
+        public int Type { get; set; }
+        public string DeadLine { get; set; }
+        public bool AutoUnlock { get; set; }
+        public string Unlock { get; set; }
+        public string Unlocker { get; set; }
+        public string UnlockDate { get; set; }
     }
 
 }
