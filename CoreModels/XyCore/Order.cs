@@ -297,7 +297,7 @@ namespace CoreModels.XyCore
         public string BuyerShopID{get;set;}
         public int ShopID{get;set;}
         public string ShopName{get;set;}
-        public string ShopSit{get;set;}
+        public int ShopSit{get;set;}
         public long SoID{get;set;}
         public long MergeSoID{get;set;}
         public string CurrencyType{get;set;}
@@ -374,14 +374,14 @@ namespace CoreModels.XyCore
         public int OID{get;set;}
         public int CoID{get;set;}
         public string Creator{get;set;}
-        public string ShopSit{get;set;}
+        public int ShopSit{get;set;}
     }
     public class RecInfoParm
     {
         public int _CoID ;//公司id
         public string _BuyerId = null;//买家账号
         public string _Receiver = null;//收货人
-        public string _ShopSit = null;//来源平台
+        public int _ShopSit = -1;//来源平台
         public string _SortField;//排序栏位
         public string _SortDirection;//排序方式
         public int _NumPerPage = 20;//每页显示资料笔数
@@ -401,7 +401,7 @@ namespace CoreModels.XyCore
             get { return _Receiver; }
             set { this._Receiver = value;}
         }
-        public string ShopSit
+        public int ShopSit
         {
             get { return _ShopSit; }
             set { this._ShopSit = value;}

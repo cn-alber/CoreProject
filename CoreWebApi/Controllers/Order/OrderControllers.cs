@@ -435,7 +435,13 @@ namespace CoreWebApi
             cp.CoID = int.Parse(GetCoid());
             cp.BuyerId = BuyerId;
             cp.Receiver = Receiver;
-            cp.ShopSit = ShopSit;
+            if(!string.IsNullOrEmpty(ShopSit))
+            {
+                if (int.TryParse(ShopSit, out x))
+                {
+                    cp.ShopSit = int.Parse(ShopSit);
+                }
+            }
             if(!string.IsNullOrEmpty(SortField))
             {
                 if(CommHaddle.SysColumnExists(DbBase.CoreConnectString,"recinfo",SortField).s == 1)
