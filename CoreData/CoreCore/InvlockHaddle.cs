@@ -219,15 +219,18 @@ namespace CoreData.CoreCore
                 main_new.CreateDate = DateTime.Now.ToString();
                 conn.Execute(AddLockMainSql(), main_new, Trans);
                 long MainID = conn.QueryFirst<long>("select LAST_INSERT_ID()", Trans);//获取新增id
-                var ItemLst_new = itemLst.Select(a => new Invlock_item
+                if (itemLst.Count > 0)
                 {
-                    ParentID = int.Parse(MainID.ToString()),
-                    Skuautoid = a.Skuautoid,
-                    Qty = main.Type == 1 ? (a.StockQty * a.Qty / 100) : (main.Type == 2 ? a.Qty : 0),
-                    Creator = UserName,
-                    CreateDate = DateTime.Now.ToString()
-                }).AsList();
-                conn.Execute(AddLockItemSql(), ItemLst_new, Trans);
+                    var ItemLst_new = itemLst.Select(a => new Invlock_item
+                    {
+                        ParentID = int.Parse(MainID.ToString()),
+                        Skuautoid = a.Skuautoid,
+                        Qty = main.Type == 1 ? (a.StockQty * a.Qty / 100) : (main.Type == 2 ? a.Qty : 0),
+                        Creator = UserName,
+                        CreateDate = DateTime.Now.ToString()
+                    }).AsList();
+                    conn.Execute(AddLockItemSql(), ItemLst_new, Trans);
+                }
                 Trans.Commit();
                 CoreUser.LogComm.InsertUserLog("新增锁定单", "Invlock_main", main.Type.ToString(), UserName, int.Parse(CoID), DateTime.Now);
             }
@@ -249,7 +252,7 @@ namespace CoreData.CoreCore
         #endregion
 
         #region 锁定单 - 手动解锁
-        public static DataResult HandUnLock(string ParentID,string CoID,string UserName)
+        public static DataResult HandUnLock(string ParentID, string CoID, string UserName)
         {
             var result = new DataResult(1, null);
             var conn = new MySqlConnection(DbBase.CoreConnectString);
@@ -267,15 +270,15 @@ namespace CoreData.CoreCore
                                     CoID =@CoID
                                 AND ID =@ID";
                 var p = new DynamicParameters();
-                p.Add("@CoID",CoID);
-                p.Add("@ID",ParentID);
-                p.Add("@Modifier",UserName);
-                p.Add("@ModifyDate",DateTime.Now.ToString());
-                p.Add("@Unlocker",UserName);
-                p.Add("@UnlockDate",DateTime.Now.ToString());
-                conn.Execute(sql,p,Trans);
-                Trans.Commit();    
-                CoreUser.LogComm.InsertUserLog("修改锁定单", "Invlock_main", "手动解锁-锁定单:"+ParentID.ToString(), UserName, int.Parse(CoID), DateTime.Now);          
+                p.Add("@CoID", CoID);
+                p.Add("@ID", ParentID);
+                p.Add("@Modifier", UserName);
+                p.Add("@ModifyDate", DateTime.Now.ToString());
+                p.Add("@Unlocker", UserName);
+                p.Add("@UnlockDate", DateTime.Now.ToString());
+                conn.Execute(sql, p, Trans);
+                Trans.Commit();
+                CoreUser.LogComm.InsertUserLog("修改锁定单", "Invlock_main", "手动解锁-锁定单:" + ParentID.ToString(), UserName, int.Parse(CoID), DateTime.Now);
             }
             catch (Exception e)
             {
@@ -293,6 +296,29 @@ namespace CoreData.CoreCore
         }
         #endregion
 
+        #region 锁定单 - 检查可用库存
+        public static DataResult CheckQty(List<string> SkuautoLst, string CoID)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                try
+                {
+                    
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+                finally
+                {
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+        #endregion
 
         #region 锁定单 - 新增sql
         public static string AddLockMainSql()

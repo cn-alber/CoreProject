@@ -66,7 +66,7 @@ namespace CoreModels.XyCore
         public string GoodsName { get; set; }
         public string KindID { get; set; }
         public string KindName { get; set; }
-        public bool Enable { get; set; }
+        public string Enable { get; set; }
         public string SalePrice { get; set; }
         public string ScoGoodsCode { get; set; }
         public int Type { get; set; }

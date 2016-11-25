@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace CoreWebApi.XyCore
 {
-    // [AllowAnonymous]
+    [AllowAnonymous]
     public class InventoryController : ControllBase
     {
 
@@ -462,7 +462,7 @@ namespace CoreWebApi.XyCore
             {
                 cp.Name = Name;
             }
-            if(res.s==1)
+            if (res.s == 1)
             {
                 InvlockHaddle.GetInvLockMainLst(cp);
             }
@@ -470,13 +470,112 @@ namespace CoreWebApi.XyCore
         }
         #endregion
 
-        // #region 商品库存查询 - 锁定库存 - 单据表头查询
-        // [HttpGetAttribute("Core/XyCore/Inventory/InvLockMain")]
-        // // public ResponseResult InvLockMain(string ID)
-        // // {
+        #region 商品库存查询 - 锁定库存 - 单据表头查询
+        [HttpGetAttribute("Core/XyCore/Inventory/InvLockMain")]
+        public ResponseResult InvLockMain(string ID)
+        {
+            var res = new DataResult(1, null);
+            int x;
+            if (int.TryParse(ID, out x))
+            {
+                string CoID = GetCoid();
+                res = InvlockHaddle.GetInvLockMain(ID, CoID);
+            }
+            else
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
 
-        // // }
-        // #endregion
+        #region 商品库存查询 - 锁定库存 - 单据明细查询
+        [HttpGetAttribute("Core/XyCore/Inventory/InvLockItem")]
+        public ResponseResult InvLockItem(string ParentID)
+        {
+            var res = new DataResult(1, null);
+            int x;
+            if (int.TryParse(ParentID, out x))
+            {
+                string CoID = GetCoid();
+                res = InvlockHaddle.GetInvLockItem(ParentID, CoID);
+            }
+            else
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 商品库存查询 - 锁定库存 - 筛选有可用库存的商品
+        [HttpPostAttribute("Core/XyCore/Inventory/CheckInvQty")]
+        public ResponseResult CheckInvQty([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            if (obj["IDLst"] == null)
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var SkuautoidLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(obj["IDLst"].ToString());
+                string CoID = GetCoid();
+                
+
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 商品库存查询 - 锁定库存 - 新增
+        [HttpPostAttribute("Core/XyCore/Inventory/InsertInvLock")]
+        public ResponseResult InsertInvLock([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            if (obj["main"] == null || obj["itemLst"] == null)
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var main = Newtonsoft.Json.JsonConvert.DeserializeObject<Invlock_main_view>(obj["main"].ToString());
+                var itemLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Invlock_item_view>>(obj["itemLst"].ToString());
+                string CoID = GetCoid();
+                string UserName = GetUname();
+                res = InvlockHaddle.InsertLock(main, itemLst, CoID, UserName);
+            }
+
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 锁定单 - 手动解锁
+        [HttpPostAttribute("Core/XyCore/Inventory/HandInvUnLock")]
+        public ResponseResult HandInvUnLock([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            int x;
+            if (obj["ParentID"] != null && int.TryParse(obj["ParentID"].ToString(), out x))
+            {
+                string CoID = GetCoid();
+                string UserName = GetUname();
+                string ParentID = obj["ParentID"].ToString();
+                res = InvlockHaddle.HandUnLock(ParentID, CoID, UserName);
+            }
+            else
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
 
 
 

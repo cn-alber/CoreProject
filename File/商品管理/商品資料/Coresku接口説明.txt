@@ -10,7 +10,7 @@ function说明
         SkuID           string      查询匹配(Sku编码,Default:null)
         ScoGoodsCode    string      查询匹配(供应商货号,Default:null)
         KindID          string      查询匹配(分类,Default:null)
-        Enable          string      启用状态(all/false/true,Default:all)
+        Enable          string      启用状态(0.禁用；1.启用；2.备用,Default:all)
         PageIndex       int         当前页码(ex.第一页就给1)
         PageSize        int         每页显示资料笔数(Default:20)
         SortField       string      排序字段(Default:all)
