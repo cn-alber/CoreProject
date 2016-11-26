@@ -547,11 +547,16 @@ namespace CoreData.CoreCore
             ord.Modifier = UserName;
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try{
-                    if ( ord.ShopID == 0)
+                    if ( ord.ShopID == -1)
                     {
                         result.s = -1;
                         result.d = "店铺必须有值!";
                         return result;
+                    }
+                    if(ord.ShopID == 0)
+                    {
+                        ord.ShopName = "{线下}";
+                        ord.ShopSit = 35;
                     }
                     else
                     {
@@ -574,7 +579,7 @@ namespace CoreData.CoreCore
                             else
                             {
                                 ord.ShopName = u[0].ShopName;
-                                ord.ShopSit = u[0].ShopSite;
+                                ord.ShopSit = u[0].SitType;
                             }
                         }
                     }
@@ -1469,9 +1474,9 @@ namespace CoreData.CoreCore
             {
                 wheresql = wheresql + " and receiver = '" + cp.Receiver + "'";
             }
-            if(!string.IsNullOrEmpty(cp.ShopSit))
+            if(cp.ShopSit >= 0)
             {
-                wheresql = wheresql + " and shopsit = '" + cp.ShopSit + "'";
+                wheresql = wheresql + " and shopsit = " + cp.ShopSit;
             }
             if(!string.IsNullOrEmpty(cp.SortField) && !string.IsNullOrEmpty(cp.SortDirection))//排序
             {
@@ -4693,8 +4698,7 @@ namespace CoreData.CoreCore
                     conn.Dispose();
                 }
             }
-            int shopid = 0;
-            string shopsit = "";
+            int shopid = 0,shopsit = 0;
             var logs = new List<Log>();
             List<int> idlist = new List<int>();
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
@@ -4704,7 +4708,7 @@ namespace CoreData.CoreCore
                     if(u.Count > 0)
                     {
                         shopid = u[0].ID;
-                        shopsit = u[0].ShopSite;
+                        shopsit = u[0].SitType;
                     }
                 }catch(Exception ex){
                     result.s = -1;
