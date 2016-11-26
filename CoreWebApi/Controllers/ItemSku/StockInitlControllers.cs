@@ -10,7 +10,7 @@ using CoreData;
 using CoreModels;
 namespace CoreWebApi.XyCore
 {
-    [AllowAnonymous]
+    // [AllowAnonymous]
     public class StockInitControllers : ControllBase
     {
         #region 库存期初 - 查询 - 主表
