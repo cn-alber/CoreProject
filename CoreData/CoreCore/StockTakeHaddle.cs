@@ -222,7 +222,7 @@ namespace CoreData.CoreCore
                         main.Parent_WhID = Parent_WhID;
                         conn.Execute(AddSfcMainSql(), main, Trans);
                         long MainID = conn.QueryFirst<long>("select LAST_INSERT_ID()", Trans);//获取新增id
-                        res.d = MainID;
+                        result.d = MainID;
                         Trans.Commit();
                         CoreUser.LogComm.InsertUserLog("新增库存" + TypeName, "sfc_main", "新增" + TypeName + ":" + WhID.ToString(), main.Creator, int.Parse(CoID), DateTime.Now);
                     }
