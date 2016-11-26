@@ -221,6 +221,8 @@ namespace CoreData.CoreCore
                         main.WhID = WhID;
                         main.Parent_WhID = Parent_WhID;
                         conn.Execute(AddSfcMainSql(), main, Trans);
+                        long MainID = conn.QueryFirst<long>("select LAST_INSERT_ID()", Trans);//获取新增id
+                        res.d = MainID;
                         Trans.Commit();
                         CoreUser.LogComm.InsertUserLog("新增库存" + TypeName, "sfc_main", "新增" + TypeName + ":" + WhID.ToString(), main.Creator, int.Parse(CoID), DateTime.Now);
                     }
@@ -517,32 +519,41 @@ namespace CoreData.CoreCore
             var Trans = conn.BeginTransaction();
             try
             {
-                string WhID = conn.QueryFirst<string>("SELECT Parent_WhID FROM sfc_main WHERE CoID=@CoID AND ID=@ID", new { CoID = CoID, ID = ID });
-                var SkuIDLst = conn.Query<string>("SELECT Skuautoid FROM sfc_item WHERE CoID=@CoID AND ParentID=@ID", new { CoID = CoID, ID = ID }).AsList();
-                if (SkuIDLst.Count > 0)
+                var sfc_main = conn.Query<Sfc_main_view>("SELECT Parent_WhID,Status FROM sfc_main WHERE CoID=@CoID AND ID=@ID", new { CoID = CoID, ID = ID }).AsList();
+                string mainsql = "UPDATE sfc_main SET Status = 2,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID=@ID";//(0:待确认;1:生效;2.作废)
+                var p = new DynamicParameters();
+                p.Add("@CoID", CoID);
+                p.Add("@ID", ID);
+                p.Add("@Modifier", UserName);
+                p.Add("@ModifyDate", DateTime.Now.ToString());
+                if (sfc_main.Count > 0)
                 {
-                    //更新单据状态&交易状态：2.作废
-                    string mainsql = "UPDATE sfc_main SET Status = 2,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID=@ID";//(0:待确认;1:生效;2.作废)
-                    string invinoutsql = "UPDATE Invinout SET Status = 2,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND RefID=@ID";
-                    string invinoutitemsql = "UPDATE Invinoutitem SET Status = 2,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND RefID=@ID";
-                    var p = new DynamicParameters();
-                    p.Add("@CoID", CoID);
-                    p.Add("@ID", ID);
-                    p.Add("@Modifier", UserName);
-                    p.Add("@ModifyDate", DateTime.Now.ToString());
-                    conn.Execute(mainsql, p, Trans);
-                    conn.Execute(invinoutsql, p, Trans);
-                    conn.Execute(invinoutitemsql, p, Trans);
-                    //更新仓库库存
-                    conn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = CoID, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
-                    //更新总库存数量
-                    var res = CommHaddle.GetWareCoidList(CoID);
-                    var CoIDLst = res.d as List<string>;
-                    conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, CoIDLst = CoIDLst, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
-                    Trans.Commit();
-                    CoreUser.LogComm.InsertUserLog(TypeName + "单据-作废", "sfc_item", "单据ID" + ID, UserName, int.Parse(CoID), DateTime.Now);
-
+                    if (sfc_main[0].Status == 0)
+                    {
+                        conn.Execute(mainsql, p, Trans);
+                    }
+                    else
+                    {
+                        var SkuIDLst = conn.Query<string>("SELECT Skuautoid FROM sfc_item WHERE CoID=@CoID AND ParentID=@ID", new { CoID = CoID, ID = ID }).AsList();
+                        if (SkuIDLst.Count > 0)
+                        {
+                            //更新单据状态&交易状态：2.作废                    
+                            string invinoutsql = "UPDATE Invinout SET Status = 2,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND RefID=@ID";
+                            string invinoutitemsql = "UPDATE Invinoutitem SET Status = 2,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND RefID=@ID";
+                            conn.Execute(mainsql, p, Trans);
+                            conn.Execute(invinoutsql, p, Trans);
+                            conn.Execute(invinoutitemsql, p, Trans);
+                            //更新仓库库存
+                            conn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = CoID, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                            //更新总库存数量
+                            var res = CommHaddle.GetWareCoidList(CoID);
+                            var CoIDLst = res.d as List<string>;
+                            conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, CoIDLst = CoIDLst, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                        }
+                    }
                 }
+                Trans.Commit();
+                CoreUser.LogComm.InsertUserLog(TypeName + "单据-作废", "sfc_item", "单据ID" + ID, UserName, int.Parse(CoID), DateTime.Now);
             }
             catch (Exception e)
             {
