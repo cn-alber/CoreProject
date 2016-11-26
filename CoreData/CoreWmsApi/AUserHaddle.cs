@@ -62,7 +62,7 @@ namespace CoreData.CoreWmsApi
                                             FROM
                                                 warehouse
                                             WHERE
-                                                ID = @WhID
+                                                ID = @WhID AND Enable=1
                                             UNION
                                                 SELECT
                                                     warehouse.ID,
@@ -77,7 +77,7 @@ namespace CoreData.CoreWmsApi
                                                         FROM
                                                             warehouse
                                                         WHERE
-                                                            ID = @WhID
+                                                            ID = @WhID AND Enable=1
                                                     )";
                             var AWhLst = DbBase.CommDB.Query<AWarehouse>(wsql, new { WhID = WhID }).AsList();
                             Lst[0].AWhLst = AWhLst;
