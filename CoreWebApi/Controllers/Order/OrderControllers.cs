@@ -862,13 +862,33 @@ namespace CoreWebApi
         public ResponseResult CancleOrdMerge([FromBodyAttribute]JObject co)
         {   
             var oid = new List<int>();
-            if(co["OID"] != null)
+            string Type = "";
+            if(co["Type"] != null)
             {
-                oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+                Type = co["Type"].ToString();
+                if(Type.ToUpper() != "A" && Type.ToUpper() != "B")
+                {
+                    return CoreResult.NewResponse(-1, "请选择合并选项", "General");
+                }
+                if(Type.ToUpper() == "A")
+                {
+                    if(co["OID"] != null)
+                    {
+                        oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "请选择需还原合并的订单", "General");
+                    }
+                }
+            }
+            else
+            {   
+                return CoreResult.NewResponse(-1, "请选择合并选项", "General");
             }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
-            var data = OrderHaddle.CancleOrdMerge(oid,CoID,username);
+            var data = OrderHaddle.CancleOrdMerge(oid,Type,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
