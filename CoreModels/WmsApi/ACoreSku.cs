@@ -21,12 +21,17 @@ namespace CoreModels.WmsApi
     }
     public class ASkuScan
     {
+        public int ID { get; set; }
         public string SkuID { get; set; }
         public string SkuName { get; set; }
         public string GoodsCode { get; set; }
-        public string ColorName { get; set; }
-        public string SizeName { get; set; }
         public string Norm { get; set; }
         public int SkuType { get; set; }
-    }  
+    }
+
+    public class ASkuScanParam
+    {
+        public int CoID { get; set; }
+        public string BarCode { get; set; }
+    }
 }

@@ -9,14 +9,14 @@ namespace CoreWebApi
     public class ABoxController : ControllBase
     {
         #region 重装箱作业-根据件码获取SKU
-        [HttpPostAttribute("Core/Api/ABox/SkuByBarCode")]
-        public ResponseResult SkuByBarCode([FromBodyAttribute]JObject obj)
+        [HttpGetAttribute("Core/ABox/SkuByBarCode")]
+        public ResponseResult SkuByBarCode(string BarCode)
         {
-            var Args = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiBoxParam>(obj.ToString());
+            // var Args = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiBoxParam>(obj.ToString());
             var cp = new WmsBoxParams();
-            cp.CoID = Args.CoID;
-            cp.BarCode = Args.BarCode;
-            cp.SkuID = Args.SkuID;
+            cp.CoID = int.Parse(GetCoid());
+            cp.BarCode = BarCode;
+            // cp.SkuID = Args.SkuID;
             var res = AWmsBoxHaddle.CheckBarCode(cp);
             return CoreResult.NewResponse(res.s, res.d, "General");
         }

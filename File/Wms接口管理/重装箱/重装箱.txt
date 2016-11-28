@@ -2,13 +2,10 @@
 function说明
 ############################################################
 1.SkuByBarCode()//重装箱作业-根据件码获取SKU
-    方法：POST
-    路由：http://192.168.30.29:5000/Core/Api/ABox/SkuByBarCode
-    参数: ApiBoxParam
+    方法：Get
+    路由：http://192.168.30.211:5000/Core/ABox/SkuByBarCode?BarCode=GB2312001001000001    
     InPut:
-        CoID        int         公司编号
         BarCode     string      件码
-        SkuID       string      商品编码
     OutPut:
         SkuLst      ACoreSku    商品信息
  参考:input json 文件:SkuByBarCode_input.json 

@@ -18,39 +18,43 @@ namespace CoreData.CoreWmsApi
         #region Api Check BarCode 重装箱作业-装箱条码检查
         public static DataResult CheckBarCode(WmsBoxParams IParam)
         {
-            var res = new DataResult(1, null);
+            var result = new DataResult(1, null);
+            var CommConn = new MySqlConnection(DbBase.CommConnectString);
+            CommConn.Open();
             try
             {
-                int count = DbBase.GoodsDB.QueryFirst<int>("select count(ID) from wmsbox where CoID=@CoID and BarCode=@BarCode", new { CoID = IParam.CoID, BarCode = IParam.BarCode });
-                if (count > 0)
+                var res = AUserHaddle.GetUniqCode(IParam.CoID.ToString());
+                if (res.s == 1)
                 {
-                    res.s = -1;
-                    res.d = "此条码已装箱";
-                }
-                else
-                {
-                    var Lst = DbBase.CoreDB.Query<ACoreSku>("select * from coresku where CoID=@CoID and SkuID=@SkuID", new { CoID = IParam.CoID, SkuID = IParam.SkuID }).AsList();
-                    if (Lst.Count == 0)
+                    var uniq = Convert.ToInt32(res.d);
+                    if (uniq == 1)
                     {
-                        res.s = -1;
-                        res.d = "无效条码";
+                        int count = CommConn.QueryFirst<int>("select count(ID) from wmsbox where CoID=@CoID and BarCode=@BarCode", new { CoID = IParam.CoID, BarCode = IParam.BarCode });
+                        if (count > 0)
+                        {
+                            result.s = -6001;//此条码已装箱
+                        }
                     }
-                    else
-                        res.d = Lst;
+                    if (result.s == 1)
+                    {
+                        var cp = new ASkuScanParam();
+                        cp.CoID = IParam.CoID;
+                        cp.BarCode = IParam.BarCode;
+                        result = ASkuScanHaddles.GetType(cp);//获取条码资料
+                    }
                 }
-
             }
             catch (Exception e)
             {
-                res.s = -1;
-                res.d = e.Message;
+                result.s = -1;
+                result.d = e.Message;
             }
             finally
             {
-                DbBase.GoodsDB.Close();
-                DbBase.CoreDB.Close();
+                CommConn.Close();
             }
-            return res;
+
+            return result;
         }
         #endregion
         #region 重装箱作业-产生装箱资料WmsBox
@@ -98,7 +102,7 @@ namespace CoreData.CoreWmsApi
             return res;
         }
         #endregion
-        
+
         #region 新增装箱资料
         public static List<AWmsBox> NewWmsboxLst(WmsBoxParams IParam)
         {

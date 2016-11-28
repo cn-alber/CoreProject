@@ -1,0 +1,13 @@
+接口名称：AUserController
+路径：..\CoreProject\CoreWebApi\Controllers\WmsApi\AUserController.cs
+function说明
+############################################################
+1.ALogin()//用户登陆 - 根据账号密码获取仓库打印等基础信息
+    方法：GET
+    路由：http://192.168.30.211:5000/Core/AUser/ALogin?Account=admin&Password=admin
+    参考:output json 文件:ALogin_output.json  
+2.AUniCode()//Wms检查 - 是否启用 唯一码管理
+    方法：GET
+    路由：http://192.168.30.211:5000/Core/AUser/AUniCode
+    OutPut:
+        GoodsUniqueCode     int       是否启用唯一码（1.启用 0.停用）

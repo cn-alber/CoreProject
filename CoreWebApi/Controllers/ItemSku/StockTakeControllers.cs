@@ -11,7 +11,7 @@ using CoreModels;
 namespace CoreWebApi.XyCore
 
 {
-    // [AllowAnonymous]
+    [AllowAnonymous]
     public class StockTakeControllers : ControllBase
     {
         #region 库存盘点-表头查询
@@ -32,11 +32,11 @@ namespace CoreWebApi.XyCore
             }
             if (DateTime.TryParse(DateT, out dt))
             {
-                string date =  Convert.ToDateTime(DateF).ToString("yyyy-MM-dd")+" "+"23:59:59";
+                string date = Convert.ToDateTime(DateF).ToString("yyyy-MM-dd") + " " + "23:59:59";
                 cp.DateT = DateT;
             }
             if (!string.IsNullOrEmpty(Status) && int.TryParse(Status, out x))
-            {                
+            {
                 cp.Status = Status;
             }
             if (int.TryParse(Skuautoid, out x))
@@ -83,7 +83,10 @@ namespace CoreWebApi.XyCore
             int x;
             if (int.TryParse(ParentID, out x))
             {
-                res = StockTakeHaddle.GetStockTakeItem(GetCoid(), ParentID);
+                var cp = new Sfc_item_param();
+                cp.CoID = GetCoid();
+                cp.ParentID = int.Parse(ParentID);
+                res = StockTakeHaddle.GetStockTakeItem(cp);
             }
             else
             {
@@ -226,5 +229,47 @@ namespace CoreWebApi.XyCore
         }
         #endregion
 
+        #region 保存备注 - 查询
+        [HttpGetAttribute("Core/XyCore/StockTake/TakeRemarkQuery")]
+        public ResponseResult TakeRemarkQuery(string ID)
+        {
+            var res = new DataResult(1, null);
+            int x;
+            if (int.TryParse(ID, out x))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                string CoID = GetCoid();
+                res = StockTakeHaddle.StockTakeRemarkQuery(ID, CoID);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 保存备注 - 更新
+        [HttpPostAttribute("Core/XyCore/StockTake/UptTakeRemark")]
+        public ResponseResult UptTakeRemark([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            int x;
+            if (!(obj["ID"] != null && int.TryParse(obj["ID"].ToString(), out x)))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                string CoID = GetCoid();
+                string UserName = GetUname();
+                string ID = obj["ID"].ToString();
+                string Remark = obj["Remark"].ToString();
+                res = StockTakeHaddle.UptStockTakeRemark(ID, Remark, CoID, UserName);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
     }
 }

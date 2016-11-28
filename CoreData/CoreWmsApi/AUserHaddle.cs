@@ -7,6 +7,7 @@ using CoreModels.WmsApi;
 using Dapper;
 using MySql.Data.MySqlClient;
 using System;
+using System.Security.Claims;
 
 namespace CoreData.CoreWmsApi
 {
@@ -21,7 +22,7 @@ namespace CoreData.CoreWmsApi
                 try
                 {
                     var p = new DynamicParameters();
-                    string sql = @"SELECT
+                    string sql = @"SELECT `user`.ID,
                             `user`.Account,
                             `user`.`Name`,
                             `user`.`PassWord`,
@@ -78,7 +79,7 @@ namespace CoreData.CoreWmsApi
                                                             warehouse
                                                         WHERE
                                                             ID = @WhID AND Enable=1
-                                                    )";
+                                                    )  AND warehouse.Enable=1";
                             var AWhLst = DbBase.CommDB.Query<AWarehouse>(wsql, new { WhID = WhID }).AsList();
                             Lst[0].AWhLst = AWhLst;
                             var IPLst = DbBase.CommDB.Query<Printer>("SELECT PrintType,IPAddress FROM printer WHERE CoID=@CoID AND IsDefault=1 AND Enabled=1", new { CoID = Lst[0].CompanyID }).AsList();
@@ -97,7 +98,7 @@ namespace CoreData.CoreWmsApi
                                         break;
                                 }
                             }
-                            res.d=Lst;
+                            res.d=Lst[0];
                         }
                     }
                 }
@@ -111,10 +112,39 @@ namespace CoreData.CoreWmsApi
                     conn.Dispose();
                     DbBase.CommDB.Close();
                 }
-
-                return res;
-            }
-
+            }         
+            return res;
         }
-    }
+
+        public static DataResult GetUniqCode(string CoID)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    var data = conn.Query<int>("SELECT GoodsUniqueCode FROM ware_setting WHERE CoID=@CoID",new{CoID=CoID}).AsList();
+                    if(data.Count>0)
+                    {
+                        result.d = data[0];
+                    }
+                    else
+                    {
+                        result.s = -1;
+                    }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+                finally
+                {
+                    conn.Dispose();
+                    DbBase.CommDB.Close();
+                }
+            }
+            return result;
+        }
+    }    
 }

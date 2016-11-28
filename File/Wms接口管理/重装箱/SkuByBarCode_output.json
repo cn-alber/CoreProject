@@ -1,20 +1,12 @@
 {
     "s": 1,
-    "d": [
-        {
-            "ID": 27,
-            "SkuID": "NJR201605070007043",
-            "GoodsCode": "NJR20160507",
-            "ColorName": "棕色",
-            "SizeName": "11",
-            "Qty": 0,
-            "PCode": null,
-            "MaxQty": 0,
-            "IsBox": false,
-            "PCodeID": 0,
-            "SortCode": null,
-            "Type": 0
-        }
-    ],
+    "d": {
+        "ID": 17610,
+        "SkuID": "GB2312001001",
+        "SkuName": "GB2312",
+        "GoodsCode": "GB2312",
+        "Norm": "白色1;S",
+        "SkuType": 0
+    },
     "m": ""
 }

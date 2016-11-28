@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 namespace CoreModels.WmsApi
 {
-     public partial class AUser
+    public partial class AUser
     {
+        public int ID { get; set; }
         public string Account { get; set; }
         public string Name { get; set; }
         public string PassWord { get; set; }

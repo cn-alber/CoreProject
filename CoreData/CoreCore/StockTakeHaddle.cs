@@ -122,63 +122,59 @@ namespace CoreData.CoreCore
         #endregion
 
         #region 库存盘点-查询-子表
-        public static DataResult GetStockTakeItem(string CoID, string ParentID)
+        public static DataResult GetStockTakeItem(Sfc_item_param IParam)
         {
             var result = new DataResult(1, null);
-            var Item = new Sfc_item_query();
-            string sql = @"SELECT ID,Skuautoid,Qty,InvQty FROM sfc_item WHERE CoID = @CoID AND ParentID=@ParentID AND Type = 2";
+            var cs = new Sfc_item_query();
             using (var conn = new MySqlConnection(DbBase.CoreConnectString))
             {
                 try
                 {
-                    var ItemLst = conn.Query<Sfc_item_view>(sql, new { CoID = CoID, ParentID = ParentID }).AsList();
-                    if (ItemLst.Count > 0)
+                    StringBuilder querysql = new StringBuilder();
+                    StringBuilder querycount = new StringBuilder();
+                    querycount.Append("SELECT count(ID) FROM sfc_item WHERE CoID = @CoID AND ParentID=@ParentID AND Type = 2");//单据类型(1.期初，2.盘点，3.调拨)
+                    querysql.Append("SELECT ID,Skuautoid,Qty,InvQty FROM sfc_item WHERE CoID = @CoID AND ParentID=@ParentID AND Type = 2");
+                    var p = new DynamicParameters();
+                    p.Add("@CoID", IParam.CoID);
+                    p.Add("@ParentID", IParam.ParentID);
+                    var DataCount = conn.QueryFirst<int>(querycount.ToString(), p);
+                    if (DataCount < 0)
                     {
-                        var SkuIDLst = ItemLst.Select(a => a.Skuautoid).Distinct().AsList();
-                        var res = CommHaddle.GetSkuViewByID(CoID, SkuIDLst);
-                        var SkuViewLst = res.d as List<CoreSkuView>;//获取商品Sku资料,拼接Lst显示
-                        ItemLst = (from a in ItemLst
-                                   join b in SkuViewLst on a.Skuautoid equals b.ID into data
-                                   from c in data.DefaultIfEmpty()
-                                   select new Sfc_item_view
-                                   {
-                                       ID = a.ID,
-                                       Skuautoid = a.Skuautoid,
-                                       InvQty = a.InvQty,
-                                       Qty = a.Qty,
-                                       SkuID = c == null ? "" : c.SkuID,
-                                       SkuName = c == null ? "" : c.SkuName,
-                                       Norm = c == null ? "" : c.Norm,
-                                       Img = c == null ? "" : c.Img
-                                   }).AsList();
-                        // ItemLst = (from a in ItemLst
-                        //            join b in SkuViewLst                                   
-                        //    on new { Skuautoid = a.Skuautoid } equals new { Skuautoid = b.ID }
-                        //    group new { a, b } by new
-                        //    {
-                        //        a.ID,
-                        //        a.Skuautoid,
-                        //        a.InvQty,
-                        //        a.Qty,
-                        //        b.SkuID,
-                        //        b.SkuName,
-                        //        b.Norm,
-                        //        b.Img
-                        //    } into c
-                        //    select new Sfc_item_view
-                        //    {
-                        //        ID = c.Key.ID,
-                        //        Skuautoid = c.Key.Skuautoid,
-                        //        InvQty = c.Key.InvQty,
-                        //        Qty = c.Key.Qty,
-                        //        SkuID = c.Key.SkuID,
-                        //        SkuName = c.Key.SkuName,
-                        //        Norm = c.Key.Norm,
-                        //        Img = c.Key.Img
-                        //    }).AsList();
-                        Item.ItemLst = ItemLst;
+                        result.s = -3001;
                     }
-                    result.d = Item;
+                    else
+                    {
+                        cs.DataCount = DataCount;
+                        decimal pagecnt = Math.Ceiling(decimal.Parse(cs.DataCount.ToString()) / decimal.Parse(IParam.PageSize.ToString()));
+                        cs.PageCount = Convert.ToInt32(pagecnt);
+                        int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
+                        querysql.Append(" LIMIT @ls , @le");
+                        p.Add("@ls", dataindex);
+                        p.Add("@le", IParam.PageSize);
+                        var ItemLst = conn.Query<Sfc_item_view>(querysql.ToString(), p).AsList();
+                        if (ItemLst.Count > 0)
+                        {
+                            var SkuIDLst = ItemLst.Select(a => a.Skuautoid).Distinct().AsList();
+                            var res = CommHaddle.GetSkuViewByID(IParam.CoID, SkuIDLst);
+                            var SkuViewLst = res.d as List<CoreSkuView>;//获取商品Sku资料,拼接Lst显示
+                            ItemLst = (from a in ItemLst
+                                       join b in SkuViewLst on a.Skuautoid equals b.ID into data
+                                       from c in data.DefaultIfEmpty()
+                                       select new Sfc_item_view
+                                       {
+                                           ID = a.ID,
+                                           Skuautoid = a.Skuautoid,
+                                           InvQty = a.InvQty,
+                                           Qty = a.Qty,
+                                           SkuID = c == null ? "" : c.SkuID,
+                                           SkuName = c == null ? "" : c.SkuName,
+                                           Norm = c == null ? "" : c.Norm,
+                                           Img = c == null ? "" : c.Img
+                                       }).AsList();
+                        }
+                        cs.ItemLst = ItemLst;
+                    }
+                    result.d = cs;
                 }
                 catch (Exception e)
                 {
@@ -571,6 +567,70 @@ namespace CoreData.CoreCore
         }
         #endregion
 
+
+        #region 保存备注 - 查询
+        public static DataResult StockTakeRemarkQuery(string ID, string CoID)
+        {
+
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                try
+                {
+                    string querysql = "SELECT Remark FROM sfc_main WHERE CoID=@CoID AND ID=@ID";
+                    var data = conn.Query<string>(querysql, new { CoID = CoID, ID = ID }).AsList();
+                    if (data.Count > 0)
+                    {
+                        result.d = data[0];
+                    }
+                    else
+                    {
+                        result.s = -1;
+                    }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+                finally
+                {
+                    conn.Dispose();
+                    conn.Close();
+                }
+            }
+            return result;
+        }
+        #endregion
+
+        #region 保存备注 - 更新
+        public static DataResult UptStockTakeRemark(string ID, string Remark, string CoID, string UserName)
+        {
+            var result = new DataResult(1, null);
+            var conn = new MySqlConnection(DbBase.CoreConnectString);
+            conn.Open();
+            var Trans = conn.BeginTransaction();
+            try
+            {
+                string sql = "UPDATE sfc_main SET Remark = @Remark,Modifier = @Modifier,ModifyDate = @ModifyDate WHERE CoID = @CoID AND ID=@ID";
+                conn.Execute(sql, new { CoID = CoID, ID = ID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                Trans.Commit();
+            }
+            catch (Exception e)
+            {
+                Trans.Rollback();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                Trans.Dispose();
+                conn.Dispose();
+                conn.Close();
+            }
+            return result;
+        }
+        #endregion
         #region Sql-新增-盘点单
         public static string AddSfcMainSql()
         {

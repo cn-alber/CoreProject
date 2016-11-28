@@ -1,0 +1,47 @@
+{
+    "s": 1,
+    "d": {
+        "Account": "admin",
+        "Name": "系统管理员",
+        "PassWord": "1bb80ddcd9b3943d07a09e5796451c8f",
+        "Enable": true,
+        "CompanyID": 1,
+        "RoleID": 1,
+        "AWhLst": [
+            {
+                "ID": 133,
+                "WarehouseName": "南极云商",
+                "Type": 0
+            },
+            {
+                "ID": 134,
+                "WarehouseName": "南极云商常熟配送1仓1",
+                "Type": 1
+            },
+            {
+                "ID": 135,
+                "WarehouseName": "南极云商常熟配送2仓",
+                "Type": 2
+            },
+            {
+                "ID": 136,
+                "WarehouseName": "南极云商常熟销退1仓2",
+                "Type": 3
+            },
+            {
+                "ID": 137,
+                "WarehouseName": "南极云商常熟进货1仓3",
+                "Type": 4
+            },
+            {
+                "ID": 138,
+                "WarehouseName": "南极云商常熟次品1仓4",
+                "Type": 5
+            }
+        ],
+        "IPAddress": "192.168.30.18",
+        "ExpressIP": "192.168.30.18",
+        "BarIp": "192.168.30.18"
+    },
+    "m": ""
+}
