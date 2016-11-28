@@ -4301,7 +4301,7 @@ namespace CoreData.CoreCore
                     }
                     res.OrdAbnormalStatus = ss;
                     //分销商
-                    string sqlcommand = "select ID,DistributorName as Name from distributor where coid =" + CoID + " and enable = true";
+                    string sqlcommand = "select ID,DistributorName as Name from distributor where coid =" + CoID + " and enable = true and type = 0";
                     var Distributor = conn.Query<AbnormalReason>(sqlcommand).AsList();
                     var aa = new List<Filter>();
                     foreach(var d in Distributor)
@@ -9360,8 +9360,8 @@ namespace CoreData.CoreCore
         {
             var result = new DataResult(1,null);
             var logs = new List<Log>();
-            var res = new ComDisExchangeReturn();
-            var su = new List<ComDisExchangeSuccess>();
+            var res = new SetOrdTypeReturn();
+            var su = new List<SetOrdTypeSuccess>();
             var fa = new List<TransferNormalReturnFail>();
             string sqlCommandText = string.Empty;
             int count = 0;
@@ -9370,7 +9370,7 @@ namespace CoreData.CoreCore
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
-                sqlCommandText = "select id,soid,type,status,coid from `order` where id in @ID and coid = @Coid";
+                sqlCommandText = "select id,soid,type,status,coid,SupDistributor,AbnormalStatus,StatusDec from `order` where id in @ID and coid = @Coid";
                 var ord = CoreDBconn.Query<Order>(sqlCommandText,new{ID = oid,Coid=CoID}).AsList();
                 if(ord.Count == 0)
                 {
@@ -9451,25 +9451,49 @@ namespace CoreData.CoreCore
                     log.LogDate = DateTime.Now;
                     log.UserName = UserName;
                     log.Title = "转成分销 + 订单";
-                    // log.Remark = "普通订单=>天猫分销";
                     log.CoID = CoID;
                     logs.Add(log);     
-                    
+                    if(string.IsNullOrEmpty(a.SupDistributor))
+                    {
+                        int reasonid = GetReasonID("不明确分销",CoID,7).s;
+                        if(reasonid == -1)
+                        {
+                            result.s = -1;
+                            result.d = "请先设定【不明确分销】的异常";
+                            return result;
+                        }
+                        a.Status = 7;
+                        a.AbnormalStatus = reasonid;
+                        a.StatusDec="不明确分销";
+                        log = new Log();
+                        log.OID = a.ID;
+                        log.SoID = a.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "标记异常";
+                        log.Remark = "不明确分销(转换订单类型时判断:不能通过分销规则自动判断供销商)";
+                        log.CoID = CoID;
+                        logs.Add(log);     
+                    }
                     a.Modifier = UserName;
                     a.ModifyDate = DateTime.Now;
-                    sqlCommandText = "update `order` set Type=@Type,Status=@Status,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
+                    sqlCommandText = @"update `order` set Type=@Type,Status=@Status,AbnormalStatus=@AbnormalStatus,StatusDec=@StatusDec,Modifier=@Modifier,
+                                       ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
                     count = CoreDBconn.Execute(sqlCommandText,a,TransCore);
                     if(count < 0)
                     {
                         result.s = -1;
                         return result;
                     }
-                    var ss = new ComDisExchangeSuccess();
+                    var ss = new SetOrdTypeSuccess();
                     ss.ID = a.ID;
                     ss.Type = a.Type;
                     ss.TypeString = GetTypeName(a.Type);
                     ss.Status = a.Status;
                     ss.StatusDec = Enum.GetName(typeof(OrdStatus), a.Status);
+                    ss.AbnormalStatus = a.AbnormalStatus;
+                    ss.AbnormalStatusDec = a.StatusDec;
                     su.Add(ss);
                 }
                 string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
@@ -9499,6 +9523,330 @@ namespace CoreData.CoreCore
             }
             return result;
         }
+        ///<summary>
+        ///取消分销+属性订单
+        ///</summary>
+        public static DataResult CancleSetOrdType(List<int> oid,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var logs = new List<Log>();
+            var res = new SetOrdTypeReturn();
+            var su = new List<SetOrdTypeSuccess>();
+            var fa = new List<TransferNormalReturnFail>();
+            string sqlCommandText = string.Empty;
+            int count = 0;
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                sqlCommandText = "select id,soid,type,status,coid,SupDistributor,AbnormalStatus,StatusDec from `order` where id in @ID and coid = @Coid";
+                var ord = CoreDBconn.Query<Order>(sqlCommandText,new{ID = oid,Coid=CoID}).AsList();
+                if(ord.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "订单单号无效!";
+                    return result;
+                }
+                foreach(var a in ord)
+                {
+                    if(a.Type == 3)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "天猫分销的订单不可操作!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    if(a.Status != 0 && a.Status !=1  && a.Status !=7)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "只有异常/待付款/已付款待审核的订单才可以操作!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    if(a.Type == 0 || a.Type == 1 || a.Type == 2 || a.Type == 4 || a.Type == 5 || a.Type == 11 || a.Type == 12 || a.Type == 13 || a.Type == 14 || a.Type == 15)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "订单不是分销属性,不可操作!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    if(a.Type == 6)
+                    {
+                        a.Type = 0; 
+                    }
+                    if(a.Type == 7)
+                    {
+                        a.Type = 1; 
+                    }
+                    if(a.Type == 8)
+                    {
+                        a.Type = 2; 
+                    }
+                    if(a.Type == 9)
+                    {
+                        a.Type = 4; 
+                    }
+                    if(a.Type == 10)
+                    {
+                        a.Type = 5; 
+                    }
+                    if(a.Type == 16)
+                    {
+                        a.Type = 11; 
+                    }
+                    if(a.Type == 17)
+                    {
+                        a.Type = 12; 
+                    }
+                    if(a.Type == 18)
+                    {
+                        a.Type = 13; 
+                    }
+                    if(a.Type == 19)
+                    {
+                        a.Type = 14; 
+                    }
+                    if(a.Type == 20)
+                    {
+                        a.Type = 15; 
+                    }
+                    var log = new Log();
+                    log.OID = a.ID;
+                    log.SoID = a.SoID;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "取消订单分销 + 属性";
+                    log.CoID = CoID;
+                    logs.Add(log);     
+                    if(a.Status == 7 && a.StatusDec == "不明确分销")
+                    {
+                        if(a.Amount == a.PaidAmount)
+                        {
+                            a.Status = 1;
+                        }
+                        else
+                        {
+                            a.Status = 0;
+                        }
+                        a.AbnormalStatus = 0;
+                        a.StatusDec="";
+                        log = new Log();
+                        log.OID = a.ID;
+                        log.SoID = a.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "取消异常标记";
+                        log.Remark = "不明确分销";
+                        log.CoID = CoID;
+                        logs.Add(log);     
+                    }
+                    a.SupDistributor = null;
+                    a.Modifier = UserName;
+                    a.ModifyDate = DateTime.Now;
+                    sqlCommandText = @"update `order` set Type=@Type,Status=@Status,AbnormalStatus=@AbnormalStatus,StatusDec=@StatusDec,Modifier=@Modifier,
+                                       ModifyDate=@ModifyDate,SupDistributor=@SupDistributor where id = @ID and coid = @Coid";
+                    count = CoreDBconn.Execute(sqlCommandText,a,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -1;
+                        return result;
+                    }
+                    var ss = new SetOrdTypeSuccess();
+                    ss.ID = a.ID;
+                    ss.Type = a.Type;
+                    ss.TypeString = GetTypeName(a.Type);
+                    ss.Status = a.Status;
+                    ss.StatusDec = Enum.GetName(typeof(OrdStatus), a.Status);
+                    ss.AbnormalStatus = a.AbnormalStatus;
+                    ss.AbnormalStatusDec = a.StatusDec;
+                    su.Add(ss);
+                }
+                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                count = CoreDBconn.Execute(loginsert,logs, TransCore);
+                if (count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                res.SuccessIDs = su;
+                res.FailIDs = fa;
+                result.d = res;
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            return result;
+        }
+        ///<summary>
+        ///获取供销商List
+        ///</summary>
+        public static DataResult GetSupDistributor(int CoID)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{  
+                    //分销商
+                    string sqlcommand = "select ID as value,DistributorName as label from distributor where coid =" + CoID + " and enable = true and type = 1";
+                    var u = conn.Query<Filter>(sqlcommand).AsList();
+                    result.d = u;                    
+                    }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }  
+            return result;
+        }
+        ///<summary>
+        ///指定供销商
+        ///</summary>
+        public static DataResult SetSupDistributor(List<int> oid,int sd,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var logs = new List<Log>();
+            var res = new SetSupDistributorReturn();
+            var su = new List<SetSupDistributorSuccess>();
+            var fa = new List<TransferNormalReturnFail>();
+            int count = 0;
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlCommandText = "select ID as value,DistributorName as label from distributor where coid =" + CoID + " and enable = true and type = 1 and ID = " + sd;
+                var SupDistributor = CoreDBconn.Query<Filter>(sqlCommandText).AsList();
+                if(SupDistributor.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "供销商ID无效!";
+                    return result;
+                }
+                string SupDistributorName = SupDistributor[0].label;
+                sqlCommandText = "select id,soid,type,status,coid,SupDistributor,AbnormalStatus,StatusDec from `order` where id in @ID and coid = @Coid";
+                var ord = CoreDBconn.Query<Order>(sqlCommandText,new{ID = oid,Coid=CoID}).AsList();
+                if(ord.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "订单单号无效!";
+                    return result;
+                }
+                foreach(var a in ord)
+                {
+                    if(a.Type == 3)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "天猫分销的订单不可操作!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    if(a.Status != 0 && a.Status !=1  && a.Status !=7)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "只有异常/待付款/已付款待审核的订单才可以操作!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    if(a.Type == 0 || a.Type == 1 || a.Type == 2 || a.Type == 4 || a.Type == 5 || a.Type == 11 || a.Type == 12 || a.Type == 13 || a.Type == 14 || a.Type == 15)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "订单不是分销属性,不可操作!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    a.SupDistributor = SupDistributorName;
+                    var log = new Log();
+                    log.OID = a.ID;
+                    log.SoID = a.SoID;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "强制指定供销商";
+                    log.Remark = "取消不明确分销";
+                    log.CoID = CoID;
+                    logs.Add(log);     
+                    if(a.Status == 7 && a.StatusDec == "不明确分销")
+                    {
+                        if(a.Amount == a.PaidAmount)
+                        {
+                            a.Status = 1;
+                        }
+                        else
+                        {
+                            a.Status = 0;
+                        }
+                        a.AbnormalStatus = 0;
+                        a.StatusDec="";
+                    }
+                    a.Modifier = UserName;
+                    a.ModifyDate = DateTime.Now;
+                    sqlCommandText = @"update `order` set SupDistributor=@SupDistributor,Status=@Status,AbnormalStatus=@AbnormalStatus,StatusDec=@StatusDec,Modifier=@Modifier,
+                                       ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
+                    count = CoreDBconn.Execute(sqlCommandText,a,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -1;
+                        return result;
+                    }
+                    var ss = new SetSupDistributorSuccess();
+                    ss.ID = a.ID;
+                    ss.SupDistributor = a.SupDistributor;
+                    ss.Status = a.Status;
+                    ss.StatusDec = Enum.GetName(typeof(OrdStatus), a.Status);
+                    ss.AbnormalStatus = a.AbnormalStatus;
+                    ss.AbnormalStatusDec = a.StatusDec;
+                    su.Add(ss);
+                }
+                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                count = CoreDBconn.Execute(loginsert,logs, TransCore);
+                if (count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                res.SuccessIDs = su;
+                res.FailIDs = fa;
+                result.d = res;
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            return result;
+        }
+        
+
+
+
 
 
 

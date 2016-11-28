@@ -509,3 +509,30 @@ output: s=1成功 else 错误代码
 参考:input jason 文件:ComDisExchange_input.json
 参考:output jason 文件:ComDisExchange_output.json
 
+48.SetOrdType()订单转成分销属性
+路由:http://localhost:5000/Core/Order/SetOrdType
+input:OID            List<int>   订单单号List
+output: s=1成功 else 错误代码
+参考:input jason 文件:SetOrdType_input.json
+参考:output jason 文件:SetOrdType_output.json
+
+49.CancleSetOrdType()取消订单分销属性
+路由:http://localhost:5000/Core/Order/CancleSetOrdType
+input:OID            List<int>   订单单号List
+output: s=1成功 else 错误代码
+参考:input jason 文件:CancleSetOrdType_input.json
+参考:output jason 文件:CancleSetOrdType_output.json
+
+50.GetSupDistributor()获取供销商List
+路由:http://localhost:5000/Core/Order/GetSupDistributor
+input:
+output:供销商资料List
+参考:output jason 文件:GetSupDistributor_output.json
+
+51.SetSupDistributor()设定供销商
+路由:http://localhost:5000/Core/Order/SetSupDistributor
+input:OID            List<int>   订单单号List
+      SupDistributor int         供销商ID
+output: s=1成功 else 错误代码
+参考:input jason 文件:SetSupDistributor_input.json
+参考:output jason 文件:SetSupDistributor_output.json

@@ -1,0 +1,29 @@
+{
+    "s": 1,
+    "d": {
+        "SuccessIDs": [
+            {
+                "ID": 10809,
+                "Type": 6,
+                "TypeString": "普通订单,分销+",
+                "Status": 7,
+                "StatusDec": "异常",
+                "AbnormalStatus": 31,
+                "AbnormalStatusDec": "不明确分销"
+            },
+            {
+                "ID": 10810,
+                "Type": 6,
+                "TypeString": "普通订单,分销+",
+                "Status": 7,
+                "StatusDec": "异常",
+                "AbnormalStatus": 31,
+                "AbnormalStatusDec": "不明确分销"
+            }
+        ],
+        "FailIDs": [
+            
+        ]
+    },
+    "m": ""
+}
