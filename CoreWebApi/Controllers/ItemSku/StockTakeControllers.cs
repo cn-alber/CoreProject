@@ -64,7 +64,7 @@ namespace CoreWebApi.XyCore
             }
             else
             {
-                cp.SortField = "CreatDate";
+                cp.SortField = "CreateDate";
                 cp.SortDirection = "DESC";
             }
             cp.CoID = GetCoid();
