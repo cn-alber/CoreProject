@@ -62,4 +62,12 @@ namespace CoreModels.XyComm
         public string WhName { get; set; }
         public string CoID{get;set;}
     }
+    
+    public class WarehouseTree{
+        public int value{get;set;}
+        public string label{get;set;}
+    }
+
+
+
 }

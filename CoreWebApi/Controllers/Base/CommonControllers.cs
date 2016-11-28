@@ -152,6 +152,17 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
         #endregion
+         
+        #region 获取子仓库列表 (value label 格式)
+        [HttpGetAttribute("/Core/Common/GetChildWarehouseList2")]
+        public ResponseResult GetChildWarehouseList2()
+        { 
+            var data = new DataResult(1,null);  
+            int CoID = int.Parse(GetCoid());
+            data = WarehouseHaddle.GetChildWarehouseList2(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+        #endregion
 
         #region 获取商品类目列表
         [HttpGetAttribute("/Core/XyComm/Customkind/CommSkuKindLst")]
