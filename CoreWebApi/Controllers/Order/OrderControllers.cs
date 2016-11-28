@@ -862,13 +862,33 @@ namespace CoreWebApi
         public ResponseResult CancleOrdMerge([FromBodyAttribute]JObject co)
         {   
             var oid = new List<int>();
-            if(co["OID"] != null)
+            string Type = "";
+            if(co["Type"] != null)
             {
-                oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+                Type = co["Type"].ToString();
+                if(Type.ToUpper() != "A" && Type.ToUpper() != "B")
+                {
+                    return CoreResult.NewResponse(-1, "请选择合并选项", "General");
+                }
+                if(Type.ToUpper() == "A")
+                {
+                    if(co["OID"] != null)
+                    {
+                        oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "请选择需还原合并的订单", "General");
+                    }
+                }
+            }
+            else
+            {   
+                return CoreResult.NewResponse(-1, "请选择合并选项", "General");
             }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
-            var data = OrderHaddle.CancleOrdMerge(oid,CoID,username);
+            var data = OrderHaddle.CancleOrdMerge(oid,Type,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -1657,6 +1677,77 @@ namespace CoreWebApi
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = OrderHaddle.ComDisExchange(oid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/SetOrdType")]
+        public ResponseResult SetOrdType([FromBodyAttribute]JObject co)
+        {   
+            var oid = new List<int>();
+            if(co["OID"] != null)
+            {
+                oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单单号必填", "General");
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.SetOrdType(oid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/CancleSetOrdType")]
+        public ResponseResult CancleSetOrdType([FromBodyAttribute]JObject co)
+        {   
+            var oid = new List<int>();
+            if(co["OID"] != null)
+            {
+                oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单单号必填", "General");
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.CancleSetOrdType(oid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Order/GetSupDistributor")]
+        public ResponseResult GetSupDistributor()
+        {   
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.GetSupDistributor(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/SetSupDistributor")]
+        public ResponseResult SetSupDistributor([FromBodyAttribute]JObject co)
+        {   
+            var oid = new List<int>();
+            if(co["OID"] != null)
+            {
+                oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单单号必填", "General");
+            }
+            int sd = 0;
+            if(co["SupDistributor"] != null)
+            {
+                sd = int.Parse(co["SupDistributor"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "供销商ID必填", "General");
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.SetSupDistributor(oid,sd,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     }

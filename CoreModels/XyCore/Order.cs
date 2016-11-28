@@ -1024,4 +1024,33 @@ namespace CoreModels.XyCore
         public string Img{get;set;}
         public int Qty{get;set;}
     }
+    public class SetOrdTypeSuccess
+    {
+        public int ID{get;set;}
+        public int Type{get;set;}
+        public string TypeString{get;set;}
+        public int Status{get;set;}
+        public string StatusDec{get;set;}
+        public int AbnormalStatus{get;set;}
+        public string AbnormalStatusDec{get;set;}
+    }
+    public class SetOrdTypeReturn
+    {
+        public List<SetOrdTypeSuccess> SuccessIDs {get;set;}
+        public List<TransferNormalReturnFail> FailIDs {get;set;}
+    }
+    public class SetSupDistributorSuccess
+    {
+        public int ID{get;set;}
+        public string SupDistributor{get;set;}
+        public int Status{get;set;}
+        public string StatusDec{get;set;}
+        public int AbnormalStatus{get;set;}
+        public string AbnormalStatusDec{get;set;}
+    }
+    public class SetSupDistributorReturn
+    {
+        public List<SetSupDistributorSuccess> SuccessIDs {get;set;}
+        public List<TransferNormalReturnFail> FailIDs {get;set;}
+    }
 }

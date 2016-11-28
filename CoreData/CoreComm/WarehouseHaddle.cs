@@ -920,10 +920,10 @@ namespace CoreData.CoreComm
         ///<summary>
         ///根据主仓库代号查询子仓库List
         ///</summary>
-        public static DataResult GetChildWarehouseList(int CoID,int parentid)
+        public static DataResult GetChildWarehouseList(int CoID)
         {
             var result = new DataResult(1,null);     
-            string wheresql = "select * from warehouse where parentid = " +parentid + " and enable = true" + " and coid = " + CoID;
+            string wheresql = "select * from warehouse where parentid <> 0 and enable = true" + " and coid = " + CoID;
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try{    
                     var u = conn.Query<Warehouse>(wheresql).AsList();
@@ -936,6 +936,27 @@ namespace CoreData.CoreComm
             }           
             return result;
         }
+
+                ///<summary>
+        ///根据主仓库代号查询子仓库List 仅返回 value label
+        ///</summary>
+        public static DataResult GetChildWarehouseList2(int CoID)
+        {
+            var result = new DataResult(1,null);     
+            string wheresql = "select ID as value, WarehouseName as label from warehouse where parentid <> 0 and enable = true" + " and coid = " + CoID;
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{    
+                    var u = conn.Query<WarehouseTree>(wheresql).AsList();
+                    result.d = u;
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }           
+            return result;
+        }
+
         ///<summary>
         ///重新生成第三方物流服务号
         ///</summary>
