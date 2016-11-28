@@ -27,14 +27,16 @@ namespace CoreWebApi.XyCore
             }
             if (DateTime.TryParse(DateF, out dt))
             {
-                cp.DateF = DateF;
+                string date = Convert.ToDateTime(DateF).ToString("yyyy-MM-dd");
+                cp.DateF = date;
             }
             if (DateTime.TryParse(DateT, out dt))
             {
+                string date =  Convert.ToDateTime(DateF).ToString("yyyy-MM-dd")+" "+"23:59:59";
                 cp.DateT = DateT;
             }
             if (!string.IsNullOrEmpty(Status) && int.TryParse(Status, out x))
-            {
+            {                
                 cp.Status = Status;
             }
             if (int.TryParse(Skuautoid, out x))

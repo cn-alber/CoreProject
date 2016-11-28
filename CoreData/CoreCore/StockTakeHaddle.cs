@@ -52,14 +52,14 @@ namespace CoreData.CoreCore
                     }
                     if (!string.IsNullOrEmpty(IParam.DateF))
                     {
-                        querycount.Append(" AND CreateDate = @DateF");
-                        querysql.Append(" AND CreateDate = @DateF");
+                        querycount.Append(" AND CreateDate >= @DateF");
+                        querysql.Append(" AND CreateDate >= @DateF");
                         p.Add("@DateF", IParam.DateF);
                     }
                     if (!string.IsNullOrEmpty(IParam.DateT))
                     {
-                        querycount.Append(" AND CreateDate = @DateT");
-                        querysql.Append(" AND CreateDate = @DateT");
+                        querycount.Append(" AND CreateDate <= @DateT");
+                        querysql.Append(" AND CreateDate <= @DateT");
                         p.Add("@DateT", IParam.DateT);
                     }
                     if (!string.IsNullOrEmpty(IParam.Skuautoid))
