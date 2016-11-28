@@ -920,10 +920,10 @@ namespace CoreData.CoreComm
         ///<summary>
         ///根据主仓库代号查询子仓库List
         ///</summary>
-        public static DataResult GetChildWarehouseList(int CoID,int parentid)
+        public static DataResult GetChildWarehouseList(int CoID)
         {
             var result = new DataResult(1,null);     
-            string wheresql = "select * from warehouse where parentid = " +parentid + " and enable = true" + " and coid = " + CoID;
+            string wheresql = "select * from warehouse where parentid <> 0 and enable = true" + " and coid = " + CoID;
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try{    
                     var u = conn.Query<Warehouse>(wheresql).AsList();

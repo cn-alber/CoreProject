@@ -144,21 +144,11 @@ namespace CoreWebApi
         #endregion
         #region 获取子仓库列表
         [HttpGetAttribute("/Core/Common/GetChildWarehouseList")]
-        public ResponseResult GetChildWarehouseList(string ID)
-        {   
+        public ResponseResult GetChildWarehouseList()
+        { 
             var data = new DataResult(1,null);  
             int CoID = int.Parse(GetCoid());
-            int id,x;
-            if (int.TryParse(ID, out x))
-            {
-                id = int.Parse(ID);
-                data = WarehouseHaddle.GetChildWarehouseList(CoID,id);
-            }
-            else
-            {
-                data.s = -1;
-                data.d = "参数无效!";
-            }
+            data = WarehouseHaddle.GetChildWarehouseList(CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
         #endregion
