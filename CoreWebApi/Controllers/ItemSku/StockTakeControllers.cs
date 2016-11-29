@@ -255,7 +255,7 @@ namespace CoreWebApi.XyCore
         {
             var res = new DataResult(1, null);
             int x;
-            if (!(obj["ID"] != null && int.TryParse(obj["ID"].ToString(), out x)))
+            if (!(obj["ID"] != null && int.TryParse(obj["ID"].ToString(), out x)&&obj["Remark"]!=null))
             {
                 res.s = -1;
                 res.d = "无效参数";
