@@ -64,29 +64,29 @@ namespace CoreData.CoreCore
                                         WHERE
                                             CoID = @CoID";
                     string sql = @"SELECT
-                                    inventory.ID,
-                                    inventory.GoodsCode,
-                                    inventory.Skuautoid,
-                                    inventory.StockQty,
-                                    inventory.LockQty,
-                                    inventory.PickQty,
-                                    inventory.WaitInQty,
-                                    inventory.SaleRetuQty,
-                                    inventory.SafeQty,
-                                    inventory.DefectiveQty,
-                                    inventory.VirtualQty,
-                                    inventory.PurchaseQty,
-                                    inventory.CoID
-                            FROM
-                                inventory
-                            WHERE
-                                CoID = @CoID AND IsDelete=0";
+                                        ID,
+                                        GoodsCode,
+                                        Skuautoid,
+                                        StockQty,
+                                        LockQty,
+                                        PickQty,
+                                        WaitInQty,
+                                        SaleRetuQty,
+                                        SafeQty,
+                                        DefectiveQty,
+                                        VirtualQty,
+                                        PurchaseQty,
+                                        CoID
+                                    FROM
+                                        inventory_sale
+                                    WHERE
+                                        CoID = @CoID AND IsDelete=0";
                     querycount.Append(countsql);
                     querysql.Append(sql);
                     if (IParam.StockQtyb < IParam.StockQtye && IParam.StockQtyb > 0)
                     {
-                        querycount.Append(" AND inventory.StockQty > @StockQtyb AND inventory.StockQty < @StockQtye");
-                        querysql.Append(" AND inventory.StockQty > @StockQtyb AND inventory.StockQty < @StockQtye");
+                        querycount.Append(" AND inventory_sale.StockQty > @StockQtyb AND inventory_sale.StockQty < @StockQtye");
+                        querysql.Append(" AND inventory_sale.StockQty > @StockQtyb AND inventory_sale.StockQty < @StockQtye");
                         p.Add("@StockQtyb", IParam.StockQtyb);
                         p.Add("@StockQtye", IParam.StockQtye);
                     }
@@ -94,13 +94,13 @@ namespace CoreData.CoreCore
                     {
                         if (IParam.Status == 1)
                         {
-                            querycount.Append(" AND inventory.StockQty>=inventory.SafeQty");
-                            querysql.Append(" AND inventory.StockQty>=inventory.SafeQty");
+                            querycount.Append(" AND inventory_sale.StockQty>=inventory_sale.SafeQty");
+                            querysql.Append(" AND inventory_sale.StockQty>=inventory_sale.SafeQty");
                         }
                         else
                         {
-                            querycount.Append(" AND inventory.StockQty<inventory.SafeQty");
-                            querysql.Append(" AND inventory.StockQty<inventory.SafeQty");
+                            querycount.Append(" AND inventory_sale.StockQty<inventory_sale.SafeQty");
+                            querysql.Append(" AND inventory_sale.StockQty<inventory_sale.SafeQty");
                         }
                     }
                     if (is_subsql)
