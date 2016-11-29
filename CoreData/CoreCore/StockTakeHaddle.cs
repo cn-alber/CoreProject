@@ -310,7 +310,7 @@ namespace CoreData.CoreCore
                 {
                     contents = contents + "数量:" + itemOld.InvQty + "=>" + InvQty + ";";
                 }
-                if (string.IsNullOrEmpty(contents))
+                if (!string.IsNullOrEmpty(contents))
                 {
                     string sql = "UPDATE sfc_item SET InvQty = @InvQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID=@ID";
                     conn.Execute(sql, new { InvQty = InvQty, CoID = CoID, ID = ID, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
