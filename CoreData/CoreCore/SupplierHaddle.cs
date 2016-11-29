@@ -6,15 +6,15 @@ using MySql.Data.MySqlClient;
 
 namespace CoreData.CoreCore
 {
-    public static class DistributorHaddle{
-        public static List<distributorEnum> getDisEnum(string CoID){
-            var res = new List<distributorEnum>();
+    public static class SupplierHaddle{
+        public static List<supplierEnum> getSupEnum(string CoID){
+            var res = new List<supplierEnum>();
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try
                 {
-                    string sql = @"SELECT ID as value ,DistributorName as label FROM distributor WHERE CoID="+CoID+" AND Type = 0 AND `Enable`=TRUE;";
+                    string sql = @"SELECT ID as value ,DistributorName as label FROM distributor WHERE CoID="+CoID+" AND Type = 1 AND `Enable`=TRUE;";
                     Console.WriteLine(sql);
-                    res = conn.Query<distributorEnum>(sql).AsList();                                  
+                    res = conn.Query<supplierEnum>(sql).AsList();                                  
                 }
                 catch
                 {

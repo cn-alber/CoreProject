@@ -265,7 +265,21 @@ namespace CoreWebApi
         }
         #endregion
 
-
+        #region 获取供销列表接口
+        [HttpGetAttribute("/Core/Distributor/getSupEnum")]
+        public ResponseResult getDEnum()
+        {          
+            var res = new DataResult(1,null);                            
+            string Coid = GetCoid();         
+            var r = SupplierHaddle.getSupEnum(Coid);
+            r.Add(new supplierEnum{
+                value = 0,
+                label = "{自营}"
+            });  
+            res.d = r;
+            return CoreResult.NewResponse(res.s,res.d,"Api");
+        }
+        #endregion
 
     }
 }

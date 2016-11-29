@@ -129,6 +129,9 @@ namespace CoreModels.XyCore
 		public string label{get;set;}
     }
 
-
+    public class supplierEnum{
+        public int value{get;set;}
+		public string label{get;set;}
+    }
     
 }
