@@ -65,7 +65,6 @@ namespace CoreData.CoreCore
                                             CoID = @CoID";
                     string sql = @"SELECT
                                         ID,
-                                        GoodsCode,
                                         Skuautoid,
                                         StockQty,
                                         LockQty,
