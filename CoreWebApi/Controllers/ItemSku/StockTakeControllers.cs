@@ -11,7 +11,7 @@ using CoreModels;
 namespace CoreWebApi.XyCore
 
 {
-    [AllowAnonymous]
+    // [AllowAnonymous]
     public class StockTakeControllers : ControllBase
     {
         #region 库存盘点-表头查询
@@ -267,6 +267,27 @@ namespace CoreWebApi.XyCore
                 string ID = obj["ID"].ToString();
                 string Remark = obj["Remark"].ToString();
                 res = StockTakeHaddle.UptStockTakeRemark(ID, Remark, CoID, UserName);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 删除待确认明细
+        [HttpPostAttribute("Core/XyCore/StockTake/DelTakeItem")]
+         public ResponseResult DelTakeItem([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            if (obj["IDLst"] == null)
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
+                string CoID = GetCoid();
+                string UserName = GetUname();
+                res = StockTakeHaddle.DelStockTakeItem(IDLst, CoID, UserName);
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }

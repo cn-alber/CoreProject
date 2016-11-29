@@ -631,7 +631,37 @@ namespace CoreData.CoreCore
             return result;
         }
         #endregion
-        #region Sql-新增-盘点单
+
+        #region 删除盘点明细
+        public static DataResult DelStockTakeItem(List<int> IDLst, string CoID, string UserName)
+        {
+            var result = new DataResult(1, null);
+            var conn = new MySqlConnection(DbBase.CoreConnectString);
+            conn.Open();
+            var Trans = conn.BeginTransaction();
+            try
+            {
+                string sql = "Delete FROM sfc_item WHERE CoID=@CoID AND ID in @IDLst";
+                conn.Execute(sql,new {CoID=CoID,IDLst = IDLst},Trans);
+                Trans.Commit();                
+            }
+            catch (Exception e)
+            {
+                Trans.Rollback();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                Trans.Dispose();
+                conn.Dispose();
+                conn.Close();
+            }
+            return result;
+        }
+        #endregion
+
+        #region Sql-新增-盘点单        
         public static string AddSfcMainSql()
         {
             string sql = @"INSERT INTO sfc_main 
