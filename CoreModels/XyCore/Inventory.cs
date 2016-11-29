@@ -39,6 +39,7 @@ namespace CoreModels.XyCore
         public string Name { get; set; }
         public string Norm { get; set; }
         public decimal StockQty { get; set; }
+        public decimal InvLockQty { get; set; }
         public decimal LockQty { get; set; }
         public decimal PickQty { get; set; }
         public decimal WaitInQty { get; set; }

@@ -67,6 +67,7 @@ namespace CoreData.CoreCore
                                         ID,
                                         Skuautoid,
                                         StockQty,
+                                        InvLockQty,
                                         LockQty,
                                         PickQty,
                                         WaitInQty,
