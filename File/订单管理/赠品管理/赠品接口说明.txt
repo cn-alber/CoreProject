@@ -1,0 +1,126 @@
+接口名称:CoreWebApi/Controllers/Order/GiftControllers
+
+function说明
+1.GetShopInitData() //店铺资料展开
+路由:http://localhost:5000/Core/Gift/GetShopInitData
+input:None
+OutPut:店铺资料List(value & label)
+参考:output jason 文件:GetShopInitData_output.json
+
+2.InsertGiftRule()赠品规则新增
+路由:http://localhost:5000/Core/Gift/InsertGiftRule
+input:GiftName          string          规则名称,必输
+      Priority          int             优先级,必输
+      DateFrom          DateTime        开始时间,必输
+      DateTo            DateTime        结束时间,必输
+      AppointSkuID      string          指定商品编码
+      AppointGoodsCode  string          指定款式编码
+      ExcludeSkuID      string          排除商品编码
+      ExcludeGoodsCode  string          排除款式编码
+      AmtMin            string          最小金额
+      AmtMax            string          最大金额
+      QtyMin            string          最小数量
+      QtyMax            string          最大数量
+      IsSkuIDValid      bool            处理规则
+      DiscountRate      string          折扣率
+      AppointShop       string          指定店铺
+      OrdType           string          限定订单类型
+      IsStock           bool            是否有库存才赠送(true/false)
+      IsAdd             bool            是否叠加赠送(true/false)
+      QtyEach           string          每多少数量送一组
+      AmtEach           string          每多少金额送一组
+      IsMarkGift        bool            订单明细是否标记为赠品(true/false)
+      MaxGiftQty        string          累计最大赠送数
+      GiftNo            List<string>    赠品
+output: s=1成功 else 错误代码
+参考:input jason 文件:InsertGiftRule_input.json
+参考:output jason 文件:InsertGiftRule_output.json
+
+3.GetGiftLog() //赠品规则修改记录
+路由:http://localhost:5000/Core/Gift/GetGiftLog
+input:ID string 赠品规则ID
+OutPut:日志资料
+参考:output jason 文件:GetGiftLog_output.json
+
+4.DisableRule()禁用规则
+路由:http://localhost:5000/Core/Gift/DisableRule
+input:ID          int          规则ID
+output: s=1成功 else 错误代码
+参考:input jason 文件:DisableRule_input.json
+参考:output jason 文件:DisableRule_output.json
+
+5.EnableRule()禁用规则
+路由:http://localhost:5000/Core/Gift/EnableRule
+input:ID          int          规则ID
+output: s=1成功 else 错误代码
+参考:input jason 文件:EnableRule_input.json
+参考:output jason 文件:EnableRule_output.json
+
+6.GetRuleEdit() //抓取单笔规则资料
+路由:http://localhost:5000/Core/Gift/GetRuleEdit
+input:ID string 赠品规则ID
+OutPut:单笔规则资料
+参考:output jason 文件:GetRuleEdit_output.json
+
+7.UpdateGiftRule()赠品规则新增
+路由:http://localhost:5000/Core/Gift/UpdateGiftRule
+input:ID                int             规则ID,必输
+      GiftName          string          规则名称
+      Priority          int             优先级
+      DateFrom          DateTime        开始时间
+      DateTo            DateTime        结束时间
+      AppointSkuID      string          指定商品编码
+      AppointGoodsCode  string          指定款式编码
+      ExcludeSkuID      string          排除商品编码
+      ExcludeGoodsCode  string          排除款式编码
+      AmtMin            string          最小金额
+      AmtMax            string          最大金额
+      QtyMin            string          最小数量
+      QtyMax            string          最大数量
+      IsSkuIDValid      bool            处理规则
+      DiscountRate      string          折扣率
+      AppointShop       string          指定店铺
+      OrdType           string          限定订单类型
+      IsStock           bool            是否有库存才赠送(true/false)
+      IsAdd             bool            是否叠加赠送(true/false)
+      QtyEach           string          每多少数量送一组
+      AmtEach           string          每多少金额送一组
+      IsMarkGift        bool            订单明细是否标记为赠品(true/false)
+      MaxGiftQty        string          累计最大赠送数
+      GiftNo            List<string>    赠品
+output: s=1成功 else 错误代码
+参考:input jason 文件:UpdateGiftRule_input.json
+参考:output jason 文件:UpdateGiftRule_output.json
+
+8.GetGiftRuleList()资料查询
+路由:http://localhost:5000/Core/Gift/GetGiftRuleList
+input:ID                int         规则ID
+      GiftNo            string      赠品
+      GiftName          string      规则名称
+      DateFrom          DateTime    开始时间
+      DateTo            DateTime    结束时间   
+      AppointSkuID      string      指定商品编码
+      ExcludeSkuID      string      排除商品编码
+      AmtMinStart       string      最小金额大于等于
+      AmtMinEnd         string      最小金额小于等于
+      AmtMaxStart       string      最大金额大于等于
+      AmtMaxEnd         string      最大金额小于等于
+      QtyMinStart       string      最小数量大于等于
+      QtyMinEnd         string      最小数量小于等于
+      QtyMaxStart       string      最大数量大于等于
+      QtyMaxEnd         string      最大数量小于等于
+      IsEnable          bool        启用否
+      IsDisable         bool        禁用否
+      QtyEachStart      string      每多少数量送一组大于等于
+      QtyEachEnd        string      每多少数量送一组小于等于
+      AmtEachStart      string      每多少金额送一组大于等于
+      AmtEachEnd        string      每多少金额送一组小于等于
+      CreateDateStart   DateTime    登记日期起
+      CreateDateEnd     DateTime    登记日期迄
+      AppointShop       string      指定店铺
+      SortField         string      排序栏位
+      SortDirection     string      排序方式
+      PageIndex         int         页码
+      NumPerPage        int         每页显示资料笔数
+output: s=1成功 else 错误代码
+参考:output jason 文件:GetGiftRuleList_output.json
