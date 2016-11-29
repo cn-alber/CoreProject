@@ -235,7 +235,7 @@ namespace CoreWebApi.XyCore
         {
             var res = new DataResult(1, null);
             int x;
-            if (int.TryParse(ID, out x))
+            if (!int.TryParse(ID, out x))
             {
                 res.s = -1;
                 res.d = "无效参数";
