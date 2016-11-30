@@ -3,7 +3,6 @@ using System.Linq;
 using CoreModels;
 using CoreModels.XyUser;
 using CoreModels.XyComm;
-using CoreModels.XyMessage;
 using CoreModels.WmsApi;
 using CoreData.CoreComm;
 using Dapper;
@@ -80,7 +79,7 @@ namespace CoreData.CoreWmsApi
                         Creator = IParam.Creator,
                         CreateDate = IParam.CreateDate
                     }).AsList();//装箱明细
-                    var logLst = IParam.BoxSkuLst.Select(a => new Wmslog
+                    var logLst = IParam.BoxSkuLst.Select(a => new AWmslog
                     {
                         BarCode = a.BarCode,
                         Skuautoid = a.Skuautoid,
