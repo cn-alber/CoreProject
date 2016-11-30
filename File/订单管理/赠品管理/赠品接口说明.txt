@@ -59,7 +59,7 @@ output: s=1成功 else 错误代码
 6.GetRuleEdit() //抓取单笔规则资料
 路由:http://localhost:5000/Core/Gift/GetRuleEdit
 input:ID string 赠品规则ID
-OutPut:单笔规则资料
+OutPut:单笔规则资料/shop资料/订单Type资料
 参考:output jason 文件:GetRuleEdit_output.json
 
 7.UpdateGiftRule()赠品规则新增
@@ -124,3 +124,9 @@ input:ID                int         规则ID
       NumPerPage        int         每页显示资料笔数
 output: s=1成功 else 错误代码
 参考:output jason 文件:GetGiftRuleList_output.json
+
+9.GetInitData() //赠品新增初始资料
+路由:http://localhost:5000/Core/Gift/GetInitData
+input:None
+OutPut:shop资料/订单Type资料
+参考:output jason 文件:GetInitData_output.json

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using CoreModels.XyComm;
 namespace CoreModels.XyCore
 {
     public class GiftRule
@@ -28,6 +27,7 @@ namespace CoreModels.XyCore
         public string AmtEach{get;set;}
         public bool IsMarkGift{get;set;}
         public string MaxGiftQty{get;set;}
+        public string GivenQty{get;set;}
         public bool Enable{get;set;}
         public int CoID{get;set;}
         public string Creator{get;set;}
@@ -272,5 +272,28 @@ namespace CoreModels.XyCore
             get { return _PageIndex; }
             set { this._PageIndex = value;}
         }
+    }
+    public class GiftInsertOrder
+    {
+        public int SkuAutoID{get;set;}
+        public int Qty{get;set;}
+        public bool IsGift{get;set;}
+    }
+    public class GiftInsertOrderReturn
+    {
+        public decimal Exweight{get;set;}
+        public int Qty{get;set;}
+        public List<OrderItem> Item{get;set;}
+    }
+    public class GiftInitData
+    {
+        public List<Filter> Shop {get;set;}
+        public List<Filter> Type {get;set;}
+    }
+    public class GiftEditData
+    {
+        public List<GiftRuleEdit> Gift{get;set;}
+        public List<Filter> Shop {get;set;}
+        public List<Filter> Type {get;set;}
     }
 }

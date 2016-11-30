@@ -1,16 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using Microsoft.AspNetCore.Authorization;
+// using Microsoft.AspNetCore.Authorization;
 using CoreModels.XyCore;
 using CoreData.CoreCore;
 using System;
 using CoreData.CoreComm;
 using CoreData;
 using System.Collections.Generic;
-using CoreModels;
 namespace CoreWebApi
 {
-    [AllowAnonymous]
+    // [AllowAnonymous]
     public class GiftController : ControllBase
     {
         [HttpGetAttribute("/Core/Gift/GetShopInitData")]
@@ -623,6 +622,13 @@ namespace CoreWebApi
                 cp.PageIndex = int.Parse(PageIndex);
             }
             var data = GiftHaddle.GetGiftRuleList(cp);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Gift/GetInitData")]
+        public ResponseResult GetInitData(string ID)
+        {   
+            var data = GiftHaddle.GetInitData(int.Parse(GetCoid()));
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     }

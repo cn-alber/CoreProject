@@ -1,36 +1,6 @@
 {
     "s": 1,
     "d": {
-        "Gift": [
-            {
-                "ID": 4,
-                "GiftName": "赠品规则1",
-                "Priority": 1,
-                "DateFrom": "2016-11-01T00:00:00",
-                "DateTo": "2016-11-30T00:00:00",
-                "AppointSkuID": "test1234560004007,test1234560004014",
-                "AppointGoodsCode": "",
-                "ExcludeSkuID": "",
-                "ExcludeGoodsCode": "",
-                "AmtMin": null,
-                "AmtMax": null,
-                "QtyMin": null,
-                "QtyMax": null,
-                "IsSkuIDValid": false,
-                "DiscountRate": null,
-                "AppointShop": "",
-                "OrdType": "",
-                "IsStock": false,
-                "IsAdd": false,
-                "QtyEach": null,
-                "AmtEach": null,
-                "IsMarkGift": false,
-                "MaxGiftQty": null,
-                "GiftNo": [
-                    "test2510002007"
-                ]
-            }
-        ],
         "Shop": [
             {
                 "value": "1",
