@@ -116,6 +116,7 @@ namespace CoreData.CoreCore
             {
                 try
                 {
+                    var lockview = new Invlock_view();
                     string sql = @"SELECT
                                     ID,
                                     NAME,
@@ -138,7 +139,29 @@ namespace CoreData.CoreCore
                     {
                         var res = CommHaddle.GetShopNameByID(CoID, main[0].ShopID);
                         main[0].ShopName = res.d as string;
-                        result.d = main[0];
+                        lockview.Main = main[0];
+                        string itemsql = @"SELECT ID,Skuautoid,Qty FROM invlock_item WHERE ParentID = @ParentID AND CoID = @CoID";
+                        var ItemLst = conn.Query<Invlock_item_view>(itemsql, new { ParentID = ID, CoID = CoID }).AsList();
+                        if (ItemLst.Count > 0)
+                        {
+                            var SkuIDLst = ItemLst.Select(a => a.Skuautoid).AsList();
+                            res = CommHaddle.GetSkuViewByID(CoID, SkuIDLst);
+                            var SkuViewLst = res.d as List<CoreSkuView>;//获取商品Sku资料,拼接Lst显示
+                            ItemLst = (from a in ItemLst
+                                       join b in SkuViewLst on a.Skuautoid equals b.ID into data
+                                       from c in data.DefaultIfEmpty()
+                                       select new Invlock_item_view
+                                       {
+                                           ID = a.ID,
+                                           Skuautoid = a.Skuautoid,
+                                           SkuID = c == null ? "" : c.SkuID,
+                                           SkuName = c == null ? "" : c.SkuName,
+                                           Norm = c == null ? "" : c.Norm,
+                                           Qty = a.Qty
+                                       }).AsList();
+                            lockview.ItemLst = ItemLst;
+                        }
+                        result.d = lockview;
                     }
                 }
                 catch (Exception e)
@@ -225,10 +248,10 @@ namespace CoreData.CoreCore
                     {
                         ParentID = int.Parse(MainID.ToString()),
                         Skuautoid = a.Skuautoid,
-                        Qty = main.Type == 1 ? (a.StockQty * a.Qty / 100) : (main.Type == 2 ? (a.StockQty-a.Qty>0?a.Qty:a.StockQty) : 0),
+                        Qty = main.Type == 1 ? (a.StockQty * a.Qty / 100) : (main.Type == 2 ? (a.StockQty - a.Qty > 0 ? a.Qty : a.StockQty) : 0),
                         Creator = UserName,
                         CreateDate = DateTime.Now.ToString(),
-                        CoID=CoID
+                        CoID = CoID
                     }).AsList();
                     conn.Execute(AddLockItemSql(), ItemLst_new, Trans);
                 }
@@ -339,7 +362,7 @@ namespace CoreData.CoreCore
                     }
                     else
                     {
-                        result.s=-1;
+                        result.s = -1;
                         result.d = "商品库存不足";
                     }
                 }

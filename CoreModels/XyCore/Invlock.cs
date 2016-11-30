@@ -34,7 +34,11 @@ namespace CoreModels.XyCore
         public string ModifyDate { get; set; }
 
     }
-
+    public class Invlock_view
+    {
+        public Invlock_main_view Main { get; set; }
+        public List<Invlock_item_view> ItemLst { get; set; }
+    }
     public class Invlock_main_view
     {
         public int ID { get; set; }
@@ -105,7 +109,7 @@ namespace CoreModels.XyCore
         public List<Invlock_main_query> LockMainLst { get; set; }//返回查询结果
     }
 
-     public class Invlock_main_query
+    public class Invlock_main_query
     {
         public int ID { get; set; }
         public string Name { get; set; }
