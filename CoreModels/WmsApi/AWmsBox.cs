@@ -9,11 +9,12 @@ namespace CoreModels.WmsApi
         public int Skuautoid { get; set; }
         public string SkuID { get; set; }
         public string BoxCode { get; set; }
+        public int Qty { get; set; }
         public int WarehouseID { get; set; }
         public string PCode { get; set; }
         public int CoID { get; set; }
         public string Creator { get; set; }
-        public DateTime? CreateDate { get; set; }
+        public string CreateDate { get; set; }
     }
     public class ApiBoxPrint
     {
@@ -36,19 +37,30 @@ namespace CoreModels.WmsApi
         public string Contents { get; set; }
     }
 
+
     public class ApiBoxParam
     {
         public int CoID { get; set; }
-        public string BarCode { get; set; }
-        public string SkuID { get; set; }
         public string Creator { get; set; }
-        public int WarehouseID { get; set; }
-        public int Type { get; set; }
-        public List<string> ABarCodeLst { get; set; }
-        public string BoxCode { get; set; }
+        public string CreateDate { get; set; }
+        public List<BoxSku> BoxSkuLst { get; set; }
+
+    }
+    public class BoxSku
+    {
+        private int _Qty = 1;
+        public string BarCode { get; set; }
+        public int Skuautoid { get; set; }
+        public string SkuID { get; set; }
+        public int Qty
+        {
+            get { return _Qty; }
+            set { this._Qty = value; }
+        }
+
     }
 
-    public class WmsBoxParams 
+    public class WmsBoxParams
     {
         public int CoID { get; set; }
         public string BarCode { get; set; }
@@ -84,4 +96,6 @@ namespace CoreModels.WmsApi
         public List<int> TempTypeLst { get; set; }
         public ASkuScan SkuAuto { get; set; }
     }
+
+
 }

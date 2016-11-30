@@ -1,10 +1,28 @@
 {
-    'CoID': 1,
-    'Creator': 'admin',
-    'SkuID': 'NJR201605070007043',
-    'ABarCodeLst': [
-            "NJR201605070007043000001",
-            "NJR201605070007043000002",
-            "NJR201605070007043000003"
-        ]
+    "BoxSkuLst": [
+        {
+            "BarCode": "GB2312001001000001",
+            "Skuautoid": 17610,
+            "SkuID": "GB2312001001",
+            "Qty": 1
+        },
+        {
+            "BarCode": "GB2312001001000002",
+            "Skuautoid": 17610,
+            "SkuID": "GB2312001001",
+            "Qty": 1
+        },
+        {
+            "BarCode": "GB2312001001000003",
+            "Skuautoid": 17610,
+            "SkuID": "GB2312001001",
+            "Qty": 1
+        },
+        {
+            "BarCode": "GB2312001001000004",
+            "Skuautoid": 17610,
+            "SkuID": "GB2312001001",
+            "Qty": 5
+        }
+    ]
 }

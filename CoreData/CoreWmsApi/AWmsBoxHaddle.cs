@@ -19,17 +19,17 @@ namespace CoreData.CoreWmsApi
         public static DataResult CheckBarCode(WmsBoxParams IParam)
         {
             var result = new DataResult(1, null);
-            var CommConn = new MySqlConnection(DbBase.CommConnectString);
-            CommConn.Open();
+            var Conn = new MySqlConnection(DbBase.CoreConnectString);
+            Conn.Open();
             try
             {
-                var res = AUserHaddle.GetUniqCode(IParam.CoID.ToString());
+                var res = AUserHaddle.GetUniqCode(IParam.CoID.ToString());//是否启用唯一码
                 if (res.s == 1)
                 {
                     var uniq = Convert.ToInt32(res.d);
-                    if (uniq == 1)
+                    if (uniq == 1)//启用唯一码，条码重复装箱卡关
                     {
-                        int count = CommConn.QueryFirst<int>("select count(ID) from wmsbox where CoID=@CoID and BarCode=@BarCode", new { CoID = IParam.CoID, BarCode = IParam.BarCode });
+                        int count = Conn.QueryFirst<int>("select count(ID) from wmsbox where CoID=@CoID and BarCode=@BarCode", new { CoID = IParam.CoID, BarCode = IParam.BarCode });
                         if (count > 0)
                         {
                             result.s = -6001;//此条码已装箱
@@ -51,90 +51,95 @@ namespace CoreData.CoreWmsApi
             }
             finally
             {
-                CommConn.Close();
+                Conn.Close();
             }
 
             return result;
         }
         #endregion
         #region 重装箱作业-产生装箱资料WmsBox
-        public static DataResult AddWmsBox(WmsBoxParams IParam)
+        public static DataResult AddWmsBox(ApiBoxParam IParam)
         {
             var res = new DataResult(1, null);
-            var GoodsConn = new MySqlConnection(DbBase.GoodsConnectString);
-            var MsgConn = new MySqlConnection(DbBase.MsgConnectString);
-            GoodsConn.Open();
-            MsgConn.Open();
-            var GoodsTrans = GoodsConn.BeginTransaction();
-            var MsgTrans = MsgConn.BeginTransaction();
+            var CoreConn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreConn.Open();
+            var CoreTrans = CoreConn.BeginTransaction();
             try
             {
-                IParam.BoxCode = "BX" + CommHaddle.GetRecordID(IParam.CoID);
-                var BoxLst = NewWmsboxLst(IParam);
-                int count = GoodsConn.Execute(AddBoxSql(), BoxLst, GoodsTrans);
-                if (count < 1)
+                if (IParam.BoxSkuLst.Count > 0)
                 {
-                    res.s = -3002;
-                }
-                else
-                {
-                    IParam.WmsboxLst = BoxLst;
-                    IParam.Contents = "扫描装箱";
-                    MsgConn.Execute(AddWorkLogSql(), InitBoxWorklog(IParam, 1), MsgTrans);
-                    GoodsTrans.Commit();
-                    MsgTrans.Commit();
+                    string BoxCode = "BX" + CommHaddle.GetRecordID(IParam.CoID);
+                    var BoxLst = IParam.BoxSkuLst.Select(a => new AWmsBox
+                    {
+                        BarCode = a.BarCode,
+                        Skuautoid = a.Skuautoid,
+                        SkuID = a.SkuID,
+                        BoxCode = BoxCode,
+                        Qty = a.Qty,
+                        CoID = IParam.CoID,
+                        Creator = IParam.Creator,
+                        CreateDate = IParam.CreateDate
+                    }).AsList();//装箱明细
+                    var logLst = IParam.BoxSkuLst.Select(a => new Wmslog
+                    {
+                        BarCode = a.BarCode,
+                        Skuautoid = a.Skuautoid,
+                        SkuID = a.SkuID,
+                        BoxCode = BoxCode,
+                        Qty = a.Qty,
+                        Contents = "扫描装箱",
+                        CoID = IParam.CoID,
+                        Creator = IParam.Creator,
+                        CreateDate = IParam.CreateDate
+                    }).AsList();//操作明细
+                                //生成装箱单&操作记录
+                    int count1 = CoreConn.Execute(AddBoxSql(), BoxLst, CoreTrans);
+                    int count2 = CoreConn.Execute(AddWmsLogSql(), logLst, CoreTrans);
+                    if (count1 < 1 || count2 < 1)
+                    {
+                        res.s = -3002;
+                    }
+                    else
+                    {
+                        CoreTrans.Commit();
+                        res.d = BoxCode;
+                    }
                 }
             }
             catch (Exception e)
             {
-                GoodsTrans.Rollback();
-                MsgTrans.Rollback();
+                CoreTrans.Rollback();
                 res.s = -1;
                 res.d = e.Message;
             }
             finally
             {
-                GoodsTrans.Dispose();
-                MsgTrans.Dispose();
-                GoodsConn.Close();
-                MsgConn.Close();
+                CoreTrans.Dispose();
+                CoreConn.Close();
             }
             return res;
         }
         #endregion
 
         #region 新增装箱资料
-        public static List<AWmsBox> NewWmsboxLst(WmsBoxParams IParam)
-        {
-            var boxList = new List<AWmsBox>();
-            foreach (var IParm in IParam.ABarCodeLst)
-            {
-                var box = new AWmsBox();
-                box.BarCode = IParm;
-                box.BoxCode = IParam.BoxCode;
-                box.SkuID = IParm.Substring(0, IParm.Length - 6);
-                box.Creator = IParam.Creator;
-                box.CreateDate = DateTime.Now;
-                box.CoID = IParam.CoID;
-                boxList.Add(box);
-            }
-            return boxList;
-        }
-
         public static string AddBoxSql()
         {
             string sql = @"
                     INSERT INTO wmsbox(
                         BarCode,
+                        Skuautoid,
                         SkuID,
                         BoxCode,
+                        Qty,
                         CoID,
                         Creator,
                         CreateDate)
                     VALUES (
                         @BarCode,
+                        @Skuautoid,
                         @SkuID,
                         @BoxCode,
+                        @Qty,
                         @CoID,
                         @Creator,
                         @CreateDate)";
@@ -143,31 +148,11 @@ namespace CoreData.CoreWmsApi
         #endregion
 
         #region 新增装箱操作记录
-        public static List<Worklog> InitBoxWorklog(WmsBoxParams param, int i)
-        {
-            var logLst = new List<Worklog>();
-            foreach (var IParm in param.WmsboxLst)
-            {
-                var log = new Worklog();
-                log.CoID = IParm.CoID;
-                log.BarCode = IParm.BarCode;
-                log.BoxCode = param.BoxCode;
-                log.SkuID = IParm.SkuID;
-                log.WarehouseID = param.WarehouseID;
-                log.qty = 1 * i;
-                log.Type = param.Type;
-                log.RecordID = param.RecordID;
-                log.Contents = param.Contents;
-                log.Creator = param.Creator;
-                log.CreateDate = DateTime.Now;
-                logLst.Add(log);
-            }
-            return logLst;
-        }
 
-        public static string AddWorkLogSql()
+        public static string AddWmsLogSql()
         {
-            string sql = @"INSERT INTO worklog(BarCode,
+            string sql = @"INSERT INTO wmslog(BarCode,
+                                            Skuautoid,
                                             SkuID,
                                             BoxCode,
                                             WarehouseID,
@@ -179,6 +164,7 @@ namespace CoreData.CoreWmsApi
                                             Creator,
                                             CreateDate)
                                       VALUES (@BarCode,
+                                            @Skuautoid,
                                             @SkuID,
                                             @BoxCode,
                                             @WarehouseID,

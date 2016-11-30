@@ -19,13 +19,25 @@ namespace CoreModels.WmsApi
         public string SortCode { get; set; }//分拣格
         public int Type { get; set; }//仓库类型
     }
+    public class ScanType
+    {
+        public int SkuType { get; set; }
+        public List<ASkuScan> ASkuLst { get; set; }
+    }
     public class ASkuScan
     {
-        public int ID { get; set; }
+        private int _Qty =1;
+        public string BarCode { get; set; }
+        public int Skuautoid { get; set; }
         public string SkuID { get; set; }
         public string SkuName { get; set; }
         public string GoodsCode { get; set; }
         public string Norm { get; set; }
+        public int Qty
+        {
+            get { return _Qty; }
+            set { this._Qty = value; }
+        }
         public int SkuType { get; set; }
     }
 

@@ -374,7 +374,7 @@ namespace CoreData.CoreCore
                                                 Creator = UserName,
                                                 CreateDate = DateTime.Now.ToString()
                                             }).AsList();
-                        var NewMainInvLst = itemLst.Where(a => !InvSkuLst
+                        var NewMainInvLst = itemLst.Where(a => !MainInvSkuLst
                                                             .Select(b => b.Skuautoid)
                                                             .Contains(a.Skuautoid))
                                             .Select(a => new Inventory_sale

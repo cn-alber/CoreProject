@@ -7,6 +7,7 @@ using CoreModels.XyComm;
 using CoreModels.XyCore;
 using CoreModels.WmsApi;
 using CoreData.CoreComm;
+using CoreData.CoreCore;
 using Dapper;
 using MySql.Data.MySqlClient;
 using System;
@@ -22,16 +23,17 @@ namespace CoreData.CoreWmsApi
             var res = new DataResult(1, null);
             try
             {
-                IParam.IsBox = IsBoxTF(IParam.SkuID, IParam.CoID);//检查参数是箱码or件码
-                if (IsExist(IParam.IsBox, IParam.Type, IParam.BoxCode, IParam.CoID))//判断箱体是否已收入or已上架
-                {
-                    res.s = -1;
-                    res.d = "重复扫描";
-                }
-                else
-                {
-                    res = GetBoxSkuDetail(IParam);//获取Sku信息      
-                }
+                //获取条码资料
+                // IParam.IsBox = IsBoxTF(IParam.SkuID, IParam.CoID);//检查参数是箱码or件码
+                // if (IsExist(IParam.IsBox, IParam.Type, IParam.BoxCode, IParam.CoID))//判断箱体是否已收入or已上架
+                // {
+                //     res.s = -1;
+                //     res.d = "重复扫描";
+                // }
+                // else
+                // {
+                //     res = GetBoxSkuDetail(IParam);//获取Sku信息      
+                // }
             }
             catch (Exception e)
             {
@@ -47,200 +49,546 @@ namespace CoreData.CoreWmsApi
         }
         #endregion
 
-        #region 新增收料单
-        public static DataResult SetPurRecDetail(APurParams IParam)
+        #region 新增采购收料单
+        public static DataResult SetPurRecDetail(ApiRecParam IParam)
         {
-            var res = new DataResult(1, null);
-            var BoxCodeLst = IParam.BPLst.Where(a => a.IsBox == true).ToList().Select(b => b.BoxCode).AsList();//装箱Sku
-            var PieceLst = IParam.BPLst.Where(a => a.IsBox == false).ToList().Select(b => b.BoxCode).AsList();//单件Sku            
-            var BoxLst = DbBase.GoodsDB.Query<AWmsBox>(@"SELECT * FROM wmsbox WHERE CoID=@CoID AND BoxCode IN @BoxCodeLst", new { CoID = IParam.CoID, BoxCodeLst = BoxCodeLst }).AsList();
-            IParam.WmsboxLst = BoxLst;
-            IParam.BarCodeLst = PieceLst;
-            if (IParam.BarCodeLst.Count > 0)
-                IParam.WmsboxLst.AddRange(ContactBox(IParam.BarCodeLst,IParam.Skuautoid,int.Parse(IParam.CoID)));//组合箱码&件码
-            IParam.RecQty = IParam.WmsboxLst.Count();
-            res = GetBoxByCode(IParam);//获取WmsPile 1.新增 2.修改
-            if (res.s == 1)
+            var result = new DataResult(1, null);
+            var CoreConn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreConn.Open();
+            var CoreTrans = CoreConn.BeginTransaction(IsolationLevel.ReadUncommitted);
+            try
             {
-                string RecordID = "RE" + CommHaddle.GetRecordID(int.Parse(IParam.CoID));
-                IParam.RecordID = RecordID;
-                var CoreConn = new MySqlConnection(DbBase.CoreConnectString);
-                var MsgConn = new MySqlConnection(DbBase.MsgConnectString);
-                CoreConn.Open();
-                MsgConn.Open();
-                var CoreTrans = CoreConn.BeginTransaction(IsolationLevel.ReadUncommitted);
-                var MsgTrans = MsgConn.BeginTransaction(IsolationLevel.ReadUncommitted);
-                try
+                //获取仓库基本资料
+                string ParentID = string.Empty;
+                int inv_type = 1101;
+                string CusType = "采购进货";
+                var WhIDLst = new List<string>();
+                WhIDLst.Add(IParam.WhID.ToString());
+                var res = CommHaddle.GetWhViewLstByID(IParam.CoID.ToString(), WhIDLst);
+                var WhViewLst = res.d as List<Warehouse_view>;
+                var RecSkuLst = (from a in IParam.RecSkuLst
+                                 group a by new { a.Skuautoid, a.SkuID } into g
+                                 select new ARecSkuSum
+                                 {
+                                     Skuautoid = g.Key.Skuautoid,
+                                     SkuID = g.Key.SkuID,
+                                     Qty = g.Sum(a => a.Qty)
+                                 }).AsList();
+                var SkuIDLst = IParam.RecSkuLst.Select(a => a.Skuautoid.ToString()).AsList();
+                res = CommHaddle.GetSkuViewByID(IParam.CoID.ToString(), SkuIDLst);
+                var SkuViewLst = res.d as List<CoreSkuView>;//获取商品Sku资料
+                //获取采购资料
+                res = GetPurDetail(IParam.PurID, IParam.CoID);
+                if (res.s == 1)
                 {
-                    var Lst = res.d as List<WmsPileAuto>;
-                    if (Lst.Count > 0)
-                    {
-                        var NewLst = Lst.Where(a => a.status == 1).ToList();
-                        var UptLst = Lst.Where(a => a.status == 2).ToList();
-                        if (NewLst.Count > 0)
-                        {
-                            int count = CoreConn.Execute(AddWmsPile(), NewLst, CoreTrans);//新增暂存WmsPile
-                        }
-                        if (UptLst.Count > 0)
-                        {
-                            string uptpilesql = "UPDATE wmspile SET qty=qty+@RecQty WHERE CoID=@CoID AND Type=@Type AND skuautoid=@Skuautoid";
-                            var args = new{RecQty=UptLst[0].Qty,CoID=IParam.CoID,Type=IParam.Type,Skuautoid=IParam.Skuautoid};
-                            int count = CoreConn.Execute(uptpilesql,args,CoreTrans);
-                        }
-                        IParam.invType = 1;
-                        IParam.Status = 1;
-                        #region 采购收料
-                        if (IParam.IsPur)
-                        {
-                            var PurRec = new PurchaseReceive();
-                            res = GetPurDetail(IParam);
-                            IParam.APurDetailLst = res.d as List<PurchaseDetail>;
-                            IParam.ApurDetail = IParam.APurDetailLst[0];
-                            IParam.CusType = "采购收入";
-                            IParam.Contents = "采购收入";
-                            IParam.Apur = CoreConn.QueryFirst<Purchase>("SELECT * FROM WHERE CoID=@CoID AND ID=@ID", new { CoID = IParam.CoID, ID = IParam.ApurDetail.purchaseid });
-                            var count = CoreConn.Execute(AddPurRecSql(), NewPurRec(IParam), CoreTrans);//新增收料单
-                            if (count > 0)
-                            {
-                                IParam.PurRecID = CoreConn.QueryFirst<int>("select LAST_INSERT_ID()");
-                                count = CoreConn.Execute(AddPurRecDetailSql(), NewPurRecDetail(IParam), CoreTrans);//新增收料明细
-                            }
-                            #region 根据收料数量更新采购状态(1:已确认=>2.已完成)
-                            string sql = @"SELECT
-                                                purchasereceive.PurchaseID,
-                                                purchaserecdetail.Skuautoid,
-                                                SUM(purchaserecdetail.RecQty) AS recqty
-                                            FROM
-                                                purchaserecdetail ,
-                                                purchasereceive
-                                            WHERE purchaserecdetail.RecID=purchasereceive.ID
-                                                AND purchasereceive.PurchaseID=@PurID
-                                                AND purchaserecdetail.Skuautoid=@Skuautoid
-                                                AND purchasereceive.`Status`=1
-                                                AND purchasereceive.CoID=@CoID
-                                            GROUP BY
-                                                purchasereceive.PurchaseID,
-                                                purchaserecdetail.Skuautoid ";
-                            var args = new DynamicParameters();
-                            args.Add("@PurID", IParam.Apur.id);
-                            args.Add("@Skuautoid", IParam.ApurDetail.skuautoid);
-                            var PurDt = CoreConn.QueryFirst<APurchaseDetail>(sql, args);
-                            string UptPurDtSql = "UPDATE purchasedetail SET RecQty=@RecQty,DetailStatus=@DetailStatus WHERE PurchaseID=@PurID AND Skuautoid=@Skuautoid AND CoID=@CoID";
-                            int DetailStatus = 1;//1:已确认;2.已完成;
-                            if (PurDt.recqty >= int.Parse(IParam.ApurDetail.purqty))
-                                DetailStatus = 2;
-                            CoreConn.Execute(UptPurDtSql, new { RecQty = PurDt.recqty, DetailStatus = DetailStatus, PurID = IParam.Apur.id, Skuautoid = IParam.ApurDetail.skuautoid, CoID = IParam.CoID });//更新明细状态
-                            sql = @"SELECT
-                                        purchasedetail.PurchaseID,
-                                        SUM(purchasedetail.PurQty) AS purqty,
-                                        SUM(purchasedetail.RecQty) AS recqty
+                    string RecordID = "RE" + CommHaddle.GetRecordID(IParam.CoID);
+                    var PurD = res.d as List<PurchaseDetail>;
+                    var PurM = CoreConn.Query<Purchase>("SELECT * FROM purchase WHERE ID =@ID AND CoID = @CoID").AsList();
+                    //新增采购收料主表
+                    var RecM = new PurchaseReceive();
+                    RecM.scoid = PurM[0].scoid;
+                    RecM.sconame = PurM[0].sconame;
+                    RecM.purchaseid = PurM[0].id;
+                    RecM.coid = IParam.CoID;
+                    RecM.creator = IParam.Creator;
+                    RecM.createdate = DateTime.Now;
+                    RecM.warehouseid = int.Parse(WhViewLst[0].ID);
+                    RecM.warehousename = WhViewLst[0].WhName;
+                    RecM.receivedate = DateTime.Now.ToString("yyyy-mm-dd");
+                    CoreConn.Execute(AddPurRecSql(), RecM, CoreTrans);
+                    var RecID = CoreConn.QueryFirst<int>("select LAST_INSERT_ID()", CoreTrans);
+                    ParentID = RecID.ToString();
+                    //新增采购收料明细
+                    var RecDLst = (from a in RecSkuLst
+                                   join b in SkuViewLst on a.Skuautoid.ToString() equals b.ID into data
+                                   from c in data.DefaultIfEmpty()
+                                   select new PurchaseRecDetail
+                                   {
+                                       skuautoid = a.Skuautoid,
+                                       goodscode = c == null ? "" : c.GoodsCode,
+                                       skuid = c == null ? "" : c.SkuID,
+                                       skuname = c == null ? "" : c.SkuName,
+                                       norm = c == null ? "" : c.Norm,
+                                       recqty = a.Qty.ToString(),
+                                       price = PurD[0].price,
+                                       amount = (int.Parse(PurD[0].price) * a.Qty).ToString(),
+                                       creator = IParam.Creator,
+                                       createdate = DateTime.Now,
+                                       coid = IParam.CoID
+                                   }).AsList();
+                    CoreConn.Execute(AddPurRecDetailSql(), RecDLst, CoreTrans);
+
+                    #region 根据收料数量更新采购状态(1:已确认=>2.已完成)
+                    string sql = @"SELECT
+                                        purchasereceive.PurchaseID,
+                                        purchaserecdetail.Skuautoid,
+                                        SUM(purchaserecdetail.RecQty) AS recqty
                                     FROM
-                                        purchasedetail
-                                    WHERE purchasedetail.PurchaseID=@PurID
-                                    GROUP BY purchasedetail.PurchaseID";
-                            var Pur = CoreConn.QueryFirst<APurchaseDetail>(sql, new { PurID = IParam.Apur.id });
-                            if (Pur.purqty <= Pur.recqty)
-                            {
-                                CoreConn.Execute("UPDATE purchase SET Status=2 WHERE CoID=@CoID AND ID=@PurID", new { CoID = IParam.CoID, PurID = IParam.Apur.id });
-                            }
-                            #endregion
-                        }
-                        else
-                        {
-                            IParam.CusType = "普通收入";
-                            IParam.Contents = "普通收入";
-                        }
-                        #endregion
-                        #region 新增库存交易
-                        var InvIO = NewPurInvInOut(IParam);
-                        var InvItem = NewPurInvInOutItem(IParam);
-                        CoreConn.Execute(CoreData.CoreCore.InventoryHaddle.AddInvinoutSql(), InvIO, CoreTrans);
-                        CoreConn.Execute(CoreData.CoreCore.InventoryHaddle.AddInvinoutitemSql(), InvItem, CoreTrans);
-                        #endregion
-                        #region 操作记录worklog
-                        StringBuilder sqltest = new StringBuilder();
-                        foreach (var Log in IParam.WmsboxLst)
-                        {
-                            sqltest.Append("('" + Log.BarCode + "','" + Log.SkuID + "','" + Log.BoxCode
-                                  + "',0,-1,0"
-                                  + "," + Log.CoID + ",'" + IParam.Creator + "','" + DateTime.Now.ToString()
-                                  + "','" + IParam.Contents + "','" + IParam.RecordID + "'),");
-                        }
-                        foreach (var Log in IParam.WmsboxLst)
-                        {
-                            sqltest.Append("('" + Log.BarCode + "','" + Log.SkuID + "','" + Log.BoxCode
-                                  + "'," + IParam.WarehouseID + ",1," + IParam.Type
-                                  + "," + Log.CoID + ",'" + IParam.Creator + "','" + DateTime.Now.ToString()
-                                  + "','" + IParam.Contents + "','" + IParam.RecordID + "'),");
-                        }
-                        string ISql = @"INSERT INTO xymessage.worklog (
-                         xymessage.worklog.BarCode,
-                         xymessage.worklog.SkuID,
-                         xymessage.worklog.BoxCode,
-                         xymessage.worklog.WarehouseID,
-                         xymessage.worklog.qty,
-                         xymessage.worklog.Type,
-                         xymessage.worklog.CoID,
-                         xymessage.worklog.Creator,
-                         xymessage.worklog.CreateDate,
-                         xymessage.worklog.Contents,
-                         xymessage.worklog.RecordID
-                        )  VALUES"
-                                + sqltest.ToString().Substring(0, sqltest.ToString().Length - 1);
-                        CoreConn.Execute(ISql,MsgTrans);//新增操作记录
-                        #endregion
-                        var invLst = NewPurInventory(IParam);
-                        if(invLst.Count>0)
-                        {
-                            CoreConn.Execute(AddInventorySql(),invLst[0],CoreTrans);
-                        }
-                        else
-                        {
-                            string UpdateInvsql = @"UPDATE inventory
-                                        SET inventory.StockQty = (
-	                                        SELECT
-		                                        sum(Qty)
-	                                        FROM
-		                                        invinoutitem
-	                                        WHERE
-		                                        invinoutitem.skuautoid = inventory.skuautoid
-	                                        AND invinoutitem.WhID = inventory.WarehouseID
-	                                        AND invinoutitem.CoID = inventory.CoID
-                                        )
-                                        WHERE
-	                                        inventory.CoID =@CoID
-                                        AND inventory.WarehouseID = @WarehouseID
-                                        AND inventory.skuautoid = @skuautoid";
-                            CoreConn.Execute(UpdateInvsql,new{CoID=IParam.CoID,WarehouseID=IParam.WarehouseID,skuautoid=IParam.ApurDetail.skuautoid},CoreTrans);
-                        }
-                        CoreTrans.Commit();
-                        MsgTrans.Commit();
+                                        purchaserecdetail ,
+                                        purchasereceive
+                                    WHERE purchaserecdetail.RecID=purchasereceive.ID
+                                        AND purchasereceive.PurchaseID=@PurID
+                                        AND purchaserecdetail.Skuautoid=@Skuautoid
+                                        AND purchasereceive.`Status`=1
+                                        AND purchasereceive.CoID=@CoID
+                                    GROUP BY
+                                        purchasereceive.PurchaseID,
+                                        purchaserecdetail.Skuautoid ";
+                    var args = new DynamicParameters();
+                    args.Add("@PurID", IParam.PurID);
+                    args.Add("@Skuautoid", SkuIDLst[0]);
+                    var PurDt = CoreConn.QueryFirst<APurchaseDetail>(sql, args, CoreTrans);
+                    string UptPurDtSql = "UPDATE purchasedetail SET RecQty=@RecQty,DetailStatus=@DetailStatus WHERE PurchaseID=@PurID AND Skuautoid=@Skuautoid AND CoID=@CoID";
+                    int DetailStatus = 1;//1:已确认;2.已完成;
+                    if (PurDt.recqty >= int.Parse(PurD[0].purqty))
+                        DetailStatus = 2;
+                    CoreConn.Execute(UptPurDtSql, new { RecQty = PurDt.recqty, DetailStatus = DetailStatus, PurID = IParam.PurID, Skuautoid = SkuIDLst[0], CoID = IParam.CoID }, CoreTrans);//更新明细状态
+                    sql = @"SELECT
+                                purchasedetail.PurchaseID,
+                                SUM(purchasedetail.PurQty) AS purqty,
+                                SUM(purchasedetail.RecQty) AS recqty
+                            FROM
+                                purchasedetail
+                            WHERE purchasedetail.PurchaseID=@PurID
+                            GROUP BY purchasedetail.PurchaseID";
+                    var Pur = CoreConn.QueryFirst<APurchaseDetail>(sql, new { PurID = IParam.PurID }, CoreTrans);
+                    if (Pur.purqty <= Pur.recqty)
+                    {
+                        CoreConn.Execute("UPDATE purchase SET Status=2 WHERE CoID=@CoID AND ID=@PurID", new { CoID = IParam.CoID, PurID = IParam.PurID }, CoreTrans);
                     }
+                    #endregion
+
+                    #region 添加WmsPile库存&Wmslog操作记录
+                    //更新WmsPile
+                    string pilesql = "SELECT * FROM wmspile WHERE CoID = @CoID AND Skuautoid in @SkuIDLst AND Type=4 AND WarehouseID=@WhID";
+                    var pileLst = CoreConn.Query<AWmsPile>(pilesql, new { CoID = IParam.CoID, SkuIDLst = SkuIDLst, WhID = IParam.WhID }, CoreTrans).AsList();
+                    var NewPileLst = RecSkuLst.Where(a => !pileLst
+                                                        .Select(b => b.Skuautoid)
+                                                        .Contains(a.Skuautoid))
+                                            .Select(a => new AWmsPile
+                                            {
+                                                Skuautoid = a.Skuautoid,
+                                                SkuID = a.SkuID,
+                                                WarehouseID = IParam.WhID,
+                                                WarehouseName = WhViewLst[0].WhName,
+                                                Type = int.Parse(WhViewLst[0].Type),
+                                                Qty = a.Qty,
+                                                Creator = IParam.Creator,
+                                                CreateDate = IParam.CreateDate,
+                                                CoID = IParam.CoID,
+                                            }).AsList();
+                    if (NewPileLst.Count > 0)
+                    {
+                        CoreConn.Execute(AddWmsPile(), NewPileLst, CoreTrans);
+                    }
+                    if (pileLst.Count > 0)
+                    {
+                        var UptPileLst = (from a in pileLst
+                                          join b in RecSkuLst on a.Skuautoid equals b.Skuautoid
+                                          select new AWmsPile
+                                          {
+                                              CoID = IParam.CoID,
+                                              ID = a.ID,
+                                              Qty = a.Qty + b.Qty
+                                          }).AsList();
+                        CoreConn.Execute("UPDATE wmspile SET Qty=@Qty WHERE CoID=@CoID AND ID=@ID", UptPileLst, CoreTrans);
+                    }
+                    //新增Log
+                    var BoxLst = IParam.RecSkuLst.Where(a => a.SkuType == 2).ToList();//装箱Sku
+                    var PieceLst = IParam.RecSkuLst.Where(a => a.SkuType < 2).ToList();//单件Sku   
+                    var logLst = new List<AWmslog>();
+                    if (BoxLst.Count > 0)
+                    {
+                        string boxsql = "SELECT BarCode,Skuautoid,SkuID,BoxCode,Qty FROM wmsbox WHERE CoID=@CoID AND BoxCode in @BoxCodeLst";
+                        var BoxCodeLst = BoxLst.Select(a => a.BarCode).AsList();
+                        var BoxSkuLst = CoreConn.Query<AWmsBox>(boxsql, new { CoID = IParam.CoID, BoxCodeLst = BoxCodeLst });
+                        var logLstA = BoxSkuLst.Select(a => new AWmslog
+                        {
+                            BarCode = a.BarCode,
+                            Skuautoid = a.Skuautoid,
+                            SkuID = a.SkuID,
+                            BoxCode = a.BoxCode,
+                            WarehouseID = IParam.WhID,
+                            Qty = a.Qty,
+                            Contents = CusType,
+                            Type = int.Parse(WhViewLst[0].Type),
+                            RecordID = ParentID,
+                            CoID = IParam.CoID,
+                            Creator = IParam.Creator,
+                            CreateDate = IParam.CreateDate
+                        }).AsList();
+                        logLst.AddRange(logLstA);
+                    }
+                    if (PieceLst.Count > 0)
+                    {
+                        var logLstB = PieceLst.Select(a => new AWmslog
+                        {
+                            BarCode = a.BarCode,
+                            Skuautoid = a.Skuautoid,
+                            SkuID = a.SkuID,
+                            WarehouseID = IParam.WhID,
+                            Qty = a.Qty,
+                            Contents = CusType,
+                            Type = int.Parse(WhViewLst[0].Type),
+                            RecordID = ParentID,
+                            CoID = IParam.CoID,
+                            Creator = IParam.Creator,
+                            CreateDate = IParam.CreateDate
+                        }).AsList();
+                        logLst.AddRange(logLstB);
+                    }
+                    if (logLst.Count > 0)
+                    {
+                        CoreConn.Execute(AddWmsLogSql(), logLst, CoreTrans);
+                    }
+                    #endregion
+
+                    #region 产生库存交易&更新库存
+                    //交易主表
+                    var inv = new Invinout();
+                    inv.RefID = ParentID;
+                    inv.RecordID = RecordID;
+                    inv.Type = inv_type;
+                    inv.CusType = CusType;
+                    inv.Status = 1;
+                    inv.WhID = WhViewLst[0].ID;
+                    inv.LinkWhID = WhViewLst[0].ParentID;
+                    inv.Creator = IParam.Creator;
+                    inv.CreateDate = IParam.CreateDate;
+                    inv.CoID = IParam.CoID.ToString();
+                    CoreConn.Execute(InventoryHaddle.AddInvinoutSql(), inv, CoreTrans);
+                    var inv_itemLst = IParam.RecSkuLst.Select(a => new Invinoutitem
+                    {
+                        RefID = ParentID,
+                        IoID = RecordID,
+                        Type = inv_type,
+                        CusType = CusType,
+                        Status = 1,
+                        Skuautoid = a.Skuautoid.ToString(),
+                        Qty = a.Qty,
+                        WhID = WhViewLst[0].ID,
+                        LinkWhID = WhViewLst[0].ParentID,
+                        Creator = IParam.Creator,
+                        CreateDate = IParam.CreateDate,
+                        CoID = IParam.CoID.ToString()
+                    }).AsList();
+                    CoreConn.Execute(InventoryHaddle.AddInvinoutitemSql(), inv_itemLst, CoreTrans);
+
+                    #endregion
+                    string InvQuerySql = @"SELECT ID,Skuautoid,StockQty FROM Inventory WHERE CoID=@CoID AND Skuautoid in @SkuIDLst";
+                    string InvMQuerySql = @"SELECT ID,Skuautoid,StockQty FROM Inventory_sale WHERE CoID=@CoID AND Skuautoid in @SkuIDLst";
+                    var InvSkuLst = CoreConn.Query<Sfc_InvStock>(InvQuerySql, new { CoID = IParam.CoID, @WarehouseID = WhViewLst[0].ParentID, SkuIDLst = SkuIDLst }).AsList();//读取现有库存
+                    var MainInvSkuLst = CoreConn.Query<Sfc_InvStock>(InvMQuerySql, new { CoID = IParam.CoID, SkuIDLst = SkuIDLst }).AsList();//读取现有主仓库存   
+                    var NewInvLst = RecSkuLst.Where(a => !InvSkuLst
+                                                           .Select(b => b.Skuautoid)
+                                                           .Contains(a.Skuautoid.ToString()))
+                                           .Select(a => new Inventory
+                                           {
+                                               Skuautoid = a.Skuautoid.ToString(),
+                                               WarehouseID = WhViewLst[0].ParentID,
+                                               CoID = IParam.CoID.ToString(),
+                                               Creator = IParam.Creator,
+                                               CreateDate = IParam.CreateDate
+                                           }).AsList();
+                    var NewMainInvLst = RecSkuLst.Where(a => !MainInvSkuLst
+                                                        .Select(b => b.Skuautoid)
+                                                        .Contains(a.Skuautoid.ToString()))
+                                        .Select(a => new Inventory
+                                        {
+                                            Skuautoid = a.Skuautoid.ToString(),
+                                            CoID = IParam.CoID.ToString(),
+                                            Creator = IParam.Creator,
+                                            CreateDate = IParam.CreateDate
+                                        }).AsList();
+                    //新增交易表头
+                    CoreConn.Execute(InventoryHaddle.AddInvinoutSql(), inv, CoreTrans);
+                    //新增交易明细
+                    CoreConn.Execute(InventoryHaddle.AddInvinoutitemSql(), inv_itemLst, CoreTrans);
+                    //Sku库存新增
+                    if (NewInvLst.Count > 0)
+                    {
+                        CoreConn.Execute(InventoryHaddle.AddInventorySql(), NewInvLst, CoreTrans);
+                    }
+                    if (NewMainInvLst.Count > 0)
+                    {
+                        CoreConn.Execute(InventoryHaddle.AddInventorySaleSql(), NewMainInvLst, CoreTrans);//Sku库存新增
+                    }
+                    //更新库存数量                                                                              
+                    CoreConn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = IParam.CoID, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
+                    //更新总库存数量
+                    res = CommHaddle.GetWareCoidList(IParam.CoID.ToString());
+                    var CoIDLst = res.d as List<string>;
+                    CoreConn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = IParam.CoID, CoIDLst = CoIDLst, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
+                    CoreTrans.Commit();
+                    CoreUser.LogComm.InsertUserLog("采购收入", "purchasereceive", "单据ID" + ParentID, IParam.Creator, IParam.CoID, DateTime.Now);
+
                 }
-                catch (Exception e)
+                else
                 {
-                    CoreTrans.Rollback();
-                    MsgTrans.Rollback();
-                    res.s = -1;
-                    res.d = e.Message;
-                }
-                finally
-                {
-                    CoreTrans.Dispose();
-                    MsgTrans.Dispose();
-                    CoreConn.Close();
-                    MsgConn.Close();
+                    result.s = res.s;
+                    result.d = res.d;
                 }
             }
+            catch (Exception e)
+            {
+                CoreTrans.Rollback();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                CoreTrans.Dispose();
+                CoreConn.Close();
+            }
 
+            //                 #region 操作记录worklog
+            //                 StringBuilder sqltest = new StringBuilder();
+            //                 foreach (var Log in IParam.WmsboxLst)
+            //                 {
+            //                     sqltest.Append("('" + Log.BarCode + "','" + Log.SkuID + "','" + Log.BoxCode
+            //                           + "',0,-1,0"
+            //                           + "," + Log.CoID + ",'" + IParam.Creator + "','" + DateTime.Now.ToString()
+            //                           + "','" + IParam.Contents + "','" + IParam.RecordID + "'),");
+            //                 }
+            //                 foreach (var Log in IParam.WmsboxLst)
+            //                 {
+            //                     sqltest.Append("('" + Log.BarCode + "','" + Log.SkuID + "','" + Log.BoxCode
+            //                           + "'," + IParam.WarehouseID + ",1," + IParam.Type
+            //                           + "," + Log.CoID + ",'" + IParam.Creator + "','" + DateTime.Now.ToString()
+            //                           + "','" + IParam.Contents + "','" + IParam.RecordID + "'),");
+            //                 }
+            // string ISql = @"INSERT INTO xymessage.worklog (
+            //  xymessage.worklog.BarCode,
+            //  xymessage.worklog.SkuID,
+            //  xymessage.worklog.BoxCode,
+            //  xymessage.worklog.WarehouseID,
+            //  xymessage.worklog.qty,
+            //  xymessage.worklog.Type,
+            //  xymessage.worklog.CoID,
+            //  xymessage.worklog.Creator,
+            //  xymessage.worklog.CreateDate,
+            //  xymessage.worklog.Contents,
+            //  xymessage.worklog.RecordID
+            // )  VALUES"
+            //                         + sqltest.ToString().Substring(0, sqltest.ToString().Length - 1);
+            //                 CoreConn.Execute(ISql, MsgTrans);//新增操作记录
+            //                 #endregion
 
-            return res;
+            return result;
         }
         #endregion
 
+        #region 新增普通收料单
+        public static DataResult SetRecDetail(ApiRecParam IParam)
+        {
+            var result = new DataResult(1, null);
+            var CoreConn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreConn.Open();
+            var CoreTrans = CoreConn.BeginTransaction(IsolationLevel.ReadUncommitted);
+            try
+            {
+                string RecordID = "RE" + CommHaddle.GetRecordID(IParam.CoID);
+                //获取仓库基本资料
+                string ParentID = string.Empty;
+                int inv_type = 1801;
+                string CusType = "其他进仓";
+                var WhIDLst = new List<string>();
+                WhIDLst.Add(IParam.WhID.ToString());
+                var res = CommHaddle.GetWhViewLstByID(IParam.CoID.ToString(), WhIDLst);
+                var WhViewLst = res.d as List<Warehouse_view>;
+                var RecSkuLst = (from a in IParam.RecSkuLst
+                                 group a by new { a.Skuautoid, a.SkuID } into g
+                                 select new ARecSkuSum
+                                 {
+                                     Skuautoid = g.Key.Skuautoid,
+                                     SkuID = g.Key.SkuID,
+                                     Qty = g.Sum(a => a.Qty)
+                                 }).AsList();
+                var SkuIDLst = IParam.RecSkuLst.Select(a => a.Skuautoid.ToString()).AsList();
+                res = CommHaddle.GetSkuViewByID(IParam.CoID.ToString(), SkuIDLst);
+                var SkuViewLst = res.d as List<CoreSkuView>;//获取商品Sku资料
+                  #region 添加WmsPile库存&Wmslog操作记录
+                    //更新WmsPile
+                    string pilesql = "SELECT * FROM wmspile WHERE CoID = @CoID AND Skuautoid in @SkuIDLst AND Type=4 AND WarehouseID=@WhID";
+                    var pileLst = CoreConn.Query<AWmsPile>(pilesql, new { CoID = IParam.CoID, SkuIDLst = SkuIDLst, WhID = IParam.WhID }, CoreTrans).AsList();
+                    var NewPileLst = RecSkuLst.Where(a => !pileLst
+                                                        .Select(b => b.Skuautoid)
+                                                        .Contains(a.Skuautoid))
+                                            .Select(a => new AWmsPile
+                                            {
+                                                Skuautoid = a.Skuautoid,
+                                                SkuID = a.SkuID,
+                                                WarehouseID = IParam.WhID,
+                                                WarehouseName = WhViewLst[0].WhName,
+                                                Type = int.Parse(WhViewLst[0].Type),
+                                                Qty = a.Qty,
+                                                Creator = IParam.Creator,
+                                                CreateDate = IParam.CreateDate,
+                                                CoID = IParam.CoID,
+                                            }).AsList();
+                    if (NewPileLst.Count > 0)
+                    {
+                        CoreConn.Execute(AddWmsPile(), NewPileLst, CoreTrans);
+                    }
+                    if (pileLst.Count > 0)
+                    {
+                        var UptPileLst = (from a in pileLst
+                                          join b in RecSkuLst on a.Skuautoid equals b.Skuautoid
+                                          select new AWmsPile
+                                          {
+                                              CoID = IParam.CoID,
+                                              ID = a.ID,
+                                              Qty = a.Qty + b.Qty
+                                          }).AsList();
+                        CoreConn.Execute("UPDATE wmspile SET Qty=@Qty WHERE CoID=@CoID AND ID=@ID", UptPileLst, CoreTrans);
+                    }
+                    //新增Log
+                    var BoxLst = IParam.RecSkuLst.Where(a => a.SkuType == 2).ToList();//装箱Sku
+                    var PieceLst = IParam.RecSkuLst.Where(a => a.SkuType < 2).ToList();//单件Sku   
+                    var logLst = new List<AWmslog>();
+                    if (BoxLst.Count > 0)
+                    {
+                        string boxsql = "SELECT BarCode,Skuautoid,SkuID,BoxCode,Qty FROM wmsbox WHERE CoID=@CoID AND BoxCode in @BoxCodeLst";
+                        var BoxCodeLst = BoxLst.Select(a => a.BarCode).AsList();
+                        var BoxSkuLst = CoreConn.Query<AWmsBox>(boxsql, new { CoID = IParam.CoID, BoxCodeLst = BoxCodeLst });
+                        var logLstA = BoxSkuLst.Select(a => new AWmslog
+                        {
+                            BarCode = a.BarCode,
+                            Skuautoid = a.Skuautoid,
+                            SkuID = a.SkuID,
+                            BoxCode = a.BoxCode,
+                            WarehouseID = IParam.WhID,
+                            Qty = a.Qty,
+                            Contents = CusType,
+                            Type = int.Parse(WhViewLst[0].Type),
+                            RecordID = RecordID,
+                            CoID = IParam.CoID,
+                            Creator = IParam.Creator,
+                            CreateDate = IParam.CreateDate
+                        }).AsList();
+                        logLst.AddRange(logLstA);
+                    }
+                    if (PieceLst.Count > 0)
+                    {
+                        var logLstB = PieceLst.Select(a => new AWmslog
+                        {
+                            BarCode = a.BarCode,
+                            Skuautoid = a.Skuautoid,
+                            SkuID = a.SkuID,
+                            WarehouseID = IParam.WhID,
+                            Qty = a.Qty,
+                            Contents = CusType,
+                            Type = int.Parse(WhViewLst[0].Type),
+                            RecordID = RecordID,
+                            CoID = IParam.CoID,
+                            Creator = IParam.Creator,
+                            CreateDate = IParam.CreateDate
+                        }).AsList();
+                        logLst.AddRange(logLstB);
+                    }
+                    if (logLst.Count > 0)
+                    {
+                        CoreConn.Execute(AddWmsLogSql(), logLst, CoreTrans);
+                    }
+                    #endregion
+
+                    #region 产生库存交易&更新库存
+                    //交易主表
+                    var inv = new Invinout();
+                    inv.RefID = ParentID;
+                    inv.RecordID = RecordID;
+                    inv.Type = inv_type;
+                    inv.CusType = CusType;
+                    inv.Status = 1;
+                    inv.WhID = WhViewLst[0].ID;
+                    inv.LinkWhID = WhViewLst[0].ParentID;
+                    inv.Creator = IParam.Creator;
+                    inv.CreateDate = IParam.CreateDate;
+                    inv.CoID = IParam.CoID.ToString();
+                    CoreConn.Execute(InventoryHaddle.AddInvinoutSql(), inv, CoreTrans);
+                    var inv_itemLst = IParam.RecSkuLst.Select(a => new Invinoutitem
+                    {
+                        RefID = ParentID,
+                        IoID = RecordID,
+                        Type = inv_type,
+                        CusType = CusType,
+                        Status = 1,
+                        Skuautoid = a.Skuautoid.ToString(),
+                        Qty = a.Qty,
+                        WhID = WhViewLst[0].ID,
+                        LinkWhID = WhViewLst[0].ParentID,
+                        Creator = IParam.Creator,
+                        CreateDate = IParam.CreateDate,
+                        CoID = IParam.CoID.ToString()
+                    }).AsList();
+                    CoreConn.Execute(InventoryHaddle.AddInvinoutitemSql(), inv_itemLst, CoreTrans);
+
+                    #endregion
+                    string InvQuerySql = @"SELECT ID,Skuautoid,StockQty FROM Inventory WHERE CoID=@CoID AND Skuautoid in @SkuIDLst";
+                    string InvMQuerySql = @"SELECT ID,Skuautoid,StockQty FROM Inventory_sale WHERE CoID=@CoID AND Skuautoid in @SkuIDLst";
+                    var InvSkuLst = CoreConn.Query<Sfc_InvStock>(InvQuerySql, new { CoID = IParam.CoID, @WarehouseID = WhViewLst[0].ParentID, SkuIDLst = SkuIDLst }).AsList();//读取现有库存
+                    var MainInvSkuLst = CoreConn.Query<Sfc_InvStock>(InvMQuerySql, new { CoID = IParam.CoID, SkuIDLst = SkuIDLst }).AsList();//读取现有主仓库存   
+                    var NewInvLst = RecSkuLst.Where(a => !InvSkuLst
+                                                           .Select(b => b.Skuautoid)
+                                                           .Contains(a.Skuautoid.ToString()))
+                                           .Select(a => new Inventory
+                                           {
+                                               Skuautoid = a.Skuautoid.ToString(),
+                                               WarehouseID = WhViewLst[0].ParentID,
+                                               CoID = IParam.CoID.ToString(),
+                                               Creator = IParam.Creator,
+                                               CreateDate = IParam.CreateDate
+                                           }).AsList();
+                    var NewMainInvLst = RecSkuLst.Where(a => !MainInvSkuLst
+                                                        .Select(b => b.Skuautoid)
+                                                        .Contains(a.Skuautoid.ToString()))
+                                        .Select(a => new Inventory
+                                        {
+                                            Skuautoid = a.Skuautoid.ToString(),
+                                            CoID = IParam.CoID.ToString(),
+                                            Creator = IParam.Creator,
+                                            CreateDate = IParam.CreateDate
+                                        }).AsList();
+                    //新增交易表头
+                    CoreConn.Execute(InventoryHaddle.AddInvinoutSql(), inv, CoreTrans);
+                    //新增交易明细
+                    CoreConn.Execute(InventoryHaddle.AddInvinoutitemSql(), inv_itemLst, CoreTrans);
+                    //Sku库存新增
+                    if (NewInvLst.Count > 0)
+                    {
+                        CoreConn.Execute(InventoryHaddle.AddInventorySql(), NewInvLst, CoreTrans);
+                    }
+                    if (NewMainInvLst.Count > 0)
+                    {
+                        CoreConn.Execute(InventoryHaddle.AddInventorySaleSql(), NewMainInvLst, CoreTrans);//Sku库存新增
+                    }
+                    //更新库存数量                                                                              
+                    CoreConn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = IParam.CoID, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
+                    //更新总库存数量
+                    res = CommHaddle.GetWareCoidList(IParam.CoID.ToString());
+                    var CoIDLst = res.d as List<string>;
+                    CoreConn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = IParam.CoID, CoIDLst = CoIDLst, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
+                    CoreTrans.Commit();
+                    CoreUser.LogComm.InsertUserLog(CusType, "Invinout", "交易ID" + RecordID, IParam.Creator, IParam.CoID, DateTime.Now);
+
+            }
+            catch (Exception e)
+            {
+                CoreTrans.Rollback();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                CoreTrans.Dispose();
+                CoreConn.Close();
+            }
+            return result;
+        }
+        #endregion
 
         #region 组合箱码&件码
-        public static List<AWmsBox> ContactBox(List<string> BarCodeLst,int Skuautoid, int CoID)
+        public static List<AWmsBox> ContactBox(List<string> BarCodeLst, int Skuautoid, int CoID)
         {
             var BoxLst = new List<AWmsBox>();
             foreach (var BarCode in BarCodeLst)
@@ -257,100 +605,6 @@ namespace CoreData.CoreWmsApi
         }
         #endregion
 
-        #region 根据装箱单号返回收入暂存依据
-        public static DataResult GetBoxByCode(APurParams IParam)
-        {
-            var res = new DataResult(1, null);
-            var SkuIDLst = IParam.WmsboxLst.Select(a => a.SkuID.ToUpper()).Distinct().ToList<string>();
-            var SkuSql = @"SELECT ID,SkuID,GoodsCode,ColorName,SizeName FROM coresku WHERE CoID=@CoID AND SkuID IN @SkuIDLst";
-            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
-            {
-                try
-                {
-                    var SkuYLst = new List<ACoreSku>();
-                    string sql = @"SELECT Distinct SkuID FROM wmspile WHERE CoID=@CoID AND Type=@Type AND SkuID IN @SkuIDLst";
-                    var p = new { CoID = IParam.CoID, Type = IParam.Type, SkuIDLst = SkuIDLst };
-                    var PileSkuLst = conn.Query<string>(sql, p).AsList();//Pile已存在资料
-                    if (PileSkuLst.Count > 0)
-                    {
-                        SkuYLst = conn.Query<ACoreSku>(SkuSql, new { CoID = IParam.CoID, SkuIDLst = PileSkuLst }).AsList();
-                        foreach (var sku in SkuYLst)
-                        {
-                            if (SkuIDLst.Contains(sku.SkuID.ToUpper()))
-                                SkuIDLst.Remove(sku.SkuID.ToUpper());
-                        }
-                    }
-                    var SkuNLst = conn.Query<ACoreSku>(sql, new { CoID = IParam.CoID, SkuIDLst = SkuIDLst }).AsList();
-                    var Lst = (from b in IParam.WmsboxLst
-                               join s in SkuYLst
-                               on new { SkuID = b.SkuID.ToUpper() } equals new { SkuID = s.SkuID.ToUpper() }
-                               group new { b, s } by new { s.SkuID, s.SkuName, s.Norm, s.GoodsCode } into c
-                               select new
-                               {
-                                   CoID = IParam.CoID,
-                                   GoodsCode = c.Key.GoodsCode,
-                                   SkuID = c.Key.SkuID,
-                                   SkuName = c.Key.SkuName,
-                                   Norm = c.Key.Norm,
-                                   WarehouseID = IParam.WarehouseID,
-                                   WarehouseName = IParam.WarehouseName,
-                                   Creator = IParam.Creator,
-                                   Qty = c.Count(),
-                                   Type = IParam.Type,
-                                   Status = 2//修改
-                               })
-                      .Union(from b in IParam.WmsboxLst
-                             join s in SkuNLst
-                             on new { SkuID = b.SkuID.ToUpper() } equals new { SkuID = s.SkuID.ToUpper() }
-                             group new { b, s } by new { s.SkuID, s.SkuName, s.Norm, s.GoodsCode } into c
-                             select new
-                             {
-                                 CoID = IParam.CoID,
-                                 GoodsCode = c.Key.GoodsCode,
-                                 SkuID = c.Key.SkuID,
-                                 SkuName = c.Key.SkuName,
-                                 Norm = c.Key.Norm,
-                                 WarehouseID = IParam.WarehouseID,
-                                 WarehouseName = IParam.WarehouseName,
-                                 Creator = IParam.Creator,
-                                 Qty = c.Count(),
-                                 Type = IParam.Type,
-                                 Status = 1//新增
-                             })
-                      .ToList();
-                    var WmsPileLst = new List<WmsPileAuto>();
-                    if (Lst.Count > 0)
-                    {
-                        foreach (var l in Lst)
-                        {
-                            var WmsPile = new WmsPileAuto();
-                            WmsPile.CoID = l.CoID;
-                            WmsPile.GoodsCode = l.GoodsCode;
-                            // WmsPile.Skuautoid = 
-                            WmsPile.SkuID = l.SkuID;
-                            WmsPile.SkuName = l.SkuName;
-                            WmsPile.Norm = l.Norm;
-                            WmsPile.WarehouseID = l.WarehouseID;
-                            WmsPile.WarehouseName = l.WarehouseName;
-                            WmsPile.Creator = l.Creator;
-                            WmsPile.Qty = l.Qty;
-                            WmsPile.status = l.Status;
-                            WmsPile.Type = l.Type;
-                            WmsPileLst.Add(WmsPile);
-                        }
-                    }
-                    res.d = WmsPileLst;
-                }
-                catch (Exception e)
-                {
-                    conn.Close();
-                    res.s = -1;
-                    res.d = e.Message;
-                }
-            }
-            return res;
-        }
-        #endregion
 
 
         #region 检查参数是箱码or件码
@@ -395,7 +649,7 @@ namespace CoreData.CoreWmsApi
             {
                 if (IParam.IsBox)
                 {
-                    Qty = DbBase.GoodsDB.QueryFirst<int>("SELECT count(ID) FROM wmsbox WHERE CoID=@CoID AND BoxCode=@BoxCode", new { CoID = IParam.CoID, BoxCode = IParam.BoxCode });
+                    Qty = DbBase.GoodsDB.QueryFirst<int>("SELECT IFNULL(SUM(Qty),0) FROM wmsbox WHERE CoID=@CoID AND BoxCode=@BoxCode", new { CoID = IParam.CoID, BoxCode = IParam.BoxCode });
                     IParam.SkuID = DbBase.GoodsDB.QueryFirst<string>("SELECT SkuID FROM wmsbox WHERE CoID=@CoID AND BoxCode=@BoxCode LIMIT 1", new { CoID = IParam.CoID, BoxCode = IParam.BoxCode });
                 }
                 string sql = @"SELECT ID,                                    
@@ -470,20 +724,20 @@ namespace CoreData.CoreWmsApi
         #endregion
 
         #region 获取采购资料
-        public static DataResult GetPurDetail(APurParams IParam)
+        public static DataResult GetPurDetail(int PurID, int CoID)
         {
             var res = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CoreConnectString))
             {
                 try
                 {
-                    string sql = "SELECT * FROM purchasedetail WHERE CoID=@CoID AND DetailStatus=2";//2.已确认
+                    string sql = "SELECT * FROM purchasedetail WHERE CoID=@CoID AND DetailStatus=1";//明细状态(0:待审核;1:已确认;2.已完成;3.待发货;4.待收货;5:作废)
                     var p = new DynamicParameters();
-                    p.Add("@CoID", IParam.CoID);
-                    if (IParam.PurID > 0)
+                    p.Add("@CoID", CoID);
+                    if (PurID > 0)
                     {
                         sql = sql + " AND ID=@PurID";
-                        p.Add("@PurID", IParam.PurID);
+                        p.Add("@PurID", PurID);
                     }
                     var Lst = conn.Query<PurchaseDetail>(sql, p).AsList();
                     if (Lst.Count <= 0)
@@ -566,78 +820,48 @@ namespace CoreData.CoreWmsApi
             return sql;
         }
 
-        public static PurchaseReceive NewPurRec(APurParams IParam)
+
+        #endregion
+
+        #region 新增操作记录
+        public static string AddWmsLogSql()
         {
-            var rec = new PurchaseReceive();
-            rec.scoid = IParam.Apur.scoid;
-            rec.sconame = IParam.Apur.sconame;
-            rec.purchaseid = IParam.Apur.id;
-            rec.coid = int.Parse(IParam.CoID);
-            rec.creator = IParam.Creator;
-            rec.createdate = DateTime.Now;
-            rec.warehouseid = IParam.WarehouseID;
-            rec.warehousename = IParam.WarehouseName;
-            rec.receivedate = DateTime.Now.ToString("yyyy-mm-dd");
-            return rec;
-        }
-        public static PurchaseRecDetail NewPurRecDetail(APurParams IParam)
-        {
-            var rec = new PurchaseRecDetail();
-            rec.recid = IParam.PurRecID;
-            rec.skuautoid = IParam.ApurDetail.skuautoid;
-            rec.skuid = IParam.ApurDetail.skuid;
-            rec.norm = IParam.ApurDetail.norm;
-            rec.skuname = IParam.ApurDetail.skuname;
-            rec.recqty = IParam.RecQty.ToString();
-            rec.price = IParam.ApurDetail.price;
-            rec.amount = (IParam.RecQty * double.Parse(rec.price)).ToString();
-            rec.goodscode = IParam.ApurDetail.goodscode;
-            rec.creator = IParam.Creator;
-            rec.createdate = DateTime.Now;
-            rec.coid =  int.Parse(IParam.CoID);
-            return rec;
+            string sql = @"INSERT INTO wmslog (
+                             BarCode,
+                             Skuautoid,
+                             SkuID,
+                             BoxCode,
+                             WarehouseID,
+                             Qty,
+                             Type,
+                             CoID,
+                             Creator,
+                             CreateDate,
+                             Contents,
+                             RecordID
+                            )  VALUES (
+                             @BarCode,
+                             @Skuautoid,
+                             @SkuID,
+                             @BoxCode,
+                             @WarehouseID,
+                             @Qty,
+                             @Type,
+                             @CoID,
+                             @Creator,
+                             @CreateDate,
+                             @Contents,
+                             @RecordID
+                            )";
+            return sql;
         }
         #endregion
 
-        #region 新增库存交易
 
-        public static Invinout NewPurInvInOut(APurParams IParam)
-        {
-            var inv = new Invinout();
-            inv.RecordID = IParam.RecordID;
-            inv.Type = IParam.invType;
-            inv.CusType = IParam.CusType;
-            inv.Status = IParam.Status;
-            inv.WhID = IParam.PWID.ToString();
-            inv.WhName = IParam.PWName;
-            inv.Creator = IParam.Creator;
-            inv.CreateDate = DateTime.Now.ToString();
-            inv.CoID = IParam.CoID.ToString();
-            inv.RecID = IParam.PurRecID;
-            return inv;
-        }
-
-        public static Invinoutitem NewPurInvInOutItem(APurParams IParam)
-        {
-            var inv = new Invinoutitem();
-            inv.IoID = IParam.RecordID;
-            inv.SkuID = IParam.ApurDetail.skuid;
-            inv.Skuautoid = IParam.ApurDetail.skuautoid.ToString();
-            inv.Norm = IParam.ApurDetail.norm;
-            inv.Qty = IParam.RecQty;
-            inv.Creator = IParam.Creator;
-            inv.CreateDate = DateTime.Now.ToString();
-            inv.CoID = IParam.CoID;
-            inv.CusType = IParam.CusType;
-            inv.WhID = IParam.WarehouseID.ToString();
-            inv.WhName = IParam.WarehouseName;
-            return inv;
-        }
-        #endregion
         #region 新增库存
         public static string AddInventorySql()
         {
-            string sql=@"INSERT INTO inventory (
+            string sql = @"INSERT INTO inventory (
                                     GoodsCode,
                                     Skuautoid,
                                     SkuID,
@@ -663,27 +887,7 @@ namespace CoreData.CoreWmsApi
                                 ";
             return sql;
         }
-        public static List<Inventory> NewPurInventory(APurParams IParam)
-        {
-            var InvLst = new List<Inventory>();
-            string sql = "SELECT Count(ID) FROM inventory WHERE CoID=@CoID AND WarehouseID=@WarehouseID AND skuautoid=@SkuAutoID";
-            var args = new { CoID = IParam.CoID, WarehouseID = IParam.WarehouseID, SkuAutoID = IParam.ApurDetail.skuautoid };
-            int count = DbBase.CoreDB.QueryFirst(sql, args);
-            if (count <= 0)
-            {
-                var inv = new Inventory();
-                inv.CoID =  IParam.CoID;
-                inv.Skuautoid = IParam.ApurDetail.skuautoid.ToString();
-                inv.SkuID = IParam.ApurDetail.skuid;
-                inv.Name = IParam.ApurDetail.skuname;
-                inv.Norm = IParam.ApurDetail.norm;
-                inv.GoodsCode = IParam.ApurDetail.goodscode;
-                inv.WarehouseID = IParam.WarehouseID.ToString();
-                inv.WarehouseName = IParam.WarehouseName;
-                InvLst.Add(inv);
-            }
-            return InvLst;
-        }
+
         #endregion
     }
 }

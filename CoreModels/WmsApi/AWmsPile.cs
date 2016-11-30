@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace CoreModels.WmsApi
 {
     public class AWmsPile
-    {
+    {        
         public int ID { get; set; }
         public string PCode { get; set; }
         public int Skuautoid{get;set;}
@@ -13,11 +13,11 @@ namespace CoreModels.WmsApi
         public int Type { get; set; }
         public int PCType { get; set; }
         public int Order { get; set; }
-        public int qty { get; set; }
+        public int Qty { get; set; }
         public int lockqty { get; set; }
         public bool Enable { get; set; }
         public string Creator { get; set; }
-        public DateTime? CreateDate { get; set; }
+        public string CreateDate { get; set; }
         public int CoID { get; set; }
         public int maxqty { get; set; }
         public string PCodeC { get; set; }

@@ -13,13 +13,10 @@ function说明
 ############################################################
 2.SetBoxCode()//重装箱作业-产生装箱资料WmsBox
     方法：POST
-    路由：http://192.168.30.29:5000/Core/Api/ABox/SetBoxCode
+    路由：http://192.168.30.211:5000/Core/ABox/SetBoxCode
     参数: ApiBoxParam
-    InPut:
-        CoID        int         公司编号
-        Creator     string      操作者
-        SkuID       string      商品编码
-        ABarCodeLst List<string> 件码列表
+    InPut:        
+        BoxSkuLst List<BoxSku> 装箱信息
     OutPut:
        成功：
             1.新增资料(Wmsbox)            

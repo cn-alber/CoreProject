@@ -60,12 +60,15 @@ namespace CoreModels.XyComm
     {
         public string ID { get; set; }
         public string WhName { get; set; }
-        public string CoID{get;set;}
+        public string CoID { get; set; }
+        public string Type { get; set; }
+        public string ParentID{get;set;}
     }
-    
-    public class WarehouseTree{
-        public int value{get;set;}
-        public string label{get;set;}
+
+    public class WarehouseTree
+    {
+        public int value { get; set; }
+        public string label { get; set; }
     }
 
 
