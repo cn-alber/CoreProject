@@ -5223,6 +5223,15 @@ namespace CoreData.CoreCore
                 ord.CreateDate = DateTime.Now;
                 ord.Modifier = UserName;
                 ord.ModifyDate = DateTime.Now;
+                //增加赠品
+                var gi = GiftHaddle.SetGift(ord,orderitem,CoID,UserName);
+                if(gi.s == 1)
+                {
+                    var gire = gi.d as GiftInsertOrderReturn;
+                    ord.OrdQty = ord.OrdQty + gire.Qty;
+                    ord.ExWeight = (decimal.Parse(ord.ExWeight) + gire.Exweight).ToString();
+                    orderitem = gire.Item;
+                }
                 //标记异常
                 if(IsSku == false)
                 {
@@ -10404,8 +10413,59 @@ namespace CoreData.CoreCore
             }
             return result;
         }
-        
+        ///<summary>
+        ///重新计算赠品
+        ///</summary>
+        public static DataResult CalGift(string OidType,List<int> oid,string DateType,bool IsSplit,bool IsDelGift,bool IsDelPrice0)
+        {
+            var result = new DataResult(1,null);
+            var logs = new List<Log>();
+            var res = new TransferNormalReturn();
+            var su = new List<TransferNormalReturnSuccess>();
+            var fa = new List<TransferNormalReturnFail>();
+            string sqlCommandText = string.Empty;
+            int count = 0;
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{    
+                    if(OidType == "A")
+                    {
 
+                    }
+                    else if(OidType == "B")
+                    {
+
+                    }
+                    // sqlCommandText = ""
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                res.SuccessIDs = su;
+                res.FailIDs = fa;
+                result.d = res;
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            return result;
+        }
 
 
 

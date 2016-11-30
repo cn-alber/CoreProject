@@ -5,9 +5,6 @@ using CoreModels.XyCore;
 using Dapper;
 using System.Collections.Generic;
 using CoreModels.XyComm;
-using static CoreModels.Enum.OrderE;
-using CoreData.CoreUser;
-using CoreModels.XyUser;
 namespace CoreData.CoreCore
 {
     public static class GiftHaddle
@@ -247,6 +244,7 @@ namespace CoreData.CoreCore
         public static DataResult GetRuleEdit(int id,int CoID)
         {
             var result = new DataResult(1,null);
+            var res = new GiftEditData();
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try{  
                         string sqlCommandText = @"select ID,GiftName,Priority,DateFrom,DateTo,AppointSkuID,AppointGoodsCode,ExcludeSkuID,ExcludeGoodsCode,AmtMin,AmtMax,QtyMin,
@@ -260,7 +258,8 @@ namespace CoreData.CoreCore
                             a = conn.Query<string>(sqlCommandText).AsList();
                             u[0].GiftNo = a;
                         }
-                        result.d = u;
+                        res.Gift = u;
+                        // result.d = u;
                     }
                     catch(Exception ex){
                     result.s = -1;
@@ -268,6 +267,14 @@ namespace CoreData.CoreCore
                     conn.Dispose();
                 }
             }
+            var re = GetInitData(CoID);
+            if(re.s == 1)
+            {
+                var a = re.d as GiftInitData;
+                res.Shop = a.Shop;
+                res.Type = a.Type;
+            }
+            result.d = res;
             return result;
         }
         ///<summary>
@@ -704,6 +711,447 @@ namespace CoreData.CoreCore
                     conn.Dispose();
                 }
             }           
+            return result;
+        }
+        ///<summary>
+        ///新增赠品初始资料
+        ///</summary>
+        public static DataResult GetInitData(int CoID)                
+        {
+            var result = new DataResult(1,null);
+            var res = new GiftInitData();
+            //获取店铺List
+            var shop = CoreComm.ShopHaddle.getShopEnum(CoID.ToString()) as List<shopEnum>;
+            var ff = new List<Filter>();
+            foreach(var t in shop)
+            {
+                var f = new Filter();
+                f.value = t.value.ToString();
+                f.label = t.label;
+                ff.Add(f);
+            }      
+            res.Shop = ff;
+            //订单类型
+            var oo = new List<Filter>();
+            var o = new Filter();
+            o.value = "0";
+            o.label = "普通订单";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "1";
+            o.label = "补发订单";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "2";
+            o.label = "换货订单";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "3";
+            o.label = "天猫分销";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "4";
+            o.label = "天猫供销";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "5";
+            o.label = "协同订单";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "6";
+            o.label = "普通订单,分销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "7";
+            o.label = "补发订单,分销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "8";
+            o.label = "换货订单,分销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "9";
+            o.label = "天猫供销,分销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "10";
+            o.label = "协同订单,分销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "11";
+            o.label = "普通订单,供销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "12";
+            o.label = "补发订单,供销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "13";
+            o.label = "换货订单,供销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "14";
+            o.label = "天猫供销,供销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "15";
+            o.label = "协同订单,供销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "16";
+            o.label = "普通订单,分销+,供销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "17";
+            o.label = "补发订单,分销+,供销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "18";
+            o.label = "换货订单,分销+,供销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "19";
+            o.label = "天猫供销,分销+,供销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "20";
+            o.label = "协同订单,分销+,供销+";
+            oo.Add(o);
+            res.Type = oo;
+            result.d = res;
+            return result;
+        }
+        public static DataResult SetGiftItem(Order ord,List<OrderItem> item,int CoID)
+        {
+            var result = new DataResult(1,null); 
+            var giftNo = new List<GiftInsertOrder>();   
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{    
+                    string sqlcommand = "select * from gift where coid = " + CoID + " and Enable = true order by Priority ASC";
+                    var u = conn.Query<GiftRule>(sqlcommand).AsList();
+                    //获取赠品明细
+                    foreach(var a in u)
+                    {
+                        //日期区间判断
+                        DateTime ordDate = DateTime.Parse(ord.ODate.ToString("d"));
+                        if(ordDate < a.DateFrom || ordDate > a.DateTo) continue;
+                        //最大赠送数量判断
+                        if(!string.IsNullOrEmpty(a.MaxGiftQty) && !string.IsNullOrEmpty(a.GivenQty) && decimal.Parse(a.MaxGiftQty) <= decimal.Parse(a.GivenQty)) continue;
+                        //指定店铺判断
+                        if(!string.IsNullOrEmpty(a.AppointShop))
+                        {
+                            int i = 0;
+                            string[] shop = a.AppointShop.Split(',');
+                            foreach(var s in shop)
+                            {
+                                if(s == ord.ShopID.ToString())
+                                {
+                                    i ++;
+                                    break;
+                                }
+                            }
+                            if(i > 0 ) continue;
+                        }
+                        //指定订单类型判断
+                        if(!string.IsNullOrEmpty(a.OrdType))
+                        {
+                            int i = 0;
+                            string[] type = a.OrdType.Split(',');
+                            foreach(var s in type)
+                            {
+                                if(s == ord.Type.ToString())
+                                {
+                                    i ++;
+                                    break;
+                                }
+                            }
+                            if(i > 0 ) continue;
+                        }
+                        //排除商品判断
+                        if(!string.IsNullOrEmpty(a.ExcludeSkuID))
+                        {
+                            int i = 0;
+                            foreach(var it in item)
+                            {
+                                if(it.IsGift == true) continue;
+                                if(a.ExcludeSkuID.Contains(it.SkuID))
+                                {
+                                    i ++;
+                                    break;
+                                }
+                            }
+                            if(i > 0 ) continue;
+                        }
+                        //排除款式判断
+                        if(!string.IsNullOrEmpty(a.ExcludeGoodsCode))
+                        {
+                            int i = 0;
+                            foreach(var it in item)
+                            {
+                                if(it.IsGift == true) continue;
+                                if(a.ExcludeGoodsCode.Contains(it.GoodsCode))
+                                {
+                                    i ++;
+                                    break;
+                                }
+                            }
+                            if(i > 0 ) continue;
+                        }
+                        //指定商品判断
+                        if(!string.IsNullOrEmpty(a.AppointSkuID))
+                        {
+                            int i = 0;
+                            foreach(var it in item)
+                            {
+                                if(it.IsGift == true) continue;
+                                if(a.AppointSkuID.Contains(it.SkuID))
+                                {
+                                    i ++;
+                                    break;
+                                }
+                            }
+                            if(i == 0 ) continue;
+                        }
+                        //指定款式判断
+                        if(!string.IsNullOrEmpty(a.AppointGoodsCode))
+                        {
+                            int i = 0;
+                            foreach(var it in item)
+                            {
+                                if(a.AppointGoodsCode.Contains(it.GoodsCode))
+                                {
+                                    if(it.IsGift == true) continue;
+                                    i ++;
+                                    break;
+                                }
+                            }
+                            if(i == 0 ) continue;
+                        }
+                        //数量金额判断
+                        if(!string.IsNullOrEmpty(a.AmtMin) || !string.IsNullOrEmpty(a.AmtMax) || !string.IsNullOrEmpty(a.QtyMin) || !string.IsNullOrEmpty(a.QtyMax))
+                        {
+                            int qty = 0;
+                            decimal amt = 0;
+                            foreach(var it in item)
+                            {
+                                if(it.IsGift == true) continue;
+                                if(a.IsSkuIDValid == false)
+                                {
+                                    qty = qty + it.Qty;
+                                    amt = amt + decimal.Parse(it.Amount);
+                                }
+                                else
+                                {
+                                    if(!string.IsNullOrEmpty(a.AppointSkuID) && a.AppointSkuID.Contains(it.SkuID))
+                                    {
+                                        qty = qty + it.Qty;
+                                        amt = amt + decimal.Parse(it.Amount);
+                                    }
+                                    else if(!string.IsNullOrEmpty(a.AppointGoodsCode) && a.AppointGoodsCode.Contains(it.GoodsCode))
+                                    {
+                                        qty = qty + it.Qty;
+                                        amt = amt + decimal.Parse(it.Amount);
+                                    }
+                                }
+                            }
+                            if(!string.IsNullOrEmpty(a.AmtMin) && amt < decimal.Parse(a.AmtMin)) continue;
+                            if(!string.IsNullOrEmpty(a.AmtMax) && amt > decimal.Parse(a.AmtMax)) continue;
+                            if(!string.IsNullOrEmpty(a.QtyMin) && qty < decimal.Parse(a.QtyMin)) continue;
+                            if(!string.IsNullOrEmpty(a.QtyMax) && qty > decimal.Parse(a.QtyMax)) continue;
+                        }
+                        //折扣率判断
+                        if(!string.IsNullOrEmpty(a.DiscountRate))
+                        {
+                            decimal amtOlder = 0,amtNew = 0;
+                            foreach(var it in item)
+                            {
+                                if(it.IsGift == true) continue;
+                                amtOlder = amtOlder + it.Qty * decimal.Parse(it.SalePrice);
+                                amtNew = amtOlder + it.Qty * decimal.Parse(it.RealPrice);
+                            }
+                            decimal dis = amtNew/amtOlder;
+                            if(dis < decimal.Parse(a.DiscountRate)) continue;
+                        }
+                        //计算赠品数量
+                        decimal giftQty = 0;
+                        if(string.IsNullOrEmpty(a.AmtEach) && string.IsNullOrEmpty(a.QtyEach))
+                        {
+                            giftQty = 1;
+                        }
+                        else
+                        {
+                            int qty = 0;
+                            decimal amt = 0;
+                            foreach(var it in item)
+                            {
+                                if(it.IsGift == true) continue;
+                                if(a.IsSkuIDValid == false)
+                                {
+                                    qty = qty + it.Qty;
+                                    amt = amt + decimal.Parse(it.Amount);
+                                }
+                                else
+                                {
+                                    if(!string.IsNullOrEmpty(a.AppointSkuID) && a.AppointSkuID.Contains(it.SkuID))
+                                    {
+                                        qty = qty + it.Qty;
+                                        amt = amt + decimal.Parse(it.Amount);
+                                    }
+                                    else if(!string.IsNullOrEmpty(a.AppointGoodsCode) && a.AppointGoodsCode.Contains(it.GoodsCode))
+                                    {
+                                        qty = qty + it.Qty;
+                                        amt = amt + decimal.Parse(it.Amount);
+                                    }
+                                }
+                            }
+                            if(!string.IsNullOrEmpty(a.AmtEach))
+                            {
+                                giftQty = Math.Floor(amt/decimal.Parse(a.AmtEach));
+                            }
+                            else if(!string.IsNullOrEmpty(a.QtyEach))
+                            {
+                                giftQty = Math.Floor(qty/decimal.Parse(a.QtyEach));
+                            }
+                        }
+                        sqlcommand = "select GiftNo from giftitem where GiftID = " + a.ID + " and coid = " + CoID;
+                        var giftitem = new List<string>();
+                        giftitem = conn.Query<string>(sqlcommand).AsList();
+                        foreach(var it in giftitem)
+                        {
+                            var yy = new GiftInsertOrder();
+                            string[] giftno = it.Split(',');
+                            if(a.IsStock == false)
+                            {
+                                sqlcommand = "select ID from coresku where skuid = '" + giftno[0] + "' and coid = " + CoID;
+                                int skuid = conn.QueryFirst<int>(sqlcommand);
+                                yy.SkuAutoID = skuid;
+                                yy.Qty = int.Parse(giftQty.ToString());
+                                yy.IsGift = a.IsMarkGift;
+                                giftNo.Add(yy);
+                            }
+                            else
+                            {
+                                foreach(var n in giftno)
+                                {
+                                    sqlcommand = "select ID from coresku where skuid = '" + n + "' and coid = " + CoID;
+                                    int skuid = conn.QueryFirst<int>(sqlcommand);
+                                    //检查库存是否足够
+                                    int invqty = OrderHaddle.GetInvQty(CoID,skuid);
+                                    if(invqty >= giftQty)
+                                    {
+                                        yy.SkuAutoID = skuid;
+                                        yy.Qty = int.Parse(giftQty.ToString());
+                                        yy.IsGift = a.IsMarkGift;
+                                        giftNo.Add(yy);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        //叠加赠送
+                        if(a.IsAdd == false) break;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }  
+            if(giftNo.Count > 0)
+            {
+                result.d = giftNo;
+            }
+            else
+            {
+                result.s = 0;
+            }
+            return result;
+        }
+        public static DataResult SetGift(Order ord,List<OrderItem> item,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null); 
+            var res = new GiftInsertOrderReturn();
+            var re = SetGiftItem(ord,item,CoID);
+            if(re.s != 1)
+            {
+                result.s = 0;
+                return result;
+            }
+            var giftNo = re.d as List<GiftInsertOrder>; 
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{    
+
+                    if(giftNo.Count > 0)
+                    {
+                        int Qty = 0;
+                        decimal Exweight = 0;
+                        foreach(var a in giftNo)
+                        {
+                            string skusql = "select skuid,skuname,norm,img,goodscode,enable,saleprice,weight from coresku where id =" + a + " and coid =" + CoID;
+                            var s = conn.Query<SkuInsert>(skusql).AsList();
+                            if (s.Count == 0)
+                            {
+                                continue;
+                            }
+                            if (s[0].enable == false)
+                            {
+                                continue;
+                            }
+                            Qty = Qty + a.Qty;
+                            Exweight = Exweight + decimal.Parse(s[0].weight) * a.Qty;
+                            int i = 0;
+                            foreach(var it in item)
+                            {
+                                if(it.IsGift == false) continue;
+                                if(it.SkuAutoID == a.SkuAutoID && a.IsGift == true)
+                                {
+                                    it.Qty = it.Qty + a.Qty;
+                                    it.TotalWeight = it.TotalWeight + decimal.Parse(s[0].weight) * a.Qty;
+                                    i ++ ;
+                                    break;
+                                }
+                            }
+                            if(i == 0)
+                            {
+                                var it = new OrderItem();
+                                it.SoID = item[0].SoID;
+                                it.CoID = CoID;
+                                it.SkuAutoID = a.SkuAutoID;
+                                it.SkuID = s[0].skuid;
+                                it.Qty = a.Qty;
+                                it.RealPrice = "0";
+                                it.Amount = "0";
+                                it.SkuName = s[0].skuname;
+                                it.Norm = s[0].norm;
+                                it.GoodsCode = s[0].goodscode;
+                                it.SalePrice = s[0].saleprice;
+                                it.DiscountRate = "0";
+                                it.img = s[0].img;
+                                it.Weight = s[0].weight;
+                                it.TotalWeight = (a.Qty * decimal.Parse(s[0].weight)).ToString();
+                                it.IsGift = a.IsGift;
+                                it.Creator = UserName;
+                                it.CreateDate = DateTime.Now;
+                                it.Modifier = UserName;
+                                it.ModifyDate= DateTime.Now;
+                                item.Add(it);
+                            }
+                        }
+                        res.Qty = Qty;
+                        res.Exweight = Exweight;
+                        res.Item = item;
+                        result.d = res;
+                    }
+                    else
+                    {
+                        result.s = 0;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }  
             return result;
         }
     }
