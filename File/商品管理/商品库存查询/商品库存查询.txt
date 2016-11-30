@@ -89,17 +89,18 @@ function说明
     OutPut:
         成功：返回请求成功信息(s=1)
         失败：返回错误信息
-    参考:input json 文件:UptInvVirtualQty_input.json
+    参考:input json 文件:UptInvMainVirtualQty_input.json
 
 7.UptInvVirtualQty()//修改虚拟库存 - 多笔
     方法：POST
     路由：http://192.168.30.211:5000/Core/XyCore/Inventory/UptInvMainLstVirtualQty
     InPut:
-        InvLst          List<InventParams>      商品-虚拟库存修改参数
+        IDLst          List<int>        商品-虚拟库存修改参数
+        VirtualQty      int             虚拟库存数量
     OutPut:
         成功：返回请求成功信息(s=1)
         失败：返回错误信息
-    参考:input json 文件:UptInvLstVirtualQty_input.json
+    参考:input json 文件:UptInvLstVirtualQty_input_input.json
 
 ############################################################
 

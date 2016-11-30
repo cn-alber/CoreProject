@@ -1081,7 +1081,7 @@ namespace CoreData.CoreCore
         #endregion
 
         #region  商品库存查询 - 修改虚拟库存 - 更新虚拟库存(多笔)
-        public static DataResult UptLstVirtualQty(List<InventParams> InvLst, string CoID, string UserName)
+        public static DataResult UptLstVirtualQty(List<int> IDLst,string VirtualQty, string CoID, string UserName)
         {
             var res = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CoreConnectString))
@@ -1089,22 +1089,19 @@ namespace CoreData.CoreCore
                 conn.Open();
                 var Trans = conn.BeginTransaction();
                 try
-                {
-                    InvLst = InvLst.Select(a => new InventParams
+                {                   
+                    if (IDLst.Count > 0)
                     {
-                        ID = a.ID,
-                        VirtualQty = a.VirtualQty,
-                        Modifier = UserName,
-                        ModifyDate = DateTime.Now.ToString(),
-                        CoID = CoID
-                    }).AsList();
-                    if (InvLst.Count > 0)
-                    {
-                        string sql = @"UPDATE inventory_sale SET VirtualQty = @VirtualQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID = @ID";
-                        conn.Execute(sql, InvLst, Trans);
+                        string sql = @"UPDATE inventory_sale SET VirtualQty = @VirtualQty,Modifier=@Modifier,ModifyDate=@ModifyDate WHERE CoID=@CoID AND ID in @IDLst";
+                        var p = new DynamicParameters();
+                        p.Add("@CoID",CoID);                        
+                        p.Add("@IDLst",IDLst);                       
+                        p.Add("@VirtualQty",VirtualQty);                       
+                        p.Add("@Modifier",UserName);                       
+                        p.Add("@ModifyDate",DateTime.Now.ToString());
+                        conn.Execute(sql, p, Trans);
                         Trans.Commit();
-                        var InvIDLst = InvLst.Select(a => a.ID).AsList();
-                        CoreUser.LogComm.InsertUserLog("修改虚拟库存", "inventory_sale", "库存ID：" + string.Join(",", InvIDLst.ToArray()), UserName, int.Parse(CoID), DateTime.Now);
+                        CoreUser.LogComm.InsertUserLog("修改虚拟库存", "inventory_sale", "库存ID：" + string.Join(",", IDLst.ToArray()), UserName, int.Parse(CoID), DateTime.Now);
                     }
                 }
                 catch (Exception e)

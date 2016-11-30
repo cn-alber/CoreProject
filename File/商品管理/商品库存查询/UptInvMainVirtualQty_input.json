@@ -1,4 +1,7 @@
 {
-   "ID": 262428,
-   "VirtualQty":2
+    "IDLst": [
+        262428,
+        262429
+    ],
+    "VirtualQty": 2
 }

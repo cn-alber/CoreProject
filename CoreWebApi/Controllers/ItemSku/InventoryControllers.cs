@@ -417,17 +417,19 @@ namespace CoreWebApi.XyCore
         public ResponseResult UptInvMainLstVirtualQty([FromBodyAttribute]JObject obj)
         {
             var res = new DataResult(1, null);
-            if (obj["InvLst"] == null)
+            int x;
+            if (!(obj["IDLst"] != null && obj["VirtualQty"]!=null && int.TryParse(obj["VirtualQty"].ToString(),out x)))
             {
                 res.s = -1;
                 res.d = "无效参数";
             }
             else
             {
-                var InvLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<InventParams>>(obj["InvLst"].ToString());
+                var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
+                string vqty = obj["VirtualQty"].ToString();
                 string CoID = GetCoid();
                 string UserName = GetUname();
-                res = InventoryHaddle.UptLstVirtualQty(InvLst, CoID, UserName);
+                res = InventoryHaddle.UptLstVirtualQty(IDLst,vqty, CoID, UserName);
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
