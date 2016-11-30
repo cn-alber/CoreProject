@@ -433,7 +433,7 @@ namespace CoreModels.XyCore
         public decimal Pagecnt{get;set;}//总页数
         public List<RecInfo> Recinfo {get;set;}
     }
-    public class Log
+    public class LogInsert
     {
         public int ID{get;set;}
         public int OID{get;set;}
