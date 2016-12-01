@@ -6,8 +6,8 @@ namespace CoreModels.XyCore
     public class ASInitData
     {
         public List<Filter> Shop {get;set;}//店铺
-        public List<Filter> ASStatus{get;set;}//售后状态
-        public List<Filter> ASType{get;set;}//售后类型
+        public List<Filter> Status{get;set;}//售后状态
+        public List<Filter> Type{get;set;}//售后类型
         public List<Filter> OrdType {get;set;} //订单类型
         public List<Filter> Distributor {get;set;}//分销商
         public List<Filter> IssueType{get;set;} //问题类型
@@ -305,7 +305,7 @@ namespace CoreModels.XyCore
         public int Datacnt {get;set;}//总资料笔数
         public decimal Pagecnt{get;set;}//总页数
         public List<AfterSaleQuery> AfterSale {get;set;}
-        public List<Filter> ASType{get;set;}//售后类型
+        public List<Filter> Type{get;set;}//售后类型
         public List<Filter> Warehouse{get;set;}
         public List<Filter> Result{get;set;}//处理结果
     }

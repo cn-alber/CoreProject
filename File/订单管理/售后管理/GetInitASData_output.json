@@ -51,7 +51,7 @@
                 "label": "{线下}"
             }
         ],
-        "ASStatus": [
+        "Status": [
             {
                 "value": "-1",
                 "label": "---不限---"
@@ -73,7 +73,7 @@
                 "label": "被合并"
             }
         ],
-        "ASType": [
+        "Type": [
             {
                 "value": "-1",
                 "label": "---不限---"

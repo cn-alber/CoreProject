@@ -745,7 +745,7 @@
                 "ConfirmDate": "2016-08-22 10:02:18"
             }
         ],
-        "ASType": [
+        "Type": [
             {
                 "value": "0",
                 "label": "普通退货"

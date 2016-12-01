@@ -5,8 +5,8 @@ function说明
 路由:http://localhost:5000/Core/AfterSale/GetInitASData
 input:  None
 OutPut: Shop        店铺
-        ASStatus    售后状态
-        ASType      售后分类
+        Status      售后状态
+        Type        售后分类
         OrdType     订单类型
         Distributor 分销商
         IssueType   问题类型
@@ -51,7 +51,7 @@ input:      ExCode              string          快递单号 default null
 OutPut: Datacnt     总资料笔数
         Pagecnt     总页数
         AfterSale   售后资料
-        ASType      售后分类
+        Type        售后分类
         Warehouse   仓库List
         Result      处理结果
 参考:output jason 文件:GetAsList_output.json

@@ -51,7 +51,7 @@ namespace CoreData.CoreCore
                 f.label = Enum.GetName(typeof(ASStatus), myCode);//获取名称
                 ff.Add(f);
             }
-            res.ASStatus = ff;
+            res.Status = ff;
             //售后类型
             ff = new List<Filter>();
             f = new Filter();
@@ -65,7 +65,7 @@ namespace CoreData.CoreCore
                 f.label = Enum.GetName(typeof(ASType), myCode);//获取名称
                 ff.Add(f);
             }
-            res.ASType = ff;
+            res.Type = ff;
             //订单类型
             var oo = new List<Filter>();
             var o = new Filter();
@@ -424,7 +424,7 @@ namespace CoreData.CoreCore
                 f.label = Enum.GetName(typeof(ASType), myCode);//获取名称
                 ff.Add(f);
             }
-            res.ASType = ff; 
+            res.Type = ff; 
             //处理结果
             ff = new List<Filter>();
             foreach (int  myCode in Enum.GetValues(typeof(Result)))
