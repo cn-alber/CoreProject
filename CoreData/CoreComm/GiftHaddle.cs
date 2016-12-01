@@ -128,7 +128,7 @@ namespace CoreData.CoreCore
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{  
                         string sqlcommand = @"select ID,LogDate,UserName,Title,Remark From orderlog where
-                                            oid = @ID and coid = @Coid and type = 2 order by LogDate Asc";
+                                            oid = @ID and coid = @Coid and type = 2 order by LogDate Desc";
                         var Log = conn.Query<OrderLog>(sqlcommand,new{ID=id,Coid=CoID}).AsList();
                         result.d = Log;
                     }
@@ -842,6 +842,32 @@ namespace CoreData.CoreCore
             return result;
         }
         ///<summary>
+        ///获取skuautoID
+        ///</summary>
+        public static DataResult GetGiftAutoID(string giftno,int CoID)
+        {
+            var result = new DataResult(1,null); 
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    string sqlcommand = "select ID from coresku where skuid = '" + giftno + "' and coid = " + CoID;
+                    int u = conn.QueryFirst<int>(sqlcommand);
+                    if(u > 0)
+                    {
+                        result.d = u;
+                    }
+                    else
+                    {
+                        result.s = -1;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }  
+            return result;
+        }
+        ///<summary>
         ///产生赠品List
         ///</summary>
         public static DataResult SetGiftItem(Order ord,List<OrderItem> item,int CoID)
@@ -875,7 +901,7 @@ namespace CoreData.CoreCore
                                     break;
                                 }
                             }
-                            if(i > 0 ) continue;
+                            if(i == 0 ) continue;
                         }
                         //指定订单类型判断
                         if(!string.IsNullOrEmpty(a.OrdType))
@@ -890,7 +916,7 @@ namespace CoreData.CoreCore
                                     break;
                                 }
                             }
-                            if(i > 0 ) continue;
+                            if(i == 0 ) continue;
                         }
                         //排除商品判断
                         if(!string.IsNullOrEmpty(a.ExcludeSkuID))
@@ -1063,12 +1089,14 @@ namespace CoreData.CoreCore
                                         a.GivenQty = (decimal.Parse(a.GivenQty) + giftQty).ToString();
                                     }
                                 }
-                                sqlcommand = "select ID from coresku where skuid = '" + giftno[0] + "' and coid = " + CoID;
-                                int skuid = conn.QueryFirst<int>(sqlcommand);
-                                yy.SkuAutoID = skuid;
-                                yy.Qty = int.Parse(giftQty.ToString());
-                                yy.IsGift = a.IsMarkGift;
-                                giftNo.Add(yy);
+                                var rr = GetGiftAutoID(giftno[0],CoID);
+                                if(rr.s == 1)
+                                {
+                                    yy.SkuAutoID = int.Parse(rr.d.ToString());
+                                    yy.Qty = int.Parse(giftQty.ToString());
+                                    yy.IsGift = a.IsMarkGift;
+                                    giftNo.Add(yy);
+                                }                                
                             }
                             else
                             {
@@ -1085,19 +1113,21 @@ namespace CoreData.CoreCore
                                             giftQty = decimal.Parse(a.MaxGiftQty) - decimal.Parse(a.GivenQty);
                                         }
                                     }
-                                    sqlcommand = "select ID from coresku where skuid = '" + n + "' and coid = " + CoID;
-                                    int skuid = conn.QueryFirst<int>(sqlcommand);
-                                    //检查库存是否足够
-                                    int invqty = OrderHaddle.GetInvQty(CoID,skuid);
-                                    if(invqty >= giftQty)
+                                    var rr = GetGiftAutoID(n,CoID);
+                                    if(rr.s == 1)
                                     {
-                                        yy.SkuAutoID = skuid;
-                                        yy.Qty = int.Parse(giftQty.ToString());
-                                        yy.IsGift = a.IsMarkGift;
-                                        giftNo.Add(yy);
-                                        a.GivenQty = (decimal.Parse(a.GivenQty) + giftQty).ToString();
-                                        break;
-                                    }
+                                        //检查库存是否足够
+                                        int invqty = OrderHaddle.GetInvQty(CoID,int.Parse(rr.d.ToString()));
+                                        if(invqty >= giftQty)
+                                        {
+                                            yy.SkuAutoID = int.Parse(rr.d.ToString());
+                                            yy.Qty = int.Parse(giftQty.ToString());
+                                            yy.IsGift = a.IsMarkGift;
+                                            giftNo.Add(yy);
+                                            a.GivenQty = (decimal.Parse(a.GivenQty) + giftQty).ToString();
+                                            break;
+                                        }
+                                    }                                    
                                 }
                             }
                             if(!string.IsNullOrEmpty(a.MaxGiftQty) && !string.IsNullOrEmpty(a.GivenQty) && decimal.Parse(a.MaxGiftQty) <= decimal.Parse(a.GivenQty)) break;

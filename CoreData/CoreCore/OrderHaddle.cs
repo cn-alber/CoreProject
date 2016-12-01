@@ -10457,7 +10457,7 @@ namespace CoreData.CoreCore
             var gift = new List<GiftRule>();
             var order = new List<Order>();
             int count = 0;
-            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{   
                     sqlCommandText = "select * from `order` where id in @ID and coid = @Coid";
                     if(DateType == "A")
