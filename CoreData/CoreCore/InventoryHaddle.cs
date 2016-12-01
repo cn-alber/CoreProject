@@ -73,6 +73,7 @@ namespace CoreData.CoreCore
                                         WaitInQty,
                                         SaleRetuQty,
                                         SafeQty,
+                                        UpSafeQty,
                                         DefectiveQty,
                                         VirtualQty,
                                         PurchaseQty,

@@ -74,7 +74,7 @@ namespace CoreData.CoreWmsApi
                                      SkuID = g.Key.SkuID,
                                      Qty = g.Sum(a => a.Qty)
                                  }).AsList();
-                var SkuIDLst = IParam.RecSkuLst.Select(a => a.Skuautoid).AsList();
+                var SkuIDLst = IParam.RecSkuLst.Select(a => a.Skuautoid).Distinct().AsList();
                 res = CommHaddle.GetSkuViewByID(IParam.CoID.ToString(), SkuIDLst);
                 var SkuViewLst = res.d as List<CoreSkuView>;//获取商品Sku资料
                 //获取采购资料
@@ -82,14 +82,15 @@ namespace CoreData.CoreWmsApi
                 if (res.s == 1)
                 {
                     string RecordID = "RE" + CommHaddle.GetRecordID(IParam.CoID);
-                    var PurD = res.d as List<PurchaseDetail>;
-                    var PurM = CoreConn.Query<Purchase>("SELECT * FROM purchase WHERE CoID = @CoID AND ID =@ID",new{CoID=IParam.CoID,ID=PurD[0].purchaseid}).AsList();
+                    var PurD = res.d as List<APurchaseDetail>;
+                    var PurM = CoreConn.Query<Purchase>("SELECT * FROM purchase WHERE CoID = @CoID AND ID =@ID",new{CoID=IParam.CoID,ID=PurD[0].PurchaseID}).AsList();
                     //新增采购收料主表
                     var RecM = new PurchaseReceive();
                     RecM.scoid = PurM[0].scoid;
                     RecM.sconame = PurM[0].sconame;
                     RecM.purchaseid = PurM[0].id;
                     RecM.coid = IParam.CoID;
+                    RecM.status = 1;
                     RecM.creator = IParam.Creator;
                     RecM.createdate = DateTime.Now;
                     RecM.warehouseid = int.Parse(WhViewLst[0].ID);
@@ -102,19 +103,20 @@ namespace CoreData.CoreWmsApi
                     var RecDLst = (from a in RecSkuLst
                                    join b in SkuViewLst on a.Skuautoid equals b.ID into data
                                    from c in data.DefaultIfEmpty()
-                                   select new PurchaseRecDetail
+                                   select new APurchaseRecDetail
                                    {
-                                       skuautoid = a.Skuautoid,
-                                       goodscode = c == null ? "" : c.GoodsCode,
-                                       skuid = c == null ? "" : c.SkuID,
-                                       skuname = c == null ? "" : c.SkuName,
-                                       norm = c == null ? "" : c.Norm,
-                                       recqty = a.Qty.ToString(),
-                                       price = PurD[0].price,
-                                       amount = (int.Parse(PurD[0].price) * a.Qty).ToString(),
-                                       creator = IParam.Creator,
-                                       createdate = DateTime.Now,
-                                       coid = IParam.CoID
+                                       RecID = RecID,
+                                       Skuautoid = a.Skuautoid,
+                                       GoodsCode = c == null ? "" : c.GoodsCode,
+                                       SkuID = c == null ? "" : c.SkuID,
+                                       SkuName = c == null ? "" : c.SkuName,
+                                       Norm = c == null ? "" : c.Norm,
+                                       RecQty = a.Qty,
+                                       Price = PurD[0].Price,
+                                       Amount = PurD[0].Price * a.Qty,
+                                       Creator = IParam.Creator,
+                                       CreateDate = IParam.CreateDate,
+                                       CoID = IParam.CoID
                                    }).AsList();
                     CoreConn.Execute(AddPurRecDetailSql(), RecDLst, CoreTrans);
 
@@ -122,7 +124,7 @@ namespace CoreData.CoreWmsApi
                     string sql = @"SELECT
                                         purchasereceive.PurchaseID,
                                         purchaserecdetail.Skuautoid,
-                                        SUM(purchaserecdetail.RecQty) AS recqty
+                                        SUM(purchaserecdetail.RecQty) AS RecQty
                                     FROM
                                         purchaserecdetail ,
                                         purchasereceive
@@ -135,14 +137,15 @@ namespace CoreData.CoreWmsApi
                                         purchasereceive.PurchaseID,
                                         purchaserecdetail.Skuautoid ";
                     var args = new DynamicParameters();
+                    args.Add("@CoID", IParam.CoID);
                     args.Add("@PurID", IParam.PurID);
                     args.Add("@Skuautoid", SkuIDLst[0]);
-                    var PurDt = CoreConn.QueryFirst<APurchaseDetail>(sql, args, CoreTrans);
+                    var PurDt = CoreConn.Query<APurchaseDetail>(sql, args, CoreTrans).AsList();
                     string UptPurDtSql = "UPDATE purchasedetail SET RecQty=@RecQty,RecieveDate=@RecieveDate,DetailStatus=@DetailStatus WHERE PurchaseID=@PurID AND Skuautoid=@Skuautoid AND CoID=@CoID";
-                    int DetailStatus = 1;//1:已确认;2.已完成;
-                    if (PurDt.recqty >= int.Parse(PurD[0].purqty))
+                    int DetailStatus = 1;//1:已确认;2.已完成;                    
+                    if (PurDt[0].RecQty >= PurD[0].PurQty)
                         DetailStatus = 2;
-                    CoreConn.Execute(UptPurDtSql, new { RecQty = PurDt.recqty, RecieveDate = IParam.CreateDate, DetailStatus = DetailStatus, PurID = IParam.PurID, Skuautoid = SkuIDLst[0], CoID = IParam.CoID }, CoreTrans);//更新明细状态
+                    CoreConn.Execute(UptPurDtSql, new { RecQty = PurDt[0].RecQty, RecieveDate = IParam.CreateDate, DetailStatus = DetailStatus, PurID = IParam.PurID, Skuautoid = SkuIDLst[0], CoID = IParam.CoID }, CoreTrans);//更新明细状态
                     sql = @"SELECT
                                 purchasedetail.PurchaseID,
                                 SUM(purchasedetail.PurQty) AS purqty,
@@ -152,7 +155,7 @@ namespace CoreData.CoreWmsApi
                             WHERE purchasedetail.PurchaseID=@PurID
                             GROUP BY purchasedetail.PurchaseID";
                     var Pur = CoreConn.QueryFirst<APurchaseDetail>(sql, new { PurID = IParam.PurID }, CoreTrans);
-                    if (Pur.purqty <= Pur.recqty)
+                    if (Pur.PurQty <= Pur.RecQty)
                     {
                         CoreConn.Execute("UPDATE purchase SET Status=2 WHERE CoID=@CoID AND ID=@PurID", new { CoID = IParam.CoID, PurID = IParam.PurID }, CoreTrans);
                     }
@@ -739,7 +742,7 @@ namespace CoreData.CoreWmsApi
                         sql = sql + " AND ID=@PurID";
                         p.Add("@PurID", PurID);
                     }
-                    var Lst = conn.Query<PurchaseDetail>(sql, p).AsList();
+                    var Lst = conn.Query<APurchaseDetail>(sql, p).AsList();
                     if (Lst.Count <= 0)
                     {
                         res.s = -1;

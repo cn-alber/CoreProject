@@ -44,6 +44,7 @@ namespace CoreModels.XyCore
         public decimal PickQty { get; set; }
         public decimal WaitInQty { get; set; }
         public decimal SaleRetuQty { get; set; }
+        public decimal UpSafeQty { get; set; }
         public decimal SafeQty { get; set; }
         public decimal DefectiveQty { get; set; }
         public decimal VirtualQty { get; set; }

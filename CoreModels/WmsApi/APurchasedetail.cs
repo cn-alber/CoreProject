@@ -6,12 +6,13 @@ namespace CoreModels.WmsApi
 {
     public class APurchaseDetail
     {
-        public int id { get; set; }
-        public int purchaseid { get; set; }
-        public int skuautoid { get; set; }
-        public int purqty { get; set; }
-        public int recqty { get; set; }
-        public string returnqty { get; set; }
+        public int ID { get; set; }
+        public int PurchaseID { get; set; }
+        public int Skuautoid { get; set; }
+        public int PurQty { get; set; }
+        public int RecQty { get; set; }
+        public decimal Price { get; set; }
+        public string ReturnQty { get; set; }
     }
 
     public class ApiRecParam
@@ -49,6 +50,26 @@ namespace CoreModels.WmsApi
     }
 
 
+public class APurchaseRecDetail
+    {
+        public int ID{get;set;}
+        public int RecID{get;set;}
+        public string img{get;set;}
+        public int Skuautoid{get;set;}
+        public string SkuID{get;set;}
+        public string SkuName{get;set;}
+        public string Norm {get;set;}
+        public int RecQty{get;set;}
+        public decimal Price{get;set;}
+        public string PlanRecQty{get;set;}
+        public decimal Amount{get;set;}
+        public string Remark{get;set;}
+        public string GoodsCode{get;set;}
+        public string SupplyNum{get;set;}
+        public int CoID{get;set;}
+        public string Creator{get;set;}
+        public string CreateDate{get;set;}
+    }
 
     // public class BoxPieceCode
     // {
