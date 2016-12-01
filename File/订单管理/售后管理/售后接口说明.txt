@@ -1,0 +1,14 @@
+接口名称:CoreWebApi/Controllers/Order/AfterSaleControllers
+
+function说明
+1.GetInitASData() //售后初始资料
+路由:http://localhost:5000/Core/AfterSale/GetInitASData
+input:  None
+OutPut: Shop        店铺
+        ASStatus    售后状态
+        ASType      售后分类
+        OrdType     订单类型
+        Distributor 分销商
+        IssueType   问题类型
+        Result      处理结果
+参考:output jason 文件:GetInitASData_output.json
