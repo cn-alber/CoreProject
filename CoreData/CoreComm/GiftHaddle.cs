@@ -679,6 +679,8 @@ namespace CoreData.CoreCore
                 wheresql = wheresql + " ORDER BY "+cp.SortField +" "+ cp.SortDirection;
             }
             var res = new GiftRuleData();
+            //抓取店铺List
+            var shop = CoreComm.ShopHaddle.getShopEnum(cp.CoID.ToString()) as List<shopEnum>;
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try{    
                     int count = conn.QueryFirst<int>(sqlcount + wheresql);
@@ -700,6 +702,24 @@ namespace CoreData.CoreCore
                         var t = new List<string>();
                         t = conn.Query<string>(sqlCommandText).AsList();
                         a.GiftNo = t;
+                        if(!string.IsNullOrEmpty(a.AppointShop))
+                        {
+                            string Name = string.Empty;
+                            string[] s = a.AppointShop.Split(',');
+                            foreach(var c in s)
+                            {
+                                foreach(var d in shop)
+                                {
+                                    if(c == d.value.ToString())
+                                    {
+                                        Name = Name + d.label + ',';
+                                        break;
+                                    }
+                                }
+                            }
+                            Name = Name.Substring(0,Name.Length - 1);
+                            a.AppointShop = Name;
+                        }
                     }
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;
