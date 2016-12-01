@@ -128,7 +128,7 @@ namespace CoreData.CoreCore
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{  
                         string sqlcommand = @"select ID,LogDate,UserName,Title,Remark From orderlog where
-                                            oid = @ID and coid = @Coid and type = 2 order by LogDate Asc";
+                                            oid = @ID and coid = @Coid and type = 2 order by LogDate Desc";
                         var Log = conn.Query<OrderLog>(sqlcommand,new{ID=id,Coid=CoID}).AsList();
                         result.d = Log;
                     }
@@ -258,7 +258,7 @@ namespace CoreData.CoreCore
                             a = conn.Query<string>(sqlCommandText).AsList();
                             u[0].GiftNo = a;
                         }
-                        res.Gift = u;
+                        res.Gift = u[0];
                         // result.d = u;
                     }
                     catch(Exception ex){
@@ -679,6 +679,8 @@ namespace CoreData.CoreCore
                 wheresql = wheresql + " ORDER BY "+cp.SortField +" "+ cp.SortDirection;
             }
             var res = new GiftRuleData();
+            //抓取店铺List
+            var shop = CoreComm.ShopHaddle.getShopEnum(cp.CoID.ToString()) as List<shopEnum>;
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try{    
                     int count = conn.QueryFirst<int>(sqlcount + wheresql);
@@ -700,6 +702,24 @@ namespace CoreData.CoreCore
                         var t = new List<string>();
                         t = conn.Query<string>(sqlCommandText).AsList();
                         a.GiftNo = t;
+                        if(!string.IsNullOrEmpty(a.AppointShop))
+                        {
+                            string Name = string.Empty;
+                            string[] s = a.AppointShop.Split(',');
+                            foreach(var c in s)
+                            {
+                                foreach(var d in shop)
+                                {
+                                    if(c == d.value.ToString())
+                                    {
+                                        Name = Name + d.label + ',';
+                                        break;
+                                    }
+                                }
+                            }
+                            Name = Name.Substring(0,Name.Length - 1);
+                            a.AppointShop = Name;
+                        }
                     }
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;
@@ -821,10 +841,41 @@ namespace CoreData.CoreCore
             result.d = res;
             return result;
         }
+        ///<summary>
+        ///获取skuautoID
+        ///</summary>
+        public static DataResult GetGiftAutoID(string giftno,int CoID)
+        {
+            var result = new DataResult(1,null); 
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    string sqlcommand = "select ID from coresku where skuid = '" + giftno + "' and coid = " + CoID;
+                    int u = conn.QueryFirst<int>(sqlcommand);
+                    if(u > 0)
+                    {
+                        result.d = u;
+                    }
+                    else
+                    {
+                        result.s = -1;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }  
+            return result;
+        }
+        ///<summary>
+        ///产生赠品List
+        ///</summary>
         public static DataResult SetGiftItem(Order ord,List<OrderItem> item,int CoID)
         {
             var result = new DataResult(1,null); 
+            var res = new GiftInsertReturn();
             var giftNo = new List<GiftInsertOrder>();   
+            var up = new List<GiftRule>();
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try{    
                     string sqlcommand = "select * from gift where coid = " + CoID + " and Enable = true order by Priority ASC";
@@ -850,7 +901,7 @@ namespace CoreData.CoreCore
                                     break;
                                 }
                             }
-                            if(i > 0 ) continue;
+                            if(i == 0 ) continue;
                         }
                         //指定订单类型判断
                         if(!string.IsNullOrEmpty(a.OrdType))
@@ -865,7 +916,7 @@ namespace CoreData.CoreCore
                                     break;
                                 }
                             }
-                            if(i > 0 ) continue;
+                            if(i == 0 ) continue;
                         }
                         //排除商品判断
                         if(!string.IsNullOrEmpty(a.ExcludeSkuID))
@@ -1022,31 +1073,68 @@ namespace CoreData.CoreCore
                             string[] giftno = it.Split(',');
                             if(a.IsStock == false)
                             {
-                                sqlcommand = "select ID from coresku where skuid = '" + giftno[0] + "' and coid = " + CoID;
-                                int skuid = conn.QueryFirst<int>(sqlcommand);
-                                yy.SkuAutoID = skuid;
-                                yy.Qty = int.Parse(giftQty.ToString());
-                                yy.IsGift = a.IsMarkGift;
-                                giftNo.Add(yy);
+                                if(!string.IsNullOrEmpty(a.MaxGiftQty))
+                                {
+                                    if(string.IsNullOrEmpty(a.GivenQty))
+                                    {
+                                        a.GivenQty = "0";
+                                    }
+                                    if(decimal.Parse(a.GivenQty) + giftQty > decimal.Parse(a.MaxGiftQty))
+                                    {
+                                        giftQty = decimal.Parse(a.MaxGiftQty) - decimal.Parse(a.GivenQty);
+                                        a.GivenQty = a.MaxGiftQty;
+                                    }
+                                    else
+                                    {
+                                        a.GivenQty = (decimal.Parse(a.GivenQty) + giftQty).ToString();
+                                    }
+                                }
+                                var rr = GetGiftAutoID(giftno[0],CoID);
+                                if(rr.s == 1)
+                                {
+                                    yy.SkuAutoID = int.Parse(rr.d.ToString());
+                                    yy.Qty = int.Parse(giftQty.ToString());
+                                    yy.IsGift = a.IsMarkGift;
+                                    giftNo.Add(yy);
+                                }                                
                             }
                             else
                             {
                                 foreach(var n in giftno)
                                 {
-                                    sqlcommand = "select ID from coresku where skuid = '" + n + "' and coid = " + CoID;
-                                    int skuid = conn.QueryFirst<int>(sqlcommand);
-                                    //检查库存是否足够
-                                    int invqty = OrderHaddle.GetInvQty(CoID,skuid);
-                                    if(invqty >= giftQty)
+                                    if(!string.IsNullOrEmpty(a.MaxGiftQty))
                                     {
-                                        yy.SkuAutoID = skuid;
-                                        yy.Qty = int.Parse(giftQty.ToString());
-                                        yy.IsGift = a.IsMarkGift;
-                                        giftNo.Add(yy);
-                                        break;
+                                        if(string.IsNullOrEmpty(a.GivenQty))
+                                        {
+                                            a.GivenQty = "0";
+                                        }
+                                        if(decimal.Parse(a.GivenQty) + giftQty > decimal.Parse(a.MaxGiftQty))
+                                        {
+                                            giftQty = decimal.Parse(a.MaxGiftQty) - decimal.Parse(a.GivenQty);
+                                        }
                                     }
+                                    var rr = GetGiftAutoID(n,CoID);
+                                    if(rr.s == 1)
+                                    {
+                                        //检查库存是否足够
+                                        int invqty = OrderHaddle.GetInvQty(CoID,int.Parse(rr.d.ToString()));
+                                        if(invqty >= giftQty)
+                                        {
+                                            yy.SkuAutoID = int.Parse(rr.d.ToString());
+                                            yy.Qty = int.Parse(giftQty.ToString());
+                                            yy.IsGift = a.IsMarkGift;
+                                            giftNo.Add(yy);
+                                            a.GivenQty = (decimal.Parse(a.GivenQty) + giftQty).ToString();
+                                            break;
+                                        }
+                                    }                                    
                                 }
                             }
+                            if(!string.IsNullOrEmpty(a.MaxGiftQty) && !string.IsNullOrEmpty(a.GivenQty) && decimal.Parse(a.MaxGiftQty) <= decimal.Parse(a.GivenQty)) break;
+                        }
+                        if(!string.IsNullOrEmpty(a.MaxGiftQty))
+                        {
+                            up.Add(a);
                         }
                         //叠加赠送
                         if(a.IsAdd == false) break;
@@ -1059,7 +1147,9 @@ namespace CoreData.CoreCore
             }  
             if(giftNo.Count > 0)
             {
-                result.d = giftNo;
+                res.Gift = up;
+                res.GiftInsert = giftNo;
+                result.d = res;
             }
             else
             {
@@ -1067,6 +1157,9 @@ namespace CoreData.CoreCore
             }
             return result;
         }
+        ///<summary>
+        ///订单导入时，新增赠品明细
+        ///</summary>
         public static DataResult SetGift(Order ord,List<OrderItem> item,int CoID,string UserName)
         {
             var result = new DataResult(1,null); 
@@ -1077,17 +1170,17 @@ namespace CoreData.CoreCore
                 result.s = 0;
                 return result;
             }
-            var giftNo = re.d as List<GiftInsertOrder>; 
+            var rejj = re.d as GiftInsertReturn; 
+            var giftNo = rejj.GiftInsert as List<GiftInsertOrder>; 
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try{    
-
                     if(giftNo.Count > 0)
                     {
                         int Qty = 0;
                         decimal Exweight = 0;
                         foreach(var a in giftNo)
                         {
-                            string skusql = "select skuid,skuname,norm,img,goodscode,enable,saleprice,weight from coresku where id =" + a + " and coid =" + CoID;
+                            string skusql = "select skuid,skuname,norm,img,goodscode,enable,saleprice,weight from coresku where id =" + a.SkuAutoID + " and coid =" + CoID;
                             var s = conn.Query<SkuInsert>(skusql).AsList();
                             if (s.Count == 0)
                             {
@@ -1140,6 +1233,7 @@ namespace CoreData.CoreCore
                         res.Qty = Qty;
                         res.Exweight = Exweight;
                         res.Item = item;
+                        res.Gift = rejj.Gift;
                         result.d = res;
                     }
                     else

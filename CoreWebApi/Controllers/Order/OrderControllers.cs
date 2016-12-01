@@ -1750,5 +1750,329 @@ namespace CoreWebApi
             var data = OrderHaddle.SetSupDistributor(oid,sd,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Order/CalGift")]
+        public ResponseResult CalGift([FromBodyAttribute]JObject co)
+        {   
+            string OidType = "",DateType = "";
+            bool IsSplit,IsDelGift,IsDelPrice0;
+            var oid = new List<int>();
+            if(co["OidType"] != null)
+            {
+                OidType = co["OidType"].ToString();
+                if(OidType != "A" && OidType != "B")
+                {
+                    return CoreResult.NewResponse(-1, "订单范围参数异常", "General");
+                }
+                if(OidType == "A")
+                {
+                    if(co["OID"] != null)
+                    {
+                        oid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["OID"].ToString());
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "订单单号必填", "General");
+                    }
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单范围必填", "General");
+            }
+            if(co["DateType"] != null)
+            {
+                DateType = co["DateType"].ToString();
+                if(DateType != "A" && DateType != "B")
+                {
+                    return CoreResult.NewResponse(-1, "日期排序方式参数异常", "General");
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "日期排序方式必填", "General");
+            }
+            if(co["IsSplit"] != null)
+            {
+                if(co["IsSplit"].ToString().ToUpper() !="TRUE" && co["IsSplit"].ToString().ToUpper() !="FALSE")
+                {
+                    return CoreResult.NewResponse(-1, "是否排除拆分订单参数异常", "General");
+                }
+                else
+                {
+                    IsSplit = bool.Parse(co["IsSplit"].ToString());
+                }                
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "是否排除拆分订单必填", "General");
+            }
+            if(co["IsDelGift"] != null)
+            {
+                if(co["IsDelGift"].ToString().ToUpper() !="TRUE" && co["IsDelGift"].ToString().ToUpper() !="FALSE")
+                {
+                    return CoreResult.NewResponse(-1, "是否删除原有赠品参数异常", "General");
+                }
+                else
+                {
+                    IsDelGift = bool.Parse(co["IsDelGift"].ToString());
+                }                
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "是否删除原有赠品必填", "General");
+            }
+            if(co["IsDelPrice0"] != null)
+            {
+                if(co["IsDelPrice0"].ToString().ToUpper() !="TRUE" && co["IsDelPrice0"].ToString().ToUpper() !="FALSE")
+                {
+                    return CoreResult.NewResponse(-1, "是否删除零单价明细参数异常", "General");
+                }
+                else
+                {
+                    IsDelPrice0 = bool.Parse(co["IsDelPrice0"].ToString());
+                }                
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "是否删除零单价明细必填", "General");
+            }
+            var ord = new List<OrderQuery>();
+            if(OidType == "B")
+            {
+                var cp = new OrderParm();
+                cp.CoID = int.Parse(GetCoid());
+                if(co["ID"] != null)
+                {
+                    cp.ID = int.Parse(co["ID"].ToString());
+                }
+                if(co["SoID"] != null)
+                {
+                    cp.SoID = int.Parse(co["SoID"].ToString());
+                }
+                if(co["PayNbr"] != null)
+                {
+                    cp.PayNbr = co["PayNbr"].ToString();
+                }
+                if(co["BuyerShopID"] != null)
+                {
+                    cp.BuyerShopID = co["BuyerShopID"].ToString();
+                }
+                if(co["ExCode"] != null)
+                {
+                    cp.ExCode = co["ExCode"].ToString();
+                }
+                if(co["RecName"] != null)
+                {
+                    cp.RecName = co["RecName"].ToString();
+                }
+                if(co["RecPhone"] != null)
+                {
+                    cp.RecPhone = co["RecPhone"].ToString();
+                }
+                if(co["RecTel"] != null)
+                {
+                    cp.RecTel = co["RecTel"].ToString();
+                }
+                if(co["RecLogistics"] != null)
+                {
+                    cp.RecLogistics = co["RecLogistics"].ToString();
+                }
+                if(co["RecCity"] != null)
+                {
+                    cp.RecCity = co["RecCity"].ToString();
+                }
+                if(co["RecDistrict"] != null)
+                {
+                    cp.RecDistrict = co["RecDistrict"].ToString();
+                }
+                if(co["RecAddress"] != null)
+                {
+                    cp.RecAddress = co["RecAddress"].ToString();
+                }                
+                if(co["StatusList"] != null)
+                {
+                    string[] a = co["StatusList"].ToString().Split(',');
+                    List<int> s = new List<int>();
+                    foreach(var i in a)
+                    {
+                        s.Add(int.Parse(i));
+                    }
+                    cp.StatusList = s;
+                }
+                if(co["AbnormalStatusList"] != null)
+                {
+                    string[] a = co["AbnormalStatusList"].ToString().Split(',');
+                    List<int> s = new List<int>();
+                    foreach(var i in a)
+                    {
+                        s.Add(int.Parse(i));
+                    }
+                    cp.AbnormalStatusList = s;
+                }
+                if(co["IsRecMsgYN"] != null)
+                {
+                    cp.IsRecMsgYN = co["IsRecMsgYN"].ToString();
+                }
+                if(co["RecMessage"] != null)
+                {
+                    cp.RecMessage = co["RecMessage"].ToString();
+                }
+                if(co["IsSendMsgYN"] != null)
+                {
+                    cp.IsSendMsgYN = co["IsSendMsgYN"].ToString();
+                }
+                if(co["SendMessage"] != null)
+                {
+                    cp.SendMessage = co["SendMessage"].ToString();
+                }
+                if(co["Datetype"] != null)
+                {
+                    cp.Datetype = co["Datetype"].ToString();
+                }
+                if(co["DateStart"] != null)
+                {
+                    cp.DateStart = DateTime.Parse(co["DateStart"].ToString());
+                }
+                if(co["DateEnd"] != null)
+                {
+                    cp.DateEnd = DateTime.Parse(co["DateEnd"].ToString());
+                }
+                if(co["Skuid"] != null)
+                {
+                    cp.Skuid = co["Skuid"].ToString();
+                }
+                if(co["GoodsCode"] != null)
+                {
+                    cp.GoodsCode = co["GoodsCode"].ToString();
+                }
+                if(co["Ordqtystart"] != null)
+                {
+                    cp.Ordqtystart = int.Parse(co["Ordqtystart"].ToString());
+                }
+                if(co["Ordqtyend"] != null)
+                {
+                    cp.Ordqtyend = int.Parse(co["Ordqtyend"].ToString());
+                }
+                if(co["Ordamtstart"] != null)
+                {
+                    cp.Ordamtstart = decimal.Parse(co["Ordamtstart"].ToString());
+                }
+                if(co["Ordamtend"] != null)
+                {
+                    cp.Ordamtend = decimal.Parse(co["Ordamtend"].ToString());
+                }
+                if(co["Skuname"] != null)
+                {
+                    cp.Skuname = co["Skuname"].ToString();
+                }
+                if(co["Norm"] != null)
+                {
+                    cp.Norm = co["Norm"].ToString();
+                }
+                if(co["ShopStatus"] != null)
+                {
+                    string[] a = co["ShopStatus"].ToString().Split(',');
+                    List<string> s = new List<string>();
+                    foreach(var i in a)
+                    {
+                        s.Add(i);
+                    }
+                    cp.ShopStatus = s;
+                }
+                if(co["Osource"] != null)
+                {
+                    cp.OSource = int.Parse(co["Osource"].ToString());
+                }
+                if(co["Type"] != null)
+                {
+                    string[] a = co["Type"].ToString().Split(',');
+                    List<int> s = new List<int>();
+                    foreach(var i in a)
+                    {
+                        s.Add(int.Parse(i));
+                    }
+                    cp.Type = s;
+                }
+                if(co["IsCOD"] != null)
+                {
+                    cp.IsCOD = co["IsCOD"].ToString();
+                }
+                if(co["IsPaid"] != null)
+                {
+                    cp.IsPaid = co["IsPaid"].ToString();
+                }
+                if(co["IsShopSelectAll"] != null)
+                {
+                    cp.IsShopSelectAll = bool.Parse(co["IsShopSelectAll"].ToString());
+                }
+                if(co["ShopID"] != null)
+                {
+                    string[] a = co["ShopID"].ToString().Split(',');
+                    List<int> s = new List<int>();
+                    foreach(var i in a)
+                    {
+                        s.Add(int.Parse(i));
+                    }
+                    cp.ShopID = s;
+                }
+                if(co["IsDisSelectAll"] != null)
+                {
+                    cp.IsDisSelectAll = bool.Parse(co["IsDisSelectAll"].ToString());
+                }
+                if(co["Distributor"] != null)
+                {
+                    string[] a = co["Distributor"].ToString().Split(',');
+                    List<string> s = new List<string>();
+                    foreach(var i in a)
+                    {
+                        s.Add(i);
+                    }
+                    cp.Distributor = s;
+                }
+                if(co["ExID"] != null)
+                {
+                    string[] a = co["ExID"].ToString().Split(',');
+                    List<int> s = new List<int>();
+                    foreach(var i in a)
+                    {
+                        s.Add(int.Parse(i));
+                    }
+                    cp.ExID = s;
+                }
+                if(co["SendWarehouse"] != null)
+                {
+                    string[] a = co["SendWarehouse"].ToString().Split(',');
+                    List<int> s = new List<int>();
+                    foreach(var i in a)
+                    {
+                        s.Add(int.Parse(i));
+                    }
+                    cp.SendWarehouse = s;
+                }
+                if(co["Others"] != null)
+                {
+                    string[] a = co["Others"].ToString().Split(',');
+                    List<int> s = new List<int>();
+                    foreach(var i in a)
+                    {
+                        s.Add(int.Parse(i));
+                    }
+                    cp.Others = s;
+                }
+                cp.NumPerPage = 100000000;
+                cp.PageIndex = 1;
+                var res = OrderHaddle.GetOrderList(cp);
+                if(res.s == 1)
+                {
+                    var rr = res.d as OrderData;
+                    ord = rr.Ord;
+                }
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = OrderHaddle.CalGift(OidType,oid,DateType,IsSplit,IsDelGift,IsDelPrice0,ord,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }  

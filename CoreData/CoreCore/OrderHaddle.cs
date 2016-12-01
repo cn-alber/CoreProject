@@ -5025,6 +5025,7 @@ namespace CoreData.CoreCore
             var result = new DataResult(1,null);
             var bu = GetConfig(CoID);
             var business = bu.d as Business;
+            var gifti = new List<GiftRule>();
             //检查平台单号是否已经存在，若是，则不能新增
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{
@@ -5231,6 +5232,7 @@ namespace CoreData.CoreCore
                     ord.OrdQty = ord.OrdQty + gire.Qty;
                     ord.ExWeight = (decimal.Parse(ord.ExWeight) + gire.Exweight).ToString();
                     orderitem = gire.Item;
+                    gifti = gire.Gift;
                 }
                 //标记异常
                 if(IsSku == false)
@@ -5461,6 +5463,38 @@ namespace CoreData.CoreCore
             {
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
+            }
+            if(gifti.Count > 0)
+            {
+                var CommDBconn = new MySqlConnection(DbBase.CommConnectString);
+                CommDBconn.Open();
+                var TransComm = CommDBconn.BeginTransaction();
+                try
+                {
+                    foreach(var a in gifti)
+                    {
+                        string sql = "update gift set GivenQty=@GivenQty where id=@ID and coid=@Coid";
+                        int count = CommDBconn.Execute(sql,a,TransComm);
+                        if(count < 0)
+                        {
+                            result.s = -3003;
+                            return result;
+                        }
+                    }
+                    TransComm.Commit();
+                }
+                catch (Exception e)
+                {
+                    TransComm.Rollback();
+                    TransComm.Dispose();
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+                finally
+                {
+                    TransComm.Dispose();
+                    CommDBconn.Dispose();
+                }
             }
             return result;
         }
@@ -10416,53 +10450,227 @@ namespace CoreData.CoreCore
         ///<summary>
         ///重新计算赠品
         ///</summary>
-        public static DataResult CalGift(string OidType,List<int> oid,string DateType,bool IsSplit,bool IsDelGift,bool IsDelPrice0)
+        public static DataResult CalGift(string OidType,List<int> oid,string DateType,bool IsSplit,bool IsDelGift,bool IsDelPrice0,List<OrderQuery> ord,int CoID,string UserName)
         {
             var result = new DataResult(1,null);
-            var logs = new List<Log>();
-            var res = new TransferNormalReturn();
-            var su = new List<TransferNormalReturnSuccess>();
-            var fa = new List<TransferNormalReturnFail>();
             string sqlCommandText = string.Empty;
+            var gift = new List<GiftRule>();
+            var order = new List<Order>();
             int count = 0;
-            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
-                try{    
-                    if(OidType == "A")
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{   
+                    sqlCommandText = "select * from `order` where id in @ID and coid = @Coid";
+                    if(DateType == "A")
                     {
-
-                    }
-                    else if(OidType == "B")
+                        sqlCommandText = sqlCommandText + " order by ODate Asc";
+                    } 
+                    else if(DateType == "B")
                     {
-
+                        sqlCommandText = sqlCommandText + " order by PayDate Asc";
+                    } 
+                    if(OidType == "B")
+                    {
+                        var id = new List<int>();
+                        foreach(var a in ord)
+                        {
+                            id.Add(a.ID);
+                        }
+                        oid = id;
                     }
-                    // sqlCommandText = ""
+                    order = conn.Query<Order>(sqlCommandText,new{ID = oid,Coid = CoID}).AsList();
+                    if(order.Count == 0)
+                    {
+                        result.s = -1;
+                        result.d = "没有符合条件的资料";
+                        return result;
+                    }
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
                     conn.Dispose();
                 }
             } 
-            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
-            CoreDBconn.Open();
-            var TransCore = CoreDBconn.BeginTransaction();
-            try
+            foreach(var a in order)
             {
-                res.SuccessIDs = su;
-                res.FailIDs = fa;
-                result.d = res;
-                TransCore.Commit();
-            }
-            catch (Exception e)
-            {
-                TransCore.Rollback();
-                TransCore.Dispose();
-                result.s = -1;
-                result.d = e.Message;
-            }
-            finally
-            {
-                TransCore.Dispose();
-                CoreDBconn.Dispose();
+                gift = new List<GiftRule>();
+                var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+                CoreDBconn.Open();
+                var TransCore = CoreDBconn.BeginTransaction();
+                try
+                {
+                    int i = 0;
+                    if(a.Status != 0 && a.Status != 1 && a.Status != 2 && a.Status != 7) continue;
+                    if(IsSplit == true && a.IsSplit == true) continue;
+                    if(IsDelGift == true)
+                    {
+                        sqlCommandText = "Delete from orderitem where oid = "+ a.ID + " and coid = " + CoID + " and IsGift = true";
+                        count = CoreDBconn.Execute(sqlCommandText,TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3004;
+                            return result;
+                        }
+                        else if(count > 0)
+                        {
+                            i ++;
+                        }
+                    }
+                    if(IsDelPrice0 == true)
+                    {
+                        sqlCommandText = "Delete from orderitem where oid = "+ a.ID + " and coid = " + CoID + " and RealPrice = 0";
+                        count = CoreDBconn.Execute(sqlCommandText,TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3004;
+                            return result;
+                        }
+                        else if(count > 0)
+                        {
+                            i ++;
+                        }
+                    }
+                    sqlCommandText = "select * from orderitem where oid = "+ a.ID + " and coid = " + CoID;
+                    var item = CoreDBconn.Query<OrderItem>(sqlCommandText).AsList();
+                    var res = GiftHaddle.SetGiftItem(a,item,CoID);
+                    if(res.s == 1)
+                    {
+                        var rejj = res.d as GiftInsertReturn; 
+                        gift = rejj.Gift;
+                        var giftNo = rejj.GiftInsert as List<GiftInsertOrder>; 
+                        foreach(var no in giftNo)
+                        {
+                            int j = 0;
+                            foreach(var it in item)
+                            {
+                                if(it.IsGift == false) continue;
+                                if(it.SkuAutoID == no.SkuAutoID && no.IsGift == true)
+                                {
+                                    sqlCommandText = @"update orderitem set qty = qty + @Qty,totalweight = weight * qty,modifier=@Modifier,modifydate = @ModifyDate 
+                                                       where id = @ID and coid = @Coid";
+                                    var args = new {ID = it.ID,Qty = no.Qty,Coid = CoID,Modifier = UserName,ModifyDate = DateTime.Now};
+                                    count = CoreDBconn.Execute(sqlCommandText, args, TransCore);
+                                    if(count < 0)
+                                    {
+                                        result.s = -3003;
+                                        return result;
+                                    }
+                                    j ++ ;
+                                    break;
+                                }
+                            }
+                            if(j > 0) continue;
+                            string skusql = "select skuid,skuname,norm,img,goodscode,enable,saleprice,weight from coresku where id =" + no.SkuAutoID + " and coid =" + CoID;
+                            var s = CoreDBconn.Query<SkuInsert>(skusql).AsList();
+                            if (s.Count == 0)
+                            {
+                                continue;
+                            }
+                            if (s[0].enable == false)
+                            {
+                                continue;
+                            }
+                            sqlCommandText = @"INSERT INTO orderitem(oid,soid,coid,skuautoid,skuid,skuname,norm,GoodsCode,qty,saleprice,img,weight,totalweight,IsGift,creator,modifier) 
+                                            VALUES(@OID,@Soid,@Coid,@Skuautoid,@Skuid,@Skuname,@Norm,@GoodsCode,@Qty,@Saleprice,@Img,@Weight,@Totalweight,@IsGift,@Creator,@Creator)";
+                            var argss = new
+                            {
+                                OID = a.ID,
+                                Soid = a.SoID,
+                                Skuautoid = no.SkuAutoID,
+                                Skuid = s[0].skuid,
+                                Skuname = s[0].skuname,
+                                Norm = s[0].norm,
+                                GoodsCode = s[0].goodscode,
+                                Qty = no.Qty,
+                                Saleprice = s[0].saleprice,
+                                Img = s[0].img,
+                                Weight = s[0].weight,
+                                Totalweight = decimal.Parse(s[0].weight)*no.Qty,
+                                Coid = CoID,
+                                Creator = UserName,
+                                IsGift = no.IsGift
+                            };
+                            count = CoreDBconn.Execute(sqlCommandText, argss, TransCore);
+                            if (count < 0)
+                            {
+                                result.s = -3002;
+                                return result;
+                            }
+                            i++;
+                        }
+                    }
+                    if(i == 0) continue;
+                    sqlCommandText = "select sum(Qty) as QtyTot,sum(Amount) as AmtTot,sum(TotalWeight) as WeightTot from orderitem where oid = " + a.ID + " and coid = " + CoID;
+                    var su = CoreDBconn.Query<OrdSum>(sqlCommandText).AsList();
+                    //更新订单的数量和重量
+                    sqlCommandText = @"update `order` set ExWeight = @ExWeight,OrdQty = @Qty,Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and CoID = @CoID";
+                    count = CoreDBconn.Execute(sqlCommandText, new { ExWeight = su[0].WeightTot,Qty = su[0].QtyTot,Modifier = UserName, ModifyDate = DateTime.Now, ID = a.ID, CoID = CoID }, TransCore);
+                    if (count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                    var log = new LogInsert();
+                    log.OID = a.ID;
+                    log.SoID = a.SoID;
+                    log.Type = 0;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "重新计算赠品";
+                    log.CoID = CoID;
+                    string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                    count = CoreDBconn.Execute(loginsert,log, TransCore);
+                    if (count < 0)
+                    {
+                        result.s = -3002;
+                        return result;
+                    }
+                    TransCore.Commit();
+                }
+                catch (Exception e)
+                {
+                    TransCore.Rollback();
+                    TransCore.Dispose();
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+                finally
+                {
+                    TransCore.Dispose();
+                    CoreDBconn.Dispose();
+                }
+                if(gift.Count > 0)
+                {
+                    var CommDBconn = new MySqlConnection(DbBase.CommConnectString);
+                    CommDBconn.Open();
+                    var TransComm = CommDBconn.BeginTransaction();
+                    try
+                    {
+                        foreach(var g in gift)
+                        {
+                            string sql = "update gift set GivenQty=@GivenQty where id=@ID and coid=@Coid";
+                            count = CommDBconn.Execute(sql,a,TransComm);
+                            if(count < 0)
+                            {
+                                result.s = -3003;
+                                return result;
+                            }
+                        }
+                        TransComm.Commit();
+                    }
+                    catch (Exception e)
+                    {
+                        TransComm.Rollback();
+                        TransComm.Dispose();
+                        result.s = -1;
+                        result.d = e.Message;
+                    }
+                    finally
+                    {
+                        TransComm.Dispose();
+                        CommDBconn.Dispose();
+                    }
+                }
             }
             return result;
         }
