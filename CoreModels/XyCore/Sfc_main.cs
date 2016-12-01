@@ -30,7 +30,7 @@ namespace CoreModels.XyCore
         public string WhID { get; set; }
         public string WhName { get; set; }
         public string Parent_WhID { get; set; }
-        public string Skuautoid { get; set; }
+        public int Skuautoid { get; set; }
         public string SkuID { get; set; }
         public string SkuName { get; set; }
         public string Norm { get; set; }
@@ -69,7 +69,7 @@ namespace CoreModels.XyCore
     public class Sfc_item_view
     {
         public int ID { get; set; }
-        public string Skuautoid { get; set; }
+        public int Skuautoid { get; set; }
         public string SkuID { get; set; }
         public string SkuName { get; set; }
         public string Norm { get; set; }
@@ -81,7 +81,7 @@ namespace CoreModels.XyCore
     public class Sfc_item_Init_view
     {
         public int ID { get; set; }
-        public string Skuautoid { get; set; }
+        public int Skuautoid { get; set; }
         public string SkuID { get; set; }
         public string SkuName { get; set; }
         public string Norm { get; set; }
@@ -119,7 +119,7 @@ namespace CoreModels.XyCore
         public string DateF { get; set; }//单据日期起
         public string DateT { get; set; }//单据日期讫
         public string Status { get; set; }//盘点状态
-        public string Skuautoid { get; set; }//商品编号
+        public int Skuautoid { get; set; }//商品编号
         public int Type { get; set; }//单据类型(1.期初，2.盘点，3.调拨)
         public int ParentID { get; set; }//主表sfc_main.ID
         public string SkuID { get; set; }

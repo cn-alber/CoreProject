@@ -41,7 +41,7 @@ namespace CoreWebApi.XyCore
             }
             if (int.TryParse(Skuautoid, out x))
             {
-                cp.Skuautoid = Skuautoid;
+                cp.Skuautoid = int.Parse(Skuautoid);
             }
             if (int.TryParse(PageIndex, out x))
             {

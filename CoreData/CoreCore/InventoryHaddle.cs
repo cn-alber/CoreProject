@@ -73,6 +73,7 @@ namespace CoreData.CoreCore
                                         WaitInQty,
                                         SaleRetuQty,
                                         SafeQty,
+                                        UpSafeQty,
                                         DefectiveQty,
                                         VirtualQty,
                                         PurchaseQty,
@@ -582,7 +583,7 @@ namespace CoreData.CoreCore
                         inv_item.CoID = CoID;
                         conn.Execute(AddInvinoutitemSql(), inv_item, Trans);
                         //更新库存数量                   
-                        var SkuIDLst = new List<string>();
+                        var SkuIDLst = new List<int>();
                         SkuIDLst.Add(inv_item.Skuautoid);
                         conn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = CoID, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
                         //获取第三方仓公司ID

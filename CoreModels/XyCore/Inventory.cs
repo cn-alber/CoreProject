@@ -6,7 +6,7 @@ namespace CoreModels.XyCore
     {
         public int ID { get; set; }
         public string GoodsCode { get; set; }
-        public string Skuautoid { get; set; }
+        public int Skuautoid { get; set; }
         public string SkuID { get; set; }
         public string Name { get; set; }
         public string Norm { get; set; }
@@ -34,7 +34,7 @@ namespace CoreModels.XyCore
     {
         public int ID { get; set; }
         public string GoodsCode { get; set; }
-        public string Skuautoid { get; set; }
+        public int Skuautoid { get; set; }
         public string SkuID { get; set; }
         public string Name { get; set; }
         public string Norm { get; set; }
@@ -44,6 +44,7 @@ namespace CoreModels.XyCore
         public decimal PickQty { get; set; }
         public decimal WaitInQty { get; set; }
         public decimal SaleRetuQty { get; set; }
+        public decimal UpSafeQty { get; set; }
         public decimal SafeQty { get; set; }
         public decimal DefectiveQty { get; set; }
         public decimal VirtualQty { get; set; }
@@ -186,7 +187,7 @@ namespace CoreModels.XyCore
     public class Sfc_InvStock
     {
         public int ID { get; set; }
-        public string Skuautoid { get; set; }
+        public int Skuautoid { get; set; }
         public string SkuID { get; set; }
         public int StockQty { get; set; }
 
@@ -206,7 +207,7 @@ namespace CoreModels.XyCore
     public class InvavailQty //获取可用库存量实体
     {
         public string CoID { get; set; }
-        public string Skuautoid { get; set; }
+        public int Skuautoid { get; set; }
         public decimal StockQty { get; set; }
         public decimal InvLockQty { get; set; }
         public decimal LockQty { get; set; }

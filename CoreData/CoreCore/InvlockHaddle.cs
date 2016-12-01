@@ -321,7 +321,7 @@ namespace CoreData.CoreCore
         #endregion
 
         #region 锁定单 - 检查可用库存 - 商品Skuautoid
-        public static DataResult CheckQtyByID(List<string> SkuIDLst, int Type, string CoID)
+        public static DataResult CheckQtyByID(List<int> SkuIDLst, int Type, string CoID)
         {
             var result = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CoreConnectString))

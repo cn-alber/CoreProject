@@ -325,7 +325,7 @@ namespace CoreData.CoreComm
 
 
         #region 公用方法——获取商品编号&名称&规格&图片
-        public static DataResult GetSkuViewByID(string CoID, List<String> IDLst)
+        public static DataResult GetSkuViewByID(string CoID, List<int> IDLst)
         {
             var result = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CoreConnectString))

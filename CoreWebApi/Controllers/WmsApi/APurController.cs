@@ -11,7 +11,7 @@ namespace CoreWebApi
     public class APurController : ControllBase
     {
         #region 收货作业-根据箱码or件码_获取SKU
-        [HttpGetAttribute("Core/Api/APur/GetBox")]
+        [HttpGetAttribute("Core/APur/GetBox")]
         public ResponseResult GetBox(string BoxCode)
         {
             // var cp =new WmsBoxParams();
@@ -20,15 +20,25 @@ namespace CoreWebApi
             // cp.Type=4;//进货仓;
             // cp.SkuID = (BoxCode.Length - 6)>0?BoxCode.Substring(0, BoxCode.Length - 6):BoxCode;//假设sku,检查条码为件码or箱码
             // var res = APurHaddles.GetBoxSku(cp);
-            var cp = new ASkuScanParam();
-            cp.CoID = int.Parse(GetCoid());
-            cp.BarCode = BoxCode;
-            var res = ASkuScanHaddles.GetType(cp);
+            var res = new DataResult(1, null);
+            if (string.IsNullOrEmpty(BoxCode))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var cp = new ASkuScanParam();
+                cp.CoID = int.Parse(GetCoid());
+                cp.BarCode = BoxCode;
+                res = ASkuScanHaddles.GetType(cp);
+            }
+
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
         #region 新增收料单
-        [HttpPostAttribute("Core/Api/APur/SetPurRec")]
+        [HttpPostAttribute("Core/APur/SetPurRec")]
         public ResponseResult SetPurRec([FromBodyAttribute]JObject obj)
         {
             var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiRecParam>(obj.ToString());

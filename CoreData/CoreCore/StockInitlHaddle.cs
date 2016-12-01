@@ -237,7 +237,7 @@ namespace CoreData.CoreCore
                             conn.Execute(uptiosql, new { CoID = CoID, RefID = itemOld.ParentID, Skuautoid = itemOld.Skuautoid, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
 
                             //重算库存
-                            var SkuIDLst = new List<string>();
+                            var SkuIDLst = new List<int>();
                             SkuIDLst.Add(itemOld.Skuautoid);
                             conn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = CoID, WarehouseID = main.Parent_WhID, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
                             conn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = CoID, WarehouseID = main.Parent_WhID, SkuIDLst = SkuIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);

@@ -1,0 +1,48 @@
+{
+    "WhID": 137,
+    "PurID": 1140,
+    "RecSkuLst": [
+        {
+            "BarCode": "BX100016112916719",
+            "Skuautoid": 17610,
+            "SkuID": "GB2312001001",
+            "Qty": 8,
+            "SkuType": 2
+        },
+        {
+            "BarCode": "BX100016112950300",
+            "Skuautoid": 17610,
+            "SkuID": "GB2312001001",
+            "Qty": 8,
+            "SkuType": 2
+        },
+        {
+            "BarCode": "GB2312001001000013",
+            "Skuautoid": 17610,
+            "SkuID": "GB2312001001",
+            "Qty": 1,
+            "SkuType": 0
+        },
+        {
+            "BarCode": "GB2312001001000014",
+            "Skuautoid": 17610,
+            "SkuID": "GB2312001001",
+            "Qty": 1,
+            "SkuType": 0
+        },
+        {
+            "BarCode": "GB2312001001000014",
+            "Skuautoid": 17610,
+            "SkuID": "GB2312001001",
+            "Qty": 1,
+            "SkuType": 0
+        },
+        {
+            "BarCode": "GB2312001001000015",
+            "Skuautoid": 17610,
+            "SkuID": "GB2312001001",
+            "Qty": 1,
+            "SkuType": 0
+        }
+    ]
+}
