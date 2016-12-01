@@ -13,7 +13,6 @@ namespace CoreModels.XyCore
         public string WarehouseID { get; set; }
         public string WarehouseName { get; set; }
         public decimal StockQty { get; set; }
-        public decimal LockQty { get; set; }
         public decimal PickQty { get; set; }
         public decimal WaitInQty { get; set; }
         public decimal SaleRetuQty { get; set; }
