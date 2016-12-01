@@ -5,10 +5,56 @@ function说明
 路由:http://localhost:5000/Core/AfterSale/GetInitASData
 input:  None
 OutPut: Shop        店铺
-        ASStatus    售后状态
-        ASType      售后分类
+        Status      售后状态
+        Type        售后分类
         OrdType     订单类型
         Distributor 分销商
         IssueType   问题类型
         Result      处理结果
+        ShopStatus  线上状态
+        GoodsStatus 货物状态
+        RefundStatus退款状态
 参考:output jason 文件:GetInitASData_output.json
+
+2.GetAsList() //查询售后单资料
+路由:http://localhost:5000/Core/AfterSale/GetAsList
+input:      ExCode              string          快递单号 default null
+            SoID                string          外部订单单号 default null
+            OID                 string          内部订单单号 default null
+            ID                  string          售后单号 default null
+            BuyerShopID         string          买家账号 default null
+            RecName             string          收货人 default null
+            Modifier            string          修改人 default null             
+            RecPhone            string          手机 default null
+            RecTel              string          电话 default null
+            Creator             string          创建人 default null
+            Remark              string          备注 default null
+            DateType            string          日期选项 default ODate
+            DateStart           string          日期起 default null
+            DateEnd             string          日期迄 default null
+            SkuID               string          商品编码 default null
+            IsNoOID             string          无信息件 Y/N/null
+            IsInterfaceLoad     string          接口下载 Y/N/null
+            IsSubmitDis         string          分销提交 Y/N/null
+            ShopID              string          店铺ID default A
+            Status              string          状态 default null
+            GoodsStatus         string          货品状态 default null
+            Type                string          售后分类 default null        
+            OrdType             string          订单类别 default null
+            ShopStatus          string          线上状态 default null 
+            RefundStatus        string          退款状态 default null
+            Distributor         string          分销商 default null
+            IsSubmit            string          供销提交 default null
+            IssueType           string          问题类别 default null
+            Result              string          处理结果 default null
+            SortField           string          排序栏位名称 default null
+            SortDirection       string          排序方式 default null
+            PageIndex           string          资料页数(ex.第一页就给1) default 1
+            NumPerPage          string          每页显示资料笔数 default 20
+OutPut: Datacnt     总资料笔数
+        Pagecnt     总页数
+        AfterSale   售后资料
+        Type        售后分类
+        Warehouse   仓库List
+        Result      处理结果
+参考:output jason 文件:GetAsList_output.json

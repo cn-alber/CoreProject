@@ -143,6 +143,7 @@ namespace CoreData.CoreCore
                                           Skuautoid = a.Skuautoid,
                                           StockQty = a.StockQty,
                                           SafeQty = a.SafeQty,
+                                          UpSafeQty = a.UpSafeQty,
                                           LockQty = a.LockQty,
                                           SaleRetuQty = a.SaleRetuQty,
                                           WaitInQty = a.WaitInQty,
@@ -215,7 +216,6 @@ namespace CoreData.CoreCore
                                     inventory.ID,
                                     inventory.Skuautoid,
                                     inventory.StockQty,
-                                    inventory.LockQty,
                                     inventory.PickQty,
                                     inventory.WaitInQty,
                                     inventory.SaleRetuQty,
@@ -301,7 +301,6 @@ namespace CoreData.CoreCore
                                               Skuautoid = a.Skuautoid,
                                               StockQty = a.StockQty,
                                               SafeQty = a.SafeQty,
-                                              LockQty = a.LockQty,
                                               SaleRetuQty = a.SaleRetuQty,
                                               WaitInQty = a.WaitInQty,
                                               VirtualQty = a.VirtualQty,
@@ -388,8 +387,8 @@ namespace CoreData.CoreCore
                     }
                     if (!string.IsNullOrEmpty(IParam.DocType))//单据类型
                     {
-                        querycount.Append(" AND DocType = @DocType");
-                        querysql.Append(" AND DocType = @DocType");
+                        querycount.Append(" AND Type = @DocType");
+                        querysql.Append(" AND Type = @DocType");
                         p.Add("@DocType", IParam.DocType);
                     }
                     // if (!string.IsNullOrEmpty(IParam.RecordID))

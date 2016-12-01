@@ -6,12 +6,15 @@ namespace CoreModels.XyCore
     public class ASInitData
     {
         public List<Filter> Shop {get;set;}//店铺
-        public List<Filter> ASStatus{get;set;}//售后状态
-        public List<Filter> ASType{get;set;}//售后类型
+        public List<Filter> Status{get;set;}//售后状态
+        public List<Filter> Type{get;set;}//售后类型
         public List<Filter> OrdType {get;set;} //订单类型
         public List<Filter> Distributor {get;set;}//分销商
         public List<Filter> IssueType{get;set;} //问题类型
         public List<Filter> Result{get;set;}//处理结果
+        public List<Filter> ShopStatus{get;set;}//线上状态
+        public List<Filter> GoodsStatus{get;set;}//货物状态
+        public List<Filter> RefundStatus{get;set;}//退款状态
     }
     public class AfterSaleParm
     {
@@ -221,5 +224,92 @@ namespace CoreModels.XyCore
             get { return _PageIndex; }
             set { this._PageIndex = value;}
         }
+    }
+    public class AfterSale
+    {
+        public int ID{get;set;}
+        public int OID{get;set;}
+        public long SoID{get;set;}
+        public DateTime RegisterDate{get;set;}
+        public string BuyerShopID{get;set;}
+        public string RecName{get;set;}
+        public int Type{get;set;}
+        public string RecTel{get;set;}
+        public string RecPhone{get;set;}
+        public decimal SalerReturnAmt{get;set;}
+        public decimal BuyerUpAmt{get;set;}
+        public decimal RealReturnAmt{get;set;}
+        public string ReturnAccount{get;set;}
+        public int ShopID{get;set;}
+        public string ShopName{get;set;}
+        public int WarehouseID{get;set;}
+        public string RecWarehouse{get;set;}
+        public int IssueType{get;set;}
+        public int OrdType{get;set;}
+        public string Remark{get;set;}
+        public int Status{get;set;}
+        public string ShopStatus{get;set;}
+        public string GoodsStatus{get;set;}
+        public string RefundStatus{get;set;}
+        public int Result{get;set;}
+        public string Express{get;set;}
+        public string ExCode{get;set;}
+        public bool IsSubmit{get;set;}
+        public bool IsSubmitDis{get;set;}
+        public bool IsInterfaceLoad{get;set;}
+        public string Distributor{get;set;}
+        public int CoID{get;set;}
+        public string Creator{get;set;}
+        public DateTime CreateDate{get;set;}
+        public string Modifier{get;set;}
+        public DateTime ModifyDate{get;set;}
+        public DateTime ConfirmDate{get;set;}
+    }
+    public class AfterSaleQuery
+    {
+        public int ID{get;set;}
+        public int OID{get;set;}
+        public string RegisterDate{get;set;}
+        public string BuyerShopID{get;set;}
+        public string RecName{get;set;}
+        public int Type{get;set;}
+        public string TypeString{get;set;}
+        public string RecPhone{get;set;}
+        public decimal SalerReturnAmt{get;set;}
+        public decimal BuyerUpAmt{get;set;}
+        public decimal RealReturnAmt{get;set;}
+        public string ReturnAccount{get;set;}
+        public string ShopName{get;set;}
+        public int WarehouseID{get;set;}
+        public string RecWarehouse{get;set;}
+        public long SoID{get;set;}
+        public int IssueType{get;set;}
+        public string IssueTypeString{get;set;}
+        public int OrdType{get;set;}
+        public string OrdTypeString{get;set;}
+        public string Remark{get;set;}
+        public int Status{get;set;}
+        public string StatusString{get;set;}
+        public string ShopStatus{get;set;}
+        public int Result{get;set;}
+        public string ResultString{get;set;}
+        public string GoodsStatus{get;set;}
+        public string ModifyDate{get;set;}
+        public string Modifier{get;set;}
+        public string Creator{get;set;}
+        public string RefundStatus{get;set;}
+        public string Express{get;set;}
+        public string ExCode{get;set;}
+        public bool IsSubmit{get;set;}        
+        public string ConfirmDate{get;set;}
+    }
+    public class AfterSaleData
+    {
+        public int Datacnt {get;set;}//总资料笔数
+        public decimal Pagecnt{get;set;}//总页数
+        public List<AfterSaleQuery> AfterSale {get;set;}
+        public List<Filter> Type{get;set;}//售后类型
+        public List<Filter> Warehouse{get;set;}
+        public List<Filter> Result{get;set;}//处理结果
     }
 }
