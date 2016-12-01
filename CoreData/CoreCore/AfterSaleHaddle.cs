@@ -215,409 +215,240 @@ namespace CoreData.CoreCore
         ///<summary>
         ///查询售后单List
         ///</summary>
-        // public static DataResult GetAsList(AfterSaleParm cp)
-        // {
-        //     var result = new DataResult(1,null);    
-        //     string sqlcount = "select count(id) from aftersale where 1=1";
-        //     string sqlcommand = @"select ID,Type,DealerType,IsMerge,IsSplit,OSource,SoID,ODate,PayDate,BuyerShopID,ShopName,Amount,PaidAmount,ExAmount,IsCOD,Status,AbnormalStatus,
-        //                           StatusDec,RecMessage,SendMessage,Express,RecLogistics,RecCity,RecDistrict,RecAddress,RecName,ExWeight,Distributor,SupDistributor,InvoiceTitle,
-        //                           PlanDate,SendWarehouse,SendDate,ExCode,Creator,RecTel,RecPhone,ExID from aftersale where 1=1"; 
-        //     string wheresql = string.Empty;
-        //     if(cp.CoID != 1)//公司编号
-        //     {
-        //         wheresql = wheresql + " and coid = " + cp.CoID;
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.ExCode))//快递单号
-        //     {
-        //        wheresql = wheresql + " and excode = '" + cp.ExCode + "'";
-        //     }
-        //     if(cp.SoID > 0)//外部订单号
-        //     {
-        //         wheresql = wheresql + " and soid = " + cp.SoID;
-        //     }
-        //     if(cp.OID > 0)//内部订单号
-        //     {
-        //         wheresql = wheresql + " and oid = " + cp.OID;
-        //     }
-        //     if(cp.ID > 0)//售后单号
-        //     {
-        //         wheresql = wheresql + " and id = " + cp.ID;
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.BuyerShopID))//买家账号
-        //     {
-        //        wheresql = wheresql + " and buyershopid like '%" + cp.BuyerShopID + "%'";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.RecName))//收货人
-        //     {
-        //        wheresql = wheresql + " and recname like '%" + cp.RecName + "%'";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.Modifier))//修改人
-        //     {
-        //        wheresql = wheresql + " and Modifier like '%" + cp.Modifier + "%'";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.RecPhone))//手机
-        //     {
-        //        wheresql = wheresql + " and recphone like '%" + cp.RecPhone + "%'";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.RecTel))//固定电话
-        //     {
-        //        wheresql = wheresql + " and rectel like '%" + cp.RecTel + "%'";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.Creator))//制单人
-        //     {
-        //        wheresql = wheresql + " and Creator like '%" + cp.Creator + "%'";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.Remark))//备注
-        //     {
-        //        wheresql = wheresql + " and Remark like '%" + cp.Remark + "%'";
-        //     }
-        //     if(cp.DateType.ToUpper() == "REGISTERDATE")
-        //     {
-        //         if(cp.DateStart > DateTime.Parse("1900-01-01"))
-        //         {
-        //             wheresql = wheresql + " AND RegisterDate >= '" + cp.DateStart + "'" ;
-        //         }
-        //         if(cp.DateEnd > DateTime.Parse("1900-01-01"))
-        //         {
-        //             wheresql = wheresql + " AND RegisterDate <= '" + cp.DateEnd + "'" ;
-        //         }
-        //     }
-        //     if(cp.DateType.ToUpper() == "MODIFYDATE")
-        //     {
-        //         if(cp.DateStart > DateTime.Parse("1900-01-01"))
-        //         {
-        //             wheresql = wheresql + " AND ModifyDate >= '" + cp.DateStart + "'" ;
-        //         }
-        //         if(cp.DateEnd > DateTime.Parse("1900-01-01"))
-        //         {
-        //             wheresql = wheresql + " AND ModifyDate <= '" + cp.DateEnd + "'" ;
-        //         }
-        //     }
-        //     if(cp.DateType.ToUpper() == "CONFIRMDATE")
-        //     {
-        //         if(cp.DateStart > DateTime.Parse("1900-01-01"))
-        //         {
-        //             wheresql = wheresql + " AND ConfirmDate >= '" + cp.DateStart + "'" ;
-        //         }
-        //         if(cp.DateEnd > DateTime.Parse("1900-01-01"))
-        //         {
-        //             wheresql = wheresql + " AND ConfirmDate <= '" + cp.DateEnd + "'" ;
-        //         }
-        //     }
-       
-        // // public string _SkuID = null;//商品编码
-        // // public string _IsNoOID = "A";//是否无信息件
-        // // public string _IsInterfaceLoad = "A";//接口下载
-        // // public string _IsSubmitDis = "A";//分销提交
-        // // public int _ShopID = -1;//店铺
-        // // public int _Status = -1;//状态
-        // // public string _GoodsStatus = null;//货物状态
-        // // public int _Type = -1;//售后分类
-        // // public int _OrdType = -1;//订单类型
-        // // public List<string> _ShopStatus = null;//淘宝状态
-        // // public List<string> _RefundStatus = null;//退款状态
-        // // public int _Distributor = -1;//分销商
-        // // public string _IsSubmit = "A";//供销提交
-        // // public int _IssueType = -1;//问题类型
-        // // public int _Result = -1;//处理结果
-            
-            
-            
-        //     if(!string.IsNullOrEmpty(cp.RecLogistics))//收货人省
-        //     {
-        //        wheresql = wheresql + " and reclogistics like '%" + cp.RecLogistics + "%'";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.RecCity))//收货人城市
-        //     {
-        //        wheresql = wheresql + " and reccity like '%" + cp.RecCity + "%'";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.RecDistrict))//收货人县区
-        //     {
-        //        wheresql = wheresql + " and recdistrict like '%" + cp.RecDistrict + "%'";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.RecAddress))//详细地址
-        //     {
-        //        wheresql = wheresql + " and recaddress like '%" + cp.RecAddress + "%'";
-        //     }
-        //     if (cp.StatusList != null)//状态List
-        //     {
-        //         wheresql = wheresql + " AND status in ("+ string.Join(",", cp.StatusList) + ")" ;
-        //     }
-        //     if (cp.AbnormalStatusList != null)//异常状态List
-        //     {
-        //         string status = " AND abnormalstatus in (0,"+ string.Join(",", cp.AbnormalStatusList) + ")" ;
-        //         if(cp.StatusList != null)
-        //         {
-        //             if(cp.StatusList.Count == 1 && cp.StatusList[0] == 7)
-        //             {
-        //                 status = " AND abnormalstatus in ("+ string.Join(",", cp.AbnormalStatusList) + ")" ;
-        //             }
-        //         }
-        //         else
-        //         {
-        //             status = " AND abnormalstatus in ("+ string.Join(",", cp.AbnormalStatusList) + ")" ;
-        //         }
-        //         wheresql = wheresql + status ;
-        //     }
-        //     if(cp.IsRecMsgYN.ToUpper() == "Y")
-        //     {
-        //         if(cp.RecMessage == null)
-        //         {
-        //             wheresql = wheresql + " AND recmessage != '' and status in (0,1,2,7)" ;
-        //         }
-        //         else
-        //         {
-        //             wheresql = wheresql + " AND recmessage like '%" + cp.RecMessage + "%' and status in (0,1,2,7)" ;
-        //         }
-        //     }
-        //     if(cp.IsRecMsgYN.ToUpper() == "N")
-        //     {
-        //         wheresql = wheresql + " AND recmessage = '' and status in (0,1,2,7)" ;
-        //     }
-        //     if(cp.IsSendMsgYN.ToUpper() == "Y")
-        //     {
-        //         if(cp.SendMessage == null)
-        //         {
-        //             wheresql = wheresql + " AND sendmessage != '' and status in (0,1,2,7)" ;
-        //         }
-        //         else 
-        //         {
-        //             wheresql = wheresql + " AND sendmessage like '%" + cp.SendMessage + "%' and status in (0,1,2,7)" ;
-        //         }
-        //     }
-        //     if(cp.IsSendMsgYN.ToUpper() == "N")
-        //     {
-        //         wheresql = wheresql + " AND sendmessage = '' and status in (0,1,2,7)" ;
-        //     }
-            
-        //     if(cp.Datetype.ToUpper() == "PLANDATE")
-        //     {
-        //         wheresql = wheresql + " AND plandate between '" + cp.DateStart + "' and '" + cp.DateEnd + "'" ;
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.Skuid))
-        //     {
-        //        wheresql = wheresql + " and exists(select id from orderitem where oid = order.id and skuid = '" + cp.Skuid + "')";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.GoodsCode))
-        //     {
-        //        wheresql = wheresql + " and exists(select id from orderitem where oid = order.id and GoodsCode = '" + cp.Skuid + "')";
-        //     }
-        //     if(cp.Ordqtystart > 0)
-        //     {
-        //         wheresql = wheresql + " AND ordqty >= " +  cp.Ordqtystart + " and status in (0,1,2,7)";
-        //     }
-        //     if(cp.Ordqtyend > 0)
-        //     {
-        //         wheresql = wheresql + " AND ordqty <= " +  cp.Ordqtyend + " and status in (0,1,2,7)";
-        //     }
-        //     if(cp.Ordamtstart > 0)
-        //     {
-        //         wheresql = wheresql + " AND amount >= " +  cp.Ordamtstart + " and status in (0,1,2,7)";
-        //     }
-        //     if(cp.Ordamtend > 0)
-        //     {
-        //         wheresql = wheresql + " AND amount <= " +  cp.Ordamtend + " and status in (0,1,2,7)";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.Skuname))
-        //     {
-        //        wheresql = wheresql + " and exists(select id from orderitem where oid = order.id and skuname like '%" + cp.Skuname + "%') and status in (0,1,2,7)";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.Norm))
-        //     {
-        //        wheresql = wheresql + " and exists(select id from orderitem where oid = order.id and norm like '%" + cp.Norm + "%') and status in (0,1,2,7)";
-        //     }
-        //     if(cp.ShopStatus != null)
-        //     {
-        //         string shopstatus = string.Empty;
-        //         foreach(var x in cp.ShopStatus)
-        //         {
-        //             shopstatus = shopstatus + "'" + x + "',";
-        //         }
-        //         shopstatus = shopstatus.Substring(0,shopstatus.Length - 1);
-        //         wheresql = wheresql + " AND shopstatus in (" +  shopstatus + ")";
-        //     }
-        //     if(cp.OSource > -1)
-        //     {
-        //         wheresql = wheresql + " AND osource = " +  cp.OSource;
-        //     }
-        //     if (cp.Type != null)
-        //     {
-        //         wheresql = wheresql + " AND type in ("+ string.Join(",", cp.Type) + ")" ;
-        //     }
-        //     if(cp.IsCOD.ToUpper() == "Y")
-        //     {
-        //         wheresql = wheresql + " AND iscod = true" ;
-        //     }
-        //     if(cp.IsCOD.ToUpper() == "N")
-        //     {
-        //         wheresql = wheresql + " AND iscod = false" ;
-        //     }
-        //     if(cp.IsPaid.ToUpper() == "Y")
-        //     {
-        //         wheresql = wheresql + " AND IsPaid = true" ;
-        //     }
-        //     if(cp.IsPaid.ToUpper() == "N")
-        //     {
-        //         wheresql = wheresql + " AND IsPaid = false" ;
-        //     }
-        //     if (cp.IsShopSelectAll == false &&　cp.ShopID != null)
-        //     {
-        //         wheresql = wheresql + " AND shopid in ("+ string.Join(",", cp.ShopID) + ")" ;
-        //     }
-        //     if(cp.IsDisSelectAll == true)
-        //     {
-        //         wheresql = wheresql + " AND dealertype = 2" ;
-        //     }
-        //     else
-        //     {
-        //         if(cp.Distributor != null)
-        //         {
-        //             string distributor = string.Empty;
-        //             foreach(var x in cp.Distributor)
-        //             {
-        //                 distributor = distributor + "'" + x + "',";
-        //             }
-        //             distributor = distributor.Substring(0,distributor.Length - 1);
-        //             wheresql = wheresql + " AND dealertype = 2 AND distributor in (" +  distributor + ")";
-        //         }
-        //     }
-        //     if(cp.ExID != null)
-        //     {
-        //         wheresql = wheresql + " AND exid in ("+ string.Join(",", cp.ExID) + ")" ;
-        //     }
-        //     if(cp.SendWarehouse != null)
-        //     {
-        //         wheresql = wheresql + " AND WarehouseID in ("+ string.Join(",", cp.SendWarehouse) + ")" ;
-        //     }
-        //     if(cp.Others != null)
-        //     {
-        //         if(cp.Others.Contains(4))
-        //         {
-        //             wheresql = wheresql + " and IsInvoice = true";
-        //         }
-        //         if(cp.Others.Contains(0) == true &&　cp.Others.Contains(0) == false)
-        //         {
-        //             wheresql = wheresql + " and IsMerge = true";
-        //         }
-        //         if(cp.Others.Contains(0) == false &&　cp.Others.Contains(0) == true)
-        //         {
-        //             wheresql = wheresql + " and IsMerge = false";
-        //         }
-        //         if(cp.Others.Contains(1) == true &&　cp.Others.Contains(3) == false)
-        //         {
-        //             wheresql = wheresql + " and IsSplit = true";
-        //         }
-        //         if(cp.Others.Contains(1) == false &&　cp.Others.Contains(3) == true)
-        //         {
-        //             wheresql = wheresql + " and IsSplit = false";
-        //         }
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.SortField) && !string.IsNullOrEmpty(cp.SortDirection))//排序
-        //     {
-        //         wheresql = wheresql + " ORDER BY "+cp.SortField +" "+ cp.SortDirection;
-        //     }
-        //     var res = new OrderData();
-        //     using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
-        //         try{    
-        //             int count = conn.QueryFirst<int>(sqlcount + wheresql);
-        //             decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
-        //             int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
-        //             wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
-        //             var u = conn.Query<OrderQuery>(sqlcommand + wheresql).AsList();
-        //             res.Datacnt = count;
-        //             res.Pagecnt = pagecnt;
-        //             res.Ord = u;
-        //             //订单资料
-        //             List<int> ItemID = new List<int>();
-        //             List<int> MID = new List<int>();
-        //             foreach(var a in res.Ord)
-        //             {
-        //                 a.TypeString = GetTypeName(a.Type);
-        //                 a.AbnormalStatusDec = a.StatusDec;
-        //                 a.StatusDec = Enum.GetName(typeof(OrdStatus), a.Status);
-        //                 if(!string.IsNullOrEmpty(a.ExID.ToString()))
-        //                 {
-        //                     a.ExpNamePinyin = GetExpNamePinyin(cp.CoID,a.ExID);
-        //                 }
-        //                 if(!string.IsNullOrEmpty(a.PaidAmount))
-        //                 {
-        //                     if(decimal.Parse(a.PaidAmount) == 0)
-        //                     {
-        //                         a.PayDate = null;
-        //                     }
-        //                 }
-        //                 if(a.OSource != 3)
-        //                 {
-        //                     a.Creator = "";
-        //                 }
-        //                 if(a.IsMerge == true)
-        //                 {
-        //                     MID.Add(a.ID);
-        //                 }
-        //                 ItemID.Add(a.ID);
-        //             }
-        //             //处理soid
-        //             var y = new List<Order>();
-        //             if(MID.Count > 0)
-        //             {
-        //                 sqlcommand = "select MergeOID,soid from `order` where coid = @Coid and MergeOID in @ID";
-        //                 y = conn.Query<Order>(sqlcommand,new{Coid = cp.CoID,ID = MID}).AsList();
-        //             }
-        //             sqlcommand = @"select id,oid,SkuAutoID,Img,Qty,GoodsCode,SkuID,SkuName,Norm,RealPrice,Amount,ShopSkuID,IsGift,Weight from orderitem 
-        //                                 where oid in @ID and coid = @Coid";
-        //             var item = conn.Query<SkuList>(sqlcommand,new{ID = ItemID,Coid = cp.CoID}).AsList();
-        //             List<int> skuid = new List<int>();
-        //             foreach(var i in item)
-        //             {
-        //                 skuid.Add(i.SkuAutoID);
-        //             }
-        //             sqlcommand = "select Skuautoid,(StockQty - LockQty + VirtualQty) as InvQty from inventory_sale where coid = @Coid and Skuautoid in @Skuid";
-        //             var inv = conn.Query<Inv>(sqlcommand,new{Coid=cp.CoID,Skuid = skuid}).AsList();
-        //             foreach(var i in item)
-        //             {
-        //                 i.InvQty = 0;
-        //                 foreach(var j in inv)
-        //                 {
-        //                     if(i.SkuAutoID == j.Skuautoid)
-        //                     {
-        //                         i.InvQty = j.InvQty;
-        //                         break;
-        //                     }
-        //                 }
-        //             }
-        //             foreach(var a in res.Ord)
-        //             {
-        //                 if(a.IsMerge == true)
-        //                 {
-        //                     var soid = new List<long>();
-        //                     soid.Add(a.SoID);
-        //                     foreach(var b in y)
-        //                     {
-        //                         if(a.ID == b.MergeOID)
-        //                         {
-        //                             soid.Add(b.SoID);
-        //                         }
-        //                     }
-        //                     a.SoIDList = soid;
-        //                 }
-        //                 var sd = new List<SkuList>();
-        //                 foreach(var i in item)
-        //                 {
-        //                     if(a.ID == i.OID)
-        //                     {
-        //                         sd.Add(i);
-        //                     }
-        //                 }
-        //                 a.SkuList = sd;
-        //             }
-        //             result.d = res;             
-        //         }catch(Exception ex){
-        //             result.s = -1;
-        //             result.d = ex.Message;
-        //             conn.Dispose();
-        //         }
-        //     }           
-        //     return result;
-        // }
+        public static DataResult GetAsList(AfterSaleParm cp)
+        {
+            var result = new DataResult(1,null);    
+            string sqlcount = "select count(id) from aftersale where 1=1";
+            string sqlcommand = @"select ID,OID,RegisterDate,BuyerShopID,RecName,Type,RecPhone,SalerReturnAmt,BuyerUpAmt,RealReturnAmt,ReturnAccount,ShopName,WarehouseID,RecWarehouse,
+                                  SoID,IssueType,OrdType,Remark,Status,ShopStatus,Result,GoodsStatus,ModifyDate,Modifier,Creator,RefundStatus,Express,ExCode,IsSubmit,ConfirmDate
+                                  from aftersale where 1=1";         
+            string wheresql = string.Empty;
+            if(cp.CoID != 1)//公司编号
+            {
+                wheresql = wheresql + " and coid = " + cp.CoID;
+            }
+            if(!string.IsNullOrEmpty(cp.ExCode))//快递单号
+            {
+               wheresql = wheresql + " and excode = '" + cp.ExCode + "'";
+            }
+            if(cp.SoID > 0)//外部订单号
+            {
+                wheresql = wheresql + " and soid = " + cp.SoID;
+            }
+            if(cp.OID > 0)//内部订单号
+            {
+                wheresql = wheresql + " and oid = " + cp.OID;
+            }
+            if(cp.ID > 0)//售后单号
+            {
+                wheresql = wheresql + " and id = " + cp.ID;
+            }
+            if(!string.IsNullOrEmpty(cp.BuyerShopID))//买家账号
+            {
+               wheresql = wheresql + " and buyershopid like '%" + cp.BuyerShopID + "%'";
+            }
+            if(!string.IsNullOrEmpty(cp.RecName))//收货人
+            {
+               wheresql = wheresql + " and recname like '%" + cp.RecName + "%'";
+            }
+            if(!string.IsNullOrEmpty(cp.Modifier))//修改人
+            {
+               wheresql = wheresql + " and Modifier like '%" + cp.Modifier + "%'";
+            }
+            if(!string.IsNullOrEmpty(cp.RecPhone))//手机
+            {
+               wheresql = wheresql + " and recphone like '%" + cp.RecPhone + "%'";
+            }
+            if(!string.IsNullOrEmpty(cp.RecTel))//固定电话
+            {
+               wheresql = wheresql + " and rectel like '%" + cp.RecTel + "%'";
+            }
+            if(!string.IsNullOrEmpty(cp.Creator))//制单人
+            {
+               wheresql = wheresql + " and Creator like '%" + cp.Creator + "%'";
+            }
+            if(!string.IsNullOrEmpty(cp.Remark))//备注
+            {
+               wheresql = wheresql + " and Remark like '%" + cp.Remark + "%'";
+            }
+            if(!string.IsNullOrEmpty(cp.DateType) && cp.DateType.ToUpper() == "REGISTERDATE")
+            {
+                if(cp.DateStart > DateTime.Parse("1900-01-01"))
+                {
+                    wheresql = wheresql + " AND RegisterDate >= '" + cp.DateStart + "'" ;
+                }
+                if(cp.DateEnd > DateTime.Parse("1900-01-01"))
+                {
+                    wheresql = wheresql + " AND RegisterDate <= '" + cp.DateEnd + "'" ;
+                }
+            }
+            if(!string.IsNullOrEmpty(cp.DateType) && cp.DateType.ToUpper() == "MODIFYDATE")
+            {
+                if(cp.DateStart > DateTime.Parse("1900-01-01"))
+                {
+                    wheresql = wheresql + " AND ModifyDate >= '" + cp.DateStart + "'" ;
+                }
+                if(cp.DateEnd > DateTime.Parse("1900-01-01"))
+                {
+                    wheresql = wheresql + " AND ModifyDate <= '" + cp.DateEnd + "'" ;
+                }
+            }
+            if(!string.IsNullOrEmpty(cp.DateType) && cp.DateType.ToUpper() == "CONFIRMDATE")
+            {
+                if(cp.DateStart > DateTime.Parse("1900-01-01"))
+                {
+                    wheresql = wheresql + " AND ConfirmDate >= '" + cp.DateStart + "'" ;
+                }
+                if(cp.DateEnd > DateTime.Parse("1900-01-01"))
+                {
+                    wheresql = wheresql + " AND ConfirmDate <= '" + cp.DateEnd + "'" ;
+                }
+            }
+            if(!string.IsNullOrEmpty(cp.SkuID))
+            {
+               wheresql = wheresql + " and exists(select id from aftersaleitem where RID = aftersale.id and skuid = '" + cp.SkuID + "')";
+            }
+            if(!string.IsNullOrEmpty(cp.IsNoOID) && cp.IsNoOID.ToUpper() == "Y")
+            {
+                wheresql = wheresql + " AND OID = -1" ;
+            }
+            if(!string.IsNullOrEmpty(cp.IsNoOID) && cp.IsNoOID.ToUpper() == "N")
+            {
+                wheresql = wheresql + " AND OID > 0" ;
+            }
+            if(!string.IsNullOrEmpty(cp.IsInterfaceLoad) && (cp.IsInterfaceLoad.ToUpper() == "Y" || cp.IsInterfaceLoad.ToUpper() == "N"))
+            {
+                wheresql = wheresql + " AND IsInterfaceLoad = '" + cp.IsInterfaceLoad.ToUpper() + "'" ;
+            }
+            if(!string.IsNullOrEmpty(cp.IsSubmitDis) && (cp.IsSubmitDis.ToUpper() == "Y" || cp.IsSubmitDis.ToUpper() == "N"))
+            {
+                wheresql = wheresql + " AND IsSubmitDis = '" + cp.IsSubmitDis.ToUpper() + "'" ;
+            }
+            if(cp.ShopID > 0)
+            {
+                wheresql = wheresql + " AND ShopID = " + cp.ShopID ;
+            }
+            if(cp.Status > 0)
+            {
+                wheresql = wheresql + " AND Status = " + cp.Status ;
+            }
+            if(!string.IsNullOrEmpty(cp.GoodsStatus) && !cp.GoodsStatus.Contains("不限"))
+            {
+                wheresql = wheresql + " AND GoodsStatus = '" + cp.GoodsStatus + "'" ;
+            }
+            if(cp.Type > 0)
+            {
+                wheresql = wheresql + " AND Type = " + cp.Type ;
+            }
+            if(cp.OrdType > 0)
+            {
+                wheresql = wheresql + " AND OrdType = " + cp.OrdType ;
+            }
+            if(cp.ShopStatus != null)
+            {
+                string shopstatus = string.Empty;
+                foreach(var x in cp.ShopStatus)
+                {
+                    shopstatus = shopstatus + "'" + x + "',";
+                }
+                shopstatus = shopstatus.Substring(0,shopstatus.Length - 1);
+                wheresql = wheresql + " AND shopstatus in (" +  shopstatus + ")";
+            }
+            if(cp.RefundStatus != null)
+            {
+                string shopstatus = string.Empty;
+                foreach(var x in cp.RefundStatus)
+                {
+                    shopstatus = shopstatus + "'" + x + "',";
+                }
+                shopstatus = shopstatus.Substring(0,shopstatus.Length - 1);
+                wheresql = wheresql + " AND RefundStatus in (" +  shopstatus + ")";
+            }
+            if(cp.Distributor > 0)
+            {
+                wheresql = wheresql + " AND Distributor = " + cp.Distributor ;
+            }
+            if(!string.IsNullOrEmpty(cp.IsSubmit) && (cp.IsSubmit.ToUpper() == "Y" || cp.IsSubmit.ToUpper() == "N"))
+            {
+                wheresql = wheresql + " AND IsSubmit = '" + cp.IsSubmit.ToUpper() + "'" ;
+            }
+            if(cp.IssueType > 0)
+            {
+                wheresql = wheresql + " AND IssueType = " + cp.IssueType ;
+            }
+            if(cp.Result > 0)
+            {
+                wheresql = wheresql + " AND Result = " + cp.Result ;
+            }
+            if(cp.Result == -2)
+            {
+                wheresql = wheresql + " AND Result = null";
+            }
+            if(!string.IsNullOrEmpty(cp.SortField) && !string.IsNullOrEmpty(cp.SortDirection))//排序
+            {
+                wheresql = wheresql + " ORDER BY "+cp.SortField +" "+ cp.SortDirection;
+            }
+            var res = new AfterSaleData();
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    int count = conn.QueryFirst<int>(sqlcount + wheresql);
+                    decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
+                    int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
+                    wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
+                    var u = conn.Query<AfterSaleQuery>(sqlcommand + wheresql).AsList();
+                    foreach(var a in u)
+                    {
+                        a.TypeString = Enum.GetName(typeof(ASType), a.Type);
+                        a.IssueTypeString = Enum.GetName(typeof(IssueType), a.IssueType);
+                        a.OrdTypeString = OrderHaddle.GetTypeName(a.OrdType);
+                        a.StatusString = Enum.GetName(typeof(ASStatus), a.Status);
+                        a.ResultString = Enum.GetName(typeof(Result), a.Result);
+                    }
+                    res.Datacnt = count;
+                    res.Pagecnt = pagecnt;
+                    res.AfterSale = u;
+                    
+                         
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }        
+            //售后类型
+            var ff = new List<Filter>();
+            foreach (int  myCode in Enum.GetValues(typeof(ASType)))
+            {
+                var f = new Filter();
+                f.value = myCode.ToString();
+                f.label = Enum.GetName(typeof(ASType), myCode);//获取名称
+                ff.Add(f);
+            }
+            res.ASType = ff; 
+            //处理结果
+            ff = new List<Filter>();
+            foreach (int  myCode in Enum.GetValues(typeof(Result)))
+            {
+                var f = new Filter();
+                f.value = myCode.ToString();
+                f.label = Enum.GetName(typeof(Result), myCode);//获取名称
+                ff.Add(f);
+            }
+            res.Result = ff;
+            //仓库资料
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{    
+                    wheresql = "select ID as value,WarehouseName as label from warehouse where ParentID > 0 and Enable = true and coid = " + cp.CoID;
+                    var u = conn.Query<Filter>(wheresql).AsList();
+                    res.Warehouse = u;                                    
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            result.d = res;          
+            return result;
+        }
     }
 }
