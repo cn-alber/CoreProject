@@ -10602,7 +10602,7 @@ namespace CoreData.CoreCore
                     sqlCommandText = "select sum(Qty) as QtyTot,sum(Amount) as AmtTot,sum(TotalWeight) as WeightTot from orderitem where oid = " + a.ID + " and coid = " + CoID;
                     var su = CoreDBconn.Query<OrdSum>(sqlCommandText).AsList();
                     //更新订单的数量和重量
-                    sqlCommandText = @"update `order` set ExWeight = ExWeight + @ExWeight,OrdQty = OrdQty + @Qty,Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and CoID = @CoID";
+                    sqlCommandText = @"update `order` set ExWeight = @ExWeight,OrdQty = @Qty,Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and CoID = @CoID";
                     count = CoreDBconn.Execute(sqlCommandText, new { ExWeight = su[0].WeightTot,Qty = su[0].QtyTot,Modifier = UserName, ModifyDate = DateTime.Now, ID = a.ID, CoID = CoID }, TransCore);
                     if (count < 0)
                     {

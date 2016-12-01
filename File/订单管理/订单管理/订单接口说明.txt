@@ -536,3 +536,56 @@ input:OID            List<int>   订单单号List
 output: s=1成功 else 错误代码
 参考:input jason 文件:SetSupDistributor_input.json
 参考:output jason 文件:SetSupDistributor_output.json
+
+52.CalGift()设定供销商
+路由:http://localhost:5000/Core/Order/CalGift
+input:      OidType             string          订单范围选项 A:列表勾选订单  B:所有符合条件的订单  必填
+            OID                 List<int>       订单单号List
+            DateType            string          日期排序方式 A:按下单时间先后  B:按付款时间先后  必填
+            IsSplit             bool            是否排除已拆分订单true/false 必填
+            IsDelGift           bool            是否删除原有赠品true/false 必填
+            IsDelPrice          bool            是否删除零单价明细true/false 必填
+            ID                  string          内部订单单号 default null
+            SoID                string          外部订单单号 default null
+            PayNbr              string          付款单号 default null
+            BuyerShopID         string          买家账号 default null
+            ExCode              string          快递单号 default null
+            RecName             string          收货人 default null
+            RecPhone            string          手机 default null
+            RecTel              string          电话 default null
+            RecLogistics        string          省 default null
+            RecCity             string          市 default null
+            RecDistrict         string          区 default null
+            RecAddress          string          详细地址 default null
+            StatusList          string          状态 default null,List 用逗号隔开
+            AbnormalStatusList  string          异常状态 default null,List 用逗号隔开
+            IsRecMsgYN          string          是否过滤买家留言 default A
+            RecMessage          string          买家留言 default null
+            IsSendMsgYN         string          是否过滤卖家留言 default null
+            SendMessage         string          卖家留言 default null
+            Datetype            string          日期选项 default ODate
+            DateStart           string          日期起 default null
+            Dateend             string          日期迄 default null
+            Skuid               string          商品编码 default null
+            GoodsCode           string          货品编码 default null add 2016-11-14
+            Ordqtystart         string          数量起 default null
+            Ordqtyend           string          数量迄 default null
+            Ordamtstart         string          金额起 default null
+            Ordamtend           string          金额迄 default null
+            Skuname             string          商品名称 default null
+            Norm                string          规格 default null
+            ShopStatus          string          淘宝店铺状态 default null,List 用逗号隔开
+            Osource             string          订单来源 default null
+            Type                string          订单类型 default null,List 用逗号隔开
+            IsCOD               string          贷款方式 default A
+            IsPaid              string          是否付款 default A add 2016-11-14
+            IsShopSelectAll     string          店铺是否全选 default false add 2016-11-14
+            ShopID              string          店铺 default null,List 用逗号隔开
+            IsDisSelectAll      string          分销商是否全选 default false
+            Distributor         string          分销商 default null,List 用逗号隔开
+            ExID                string          快递公司 default null,List 用逗号隔开
+            SendWarehouse       string          发货仓库 default null,List 用逗号隔开
+            Others              string          其他选项 default null,List 用逗号隔开 add 2016-11-14
+output: s=1成功 else 错误代码
+参考:input jason 文件:CalGift_input.json
+参考:output jason 文件:CalGift_output.json
