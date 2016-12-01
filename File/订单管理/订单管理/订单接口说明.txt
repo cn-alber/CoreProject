@@ -537,7 +537,7 @@ output: s=1成功 else 错误代码
 参考:input jason 文件:SetSupDistributor_input.json
 参考:output jason 文件:SetSupDistributor_output.json
 
-52.CalGift()设定供销商
+52.CalGift()重新计算并添加赠品
 路由:http://localhost:5000/Core/Order/CalGift
 input:      OidType             string          订单范围选项 A:列表勾选订单  B:所有符合条件的订单  必填
             OID                 List<int>       订单单号List

@@ -1822,15 +1822,15 @@ namespace CoreWebApi
             {
                 return CoreResult.NewResponse(-1, "是否删除原有赠品必填", "General");
             }
-            if(co["IsDelPrice0"] != null)
+            if(co["IsDelPrice"] != null)
             {
-                if(co["IsDelPrice0"].ToString().ToUpper() !="TRUE" && co["IsDelPrice0"].ToString().ToUpper() !="FALSE")
+                if(co["IsDelPrice"].ToString().ToUpper() !="TRUE" && co["IsDelPrice"].ToString().ToUpper() !="FALSE")
                 {
                     return CoreResult.NewResponse(-1, "是否删除零单价明细参数异常", "General");
                 }
                 else
                 {
-                    IsDelPrice0 = bool.Parse(co["IsDelPrice0"].ToString());
+                    IsDelPrice0 = bool.Parse(co["IsDelPrice"].ToString());
                 }                
             }
             else

@@ -41,8 +41,7 @@ namespace CoreModels.Enum
             拼多多 = 33,
             蜜芽 = 34,
             线下 = 35
-        }
-                
+        }  
         public enum ApiTypes
         {
             Unknow = -1,
@@ -85,20 +84,6 @@ namespace CoreModels.Enum
             Base = 36,
 
         }
-        public enum OrdType
-        {
-            普通订单 = 0,
-            补发订单 = 1,
-            换货订单 = 2,
-            天猫分销 = 3,
-            天猫供销 = 4,
-            协同订单 = 5,
-            普通订单供销 = 6,
-            补发订单供销 = 7,
-            换货订单供销 = 8,
-            天猫供销供销 = 9,
-            协同订单供销 = 10
-        }
         public enum OrdStatus
         {
             待付款 = 0,
@@ -118,14 +103,14 @@ namespace CoreModels.Enum
             移动端订单 = 2,
             手工下单 = 3,
             手Q订单 = 4,
-            历史订单暂无来源 =5
+            历史订单暂无来源 =5,
+            售后 = 6
         }
         public enum TokenType {
             未授权 = 0,
             已授权 = 1,
             已过期 = 2
         }
-
         public enum SaleOutStatus
         {
             待出库 = 0,
@@ -136,7 +121,8 @@ namespace CoreModels.Enum
         {
             待确认 = 0,
             已确认 = 1,
-            作废 = 2
+            作废 = 2,
+            被合并 = 3
         }
         public enum ASType
         {
@@ -161,7 +147,22 @@ namespace CoreModels.Enum
             条码与吊牌与商品不符 = 9,
             发错货 = 10,
             退运费 = 11,
-            未按约定时间发货 = 12
+            未按约定时间发货 = 12,
+            差价 = 13,
+            补偿 = 14,
+            丢件或快递破损 = 15
+        }
+        public enum Result
+        {
+            待退货 = 0,
+            已退过 = 1,
+            支付宝退不了 = 2,
+            未申请 = 3,
+            邮费差价再核实 = 4,
+            漏填无法退 = 5,
+            中差评 = 6,
+            其他 = 7,
+            未确认收货 = 8
         }
         public enum ReturnType
         {
