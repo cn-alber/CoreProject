@@ -9,7 +9,7 @@ namespace CoreModels.XyCore
         public int Type { get; set; }
         public string CusType { get; set; }
         public int Status { get; set; }
-        public string Skuautoid { get; set; }
+        public int Skuautoid { get; set; }
         public string SkuID { get; set; }
         public string SkuName { get; set; }
         public string Norm { get; set; }

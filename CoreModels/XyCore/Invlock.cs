@@ -25,7 +25,7 @@ namespace CoreModels.XyCore
     {
         public int ID { get; set; }
         public int ParentID { get; set; }
-        public string Skuautoid { get; set; }
+        public int Skuautoid { get; set; }
         public int Qty { get; set; }
         public string CoID { get; set; }
         public string Creator { get; set; }
@@ -53,7 +53,7 @@ namespace CoreModels.XyCore
     public class Invlock_item_view
     {
         public int ID { get; set; }
-        public string Skuautoid { get; set; }
+        public int Skuautoid { get; set; }
         public string SkuID { get; set; }
         public string SkuName { get; set; }
         public string Norm { get; set; }

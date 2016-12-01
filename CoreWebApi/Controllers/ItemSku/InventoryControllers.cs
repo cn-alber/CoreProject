@@ -526,7 +526,7 @@ namespace CoreWebApi.XyCore
             }
             else
             {
-                var SkuautoidLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(obj["IDLst"].ToString());
+                var SkuautoidLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
                 string CoID = GetCoid();
                 int Type = int.Parse(obj["Type"].ToString());
                 res = InvlockHaddle.CheckQtyByID(SkuautoidLst,Type, CoID);

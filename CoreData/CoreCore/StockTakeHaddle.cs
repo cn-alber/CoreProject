@@ -62,7 +62,7 @@ namespace CoreData.CoreCore
                         querysql.Append(" AND CreateDate <= @DateT");
                         p.Add("@DateT", IParam.DateT);
                     }
-                    if (!string.IsNullOrEmpty(IParam.Skuautoid))
+                    if (IParam.Skuautoid>0)
                     {
                         querycount.Append(" AND ID in (SELECT distinct ParentID FROM sfc_item WHERE sfc_item.CoID= sfc_main.CoID AND sfc_item.ParentID=sfc_main.ID AND sfc_item.Skuautoid LIKE @Skuautoid )");
                         querysql.Append(" AND ID in (SELECT distinct ParentID FROM sfc_item WHERE sfc_item.CoID= sfc_main.CoID AND sfc_item.ParentID=sfc_main.ID AND sfc_item.Skuautoid LIKE @Skuautoid )");
@@ -266,7 +266,7 @@ namespace CoreData.CoreCore
                     WhID = main.WhID,
                     ParentID = ParentID,
                     Parent_WhID = main.Parent_WhID,
-                    Skuautoid = a.ToString(),
+                    Skuautoid = a,
                     Type = Type,
                     CoID = CoID,
                     Creator = UserName,

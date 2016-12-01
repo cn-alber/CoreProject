@@ -3,11 +3,17 @@ function说明
 ############################################################
 1.GetBox()//收货作业-根据箱码or件码_获取SKU
     方法：GET
-    路由：http://192.168.30.211:5000/Core/Api/APur/GetBox?CoID=&BoxCode=    
+    路由：http://192.168.30.211:5000/Core/APur/GetBox?BoxCode=    
     InPut:
-        CoID        int         公司编号
         BoxCode     string      箱/件码
     OutPut：
         ACore       ACoreSku    箱/件码Sku
     参考:output json 文件:GetBox_output.json  
-2.
+2.SetPurRec()//新增收料单
+    方法：POST
+    路由：http://192.168.30.211:5000/Core/APur/SetPurRec
+    InPut:
+        WhID        int             收入仓库编号Warehouse.ID
+        PurID       int             采购单编号Purchase.ID
+        RecSkuLst   List<ARecSku>   收入条码信息
+    参考：input json 文件：SetPurRec_input.json

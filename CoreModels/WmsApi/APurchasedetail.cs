@@ -22,7 +22,6 @@ namespace CoreModels.WmsApi
         public int WhID { get; set; }
         public int PWhID { get; set; }
         public int PurID { get; set; }
-        public int RecQty { get; set; }
         public List<ARecSku> RecSkuLst { get; set; }
         // public List<BoxPieceCode> BPLst { get; set; }
     }
