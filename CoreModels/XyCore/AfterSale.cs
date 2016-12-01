@@ -12,6 +12,9 @@ namespace CoreModels.XyCore
         public List<Filter> Distributor {get;set;}//分销商
         public List<Filter> IssueType{get;set;} //问题类型
         public List<Filter> Result{get;set;}//处理结果
+        public List<Filter> ShopStatus{get;set;}//线上状态
+        public List<Filter> GoodsStatus{get;set;}//货物状态
+        public List<Filter> RefundStatus{get;set;}//退款状态
     }
     public class AfterSaleParm
     {

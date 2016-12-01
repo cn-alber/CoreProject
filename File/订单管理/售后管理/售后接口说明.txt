@@ -11,6 +11,9 @@ OutPut: Shop        店铺
         Distributor 分销商
         IssueType   问题类型
         Result      处理结果
+        ShopStatus  线上状态
+        GoodsStatus 货物状态
+        RefundStatus退款状态
 参考:output jason 文件:GetInitASData_output.json
 
 2.GetAsList() //查询售后单资料
