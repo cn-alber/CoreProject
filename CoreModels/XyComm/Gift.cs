@@ -279,11 +279,17 @@ namespace CoreModels.XyCore
         public int Qty{get;set;}
         public bool IsGift{get;set;}
     }
+    public class GiftInsertReturn
+    {
+        public List<GiftInsertOrder> GiftInsert{get;set;}
+        public List<GiftRule> Gift{get;set;}
+    }
     public class GiftInsertOrderReturn
     {
         public decimal Exweight{get;set;}
         public int Qty{get;set;}
         public List<OrderItem> Item{get;set;}
+        public List<GiftRule> Gift{get;set;}
     }
     public class GiftInitData
     {
@@ -292,7 +298,7 @@ namespace CoreModels.XyCore
     }
     public class GiftEditData
     {
-        public List<GiftRuleEdit> Gift{get;set;}
+        public GiftRuleEdit Gift{get;set;}
         public List<Filter> Shop {get;set;}
         public List<Filter> Type {get;set;}
     }
