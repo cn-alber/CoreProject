@@ -58,3 +58,43 @@ OutPut: Datacnt     总资料笔数
         Warehouse   仓库List
         Result      处理结果
 参考:output jason 文件:GetAsList_output.json
+
+3.GetASOrderList() //售后订单查询
+路由:http://localhost:5000/Core/AfterSale/GetASOrderList
+input:      ID                  string          内部订单单号 default null
+            SoID                string          外部订单单号 default null
+            PayNbr              string          付款单号 default null
+            BuyerShopID         string          买家账号 default null
+            ExCode              string          快递单号 default null
+            RecName             string          收货人 default null
+            RecPhone            string          手机 default null
+            RecTel              string          电话 default null
+            Status              string          状态 default null
+            DateStart           string          日期起 default null
+            DateEnd             string          日期迄 default null
+            ShopID              string          店铺 default null
+            Distributor         string          分销商 default null
+            ExID                string          快递公司 default null
+            SendWarehouse       string          发货仓库 default null
+            SortField           string          排序栏位名称 default null
+            SortDirection       string          排序方式 default null
+            PageIndex           string          资料页数(ex.第一页就给1) default 1
+            NumPerPage          string          每页显示资料笔数 default 20
+OutPut:     Datacnt             int             资料总笔数
+            Pagecnt             decimal         总页数
+            Ord                 List<Order>     Order 资料
+参考:output jason 文件:GetASOrderList_output.json
+
+4.InsertASInit() //售后订单查询
+路由:http://localhost:5000/Core/AfterSale/InsertASInit
+input: Type  string  A:订单售后单  B:无信息件售后单
+OutPut:Order            订单
+       Shop             店铺
+       Express          快递
+       Distributor      分销商
+       SendWarehouse    发货仓库
+       IssueType        问题类型
+       Type             售后分类
+       Warehouse        退货仓
+       DefaultWare      退货仓预设值
+参考:output jason 文件:InsertASInit_output.json
