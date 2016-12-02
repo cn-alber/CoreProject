@@ -211,7 +211,7 @@ namespace CoreData.CoreCore
                         p.Add("@Norm", "%" + IParam.Norm + "%");
                     }
                     // var SkuautoidLst = conn.Query(queryskusql+" ORDER BY ID", p1).AsList();//本仓商品autoid
-                    string countsql = @"SELECT count(ID) FROM inventory WHERE CoID in @CoIDLst AND Skuautoid in (" + queryskusql + " ORDER BY ID)";
+                    string countsql = @"SELECT count(ID) FROM inventory WHERE CoID in @CoIDLst AND IsDelete=0 AND Skuautoid in (" + queryskusql + " ORDER BY ID)";
                     string sql = @"SELECT
                                     inventory.ID,
                                     inventory.Skuautoid,
@@ -227,7 +227,7 @@ namespace CoreData.CoreCore
                                     inventory.CoID
                                    FROM
                                     inventory
-                                   WHERE CoID in @CoIDLst AND Skuautoid in (" + queryskusql + " ORDER BY ID)";
+                                   WHERE CoID in @CoIDLst AND IsDelete=0 AND Skuautoid in (" + queryskusql + " ORDER BY ID)";
                     querycount.Append(countsql);
                     querysql.Append(sql);
                     //获取第三方仓公司ID

@@ -83,19 +83,19 @@ namespace CoreData.CoreWmsApi
                 {
                     string RecordID = "RE" + CommHaddle.GetRecordID(IParam.CoID);
                     var PurD = res.d as List<APurchaseDetail>;
-                    var PurM = CoreConn.Query<Purchase>("SELECT * FROM purchase WHERE CoID = @CoID AND ID =@ID",new{CoID=IParam.CoID,ID=PurD[0].PurchaseID}).AsList();
+                    var PurM = CoreConn.Query<Purchase>("SELECT * FROM purchase WHERE CoID = @CoID AND ID =@ID", new { CoID = IParam.CoID, ID = PurD[0].PurchaseID }).AsList();
                     //新增采购收料主表
-                    var RecM = new PurchaseReceive();
-                    RecM.scoid = PurM[0].scoid;
-                    RecM.sconame = PurM[0].sconame;
-                    RecM.purchaseid = PurM[0].id;
-                    RecM.coid = IParam.CoID;
-                    RecM.status = 1;
-                    RecM.creator = IParam.Creator;
-                    RecM.createdate = DateTime.Now;
-                    RecM.warehouseid = int.Parse(WhViewLst[0].ID);
-                    RecM.warehousename = WhViewLst[0].WhName;
-                    RecM.receivedate = DateTime.Now.ToString("yyyy-mm-dd");
+                    var RecM = new APurchaseReceive();
+                    RecM.SCoID = PurM[0].scoid;
+                    RecM.SCoName = PurM[0].sconame;
+                    RecM.PurchaseID = PurM[0].id;
+                    RecM.CoID = IParam.CoID;
+                    RecM.Status = 1;
+                    RecM.Creator = IParam.Creator;
+                    RecM.CreateDate = IParam.CreateDate;
+                    RecM.WarehouseID = int.Parse(WhViewLst[0].ID);
+                    RecM.WarehouseName = WhViewLst[0].WhName;
+                    RecM.ReceiveDate = DateTime.Now.ToString("yyyy-MM-dd");
                     CoreConn.Execute(AddPurRecSql(), RecM, CoreTrans);
                     var RecID = CoreConn.QueryFirst<int>("select LAST_INSERT_ID()", CoreTrans);
                     ParentID = RecID.ToString();
@@ -122,42 +122,37 @@ namespace CoreData.CoreWmsApi
 
                     #region 根据收料数量更新采购状态(1:已确认=>2.已完成)
                     string sql = @"SELECT
-                                        purchasereceive.PurchaseID,
-                                        purchaserecdetail.Skuautoid,
-                                        SUM(purchaserecdetail.RecQty) AS RecQty
+                                        IFNULL(SUM(purchaserecdetail.RecQty),0) 
                                     FROM
                                         purchaserecdetail ,
                                         purchasereceive
                                     WHERE purchaserecdetail.RecID=purchasereceive.ID
+                                        AND purchasereceive.CoID=@CoID
                                         AND purchasereceive.PurchaseID=@PurID
                                         AND purchaserecdetail.Skuautoid=@Skuautoid
-                                        AND purchasereceive.`Status`=1
-                                        AND purchasereceive.CoID=@CoID
-                                    GROUP BY
-                                        purchasereceive.PurchaseID,
-                                        purchaserecdetail.Skuautoid ";
+                                        AND purchasereceive.`Status`=1";
                     var args = new DynamicParameters();
                     args.Add("@CoID", IParam.CoID);
-                    args.Add("@PurID", IParam.PurID);
+                    args.Add("@PurID", PurM[0].id);
                     args.Add("@Skuautoid", SkuIDLst[0]);
-                    var PurDt = CoreConn.Query<APurchaseDetail>(sql, args, CoreTrans).AsList();
-                    string UptPurDtSql = "UPDATE purchasedetail SET RecQty=@RecQty,RecieveDate=@RecieveDate,DetailStatus=@DetailStatus WHERE PurchaseID=@PurID AND Skuautoid=@Skuautoid AND CoID=@CoID";
+                    var RecQty = CoreConn.QueryFirst<int>(sql, args, CoreTrans);
+                    string UptPurDtSql = "UPDATE purchasedetail SET RecQty=@RecQty,RecieveDate=@RecieveDate,DetailStatus=@DetailStatus WHERE ID=@PurID AND Skuautoid=@Skuautoid AND CoID=@CoID";
                     int DetailStatus = 1;//1:已确认;2.已完成;                    
-                    if (PurDt[0].RecQty >= PurD[0].PurQty)
+                    if (RecQty >= PurD[0].PurQty)
                         DetailStatus = 2;
-                    CoreConn.Execute(UptPurDtSql, new { RecQty = PurDt[0].RecQty, RecieveDate = IParam.CreateDate, DetailStatus = DetailStatus, PurID = IParam.PurID, Skuautoid = SkuIDLst[0], CoID = IParam.CoID }, CoreTrans);//更新明细状态
+                    CoreConn.Execute(UptPurDtSql, new { RecQty = RecQty, RecieveDate = DateTime.Now.ToString("yyyy-MM-dd"), DetailStatus = DetailStatus, PurID = IParam.PurID, Skuautoid = SkuIDLst[0], CoID = IParam.CoID }, CoreTrans);//更新明细状态
                     sql = @"SELECT
                                 purchasedetail.PurchaseID,
-                                SUM(purchasedetail.PurQty) AS purqty,
-                                SUM(purchasedetail.RecQty) AS recqty
+                                IFNULL(SUM(purchasedetail.PurQty),0) AS PurQty,
+                                IFNULL(SUM(purchasedetail.RecQty),0) AS RecQty
                             FROM
                                 purchasedetail
                             WHERE purchasedetail.PurchaseID=@PurID
-                            GROUP BY purchasedetail.PurchaseID";
-                    var Pur = CoreConn.QueryFirst<APurchaseDetail>(sql, new { PurID = IParam.PurID }, CoreTrans);
-                    if (Pur.PurQty <= Pur.RecQty)
+                            AND purchasedetail.CoID = @CoID";
+                    var Pur = CoreConn.Query<APurchaseDetail>(sql, new { CoID = IParam.CoID, PurID = PurM[0].id }, CoreTrans).AsList();
+                    if (Pur[0].PurQty <= Pur[0].RecQty)
                     {
-                        CoreConn.Execute("UPDATE purchase SET Status=2 WHERE CoID=@CoID AND ID=@PurID", new { CoID = IParam.CoID, PurID = IParam.PurID }, CoreTrans);
+                        CoreConn.Execute("UPDATE purchase SET Status=2 WHERE CoID=@CoID AND ID=@PurID", new { CoID = IParam.CoID, PurID = PurM[0].id }, CoreTrans);
                     }
                     #endregion
 
@@ -172,6 +167,7 @@ namespace CoreData.CoreWmsApi
                                             {
                                                 Skuautoid = a.Skuautoid,
                                                 SkuID = a.SkuID,
+                                                PCode = "",
                                                 WarehouseID = IParam.WhID,
                                                 WarehouseName = WhViewLst[0].WhName,
                                                 Type = int.Parse(WhViewLst[0].Type),
@@ -259,7 +255,7 @@ namespace CoreData.CoreWmsApi
                     inv.Creator = IParam.Creator;
                     inv.CreateDate = IParam.CreateDate;
                     inv.CoID = IParam.CoID.ToString();
-                    CoreConn.Execute(InventoryHaddle.AddInvinoutSql(), inv, CoreTrans);
+                    // CoreConn.Execute(InventoryHaddle.AddInvinoutSql(), inv, CoreTrans);
                     var inv_itemLst = IParam.RecSkuLst.Select(a => new Invinoutitem
                     {
                         RefID = ParentID,
@@ -275,7 +271,7 @@ namespace CoreData.CoreWmsApi
                         CreateDate = IParam.CreateDate,
                         CoID = IParam.CoID.ToString()
                     }).AsList();
-                    CoreConn.Execute(InventoryHaddle.AddInvinoutitemSql(), inv_itemLst, CoreTrans);
+                    // CoreConn.Execute(InventoryHaddle.AddInvinoutitemSql(), inv_itemLst, CoreTrans);
 
                     #endregion
                     string InvQuerySql = @"SELECT ID,Skuautoid,StockQty FROM Inventory WHERE CoID=@CoID AND Skuautoid in @SkuIDLst";
@@ -296,7 +292,7 @@ namespace CoreData.CoreWmsApi
                     var NewMainInvLst = RecSkuLst.Where(a => !MainInvSkuLst
                                                         .Select(b => b.Skuautoid)
                                                         .Contains(a.Skuautoid))
-                                        .Select(a => new Inventory
+                                        .Select(a => new Inventory_sale
                                         {
                                             Skuautoid = a.Skuautoid,
                                             CoID = IParam.CoID.ToString(),
@@ -421,6 +417,7 @@ namespace CoreData.CoreWmsApi
                                         {
                                             Skuautoid = a.Skuautoid,
                                             SkuID = a.SkuID,
+                                            PCode = "",
                                             WarehouseID = IParam.WhID,
                                             WarehouseName = WhViewLst[0].WhName,
                                             Type = int.Parse(WhViewLst[0].Type),
@@ -508,7 +505,7 @@ namespace CoreData.CoreWmsApi
                 inv.Creator = IParam.Creator;
                 inv.CreateDate = IParam.CreateDate;
                 inv.CoID = IParam.CoID.ToString();
-                CoreConn.Execute(InventoryHaddle.AddInvinoutSql(), inv, CoreTrans);
+                // CoreConn.Execute(InventoryHaddle.AddInvinoutSql(), inv, CoreTrans);
                 var inv_itemLst = IParam.RecSkuLst.Select(a => new Invinoutitem
                 {
                     RefID = ParentID,
@@ -524,7 +521,7 @@ namespace CoreData.CoreWmsApi
                     CreateDate = IParam.CreateDate,
                     CoID = IParam.CoID.ToString()
                 }).AsList();
-                CoreConn.Execute(InventoryHaddle.AddInvinoutitemSql(), inv_itemLst, CoreTrans);
+                // CoreConn.Execute(InventoryHaddle.AddInvinoutitemSql(), inv_itemLst, CoreTrans);
 
                 #endregion
                 string InvQuerySql = @"SELECT ID,Skuautoid,StockQty FROM Inventory WHERE CoID=@CoID AND Skuautoid in @SkuIDLst";
@@ -694,6 +691,7 @@ namespace CoreData.CoreWmsApi
         {
             string sql = @"INSERT INTO wmspile(
                                 PCode,
+                                Skuautoid,
                                 SkuID,
                                 WarehouseID,
                                 WarehouseName,
@@ -709,6 +707,7 @@ namespace CoreData.CoreWmsApi
                                 maxqty ) 
                             VALUES (
                                 @PCode,
+                                @Skuautoid,
                                 @SkuID,
                                 @WarehouseID,
                                 @WarehouseName,

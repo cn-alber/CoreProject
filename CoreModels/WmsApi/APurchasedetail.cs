@@ -48,27 +48,40 @@ namespace CoreModels.WmsApi
         public string SkuID { get; set; }
         public int Qty { get; set; }
     }
-
-
-public class APurchaseRecDetail
+    public class APurchaseReceive
     {
-        public int ID{get;set;}
-        public int RecID{get;set;}
-        public string img{get;set;}
-        public int Skuautoid{get;set;}
-        public string SkuID{get;set;}
-        public string SkuName{get;set;}
-        public string Norm {get;set;}
-        public int RecQty{get;set;}
-        public decimal Price{get;set;}
-        public string PlanRecQty{get;set;}
-        public decimal Amount{get;set;}
-        public string Remark{get;set;}
-        public string GoodsCode{get;set;}
-        public string SupplyNum{get;set;}
-        public int CoID{get;set;}
-        public string Creator{get;set;}
-        public string CreateDate{get;set;}
+        public int ID { get; set; }
+        public int SCoID { get; set; }
+        public string SCoName { get; set; }
+        public int PurchaseID { get; set; }
+        public int WarehouseID { get; set; }
+        public string WarehouseName { get; set; }
+        public string ReceiveDate { get; set; }
+        public int Status { get; set; }
+        public string Creator { get; set; }
+        public string CreateDate { get; set; }
+        public int CoID { get; set; }
+    }
+
+    public class APurchaseRecDetail
+    {
+        public int ID { get; set; }
+        public int RecID { get; set; }
+        public string img { get; set; }
+        public int Skuautoid { get; set; }
+        public string SkuID { get; set; }
+        public string SkuName { get; set; }
+        public string Norm { get; set; }
+        public int RecQty { get; set; }
+        public decimal Price { get; set; }
+        public string PlanRecQty { get; set; }
+        public decimal Amount { get; set; }
+        public string Remark { get; set; }
+        public string GoodsCode { get; set; }
+        public string SupplyNum { get; set; }
+        public int CoID { get; set; }
+        public string Creator { get; set; }
+        public string CreateDate { get; set; }
     }
 
     // public class BoxPieceCode

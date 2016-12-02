@@ -3,10 +3,11 @@ using System.Collections.Generic;
 namespace CoreModels.WmsApi
 {
     public class AWmsPile
-    {        
+    {
+        private bool _Enable = true;
         public int ID { get; set; }
         public string PCode { get; set; }
-        public int Skuautoid{get;set;}
+        public int Skuautoid { get; set; }
         public string SkuID { get; set; }
         public int WarehouseID { get; set; }
         public string WarehouseName { get; set; }
@@ -15,7 +16,11 @@ namespace CoreModels.WmsApi
         public int Order { get; set; }
         public int Qty { get; set; }
         public int lockqty { get; set; }
-        public bool Enable { get; set; }
+        public bool Enable
+        {
+            get { return _Enable; }
+            set { _Enable = value; }
+        }
         public string Creator { get; set; }
         public string CreateDate { get; set; }
         public int CoID { get; set; }
@@ -30,7 +35,7 @@ namespace CoreModels.WmsApi
     {
         public string CoID { get; set; }
         public string GoodsCode { get; set; }
-        public int Skuautoid{get;set;}
+        public int Skuautoid { get; set; }
         public string SkuID { get; set; }
         public string SkuName { get; set; }
         public string Norm { get; set; }
