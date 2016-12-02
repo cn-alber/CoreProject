@@ -86,7 +86,7 @@ OutPut:     Datacnt             int             资料总笔数
             Ord                 List<Order>     Order 资料
 参考:output jason 文件:GetASOrderList_output.json
 
-4.InsertASInit() //售后订单查询
+4.InsertASInit() //新增售后单初始资料
 路由:http://localhost:5000/Core/AfterSale/InsertASInit
 input: Type  string  A:订单售后单  B:无信息件售后单
 OutPut:Order            订单

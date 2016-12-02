@@ -1006,6 +1006,31 @@ namespace CoreData.CoreCore
                     logs.Add(log);
                     u[0].Type = Type;
                     i ++;
+                    sqlcommand = "delete from aftersaleitem where RID = " + RID + " and coid = " + CoID;
+                    count = CoreDBconn.Execute(sqlcommand,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3004;
+                        return result;
+                    }
+                    if(Type == 1 && u[0].OID > 0)
+                    {
+                        sqlcommand = "select * from orderitem where oid = " + u[0].OID + " and coid = " + CoID;
+                        var item = CoreDBconn.Query<OrderItem>(sqlcommand).AsList();
+                        foreach(var it in item)
+                        {
+                            sqlcommand = @"INSERT INTO aftersaleitem(RID,ReturnType,SkuAutoID,SkuID,SkuName,Norm,GoodsCode,RegisterQty,Price,Amount,Img,CoID,Creator,Modifier) 
+                                           VALUES(@RID,@ReturnType,@SkuAutoID,@SkuID,@SkuName,@Norm,@GoodsCode,@RegisterQty,@Price,@Amount,@Img,@CoID,@Creator,@Creator)";
+                            var args = new{RID = RID,ReturnType = 0,SkuAutoID=it.SkuAutoID,SkuID = it.SkuID,SkuName=it.SkuName,Norm=it.Norm,GoodsCode=it.GoodsCode,RegisterQty=it.Qty,
+                                           Price=it.RealPrice,Amount=it.Amount,Img=it.img,CoID=CoID,Creator=UserName};
+                            count = CoreDBconn.Execute(sqlcommand,args,TransCore);
+                            if(count < 0)
+                            {
+                                result.s = -3002;
+                                return result;
+                            }
+                        }
+                    }
                 }
                 if(ReturnAccount != null  && u[0].ReturnAccount != ReturnAccount)
                 {
