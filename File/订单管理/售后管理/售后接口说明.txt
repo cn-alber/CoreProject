@@ -98,3 +98,19 @@ OutPut:Order            订单
        Warehouse        退货仓
        DefaultWare      退货仓预设值
 参考:output jason 文件:InsertASInit_output.json
+
+5.InsertAfterSale()售后单新增
+路由:http://localhost:5000/Core/AfterSale/InsertAfterSale
+input:DocumentType      string  A:订单售后单  B:无信息件售后单,必填
+      Type              int     售后类型,必填
+      SalerReturnAmt    decimal 卖家应退金额 
+      BuyerUpAmt        decimal 买家应补金额
+      WarehouseID       int     仓库ID
+      IssueType         int     问题分类,必填
+      Remark            string  问题描述
+      Express           string  快递
+      ExCode            string  运单号
+      OID               int     订单ID(DocumentType=A时,必填)
+output: s=1成功 else 错误代码
+参考:input jason 文件:InsertAfterSale_input.json
+参考:output jason 文件:InsertAfterSale_output.json

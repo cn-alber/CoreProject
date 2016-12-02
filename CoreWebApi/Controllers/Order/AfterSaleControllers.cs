@@ -287,5 +287,153 @@ namespace CoreWebApi
             var data = AfterSaleHaddle.InsertASInit(Type.ToUpper(),CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+        [HttpPostAttribute("/Core/AfterSale/InsertAfterSale")]
+        public ResponseResult InsertAfterSale([FromBodyAttribute]JObject co)
+        {   
+            string DuType = "",Remark="",Express="",ExCode = "";
+            if(co["DocumentType"] != null)
+            {
+                DuType = co["DocumentType"].ToString();
+                if(!string.IsNullOrEmpty(DuType))
+                {
+                    DuType = DuType.ToUpper();
+                    if(DuType != "A" && DuType != "B")
+                    {
+                        return CoreResult.NewResponse(-1, "请指定创建的售后单是否是无信息件", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "请指定创建的售后单是否是无信息件", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "请指定创建的售后单是否是无信息件", "General"); 
+            }
+            if(co["Remark"] != null)
+            {
+                Remark = co["Remark"].ToString();
+            }
+            if(co["Express"] != null)
+            {
+                Express = co["Express"].ToString();
+            }
+            if(co["ExCode"] != null)
+            {
+                ExCode = co["ExCode"].ToString();
+            }
+            int Type = 0,x,WarehouseID = -1,IssueType = 0,OID = -1;
+            if(co["Type"] != null)
+            {
+                string Text = co["Type"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (int.TryParse(Text, out x))
+                    {
+                        Type = int.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "售后类型参数无效", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "售后类型必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "售后类型必填", "General"); 
+            }
+            if(co["IssueType"] != null)
+            {
+                string Text = co["IssueType"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (int.TryParse(Text, out x))
+                    {
+                        IssueType = int.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "问题分类参数无效", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "问题分类必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "问题分类必填", "General"); 
+            }
+            if(co["WarehouseID"] != null)
+            {
+                string Text = co["WarehouseID"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (int.TryParse(Text, out x))
+                    {
+                        WarehouseID = int.Parse(Text);
+                    }
+                }
+            }
+            decimal SalerReturnAmt = 0,BuyerUpAmt = 0,y;
+            if(co["SalerReturnAmt"] != null)
+            {
+                string Text = co["SalerReturnAmt"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (decimal.TryParse(Text, out y))
+                    {
+                        SalerReturnAmt = decimal.Parse(Text);
+                    }
+                }
+            }
+            if(co["BuyerUpAmt"] != null)
+            {
+                string Text = co["BuyerUpAmt"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (decimal.TryParse(Text, out y))
+                    {
+                        BuyerUpAmt = decimal.Parse(Text);
+                    }
+                }
+            }
+            if(DuType == "A")
+            {
+                if(co["OID"] != null)
+                {
+                    string Text = co["OID"].ToString();
+                    if(!string.IsNullOrEmpty(Text))
+                    {
+                        if (int.TryParse(Text, out x))
+                        {
+                            OID = int.Parse(Text);
+                        }
+                        else
+                        {
+                            return CoreResult.NewResponse(-1, "订单ID参数无效", "General"); 
+                        }
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "订单ID必填", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "订单ID必填", "General"); 
+                }
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = AfterSaleHaddle.InsertAfterSale(DuType,CoID,Type,SalerReturnAmt,BuyerUpAmt,WarehouseID,IssueType,Remark,username,Express,ExCode,OID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }
