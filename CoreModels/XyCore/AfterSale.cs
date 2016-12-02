@@ -474,11 +474,6 @@ namespace CoreModels.XyCore
     }
     public class ASOrderInit
     {
-        public ASOrderData Order{get;set;}
-        public List<Filter> Shop{get;set;}
-        public List<Filter> Express{get;set;}
-        public List<Filter> Distributor{get;set;}
-        public List<Filter> SendWarehouse{get;set;}
         public List<Filter> IssueType{get;set;}
         public List<Filter> Type{get;set;}
         public List<Filter> Warehouse{get;set;}

@@ -657,70 +657,10 @@ namespace CoreData.CoreCore
         ///<summary>
         ///售后订单初始资料
         ///</summary>
-        public static DataResult InsertASInit(string Type,int CoID)
+        public static DataResult InsertASInit(int CoID)
         {
             var result = new DataResult(1,null);
             var res = new ASOrderInit();   
-            if(Type == "A")
-            {
-                var cp = new ASOrderParm();
-                cp.CoID = CoID;
-                var re = GetASOrderList(cp);
-                if(re.s == 1)
-                {
-                    res.Order = re.d as ASOrderData;
-                }
-                //获取店铺List
-                var shop = CoreComm.ShopHaddle.getShopEnum(CoID.ToString()) as List<shopEnum>;
-                var ff = new List<Filter>();
-                foreach(var t in shop)
-                {
-                    var f = new Filter();
-                    f.value = t.value.ToString();
-                    f.label = t.label;
-                    ff.Add(f);
-                }
-                var fd = new Filter();
-                fd.value = "0";
-                fd.label = "{线下}";
-                ff.Add(fd);
-                res.Shop = ff;  
-                //快递Lsit
-                var Express = CoreComm.ExpressHaddle.GetExpressSimple(CoID).d as List<ExpressSimple>;
-                ff = new List<Filter>();
-                foreach(var t in Express)
-                {
-                    var f = new Filter();
-                    f.value = t.ID;
-                    f.label = t.Name;
-                    ff.Add(f);
-                }
-                res.Express = ff;  
-                //分销商
-                using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
-                try{  
-                        string sqlcommand = "select ID  as value,DistributorName as label from distributor where coid =" + CoID + " and enable = true and type = 0";
-                        var Distributor = conn.Query<Filter>(sqlcommand).AsList();
-                        res.Distributor = Distributor;
-                        
-                        }catch(Exception ex){
-                        result.s = -1;
-                        result.d = ex.Message;
-                        conn.Dispose();
-                    }
-                }  
-                //仓库资料
-                List<Filter> wh = new List<Filter>();
-                var w = CoreComm.WarehouseHaddle.getWarelist(CoID.ToString()) as List<wareLst>;
-                foreach(var h in w)
-                {
-                    var a = new Filter();
-                    a.value = h.id.ToString();
-                    a.label = h.warename;
-                    wh.Add(a);
-                }
-                res.SendWarehouse = wh ;
-            }
             //售后类型
             var filter = new List<Filter>();
             foreach (int  myCode in Enum.GetValues(typeof(ASType)))

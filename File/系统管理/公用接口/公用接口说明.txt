@@ -97,3 +97,9 @@ InPut:
      
 OutPut:
     参见：GetShopEnum.json  
+
+GetExpressList() //快递List
+路由:http://localhost:5000/Core/Common/GetExpressList
+input:  None
+OutPut: 快递List
+参考:output jason 文件:GetExpressList_output.json

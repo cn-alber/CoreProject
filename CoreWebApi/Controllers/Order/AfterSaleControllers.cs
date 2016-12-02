@@ -271,21 +271,10 @@ namespace CoreWebApi
         }
 
         [HttpGetAttribute("/Core/AfterSale/InsertASInit")]
-        public ResponseResult InsertASInit(string Type)
+        public ResponseResult InsertASInit()
         {  
-            if(!string.IsNullOrEmpty(Type))
-            {
-                if(Type.ToUpper() != "A" && Type.ToUpper() != "B")
-                {
-                    return CoreResult.NewResponse(-1, "请指定创建的售后单是否是无信息件", "General"); 
-                }
-            }
-            else
-            {
-                return CoreResult.NewResponse(-1, "请指定创建的售后单是否是无信息件", "General"); 
-            }
             int CoID = int.Parse(GetCoid());
-            var data = AfterSaleHaddle.InsertASInit(Type.ToUpper(),CoID);
+            var data = AfterSaleHaddle.InsertASInit(CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
         [HttpPostAttribute("/Core/AfterSale/InsertAfterSale")]
