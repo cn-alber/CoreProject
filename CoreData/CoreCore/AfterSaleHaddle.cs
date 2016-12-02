@@ -903,24 +903,217 @@ namespace CoreData.CoreCore
             
             return result;
         }
-
-        public static DataResult SetExpress()
+        ///<summary>
+        ///修改售后单
+        ///</summary>
+        public static DataResult UpdateAfterSale(int CoID,int Type,decimal SalerReturnAmt,decimal BuyerUpAmt,string ReturnAccount,int WarehouseID,string Remark,
+                                                 string UserName,string Express,string ExCode,int Result,int RID)
         {
             var result = new DataResult(1,null);
-            // var logs = new List<Log>();
-            var res = new TransferNormalReturn();
-            var su = new List<TransferNormalReturnSuccess>();
-            var fa = new List<TransferNormalReturnFail>();
-            string sqlCommandText = string.Empty;
             int count = 0;
+            var logs = new List<LogInsert>();
+            var log = new LogInsert();
+            string WarehouseName = "";
+            string sqlcommand = string.Empty;
+            if(WarehouseID > 0)
+            {   
+                using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                    try{    
+                        string wheresql = "select WarehouseName from warehouse where ID =" + WarehouseID + " and enable = true and coid = " + CoID;
+                        var u = conn.Query<string>(wheresql).AsList();
+                        if(u.Count == 0)
+                        {
+                            result.s = -1;
+                            result.d = "仓库ID无效";
+                            return result;
+                        }
+                        else
+                        {
+                            WarehouseName = u[0];
+                        }          
+                    }catch(Exception ex){
+                        result.s = -1;
+                        result.d = ex.Message;
+                        conn.Dispose();
+                    }
+                }  
+            }
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
             var TransCore = CoreDBconn.BeginTransaction();
             try
             {
-                res.SuccessIDs = su;
-                res.FailIDs = fa;
-                result.d = res;
+                sqlcommand = "select * from aftersale where id =" + RID + " and coid = " + CoID;
+                var u = CoreDBconn.Query<AfterSale>(sqlcommand).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "售后ID无效!";
+                    return result;
+                }
+                else
+                {
+                    if(u[0].Status != 0)
+                    {
+                        result.s = -1;
+                        result.d = "只有待确认的售后单才可以修改!";
+                        return result;
+                    }
+                }
+                int i = 0;
+                if(SalerReturnAmt >= 0 && u[0].SalerReturnAmt != SalerReturnAmt)
+                {
+                    log = new LogInsert();
+                    log.OID = RID;
+                    log.Type = 1;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "修改卖家应退金额";
+                    log.Remark = u[0].SalerReturnAmt + "=>" + SalerReturnAmt;
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    u[0].SalerReturnAmt = SalerReturnAmt;
+                    i ++;
+                }
+                if(BuyerUpAmt >= 0  && u[0].BuyerUpAmt != BuyerUpAmt)
+                {
+                    log = new LogInsert();
+                    log.OID = RID;
+                    log.Type = 1;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "修改买家应补金额";
+                    log.Remark = u[0].BuyerUpAmt + "=>" + BuyerUpAmt;
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    u[0].BuyerUpAmt = BuyerUpAmt;
+                    i ++;
+                }
+                if(i > 0)
+                {
+                    u[0].RealReturnAmt = u[0].SalerReturnAmt - u[0].BuyerUpAmt;
+                }
+                if(Type >= 0  && u[0].Type != Type)
+                {
+                    log = new LogInsert();
+                    log.OID = RID;
+                    log.Type = 1;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "修改售后分类";
+                    log.Remark = Enum.GetName(typeof(ASType), u[0].Type) + "=>" + Enum.GetName(typeof(ASType), Type);
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    u[0].Type = Type;
+                    i ++;
+                }
+                if(ReturnAccount != null  && u[0].ReturnAccount != ReturnAccount)
+                {
+                    log = new LogInsert();
+                    log.OID = RID;
+                    log.Type = 1;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "修改退款账号";
+                    log.Remark = u[0].ReturnAccount + "=>" + ReturnAccount;
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    u[0].ReturnAccount = ReturnAccount;
+                    i ++;
+                }
+                if(WarehouseID > 0  && u[0].WarehouseID != WarehouseID)
+                {
+                    log = new LogInsert();
+                    log.OID = RID;
+                    log.Type = 1;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "修改退货仓库";
+                    log.Remark = u[0].RecWarehouse + "=>" + WarehouseName;
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    u[0].WarehouseID = WarehouseID;
+                    u[0].RecWarehouse = WarehouseName;
+                    i ++;
+                }
+                if(Remark != null  && u[0].Remark != Remark)
+                {
+                    log = new LogInsert();
+                    log.OID = RID;
+                    log.Type = 1;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "修改备注";
+                    log.Remark = u[0].Remark + "=>" + Remark;
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    u[0].Remark = Remark;
+                    i ++;
+                }
+                if(Express != null  && u[0].Express != Express)
+                {
+                    log = new LogInsert();
+                    log.OID = RID;
+                    log.Type = 1;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "修改快递公司";
+                    log.Remark = u[0].Express + "=>" + Express;
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    u[0].Express = Express;
+                    i ++;
+                }
+                if(ExCode != null  && u[0].ExCode != ExCode)
+                {
+                    log = new LogInsert();
+                    log.OID = RID;
+                    log.Type = 1;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "修改运单号";
+                    log.Remark = u[0].ExCode + "=>" + ExCode;
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    u[0].ExCode = ExCode;
+                    i ++;
+                }
+                if(Result >= 0  && u[0].Result != Result)
+                {
+                    log = new LogInsert();
+                    log.OID = RID;
+                    log.Type = 1;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "修改处理结果";
+                    log.Remark = Enum.GetName(typeof(Result), u[0].Result) + "=>" + Enum.GetName(typeof(Result), Result);
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    u[0].Result = Result;
+                    i ++;
+                }
+                if(i > 0)
+                {
+                    u[0].Modifier = UserName;
+                    u[0].ModifyDate = DateTime.Now;                
+                    sqlcommand = @"update aftersale set SalerReturnAmt=@SalerReturnAmt,BuyerUpAmt=@BuyerUpAmt,RealReturnAmt=@RealReturnAmt,Type=@Type,ReturnAccount=@ReturnAccount,
+                                   WarehouseID=@WarehouseID,RecWarehouse=@RecWarehouse,Remark=@Remark,Express=@Express,ExCode=@ExCode,Result=@Result,Modifier=@Modifier,
+                                   ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
+                    count = CoreDBconn.Execute(sqlcommand,u[0],TransCore);
+                    if(count <= 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                    string loginsert = @"INSERT INTO orderlog(OID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                    VALUES(@OID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                    count =CoreDBconn.Execute(loginsert,logs,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3002;
+                        return result;
+                    }
+                }
                 TransCore.Commit();
             }
             catch (Exception e)
@@ -934,8 +1127,9 @@ namespace CoreData.CoreCore
             {
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
-            }
+            }           
             return result;
         }
+        
     }
 }

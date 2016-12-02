@@ -115,3 +115,19 @@ input:DocumentType      string  A:订单售后单  B:无信息件售后单,必�
 output: s=1成功 else 错误代码
 参考:input jason 文件:InsertAfterSale_input.json
 参考:output jason 文件:InsertAfterSale_output.json
+
+6.UpdateAfterSale()售后单修改更新
+路由:http://localhost:5000/Core/AfterSale/UpdateAfterSale
+input:RID               int     售后ID,必填
+      Type              int     售后类型
+      SalerReturnAmt    decimal 卖家应退金额 
+      BuyerUpAmt        decimal 买家应补金额
+      ReturnAccount     string  退款账号
+      WarehouseID       int     仓库ID
+      Result            int     处理结果
+      Remark            string  问题描述
+      Express           string  快递
+      ExCode            string  运单号
+output: s=1成功 else 错误代码
+参考:input jason 文件:UpdateAfterSale_input.json
+参考:output jason 文件:UpdateAfterSale_output.json

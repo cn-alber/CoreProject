@@ -436,5 +436,111 @@ namespace CoreWebApi
             var data = AfterSaleHaddle.InsertAfterSale(DuType,CoID,Type,SalerReturnAmt,BuyerUpAmt,WarehouseID,IssueType,Remark,username,Express,ExCode,OID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/AfterSale/UpdateAfterSale")]
+        public ResponseResult UpdateAfterSale([FromBodyAttribute]JObject co)
+        {   
+            string Remark = null,Express = null,ExCode = null,ReturnAccount=null;
+            if(co["Remark"] != null)
+            {
+                Remark = co["Remark"].ToString();
+            }
+            if(co["Express"] != null)
+            {
+                Express = co["Express"].ToString();
+            }
+            if(co["ExCode"] != null)
+            {
+                ExCode = co["ExCode"].ToString();
+            }
+            if(co["ReturnAccount"] != null)
+            {
+                ReturnAccount = co["ReturnAccount"].ToString();
+            }
+            int Type = -1,x,WarehouseID = -1,Result = -1,RID = -1;
+            if(co["Type"] != null)
+            {
+                string Text = co["Type"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (int.TryParse(Text, out x))
+                    {
+                        Type = int.Parse(Text);
+                    }
+                }
+            }
+            if(co["Result"] != null)
+            {
+                string Text = co["Result"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (int.TryParse(Text, out x))
+                    {
+                        Result = int.Parse(Text);
+                    }
+                }
+            }
+            if(co["RID"] != null)
+            {
+                string Text = co["RID"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (int.TryParse(Text, out x))
+                    {
+                        RID = int.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "售后ID参数无效", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "售后ID必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "售后ID必填", "General"); 
+            }
+            if(co["WarehouseID"] != null)
+            {
+                string Text = co["WarehouseID"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (int.TryParse(Text, out x))
+                    {
+                        WarehouseID = int.Parse(Text);
+                    }
+                }
+            }
+            decimal SalerReturnAmt = -1,BuyerUpAmt = -1,y;
+            if(co["SalerReturnAmt"] != null)
+            {
+                string Text = co["SalerReturnAmt"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (decimal.TryParse(Text, out y))
+                    {
+                        SalerReturnAmt = decimal.Parse(Text);
+                    }
+                }
+            }
+            if(co["BuyerUpAmt"] != null)
+            {
+                string Text = co["BuyerUpAmt"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (decimal.TryParse(Text, out y))
+                    {
+                        BuyerUpAmt = decimal.Parse(Text);
+                    }
+                }
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = AfterSaleHaddle.UpdateAfterSale(CoID,Type,SalerReturnAmt,BuyerUpAmt,ReturnAccount,WarehouseID,Remark,username,Express,ExCode,Result,RID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }
