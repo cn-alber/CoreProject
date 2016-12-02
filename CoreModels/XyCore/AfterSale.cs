@@ -312,4 +312,170 @@ namespace CoreModels.XyCore
         public List<Filter> Warehouse{get;set;}
         public List<Filter> Result{get;set;}//处理结果
     }
+    public class ASOrderParm
+    {
+        public int _CoID ;//公司id
+        public int _ID = 0;//内部订单号
+        public long _SoID = 0;//线上订单号
+        public string _PayNbr = null;//付款单号
+        public string _ExCode = null;//快递单号
+        public DateTime _DateStart = DateTime.Parse("1900-01-01");//日期起
+        public DateTime _DateEnd = DateTime.Parse("1900-01-01");//日期迄
+        public string _Distributor=null;//分销商
+        public int _ExID = 0;//快递公司
+        public int _ShopID= -1;//店铺
+        public int _SendWarehouse = 0;//仓库
+        public string _BuyerShopID = null;//买家账号
+        public string _RecName = null;//收货人
+        public string _RecPhone = null;//手机
+        public string _RecTel = null;//固定电话
+        public int _Status = -1;//状态
+        public string _SortField = "id";//排序栏位
+        public string _SortDirection = "DESC";//排序方式
+        public int _NumPerPage = 20;//每页显示资料笔数
+        public int _PageIndex = 1;//页码
+        public int CoID
+        {
+            get { return _CoID; }
+            set { this._CoID = value;}
+        }
+        public long SoID
+        {
+            get { return _SoID; }
+            set { this._SoID = value;}
+        }
+        public int ID
+        {
+            get { return _ID; }
+            set { this._ID = value;}
+        }
+        public string PayNbr
+        {
+            get { return _PayNbr; }
+            set { this._PayNbr = value;}
+        }
+        public string BuyerShopID
+        {
+            get { return _BuyerShopID; }
+            set { this._BuyerShopID = value;}
+        }
+        public string ExCode
+        {
+            get { return _ExCode; }
+            set { this._ExCode = value;}
+        }
+        public string RecName
+        {
+            get { return _RecName; }
+            set { this._RecName = value;}
+        }
+        public string RecPhone
+        {
+            get { return _RecPhone; }
+            set { this._RecPhone = value;}
+        }
+        public string RecTel
+        {
+            get { return _RecTel; }
+            set { this._RecTel = value;}
+        }
+        public int Status
+        {
+            get { return _Status; }
+            set { this._Status = value;}
+        }
+        public DateTime DateStart
+        {
+            get { return _DateStart; }
+            set { this._DateStart = value;}
+        }
+        public DateTime DateEnd
+        {
+            get { return _DateEnd; }
+            set { this._DateEnd = value;}
+        }
+        public int ShopID
+        {
+            get { return _ShopID; }
+            set { this._ShopID = value;}
+        }
+        public string Distributor
+        {
+            get { return _Distributor; }
+            set { this._Distributor = value;}
+        }
+        public int ExID
+        {
+            get { return _ExID; }
+            set { this._ExID = value;}
+        }
+        public int SendWarehouse
+        {
+            get { return _SendWarehouse; }
+            set { this._SendWarehouse = value;}
+        }
+        public string SortField
+        {
+            get { return _SortField; }
+            set { this._SortField = value;}
+        }
+        public string SortDirection
+        {
+            get { return _SortDirection; }
+            set { this._SortDirection = value;}
+        }
+        public int NumPerPage
+        {
+            get { return _NumPerPage; }
+            set { this._NumPerPage = value;}
+        }
+        public int PageIndex
+        {
+            get { return _PageIndex; }
+            set { this._PageIndex = value;}
+        }
+    }
+    public class ASOrderQuery
+    {
+        public int ID {get;set;}
+        public int Type{get;set;}
+        public string TypeString{get;set;}
+        public string ODate{get;set;}
+        public string BuyerShopID{get;set;}
+        public string ShopName{get;set;}
+        public long SoID{get;set;}
+        public string Amount{get;set;}
+        public string PaidAmount{get;set;}
+        public string ExAmount{get;set;}
+        public string RecName{get;set;}
+        public string RecLogistics{get;set;}
+        public string RecCity{get;set;}
+        public string RecDistrict{get;set;}
+        public string RecAddress{get;set;}
+        public string RecTel{get;set;}
+        public string RecPhone{get;set;}
+        public string RecMessage{get;set;}
+        public string SendMessage{get;set;}
+        public string Express{get;set;}
+        public string ExCode{get;set;}
+        public List<SkuList> SkuList{get;set;}
+    }
+    public class ASOrderData
+    {
+        public int Datacnt {get;set;}//总资料笔数
+        public decimal Pagecnt{get;set;}//总页数
+        public List<ASOrderQuery> Ord {get;set;}//订单资料List
+    }
+    public class ASOrderInit
+    {
+        public ASOrderData Order{get;set;}
+        public List<Filter> Shop{get;set;}
+        public List<Filter> Express{get;set;}
+        public List<Filter> Distributor{get;set;}
+        public List<Filter> SendWarehouse{get;set;}
+        public List<Filter> IssueType{get;set;}
+        public List<Filter> Type{get;set;}
+        public List<Filter> Warehouse{get;set;}
+        public int DefaultWare {get;set;}
+    }
 }

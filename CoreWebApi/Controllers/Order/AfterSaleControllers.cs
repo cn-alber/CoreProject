@@ -175,5 +175,117 @@ namespace CoreWebApi
             var data = AfterSaleHaddle.GetAsList(cp);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpGetAttribute("/Core/AfterSale/GetASOrderList")]
+        public ResponseResult GetASOrderList(string ID,string SoID,string PayNbr,string BuyerShopID,string ExCode,string RecName,string RecPhone,string RecTel,
+                                             string Status,string DateStart,string DateEnd,string ShopID,string Distributor,string ExID,string SendWarehouse,
+                                             string SortField,string SortDirection,string PageIndex,string NumPerPage)
+        {   
+            int x;
+            long l;
+            var cp = new ASOrderParm();
+            cp.CoID = int.Parse(GetCoid());
+            if(!string.IsNullOrEmpty(ID))
+            {
+                if (int.TryParse(ID, out x))
+                {
+                    cp.ID = int.Parse(ID);
+                }
+            }
+            if(!string.IsNullOrEmpty(SoID))
+            {
+                if (long.TryParse(SoID, out l))
+                {
+                    cp.SoID = long.Parse(SoID);
+                }
+            }
+            cp.PayNbr = PayNbr;
+            cp.BuyerShopID = BuyerShopID;
+            cp.ExCode = ExCode;
+            cp.RecName = RecName;
+            cp.RecPhone = RecPhone;
+            cp.RecTel = RecTel;
+            if(!string.IsNullOrEmpty(Status))
+            {
+                if (int.TryParse(Status, out x))
+                {
+                    cp.Status = int.Parse(Status);
+                }
+            }
+            DateTime date;
+            if (DateTime.TryParse(DateStart, out date))
+            {
+                cp.DateStart = DateTime.Parse(DateStart);
+            }
+            if (DateTime.TryParse(DateEnd, out date))
+            {
+                cp.DateEnd = DateTime.Parse(DateEnd);
+            }
+            if(!string.IsNullOrEmpty(ShopID))
+            {
+                if (int.TryParse(ShopID, out x))
+                {
+                    cp.ShopID = int.Parse(ShopID);
+                }
+            }
+            if(!string.IsNullOrEmpty(ExID))
+            {
+                if (int.TryParse(ExID, out x))
+                {
+                    cp.ExID = int.Parse(ExID);
+                }
+            }
+            if(!string.IsNullOrEmpty(SendWarehouse))
+            {
+                if (int.TryParse(SendWarehouse, out x))
+                {
+                    cp.SendWarehouse = int.Parse(SendWarehouse);
+                }
+            }
+            cp.Distributor = Distributor;
+            if(!string.IsNullOrEmpty(SortField))
+            {
+                if(CommHaddle.SysColumnExists(DbBase.CoreConnectString,"order",SortField).s == 1)
+                {
+                    cp.SortField = SortField;
+                }
+            }
+            if(!string.IsNullOrEmpty(SortDirection))
+            {
+                 if(SortDirection.ToUpper() == "ASC" || SortDirection.ToUpper() == "DESC")
+                {
+                    cp.SortDirection = SortDirection;
+                }
+            }
+            if (int.TryParse(NumPerPage, out x))
+            {
+                cp.NumPerPage = int.Parse(NumPerPage);
+            }
+            if (int.TryParse(PageIndex, out x))
+            {
+                cp.PageIndex = int.Parse(PageIndex);
+            }
+            var data = AfterSaleHaddle.GetASOrderList(cp);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/AfterSale/InsertASInit")]
+        public ResponseResult InsertASInit(string Type)
+        {  
+            if(!string.IsNullOrEmpty(Type))
+            {
+                if(Type.ToUpper() != "A" && Type.ToUpper() != "B")
+                {
+                    return CoreResult.NewResponse(-1, "请指定创建的售后单是否是无信息件", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "请指定创建的售后单是否是无信息件", "General"); 
+            }
+            int CoID = int.Parse(GetCoid());
+            var data = AfterSaleHaddle.InsertASInit(Type.ToUpper(),CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }

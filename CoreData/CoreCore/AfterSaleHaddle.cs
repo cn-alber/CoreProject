@@ -531,5 +531,238 @@ namespace CoreData.CoreCore
             result.d = res;          
             return result;
         }
+        ///<summary>
+        ///售后订单List查询
+        ///</summary>
+        public static DataResult GetASOrderList(ASOrderParm cp)
+        {
+            var result = new DataResult(1,null);    
+            string sqlcount = "select count(id) from `order` where 1=1";
+            string sqlcommand = @"select ID,ODate,BuyerShopID,ShopName,SoID,Amount,PaidAmount,ExAmount,Type,RecName,RecMessage,SendMessage,RecTel,RecPhone,RecLogistics,
+                                  RecCity,RecDistrict,RecAddress,Express,ExCode from `order` where 1=1"; 
+            string wheresql = string.Empty;
+            if(cp.CoID != 1)//公司编号
+            {
+                wheresql = wheresql + " and coid = " + cp.CoID;
+            }
+            if(cp.ID > 0)//内部订单号
+            {
+                wheresql = wheresql + " and id = " + cp.ID;
+            }
+            if(cp.SoID > 0)//外部订单号
+            {
+                wheresql = wheresql + " and soid = " + cp.SoID;
+            }
+            if(!string.IsNullOrEmpty(cp.PayNbr))//付款单号
+            {
+               wheresql = wheresql + " and paynbr = '" + cp.PayNbr + "'";
+            }
+            if(!string.IsNullOrEmpty(cp.BuyerShopID))//买家账号
+            {
+               wheresql = wheresql + " and buyershopid like '%" + cp.BuyerShopID + "%'";
+            }
+            if(!string.IsNullOrEmpty(cp.ExCode))//快递单号
+            {
+               wheresql = wheresql + " and excode like '%" + cp.ExCode + "%'";
+            }
+            if(!string.IsNullOrEmpty(cp.RecName))//收货人
+            {
+               wheresql = wheresql + " and recname like '%" + cp.RecName + "%'";
+            }
+            if(!string.IsNullOrEmpty(cp.RecPhone))//手机
+            {
+               wheresql = wheresql + " and recphone like '%" + cp.RecPhone + "%'";
+            }
+            if(!string.IsNullOrEmpty(cp.RecTel))//固定电话
+            {
+               wheresql = wheresql + " and rectel like '%" + cp.RecTel + "%'";
+            }
+            if (cp.Status > 0)//状态List
+            {
+                wheresql = wheresql + " AND status = " + cp.Status ;
+            }
+            if(cp.DateStart > DateTime.Parse("1900-01-01"))
+            {
+                wheresql = wheresql + " AND odate >= '" + cp.DateStart + "'" ;
+            }
+            if(cp.DateEnd > DateTime.Parse("1900-01-01"))
+            {
+                wheresql = wheresql + " AND odate <= '" + cp.DateEnd + "'" ;
+            }
+            if(!string.IsNullOrEmpty(cp.Distributor))
+            {
+                wheresql = wheresql + " AND distributor = '" +  cp.Distributor + "'";
+            }
+            if(cp.ExID > 0)
+            {
+                wheresql = wheresql + " AND exid = "+ cp.ExID  ;
+            }
+            if(cp.SendWarehouse > 0)
+            {
+                wheresql = wheresql + " AND WarehouseID = "+ cp.SendWarehouse ;
+            }
+            if(cp.ShopID >= 0)
+            {
+                wheresql = wheresql + " AND ShopID = "+ cp.ShopID  ;
+            }
+            if(!string.IsNullOrEmpty(cp.SortField) && !string.IsNullOrEmpty(cp.SortDirection))//排序
+            {
+                wheresql = wheresql + " ORDER BY "+cp.SortField +" "+ cp.SortDirection;
+            }
+            var res = new ASOrderData();
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    int count = conn.QueryFirst<int>(sqlcount + wheresql);
+                    decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
+                    int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
+                    wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
+                    var u = conn.Query<ASOrderQuery>(sqlcommand + wheresql).AsList();
+                    var ItemID = new List<int>();
+                    foreach(var a in u)
+                    {
+                        a.TypeString = OrderHaddle.GetTypeName(a.Type);
+                        ItemID.Add(a.ID);
+                    }
+                    sqlcommand = @"select id,oid,SkuAutoID,Img,Qty,GoodsCode,SkuID,SkuName,Norm,RealPrice,Amount,ShopSkuID,IsGift,Weight from orderitem 
+                                    where oid in @ID and coid = @Coid";
+                    var item = conn.Query<SkuList>(sqlcommand,new{ID = ItemID,Coid = cp.CoID}).AsList();
+                    foreach(var a in u)
+                    {
+                        var sd = new List<SkuList>();
+                        foreach(var i in item)
+                        {
+                            if(a.ID == i.OID)
+                            {
+                                sd.Add(i);
+                            }
+                        }
+                        a.SkuList = sd;
+                    }
+                    res.Datacnt = count;
+                    res.Pagecnt = pagecnt;
+                    res.Ord = u;
+                    result.d = res;             
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }           
+            return result;
+        }
+        ///<summary>
+        ///售后订单初始资料
+        ///</summary>
+        public static DataResult InsertASInit(string Type,int CoID)
+        {
+            var result = new DataResult(1,null);
+            var res = new ASOrderInit();   
+            if(Type == "A")
+            {
+                var cp = new ASOrderParm();
+                cp.CoID = CoID;
+                var re = GetASOrderList(cp);
+                if(re.s == 1)
+                {
+                    res.Order = re.d as ASOrderData;
+                }
+                //获取店铺List
+                var shop = CoreComm.ShopHaddle.getShopEnum(CoID.ToString()) as List<shopEnum>;
+                var ff = new List<Filter>();
+                foreach(var t in shop)
+                {
+                    var f = new Filter();
+                    f.value = t.value.ToString();
+                    f.label = t.label;
+                    ff.Add(f);
+                }
+                var fd = new Filter();
+                fd.value = "0";
+                fd.label = "{线下}";
+                ff.Add(fd);
+                res.Shop = ff;  
+                //快递Lsit
+                var Express = CoreComm.ExpressHaddle.GetExpressSimple(CoID).d as List<ExpressSimple>;
+                ff = new List<Filter>();
+                foreach(var t in Express)
+                {
+                    var f = new Filter();
+                    f.value = t.ID;
+                    f.label = t.Name;
+                    ff.Add(f);
+                }
+                res.Express = ff;  
+                //分销商
+                using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{  
+                        string sqlcommand = "select ID  as value,DistributorName as label from distributor where coid =" + CoID + " and enable = true and type = 0";
+                        var Distributor = conn.Query<Filter>(sqlcommand).AsList();
+                        res.Distributor = Distributor;
+                        
+                        }catch(Exception ex){
+                        result.s = -1;
+                        result.d = ex.Message;
+                        conn.Dispose();
+                    }
+                }  
+                //仓库资料
+                List<Filter> wh = new List<Filter>();
+                var w = CoreComm.WarehouseHaddle.getWarelist(CoID.ToString()) as List<wareLst>;
+                foreach(var h in w)
+                {
+                    var a = new Filter();
+                    a.value = h.id.ToString();
+                    a.label = h.warename;
+                    wh.Add(a);
+                }
+                res.SendWarehouse = wh ;
+            }
+            //售后类型
+            var filter = new List<Filter>();
+            foreach (int  myCode in Enum.GetValues(typeof(ASType)))
+            {
+                var f = new Filter();
+                f.value = myCode.ToString();
+                f.label = Enum.GetName(typeof(ASType), myCode);//获取名称
+                filter.Add(f);
+            }
+            res.Type = filter;
+            //问题类型
+            filter = new List<Filter>();
+            foreach (int  myCode in Enum.GetValues(typeof(IssueType)))
+            {
+                var f = new Filter();
+                f.value = myCode.ToString();
+                f.label = Enum.GetName(typeof(IssueType), myCode);//获取名称
+                filter.Add(f);
+            }
+            res.IssueType = filter;
+            //仓库资料
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{    
+                    string wheresql = "select ID as value,WarehouseName as label from warehouse where ParentID > 0 and Enable = true and coid = " + CoID;
+                    var u = conn.Query<Filter>(wheresql).AsList();
+                    res.Warehouse = u;    
+                    wheresql = "select ID from warehouse where ParentID > 0 and Enable = true and type = 3 and coid = " + CoID;           
+                    int a = conn.QueryFirst<int>(wheresql);        
+                    res.DefaultWare = a;             
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            result.d = res;
+            return result;  
+        }
+        ///<summary>
+        ///新增售后单
+        ///</summary>
+        public static DataResult InsertAfterSale(string Type,int CoID)
+        {
+            var result = new DataResult(1,null);
+            
+            return result;
+        }
     }
 }

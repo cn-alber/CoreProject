@@ -408,6 +408,7 @@ namespace CoreData.CoreCore
                         querycount.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                         querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                     }
+                    Console.WriteLine(querycount.ToString());
                     var DataCount = CoreData.DbBase.CoreDB.QueryFirst<int>(querycount.ToString(), p);
                     if (DataCount < 0)
                     {
