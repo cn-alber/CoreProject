@@ -33,6 +33,7 @@ input:      ExCode              string          快递单号 default null
             DateStart           string          日期起 default null
             DateEnd             string          日期迄 default null
             SkuID               string          商品编码 default null
+            GoodsCode           string          货号default null
             IsNoOID             string          无信息件 Y/N/null
             IsInterfaceLoad     string          接口下载 Y/N/null
             IsSubmitDis         string          分销提交 Y/N/null

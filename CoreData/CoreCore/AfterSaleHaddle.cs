@@ -389,6 +389,10 @@ namespace CoreData.CoreCore
             {
                wheresql = wheresql + " and exists(select id from aftersaleitem where RID = aftersale.id and skuid = '" + cp.SkuID + "')";
             }
+            if(!string.IsNullOrEmpty(cp.GoodsCode))
+            {
+               wheresql = wheresql + " and exists(select id from aftersaleitem where RID = aftersale.id and GoodsCode = '" + cp.GoodsCode + "')";
+            }
             if(!string.IsNullOrEmpty(cp.IsNoOID) && cp.IsNoOID.ToUpper() == "Y")
             {
                 wheresql = wheresql + " AND OID = -1" ;
@@ -903,7 +907,7 @@ namespace CoreData.CoreCore
         public static DataResult SetExpress()
         {
             var result = new DataResult(1,null);
-            var logs = new List<Log>();
+            // var logs = new List<Log>();
             var res = new TransferNormalReturn();
             var su = new List<TransferNormalReturnSuccess>();
             var fa = new List<TransferNormalReturnFail>();

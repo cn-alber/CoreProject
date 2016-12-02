@@ -34,6 +34,7 @@ namespace CoreModels.XyCore
         public DateTime _DateStart = DateTime.Parse("1900-01-01");//日期起
         public DateTime _DateEnd = DateTime.Parse("1900-01-01");//日期迄
         public string _SkuID = null;//商品编码
+        public string _GoodsCode = null;//款式编码
         public string _IsNoOID = "A";//是否无信息件
         public string _IsInterfaceLoad = "A";//接口下载
         public string _IsSubmitDis = "A";//分销提交
@@ -132,6 +133,11 @@ namespace CoreModels.XyCore
         {
             get { return _SkuID; }
             set { this._SkuID = value;}
+        }
+        public string GoodsCode
+        {
+            get { return _GoodsCode; }
+            set { this._GoodsCode = value;}
         }
         public string IsNoOID
         {

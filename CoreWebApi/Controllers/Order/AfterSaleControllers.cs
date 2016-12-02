@@ -22,7 +22,7 @@ namespace CoreWebApi
 
         [HttpGetAttribute("/Core/AfterSale/GetAsList")]
         public ResponseResult GetAsList(string ExCode,string SoID,string OID,string ID,string BuyerShopID,string RecName,string Modifier,string RecPhone,string RecTel,
-                                        string Creator,string Remark,string DateType,string DateStart,string DateEnd,string SkuID,string IsNoOID,string IsInterfaceLoad,
+                                        string Creator,string Remark,string DateType,string DateStart,string DateEnd,string SkuID,string GoodsCode,string IsNoOID,string IsInterfaceLoad,
                                         string IsSubmitDis,string ShopID,string Status,string GoodsStatus,string Type,string OrdType,string ShopStatus,string RefundStatus,
                                         string Distributor,string IsSubmit,string IssueType,string Result,string SortField,string SortDirection,string PageIndex,string NumPerPage)
         {   
@@ -76,6 +76,7 @@ namespace CoreWebApi
                 cp.DateEnd = DateTime.Parse(DateEnd);
             }
             cp.SkuID = SkuID;
+            cp.GoodsCode = GoodsCode;
             cp.IsNoOID = IsNoOID;
             cp.IsInterfaceLoad = IsInterfaceLoad;
             cp.IsSubmitDis = IsSubmitDis;
