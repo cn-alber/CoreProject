@@ -299,7 +299,7 @@ namespace CoreWebApi.XyCore
             {
                 IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
             }
-            var res = InventoryHaddle.DelZeroSku(IDLst, 1, CoID, UserName);
+            var res = InventoryHaddle.DelZeroSku(IDLst, 2, CoID, UserName);
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
