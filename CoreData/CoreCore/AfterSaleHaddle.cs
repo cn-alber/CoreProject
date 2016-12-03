@@ -621,31 +621,34 @@ namespace CoreData.CoreCore
                     int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
                     var u = conn.Query<ASOrderQuery>(sqlcommand + wheresql).AsList();
-                    var ItemID = new List<int>();
                     foreach(var a in u)
                     {
                         a.TypeString = OrderHaddle.GetTypeName(a.Type);
-                        ItemID.Add(a.ID);
-                    }
-                    sqlcommand = @"select id,oid,SkuAutoID,Img,Qty,GoodsCode,SkuID,SkuName,Norm,RealPrice,Amount,ShopSkuID,IsGift,Weight from orderitem 
-                                    where oid in @ID and coid = @Coid";
-                    var item = conn.Query<SkuList>(sqlcommand,new{ID = ItemID,Coid = cp.CoID}).AsList();
-                    foreach(var a in u)
-                    {
-                        var sd = new List<SkuList>();
-                        foreach(var i in item)
-                        {
-                            if(a.ID == i.OID)
-                            {
-                                sd.Add(i);
-                            }
-                        }
-                        a.SkuList = sd;
                     }
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;
                     res.Ord = u;
                     result.d = res;             
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }           
+            return result;
+        }
+        ///<summary>
+        ///根据OID查询订单明细
+        ///</summary>
+        public static DataResult GetASOrderItemS(int OID,int CoID)
+        {
+            var result = new DataResult(1,null);    
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    string sqlcommand = @"select id,oid,SkuAutoID,Img,Qty,GoodsCode,SkuID,SkuName,Norm,RealPrice,Amount,ShopSkuID,IsGift,Weight from orderitem 
+                                    where oid = @ID and coid = @Coid";
+                    var item = conn.Query<SkuList>(sqlcommand,new{ID = OID,Coid = CoID}).AsList();
+                    result.d = item;             
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
@@ -1613,6 +1616,96 @@ namespace CoreData.CoreCore
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
             }                
+            return result;
+        }
+        ///<summary>
+        ///抓取售后单的日志
+        ///</summary>
+        public static DataResult GetOrderLog(int rid,int CoID)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{  
+                        string sqlcommand = @"select ID,LogDate,UserName,Title,Remark From orderlog where
+                                            oid = @ID and coid = @Coid and type = 1 order by LogDate Desc";
+                        var Log = conn.Query<OrderLog>(sqlcommand,new{ID=rid,Coid=CoID}).AsList();
+                        result.d = Log;
+                    }
+                    catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+        ///<summary>
+        ///抓取单笔售后资料
+        ///</summary>
+        public static DataResult GetAfterSaleSingle(int rid,int CoID)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{  
+                        string sqlcommand = @"select ID,OID,ShopName,Status,GoodsStatus,SoID,BuyerShopID,RecName,RecTel,RecPhone,Type,IssueType,RegisterDate,SalerReturnAmt,BuyerUpAmt,
+                                              RealReturnAmt,ReturnAccount,WarehouseID,RecWarehouse,Express,ExCode,Remark From aftersale where id = " + rid + " and coid = " + CoID;
+                        var u = conn.Query<AfterSaleEdit>(sqlcommand).AsList();
+                        u[0].TypeString = Enum.GetName(typeof(ASType), u[0].Type);
+                        u[0].IssueTypeString = Enum.GetName(typeof(IssueType), u[0].IssueType);
+                        u[0].StatusString = Enum.GetName(typeof(ASStatus), u[0].Status);
+                        result.d = u[0];
+                    }
+                    catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }            
+            return result;
+        }
+        ///<summary>
+        ///抓取售后详情的资料
+        ///</summary>
+        public static DataResult GetAfterSaleEdit(int rid,int CoID)
+        {
+            var result = new DataResult(1,null);
+            var res = new AfterSaleEditReturn();
+            res.AfterSale = GetAfterSaleSingle(rid,CoID).d as AfterSaleEdit;
+            //售后类型
+            var filter = new List<Filter>();
+            foreach (int  myCode in Enum.GetValues(typeof(ASType)))
+            {
+                var f = new Filter();
+                f.value = myCode.ToString();
+                f.label = Enum.GetName(typeof(ASType), myCode);//获取名称
+                filter.Add(f);
+            }
+            res.Type = filter;
+            //问题类型
+            filter = new List<Filter>();
+            foreach (int  myCode in Enum.GetValues(typeof(IssueType)))
+            {
+                var f = new Filter();
+                f.value = myCode.ToString();
+                f.label = Enum.GetName(typeof(IssueType), myCode);//获取名称
+                filter.Add(f);
+            }
+            res.IssueType = filter;
+            //仓库资料
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{    
+                    string wheresql = "select ID as value,WarehouseName as label from warehouse where ParentID > 0 and Enable = true and coid = " + CoID;
+                    var u = conn.Query<Filter>(wheresql).AsList();
+                    res.Warehouse = u;               
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            res.AfterSaleItem = GetAfterSaleItem(CoID,rid).d as List<AfterSaleItemQuery>;
+            res.Log = GetOrderLog(rid,CoID).d as List<OrderLog>;
+            result.d = res;
             return result;
         }
     }

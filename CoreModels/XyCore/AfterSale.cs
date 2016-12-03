@@ -464,7 +464,7 @@ namespace CoreModels.XyCore
         public string SendMessage{get;set;}
         public string Express{get;set;}
         public string ExCode{get;set;}
-        public List<SkuList> SkuList{get;set;}
+        // public List<SkuList> SkuList{get;set;}
     }
     public class ASOrderData
     {
@@ -535,5 +535,59 @@ namespace CoreModels.XyCore
     {
         public List<AfterSaleItemQuery> SuccessIDs{get;set;}
         public List<InsertFailReason> FailIDs{get;set;}
+    }
+    public class AfterSaleEdit
+    {
+        public int ID{get;set;}
+        public int OID{get;set;}
+        public string ShopName{get;set;}
+        public int Status{get;set;}
+        public string StatusString{get;set;}
+        public string GoodsStatus{get;set;}
+        public long SoID{get;set;}
+        public string BuyerShopID{get;set;}
+        public string RecName{get;set;}
+        public string RecTel{get;set;}
+        public string RecPhone{get;set;}
+        public int Type{get;set;}
+        public string TypeString{get;set;}
+        public int IssueType{get;set;}
+        public string IssueTypeString{get;set;}
+        public string RegisterDate{get;set;}
+        public string SalerReturnAmt{get;set;}
+        public string BuyerUpAmt{get;set;}
+        public string RealReturnAmt{get;set;}
+        public string ReturnAccount{get;set;}
+        public int WarehouseID{get;set;}
+        public string RecWarehouse{get;set;}
+        public string Express{get;set;}
+        public string ExCode{get;set;}
+        public string Remark{get;set;}
+    }
+    public class AfterSaleEditReturn
+    {
+        public AfterSaleEdit AfterSale{get;set;}
+        public List<Filter> IssueType{get;set;}
+        public List<Filter> Type{get;set;}
+        public List<Filter> Warehouse{get;set;}
+        public List<AfterSaleItemQuery> AfterSaleItem{get;set;}
+        public List<OrderLog> Log{get;set;}
+    }
+    public class UpdateAfterSaleEReturn
+    {
+        public AfterSaleEdit AfterSale{get;set;}
+        public List<AfterSaleItemQuery> AfterSaleItem{get;set;}
+        public List<OrderLog> Log{get;set;}
+    }
+    public class InsertASItemOrderEReturn
+    {
+        public List<AfterSaleItemQuery> AfterSaleItem{get;set;}
+        public List<OrderLog> Log{get;set;}
+    }
+    public class InsertASItemSkuEReturn
+    {
+        public List<AfterSaleItemQuery> SuccessIDs{get;set;}
+        public List<InsertFailReason> FailIDs{get;set;}
+        public List<OrderLog> Log{get;set;}
     }
 }

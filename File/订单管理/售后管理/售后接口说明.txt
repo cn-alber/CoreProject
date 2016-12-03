@@ -171,3 +171,57 @@ input:RID         int   售后ID
 output:售后单明细
 参考:input jason 文件:DeleteASItem_input.json
 参考:output jason 文件:DeleteASItem_output.json
+
+13.GetAfterSaleEdit() //新增售后单初始资料
+路由:http://localhost:5000/Core/AfterSale/GetAfterSaleEdit
+input: None
+OutPut:AfterSale        售后单
+       IssueType        问题类型
+       Type             售后分类
+       Warehouse        退货仓
+       AfterSaleItem    售后明细
+       Log              日志
+参考:output jason 文件:GetAfterSaleEdit_output.json
+
+14.UpdateAfterSaleE()售后单修改更新(售后详情修改)
+路由:http://localhost:5000/Core/AfterSale/UpdateAfterSaleE
+input:RID               int     售后ID,必填
+      Type              int     售后类型
+      SalerReturnAmt    decimal 卖家应退金额 
+      BuyerUpAmt        decimal 买家应补金额
+      ReturnAccount     string  退款账号
+      WarehouseID       int     仓库ID
+      Result            int     处理结果
+      Remark            string  问题描述
+      Express           string  快递
+      ExCode            string  运单号
+output:AfterSale        售后资料
+       AfterSaleItem    售后明细资料
+       Log              日志
+参考:input jason 文件:UpdateAfterSaleE_input.json
+参考:output jason 文件:UpdateAfterSaleE_output.json
+
+15.InsertASItemOrderE()新增售后单明细来自订单(售后详情新增)
+路由:http://localhost:5000/Core/AfterSale/InsertASItemOrderE
+input:RID         int         售后ID
+      DetailID    List<int>   订单明细ID
+output:AfterSaleItem    售后明细资料
+       Log              日志
+参考:input jason 文件:InsertASItemOrderE_input.json
+参考:output jason 文件:InsertASItemOrderE_output.json
+
+16.InsertASItemSkuE()新增售后单明细来自商品库(售后详情新增)
+路由:http://localhost:5000/Core/AfterSale/InsertASItemSkuE
+input:RID         int         售后ID
+      SkuID       List<int>   商品ID
+output:SuccessIDs    售后明细资料
+       FailIDs       失败的skuid
+       Log           日志
+参考:input jason 文件:InsertASItemSkuE_input.json
+参考:output jason 文件:InsertASItemSkuE_output.json
+
+17.GetASOrderItemS() //售后订单查询
+路由:http://localhost:5000/Core/AfterSale/GetASOrderItemS
+input:OID                 string          内部订单单号
+OutPut:订单明细List
+参考:output jason 文件:GetASOrderItemS_output.json
