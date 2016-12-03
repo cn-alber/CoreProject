@@ -1,0 +1,45 @@
+{
+    "s": 1,
+    "d": [
+        {
+            "ID": 19123,
+            "SkuID": "test2510002007",
+            "SkuName": "南极人2016男装夹克休闲版",
+            "Norm": "白色;43",
+            "Qty": 1,
+            "SalePrice": "12.00",
+            "RealPrice": "199.00",
+            "Amount": "199.00",
+            "DiscountRate": "16.58",
+            "img": "",
+            "IsGift": false
+        },
+        {
+            "ID": 19124,
+            "SkuID": "test2510010007",
+            "SkuName": "南极人2016男装夹克休闲版",
+            "Norm": "绿色;43",
+            "Qty": 1,
+            "SalePrice": "5.00",
+            "RealPrice": "99.00",
+            "Amount": "99.00",
+            "DiscountRate": "19.80",
+            "img": "",
+            "IsGift": false
+        },
+        {
+            "ID": 19125,
+            "SkuID": "test2510002007",
+            "SkuName": "南极人2016男装夹克休闲版",
+            "Norm": "白色;43",
+            "Qty": 1,
+            "SalePrice": "12.00",
+            "RealPrice": "0.00",
+            "Amount": "0.00",
+            "DiscountRate": "0.00",
+            "img": "",
+            "IsGift": false
+        }
+    ],
+    "m": ""
+}
