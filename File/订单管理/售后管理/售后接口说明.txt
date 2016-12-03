@@ -111,7 +111,7 @@ output: s=1成功 else 错误代码
 参考:input jason 文件:InsertAfterSale_input.json
 参考:output jason 文件:InsertAfterSale_output.json
 
-6.UpdateAfterSale()售后单修改更新
+6.UpdateAfterSale()售后单修改更新(直接修改)
 路由:http://localhost:5000/Core/AfterSale/UpdateAfterSale
 input:RID               int     售后ID,必填
       Type              int     售后类型
@@ -126,3 +126,48 @@ input:RID               int     售后ID,必填
 output: s=1成功 else 错误代码
 参考:input jason 文件:UpdateAfterSale_input.json
 参考:output jason 文件:UpdateAfterSale_output.json
+
+7.GetAfterSaleItem() //根据售后单获取售后明细
+路由:http://localhost:5000/Core/AfterSale/GetAfterSaleItem
+input: None
+OutPut:售后明细资料
+参考:output jason 文件:GetAfterSaleItem.json
+
+8.GetASOrdItem() //根据售后单获取订单明细
+路由:http://localhost:5000/Core/AfterSale/GetASOrdItem
+input: None
+OutPut:订单明细资料
+参考:output jason 文件:GetASOrdItemoutput.json
+
+9.InsertASItemOrder()新增售后单明细来自订单(直接新增)
+路由:http://localhost:5000/Core/AfterSale/InsertASItemOrder
+input:RID         int         售后ID
+      DetailID    List<int>   订单明细ID
+output:售后单明细
+参考:input jason 文件:InsertASItemOrder_input.json
+参考:output jason 文件:InsertASItemOrder_output.json
+
+10.InsertASItemSku()新增售后单明细来自商品库(直接新增)
+路由:http://localhost:5000/Core/AfterSale/InsertASItemSku
+input:RID         int         售后ID
+      SkuID       List<int>   商品ID
+output:售后单明细
+参考:input jason 文件:InsertASItemSku_input.json
+参考:output jason 文件:InsertASItemSku_output.json
+
+11.UpdateASItem()修改售后明细(直接修改)
+路由:http://localhost:5000/Core/AfterSale/UpdateASItem
+input:RID         int   售后ID
+      RDetailID   int   售后明细ID
+      Qty         int   数量
+output:售后单明细
+参考:input jason 文件:UpdateASItem_input.json
+参考:output jason 文件:UpdateASItem_output.json
+
+12.DeleteASItem()删除售后明细(直接删除)
+路由:http://localhost:5000/Core/AfterSale/DeleteASItem
+input:RID         int   售后ID
+      RDetailID   int   售后明细ID
+output:售后单明细
+参考:input jason 文件:DeleteASItem_input.json
+参考:output jason 文件:DeleteASItem_output.json
