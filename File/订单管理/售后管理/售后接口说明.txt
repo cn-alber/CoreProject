@@ -225,3 +225,21 @@ output:SuccessIDs    售后明细资料
 input:OID                 string          内部订单单号
 OutPut:订单明细List
 参考:output jason 文件:GetASOrderItemS_output.json
+
+18.UpdateASItemE()修改售后明细(售后详情修改)
+路由:http://localhost:5000/Core/AfterSale/UpdateASItemE
+input:RID         int   售后ID
+      RDetailID   int   售后明细ID
+      Qty         int   数量
+output:日志
+参考:input jason 文件:UpdateASItemE_input.json
+参考:output jason 文件:UpdateASItemE_output.json
+
+19.DeleteASItemE()删除售后明细(售后详情删除)
+路由:http://localhost:5000/Core/AfterSale/DeleteASItemE
+input:RID         int   售后ID
+      RDetailID   int   售后明细ID
+output:AfterSaleItem    售后单明细
+       Log              日志
+参考:input jason 文件:DeleteASItemE_input.json
+参考:output jason 文件:DeleteASItemE_output.json

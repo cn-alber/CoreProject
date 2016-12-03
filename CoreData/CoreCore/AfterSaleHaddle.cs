@@ -1439,7 +1439,7 @@ namespace CoreData.CoreCore
         ///<summary>
         ///更新售后明细
         ///</summary>
-        public static DataResult UpdateASItem(int CoID,string UserName,int RID,int RDetailID,int Qty)
+        public static DataResult UpdateASItem(int CoID,string UserName,int RID,int RDetailID,int Qty,decimal Amount)
         {
             var result = new DataResult(1,null);
             int count = 0;
@@ -1479,41 +1479,59 @@ namespace CoreData.CoreCore
                     result.d = "售后明细ID无效!";
                     return result;
                 }
-                if(item[0].RegisterQty == Qty)
+                int i = 0;
+                if(Qty != -1 &&　item[0].RegisterQty != Qty)
                 {
-                    return result;
+                    i ++;
+                    log = new LogInsert();
+                    log.OID = RID;
+                    log.Type = 1;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "修改退货数量";
+                    log.Remark = item[0].RegisterQty + "=>" + Qty;
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    item[0].RegisterQty = Qty;
+                    item[0].Amount = item[0].Price * Qty;
                 }
-                log = new LogInsert();
-                log.OID = RID;
-                log.Type = 1;
-                log.LogDate = DateTime.Now;
-                log.UserName = UserName;
-                log.Title = "修改退货数量";
-                log.Remark = item[0].RegisterQty + "=>" + Qty;
-                log.CoID = CoID;
-                logs.Add(log);
+                if(Amount != -1 &&　item[0].Amount != Amount)
+                {
+                    i ++;
+                    log = new LogInsert();
+                    log.OID = RID;
+                    log.Type = 1;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "修改金额";
+                    log.Remark = item[0].Amount + "=>" + Amount;
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    item[0].Amount = Amount;
+                    item[0].Price = Amount/item[0].RegisterQty;
+                }
+                if(i > 0)
+                {
+                    item[0].Modifier = UserName;
+                    item[0].ModifyDate = DateTime.Now;
+                    
+                    sqlcommand = @"update aftersaleitem set RegisterQty=@RegisterQty,Amount=@Amount,Price=@Price,Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and coid = @Coid";
+                    count = CoreDBconn.Execute(sqlcommand, item[0], TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
 
-                item[0].RegisterQty = Qty;
-                item[0].Amount = item[0].Price * Qty;
-                item[0].Modifier = UserName;
-                item[0].ModifyDate = DateTime.Now;
-                
-                sqlcommand = @"update aftersaleitem set RegisterQty=@RegisterQty,Amount=@Amount,Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and coid = @Coid";
-                count = CoreDBconn.Execute(sqlcommand, item[0], TransCore);
-                if(count < 0)
-                {
-                    result.s = -3003;
-                    return result;
-                }
-
-                string loginsert = @"INSERT INTO orderlog(OID,Type,LogDate,UserName,Title,Remark,CoID) 
-                                                    VALUES(@OID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
-                count =CoreDBconn.Execute(loginsert,logs,TransCore);
-                if(count < 0)
-                {
-                    result.s = -3002;
-                    return result;
-                }
+                    string loginsert = @"INSERT INTO orderlog(OID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                        VALUES(@OID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                    count =CoreDBconn.Execute(loginsert,logs,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3002;
+                        return result;
+                    }
+                }                
                 TransCore.Commit();
             }
             catch (Exception e)
@@ -1706,6 +1724,15 @@ namespace CoreData.CoreCore
             res.AfterSaleItem = GetAfterSaleItem(CoID,rid).d as List<AfterSaleItemQuery>;
             res.Log = GetOrderLog(rid,CoID).d as List<OrderLog>;
             result.d = res;
+            return result;
+        }
+        ///<summary>
+        ///绑定订单
+        ///</summary>
+        public static DataResult BindOrd()
+        {
+            var result = new DataResult(1,null);
+            
             return result;
         }
     }
