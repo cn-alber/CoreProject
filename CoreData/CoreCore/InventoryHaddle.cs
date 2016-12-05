@@ -2063,26 +2063,7 @@ namespace CoreData.CoreCore
                             AND inventory_sale.Skuautoid in @SkuIDLst";
             return sql;
         }
-        #endregion
-
-        #region 更新仓库安全库存
-        public static string UptInvMainWaitInQtySql()
-        {
-            string sql = @"UPDATE inventory_sale
-                            SET inventory_sale.WaitInQty = (
-                                SELECT          
-                                    IFNULL(SUM(WaitInQty),0)
-                                FROM
-                                    inventory
-                                WHERE
-                                    inventory.CoID IN @CoIDLst
-                                AND inventory.Skuautoid = inventory_sale.Skuautoid
-                            ),IsDelete=0,Modifier=@Modifier,ModifyDate=@ModifyDate
-                            WHERE inventory_sale.CoID=@CoID
-                            AND inventory_sale.Skuautoid in @SkuIDLst";
-            return sql;
-        }
-        #endregion
+        #endregion       
 
         #region 更新销退仓库存
         public static string UptInvMainSaleRetuQtySql()
