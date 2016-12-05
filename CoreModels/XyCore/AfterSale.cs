@@ -604,6 +604,7 @@ namespace CoreModels.XyCore
     {
         public int Status{get;set;}
         public int Type{get;set;}
+        public int OID{get;set;}
         public List<AfterSaleItemQuery> AfterSaleItem{get;set;}
     }
     public class CancleAfterSaleSuccess

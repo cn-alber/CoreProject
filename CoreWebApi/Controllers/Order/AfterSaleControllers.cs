@@ -1319,5 +1319,23 @@ namespace CoreWebApi
             var data = AfterSaleHaddle.AgressReturn(rid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/AfterSale/DisagressReturn")]
+        public ResponseResult DisagressReturn([FromBodyAttribute]JObject co)
+        {   
+            var rid = new List<int>();
+            if(co["RID"] != null)
+            {
+                rid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["RID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "售后ID必填", "General");
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = AfterSaleHaddle.DisagressReturn(rid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }

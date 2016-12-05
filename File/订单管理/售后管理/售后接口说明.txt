@@ -269,3 +269,19 @@ output:SuccessIDs    成功的ID和状态
 参考:input jason 文件:CancleAfterSale_input.json
 参考:output jason 文件:CancleAfterSale_output.json
 
+23.AgressReturn()同意退货
+路由:http://localhost:5000/Core/AfterSale/AgressReturn
+input:RID   List<int>   售后ID List
+output:SuccessIDs    成功的ID和线上状态
+       FailIDs       失败的ID和原因
+参考:input jason 文件:AgressReturn_input.json
+参考:output jason 文件:AgressReturn_output.json
+
+24.DisagressReturn()拒绝退货
+路由:http://localhost:5000/Core/AfterSale/DisagressReturn
+input:RID   List<int>   售后ID List
+output:SuccessIDs    成功的ID和线上状态
+       FailIDs       失败的ID和原因
+参考:input jason 文件:DisagressReturn_input.json
+参考:output jason 文件:DisagressReturn_output.json
+

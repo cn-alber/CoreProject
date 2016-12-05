@@ -1283,12 +1283,13 @@ namespace CoreData.CoreCore
             string sqlcommand = string.Empty;   
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{    
-                    sqlcommand = "select status,type from aftersale where id = " + RID + " and coid = " + CoID;
+                    sqlcommand = "select status,type,oid from aftersale where id = " + RID + " and coid = " + CoID;
                     var sa = conn.Query<AfterSale>(sqlcommand).AsList();
                     if(sa.Count > 0)
                     {
                         res.Status = sa[0].Status;
                         res.Type = sa[0].Type;
+                        res.OID = sa[0].OID;
                     }
                     sqlcommand = "select ID,ReturnType,SkuAutoID,SkuID,SkuName,Norm,GoodsCode,RegisterQty,ReturnQty,Price,Amount,img,Creator from aftersaleitem where rid = " + RID + 
                                  " and coid = " + CoID;
@@ -2076,6 +2077,102 @@ namespace CoreData.CoreCore
                     log.LogDate = DateTime.Now;
                     log.UserName = UserName;
                     log.Title = "同意退货";
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    
+                    var ss = new AgressReturnSuccess();
+                    ss.ID = a.ID;
+                    ss.ShopStatus = a.ShopStatus;
+                    su.Add(ss);
+                }
+                string loginsert = @"INSERT INTO orderlog(OID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                   VALUES(@OID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                count =CoreDBconn.Execute(loginsert,logs,TransCore);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }                
+            res.SuccessIDs = su;
+            res.FailIDs = fa;
+            result.d = res; 
+            return result;
+        }
+        ///<summary>
+        ///拒绝退货
+        ///</summary>
+        public static DataResult DisagressReturn(List<int> RID,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            int count = 0;
+            var logs = new List<LogInsert>();
+            var log = new LogInsert();
+            var res = new AgressReturn();
+            var fa = new List<InsertFailReason>();
+            var su = new List<AgressReturnSuccess>();
+            string sqlcommand = string.Empty;
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                sqlcommand = "select * from aftersale where id in @ID and coid = @CoID";
+                var u = CoreDBconn.Query<AfterSale>(sqlcommand,new{ID = RID,CoID = CoID}).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "售后单号无效";
+                    return result;
+                }
+                foreach(var a in u)
+                {
+                    if(a.Status != 0)
+                    {
+                        var ff = new InsertFailReason();
+                        ff.id = a.ID;
+                        ff.reason = "只有待确认的单据才可以操作!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    if(a.ShopStatus != "买家已经申请退款,等待卖家同意")
+                    {
+                        var ff = new InsertFailReason();
+                        ff.id = a.ID;
+                        ff.reason = "只有[买家已经申请退款,等待卖家同意]的单据才可以操作!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    a.ShopStatus = "卖家拒绝退款";
+                    a.Modifier = UserName;
+                    a.ModifyDate = DateTime.Now;
+                    sqlcommand = @"update aftersale set ShopStatus=@ShopStatus,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @CoID";
+                    count = CoreDBconn.Execute(sqlcommand,a,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+       
+                    log = new LogInsert();
+                    log.OID = a.ID;
+                    log.Type = 1;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "拒绝退货";
                     log.CoID = CoID;
                     logs.Add(log);
                     
