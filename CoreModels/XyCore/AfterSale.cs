@@ -595,5 +595,15 @@ namespace CoreModels.XyCore
         public List<AfterSaleQuery> SuccessIDs{get;set;}
         public List<InsertFailReason> FailIDs{get;set;}
     }
-    
+    public class RefreshASReturn
+    {
+        public AfterSaleQuery AfterSale{get;set;}
+        public List<AfterSaleItemQuery> AfterSaleItem{get;set;}
+    }
+    public class GetAfterSaleItemReturn
+    {
+        public int Status{get;set;}
+        public int Type{get;set;}
+        public List<AfterSaleItemQuery> AfterSaleItem{get;set;}
+    }
 }
