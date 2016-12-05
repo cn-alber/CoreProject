@@ -245,6 +245,7 @@ namespace CoreModels.XyCore{
 		public string Col{get;set;}
 		public string Storey{get;set;}
 		public string Cell{get;set;}
+		public string Order{get;set;}
 	}
 	public class Sub{
 		public string parent{get;set;}
@@ -261,6 +262,11 @@ namespace CoreModels.XyCore{
 		public string[] col{get;set;}
 		public string[] storey{get;set;}
 		public string[] cell{get;set;}
+	}
+
+	public class editOrder{
+		public int id{get;set;}
+		public int oIndex{get;set;}
 	}
 
 

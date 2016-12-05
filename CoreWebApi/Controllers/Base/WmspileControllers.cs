@@ -58,7 +58,15 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
-
+        [HttpPostAttribute("/Core/Wmspile/pileOrder")]
+        public ResponseResult pileOrder([FromBodyAttribute]JObject co)
+        {   
+            var editorder = Newtonsoft.Json.JsonConvert.DeserializeObject<editOrder>(co.ToString());
+            string CoID = GetCoid();
+            var insertM = new PileInsert();
+            var data = WmspileHaddle.pileOrder(editorder,CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
 
 
     }

@@ -15,7 +15,7 @@ namespace CoreData.CoreCore
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try
                 {
-                    string sql = @"SELECT ID,SkuID,Skuautoid,PCode,`Enable`,Area,`Row`,Col,Storey,Cell FROM wmspile WHERE CoID = 1 AND IsDelete = FALSE ";
+                    string sql = @"SELECT ID,SkuID,Skuautoid,PCode,`Enable`,Area,`Row`,Col,Storey,Cell, `Order` FROM wmspile WHERE CoID = 1 AND IsDelete = FALSE ";
                     string whereSql = "";
                     if(!string.IsNullOrEmpty(area)){
                         whereSql += " AND Area = '"+area+"' ";
@@ -32,7 +32,7 @@ namespace CoreData.CoreCore
                     if(!string.IsNullOrEmpty(cell)){
                         whereSql += " AND Cell = '"+cell+"' ";
                     }                    
-                    var list = conn.Query<Pilelist>(sql+whereSql).AsList();
+                    var list = conn.Query<Pilelist>(sql+whereSql+" ORDER BY `Order` ").AsList();
                     var subs = list.GroupBy(i=>i.Area).Select(g => new Sub{ parent = g.FirstOrDefault().Area}).ToList();
                     foreach(var rowsub in subs ){
                         if(!string.IsNullOrEmpty(rowsub.parent)){
@@ -92,7 +92,7 @@ namespace CoreData.CoreCore
                     if(!string.IsNullOrEmpty(cell)){
                         whereSql += " AND Cell = '"+cell+"' ";
                     }                    
-                    var list = conn.Query<Pilelist>(sql+whereSql).AsList();
+                    var list = conn.Query<Pilelist>(sql+whereSql+" ORDER BY `Order` ").AsList();
                          
                     res.d=new {
                         list = list
@@ -187,6 +187,9 @@ namespace CoreData.CoreCore
                     //传递给计算方法中计算  
                     Descartes(dimvalue, 0, result, string.Empty);  
                     StringBuilder sql = new StringBuilder("");
+                    string maxOrder = "SELECT MAX(`Order`) FROM wmspile";
+                    int oIndex = conn.Query<int>(maxOrder).AsList()[0]; 
+                    oIndex++;  
                     //遍历查询结果  
                     foreach (string s in result)  
                     {  
@@ -206,15 +209,23 @@ namespace CoreData.CoreCore
                                         wmspile.Type='"+pile.Type+@"',
                                         wmspile.Creator='"+uname+@"',
                                         wmspile.`Enable`=TRUE,
+                                        wmspile.`Order` = "+(oIndex++)+@",
                                         wmspile.WarehouseID="+pile.WarehouseID+@",
                                         wmspile.WarehouseName='"+pile.WarehouseName+"';");
                     }  
+
                     res.d = conn.Execute(sql.ToString());                             
                 }
                 catch(Exception ex)
                 {
                     res.s = -1;
-                    res.d = ex.Message;
+                    if (ex.Message.IndexOf("Duplicate entry")>-1){
+                        var pcode = ex.Message.Split('\'')[1];
+                        res.d = "仓位："+ pcode.Substring(0,pcode.Length - 3) + " 已存在";
+                    }else {
+                        res.d = ex.Message;
+                    }
+                    
                     conn.Dispose();
                 }
             }
@@ -231,6 +242,38 @@ namespace CoreData.CoreCore
                 {
                     var sql = "UPDATE  wmspile SET IsDelete=TRUE WHERE ID in(" + string.Join(",", ids.ToArray()) + ") AND CoID = " + CoID;
                     var rnt = conn.Execute(sql);
+                    if (rnt > 0)
+                    {
+                        res.s = 1;
+                    }
+                    else
+                    {
+                        res.s = -1;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    res.s = -1;
+                    res.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+
+            return res;
+        }
+        public static DataResult pileOrder(editOrder editOrder, string CoID)
+        {
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                try
+                {
+                    var sql = "UPDATE  wmspile SET `Order`=@oIndex WHERE ID =@id AND CoID = @CoID";
+                    var rnt = conn.Execute(sql,new {
+                        oIndex = editOrder.oIndex,
+                        ID = editOrder.id,
+                        CoID = CoID
+                    });
                     if (rnt > 0)
                     {
                         res.s = 1;
