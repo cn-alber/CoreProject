@@ -590,4 +590,10 @@ namespace CoreModels.XyCore
         public List<InsertFailReason> FailIDs{get;set;}
         public List<OrderLog> Log{get;set;}
     }
+    public class BindOrdReturn
+    {
+        public List<AfterSaleQuery> SuccessIDs{get;set;}
+        public List<InsertFailReason> FailIDs{get;set;}
+    }
+    
 }

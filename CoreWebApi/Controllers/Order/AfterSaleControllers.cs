@@ -1217,5 +1217,47 @@ namespace CoreWebApi
             }
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/AfterSale/BindOrd")]
+        public ResponseResult BindOrd([FromBodyAttribute]JObject co)
+        {   
+            int OID = 0,x;
+            if(co["OID"] != null)
+            {
+                string Text = co["OID"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (int.TryParse(Text, out x))
+                    {
+                        OID = int.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "订单ID参数无效", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "订单ID必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单ID必填", "General"); 
+            }
+            var rid = new List<int>();
+            if(co["RID"] != null)
+            {
+                rid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["RID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "售后ID必填", "General");
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = AfterSaleHaddle.BindOrd(rid,OID,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }

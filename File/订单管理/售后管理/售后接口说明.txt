@@ -129,7 +129,7 @@ output: s=1成功 else 错误代码
 
 7.GetAfterSaleItem() //根据售后单获取售后明细
 路由:http://localhost:5000/Core/AfterSale/GetAfterSaleItem
-input: None
+input: RID  售后ID
 OutPut:售后明细资料
 参考:output jason 文件:GetAfterSaleItem.json
 
@@ -243,3 +243,13 @@ output:AfterSaleItem    售后单明细
        Log              日志
 参考:input jason 文件:DeleteASItemE_input.json
 参考:output jason 文件:DeleteASItemE_output.json
+
+21.BindOrd()绑定订单
+路由:http://localhost:5000/Core/AfterSale/BindOrd
+input:RID   List<int>   售后ID List
+      OID   int         订单ID
+output:SuccessIDs    成功的ID售后资料,刷新资料显示
+       FailIDs       失败的ID和原因
+参考:input jason 文件:BindOrd_input.json
+参考:output jason 文件:BindOrd_output.json
+
