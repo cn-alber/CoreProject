@@ -261,7 +261,7 @@ output:SuccessIDs    成功的ID售后资料,刷新资料显示
 参考:input jason 文件:BindOrd_input.json
 参考:output jason 文件:BindOrd_output.json
 
-22.CancleAfterSale()绑定订单
+22.CancleAfterSale()作废
 路由:http://localhost:5000/Core/AfterSale/CancleAfterSale
 input:RID   List<int>   售后ID List
 output:SuccessIDs    成功的ID和状态

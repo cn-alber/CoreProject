@@ -617,4 +617,14 @@ namespace CoreModels.XyCore
         public List<CancleAfterSaleSuccess> SuccessIDs{get;set;}
         public List<InsertFailReason> FailIDs{get;set;}
     }
+    public class AgressReturnSuccess
+    {
+        public int ID{get;set;}
+        public string ShopStatus{get;set;}
+    }
+    public class AgressReturn
+    {
+        public List<AgressReturnSuccess> SuccessIDs{get;set;}
+        public List<InsertFailReason> FailIDs{get;set;}
+    }
 }
