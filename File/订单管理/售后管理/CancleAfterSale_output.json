@@ -1,0 +1,19 @@
+{
+    "s": 1,
+    "d": {
+        "SuccessIDs": [
+            {
+                "ID": 258,
+                "Status": 2,
+                "StatusString": "作废"
+            }
+        ],
+        "FailIDs": [
+            {
+                "id": 255,
+                "reason": "只有待确认的单据才可以作废!"
+            }
+        ]
+    },
+    "m": ""
+}

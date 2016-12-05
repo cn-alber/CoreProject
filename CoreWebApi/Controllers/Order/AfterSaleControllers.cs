@@ -1259,5 +1259,47 @@ namespace CoreWebApi
             var data = AfterSaleHaddle.BindOrd(rid,OID,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpGetAttribute("/Core/AfterSale/RefreshAS")]
+        public ResponseResult RefreshAS(string RID)
+        {  
+            int rid,x;
+            if(!string.IsNullOrEmpty(RID))
+            {
+                if (int.TryParse(RID, out x))
+                {
+                    rid = int.Parse(RID);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "售后ID参数无效", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "售后ID必填", "General"); 
+            }
+            int CoID = int.Parse(GetCoid());
+            var data = AfterSaleHaddle.RefreshAS(rid,CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/AfterSale/CancleAfterSale")]
+        public ResponseResult CancleAfterSale([FromBodyAttribute]JObject co)
+        {   
+            var rid = new List<int>();
+            if(co["RID"] != null)
+            {
+                rid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["RID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "售后ID必填", "General");
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = AfterSaleHaddle.CancleAfterSale(rid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }

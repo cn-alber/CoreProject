@@ -1886,157 +1886,135 @@ namespace CoreData.CoreCore
             result.d = res; 
             return result;
         }
-
         ///<summary>
         ///订单详情关闭后,刷新主页面
         ///</summary>
-        // public static DataResult RefreshAS(int RID,int CoID)
-        // {
-        //     var result = new DataResult(1,null);
-        //     int count = 0;
-        //     var logs = new List<LogInsert>();
-        //     var log = new LogInsert();
-        //     var res = new BindOrdReturn();
-        //     var fa = new List<InsertFailReason>();
-        //     var sID = new List<int>();
-        //     string sqlcommand = string.Empty;
-        //     var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
-        //     CoreDBconn.Open();
-        //     var TransCore = CoreDBconn.BeginTransaction();
-        //     try
-        //     {
-        //         sqlcommand = "select * from `order` where id = " + OID + " and coid = " + CoID;
-        //         var order = CoreDBconn.Query<Order>(sqlcommand).AsList();
-        //         if(order.Count == 0)
-        //         {
-        //             result.s = -1;
-        //             result.d = "订单单号无效";
-        //             return result;
-        //         }
-        //         sqlcommand = "select * from aftersale where id in @ID and coid = @CoID";
-        //         var u = CoreDBconn.Query<AfterSale>(sqlcommand,new{ID = RID,CoID = CoID}).AsList();
-        //         if(u.Count == 0)
-        //         {
-        //             result.s = -1;
-        //             result.d = "售后单号无效";
-        //             return result;
-        //         }
-        //         foreach(var a in u)
-        //         {
-        //             if(a.Status != 0)
-        //             {
-        //                 var ff = new InsertFailReason();
-        //                 ff.id = a.ID;
-        //                 ff.reason = "待确认的单据才可以绑定订单!";
-        //                 fa.Add(ff);
-        //                 continue;
-        //             }
-        //             if(a.OID != -1)
-        //             {
-        //                 var ff = new InsertFailReason();
-        //                 ff.id = a.ID;
-        //                 ff.reason = "无信息件才可以绑定订单!";
-        //                 fa.Add(ff);
-        //                 continue;
-        //             }
-        //             a.OID = order[0].ID;
-        //             a.SoID = order[0].SoID;
-        //             a.BuyerShopID = order[0].BuyerShopID;
-        //             a.RecName = order[0].RecName;
-        //             a.RecTel = order[0].RecTel;
-        //             a.RecPhone = order[0].RecPhone;
-        //             a.ShopID = order[0].ShopID;
-        //             a.ShopName = order[0].ShopName;
-        //             a.OrdType = order[0].Type;
-        //             a.Distributor = order[0].Distributor;
-        //             a.Modifier = UserName;
-        //             a.ModifyDate = DateTime.Now;
-        //             sqlcommand = @"update aftersale set OID=@OID,SoID=@SoID,BuyerShopID=@BuyerShopID,RecName=@RecName,RecTel=@RecTel,RecPhone=@RecPhone,ShopID=@ShopID,
-        //                            ShopName=@ShopName,OrdType=@OrdType,Distributor=@Distributor,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @CoID";
-        //             count = CoreDBconn.Execute(sqlcommand,a,TransCore);
-        //             if(count < 0)
-        //             {
-        //                 result.s = -3003;
-        //                 return result;
-        //             }
-        //             sID.Add(a.ID);
-        //             log = new LogInsert();
-        //             log.OID = a.ID;
-        //             log.Type = 1;
-        //             log.LogDate = DateTime.Now;
-        //             log.UserName = UserName;
-        //             log.Title = "绑定订单";
-        //             log.Remark = a.OID.ToString();
-        //             log.CoID = CoID;
-        //             logs.Add(log);
-        //             if(a.Type == 1)
-        //             {
-        //                 sqlcommand = "select * from orderitem where oid = " + a.OID + " and coid = " + CoID;
-        //                 var item = CoreDBconn.Query<OrderItem>(sqlcommand).AsList();
-        //                 foreach(var it in item)
-        //                 {
-        //                     sqlcommand = @"INSERT INTO aftersaleitem(RID,ReturnType,SkuAutoID,SkuID,SkuName,Norm,GoodsCode,RegisterQty,Price,Amount,Img,CoID,Creator,Modifier) 
-        //                                    VALUES(@RID,@ReturnType,@SkuAutoID,@SkuID,@SkuName,@Norm,@GoodsCode,@RegisterQty,@Price,@Amount,@Img,@CoID,@Creator,@Creator)";
-        //                     var args = new{RID = a.ID,ReturnType = 0,SkuAutoID=it.SkuAutoID,SkuID = it.SkuID,SkuName=it.SkuName,Norm=it.Norm,GoodsCode=it.GoodsCode,RegisterQty=it.Qty,
-        //                                    Price=it.RealPrice,Amount=it.Amount,Img=it.img,CoID=CoID,Creator=UserName};
-        //                     count = CoreDBconn.Execute(sqlcommand,args,TransCore);
-        //                     if(count < 0)
-        //                     {
-        //                         result.s = -3002;
-        //                         return result;
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //         string loginsert = @"INSERT INTO orderlog(OID,Type,LogDate,UserName,Title,Remark,CoID) 
-        //                                            VALUES(@OID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
-        //         count =CoreDBconn.Execute(loginsert,logs,TransCore);
-        //         if(count < 0)
-        //         {
-        //             result.s = -3002;
-        //             return result;
-        //         }
-        //         TransCore.Commit();
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         TransCore.Rollback();
-        //         TransCore.Dispose();
-        //         result.s = -1;
-        //         result.d = e.Message;
-        //     }
-        //     finally
-        //     {
-        //         TransCore.Dispose();
-        //         CoreDBconn.Dispose();
-        //     }                
-        //     res.FailIDs = fa;
-        //     if(sID.Count > 0)
-        //     {
-        //         sqlcommand = @"select ID,OID,RegisterDate,BuyerShopID,RecName,Type,RecPhone,SalerReturnAmt,BuyerUpAmt,RealReturnAmt,ReturnAccount,ShopName,WarehouseID,RecWarehouse,
-        //                         SoID,IssueType,OrdType,Remark,Status,ShopStatus,Result,GoodsStatus,ModifyDate,Modifier,Creator,RefundStatus,Express,ExCode,IsSubmit,ConfirmDate
-        //                         from aftersale where id in @ID and coid = @Coid";  
-        //         using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
-        //             try{    
-        //                 var u = conn.Query<AfterSaleQuery>(sqlcommand,new{ID=sID,Coid = CoID}).AsList();
-        //                 foreach(var a in u)
-        //                 {
-        //                     a.TypeString = Enum.GetName(typeof(ASType), a.Type);
-        //                     a.IssueTypeString = Enum.GetName(typeof(IssueType), a.IssueType);
-        //                     a.OrdTypeString = OrderHaddle.GetTypeName(a.OrdType);
-        //                     a.StatusString = Enum.GetName(typeof(ASStatus), a.Status);
-        //                     a.ResultString = Enum.GetName(typeof(Result), a.Result);
-        //                 }
-        //                 res.SuccessIDs = u;
-        //             }catch(Exception ex){
-        //                 result.s = -1;
-        //                 result.d = ex.Message;
-        //                 conn.Dispose();
-        //             }
-        //         }       
-        //     }
-        //     result.d = res; 
-        //     return result;
-        // }
+        public static DataResult RefreshAS(int RID,int CoID)
+        {
+            var result = new DataResult(1,null);
+            var res = new RefreshASReturn();
+            string sqlcommand = string.Empty;
+            sqlcommand = @"select ID,OID,RegisterDate,BuyerShopID,RecName,Type,RecPhone,SalerReturnAmt,BuyerUpAmt,RealReturnAmt,ReturnAccount,ShopName,WarehouseID,RecWarehouse,
+                            SoID,IssueType,OrdType,Remark,Status,ShopStatus,Result,GoodsStatus,ModifyDate,Modifier,Creator,RefundStatus,Express,ExCode,IsSubmit,ConfirmDate
+                            from aftersale where id = " + RID + " and coid = " + CoID;  
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    var u = conn.Query<AfterSaleQuery>(sqlcommand).AsList();
+                    u[0].TypeString = Enum.GetName(typeof(ASType), u[0].Type);
+                    u[0].IssueTypeString = Enum.GetName(typeof(IssueType), u[0].IssueType);
+                    u[0].OrdTypeString = OrderHaddle.GetTypeName(u[0].OrdType);
+                    u[0].StatusString = Enum.GetName(typeof(ASStatus), u[0].Status);
+                    u[0].ResultString = Enum.GetName(typeof(Result), u[0].Result);
+                    res.AfterSale = u[0];
+                    sqlcommand = "select ID,ReturnType,SkuAutoID,SkuID,SkuName,Norm,GoodsCode,RegisterQty,ReturnQty,Price,Amount,img,Creator from aftersaleitem where rid = " + RID + 
+                                 " and coid = " + CoID;
+                    var g = conn.Query<AfterSaleItemQuery>(sqlcommand).AsList();
+                    foreach(var a in g)
+                    {
+                        a.ReturnTypeString = Enum.GetName(typeof(ReturnType), a.ReturnType);//获取名称
+                    }
+                    res.AfterSaleItem = g;
+
+                    result.d = res;
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }       
+            return result;
+        }
+
+        ///<summary>
+        ///作废售后单
+        ///</summary>
+        public static DataResult CancleAfterSale(List<int> RID,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            int count = 0;
+            var logs = new List<LogInsert>();
+            var log = new LogInsert();
+            var res = new CancleAfterSaleReturn();
+            var fa = new List<InsertFailReason>();
+            var su = new List<CancleAfterSaleSuccess>();
+            string sqlcommand = string.Empty;
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                sqlcommand = "select * from aftersale where id in @ID and coid = @CoID";
+                var u = CoreDBconn.Query<AfterSale>(sqlcommand,new{ID = RID,CoID = CoID}).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "售后单号无效";
+                    return result;
+                }
+                foreach(var a in u)
+                {
+                    if(a.Status != 0)
+                    {
+                        var ff = new InsertFailReason();
+                        ff.id = a.ID;
+                        ff.reason = "只有待确认的单据才可以作废!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    
+                    a.Status = 2;
+                    a.Modifier = UserName;
+                    a.ModifyDate = DateTime.Now;
+                    sqlcommand = @"update aftersale set Status=@Status,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @CoID";
+                    count = CoreDBconn.Execute(sqlcommand,a,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+       
+                    log = new LogInsert();
+                    log.OID = a.ID;
+                    log.Type = 1;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "作废";
+                    log.Remark = "Cancle";
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    
+                    var ss = new CancleAfterSaleSuccess();
+                    ss.ID = a.ID;
+                    ss.Status = a.Status;
+                    ss.StatusString = Enum.GetName(typeof(ASStatus), a.Status);
+                    su.Add(ss);
+                }
+                string loginsert = @"INSERT INTO orderlog(OID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                   VALUES(@OID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                count =CoreDBconn.Execute(loginsert,logs,TransCore);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }                
+            res.SuccessIDs = su;
+            res.FailIDs = fa;
+            result.d = res; 
+            return result;
+        }
     }
 }

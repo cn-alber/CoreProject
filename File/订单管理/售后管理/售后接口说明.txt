@@ -157,9 +157,10 @@ output:售后单明细
 
 11.UpdateASItem()修改售后明细(直接修改)
 路由:http://localhost:5000/Core/AfterSale/UpdateASItem
-input:RID         int   售后ID
-      RDetailID   int   售后明细ID
-      Qty         int   数量
+input:RID         int         售后ID
+      RDetailID   int         售后明细ID
+      Qty         int         数量
+      Amount      decimal     金额
 output:售后单明细
 参考:input jason 文件:UpdateASItem_input.json
 参考:output jason 文件:UpdateASItem_output.json
@@ -244,6 +245,13 @@ output:AfterSaleItem    售后单明细
 参考:input jason 文件:DeleteASItemE_input.json
 参考:output jason 文件:DeleteASItemE_output.json
 
+20.RefreshAS() //售后详情关闭后刷新画面
+路由:http://localhost:5000/Core/AfterSale/RefreshAS
+input:RID   string      售后ID
+OutPut:AfterSale        售后单资料
+       AfterSaleItem    售后明细
+参考:output jason 文件:RefreshAS_output.json
+
 21.BindOrd()绑定订单
 路由:http://localhost:5000/Core/AfterSale/BindOrd
 input:RID   List<int>   售后ID List
@@ -252,4 +260,12 @@ output:SuccessIDs    成功的ID售后资料,刷新资料显示
        FailIDs       失败的ID和原因
 参考:input jason 文件:BindOrd_input.json
 参考:output jason 文件:BindOrd_output.json
+
+22.CancleAfterSale()绑定订单
+路由:http://localhost:5000/Core/AfterSale/CancleAfterSale
+input:RID   List<int>   售后ID List
+output:SuccessIDs    成功的ID和状态
+       FailIDs       失败的ID和原因
+参考:input jason 文件:CancleAfterSale_input.json
+参考:output jason 文件:CancleAfterSale_output.json
 
