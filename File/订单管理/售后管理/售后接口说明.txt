@@ -286,3 +286,10 @@ output:SuccessIDs    成功的ID和线上状态
 参考:input jason 文件:DisagressReturn_input.json
 参考:output jason 文件:DisagressReturn_output.json
 
+25.ConfirmAfterSale()确认
+路由:http://localhost:5000/Core/AfterSale/ConfirmAfterSale
+input:RID   List<int>   售后ID List
+output:SuccessIDs    成功的ID和修改后资料
+       FailIDs       失败的ID和原因
+参考:input jason 文件:ConfirmAfterSale_input.json
+参考:output jason 文件:ConfirmAfterSale_output.json

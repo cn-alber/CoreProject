@@ -1318,6 +1318,8 @@ namespace CoreData.CoreCore
             var logs = new List<LogInsert>();
             var log = new LogInsert();
             var rt = new List<InsertFailReason>();
+            var res = new InsertASItemSkuReturn();
+            var sid = new List<int>();
             // int ReturnType = 0;
             string sqlcommand = string.Empty;
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
@@ -1419,6 +1421,8 @@ namespace CoreData.CoreCore
                         log.Remark = s[0].skuid;
                         log.CoID = CoID;
                         logs.Add(log);
+                        int rtn = CoreDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
+                        sid.Add(rtn);
                     }
                 }
                 string loginsert = @"INSERT INTO orderlog(OID,Type,LogDate,UserName,Title,Remark,CoID) 
@@ -1429,7 +1433,18 @@ namespace CoreData.CoreCore
                     result.s = -3002;
                     return result;
                 }
-                result.d = rt;
+                if(sid.Count > 0)
+                {
+                    sqlcommand = "select ID,ReturnType,SkuAutoID,SkuID,SkuName,Norm,GoodsCode,RegisterQty,ReturnQty,Price,Amount,img,Creator from aftersaleitem where id in @ID and coid = @Coid";
+                    var su = CoreDBconn.Query<AfterSaleItemQuery>(sqlcommand,new{ID=sid,Coid = CoID}).AsList();
+                    foreach(var a in su)
+                    {
+                        a.ReturnTypeString = Enum.GetName(typeof(ReturnType), a.ReturnType);//获取名称
+                    }
+                    res.SuccessIDs = su;
+                }
+                res.FailIDs = rt;
+                result.d = res;
                 TransCore.Commit();
             }
             catch (Exception e)
@@ -2239,7 +2254,7 @@ namespace CoreData.CoreCore
                     }
                     if(a.Type == 2 && a.OID > -1)//检查换货的售后单，明细中换货&退货的资料是否匹配,产生换货订单
                     {
-                        sqlcommand = "select * from aftersale where rid = " + a.ID + " and coid = " + CoID;
+                        sqlcommand = "select * from aftersaleitem where rid = " + a.ID + " and coid = " + CoID;
                         var item = CoreDBconn.Query<AfterSaleItem>(sqlcommand).AsList();
                         int x = 0,y = 0;
                         foreach(var i in item)
@@ -2447,7 +2462,7 @@ namespace CoreData.CoreCore
                     }
                     if(a.Type == 3 && a.OID > -1)//产生补发订单
                     {
-                        sqlcommand = "select * from aftersale where rid = " + a.ID + " and coid = " + CoID;
+                        sqlcommand = "select * from aftersaleitem where rid = " + a.ID + " and coid = " + CoID;
                         var item = CoreDBconn.Query<AfterSaleItem>(sqlcommand).AsList();
                         //订单明细
                         var orditems = new List<OrderItem>();
@@ -2653,8 +2668,8 @@ namespace CoreData.CoreCore
                     ss.ConfirmDate = a.ConfirmDate.ToString();
                     su.Add(ss);
                 }
-                string loginsert = @"INSERT INTO orderlog(OID,Type,LogDate,UserName,Title,Remark,CoID) 
-                                                   VALUES(@OID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                   VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
                 count =CoreDBconn.Execute(loginsert,logs,TransCore);
                 if(count < 0)
                 {

@@ -713,14 +713,14 @@ namespace CoreWebApi
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = AfterSaleHaddle.InsertASItemSku(CoID,username,RID,oid,ReturnType);
-            var res = new InsertASItemSkuReturn();
-            if(data.s == 1)
-            {
-                var d = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as GetAfterSaleItemReturn;
-                res.SuccessIDs = d.AfterSaleItem as List<AfterSaleItemQuery>;
-                res.FailIDs = data.d  as List<InsertFailReason>;
-                data.d = res;
-            }
+            // var res = new InsertASItemSkuReturn();
+            // if(data.s == 1)
+            // {
+            //     var d = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as GetAfterSaleItemReturn;
+            //     res.SuccessIDs = d.AfterSaleItem as List<AfterSaleItemQuery>;
+            //     res.FailIDs = data.d  as List<InsertFailReason>;
+            //     data.d = res;
+            // }
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -1114,11 +1114,11 @@ namespace CoreWebApi
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = AfterSaleHaddle.InsertASItemSku(CoID,username,RID,oid,ReturnType);
+            var dr = data.d as InsertASItemSkuReturn;
             var res = new InsertASItemSkuEReturn();
             if(data.s == 1)
             {
-                var d = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as GetAfterSaleItemReturn;
-                res.SuccessIDs = d.AfterSaleItem as List<AfterSaleItemQuery>;
+                res.SuccessIDs = dr.SuccessIDs as List<AfterSaleItemQuery>;
                 res.FailIDs = data.d  as List<InsertFailReason>;
                 res.Log = AfterSaleHaddle.GetOrderLog(RID,CoID).d as List<OrderLog>;
                 data.d = res;
