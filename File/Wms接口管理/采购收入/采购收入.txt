@@ -1,4 +1,4 @@
-接口名称：AWmsBoxControllers
+接口名称：APurControllers
 function说明
 ############################################################
 1.GetBox()//收货作业-根据箱码or件码_获取SKU

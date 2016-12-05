@@ -313,11 +313,11 @@ namespace CoreData.CoreWmsApi
                         CoreConn.Execute(InventoryHaddle.AddInventorySaleSql(), NewMainInvLst, CoreTrans);//Sku库存新增
                     }
                     //更新库存数量                                                                              
-                    CoreConn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = IParam.CoID, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
+                    CoreConn.Execute(UptInvWaitInQtySql(), new { CoID = IParam.CoID, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
                     //更新总库存数量
                     res = CommHaddle.GetWareCoidList(IParam.CoID.ToString());
                     var CoIDLst = res.d as List<string>;
-                    CoreConn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = IParam.CoID, CoIDLst = CoIDLst, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
+                    CoreConn.Execute(UptInvMWaitInQtySql(), new { CoID = IParam.CoID, CoIDLst = CoIDLst, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
                     CoreTrans.Commit();
                     CoreUser.LogComm.InsertUserLog("采购收入", "purchasereceive", "单据ID" + ParentID, IParam.Creator, IParam.CoID, DateTime.Now);
 
@@ -563,11 +563,11 @@ namespace CoreData.CoreWmsApi
                     CoreConn.Execute(InventoryHaddle.AddInventorySaleSql(), NewMainInvLst, CoreTrans);//Sku库存新增
                 }
                 //更新库存数量                                                                              
-                CoreConn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = IParam.CoID, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
+                CoreConn.Execute(UptInvWaitInQtySql(), new { CoID = IParam.CoID, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
                 //更新总库存数量
                 res = CommHaddle.GetWareCoidList(IParam.CoID.ToString());
                 var CoIDLst = res.d as List<string>;
-                CoreConn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = IParam.CoID, CoIDLst = CoIDLst, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
+                CoreConn.Execute(UptInvMWaitInQtySql(), new { CoID = IParam.CoID, CoIDLst = CoIDLst, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
                 CoreTrans.Commit();
                 CoreUser.LogComm.InsertUserLog(CusType, "Invinout", "交易ID" + RecordID, IParam.Creator, IParam.CoID, DateTime.Now);
 
@@ -892,6 +892,59 @@ namespace CoreData.CoreWmsApi
             return sql;
         }
 
+        #endregion
+
+        #region 更新库存数量&待入库数量(分仓)
+        public static string UptInvWaitInQtySql()
+        {
+            string sql = @"UPDATE inventory 
+                            SET StockQty= (SELECT IFNULL(sum(Qty),0)
+	                                            FROM
+		                                            invinoutitem
+	                                            WHERE
+		                                            invinoutitem.Skuautoid = inventory.Skuautoid
+	                                            AND invinoutitem.CoID = inventory.CoID
+                                                AND invinoutitem.`Status` = 1
+                                                AND invinoutitem.Skuautoid in @SkuIDLst),
+                                WaitInQty = (SELECT IFNULL(SUM(Qty),0)
+                                                FROM wmspile
+                                                WHERE wmspile.Skuautoid = inventory.Skuautoid
+                                                AND wmspile.CoID = inventory.CoID
+                                                AND wmspile.Skuautoid in @SkuIDLst
+                                                AND wmspile.Type = 4),
+                                            IsDelete=0,Modifier=@Modifier,ModifyDate=@ModifyDate
+                                            WHERE
+	                                            inventory.CoID =@CoID
+                                            AND Inventory.Skuautoid in @SkuIDLst";
+            return sql;
+        }
+        #endregion
+
+        #region 更新总库存数量-待入库数量(主仓)
+        public static string UptInvMWaitInQtySql()
+        {
+            string sql = @"UPDATE Inventory_sale
+                            SET Inventory_sale.StockQty = (
+                                SELECT          
+                                    IFNULL(SUM(StockQty),0)
+                                FROM
+                                    inventory
+                                WHERE
+                                    inventory.CoID IN @CoIDLst
+                                AND inventory.Skuautoid = inventory_sale.Skuautoid),
+                            inventory_sale.WaitInQty = (
+                                SELECT          
+                                    IFNULL(SUM(WaitInQty),0)
+                                FROM
+                                    inventory
+                                WHERE
+                                    inventory.CoID IN @CoIDLst
+                                AND inventory.Skuautoid = inventory_sale.Skuautoid
+                            ),IsDelete=0,Modifier=@Modifier,ModifyDate=@ModifyDate
+                            WHERE inventory_sale.CoID=@CoID
+                            AND inventory_sale.Skuautoid in @SkuIDLst";
+            return sql;
+        }
         #endregion
     }
 }

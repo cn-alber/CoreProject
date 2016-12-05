@@ -1,0 +1,28 @@
+接口名称：AShelvesController.cs
+function说明
+############################################################
+1.GetUpSkuByCode()//货品上架 - 扫描Sku,检查货位库存,返回有效货位
+    方法：GET
+    路由：http://192.168.30.211:5000/Core/AShelves/GetUpSkuByCode?BoxCode=BX100016112920454&WarehouseID=&PCode=
+    InPut:
+        BoxCode     string      箱/件码
+        WarehouseID int         仓库ID
+        PCode       string      货位编码
+    OutPut：
+        AShelf       AShelfData 上架资料
+    参考:output json 文件:GetUpSkuByCode_output.json  
+2.CheckWhPCode()//货品上架 - 修改仓库or货位，检查货位库存
+    方法：GET
+    路由：http://192.168.30.211:5000/Core/AShelves/CheckWhPCode?Skuautoid=&Qty=&WarehouseID=&PCode=
+    InPut:
+        Skuautoid           int             商品编号
+        Qty                 int             商品数量
+        WarehouseID         int             收入仓库编号Warehouse.ID
+        PCode               string          货位编码
+    参考：input json 文件：CheckWhPCode_output.json
+3.SetUpPile()//货品上架 - 新增上架资料
+    方法：POST
+    路由：http://192.168.30.211:5000/Core/AShelves/SetUpPile
+    InPut:
+        SkuAuto             ASkuScan        商品资料
+        PileID              int             货位资料

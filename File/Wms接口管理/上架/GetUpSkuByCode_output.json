@@ -1,0 +1,33 @@
+{
+    "s": 1,
+    "d": {
+        "SkuAuto": {
+            "BarCode": "BX100016112920454",
+            "Skuautoid": 17610,
+            "SkuID": "GB2312001001",
+            "SkuName": "GB2312",
+            "GoodsCode": "GB2312",
+            "Norm": "白色1;S",
+            "Qty": 8,
+            "SkuType": 2
+        },
+        "PileAuto": {
+            "ID": 43,
+            "WarehouseID": 134,
+            "Skuautoid": 0,
+            "SkuID": "",
+            "Qty": 0,
+            "MaxQty": 50,
+            "Type": 1,
+            "PCType": 0,
+            "PCode": "100-10-10-G",
+            "Order": null,
+            "Enable": true,
+            "CoID": null
+        },
+        "CoID": 0,
+        "Creator": null,
+        "CreateDate": null
+    },
+    "m": ""
+}

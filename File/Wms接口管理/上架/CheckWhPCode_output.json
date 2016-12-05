@@ -1,0 +1,18 @@
+{
+    "s": 1,
+    "d": {
+        "ID": 43,
+        "WarehouseID": 134,
+        "Skuautoid": 0,
+        "SkuID": "",
+        "Qty": 0,
+        "MaxQty": 50,
+        "Type": 1,
+        "PCType": 0,
+        "PCode": "100-10-10-G",
+        "Order": null,
+        "Enable": true,
+        "CoID": null
+    },
+    "m": ""
+}
