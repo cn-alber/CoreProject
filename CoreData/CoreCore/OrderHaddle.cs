@@ -10674,46 +10674,5 @@ namespace CoreData.CoreCore
             }
             return result;
         }
-
-
-
-
-
-
-
-
-        public static DataResult SetExpress()
-        {
-            var result = new DataResult(1,null);
-            var logs = new List<Log>();
-            var res = new TransferNormalReturn();
-            var su = new List<TransferNormalReturnSuccess>();
-            var fa = new List<TransferNormalReturnFail>();
-            string sqlCommandText = string.Empty;
-            int count = 0;
-            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
-            CoreDBconn.Open();
-            var TransCore = CoreDBconn.BeginTransaction();
-            try
-            {
-                res.SuccessIDs = su;
-                res.FailIDs = fa;
-                result.d = res;
-                TransCore.Commit();
-            }
-            catch (Exception e)
-            {
-                TransCore.Rollback();
-                TransCore.Dispose();
-                result.s = -1;
-                result.d = e.Message;
-            }
-            finally
-            {
-                TransCore.Dispose();
-                CoreDBconn.Dispose();
-            }
-            return result;
-        }
     }
 }

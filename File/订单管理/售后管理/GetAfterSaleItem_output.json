@@ -1,0 +1,26 @@
+{
+    "s": 1,
+    "d": {
+        "Status": 0,
+        "Type": 0,
+        "AfterSaleItem": [
+            {
+                "ID": 71,
+                "ReturnType": 0,
+                "ReturnTypeString": "退货",
+                "SkuAutoID": 8,
+                "SkuID": "test2510002007",
+                "SkuName": "南极人2016男装夹克休闲版",
+                "Norm": "白色;43",
+                "GoodsCode": "test251",
+                "RegisterQty": 1,
+                "ReturnQty": 0,
+                "Price": "199.00",
+                "Amount": "199.00",
+                "img": "",
+                "Creator": "管理员"
+            }
+        ]
+    },
+    "m": ""
+}

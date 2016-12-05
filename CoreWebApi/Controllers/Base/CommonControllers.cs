@@ -277,5 +277,14 @@ namespace CoreWebApi
         }
         #endregion
 
+        #region 获取快递列表
+        [HttpGetAttribute("/Core/Common/GetExpressList")]
+        public ResponseResult GetExpressList()
+        {                                   
+            string Coid = GetCoid();         
+            var r = CommHaddle.GetExpressList(Coid);
+            return CoreResult.NewResponse(r.s, r.d, "General");
+        }
+        #endregion
     }
 }

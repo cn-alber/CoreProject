@@ -520,5 +520,23 @@ namespace CoreData.CoreComm
             return result;
         }
         #endregion
+
+        #region 获取快递List
+        public static DataResult GetExpressList(string CoID)
+        {
+            var result = new DataResult(1, null);
+            var Express = CoreComm.ExpressHaddle.GetExpressSimple(int.Parse(CoID)).d as List<ExpressSimple>;
+            var filter = new List<Filter>();
+            foreach(var t in Express)
+            {
+                var f = new Filter();
+                f.value = t.ID;
+                f.label = t.Name;
+                filter.Add(f);
+            }
+            result.d = filter;
+            return result;
+        }
+        #endregion
     }
 }

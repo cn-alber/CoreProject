@@ -1,0 +1,286 @@
+{
+    "s": 1,
+    "d": {
+        "AfterSale": {
+            "ID": 254,
+            "OID": 10879,
+            "ShopName": "京东南极人男装官方旗舰店",
+            "Status": 0,
+            "StatusString": "待确认",
+            "GoodsStatus": "",
+            "SoID": 63616182021,
+            "BuyerShopID": "xiayun",
+            "RecName": "xiayun",
+            "RecTel": "",
+            "RecPhone": "158974335",
+            "Type": 0,
+            "TypeString": "普通退货",
+            "IssueType": 1,
+            "IssueTypeString": "有质量问题",
+            "RegisterDate": "2016-12-02 10:08:47",
+            "SalerReturnAmt": "100.00",
+            "BuyerUpAmt": "40.00",
+            "RealReturnAmt": "60.00",
+            "ReturnAccount": "",
+            "WarehouseID": 136,
+            "RecWarehouse": "南极云商常熟销退1仓2",
+            "Express": "Ems",
+            "ExCode": "12345",
+            "Remark": "测试"
+        },
+        "IssueType": [
+            {
+                "value": "0",
+                "label": "不喜欢"
+            },
+            {
+                "value": "1",
+                "label": "有质量问题"
+            },
+            {
+                "value": "2",
+                "label": "七天无理由退货"
+            },
+            {
+                "value": "3",
+                "label": "重复购买"
+            },
+            {
+                "value": "4",
+                "label": "与描述不符"
+            },
+            {
+                "value": "5",
+                "label": "不想买了"
+            },
+            {
+                "value": "6",
+                "label": "其他"
+            },
+            {
+                "value": "7",
+                "label": "买错了"
+            },
+            {
+                "value": "8",
+                "label": "服务承诺态度"
+            },
+            {
+                "value": "9",
+                "label": "条码与吊牌与商品不符"
+            },
+            {
+                "value": "10",
+                "label": "发错货"
+            },
+            {
+                "value": "11",
+                "label": "退运费"
+            },
+            {
+                "value": "12",
+                "label": "未按约定时间发货"
+            },
+            {
+                "value": "13",
+                "label": "差价"
+            },
+            {
+                "value": "14",
+                "label": "补偿"
+            },
+            {
+                "value": "15",
+                "label": "丢件或快递破损"
+            }
+        ],
+        "Type": [
+            {
+                "value": "0",
+                "label": "普通退货"
+            },
+            {
+                "value": "1",
+                "label": "拒收退货"
+            },
+            {
+                "value": "2",
+                "label": "换货"
+            },
+            {
+                "value": "3",
+                "label": "补发"
+            },
+            {
+                "value": "4",
+                "label": "投诉"
+            },
+            {
+                "value": "5",
+                "label": "其他"
+            }
+        ],
+        "Warehouse": [
+            {
+                "value": "134",
+                "label": "南极云商常熟配送1仓1"
+            },
+            {
+                "value": "135",
+                "label": "南极云商常熟配送2仓"
+            },
+            {
+                "value": "136",
+                "label": "南极云商常熟销退1仓2"
+            },
+            {
+                "value": "137",
+                "label": "南极云商常熟进货1仓3"
+            },
+            {
+                "value": "138",
+                "label": "南极云商常熟次品1仓4"
+            }
+        ],
+        "AfterSaleItem": [
+            {
+                "ID": 61,
+                "ReturnType": 0,
+                "ReturnTypeString": "退货",
+                "SkuAutoID": 8,
+                "SkuID": "test2510002007",
+                "SkuName": "南极人2016男装夹克休闲版",
+                "Norm": "白色;43",
+                "GoodsCode": "test251",
+                "RegisterQty": 1,
+                "ReturnQty": 0,
+                "Price": "199.00",
+                "Amount": "199.00",
+                "img": "",
+                "Creator": "管理员"
+            }
+        ],
+        "Log": [
+            {
+                "ID": "59031",
+                "LogDate": "2016-12-03 11:26:48",
+                "UserName": "管理员",
+                "Title": "删除售后明细",
+                "Remark": "test2510010007"
+            },
+            {
+                "ID": "59032",
+                "LogDate": "2016-12-03 11:26:48",
+                "UserName": "管理员",
+                "Title": "删除售后明细",
+                "Remark": "test1234560004007"
+            },
+            {
+                "ID": "59033",
+                "LogDate": "2016-12-03 11:26:48",
+                "UserName": "管理员",
+                "Title": "删除售后明细",
+                "Remark": "test1234560004014"
+            },
+            {
+                "ID": "59030",
+                "LogDate": "2016-12-03 11:15:17",
+                "UserName": "管理员",
+                "Title": "修改退货数量",
+                "Remark": "1=>2"
+            },
+            {
+                "ID": "59028",
+                "LogDate": "2016-12-03 10:45:46",
+                "UserName": "管理员",
+                "Title": "新增退货商品",
+                "Remark": "test1234560004007"
+            },
+            {
+                "ID": "59029",
+                "LogDate": "2016-12-03 10:45:46",
+                "UserName": "管理员",
+                "Title": "新增退货商品",
+                "Remark": "test1234560004014"
+            },
+            {
+                "ID": "59027",
+                "LogDate": "2016-12-03 10:19:47",
+                "UserName": "管理员",
+                "Title": "新增退货商品",
+                "Remark": "test2510010007"
+            },
+            {
+                "ID": "59026",
+                "LogDate": "2016-12-03 09:38:03",
+                "UserName": "管理员",
+                "Title": "新增退货商品",
+                "Remark": "test2510002007"
+            },
+            {
+                "ID": "59025",
+                "LogDate": "2016-12-02 14:58:30",
+                "UserName": "管理员",
+                "Title": "修改售后分类",
+                "Remark": "拒收退货=>普通退货"
+            },
+            {
+                "ID": "59024",
+                "LogDate": "2016-12-02 14:07:01",
+                "UserName": "管理员",
+                "Title": "修改售后分类",
+                "Remark": "补发=>拒收退货"
+            },
+            {
+                "ID": "59023",
+                "LogDate": "2016-12-02 11:52:43",
+                "UserName": "管理员",
+                "Title": "修改售后分类",
+                "Remark": "拒收退货=>补发"
+            },
+            {
+                "ID": "59022",
+                "LogDate": "2016-12-02 11:51:49",
+                "UserName": "管理员",
+                "Title": "修改售后分类",
+                "Remark": "补发=>拒收退货"
+            },
+            {
+                "ID": "59020",
+                "LogDate": "2016-12-02 11:08:28",
+                "UserName": "管理员",
+                "Title": "修改买家应补金额",
+                "Remark": "30.00=>40"
+            },
+            {
+                "ID": "59021",
+                "LogDate": "2016-12-02 11:08:28",
+                "UserName": "管理员",
+                "Title": "修改售后分类",
+                "Remark": "普通退货=>补发"
+            },
+            {
+                "ID": "59018",
+                "LogDate": "2016-12-02 11:04:27",
+                "UserName": "管理员",
+                "Title": "修改售后分类",
+                "Remark": "其他=>普通退货"
+            },
+            {
+                "ID": "59019",
+                "LogDate": "2016-12-02 11:04:27",
+                "UserName": "管理员",
+                "Title": "修改售后分类",
+                "Remark": "其他=>普通退货"
+            },
+            {
+                "ID": "59016",
+                "LogDate": "2016-12-02 10:09:05",
+                "UserName": "管理员",
+                "Title": "售后时间",
+                "Remark": "手工新增售后时间"
+            }
+        ]
+    },
+    "m": ""
+}

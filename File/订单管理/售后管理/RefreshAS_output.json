@@ -1,0 +1,61 @@
+{
+    "s": 1,
+    "d": {
+        "AfterSale": {
+            "ID": 254,
+            "OID": 10879,
+            "RegisterDate": "2016-12-02 10:08:47",
+            "BuyerShopID": "xiayun",
+            "RecName": "xiayun",
+            "Type": 0,
+            "TypeString": "普通退货",
+            "RecPhone": "158974335",
+            "SalerReturnAmt": 100,
+            "BuyerUpAmt": 40,
+            "RealReturnAmt": 60,
+            "ReturnAccount": "",
+            "ShopName": "京东南极人男装官方旗舰店",
+            "WarehouseID": 136,
+            "RecWarehouse": "南极云商常熟销退1仓2",
+            "SoID": 63616182021,
+            "IssueType": 1,
+            "IssueTypeString": "有质量问题",
+            "OrdType": 0,
+            "OrdTypeString": "普通订单",
+            "Remark": "测试",
+            "Status": 0,
+            "StatusString": "待确认",
+            "ShopStatus": "",
+            "Result": 0,
+            "ResultString": "待退货",
+            "GoodsStatus": "",
+            "ModifyDate": "2016-12-03 13:43:37",
+            "Modifier": "管理员",
+            "Creator": "管理员",
+            "RefundStatus": "未申请状态",
+            "Express": "Ems",
+            "ExCode": "12345",
+            "IsSubmit": false,
+            "ConfirmDate": null
+        },
+        "AfterSaleItem": [
+            {
+                "ID": 71,
+                "ReturnType": 0,
+                "ReturnTypeString": "退货",
+                "SkuAutoID": 8,
+                "SkuID": "test2510002007",
+                "SkuName": "南极人2016男装夹克休闲版",
+                "Norm": "白色;43",
+                "GoodsCode": "test251",
+                "RegisterQty": 1,
+                "ReturnQty": 0,
+                "Price": "199.00",
+                "Amount": "199.00",
+                "img": "",
+                "Creator": "管理员"
+            }
+        ]
+    },
+    "m": ""
+}

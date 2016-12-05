@@ -1,0 +1,12 @@
+{
+    "DocumentType":"A",
+    "Type":"5",
+    "SalerReturnAmt":"100",
+    "BuyerUpAmt":"",
+    "WarehouseID":"136",
+    "IssueType":"1",
+    "Remark":"测试",
+    "Express":"Ems",
+    "ExCode":"12345",
+    "OID":"10879"
+}

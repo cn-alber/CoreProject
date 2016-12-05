@@ -33,6 +33,7 @@ input:      ExCode              string          快递单号 default null
             DateStart           string          日期起 default null
             DateEnd             string          日期迄 default null
             SkuID               string          商品编码 default null
+            GoodsCode           string          货号default null
             IsNoOID             string          无信息件 Y/N/null
             IsInterfaceLoad     string          接口下载 Y/N/null
             IsSubmitDis         string          分销提交 Y/N/null
@@ -85,16 +86,203 @@ OutPut:     Datacnt             int             资料总笔数
             Ord                 List<Order>     Order 资料
 参考:output jason 文件:GetASOrderList_output.json
 
-4.InsertASInit() //售后订单查询
+4.InsertASInit() //新增售后单初始资料
 路由:http://localhost:5000/Core/AfterSale/InsertASInit
-input: Type  string  A:订单售后单  B:无信息件售后单
-OutPut:Order            订单
-       Shop             店铺
-       Express          快递
-       Distributor      分销商
-       SendWarehouse    发货仓库
-       IssueType        问题类型
+input: None
+OutPut:IssueType        问题类型
        Type             售后分类
        Warehouse        退货仓
        DefaultWare      退货仓预设值
 参考:output jason 文件:InsertASInit_output.json
+
+5.InsertAfterSale()售后单新增
+路由:http://localhost:5000/Core/AfterSale/InsertAfterSale
+input:DocumentType      string  A:订单售后单  B:无信息件售后单,必填
+      Type              int     售后类型,必填
+      SalerReturnAmt    decimal 卖家应退金额 
+      BuyerUpAmt        decimal 买家应补金额
+      WarehouseID       int     仓库ID
+      IssueType         int     问题分类,必填
+      Remark            string  问题描述
+      Express           string  快递
+      ExCode            string  运单号
+      OID               int     订单ID(DocumentType=A时,必填)
+output: s=1成功 else 错误代码
+参考:input jason 文件:InsertAfterSale_input.json
+参考:output jason 文件:InsertAfterSale_output.json
+
+6.UpdateAfterSale()售后单修改更新(直接修改)
+路由:http://localhost:5000/Core/AfterSale/UpdateAfterSale
+input:RID               int     售后ID,必填
+      Type              int     售后类型
+      SalerReturnAmt    decimal 卖家应退金额 
+      BuyerUpAmt        decimal 买家应补金额
+      ReturnAccount     string  退款账号
+      WarehouseID       int     仓库ID
+      Result            int     处理结果
+      Remark            string  问题描述
+      Express           string  快递
+      ExCode            string  运单号
+output: s=1成功 else 错误代码
+参考:input jason 文件:UpdateAfterSale_input.json
+参考:output jason 文件:UpdateAfterSale_output.json
+
+7.GetAfterSaleItem() //根据售后单获取售后明细
+路由:http://localhost:5000/Core/AfterSale/GetAfterSaleItem
+input: RID  售后ID
+OutPut:售后明细资料
+参考:output jason 文件:GetAfterSaleItem.json
+
+8.GetASOrdItem() //根据售后单获取订单明细
+路由:http://localhost:5000/Core/AfterSale/GetASOrdItem
+input: RID  售后ID
+OutPut:订单明细资料
+参考:output jason 文件:GetASOrdItemoutput.json
+
+9.InsertASItemOrder()新增售后单明细来自订单(直接新增)
+路由:http://localhost:5000/Core/AfterSale/InsertASItemOrder
+input:RID         int         售后ID
+      DetailID    List<int>   订单明细ID
+output:售后单明细
+参考:input jason 文件:InsertASItemOrder_input.json
+参考:output jason 文件:InsertASItemOrder_output.json
+
+10.InsertASItemSku()新增售后单明细来自商品库(直接新增)
+路由:http://localhost:5000/Core/AfterSale/InsertASItemSku
+input:RID         int         售后ID
+      SkuID       List<int>   商品ID
+      ReturnType  int         类型
+output:售后单明细
+参考:input jason 文件:InsertASItemSku_input.json
+参考:output jason 文件:InsertASItemSku_output.json
+
+11.UpdateASItem()修改售后明细(直接修改)
+路由:http://localhost:5000/Core/AfterSale/UpdateASItem
+input:RID         int         售后ID
+      RDetailID   int         售后明细ID
+      Qty         int         数量
+      Amount      decimal     金额
+output:售后单明细
+参考:input jason 文件:UpdateASItem_input.json
+参考:output jason 文件:UpdateASItem_output.json
+
+12.DeleteASItem()删除售后明细(直接删除)
+路由:http://localhost:5000/Core/AfterSale/DeleteASItem
+input:RID         int   售后ID
+      RDetailID   int   售后明细ID
+output:售后单明细
+参考:input jason 文件:DeleteASItem_input.json
+参考:output jason 文件:DeleteASItem_output.json
+
+13.GetAfterSaleEdit() //新增售后单初始资料
+路由:http://localhost:5000/Core/AfterSale/GetAfterSaleEdit
+input: None
+OutPut:AfterSale        售后单
+       IssueType        问题类型
+       Type             售后分类
+       Warehouse        退货仓
+       AfterSaleItem    售后明细
+       Log              日志
+参考:output jason 文件:GetAfterSaleEdit_output.json
+
+14.UpdateAfterSaleE()售后单修改更新(售后详情修改)
+路由:http://localhost:5000/Core/AfterSale/UpdateAfterSaleE
+input:RID               int     售后ID,必填
+      Type              int     售后类型
+      SalerReturnAmt    decimal 卖家应退金额 
+      BuyerUpAmt        decimal 买家应补金额
+      ReturnAccount     string  退款账号
+      WarehouseID       int     仓库ID
+      Result            int     处理结果
+      Remark            string  问题描述
+      Express           string  快递
+      ExCode            string  运单号
+output:AfterSale        售后资料
+       AfterSaleItem    售后明细资料
+       Log              日志
+参考:input jason 文件:UpdateAfterSaleE_input.json
+参考:output jason 文件:UpdateAfterSaleE_output.json
+
+15.InsertASItemOrderE()新增售后单明细来自订单(售后详情新增)
+路由:http://localhost:5000/Core/AfterSale/InsertASItemOrderE
+input:RID         int         售后ID
+      DetailID    List<int>   订单明细ID
+output:AfterSaleItem    售后明细资料
+       Log              日志
+参考:input jason 文件:InsertASItemOrderE_input.json
+参考:output jason 文件:InsertASItemOrderE_output.json
+
+16.InsertASItemSkuE()新增售后单明细来自商品库(售后详情新增)
+路由:http://localhost:5000/Core/AfterSale/InsertASItemSkuE
+input:RID         int         售后ID
+      SkuID       List<int>   商品ID
+      ReturnType  int         类型
+output:SuccessIDs    售后明细资料
+       FailIDs       失败的skuid
+       Log           日志
+参考:input jason 文件:InsertASItemSkuE_input.json
+参考:output jason 文件:InsertASItemSkuE_output.json
+
+17.GetASOrderItemS() //售后订单查询
+路由:http://localhost:5000/Core/AfterSale/GetASOrderItemS
+input:OID                 string          内部订单单号
+OutPut:订单明细List
+参考:output jason 文件:GetASOrderItemS_output.json
+
+18.UpdateASItemE()修改售后明细(售后详情修改)
+路由:http://localhost:5000/Core/AfterSale/UpdateASItemE
+input:RID         int   售后ID
+      RDetailID   int   售后明细ID
+      Qty         int   数量
+output:日志
+参考:input jason 文件:UpdateASItemE_input.json
+参考:output jason 文件:UpdateASItemE_output.json
+
+19.DeleteASItemE()删除售后明细(售后详情删除)
+路由:http://localhost:5000/Core/AfterSale/DeleteASItemE
+input:RID         int   售后ID
+      RDetailID   int   售后明细ID
+output:AfterSaleItem    售后单明细
+       Log              日志
+参考:input jason 文件:DeleteASItemE_input.json
+参考:output jason 文件:DeleteASItemE_output.json
+
+20.RefreshAS() //售后详情关闭后刷新画面
+路由:http://localhost:5000/Core/AfterSale/RefreshAS
+input:RID   string      售后ID
+OutPut:AfterSale        售后单资料
+       AfterSaleItem    售后明细
+参考:output jason 文件:RefreshAS_output.json
+
+21.BindOrd()绑定订单
+路由:http://localhost:5000/Core/AfterSale/BindOrd
+input:RID   int         售后ID
+      OID   int         订单ID
+output:刷新后售后资料
+参考:input jason 文件:BindOrd_input.json
+参考:output jason 文件:BindOrd_output.json
+
+22.CancleAfterSale()作废
+路由:http://localhost:5000/Core/AfterSale/CancleAfterSale
+input:RID   List<int>   售后ID List
+output:SuccessIDs    成功的ID和状态
+       FailIDs       失败的ID和原因
+参考:input jason 文件:CancleAfterSale_input.json
+参考:output jason 文件:CancleAfterSale_output.json
+
+23.AgressReturn()同意退货
+路由:http://localhost:5000/Core/AfterSale/AgressReturn
+input:RID   List<int>   售后ID List
+output:SuccessIDs    成功的ID和线上状态
+       FailIDs       失败的ID和原因
+参考:input jason 文件:AgressReturn_input.json
+参考:output jason 文件:AgressReturn_output.json
+
+24.DisagressReturn()拒绝退货
+路由:http://localhost:5000/Core/AfterSale/DisagressReturn
+input:RID   List<int>   售后ID List
+output:SuccessIDs    成功的ID和线上状态
+       FailIDs       失败的ID和原因
+参考:input jason 文件:DisagressReturn_input.json
+参考:output jason 文件:DisagressReturn_output.json
+

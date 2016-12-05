@@ -34,6 +34,7 @@ namespace CoreModels.XyCore
         public DateTime _DateStart = DateTime.Parse("1900-01-01");//日期起
         public DateTime _DateEnd = DateTime.Parse("1900-01-01");//日期迄
         public string _SkuID = null;//商品编码
+        public string _GoodsCode = null;//款式编码
         public string _IsNoOID = "A";//是否无信息件
         public string _IsInterfaceLoad = "A";//接口下载
         public string _IsSubmitDis = "A";//分销提交
@@ -132,6 +133,11 @@ namespace CoreModels.XyCore
         {
             get { return _SkuID; }
             set { this._SkuID = value;}
+        }
+        public string GoodsCode
+        {
+            get { return _GoodsCode; }
+            set { this._GoodsCode = value;}
         }
         public string IsNoOID
         {
@@ -458,7 +464,7 @@ namespace CoreModels.XyCore
         public string SendMessage{get;set;}
         public string Express{get;set;}
         public string ExCode{get;set;}
-        public List<SkuList> SkuList{get;set;}
+        // public List<SkuList> SkuList{get;set;}
     }
     public class ASOrderData
     {
@@ -468,14 +474,172 @@ namespace CoreModels.XyCore
     }
     public class ASOrderInit
     {
-        public ASOrderData Order{get;set;}
-        public List<Filter> Shop{get;set;}
-        public List<Filter> Express{get;set;}
-        public List<Filter> Distributor{get;set;}
-        public List<Filter> SendWarehouse{get;set;}
         public List<Filter> IssueType{get;set;}
         public List<Filter> Type{get;set;}
         public List<Filter> Warehouse{get;set;}
         public int DefaultWare {get;set;}
+    }
+    public class ASOrderItem
+    {
+        public int ID{get;set;}
+        public string SkuID{get;set;}
+        public string SkuName{get;set;}
+        public string Norm{get;set;}
+        public int Qty{get;set;}
+        public string SalePrice{get;set;}
+        public string RealPrice{get;set;}
+        public string Amount{get;set;}
+        public string DiscountRate{get;set;}
+        public string img{get;set;}
+        public bool IsGift{get;set;}
+    }
+    public class AfterSaleItem
+    {
+        public int ID{get;set;}
+        public int RID{get;set;}
+        public int ReturnType{get;set;}
+        public int SkuAutoID{get;set;}
+        public string SkuID{get;set;}
+        public string SkuName{get;set;}
+        public string Norm{get;set;}
+        public string GoodsCode{get;set;}
+        public int RegisterQty{get;set;}
+        public int ReturnQty{get;set;}
+        public decimal Price{get;set;}
+        public decimal Amount{get;set;}
+        public string img{get;set;}
+        public int CoID{get;set;}
+        public string Creator{get;set;}
+        public DateTime CreateDate{get;set;}
+        public string Modifier{get;set;}
+        public DateTime ModifyDate{get;set;}
+    }
+    public class AfterSaleItemQuery
+    {
+        public int ID{get;set;}
+        public int ReturnType{get;set;}
+        public string ReturnTypeString{get;set;}
+        public int SkuAutoID{get;set;}
+        public string SkuID{get;set;}
+        public string SkuName{get;set;}
+        public string Norm{get;set;}
+        public string GoodsCode{get;set;}
+        public int RegisterQty{get;set;}
+        public int ReturnQty{get;set;}
+        public string Price{get;set;}
+        public string Amount{get;set;}
+        public string img{get;set;}
+        public string Creator{get;set;}
+    }
+    public class InsertASItemSkuReturn
+    {
+        public List<AfterSaleItemQuery> SuccessIDs{get;set;}
+        public List<InsertFailReason> FailIDs{get;set;}
+    }
+    public class AfterSaleEdit
+    {
+        public int ID{get;set;}
+        public int OID{get;set;}
+        public string ShopName{get;set;}
+        public int Status{get;set;}
+        public string StatusString{get;set;}
+        public string GoodsStatus{get;set;}
+        public long SoID{get;set;}
+        public string BuyerShopID{get;set;}
+        public string RecName{get;set;}
+        public string RecTel{get;set;}
+        public string RecPhone{get;set;}
+        public int Type{get;set;}
+        public string TypeString{get;set;}
+        public int IssueType{get;set;}
+        public string IssueTypeString{get;set;}
+        public string RegisterDate{get;set;}
+        public string SalerReturnAmt{get;set;}
+        public string BuyerUpAmt{get;set;}
+        public string RealReturnAmt{get;set;}
+        public string ReturnAccount{get;set;}
+        public int WarehouseID{get;set;}
+        public string RecWarehouse{get;set;}
+        public string Express{get;set;}
+        public string ExCode{get;set;}
+        public string Remark{get;set;}
+    }
+    public class AfterSaleEditReturn
+    {
+        public AfterSaleEdit AfterSale{get;set;}
+        public List<Filter> IssueType{get;set;}
+        public List<Filter> Type{get;set;}
+        public List<Filter> Warehouse{get;set;}
+        public List<AfterSaleItemQuery> AfterSaleItem{get;set;}
+        public List<OrderLog> Log{get;set;}
+    }
+    public class UpdateAfterSaleEReturn
+    {
+        public AfterSaleEdit AfterSale{get;set;}
+        public List<AfterSaleItemQuery> AfterSaleItem{get;set;}
+        public List<OrderLog> Log{get;set;}
+    }
+    public class InsertASItemOrderEReturn
+    {
+        public List<AfterSaleItemQuery> AfterSaleItem{get;set;}
+        public List<OrderLog> Log{get;set;}
+    }
+    public class InsertASItemSkuEReturn
+    {
+        public List<AfterSaleItemQuery> SuccessIDs{get;set;}
+        public List<InsertFailReason> FailIDs{get;set;}
+        public List<OrderLog> Log{get;set;}
+    }
+    public class BindOrdReturn
+    {
+        public List<AfterSaleQuery> SuccessIDs{get;set;}
+        public List<InsertFailReason> FailIDs{get;set;}
+    }
+    public class RefreshASReturn
+    {
+        public AfterSaleQuery AfterSale{get;set;}
+        public List<AfterSaleItemQuery> AfterSaleItem{get;set;}
+    }
+    public class GetAfterSaleItemReturn
+    {
+        public int Status{get;set;}
+        public int Type{get;set;}
+        public int OID{get;set;}
+        public List<AfterSaleItemQuery> AfterSaleItem{get;set;}
+    }
+    public class CancleAfterSaleSuccess
+    {
+        public int ID{get;set;}
+        public int Status{get;set;}
+        public string StatusString{get;set;}
+    }
+    public class CancleAfterSaleReturn
+    {
+        public List<CancleAfterSaleSuccess> SuccessIDs{get;set;}
+        public List<InsertFailReason> FailIDs{get;set;}
+    }
+    public class AgressReturnSuccess
+    {
+        public int ID{get;set;}
+        public string ShopStatus{get;set;}
+    }
+    public class AgressReturn
+    {
+        public List<AgressReturnSuccess> SuccessIDs{get;set;}
+        public List<InsertFailReason> FailIDs{get;set;}
+    }
+    public class ConfirmAfterSaleSuccess
+    {
+        public int ID{get;set;}
+        public int Status{get;set;}
+        public string StatusString{get;set;}
+        public string Modifier{get;set;}
+        public string ModifyDate{get;set;}
+        public string ConfirmDate{get;set;}
+    }
+    public class ConfirmAfterSaleReturn
+    {
+        public List<ConfirmAfterSaleSuccess> SuccessIDs{get;set;}
+        public List<InsertFailReason> FailIDs{get;set;}
     }
 }
