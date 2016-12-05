@@ -654,7 +654,7 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/AfterSale/InsertASItemSku")]
         public ResponseResult InsertASItemSku([FromBodyAttribute]JObject co)
         {   
-            int RID = 0,x;
+            int RID = 0,x,ReturnType;
             if(co["RID"] != null)
             {
                 string Text = co["RID"].ToString();
@@ -678,6 +678,29 @@ namespace CoreWebApi
             {
                 return CoreResult.NewResponse(-1, "售后ID必填", "General"); 
             }
+            if(co["ReturnType"] != null)
+            {
+                string Text = co["ReturnType"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (int.TryParse(Text, out x))
+                    {
+                        ReturnType = int.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "类型参数无效", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "类型必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "类型必填", "General"); 
+            }
             var oid = new List<int>();
             if(co["SkuID"] != null)
             {
@@ -689,7 +712,7 @@ namespace CoreWebApi
             }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
-            var data = AfterSaleHaddle.InsertASItemSku(CoID,username,RID,oid);
+            var data = AfterSaleHaddle.InsertASItemSku(CoID,username,RID,oid,ReturnType);
             var res = new InsertASItemSkuReturn();
             if(data.s == 1)
             {
@@ -1032,7 +1055,7 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/AfterSale/InsertASItemSkuE")]
         public ResponseResult InsertASItemSkuE([FromBodyAttribute]JObject co)
         {   
-            int RID = 0,x;
+            int RID = 0,x,ReturnType;
             if(co["RID"] != null)
             {
                 string Text = co["RID"].ToString();
@@ -1056,6 +1079,29 @@ namespace CoreWebApi
             {
                 return CoreResult.NewResponse(-1, "售后ID必填", "General"); 
             }
+            if(co["ReturnType"] != null)
+            {
+                string Text = co["ReturnType"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (int.TryParse(Text, out x))
+                    {
+                        ReturnType = int.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "类型参数无效", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "类型必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "类型必填", "General"); 
+            }
             var oid = new List<int>();
             if(co["SkuID"] != null)
             {
@@ -1067,7 +1113,7 @@ namespace CoreWebApi
             }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
-            var data = AfterSaleHaddle.InsertASItemSku(CoID,username,RID,oid);
+            var data = AfterSaleHaddle.InsertASItemSku(CoID,username,RID,oid,ReturnType);
             var res = new InsertASItemSkuEReturn();
             if(data.s == 1)
             {

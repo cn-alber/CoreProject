@@ -1311,14 +1311,14 @@ namespace CoreData.CoreCore
         ///<summary>
         ///从商品库新增明细
         ///</summary>
-        public static DataResult InsertASItemSku(int CoID,string UserName,int RID,List<int> SkuID)
+        public static DataResult InsertASItemSku(int CoID,string UserName,int RID,List<int> SkuID,int ReturnType)
         {
             var result = new DataResult(1,null);
             int count = 0;
             var logs = new List<LogInsert>();
             var log = new LogInsert();
             var rt = new List<InsertFailReason>();
-            int ReturnType = 0;
+            // int ReturnType = 0;
             string sqlcommand = string.Empty;
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
@@ -1345,18 +1345,18 @@ namespace CoreData.CoreCore
                     result.d = "待确认的售后单才可以新增明细!";
                     return result;
                 }
-                if(u[0].Type == 0)
-                {   
-                    ReturnType = 0;
-                }
-                if(u[0].Type == 2)
-                {   
-                    ReturnType = 1;
-                }
-                if(u[0].Type == 3)
-                {
-                    ReturnType = 2;
-                }
+                // if(u[0].Type == 0)
+                // {   
+                //     ReturnType = 0;
+                // }
+                // if(u[0].Type == 2)
+                // {   
+                //     ReturnType = 1;
+                // }
+                // if(u[0].Type == 3)
+                // {
+                //     ReturnType = 2;
+                // }
                 foreach (int a in SkuID)
                 {
                     InsertFailReason rf = new InsertFailReason();

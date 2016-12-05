@@ -151,6 +151,7 @@ output:售后单明细
 路由:http://localhost:5000/Core/AfterSale/InsertASItemSku
 input:RID         int         售后ID
       SkuID       List<int>   商品ID
+      ReturnType  int         类型
 output:售后单明细
 参考:input jason 文件:InsertASItemSku_input.json
 参考:output jason 文件:InsertASItemSku_output.json
@@ -215,6 +216,7 @@ output:AfterSaleItem    售后明细资料
 路由:http://localhost:5000/Core/AfterSale/InsertASItemSkuE
 input:RID         int         售后ID
       SkuID       List<int>   商品ID
+      ReturnType  int         类型
 output:SuccessIDs    售后明细资料
        FailIDs       失败的skuid
        Log           日志
