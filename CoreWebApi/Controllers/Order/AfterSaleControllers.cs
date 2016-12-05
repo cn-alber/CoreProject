@@ -831,12 +831,12 @@ namespace CoreWebApi
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = AfterSaleHaddle.DeleteASItem(CoID,username,RID,oid);
-            var res = new InsertASItemSkuReturn();
-            if(data.s == 1)
-            {
-                var d = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as GetAfterSaleItemReturn;
-                data.d = d.AfterSaleItem;
-            }
+            // var res = new InsertASItemSkuReturn();
+            // if(data.s == 1)
+            // {
+            //     var d = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as GetAfterSaleItemReturn;
+            //     data.d = d.AfterSaleItem;
+            // }
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -1228,7 +1228,7 @@ namespace CoreWebApi
         [HttpPostAttribute("/Core/AfterSale/BindOrd")]
         public ResponseResult BindOrd([FromBodyAttribute]JObject co)
         {   
-            int OID = 0,x;
+            int OID = 0,x,rid=0;
             if(co["OID"] != null)
             {
                 string Text = co["OID"].ToString();
@@ -1252,14 +1252,28 @@ namespace CoreWebApi
             {
                 return CoreResult.NewResponse(-1, "订单ID必填", "General"); 
             }
-            var rid = new List<int>();
             if(co["RID"] != null)
             {
-                rid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["RID"].ToString());
+                string Text = co["RID"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (int.TryParse(Text, out x))
+                    {
+                        rid = int.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "售后ID参数无效", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "售后ID必填", "General"); 
+                }
             }
             else
             {
-                return CoreResult.NewResponse(-1, "售后ID必填", "General");
+                return CoreResult.NewResponse(-1, "售后ID必填", "General"); 
             }
             string username = GetUname();
             int CoID = int.Parse(GetCoid());

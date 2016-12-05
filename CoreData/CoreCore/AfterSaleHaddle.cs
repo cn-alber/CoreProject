@@ -1739,15 +1739,15 @@ namespace CoreData.CoreCore
         ///<summary>
         ///绑定订单
         ///</summary>
-        public static DataResult BindOrd(List<int> RID,int OID,int CoID,string UserName)
+        public static DataResult BindOrd(int RID,int OID,int CoID,string UserName)
         {
             var result = new DataResult(1,null);
             int count = 0;
             var logs = new List<LogInsert>();
             var log = new LogInsert();
-            var res = new BindOrdReturn();
-            var fa = new List<InsertFailReason>();
-            var sID = new List<int>();
+            // var res = new BindOrdReturn();
+            // var fa = new List<InsertFailReason>();
+            // var sID = new List<int>();
             string sqlcommand = string.Empty;
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
             CoreDBconn.Open();
@@ -1770,70 +1770,63 @@ namespace CoreData.CoreCore
                     result.d = "售后单号无效";
                     return result;
                 }
-                foreach(var a in u)
+                var a = u[0] as AfterSale;
+                if(a.Status != 0)
                 {
-                    if(a.Status != 0)
+                    result.s = -1;
+                    result.d = "待确认的单据才可以绑定订单";
+                    return result;
+                }
+                if(a.OID != -1)
+                {
+                    result.s = -1;
+                    result.d = "无信息件才可以绑定订单";
+                    return result;
+                }
+                a.OID = order[0].ID;
+                a.SoID = order[0].SoID;
+                a.BuyerShopID = order[0].BuyerShopID;
+                a.RecName = order[0].RecName;
+                a.RecTel = order[0].RecTel;
+                a.RecPhone = order[0].RecPhone;
+                a.ShopID = order[0].ShopID;
+                a.ShopName = order[0].ShopName;
+                a.OrdType = order[0].Type;
+                a.Distributor = order[0].Distributor;
+                a.Modifier = UserName;
+                a.ModifyDate = DateTime.Now;
+                sqlcommand = @"update aftersale set OID=@OID,SoID=@SoID,BuyerShopID=@BuyerShopID,RecName=@RecName,RecTel=@RecTel,RecPhone=@RecPhone,ShopID=@ShopID,
+                                ShopName=@ShopName,OrdType=@OrdType,Distributor=@Distributor,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @CoID";
+                count = CoreDBconn.Execute(sqlcommand,a,TransCore);
+                if(count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }
+                log = new LogInsert();
+                log.OID = a.ID;
+                log.Type = 1;
+                log.LogDate = DateTime.Now;
+                log.UserName = UserName;
+                log.Title = "绑定订单";
+                log.Remark = a.OID.ToString();
+                log.CoID = CoID;
+                logs.Add(log);
+                if(a.Type == 1)
+                {
+                    sqlcommand = "select * from orderitem where oid = " + a.OID + " and coid = " + CoID;
+                    var item = CoreDBconn.Query<OrderItem>(sqlcommand).AsList();
+                    foreach(var it in item)
                     {
-                        var ff = new InsertFailReason();
-                        ff.id = a.ID;
-                        ff.reason = "待确认的单据才可以绑定订单!";
-                        fa.Add(ff);
-                        continue;
-                    }
-                    if(a.OID != -1)
-                    {
-                        var ff = new InsertFailReason();
-                        ff.id = a.ID;
-                        ff.reason = "无信息件才可以绑定订单!";
-                        fa.Add(ff);
-                        continue;
-                    }
-                    a.OID = order[0].ID;
-                    a.SoID = order[0].SoID;
-                    a.BuyerShopID = order[0].BuyerShopID;
-                    a.RecName = order[0].RecName;
-                    a.RecTel = order[0].RecTel;
-                    a.RecPhone = order[0].RecPhone;
-                    a.ShopID = order[0].ShopID;
-                    a.ShopName = order[0].ShopName;
-                    a.OrdType = order[0].Type;
-                    a.Distributor = order[0].Distributor;
-                    a.Modifier = UserName;
-                    a.ModifyDate = DateTime.Now;
-                    sqlcommand = @"update aftersale set OID=@OID,SoID=@SoID,BuyerShopID=@BuyerShopID,RecName=@RecName,RecTel=@RecTel,RecPhone=@RecPhone,ShopID=@ShopID,
-                                   ShopName=@ShopName,OrdType=@OrdType,Distributor=@Distributor,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @CoID";
-                    count = CoreDBconn.Execute(sqlcommand,a,TransCore);
-                    if(count < 0)
-                    {
-                        result.s = -3003;
-                        return result;
-                    }
-                    sID.Add(a.ID);
-                    log = new LogInsert();
-                    log.OID = a.ID;
-                    log.Type = 1;
-                    log.LogDate = DateTime.Now;
-                    log.UserName = UserName;
-                    log.Title = "绑定订单";
-                    log.Remark = a.OID.ToString();
-                    log.CoID = CoID;
-                    logs.Add(log);
-                    if(a.Type == 1)
-                    {
-                        sqlcommand = "select * from orderitem where oid = " + a.OID + " and coid = " + CoID;
-                        var item = CoreDBconn.Query<OrderItem>(sqlcommand).AsList();
-                        foreach(var it in item)
+                        sqlcommand = @"INSERT INTO aftersaleitem(RID,ReturnType,SkuAutoID,SkuID,SkuName,Norm,GoodsCode,RegisterQty,Price,Amount,Img,CoID,Creator,Modifier) 
+                                        VALUES(@RID,@ReturnType,@SkuAutoID,@SkuID,@SkuName,@Norm,@GoodsCode,@RegisterQty,@Price,@Amount,@Img,@CoID,@Creator,@Creator)";
+                        var args = new{RID = a.ID,ReturnType = 0,SkuAutoID=it.SkuAutoID,SkuID = it.SkuID,SkuName=it.SkuName,Norm=it.Norm,GoodsCode=it.GoodsCode,RegisterQty=it.Qty,
+                                        Price=it.RealPrice,Amount=it.Amount,Img=it.img,CoID=CoID,Creator=UserName};
+                        count = CoreDBconn.Execute(sqlcommand,args,TransCore);
+                        if(count < 0)
                         {
-                            sqlcommand = @"INSERT INTO aftersaleitem(RID,ReturnType,SkuAutoID,SkuID,SkuName,Norm,GoodsCode,RegisterQty,Price,Amount,Img,CoID,Creator,Modifier) 
-                                           VALUES(@RID,@ReturnType,@SkuAutoID,@SkuID,@SkuName,@Norm,@GoodsCode,@RegisterQty,@Price,@Amount,@Img,@CoID,@Creator,@Creator)";
-                            var args = new{RID = a.ID,ReturnType = 0,SkuAutoID=it.SkuAutoID,SkuID = it.SkuID,SkuName=it.SkuName,Norm=it.Norm,GoodsCode=it.GoodsCode,RegisterQty=it.Qty,
-                                           Price=it.RealPrice,Amount=it.Amount,Img=it.img,CoID=CoID,Creator=UserName};
-                            count = CoreDBconn.Execute(sqlcommand,args,TransCore);
-                            if(count < 0)
-                            {
-                                result.s = -3002;
-                                return result;
-                            }
+                            result.s = -3002;
+                            return result;
                         }
                     }
                 }
@@ -1859,15 +1852,14 @@ namespace CoreData.CoreCore
                 TransCore.Dispose();
                 CoreDBconn.Dispose();
             }                
-            res.FailIDs = fa;
-            if(sID.Count > 0)
+            if(result.s > 0)
             {
                 sqlcommand = @"select ID,OID,RegisterDate,BuyerShopID,RecName,Type,RecPhone,SalerReturnAmt,BuyerUpAmt,RealReturnAmt,ReturnAccount,ShopName,WarehouseID,RecWarehouse,
                                 SoID,IssueType,OrdType,Remark,Status,ShopStatus,Result,GoodsStatus,ModifyDate,Modifier,Creator,RefundStatus,Express,ExCode,IsSubmit,ConfirmDate
-                                from aftersale where id in @ID and coid = @Coid";  
+                                from aftersale where id = @ID and coid = @Coid";  
                 using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                     try{    
-                        var u = conn.Query<AfterSaleQuery>(sqlcommand,new{ID=sID,Coid = CoID}).AsList();
+                        var u = conn.Query<AfterSaleQuery>(sqlcommand,new{ID=RID,Coid = CoID}).AsList();
                         foreach(var a in u)
                         {
                             a.TypeString = Enum.GetName(typeof(ASType), a.Type);
@@ -1876,7 +1868,7 @@ namespace CoreData.CoreCore
                             a.StatusString = Enum.GetName(typeof(ASStatus), a.Status);
                             a.ResultString = Enum.GetName(typeof(Result), a.Result);
                         }
-                        res.SuccessIDs = u;
+                        result.d = u[0];
                     }catch(Exception ex){
                         result.s = -1;
                         result.d = ex.Message;
@@ -1884,7 +1876,6 @@ namespace CoreData.CoreCore
                     }
                 }       
             }
-            result.d = res; 
             return result;
         }
         ///<summary>
@@ -2270,6 +2261,7 @@ namespace CoreData.CoreCore
                             fa.Add(ff);
                             continue;
                         }
+                        //订单明细
                         var orditems = new List<OrderItem>();
                         decimal amt = 0,weight = 0;
                         int qty = 0;
@@ -2303,60 +2295,332 @@ namespace CoreData.CoreCore
                         }
                         sqlcommand = "select * from `order` where id = " + a.OID + " and coid = " + CoID;
                         var ord = CoreDBconn.Query<Order>(sqlcommand).AsList();
+                        //订单资料
                         var ordNew = new Order();
-                        // ordNew.Type
-                        // ordNew.DealerType
-                        // ordNew.MergeOID
-                        // ordNew.IsMerge
-                        // ordNew.IsSplit
-                        // ordNew.OSource
-                        // ordNew.ODate
-                        // ordNew.CoID
-                        // ordNew.BuyerID
-                        // ordNew.BuyerShopID
-                        // ordNew.ShopID
-                        // ordNew.ShopName
-                        // ordNew.ShopSit
-                        // ordNew.SoID
-                        // ordNew.MergeSoID
-                        // ordNew.OrdQty
-                        // ordNew.Amount
-                        // ordNew.SkuAmount
-                        // ordNew.PaidAmount
-                        // ordNew.PayAmount
-                        // ordNew.ExAmount
-                        // ordNew.IsInvoice
-                        // ordNew.InvoiceType
-                        // ordNew.InvoiceTitle
-                        // ordNew.InvoiceDate
-                        // ordNew.IsPaid
-                        // ordNew.PayDate
-                        // ordNew.PayNbr
-                        // ordNew.IsCOD
-                        // ordNew.Status
-                        // ordNew.AbnormalStatus
-                        // ordNew.StatusDec
-                        // ordNew.ShopStatus
-                        // ordNew.RecName
-                        // ordNew.RecLogistics
-                        // ordNew.RecCity
-                        // ordNew.RecDistrict
-                        // ordNew.RecAddress
-                        // ordNew.RecZip
-                        // ordNew.RecTel
-                        // ordNew.RecPhone
-                        // ordNew.RecMessage
-                        // ordNew.SendMessage
-                        // ordNew.ExWeight
-                        // ordNew.Distributor
-                        // ordNew.SupDistributor
-                        // ordNew.Creator
-                        // ordNew.Modifier
-                        
+                        if(ord[0].Type == 0 || ord[0].Type == 1 || ord[0].Type == 2 ||ord[0].Type == 3 ||ord[0].Type == 4 ||ord[0].Type == 5)
+                        {
+                            ordNew.Type = 2;
+                        }
+                        if(ord[0].Type == 6 || ord[0].Type == 7 || ord[0].Type == 8 ||ord[0].Type == 9 ||ord[0].Type == 10)
+                        {
+                            ordNew.Type = 8;
+                        }
+                        if(ord[0].Type == 11 || ord[0].Type == 12 ||ord[0].Type == 13 ||ord[0].Type == 14 ||ord[0].Type == 15)
+                        {
+                            ordNew.Type = 13;
+                        }
+                        if(ord[0].Type == 16 || ord[0].Type == 17 || ord[0].Type == 18 ||ord[0].Type == 19 ||ord[0].Type == 20)
+                        {
+                            ordNew.Type = 18;
+                        }
+                        ordNew.DealerType = ord[0].DealerType;
+                        ordNew.MergeOID = ord[0].MergeOID;
+                        ordNew.IsMerge = ord[0].IsMerge;
+                        ordNew.IsSplit = ord[0].IsSplit;
+                        ordNew.OSource = 6;
+                        ordNew.ODate = DateTime.Now;
+                        ordNew.CoID = CoID;
+                        ordNew.BuyerID = ord[0].BuyerID;
+                        ordNew.BuyerShopID = ord[0].BuyerShopID;
+                        ordNew.ShopID = ord[0].ShopID;
+                        ordNew.ShopName = ord[0].ShopName;
+                        ordNew.ShopSit = ord[0].ShopSit;
+                        ordNew.SoID = ord[0].SoID;
+                        ordNew.MergeSoID = ord[0].MergeSoID;
+                        ordNew.OrdQty = qty;
+                        ordNew.Amount = amt.ToString();
+                        ordNew.SkuAmount = amt.ToString();
+                        ordNew.PaidAmount = amt.ToString();
+                        ordNew.PayAmount = amt.ToString();
+                        ordNew.ExAmount = "0";
+                        ordNew.IsInvoice = ord[0].IsInvoice;
+                        ordNew.InvoiceType = ord[0].InvoiceType;
+                        ordNew.InvoiceTitle = ord[0].InvoiceTitle;
+                        ordNew.InvoiceDate = ord[0].InvoiceDate;
+                        ordNew.IsPaid = true;
+                        ordNew.PayDate = DateTime.Now;
+                        ordNew.PayNbr = ord[0].PayNbr + "_In";
+                        ordNew.IsCOD = false;
+                        if(business.isexceptions == true)
+                        {
+                            int reasonid = OrderHaddle.GetReasonID("等待售后收货",CoID,7).s;
+                            if(reasonid == -1)
+                            {
+                                result.s = -1;
+                                result.d = "请先设定【等待售后收货】的异常";
+                                return result;
+                            }
+                            ordNew.Status = 7;
+                            ordNew.AbnormalStatus = reasonid;
+                            ordNew.StatusDec = "等待售后收货";
+                        }
+                        else
+                        {
+                            ordNew.Status = 1;
+                            ordNew.AbnormalStatus = 0;
+                            ordNew.StatusDec = "";
+                        }
+                        ordNew.ShopStatus = ord[0].ShopStatus;
+                        ordNew.RecName = ord[0].RecName;
+                        ordNew.RecLogistics = ord[0].RecLogistics;
+                        ordNew.RecCity = ord[0].RecCity;
+                        ordNew.RecDistrict = ord[0].RecDistrict;
+                        ordNew.RecAddress = ord[0].RecAddress;
+                        ordNew.RecZip = ord[0].RecZip;
+                        ordNew.RecTel = ord[0].RecTel;
+                        ordNew.RecPhone = ord[0].RecPhone;
+                        ordNew.RecMessage = ord[0].RecMessage;
+                        ordNew.SendMessage = ord[0].SendMessage;
+                        ordNew.ExWeight = weight.ToString();
+                        ordNew.Distributor = ord[0].Distributor;
+                        ordNew.SupDistributor = ord[0].SupDistributor;
+                        ordNew.Creator = UserName;
+                        ordNew.Modifier = UserName;
+                        int rtn = 0;
+                        sqlcommand = @"INSERT INTO `order`(Type,DealerType,MergeOID,IsMerge,IsSplit,OSource,ODate,CoID,BuyerID,BuyerShopID,ShopID,ShopName,ShopSit,SoID,
+                                                           MergeSoID,OrdQty,Amount,SkuAmount,PaidAmount,PayAmount,ExAmount,IsInvoice,InvoiceType,InvoiceTitle,InvoiceDate,
+                                                           IsPaid,PayDate,PayNbr,IsCOD,Status,AbnormalStatus,StatusDec,ShopStatus,RecName,RecLogistics,RecCity,RecDistrict,
+                                                           RecAddress,RecZip,RecTel,RecPhone,RecMessage,SendMessage,ExWeight,Distributor,SupDistributor,Creator,Modifier) 
+                                       VALUES(@Type,@DealerType,@MergeOID,@IsMerge,@IsSplit,@OSource,@ODate,@CoID,@BuyerID,@BuyerShopID,@ShopID,@ShopName,@ShopSit,@SoID,
+                                              @MergeSoID,@OrdQty,@Amount,@SkuAmount,@PaidAmount,@PayAmount,@ExAmount,@IsInvoice,@InvoiceType,@InvoiceTitle,@InvoiceDate,
+                                              @IsPaid,@PayDate,@PayNbr,@IsCOD,@Status,@AbnormalStatus,@StatusDec,@ShopStatus,@RecName,@RecLogistics,@RecCity,@RecDistrict,
+                                              @RecAddress,@RecZip,@RecTel,@RecPhone,@RecMessage,@SendMessage,@ExWeight,@Distributor,@SupDistributor,@Creator,@Modifier)";
+                        count = CoreDBconn.Execute(sqlcommand,ordNew,TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3002;
+                            return result;
+                        }
+                        else
+                        {
+                            rtn = CoreDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
+                        }
+                        foreach(var i in orditems)
+                        {
+                            i.OID = rtn;
+                        }
+                        sqlcommand = @"INSERT INTO orderitem(OID,SoID,CoID,SkuAutoID,SkuID,SkuName,Norm,GoodsCode,Qty,SalePrice,RealPrice,Amount,DiscountRate,img,
+                                                             Weight,TotalWeight,Creator,Modifier) 
+                                       VALUES(@OID,@SoID,@CoID,@SkuAutoID,@SkuID,@SkuName,@Norm,@GoodsCode,@Qty,@SalePrice,@RealPrice,@Amount,@DiscountRate,@img,
+                                              @Weight,@TotalWeight,@Creator,@Modifier)";
+                        count = CoreDBconn.Execute(sqlcommand,orditems,TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3002;
+                            return result;
+                        }
+                        //付款资料
+                        var pay = new PayInfo();
+                        pay.PayNbr = ordNew.PayNbr;
+                        pay.RecID = ordNew.BuyerID;
+                        pay.RecName = ordNew.RecName;
+                        pay.OID = rtn;
+                        pay.SoID = ordNew.SoID;
+                        pay.Payment = "内部流转";
+                        pay.PayDate = ordNew.PayDate;
+                        pay.Amount = ordNew.PaidAmount;
+                        pay.PayAmount = ordNew.PaidAmount;
+                        pay.DataSource = 0;
+                        pay.Status = 1;
+                        pay.CoID = CoID;
+                        pay.Creator = UserName;
+                        pay.Confirmer = UserName;
+                        sqlcommand = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SoID,Payment,PayDate,Amount,PayAmount,DataSource,Status,CoID,Creator,Confirmer) 
+                                       VALUES(@PayNbr,@RecID,@RecName,@OID,@SoID,@Payment,@PayDate,@Amount,@PayAmount,@DataSource,@Status,@CoID,@Creator,@Confirmer)";
+                        count = CoreDBconn.Execute(sqlcommand,pay,TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3002;
+                            return result;
+                        }
+                        //Log
+                        log = new LogInsert();
+                        log.OID = rtn;
+                        log.SoID = a.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "接单时间";
+                        log.Remark = "售后时间";
+                        log.CoID = CoID;
+                        logs.Add(log);
                     }
                     if(a.Type == 3 && a.OID > -1)//产生补发订单
                     {
-
+                        sqlcommand = "select * from aftersale where rid = " + a.ID + " and coid = " + CoID;
+                        var item = CoreDBconn.Query<AfterSaleItem>(sqlcommand).AsList();
+                        //订单明细
+                        var orditems = new List<OrderItem>();
+                        decimal amt = 0,weight = 0;
+                        int qty = 0;
+                        foreach(var i in item)
+                        {
+                            string skusql = "select saleprice,weight from coresku where id =" + i.SkuAutoID + " and coid =" + CoID;
+                            var s = CoreDBconn.Query<SkuInsert>(skusql).AsList();
+                            var orditem = new OrderItem();
+                            orditem.SoID = a.SoID;
+                            orditem.CoID = CoID;
+                            orditem.SkuAutoID = i.SkuAutoID;
+                            orditem.SkuID = i.SkuID;
+                            orditem.SkuName = i.SkuName;
+                            orditem.Norm = i.Norm;
+                            orditem.GoodsCode = i.GoodsCode;
+                            orditem.Qty = i.RegisterQty;
+                            orditem.SalePrice = s[0].saleprice;
+                            orditem.RealPrice = i.Price.ToString();
+                            orditem.Amount = i.Amount.ToString();
+                            orditem.DiscountRate = (i.Price/decimal.Parse(s[0].saleprice)).ToString();
+                            orditem.img = i.img;
+                            orditem.Weight = s[0].weight;
+                            orditem.TotalWeight = (decimal.Parse(s[0].weight) * i.RegisterQty).ToString();
+                            orditem.Creator = UserName;
+                            orditem.Modifier = UserName;
+                            orditems.Add(orditem);
+                            qty = qty + i.RegisterQty;
+                            amt = amt + i.Amount;
+                            weight = weight + decimal.Parse(orditem.TotalWeight);
+                        }
+                        sqlcommand = "select * from `order` where id = " + a.OID + " and coid = " + CoID;
+                        var ord = CoreDBconn.Query<Order>(sqlcommand).AsList();
+                        //订单资料
+                        var ordNew = new Order();
+                        if(ord[0].Type == 0 || ord[0].Type == 1 || ord[0].Type == 2 ||ord[0].Type == 3 ||ord[0].Type == 4 ||ord[0].Type == 5)
+                        {
+                            ordNew.Type = 1;
+                        }
+                        if(ord[0].Type == 6 || ord[0].Type == 7 || ord[0].Type == 8 ||ord[0].Type == 9 ||ord[0].Type == 10)
+                        {
+                            ordNew.Type = 7;
+                        }
+                        if(ord[0].Type == 11 || ord[0].Type == 12 ||ord[0].Type == 13 ||ord[0].Type == 14 ||ord[0].Type == 15)
+                        {
+                            ordNew.Type = 12;
+                        }
+                        if(ord[0].Type == 16 || ord[0].Type == 17 || ord[0].Type == 18 ||ord[0].Type == 19 ||ord[0].Type == 20)
+                        {
+                            ordNew.Type = 17;
+                        }
+                        ordNew.DealerType = ord[0].DealerType;
+                        ordNew.MergeOID = ord[0].MergeOID;
+                        ordNew.IsMerge = ord[0].IsMerge;
+                        ordNew.IsSplit = ord[0].IsSplit;
+                        ordNew.OSource = 6;
+                        ordNew.ODate = DateTime.Now;
+                        ordNew.CoID = CoID;
+                        ordNew.BuyerID = ord[0].BuyerID;
+                        ordNew.BuyerShopID = ord[0].BuyerShopID;
+                        ordNew.ShopID = ord[0].ShopID;
+                        ordNew.ShopName = ord[0].ShopName;
+                        ordNew.ShopSit = ord[0].ShopSit;
+                        ordNew.SoID = ord[0].SoID;
+                        ordNew.MergeSoID = ord[0].MergeSoID;
+                        ordNew.OrdQty = qty;
+                        ordNew.Amount = amt.ToString();
+                        ordNew.SkuAmount = amt.ToString();
+                        ordNew.PaidAmount = amt.ToString();
+                        ordNew.PayAmount = amt.ToString();
+                        ordNew.ExAmount = "0";
+                        ordNew.IsInvoice = ord[0].IsInvoice;
+                        ordNew.InvoiceType = ord[0].InvoiceType;
+                        ordNew.InvoiceTitle = ord[0].InvoiceTitle;
+                        ordNew.InvoiceDate = ord[0].InvoiceDate;
+                        ordNew.IsPaid = true;
+                        if(amt > 0)
+                        {
+                            ordNew.PayDate = DateTime.Now;
+                            ordNew.PayNbr = ord[0].PayNbr + "_In";
+                        }
+                        ordNew.IsCOD = false;
+                        ordNew.Status = 1;
+                        ordNew.AbnormalStatus = 0;
+                        ordNew.StatusDec = "";
+                        ordNew.ShopStatus = ord[0].ShopStatus;
+                        ordNew.RecName = ord[0].RecName;
+                        ordNew.RecLogistics = ord[0].RecLogistics;
+                        ordNew.RecCity = ord[0].RecCity;
+                        ordNew.RecDistrict = ord[0].RecDistrict;
+                        ordNew.RecAddress = ord[0].RecAddress;
+                        ordNew.RecZip = ord[0].RecZip;
+                        ordNew.RecTel = ord[0].RecTel;
+                        ordNew.RecPhone = ord[0].RecPhone;
+                        ordNew.RecMessage = ord[0].RecMessage;
+                        ordNew.SendMessage = ord[0].SendMessage;
+                        ordNew.ExWeight = weight.ToString();
+                        ordNew.Distributor = ord[0].Distributor;
+                        ordNew.SupDistributor = ord[0].SupDistributor;
+                        ordNew.Creator = UserName;
+                        ordNew.Modifier = UserName;
+                        int rtn = 0;
+                        sqlcommand = @"INSERT INTO `order`(Type,DealerType,MergeOID,IsMerge,IsSplit,OSource,ODate,CoID,BuyerID,BuyerShopID,ShopID,ShopName,ShopSit,SoID,
+                                                           MergeSoID,OrdQty,Amount,SkuAmount,PaidAmount,PayAmount,ExAmount,IsInvoice,InvoiceType,InvoiceTitle,InvoiceDate,
+                                                           IsPaid,PayDate,PayNbr,IsCOD,Status,AbnormalStatus,StatusDec,ShopStatus,RecName,RecLogistics,RecCity,RecDistrict,
+                                                           RecAddress,RecZip,RecTel,RecPhone,RecMessage,SendMessage,ExWeight,Distributor,SupDistributor,Creator,Modifier) 
+                                       VALUES(@Type,@DealerType,@MergeOID,@IsMerge,@IsSplit,@OSource,@ODate,@CoID,@BuyerID,@BuyerShopID,@ShopID,@ShopName,@ShopSit,@SoID,
+                                              @MergeSoID,@OrdQty,@Amount,@SkuAmount,@PaidAmount,@PayAmount,@ExAmount,@IsInvoice,@InvoiceType,@InvoiceTitle,@InvoiceDate,
+                                              @IsPaid,@PayDate,@PayNbr,@IsCOD,@Status,@AbnormalStatus,@StatusDec,@ShopStatus,@RecName,@RecLogistics,@RecCity,@RecDistrict,
+                                              @RecAddress,@RecZip,@RecTel,@RecPhone,@RecMessage,@SendMessage,@ExWeight,@Distributor,@SupDistributor,@Creator,@Modifier)";
+                        count = CoreDBconn.Execute(sqlcommand,ordNew,TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3002;
+                            return result;
+                        }
+                        else
+                        {
+                            rtn = CoreDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
+                        }
+                        foreach(var i in orditems)
+                        {
+                            i.OID = rtn;
+                        }
+                        sqlcommand = @"INSERT INTO orderitem(OID,SoID,CoID,SkuAutoID,SkuID,SkuName,Norm,GoodsCode,Qty,SalePrice,RealPrice,Amount,DiscountRate,img,
+                                                             Weight,TotalWeight,Creator,Modifier) 
+                                       VALUES(@OID,@SoID,@CoID,@SkuAutoID,@SkuID,@SkuName,@Norm,@GoodsCode,@Qty,@SalePrice,@RealPrice,@Amount,@DiscountRate,@img,
+                                              @Weight,@TotalWeight,@Creator,@Modifier)";
+                        count = CoreDBconn.Execute(sqlcommand,orditems,TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3002;
+                            return result;
+                        }
+                        //付款资料
+                        if(amt > 0)
+                        {
+                            var pay = new PayInfo();
+                            pay.PayNbr = ordNew.PayNbr;
+                            pay.RecID = ordNew.BuyerID;
+                            pay.RecName = ordNew.RecName;
+                            pay.OID = rtn;
+                            pay.SoID = ordNew.SoID;
+                            pay.Payment = "内部流转";
+                            pay.PayDate = ordNew.PayDate;
+                            pay.Amount = ordNew.PaidAmount;
+                            pay.PayAmount = ordNew.PaidAmount;
+                            pay.DataSource = 0;
+                            pay.Status = 1;
+                            pay.CoID = CoID;
+                            pay.Creator = UserName;
+                            pay.Confirmer = UserName;
+                            sqlcommand = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SoID,Payment,PayDate,Amount,PayAmount,DataSource,Status,CoID,Creator,Confirmer) 
+                                        VALUES(@PayNbr,@RecID,@RecName,@OID,@SoID,@Payment,@PayDate,@Amount,@PayAmount,@DataSource,@Status,@CoID,@Creator,@Confirmer)";
+                            count = CoreDBconn.Execute(sqlcommand,pay,TransCore);
+                            if(count < 0)
+                            {
+                                result.s = -3002;
+                                return result;
+                            }
+                        }
+                        //Log
+                        log = new LogInsert();
+                        log.OID = rtn;
+                        log.SoID = a.SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "接单时间";
+                        log.Remark = "售后时间";
+                        log.CoID = CoID;
+                        logs.Add(log);
                     }
                     a.Status = 1;
                     a.Modifier = UserName;
