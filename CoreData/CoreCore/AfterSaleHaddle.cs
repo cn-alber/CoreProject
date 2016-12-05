@@ -1762,7 +1762,7 @@ namespace CoreData.CoreCore
                     result.d = "订单单号无效";
                     return result;
                 }
-                sqlcommand = "select * from aftersale where id in @ID and coid = @CoID";
+                sqlcommand = "select * from aftersale where id = @ID and coid = @CoID";
                 var u = CoreDBconn.Query<AfterSale>(sqlcommand,new{ID = RID,CoID = CoID}).AsList();
                 if(u.Count == 0)
                 {
