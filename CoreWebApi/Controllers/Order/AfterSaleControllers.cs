@@ -621,7 +621,8 @@ namespace CoreWebApi
             var data = AfterSaleHaddle.InsertASItemOrder(CoID,username,RID,oid);
             if(data.s == 1)
             {
-                data = AfterSaleHaddle.GetAfterSaleItem(CoID,RID);
+                var res = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as GetAfterSaleItemReturn;
+                data.d = res.AfterSaleItem;
             }
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -692,7 +693,8 @@ namespace CoreWebApi
             var res = new InsertASItemSkuReturn();
             if(data.s == 1)
             {
-                res.SuccessIDs = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as List<AfterSaleItemQuery>;
+                var d = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as GetAfterSaleItemReturn;
+                res.SuccessIDs = d.AfterSaleItem as List<AfterSaleItemQuery>;
                 res.FailIDs = data.d  as List<InsertFailReason>;
                 data.d = res;
             }
@@ -832,7 +834,8 @@ namespace CoreWebApi
             var res = new InsertASItemSkuReturn();
             if(data.s == 1)
             {
-                data = AfterSaleHaddle.GetAfterSaleItem(CoID,RID);
+                var d = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as GetAfterSaleItemReturn;
+                data.d = d.AfterSaleItem;
             }
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -968,7 +971,8 @@ namespace CoreWebApi
             if(data.s == 1)
             {
                 res.AfterSale = AfterSaleHaddle.GetAfterSaleSingle(RID,CoID).d as AfterSaleEdit;
-                res.AfterSaleItem = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as List<AfterSaleItemQuery>;
+                var d = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as GetAfterSaleItemReturn;
+                res.AfterSaleItem = d.AfterSaleItem;
                 res.Log = AfterSaleHaddle.GetOrderLog(RID,CoID).d as List<OrderLog>;
                 data.d = res;
             }
@@ -1017,7 +1021,8 @@ namespace CoreWebApi
             var res = new InsertASItemOrderEReturn();
             if(data.s == 1)
             {
-                res.AfterSaleItem = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as List<AfterSaleItemQuery>;
+                var d = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as GetAfterSaleItemReturn;
+                res.AfterSaleItem = d.AfterSaleItem as List<AfterSaleItemQuery>;
                 res.Log = AfterSaleHaddle.GetOrderLog(RID,CoID).d as List<OrderLog>;
                 data.d = res;
             }
@@ -1066,7 +1071,8 @@ namespace CoreWebApi
             var res = new InsertASItemSkuEReturn();
             if(data.s == 1)
             {
-                res.SuccessIDs = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as List<AfterSaleItemQuery>;
+                var d = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as GetAfterSaleItemReturn;
+                res.SuccessIDs = d.AfterSaleItem as List<AfterSaleItemQuery>;
                 res.FailIDs = data.d  as List<InsertFailReason>;
                 res.Log = AfterSaleHaddle.GetOrderLog(RID,CoID).d as List<OrderLog>;
                 data.d = res;
@@ -1211,7 +1217,8 @@ namespace CoreWebApi
             var res = new InsertASItemOrderEReturn();
             if(data.s == 1)
             {
-                res.AfterSaleItem = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as List<AfterSaleItemQuery>;
+                var d = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as GetAfterSaleItemReturn;
+                res.AfterSaleItem = d.AfterSaleItem as List<AfterSaleItemQuery>;
                 res.Log = AfterSaleHaddle.GetOrderLog(RID,CoID).d as List<OrderLog>;
                 data.d = res;
             }

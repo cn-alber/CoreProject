@@ -2208,5 +2208,213 @@ namespace CoreData.CoreCore
             result.d = res; 
             return result;
         }
+        ///<summary>
+        ///确认
+        ///</summary>
+        public static DataResult ConfirmAfterSale(List<int> RID,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var bu = OrderHaddle.GetConfig(CoID);
+            var business = bu.d as Business;
+            int count = 0;
+            var logs = new List<LogInsert>();
+            var log = new LogInsert();
+            var res = new ConfirmAfterSaleReturn();
+            var fa = new List<InsertFailReason>();
+            var su = new List<ConfirmAfterSaleSuccess>();
+            string sqlcommand = string.Empty;
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                sqlcommand = "select * from aftersale where id in @ID and coid = @CoID";
+                var u = CoreDBconn.Query<AfterSale>(sqlcommand,new{ID = RID,CoID = CoID}).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "售后单号无效";
+                    return result;
+                }
+                foreach(var a in u)
+                {
+                    if(a.Status != 0)
+                    {
+                        var ff = new InsertFailReason();
+                        ff.id = a.ID;
+                        ff.reason = "只有待确认的单据才可以操作!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    if(a.Type == 2 && a.OID > -1)//检查换货的售后单，明细中换货&退货的资料是否匹配,产生换货订单
+                    {
+                        sqlcommand = "select * from aftersale where rid = " + a.ID + " and coid = " + CoID;
+                        var item = CoreDBconn.Query<AfterSaleItem>(sqlcommand).AsList();
+                        int x = 0,y = 0;
+                        foreach(var i in item)
+                        {
+                            if(i.ReturnType == 0)
+                            {
+                                x ++;
+                            }
+                            if(i.ReturnType == 1)
+                            {
+                                y ++;
+                            }
+                        }
+                        if(x != y)
+                        {
+                            var ff = new InsertFailReason();
+                            ff.id = a.ID;
+                            ff.reason = "退货的商品数量不等于换货的商品数量!";
+                            fa.Add(ff);
+                            continue;
+                        }
+                        var orditems = new List<OrderItem>();
+                        decimal amt = 0,weight = 0;
+                        int qty = 0;
+                        foreach(var i in item)
+                        {
+                            if(i.ReturnType == 0) continue;
+                            string skusql = "select saleprice,weight from coresku where id =" + i.SkuAutoID + " and coid =" + CoID;
+                            var s = CoreDBconn.Query<SkuInsert>(skusql).AsList();
+                            var orditem = new OrderItem();
+                            orditem.SoID = a.SoID;
+                            orditem.CoID = CoID;
+                            orditem.SkuAutoID = i.SkuAutoID;
+                            orditem.SkuID = i.SkuID;
+                            orditem.SkuName = i.SkuName;
+                            orditem.Norm = i.Norm;
+                            orditem.GoodsCode = i.GoodsCode;
+                            orditem.Qty = i.RegisterQty;
+                            orditem.SalePrice = s[0].saleprice;
+                            orditem.RealPrice = i.Price.ToString();
+                            orditem.Amount = i.Amount.ToString();
+                            orditem.DiscountRate = (i.Price/decimal.Parse(s[0].saleprice)).ToString();
+                            orditem.img = i.img;
+                            orditem.Weight = s[0].weight;
+                            orditem.TotalWeight = (decimal.Parse(s[0].weight) * i.RegisterQty).ToString();
+                            orditem.Creator = UserName;
+                            orditem.Modifier = UserName;
+                            orditems.Add(orditem);
+                            qty = qty + i.RegisterQty;
+                            amt = amt + i.Amount;
+                            weight = weight + decimal.Parse(orditem.TotalWeight);
+                        }
+                        sqlcommand = "select * from `order` where id = " + a.OID + " and coid = " + CoID;
+                        var ord = CoreDBconn.Query<Order>(sqlcommand).AsList();
+                        var ordNew = new Order();
+                        // ordNew.Type
+                        // ordNew.DealerType
+                        // ordNew.MergeOID
+                        // ordNew.IsMerge
+                        // ordNew.IsSplit
+                        // ordNew.OSource
+                        // ordNew.ODate
+                        // ordNew.CoID
+                        // ordNew.BuyerID
+                        // ordNew.BuyerShopID
+                        // ordNew.ShopID
+                        // ordNew.ShopName
+                        // ordNew.ShopSit
+                        // ordNew.SoID
+                        // ordNew.MergeSoID
+                        // ordNew.OrdQty
+                        // ordNew.Amount
+                        // ordNew.SkuAmount
+                        // ordNew.PaidAmount
+                        // ordNew.PayAmount
+                        // ordNew.ExAmount
+                        // ordNew.IsInvoice
+                        // ordNew.InvoiceType
+                        // ordNew.InvoiceTitle
+                        // ordNew.InvoiceDate
+                        // ordNew.IsPaid
+                        // ordNew.PayDate
+                        // ordNew.PayNbr
+                        // ordNew.IsCOD
+                        // ordNew.Status
+                        // ordNew.AbnormalStatus
+                        // ordNew.StatusDec
+                        // ordNew.ShopStatus
+                        // ordNew.RecName
+                        // ordNew.RecLogistics
+                        // ordNew.RecCity
+                        // ordNew.RecDistrict
+                        // ordNew.RecAddress
+                        // ordNew.RecZip
+                        // ordNew.RecTel
+                        // ordNew.RecPhone
+                        // ordNew.RecMessage
+                        // ordNew.SendMessage
+                        // ordNew.ExWeight
+                        // ordNew.Distributor
+                        // ordNew.SupDistributor
+                        // ordNew.Creator
+                        // ordNew.Modifier
+                        
+                    }
+                    if(a.Type == 3 && a.OID > -1)//产生补发订单
+                    {
+
+                    }
+                    a.Status = 1;
+                    a.Modifier = UserName;
+                    a.ModifyDate = DateTime.Now;
+                    a.ConfirmDate = DateTime.Now;
+                    sqlcommand = @"update aftersale set Status=@Status,Modifier=@Modifier,ModifyDate=@ModifyDate,ConfirmDate=@ConfirmDate where id = @ID and coid = @CoID";
+                    count = CoreDBconn.Execute(sqlcommand,a,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+       
+                    log = new LogInsert();
+                    log.OID = a.ID;
+                    log.Type = 1;
+                    log.LogDate = DateTime.Now;
+                    log.UserName = UserName;
+                    log.Title = "确认";
+                    log.Remark = "Confirm";
+                    log.CoID = CoID;
+                    logs.Add(log);
+                    
+                    var ss = new ConfirmAfterSaleSuccess();
+                    ss.ID = a.ID;
+                    ss.Status = a.Status;
+                    ss.StatusString = Enum.GetName(typeof(ASStatus), a.Status);
+                    ss.Modifier = a.Modifier;
+                    ss.ModifyDate = a.ModifyDate.ToString();
+                    ss.ConfirmDate = a.ConfirmDate.ToString();
+                    su.Add(ss);
+                }
+                string loginsert = @"INSERT INTO orderlog(OID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                   VALUES(@OID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                count =CoreDBconn.Execute(loginsert,logs,TransCore);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }                
+            res.SuccessIDs = su;
+            res.FailIDs = fa;
+            result.d = res; 
+            return result;
+        }
     }
 }

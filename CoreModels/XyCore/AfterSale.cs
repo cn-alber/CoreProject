@@ -628,4 +628,18 @@ namespace CoreModels.XyCore
         public List<AgressReturnSuccess> SuccessIDs{get;set;}
         public List<InsertFailReason> FailIDs{get;set;}
     }
+    public class ConfirmAfterSaleSuccess
+    {
+        public int ID{get;set;}
+        public int Status{get;set;}
+        public string StatusString{get;set;}
+        public string Modifier{get;set;}
+        public string ModifyDate{get;set;}
+        public string ConfirmDate{get;set;}
+    }
+    public class ConfirmAfterSaleReturn
+    {
+        public List<ConfirmAfterSaleSuccess> SuccessIDs{get;set;}
+        public List<InsertFailReason> FailIDs{get;set;}
+    }
 }
