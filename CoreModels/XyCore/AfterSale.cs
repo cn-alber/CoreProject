@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using CoreModels.XyComm;
 namespace CoreModels.XyCore
 {
     public class ASInitData

@@ -1,0 +1,17 @@
+{
+    "s": 1,
+    "d": {
+        "SuccessIDs": [
+            {
+                "ID": 266,
+                "GoodsStatus": "买家已退货",
+                "Modifier": "管理员",
+                "ModifyDate": "2016-12-06 10:45:06"
+            }
+        ],
+        "FailIDs": [
+            
+        ]
+    },
+    "m": ""
+}

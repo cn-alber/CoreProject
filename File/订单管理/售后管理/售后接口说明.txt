@@ -174,9 +174,9 @@ output:售后单明细
 参考:input jason 文件:DeleteASItem_input.json
 参考:output jason 文件:DeleteASItem_output.json
 
-13.GetAfterSaleEdit() //新增售后单初始资料
+13.GetAfterSaleEdit() //售后详情打开
 路由:http://localhost:5000/Core/AfterSale/GetAfterSaleEdit
-input: None
+input: RID
 OutPut:AfterSale        售后单
        IssueType        问题类型
        Type             售后分类
@@ -317,3 +317,11 @@ output:成功返回 更新后的售后资料 && 售后明细 &&　日志
 　　　　失败返回原因
 参考:input jason 文件:ConfirmGoodsE_input.json
 参考:output jason 文件:ConfirmGoodsE_output.json
+
+29.CancleGoods()取消收到货物(订单详情单笔操作)
+路由:http://localhost:5000/Core/AfterSale/CancleGoods
+input:RID   int   售后ID
+output:SuccessIDs    成功的ID和修改后资料
+       FailIDs       失败的ID和原因
+参考:input jason 文件:CancleGoods_input.json
+参考:output jason 文件:CancleGoods_output.json
