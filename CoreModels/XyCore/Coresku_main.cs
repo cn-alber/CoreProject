@@ -120,5 +120,5 @@ namespace CoreModels.XyCore
             get { return _Enable; }
             set { this._Enable = value; }
         }
-    }
+    }   
 }

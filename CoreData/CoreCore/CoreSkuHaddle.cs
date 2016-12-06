@@ -514,12 +514,12 @@ namespace CoreData.CoreCore
             }
         }
 
-        public static DataResult ExistSkuByItem(IDbTransaction Trans,int ParentID, List<CoreSkuItem> itemLst, string CoID)
+        public static DataResult ExistSkuByItem(IDbTransaction Trans, int ParentID, List<CoreSkuItem> itemLst, string CoID)
         {
             var res = new DataResult(1, null);
             foreach (var item in itemLst)
             {
-                res = ExistSkuByID(Trans,ParentID, item.ID, item.SkuID, CoID);
+                res = ExistSkuByID(Trans, ParentID, item.ID, item.SkuID, CoID);
                 if (res.s < 1)
                 {
                     break;
@@ -528,7 +528,7 @@ namespace CoreData.CoreCore
             return res;
         }
 
-        public static DataResult ExistSkuByID(IDbTransaction Trans,int ParentID, int ID, string SkuID, string CoID)
+        public static DataResult ExistSkuByID(IDbTransaction Trans, int ParentID, int ID, string SkuID, string CoID)
         {
             var res = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CoreConnectString))
@@ -720,7 +720,7 @@ namespace CoreData.CoreCore
                     p.Add("@ID", MainID);
                     p.Add("@CoID", main.CoID);
                     var CheckitemLst = conn.Query<CoreSkuItem>(itemsql, p, Trans).AsList();
-                    res = ExistSkuByItem(Trans,int.Parse(MainID.ToString()), CheckitemLst, main.CoID);
+                    res = ExistSkuByItem(Trans, int.Parse(MainID.ToString()), CheckitemLst, main.CoID);
                     if (res.s == 1)
                     {
                         Trans.Commit();
@@ -1150,7 +1150,7 @@ namespace CoreData.CoreCore
                         p1.Add("@ID", main.ID);
                         p1.Add("@CoID", main.CoID);
                         var CheckitemLst = conn.Query<CoreSkuItem>(checkitemsql, p, Trans).AsList();
-                        res = ExistSkuByItem(Trans,int.Parse(main.ID.ToString()), CheckitemLst, main.CoID);
+                        res = ExistSkuByItem(Trans, int.Parse(main.ID.ToString()), CheckitemLst, main.CoID);
                         if (res.s == 1)
                         {
                             Trans.Commit();
@@ -1324,15 +1324,15 @@ namespace CoreData.CoreCore
             }
             if (!string.IsNullOrEmpty(IParam.GoodsCode))
             {
-                querycount.Append(" AND GoodsCode = @GoodsCode");
-                querysql.Append(" AND GoodsCode = @GoodsCode");
-                p.Add("@GoodsCode", IParam.GoodsCode);
+                querycount.Append(" AND GoodsCode like @GoodsCode");
+                querysql.Append(" AND GoodsCode like @GoodsCode");
+                p.Add("@GoodsCode", "%" + IParam.GoodsCode + "%");
             }
             if (!string.IsNullOrEmpty(IParam.SkuID))
             {
-                querycount.Append(" AND SkuID = @SkuID");
-                querysql.Append(" AND SkuID = @SkuID");
-                p.Add("@SkuID", IParam.SkuID);
+                querycount.Append(" AND SkuID like @SkuID");
+                querysql.Append(" AND SkuID like @SkuID");
+                p.Add("@SkuID", "%" + IParam.SkuID + "%");
             }
             if (!string.IsNullOrEmpty(IParam.Brand))
             {
@@ -1357,69 +1357,162 @@ namespace CoreData.CoreCore
                 querycount.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
                 querysql.Append(" ORDER BY " + IParam.SortField + " " + IParam.SortDirection);
             }
+            using (var CoreConn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                try
+                {
+                    var DataCount = CoreConn.QueryFirst<int>(querycount.ToString(), p);
+                    if (DataCount < 0)
+                    {
+                        res.s = -3001;
+                    }
+                    else
+                    {
+                        cs.DataCount = DataCount;
+                        decimal pagecnt = Math.Ceiling(decimal.Parse(cs.DataCount.ToString()) / decimal.Parse(IParam.PageSize.ToString()));
+                        cs.PageCount = Convert.ToInt32(pagecnt);
+                        int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
+                        querysql.Append(" LIMIT @ls , @le");
+                        p.Add("@ls", dataindex);
+                        p.Add("@le", IParam.PageSize);
+                        //商品明细
+                        var SkuLst = CoreConn.Query<SkuQuery>(querysql.ToString(), p).AsList();
+                        //品牌列表
+                        if (SkuLst.Count > 0)
+                        {
+                            var BrandIDLst = SkuLst.Select(a => a.Brand).Distinct().AsList();
+                            res = CommHaddle.GetBrandsByID(IParam.CoID.ToString(), BrandIDLst);
+                            if (res.s == 1)
+                            {
+                                var BrandLst = res.d as List<BrandDDLB>;
+                                if (BrandLst.Count > 0)
+                                {
+                                    SkuLst = (from a in SkuLst
+                                              join b in BrandLst on a.Brand equals b.ID into data
+                                              from c in data.DefaultIfEmpty()
+                                              select new SkuQuery
+                                              {
+                                                  ID = a.ID,
+                                                  GoodsCode = a.GoodsCode,
+                                                  GoodsName = a.GoodsName,
+                                                  SkuID = a.SkuID,
+                                                  SkuName = a.SkuName,
+                                                  Norm = a.Norm,
+                                                  GBCode = a.GBCode,
+                                                  Brand = a.Brand,
+                                                  BrandName = c == null ? "" : c.Name,
+                                                  CostPrice = a.CostPrice,
+                                                  SalePrice = a.SalePrice,
+                                                  Enable = a.Enable,
+                                                  Img = a.Img,
+                                                  Creator = a.Creator,
+                                                  CreateDate = a.CreateDate
+                                              }).AsList();
+                                }
+
+                            }
+                            cs.SkuLst = SkuLst;
+                        }
+                        res.d = cs;
+                    }
+                }
+                catch (Exception e)
+                {
+                    res.s = -1;
+                    res.d = e.Message;
+                }
+            }
+
+            return res;
+        }
+        #endregion
+
+        #region 商品吊牌打印 - 货号查询
+        public static DataResult PrintGoodsCode(SkuPrintParam IParam)
+        {
+            var result = new DataResult(1, null);
+            using (var CoreConn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                try
+                {
+                    string sql = "SELECT ID,GoodsCode FROM coresku_main WHERE CoID=@CoID";
+                    StringBuilder querysql = new StringBuilder();
+                    querysql.Append(sql);
+                    var p = new DynamicParameters();
+                    p.Add("@CoID", IParam.CoID);
+                    if (!string.IsNullOrEmpty(IParam.GoodsCode))
+                    {
+                        querysql.Append(" AND GoodsCode like @GoodsCode");
+                        p.Add("@GoodsCode", "%" + IParam.GoodsCode + "%");
+                    }
+                    if (!string.IsNullOrEmpty(IParam.ScoGoodsCode))
+                    {
+                        querysql.Append(" AND ScoGoodsCode like @ScoGoodsCode");
+                        p.Add("@ScoGoodsCode", "%" + IParam.ScoGoodsCode + "%");
+                    }
+                    if (!string.IsNullOrEmpty(IParam.SkuID))
+                    {
+                        querysql.Append(" AND ID in (SELECT ParentID FROM coresku WHERE CoID=@CoID AND ParentID=coresku_main.ID AND SkuID = @SkuID )");
+                        p.Add("@SkuID", IParam.SkuID);
+                    }
+                    var GoodsCodeLst = CoreConn.Query<goods_print_goodscode>(querysql.ToString(), p).AsList();
+                    if (GoodsCodeLst.Count < 0)
+                    {
+                        result.s = -3012;
+                    }
+                    else
+                    {
+                        result.d = GoodsCodeLst;
+                    }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+        #endregion
+
+        #region 商品吊牌打印 - 根据货号带出Sku属性
+        public static DataResult PrintSkuProps(string ID, string CoID)
+        {
+            var result = new DataResult(1, null);
+            var CoreConn = new MySqlConnection(DbBase.CoreConnectString);
+            var CommConn = new MySqlConnection(DbBase.CommConnectString);
             try
             {
-                var DataCount = CoreData.DbBase.CoreDB.QueryFirst<int>(querycount.ToString(), p);
-                if (DataCount < 0)
+                var data = new goods_print_skuprops();
+                string mainsql = "SELECT KindID FROM coresku_main WHERE CoID=@CoID AND ID=@ID";
+                string skupropsql = @"SELECT * FROM coresku_sku_props WHERE ParentID=@ID AND CoID = @CoID AND Enable = 1 AND ISDelete = 0 ORDER BY pid";
+                string kindsql = "SELECT pid,name FROM customkind_skuprops WHERE CoID=@CoID AND kindid=@KindID";
+                var SkuProps = CoreConn.Query<goods_sku_props>(skupropsql, new { CoID = CoID, ID = ID }).AsList();
+                data.SkuProps = SkuProps;
+                var KindID = CoreConn.Query<string>(mainsql, new { CoID = CoID, ID = ID }).AsList();
+                if (KindID.Count > 0)
                 {
-                    res.s = -3001;
-                }
-                else
-                {
-                    cs.DataCount = DataCount;
-                    decimal pagecnt = Math.Ceiling(decimal.Parse(cs.DataCount.ToString()) / decimal.Parse(IParam.PageSize.ToString()));
-                    cs.PageCount = Convert.ToInt32(pagecnt);
-                    int dataindex = (IParam.PageIndex - 1) * IParam.PageSize;
-                    querysql.Append(" LIMIT @ls , @le");
-                    p.Add("@ls", dataindex);
-                    p.Add("@le", IParam.PageSize);
-                    //商品明细
-                    var SkuLst = CoreData.DbBase.CoreDB.Query<SkuQuery>(querysql.ToString(), p).AsList();
-                    //品牌列表
-                    if (SkuLst.Count > 0)
+                    var props = CommConn.Query<skuprops_data>(kindsql, new { CoID = CoID, KindID = KindID[0] }).AsList();
+                    var dicprops = new Dictionary<string, string>();
+                    foreach (var p in props)
                     {
-                        var BrandIDLst = SkuLst.Select(a => a.Brand).Distinct().AsList();
-                        res = CommHaddle.GetBrandsByID(IParam.CoID.ToString(), BrandIDLst);
-                        if (res.s == 1)
-                        {
-                            var BrandLst = res.d as List<BrandDDLB>;
-                            if (BrandLst.Count > 0)
-                            {
-                                SkuLst = (from a in SkuLst
-                                          join b in BrandLst on a.Brand equals b.ID into data
-                                          from c in data.DefaultIfEmpty()
-                                          select new SkuQuery
-                                          {
-                                              ID = a.ID,
-                                              GoodsCode = a.GoodsCode,
-                                              GoodsName = a.GoodsName,
-                                              SkuID = a.SkuID,
-                                              SkuName = a.SkuName,
-                                              Norm = a.Norm,
-                                              GBCode = a.GBCode,
-                                              Brand = a.Brand,
-                                              BrandName = c == null ? "" : c.Name,
-                                              CostPrice = a.CostPrice,
-                                              SalePrice = a.SalePrice,
-                                              Enable = a.Enable,
-                                              Img = a.Img,
-                                              Creator = a.Creator,
-                                              CreateDate = a.CreateDate
-                                          }).AsList();
-                            }
-
-                        }
-                        cs.SkuLst = SkuLst;
+                        dicprops.Add(p.pid.ToString(), p.name);
                     }
-                    res.d = cs;
+                    data.DicSkuProps = dicprops;
                 }
+                result.d = data;
             }
             catch (Exception e)
             {
-                res.s = -1;
-                res.d = e.Message;
+                result.s = -1;
+                result.d = e.Message;
             }
-            return res;
+            finally
+            {
+                CommConn.Close();
+                CoreConn.Close();
+            }
+            return result;
         }
         #endregion
 

@@ -282,6 +282,30 @@ namespace CoreModels.XyCore
     }
     #endregion
 
+    #region 商品吊牌打印 - 查询参数
+    public class SkuPrintParam
+    {
+        public string GoodsCode { get; set; }
+        public string ScoGoodsCode { get; set; }
+        public string SkuID { get; set; }
+        public string CoID { get; set; }
+    }
+    #endregion
+
+    #region 商品吊牌打印-查询货号
+    public class goods_print_goodscode
+    {
+        public int ID { get; set; }
+        public string GoodsCode { get; set; }
+    }
+    #endregion
+
+    public class goods_print_skuprops
+    {
+        public Dictionary<string, string> DicSkuProps { get; set; }
+        public List<goods_sku_props> SkuProps { get; set; }
+    }
+
     #region ######### CoreMat
 
     public class CoreSkuMatQuery

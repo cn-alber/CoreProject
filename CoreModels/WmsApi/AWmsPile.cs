@@ -77,11 +77,20 @@ namespace CoreModels.WmsApi
     {
         public ASkuScan SkuAuto { get; set; }
         public AWmsPileAuto PileAuto { get; set; }
+
+    }
+
+    public class AShelfSet
+    {
+        public ASkuScan SkuAuto { get; set; }
         public int PileID { get; set; }
+        public int WarehouseID { get; set; }
+        public int Type { get; set; }
+        public string PCode { get; set; }
+        public string Contents { get; set; }
         public int CoID { get; set; }
         public string Creator { get; set; }
         public string CreateDate { get; set; }
-
     }
 
     public class APileQty

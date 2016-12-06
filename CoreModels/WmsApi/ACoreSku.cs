@@ -38,7 +38,7 @@ namespace CoreModels.WmsApi
             get { return _Qty; }
             set { this._Qty = value; }
         }
-        public int SkuType { get; set; }
+        public int SkuType { get; set; }//0.件码(唯一码)||1.普通Sku||2.箱码
     }
 
     public class ASkuScanParam

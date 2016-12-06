@@ -11,7 +11,7 @@ namespace CoreWebApi
     [AllowAnonymous]
     public class AShelvesController : ControllBase
     {
-        #region 扫描Sku,检查货位库存,返回有效货位
+        #region 货品上架 - 扫描Sku,检查货位库存,返回有效货位
         [HttpGetAttribute("Core/AShelves/GetUpSkuByCode")]
         public ResponseResult GetUpSkuByCode(string BoxCode, string WarehouseID, string PCode)
         {
@@ -36,7 +36,7 @@ namespace CoreWebApi
             return CoreResult.NewResponse(res.s, res.d, "WmsApi");
         }
         #endregion
-        #region 修改仓库or货位，检查货位库存
+        #region 货品上架 - 修改仓库or货位，检查货位库存
         [HttpGetAttribute("Core/AShelves/CheckWhPCode")]
         public ResponseResult CheckWhPCode(string Skuautoid, string Qty, string WarehouseID, string PCode)
         {
@@ -74,7 +74,7 @@ namespace CoreWebApi
         }
 
         #endregion
-        #region 新增上架功能
+        #region 货品上架 - 新增上架功能
         [HttpPostAttribute("Core/AShelves/SetUpPile")]
         public ResponseResult SetUpPile([FromBodyAttribute]JObject obj)
         {
@@ -87,9 +87,11 @@ namespace CoreWebApi
             }
             else
             {
-                var cp = new AShelfData();
+                var cp = new AShelfSet();
                 cp.PileID = int.Parse(obj["PileID"].ToString());
                 cp.SkuAuto = Newtonsoft.Json.JsonConvert.DeserializeObject<ASkuScan>(obj["SkuAuto"].ToString());
+                cp.Type = 4;
+                cp.Contents = "货品上架";
                 cp.CoID = int.Parse(GetCoid());
                 cp.Creator = GetUname();
                 cp.CreateDate = DateTime.Now.ToString();
@@ -98,5 +100,29 @@ namespace CoreWebApi
             return CoreResult.NewResponse(res.s, res.d, "WmsApi");
         }
         #endregion
+
+        #region 移库下架 - 货位扫描
+        [HttpGetAttribute("Core/AShelves/SkuByArea")]
+        public ResponseResult SkuByArea(string PCode)
+        {
+            var res = new DataResult(1, null);
+            if (string.IsNullOrEmpty(PCode))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var cp = new AShelfParam();
+                cp.PCode = PCode;
+                res = AShelvesHaddles.GetAreaSku(cp);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "WmsApi");
+        }
+        #endregion
+
+        #region 移库下架 - 
+        #endregion
+
     }
 }

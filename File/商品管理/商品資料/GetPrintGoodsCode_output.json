@@ -1,0 +1,14 @@
+{
+    "s": 1,
+    "d": [
+        {
+            "ID": 6,
+            "GoodsCode": "ABCTST"
+        },
+        {
+            "ID": 7,
+            "GoodsCode": "ABCTST2"
+        }
+    ],
+    "m": ""
+}

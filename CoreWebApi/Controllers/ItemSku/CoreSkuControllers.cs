@@ -11,7 +11,7 @@ using CoreModels;
 namespace CoreWebApi.XyCore
 
 {
-    // [AllowAnonymous]
+    [AllowAnonymous]
     public class CoreSkuControllers : ControllBase
     {
 
@@ -250,14 +250,14 @@ namespace CoreWebApi.XyCore
         [HttpPostAttribute("Core/XyCore/CoreSku/InsertGoods")]
         public ResponseResult InsertGoods([FromBodyAttribute]JObject obj)
         {
-            var main = Newtonsoft.Json.JsonConvert.DeserializeObject<Coresku_main>(obj["main"].ToString());   
-            var itemprops = Newtonsoft.Json.JsonConvert.DeserializeObject<List<goods_item_props>>(obj["itemprops"].ToString()); 
-            var skuprops = Newtonsoft.Json.JsonConvert.DeserializeObject<List<goods_sku_props>>(obj["skuprops"].ToString()); 
-            var items = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CoreSkuItem>>(obj["items"].ToString()); 
-            main.CoID = GetCoid();  
+            var main = Newtonsoft.Json.JsonConvert.DeserializeObject<Coresku_main>(obj["main"].ToString());
+            var itemprops = Newtonsoft.Json.JsonConvert.DeserializeObject<List<goods_item_props>>(obj["itemprops"].ToString());
+            var skuprops = Newtonsoft.Json.JsonConvert.DeserializeObject<List<goods_sku_props>>(obj["skuprops"].ToString());
+            var items = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CoreSkuItem>>(obj["items"].ToString());
+            main.CoID = GetCoid();
             main.Creator = GetUname();
             main.CreateDate = DateTime.Now.ToString();
-            var res = CoreSkuHaddle.NewCore(main,itemprops,skuprops,items);
+            var res = CoreSkuHaddle.NewCore(main, itemprops, skuprops, items);
             var Result = CoreResult.NewResponse(res.s, res.d, "General");
             return Result;
         }
@@ -267,15 +267,15 @@ namespace CoreWebApi.XyCore
         [HttpPostAttribute("Core/XyCore/CoreSku/UpdateGoods")]
         public ResponseResult UpdateGoods([FromBodyAttribute]JObject obj)
         {
-            var main = Newtonsoft.Json.JsonConvert.DeserializeObject<Coresku_main>(obj["main"].ToString());   
-            var itemprops = Newtonsoft.Json.JsonConvert.DeserializeObject<List<goods_item_props>>(obj["itemprops"].ToString()); 
-            var skuprops = Newtonsoft.Json.JsonConvert.DeserializeObject<List<goods_sku_props>>(obj["skuprops"].ToString()); 
-            var items = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CoreSkuItem>>(obj["items"].ToString()); 
+            var main = Newtonsoft.Json.JsonConvert.DeserializeObject<Coresku_main>(obj["main"].ToString());
+            var itemprops = Newtonsoft.Json.JsonConvert.DeserializeObject<List<goods_item_props>>(obj["itemprops"].ToString());
+            var skuprops = Newtonsoft.Json.JsonConvert.DeserializeObject<List<goods_sku_props>>(obj["skuprops"].ToString());
+            var items = Newtonsoft.Json.JsonConvert.DeserializeObject<List<CoreSkuItem>>(obj["items"].ToString());
             string CoID = GetCoid();
             string UserName = GetUname();
             string CreateDate = DateTime.Now.ToString();
             main.CoID = CoID;
-            var res = CoreSkuHaddle.EditCore(main,itemprops,skuprops,items,CoID,UserName);
+            var res = CoreSkuHaddle.EditCore(main, itemprops, skuprops, items, CoID, UserName);
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
@@ -285,20 +285,20 @@ namespace CoreWebApi.XyCore
         public ResponseResult UpdateGoodsEnable([FromBodyAttribute]JObject obj)
         {
             var res = new DataResult(1, null);
-            int Enable = 0;            
+            int Enable = 0;
             var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
             if (IDLst.Count == 0)
             {
                 res.s = -1;
                 res.d = "请先选中操作明细";
             }
-            else if(!int.TryParse(obj["Enable"].ToString(),out Enable))
+            else if (!int.TryParse(obj["Enable"].ToString(), out Enable))
             {
                 res.s = -1;
                 res.d = "无效参数Enable";
             }
             else
-            {                
+            {
                 string CoID = GetCoid();
                 string UserName = GetUname();
                 Enable = int.Parse(obj["Enable"].ToString());
@@ -307,7 +307,7 @@ namespace CoreWebApi.XyCore
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
-        
+
         #region 采购查询
         [HttpPostAttribute("Core/XyCore/CoreSku/SkuQuery")]
         public ResponseResult SkuQuery([FromBodyAttribute]JObject obj)
@@ -319,6 +319,48 @@ namespace CoreWebApi.XyCore
             return Result;
         }
 
+        #endregion
+
+        #region 商品吊牌打印 - 货号查询
+        [HttpGetAttribute("Core/XyCore/CoreSku/GetPrintGoodsCode")]
+        public ResponseResult GetPrintGoodsCode(string GoodsCode, string ScoGoodsCode, string SkuID)
+        {
+            var res = new DataResult(1, null);
+            if (string.IsNullOrEmpty(GoodsCode) && string.IsNullOrEmpty(ScoGoodsCode) && string.IsNullOrEmpty(SkuID))
+            {
+                res.s = -1;
+                res.d = "供销商货号与商家货号至少填写一个！";
+            }
+            else
+            {
+                var cp = new SkuPrintParam();
+                cp.CoID = GetCoid();
+                cp.GoodsCode = GoodsCode;
+                cp.ScoGoodsCode = ScoGoodsCode;
+                cp.SkuID = SkuID;
+                res = CoreSkuHaddle.PrintGoodsCode(cp);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+        #region 商品吊牌打印 - 根据货号带出Sku属性
+        [HttpGetAttribute("Core/XyCore/CoreSku/GetPrintSkuProps")]
+        public ResponseResult GetPrintSkuProps(string ID)
+        {
+            var res = new DataResult(1,null);
+            int x;
+            if(string.IsNullOrEmpty(ID)||!string.IsNullOrEmpty(ID)&&!int.TryParse(ID,out x))
+            {
+                res.s = -1;
+                res.d="无效参数";
+            }
+            else
+            {
+                string CoID = GetCoid();
+                res = CoreSkuHaddle.PrintSkuProps(ID,CoID);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
         #endregion
     }
 

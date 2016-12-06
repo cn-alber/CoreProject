@@ -114,3 +114,22 @@ function说明
                 "Enable":1              int        0.停用1.启用2.备用
             }  
     参考：input json 文件：UpdateGoodsEnable_input.json
+
+
+10.GetPrintGoodsCode() //商品吊牌打印 - 货号查询
+    方法：Get
+    路由：http://192.168.30.211:5000/Core/XyCore/CoreSku/GetPrintGoodsCode?GoodsCode=&ScoGoodsCode=&SkuID=
+    参数：
+        GoodsCode       string      货号(模糊查询)
+        ScoGoodsCode    string      供应商货号(模糊查询)
+        SkuID           string      商品Sku(精确查询)
+    OutPut:
+        GoodsCodeLst        List<goods_print_goodscode>     商品编码List
+    参考：output json 文件：GetPrintGoodsCode_output.json
+11.GetPrintSkuProps()//商品吊牌打印 - 根据货号带出Sku属性
+    方法：Get
+    路由：http://192.168.30.211:5000/Core/XyCore/CoreSku/GetPrintSkuProps?ID=
+    参数：
+        ID              int                         商品主表coresku_main.ID
+    OutPut:
+        goods_skuprops  goods_print_skuprops        商品属性列表

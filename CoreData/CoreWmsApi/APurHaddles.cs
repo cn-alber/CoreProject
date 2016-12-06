@@ -250,8 +250,8 @@ namespace CoreData.CoreWmsApi
                     inv.Type = inv_type;
                     inv.CusType = CusType;
                     inv.Status = 1;
-                    inv.WhID = WhViewLst[0].ID;
-                    inv.LinkWhID = WhViewLst[0].ParentID;
+                    inv.WhID = WhViewLst[0].ParentID;
+                    inv.LinkWhID = WhViewLst[0].ID;
                     inv.Creator = IParam.Creator;
                     inv.CreateDate = IParam.CreateDate;
                     inv.CoID = IParam.CoID.ToString();
@@ -265,8 +265,8 @@ namespace CoreData.CoreWmsApi
                         Status = 1,
                         Skuautoid = a.Skuautoid,
                         Qty = a.Qty,
-                        WhID = WhViewLst[0].ID,
-                        LinkWhID = WhViewLst[0].ParentID,
+                        WhID = WhViewLst[0].ParentID,
+                        LinkWhID = WhViewLst[0].ID,
                         Creator = IParam.Creator,
                         CreateDate = IParam.CreateDate,
                         CoID = IParam.CoID.ToString()
@@ -500,8 +500,8 @@ namespace CoreData.CoreWmsApi
                 inv.Type = inv_type;
                 inv.CusType = CusType;
                 inv.Status = 1;
-                inv.WhID = WhViewLst[0].ID;
-                inv.LinkWhID = WhViewLst[0].ParentID;
+                inv.WhID = WhViewLst[0].ParentID;
+                inv.LinkWhID = WhViewLst[0].ID;
                 inv.Creator = IParam.Creator;
                 inv.CreateDate = IParam.CreateDate;
                 inv.CoID = IParam.CoID.ToString();
@@ -515,8 +515,8 @@ namespace CoreData.CoreWmsApi
                     Status = 1,
                     Skuautoid = a.Skuautoid,
                     Qty = a.Qty,
-                    WhID = WhViewLst[0].ID,
-                    LinkWhID = WhViewLst[0].ParentID,
+                    WhID = WhViewLst[0].ParentID,
+                    LinkWhID = WhViewLst[0].ID,
                     Creator = IParam.Creator,
                     CreateDate = IParam.CreateDate,
                     CoID = IParam.CoID.ToString()
