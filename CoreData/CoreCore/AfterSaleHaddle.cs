@@ -813,6 +813,24 @@ namespace CoreData.CoreCore
                     rtn = CoreDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
                     result.d = rtn;
                 }
+                if(afterAsale.Type == 1 && afterAsale.OID > 0)
+                {
+                    sqlcommand = "select * from orderitem where oid = " + afterAsale.OID + " and coid = " + CoID;
+                    var item = CoreDBconn.Query<OrderItem>(sqlcommand).AsList();
+                    foreach(var it in item)
+                    {
+                        sqlcommand = @"INSERT INTO aftersaleitem(RID,ReturnType,SkuAutoID,SkuID,SkuName,Norm,GoodsCode,RegisterQty,Price,Amount,Img,CoID,Creator,Modifier) 
+                                        VALUES(@RID,@ReturnType,@SkuAutoID,@SkuID,@SkuName,@Norm,@GoodsCode,@RegisterQty,@Price,@Amount,@Img,@CoID,@Creator,@Creator)";
+                        var args = new{RID = rtn,ReturnType = 0,SkuAutoID=it.SkuAutoID,SkuID = it.SkuID,SkuName=it.SkuName,Norm=it.Norm,GoodsCode=it.GoodsCode,RegisterQty=it.Qty,
+                                        Price=it.RealPrice,Amount=it.Amount,Img=it.img,CoID=CoID,Creator=UserName};
+                        count = CoreDBconn.Execute(sqlcommand,args,TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3002;
+                            return result;
+                        }
+                    }
+                }
                 log.OID = rtn;
                 log.Type = 1;
                 log.LogDate = DateTime.Now;
@@ -1812,14 +1830,7 @@ namespace CoreData.CoreCore
                 a.Distributor = order[0].Distributor;
                 a.Modifier = UserName;
                 a.ModifyDate = DateTime.Now;
-                sqlcommand = @"update aftersale set OID=@OID,SoID=@SoID,BuyerShopID=@BuyerShopID,RecName=@RecName,RecTel=@RecTel,RecPhone=@RecPhone,ShopID=@ShopID,
-                                ShopName=@ShopName,OrdType=@OrdType,Distributor=@Distributor,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @CoID";
-                count = CoreDBconn.Execute(sqlcommand,a,TransCore);
-                if(count < 0)
-                {
-                    result.s = -3003;
-                    return result;
-                }
+
                 log = new LogInsert();
                 log.OID = a.ID;
                 log.Type = 1;
@@ -1829,7 +1840,136 @@ namespace CoreData.CoreCore
                 log.Remark = a.OID.ToString();
                 log.CoID = CoID;
                 logs.Add(log);
-                if(a.Type == 1)
+                //检查订单是否有未确认的同订单资料，若有，则合并
+                sqlcommand = "select * from aftersale where oid = " + OID + " and coid = " + CoID + " and status = 0";
+                var aftersaleM = CoreDBconn.Query<AfterSale>(sqlcommand).AsList();
+                var IDM = new List<int>();
+                if (aftersaleM.Count > 0)
+                {
+                    if(a.GoodsStatus == "卖家已经收到退货")
+                    {
+                        foreach(var yy in aftersaleM)
+                        {
+                            yy.Status = 3;
+                            yy.Modifier = UserName;
+                            yy.ModifyDate = DateTime.Now;
+                            yy.Remark = yy.Remark + ";合并售后单号:" + a.ID;
+                            sqlcommand = @"update aftersale set Status=@Status,Remark=@Remark,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @CoID";
+                            count = CoreDBconn.Execute(sqlcommand,yy,TransCore);
+                            if(count < 0)
+                            {
+                                result.s = -3003;
+                                return result;
+                            }
+                            log = new LogInsert();
+                            log.OID = yy.ID;
+                            log.Type = 1;
+                            log.LogDate = DateTime.Now;
+                            log.UserName = UserName;
+                            log.Title = "合并到:" + a.ID;
+                            log.CoID = CoID;
+                            logs.Add(log);
+                            IDM.Add(yy.ID);
+                        }
+                    }
+                    else
+                    {
+                        int i = 0;
+                        foreach(var yy in aftersaleM)
+                        {
+                            if(yy.GoodsStatus == "卖家已经收到退货")
+                            {
+                                i = yy.ID;
+                                break;
+                            }
+                        }
+                        foreach(var yy in aftersaleM)
+                        {
+                            if(i == yy.ID) continue;
+                            yy.Status = 3;
+                            yy.Modifier = UserName;
+                            yy.ModifyDate = DateTime.Now;
+                            if(i == 0)
+                            {
+                                yy.Remark = yy.Remark + ";合并售后单号:" + a.ID;
+                            }
+                            else
+                            {
+                                yy.Remark = yy.Remark + ";合并售后单号:" + i;
+                            }
+                            sqlcommand = @"update aftersale set Status=@Status,Remark=@Remark,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @CoID";
+                            count = CoreDBconn.Execute(sqlcommand,yy,TransCore);
+                            if(count < 0)
+                            {
+                                result.s = -3003;
+                                return result;
+                            }
+                            log = new LogInsert();
+                            log.OID = yy.ID;
+                            log.Type = 1;
+                            log.LogDate = DateTime.Now;
+                            log.UserName = UserName;
+                            if(i == 0)
+                            {
+                                log.Title = "合并到:" + a.ID;
+                            }
+                            else
+                            {
+                                log.Title = "合并到:" + i;
+                            }
+                            log.CoID = CoID;
+                            logs.Add(log);
+                            IDM.Add(yy.ID);
+                        }
+                        if(i > 0)
+                        {
+                            a.Status = 3;
+                            a.Remark = a.Remark + ";合并售后单号:" + a.ID;
+                            
+                            log = new LogInsert();
+                            log.OID = a.ID;
+                            log.Type = 1;
+                            log.LogDate = DateTime.Now;
+                            log.UserName = UserName;
+                            log.Title = "合并到:" + i;
+                            log.CoID = CoID;
+                            logs.Add(log);
+
+                            IDM.Add(a.ID);
+                        }
+                    }
+                }
+                
+                sqlcommand = @"update aftersale set OID=@OID,SoID=@SoID,BuyerShopID=@BuyerShopID,RecName=@RecName,RecTel=@RecTel,RecPhone=@RecPhone,ShopID=@ShopID,
+                                ShopName=@ShopName,OrdType=@OrdType,Distributor=@Distributor,Modifier=@Modifier,ModifyDate=@ModifyDate,Status=@Status,Remark=@Remark
+                                 where id = @ID and coid = @CoID";
+                count = CoreDBconn.Execute(sqlcommand,a,TransCore);
+                if(count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }
+                int itemcount = 0;
+                if(IDM.Count > 0)
+                {
+                    sqlcommand = "select * from aftersaleitem where rid in @RID and coid = @Coid";
+                    var item = CoreDBconn.Query<AfterSaleItem>(sqlcommand,new{RID=IDM,Coid = CoID}).AsList();
+                    itemcount = item.Count;
+                    foreach(var it in item)
+                    {
+                        sqlcommand = @"INSERT INTO aftersaleitem(RID,ReturnType,SkuAutoID,SkuID,SkuName,Norm,GoodsCode,RegisterQty,ReturnQty,Price,Amount,Img,CoID,Creator,Modifier) 
+                                        VALUES(@RID,@ReturnType,@SkuAutoID,@SkuID,@SkuName,@Norm,@GoodsCode,@RegisterQty,@ReturnQty,@Price,@Amount,@Img,@CoID,@Creator,@Creator)";
+                        var args = new{RID = a.ID,ReturnType = it.ReturnType,SkuAutoID=it.SkuAutoID,SkuID = it.SkuID,SkuName=it.SkuName,Norm=it.Norm,GoodsCode=it.GoodsCode,
+                                        RegisterQty=it.RegisterQty,ReturnQty=it.ReturnQty,Price=it.Price,Amount=it.Amount,Img=it.img,CoID=CoID,Creator=UserName};
+                        count = CoreDBconn.Execute(sqlcommand,args,TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3002;
+                            return result;
+                        }
+                    }
+                }
+                if(a.Type == 1 && itemcount == 0)
                 {
                     sqlcommand = "select * from orderitem where oid = " + a.OID + " and coid = " + CoID;
                     var item = CoreDBconn.Query<OrderItem>(sqlcommand).AsList();
@@ -2286,6 +2426,7 @@ namespace CoreData.CoreCore
                         Refund.CoID = CoID;
                         Refund.Creator = UserName;
                         Refund.Modifier = UserName;
+                        Refund.Distributor = ord[0].Distributor;
                         sqlcommand = @"INSERT INTO refundinfo(RefundDate,RefundNbr,ShopID,ShopName,BuyerShopID,OID,SoID,Refundment,PayAccount,Amount,Status,RID,RType,
                                                               IssueType,RRmark,CoID,Creator,Modifier) 
                                        VALUES(@RefundDate,@RefundNbr,@ShopID,@ShopName,@BuyerShopID,@OID,@SoID,@Refundment,@PayAccount,@Amount,@Status,@RID,@RType,
@@ -2515,6 +2656,7 @@ namespace CoreData.CoreCore
                         Refund.CoID = CoID;
                         Refund.Creator = UserName;
                         Refund.Modifier = UserName;
+                        Refund.Distributor = ord[0].Distributor;
                         sqlcommand = @"INSERT INTO refundinfo(RefundDate,RefundNbr,ShopID,ShopName,BuyerShopID,OID,SoID,Refundment,PayAccount,Amount,Status,RID,RType,
                                                               IssueType,RRmark,CoID,Creator,Modifier) 
                                        VALUES(@RefundDate,@RefundNbr,@ShopID,@ShopName,@BuyerShopID,@OID,@SoID,@Refundment,@PayAccount,@Amount,@Status,@RID,@RType,
@@ -3141,6 +3283,165 @@ namespace CoreData.CoreCore
             res.SuccessIDs = su;
             res.FailIDs = fa;
             result.d = res; 
+            return result;
+        }
+        ///<summary>
+        ///订单新增售后单
+        ///</summary>
+        public static DataResult InsertAfterSaleOrd(int CoID,string UserName,int OID)
+        {
+            var result = new DataResult(1,null);
+            int whid = 0;
+            string whname = "";
+            //仓库资料
+            using(var conn = new MySqlConnection(DbBase.CommConnectString)){
+                try{    
+                    string wheresql = "select ID as value,WarehouseName as label from warehouse where ParentID > 0 and Enable = true and type = 3 and coid = " + CoID;           
+                    var u = conn.Query<Filter>(wheresql).AsList();       
+                    whid = int.Parse(u[0].value);   
+                    whname = u[0].label;     
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            int count = 0;
+            var log = new LogInsert();
+            var afterAsale = new AfterSale();
+            string sqlcommand = string.Empty;
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                afterAsale.RegisterDate = DateTime.Now;
+                afterAsale.Type = 5;
+                afterAsale.WarehouseID = whid;
+                afterAsale.RecWarehouse = whname;
+                afterAsale.IssueType = 6;
+                afterAsale.Status = 0;
+                afterAsale.RefundStatus = "未申请状态";
+                afterAsale.IsSubmit = false;
+                afterAsale.IsSubmitDis = false;
+                afterAsale.IsInterfaceLoad = false;
+                afterAsale.CoID = CoID;
+                afterAsale.Creator = UserName;
+                afterAsale.Modifier = UserName;
+                afterAsale.OID = OID;
+                sqlcommand = "select SoID,BuyerShopID,RecName,RecTel,RecPhone,ShopID,ShopName,Type,Distributor from `order` where id = " + OID + " and coid = " + CoID;
+                var u = CoreDBconn.Query<Order>(sqlcommand).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "订单ID无效";
+                    return result;
+                }
+                afterAsale.SoID = u[0].SoID;
+                afterAsale.BuyerShopID = u[0].BuyerShopID;
+                afterAsale.RecName = u[0].RecName;
+                afterAsale.RecTel = u[0].RecTel;
+                afterAsale.RecPhone = u[0].RecPhone;
+                afterAsale.ShopID = u[0].ShopID;
+                afterAsale.ShopName = u[0].ShopName;
+                afterAsale.OrdType = u[0].Type;
+                afterAsale.Distributor = u[0].Distributor;
+                
+                sqlcommand = @"INSERT INTO aftersale(OID,SoID,RegisterDate,BuyerShopID,RecName,Type,RecTel,RecPhone,ShopID,ShopName,WarehouseID,RecWarehouse,IssueType,OrdType,Status,
+                                                     RefundStatus,IsSubmit,IsSubmitDis,IsInterfaceLoad,Distributor,CoID,Creator,Modifier) 
+                               VALUES(@OID,@SoID,@RegisterDate,@BuyerShopID,@RecName,@Type,@RecTel,@RecPhone,@ShopID,@ShopName,@WarehouseID,@RecWarehouse,@IssueType,@OrdType,@Status,
+                                      @RefundStatus,@IsSubmit,@IsSubmitDis,@IsInterfaceLoad,@Distributor,@CoID,@Creator,@Modifier)";
+                count = CoreDBconn.Execute(sqlcommand,afterAsale,TransCore);
+                int rtn = 0;
+                if(count <= 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                else
+                {
+                    rtn = CoreDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
+                    result.d = rtn;
+                }
+                
+                log.OID = rtn;
+                log.Type = 1;
+                log.LogDate = DateTime.Now;
+                log.UserName = UserName;
+                log.Title = "从订单新增";
+                log.CoID = CoID;
+                string loginsert = @"INSERT INTO orderlog(OID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                   VALUES(@OID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                count =CoreDBconn.Execute(loginsert,log,TransCore);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                result.d = rtn;
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }            
+            return result;
+        }
+        ///<summary>
+        ///订单转售后
+        ///</summary>
+        public static DataResult OrdAddAfterSale(int OID,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            string sqlcommand = string.Empty;
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString)){
+                try{ 
+                    sqlcommand = @"select ID,OID,RegisterDate,Type,Status,GoodsStatus,BuyerShopID,RecName,ReturnAccount,RecWarehouse,SalerReturnAmt,BuyerUpAmt,RealReturnAmt,
+                                ShopName,IssueType,Remark from aftersale where oid = @ID and coid = @CoID and status in (0,1)";
+                    var u = conn.Query<AfterSaleOrd>(sqlcommand,new{ID = OID,CoID = CoID}).AsList();
+                    if(u.Count == 0)
+                    {
+                        var data = InsertAfterSaleOrd(CoID,UserName,OID);
+                        if(data.s == 1)
+                        {
+                            int RID = int.Parse(data.d.ToString());
+                            var res = new OrdAddAfterSale2Return();
+                            res.RID = RID;
+                            res.Type = "B";
+                            result.d = res;
+                        }
+                        else
+                        {
+                            result.d = data.d;
+                        }
+                    }
+                    else
+                    {
+                        foreach(var a in u)
+                        {
+                            a.TypeString = Enum.GetName(typeof(ASType), a.Type);
+                            a.IssueTypeString = Enum.GetName(typeof(IssueType), a.IssueType);
+                            a.StatusString = Enum.GetName(typeof(ASStatus), a.Status);
+                        }
+                        var res = new OrdAddAfterSale1Return();
+                        res.AfterSale = u;
+                        res.Type = "B";
+                        result.d = res;
+                    }
+            }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
             return result;
         }
     }

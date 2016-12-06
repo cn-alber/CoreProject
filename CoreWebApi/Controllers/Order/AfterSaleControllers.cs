@@ -1215,7 +1215,11 @@ namespace CoreWebApi
             var data = AfterSaleHaddle.UpdateASItem(CoID,username,RID,RDetailID,Qty,Amount);
             if(data.s == 1)
             {
-                data.d = AfterSaleHaddle.GetOrderLog(RID,CoID).d;
+                var res = new UpdateASItemEReturn();
+                var d = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as GetAfterSaleItemReturn;
+                res.AfterSaleItem = d.AfterSaleItem;
+                res.Log = AfterSaleHaddle.GetOrderLog(RID,CoID).d as List<OrderLog>;
+                data.d = res;
             }
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -1556,5 +1560,62 @@ namespace CoreWebApi
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
+        [HttpPostAttribute("/Core/AfterSale/InsertAfterSaleOrd")]
+        public ResponseResult InsertAfterSaleOrd([FromBodyAttribute]JObject co)
+        {   
+            int OID = 0,x;
+            if(co["OID"] != null)
+            {
+                string Text = co["OID"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (int.TryParse(Text, out x))
+                    {
+                        OID = int.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "订单ID参数无效", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "订单ID必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单ID必填", "General"); 
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = AfterSaleHaddle.InsertAfterSaleOrd(CoID,username,OID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/AfterSale/OrdAddAfterSale")]
+        public ResponseResult OrdAddAfterSale(string OID)
+        {  
+            int rid,x;
+            if(!string.IsNullOrEmpty(OID))
+            {
+                if (int.TryParse(OID, out x))
+                {
+                    rid = int.Parse(OID);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "订单ID参数无效", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单ID必填", "General"); 
+            }
+            int CoID = int.Parse(GetCoid());
+            string username = GetUname();
+            var data = AfterSaleHaddle.OrdAddAfterSale(rid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }

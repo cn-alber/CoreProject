@@ -27,5 +27,6 @@ namespace CoreModels.XyCore
         public DateTime ModifyDate{get;set;}
         public string Confirmer{get;set;}
         public DateTime ConfirmDate{get;set;}
+        public string Distributor{get;set;}
     }
 }
