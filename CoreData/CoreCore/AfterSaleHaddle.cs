@@ -1746,7 +1746,9 @@ namespace CoreData.CoreCore
                     conn.Dispose();
                 }
             } 
-            res.AfterSaleItem = GetAfterSaleItem(CoID,rid).d as List<AfterSaleItemQuery>;
+            var d = GetAfterSaleItem(CoID,rid).d as GetAfterSaleItemReturn;
+            res.AfterSaleItem = d.AfterSaleItem as List<AfterSaleItemQuery>;
+            // res.AfterSaleItem = GetAfterSaleItem(CoID,rid).d as List<AfterSaleItemQuery>;
             res.Log = GetOrderLog(rid,CoID).d as List<OrderLog>;
             result.d = res;
             return result;
