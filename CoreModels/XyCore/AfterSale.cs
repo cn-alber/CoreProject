@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using CoreModels.XyComm;
 namespace CoreModels.XyCore
 {
     public class ASInitData
@@ -640,6 +639,23 @@ namespace CoreModels.XyCore
     public class ConfirmAfterSaleReturn
     {
         public List<ConfirmAfterSaleSuccess> SuccessIDs{get;set;}
+        public List<InsertFailReason> FailIDs{get;set;}
+    }
+    public class ConfirmAfterSaleEEReturn
+    {
+        public AfterSaleEdit AfterSale{get;set;}
+        public List<OrderLog> Log{get;set;}
+    }
+    public class ConfirmGoodsSuccess
+    {
+        public int ID{get;set;}
+        public string GoodsStatus{get;set;}
+        public string Modifier{get;set;}
+        public string ModifyDate{get;set;}
+    }
+    public class ConfirmGoodsReturn
+    {
+        public List<ConfirmGoodsSuccess> SuccessIDs{get;set;}
         public List<InsertFailReason> FailIDs{get;set;}
     }
 }

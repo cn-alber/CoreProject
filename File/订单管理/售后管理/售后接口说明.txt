@@ -174,9 +174,9 @@ output:售后单明细
 参考:input jason 文件:DeleteASItem_input.json
 参考:output jason 文件:DeleteASItem_output.json
 
-13.GetAfterSaleEdit() //新增售后单初始资料
+13.GetAfterSaleEdit() //售后详情打开
 路由:http://localhost:5000/Core/AfterSale/GetAfterSaleEdit
-input: None
+input: RID
 OutPut:AfterSale        售后单
        IssueType        问题类型
        Type             售后分类
@@ -286,10 +286,42 @@ output:SuccessIDs    成功的ID和线上状态
 参考:input jason 文件:DisagressReturn_input.json
 参考:output jason 文件:DisagressReturn_output.json
 
-25.ConfirmAfterSale()确认
+25.ConfirmAfterSale()确认(批次操作)
 路由:http://localhost:5000/Core/AfterSale/ConfirmAfterSale
 input:RID   List<int>   售后ID List
 output:SuccessIDs    成功的ID和修改后资料
        FailIDs       失败的ID和原因
 参考:input jason 文件:ConfirmAfterSale_input.json
 参考:output jason 文件:ConfirmAfterSale_output.json
+
+26.ConfirmAfterSaleE()确认(订单详情单笔操作)
+路由:http://localhost:5000/Core/AfterSale/ConfirmAfterSaleE
+input:RID   int   售后ID
+output:成功返回 更新后的售后资料  &&　日志
+　　　　失败返回原因
+参考:input jason 文件:ConfirmAfterSaleE_input.json
+参考:output jason 文件:ConfirmAfterSaleE_output.json
+
+27.ConfirmGoods()确认收到货物(批次操作)
+路由:http://localhost:5000/Core/AfterSale/ConfirmGoods
+input:RID   List<int>   售后ID List
+output:SuccessIDs    成功的ID和修改后资料
+       FailIDs       失败的ID和原因
+参考:input jason 文件:ConfirmGoods_input.json
+参考:output jason 文件:ConfirmGoods_output.json
+
+28.ConfirmGoodsE()确认收到货物(订单详情单笔操作)
+路由:http://localhost:5000/Core/AfterSale/ConfirmGoodsE
+input:RID   int   售后ID
+output:成功返回 更新后的售后资料 && 售后明细 &&　日志
+　　　　失败返回原因
+参考:input jason 文件:ConfirmGoodsE_input.json
+参考:output jason 文件:ConfirmGoodsE_output.json
+
+29.CancleGoods()取消收到货物(订单详情单笔操作)
+路由:http://localhost:5000/Core/AfterSale/CancleGoods
+input:RID   int   售后ID
+output:SuccessIDs    成功的ID和修改后资料
+       FailIDs       失败的ID和原因
+参考:input jason 文件:CancleGoods_input.json
+参考:output jason 文件:CancleGoods_output.json

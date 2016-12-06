@@ -1,0 +1,97 @@
+{
+    "s": 1,
+    "d": {
+        "AfterSale": {
+            "ID": 267,
+            "OID": -1,
+            "ShopName": "",
+            "Status": 0,
+            "StatusString": "待确认",
+            "GoodsStatus": "卖家已收到退货",
+            "SoID": 0,
+            "BuyerShopID": "",
+            "RecName": "",
+            "RecTel": "",
+            "RecPhone": "",
+            "Type": 0,
+            "TypeString": "普通退货",
+            "IssueType": 2,
+            "IssueTypeString": "七天无理由退货",
+            "RegisterDate": "2016-12-06 10:03:23",
+            "SalerReturnAmt": "0.00",
+            "BuyerUpAmt": "0.00",
+            "RealReturnAmt": "0.00",
+            "ReturnAccount": "",
+            "WarehouseID": 136,
+            "RecWarehouse": "南极云商常熟销退1仓2",
+            "Express": "",
+            "ExCode": "",
+            "Remark": ""
+        },
+        "AfterSaleItem": [
+            {
+                "ID": 106,
+                "ReturnType": 0,
+                "ReturnTypeString": "退货",
+                "SkuAutoID": 17,
+                "SkuID": "test4560011007",
+                "SkuName": "南极人2016男装休闲西裤",
+                "Norm": "蓝色;43",
+                "GoodsCode": "test456",
+                "RegisterQty": 1,
+                "ReturnQty": 1,
+                "Price": "6.00",
+                "Amount": "6.00",
+                "img": "",
+                "Creator": "管理员"
+            },
+            {
+                "ID": 107,
+                "ReturnType": 0,
+                "ReturnTypeString": "退货",
+                "SkuAutoID": 18,
+                "SkuID": "test4560011014",
+                "SkuName": "南极人2016男装休闲西裤",
+                "Norm": "蓝色;46",
+                "GoodsCode": "test456",
+                "RegisterQty": 1,
+                "ReturnQty": 1,
+                "Price": "6.00",
+                "Amount": "6.00",
+                "img": "",
+                "Creator": "管理员"
+            }
+        ],
+        "Log": [
+            {
+                "ID": "59117",
+                "LogDate": "2016-12-06 10:05:44",
+                "UserName": "管理员",
+                "Title": "新增退货商品",
+                "Remark": "test4560011007"
+            },
+            {
+                "ID": "59118",
+                "LogDate": "2016-12-06 10:05:44",
+                "UserName": "管理员",
+                "Title": "新增退货商品",
+                "Remark": "test4560011014"
+            },
+            {
+                "ID": "59119",
+                "LogDate": "2016-12-06 10:04:50",
+                "UserName": "管理员",
+                "Title": "确认收货",
+                "Remark": "ConfirmGoods"
+            },
+            {
+                "ID": "59115",
+                "LogDate": "2016-12-06 10:03:23",
+                "UserName": "管理员",
+                "Title": "售后时间",
+                "Remark": "手工新增售后时间"
+            }
+        ]
+    },
+    "m": ""
+}
