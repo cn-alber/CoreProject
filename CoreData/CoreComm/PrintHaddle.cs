@@ -6,6 +6,7 @@ using CoreData;
 using Newtonsoft.Json;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
+using CoreData.CoreComm;
 
 namespace CoreDate.CoreComm
 {
@@ -1080,6 +1081,55 @@ namespace CoreDate.CoreComm
                     {
                         myTpls = myTpls,    
                         sysTpls = type_syses,
+                    };                
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d= e.Message; 
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
+        public static DataResult GetShopAndMytpl(string t,string admin_id, string coid){
+
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                   
+                    List<print_uses> type = conn.Query<print_uses>(@"SELECT 
+                                                                        a.id , 
+                                                                        a.`name` 
+                                                                    FROM 
+                                                                        print_uses as a 
+                                                                    WHERE 
+                                                                        a.deleted = FALSE AND a.type = "+t).AsList();                    
+                    List<myTplModel> myTpls = new List<myTplModel>();
+                    myTplModel mytpl = new myTplModel();
+                    if (type != null) {
+                        var res = conn.Query<print_use_setting>(@"SELECT * FROM 
+                                                                    print_use_setting 
+                                                                  WHERE 
+                                                                    print_use_setting.admin_id = "+admin_id).AsList()[0];
+                        var defed_id = res != null ? res.defed_id : 0;
+                        foreach (print_uses pintuse in type) {                      
+                            mytpl.id = pintuse.id;
+                            mytpl.name = pintuse.name;
+                            mytpl.defed = defed_id == pintuse.id;
+                            myTpls.Add(mytpl);
+                            mytpl = new myTplModel();
+                        }                    
+                    }          
+
+                    string sql = @"SELECT ID as value ,ShopName as label, printID FROM shop WHERE CoID="+coid+" AND Enable=TRUE AND Deleted=FALSE ;";
+                    var shopEnum = conn.Query<shopWithPrint>(sql).AsList();  
+                    result.d = new
+                    {
+                        myTpls = myTpls,  
+                        shopEnum = shopEnum  
                     };                
                 }
                 catch (Exception e)

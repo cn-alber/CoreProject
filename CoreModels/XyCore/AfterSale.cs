@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using CoreModels.XyComm;
 namespace CoreModels.XyCore
 {
     public class ASInitData
@@ -642,4 +641,59 @@ namespace CoreModels.XyCore
         public List<ConfirmAfterSaleSuccess> SuccessIDs{get;set;}
         public List<InsertFailReason> FailIDs{get;set;}
     }
+    public class ConfirmAfterSaleEEReturn
+    {
+        public AfterSaleEdit AfterSale{get;set;}
+        public List<OrderLog> Log{get;set;}
+    }
+    public class ConfirmGoodsSuccess
+    {
+        public int ID{get;set;}
+        public string GoodsStatus{get;set;}
+        public string Modifier{get;set;}
+        public string ModifyDate{get;set;}
+    }
+    public class ConfirmGoodsReturn
+    {
+        public List<ConfirmGoodsSuccess> SuccessIDs{get;set;}
+        public List<InsertFailReason> FailIDs{get;set;}
+    }
+    public class AfterSaleOrd
+    {
+        public int ID{get;set;}
+        public int OID{get;set;}
+        public string RegisterDate{get;set;}
+        public int Type{get;set;}
+        public string TypeString{get;set;}
+        public int Status{get;set;}
+        public string StatusString{get;set;}
+        public string GoodsStatus{get;set;}
+        public string BuyerShopID{get;set;}
+        public string RecName{get;set;}
+        public string ReturnAccount{get;set;}
+        public string RecWarehouse{get;set;}
+        public string SalerReturnAmt{get;set;}
+        public string BuyerUpAmt{get;set;}
+        public string RealReturnAmt{get;set;}
+        public string ShopName{get;set;}
+        public int IssueType{get;set;}
+        public string IssueTypeString{get;set;}
+        public string Remark{get;set;}
+    }
+    public class OrdAddAfterSale1Return
+    {
+        public string Type{get;set;}
+        public List<AfterSaleOrd> AfterSale{get;set;}
+    }
+    public class OrdAddAfterSale2Return
+    {
+        public string Type{get;set;}
+        public int RID{get;set;}
+    }
+    public class UpdateASItemEReturn
+    {
+        public List<AfterSaleItemQuery> AfterSaleItem{get;set;}
+        public List<OrderLog> Log{get;set;}
+    }
+    
 }

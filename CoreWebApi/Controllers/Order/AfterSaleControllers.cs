@@ -7,7 +7,6 @@ using System;
 using CoreData.CoreComm;
 using CoreData;
 using System.Collections.Generic;
-using CoreModels;
 namespace CoreWebApi
 {
     [AllowAnonymous]
@@ -713,14 +712,14 @@ namespace CoreWebApi
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = AfterSaleHaddle.InsertASItemSku(CoID,username,RID,oid,ReturnType);
-            var res = new InsertASItemSkuReturn();
-            if(data.s == 1)
-            {
-                var d = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as GetAfterSaleItemReturn;
-                res.SuccessIDs = d.AfterSaleItem as List<AfterSaleItemQuery>;
-                res.FailIDs = data.d  as List<InsertFailReason>;
-                data.d = res;
-            }
+            // var res = new InsertASItemSkuReturn();
+            // if(data.s == 1)
+            // {
+            //     var d = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as GetAfterSaleItemReturn;
+            //     res.SuccessIDs = d.AfterSaleItem as List<AfterSaleItemQuery>;
+            //     res.FailIDs = data.d  as List<InsertFailReason>;
+            //     data.d = res;
+            // }
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
@@ -1114,11 +1113,11 @@ namespace CoreWebApi
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = AfterSaleHaddle.InsertASItemSku(CoID,username,RID,oid,ReturnType);
+            var dr = data.d as InsertASItemSkuReturn;
             var res = new InsertASItemSkuEReturn();
             if(data.s == 1)
             {
-                var d = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as GetAfterSaleItemReturn;
-                res.SuccessIDs = d.AfterSaleItem as List<AfterSaleItemQuery>;
+                res.SuccessIDs = dr.SuccessIDs as List<AfterSaleItemQuery>;
                 res.FailIDs = data.d  as List<InsertFailReason>;
                 res.Log = AfterSaleHaddle.GetOrderLog(RID,CoID).d as List<OrderLog>;
                 data.d = res;
@@ -1216,7 +1215,11 @@ namespace CoreWebApi
             var data = AfterSaleHaddle.UpdateASItem(CoID,username,RID,RDetailID,Qty,Amount);
             if(data.s == 1)
             {
-                data.d = AfterSaleHaddle.GetOrderLog(RID,CoID).d;
+                var res = new UpdateASItemEReturn();
+                var d = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as GetAfterSaleItemReturn;
+                res.AfterSaleItem = d.AfterSaleItem;
+                res.Log = AfterSaleHaddle.GetOrderLog(RID,CoID).d as List<OrderLog>;
+                data.d = res;
             }
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -1420,6 +1423,198 @@ namespace CoreWebApi
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = AfterSaleHaddle.ConfirmAfterSale(rid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/AfterSale/ConfirmAfterSaleE")]
+        public ResponseResult ConfirmAfterSaleE([FromBodyAttribute]JObject co)
+        {   
+            var rid = new List<int>();
+            int RID = 0,x;
+            if(co["RID"] != null)
+            {
+                string Text = co["RID"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (int.TryParse(Text, out x))
+                    {
+                        RID = int.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "售后ID参数无效", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "售后ID必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "售后ID必填", "General"); 
+            }
+            rid.Add(RID);
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = AfterSaleHaddle.ConfirmAfterSale(rid,CoID,username);
+            var res = data.d as ConfirmAfterSaleReturn;
+            if(res.SuccessIDs.Count > 0 && res.FailIDs.Count == 0)
+            {
+                var dc = new ConfirmAfterSaleEEReturn();
+                dc.AfterSale = AfterSaleHaddle.GetAfterSaleSingle(RID,CoID).d as AfterSaleEdit;
+                dc.Log = AfterSaleHaddle.GetOrderLog(RID,CoID).d as List<OrderLog>;
+                data.d = dc;
+            }
+            if(res.SuccessIDs.Count == 0 && res.FailIDs.Count > 0)
+            {
+                data.s = -1;
+                data.d = res.FailIDs[0].reason;
+            }
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/AfterSale/ConfirmGoods")]
+        public ResponseResult ConfirmGoods([FromBodyAttribute]JObject co)
+        {   
+            var rid = new List<int>();
+            if(co["RID"] != null)
+            {
+                rid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["RID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "售后ID必填", "General");
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = AfterSaleHaddle.ConfirmGoods(rid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/AfterSale/ConfirmGoodsE")]
+        public ResponseResult ConfirmGoodsE([FromBodyAttribute]JObject co)
+        {   
+            var rid = new List<int>();
+            int RID = 0,x;
+            if(co["RID"] != null)
+            {
+                string Text = co["RID"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (int.TryParse(Text, out x))
+                    {
+                        RID = int.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "售后ID参数无效", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "售后ID必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "售后ID必填", "General"); 
+            }
+            rid.Add(RID);
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = AfterSaleHaddle.ConfirmGoods(rid,CoID,username);
+            var res = data.d as ConfirmGoodsReturn;
+            if(res.SuccessIDs.Count > 0 && res.FailIDs.Count == 0)
+            {
+                var dc = new UpdateAfterSaleEReturn();
+                dc.AfterSale = AfterSaleHaddle.GetAfterSaleSingle(RID,CoID).d as AfterSaleEdit;
+                var d = AfterSaleHaddle.GetAfterSaleItem(CoID,RID).d as GetAfterSaleItemReturn;
+                dc.AfterSaleItem = d.AfterSaleItem;
+                dc.Log = AfterSaleHaddle.GetOrderLog(RID,CoID).d as List<OrderLog>;
+                data.d = dc;
+            }
+            if(res.SuccessIDs.Count == 0 && res.FailIDs.Count > 0)
+            {
+                data.s = -1;
+                data.d = res.FailIDs[0].reason;
+            }
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/AfterSale/CancleGoods")]
+        public ResponseResult CancleGoods([FromBodyAttribute]JObject co)
+        {   
+            var rid = new List<int>();
+            if(co["RID"] != null)
+            {
+                rid = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["RID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "售后ID必填", "General");
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = AfterSaleHaddle.CancleGoods(rid,CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/AfterSale/InsertAfterSaleOrd")]
+        public ResponseResult InsertAfterSaleOrd([FromBodyAttribute]JObject co)
+        {   
+            int OID = 0,x;
+            if(co["OID"] != null)
+            {
+                string Text = co["OID"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (int.TryParse(Text, out x))
+                    {
+                        OID = int.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "订单ID参数无效", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "订单ID必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单ID必填", "General"); 
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = AfterSaleHaddle.InsertAfterSaleOrd(CoID,username,OID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/AfterSale/OrdAddAfterSale")]
+        public ResponseResult OrdAddAfterSale(string OID)
+        {  
+            int rid,x;
+            if(!string.IsNullOrEmpty(OID))
+            {
+                if (int.TryParse(OID, out x))
+                {
+                    rid = int.Parse(OID);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "订单ID参数无效", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "订单ID必填", "General"); 
+            }
+            int CoID = int.Parse(GetCoid());
+            string username = GetUname();
+            var data = AfterSaleHaddle.OrdAddAfterSale(rid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     }
