@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 namespace CoreWebApi
 {
-    [AllowAnonymous]
+    // [AllowAnonymous]
     public class AShelvesController : ControllBase
     {
         #region 货品上架 - 扫描Sku,检查货位库存,返回有效货位
