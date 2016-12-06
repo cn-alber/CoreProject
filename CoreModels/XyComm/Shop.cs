@@ -34,6 +34,8 @@ namespace CoreModels.XyComm
         public string Token{get;set;}    
         public string ShopBegin{get;set;} // 创店日期
         public bool Deleted {get;set;} //是否删除
+
+        public int PrintID{get;set;} // 打印模板
         #endregion
     }
 
@@ -92,6 +94,17 @@ namespace CoreModels.XyComm
 	    public int value{get;set;}
 		public string label{get;set;}
 
+    }
+    public class shopWithPrint{
+	    public int value{get;set;}
+		public string label{get;set;}
+        public int printID{get;set;}
+
+    }
+
+    public class shopPrintUpdate{
+        public int id {get;set;}
+        public int printID{get;set;}
     }
 
 

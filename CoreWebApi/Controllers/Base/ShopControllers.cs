@@ -157,7 +157,15 @@ namespace CoreWebApi.Base
             return CoreResult.NewResponse(res.s,res.d,"Api");
         }
 
-        
+        [HttpPostAttribute("/Core/Shop/setShopPrint")]
+        public ResponseResult setShopPrint([FromBodyAttribute]JObject obj)
+        {    
+            var shopPrint = Newtonsoft.Json.JsonConvert.DeserializeObject<List<shopPrintUpdate>>(obj["shopArr"].ToString());                      
+            string Coid = GetCoid();
+            
+            var res = ShopHaddle.setShopPrint(shopPrint,Coid);
+            return CoreResult.NewResponse(res.s,res.d,"Api");
+        }
 
 
 

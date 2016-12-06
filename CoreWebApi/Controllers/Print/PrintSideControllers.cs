@@ -45,6 +45,18 @@ namespace CoreWebApi.Print
         }
         #endregion
 
+        #region 获取店铺和模板列表
+        [HttpGetAttribute("/core/print/tpl/GetShopAndMytpl")]
+        public ResponseResult GetShopAndMytpl(int type)
+        {
+            if(!checkInt(type)) return CoreResult.NewResponse(-4001, null, "Print");
+            var admin_id = GetUid();
+            string coid = GetCoid();
+            var m = PrintHaddle.GetShopAndMytpl(type.ToString(),admin_id, coid);
+            return CoreResult.NewResponse(m.s, m.d, "Print");
+        }
+        #endregion
+
 
 
 

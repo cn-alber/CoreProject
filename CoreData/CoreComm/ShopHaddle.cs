@@ -789,6 +789,29 @@ namespace CoreData.CoreComm
 
             return res;
         }
+        
+        ///<summary>
+        /// 指定店铺
+        ///</summary>
+        public static DataResult setShopPrint(List<shopPrintUpdate> data, string CoID){
+            var res = new DataResult(1, null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    StringBuilder sql = new StringBuilder("");
+                    foreach(var d in data){
+                        sql.Append("UPDATE shop SET shop.PrintID = "+d.printID+" WHERE ID = "+d.id+" AND CoID =1;");
+                    }
+                    res.d = conn.Execute(sql.ToString());                                  
+                }
+                catch
+                {
+                    conn.Dispose();
+                }
+            }
+
+            return res;
+        }
 
 
     }
