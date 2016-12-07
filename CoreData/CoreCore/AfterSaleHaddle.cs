@@ -409,11 +409,11 @@ namespace CoreData.CoreCore
             {
                 wheresql = wheresql + " AND IsSubmitDis = '" + cp.IsSubmitDis.ToUpper() + "'" ;
             }
-            if(cp.ShopID > 0)
+            if(cp.ShopID >= 0)
             {
                 wheresql = wheresql + " AND ShopID = " + cp.ShopID ;
             }
-            if(cp.Status > 0)
+            if(cp.Status >= 0)
             {
                 wheresql = wheresql + " AND Status = " + cp.Status ;
             }
@@ -421,11 +421,11 @@ namespace CoreData.CoreCore
             {
                 wheresql = wheresql + " AND GoodsStatus = '" + cp.GoodsStatus + "'" ;
             }
-            if(cp.Type > 0)
+            if(cp.Type >= 0)
             {
                 wheresql = wheresql + " AND Type = " + cp.Type ;
             }
-            if(cp.OrdType > 0)
+            if(cp.OrdType >= 0)
             {
                 wheresql = wheresql + " AND OrdType = " + cp.OrdType ;
             }
@@ -449,19 +449,19 @@ namespace CoreData.CoreCore
                 shopstatus = shopstatus.Substring(0,shopstatus.Length - 1);
                 wheresql = wheresql + " AND RefundStatus in (" +  shopstatus + ")";
             }
-            if(cp.Distributor > 0)
+            if(!string.IsNullOrEmpty(cp.Distributor))
             {
-                wheresql = wheresql + " AND Distributor = " + cp.Distributor ;
+                wheresql = wheresql + " AND Distributor = '" + cp.Distributor + "'";
             }
             if(!string.IsNullOrEmpty(cp.IsSubmit) && (cp.IsSubmit.ToUpper() == "Y" || cp.IsSubmit.ToUpper() == "N"))
             {
                 wheresql = wheresql + " AND IsSubmit = '" + cp.IsSubmit.ToUpper() + "'" ;
             }
-            if(cp.IssueType > 0)
+            if(cp.IssueType >= 0)
             {
                 wheresql = wheresql + " AND IssueType = " + cp.IssueType ;
             }
-            if(cp.Result > 0)
+            if(cp.Result >= 0)
             {
                 wheresql = wheresql + " AND Result = " + cp.Result ;
             }
@@ -1335,7 +1335,7 @@ namespace CoreData.CoreCore
             int count = 0;
             var logs = new List<LogInsert>();
             var log = new LogInsert();
-            var rt = new List<InsertFailReason>();
+            var rt = new List<TransferNormalReturnFail>();
             var res = new InsertASItemSkuReturn();
             var sid = new List<int>();
             // int ReturnType = 0;
@@ -1379,13 +1379,13 @@ namespace CoreData.CoreCore
                 // }
                 foreach (int a in SkuID)
                 {
-                    InsertFailReason rf = new InsertFailReason();
+                    TransferNormalReturnFail rf = new TransferNormalReturnFail();
                     string skusql = "select skuid,skuname,norm,img,goodscode,enable,saleprice,weight from coresku where id =" + a + " and coid =" + CoID;
                     var s = CoreDBconn.Query<SkuInsert>(skusql).AsList();
                     if (s.Count == 0)
                     {
-                        rf.id = a;
-                        rf.reason = "此商品不存在!";
+                        rf.ID = a;
+                        rf.Reason = "此商品不存在!";
                         rt.Add(rf);
                         continue;
                     }
@@ -1393,8 +1393,8 @@ namespace CoreData.CoreCore
                     {
                         if (s[0].enable == false)
                         {
-                            rf.id = a;
-                            rf.reason = "此商品已停用!";
+                            rf.ID = a;
+                            rf.Reason = "此商品已停用!";
                             rt.Add(rf);
                             continue;
                         }
@@ -1424,8 +1424,8 @@ namespace CoreData.CoreCore
                     count = CoreDBconn.Execute(sqlcommand, args, TransCore);
                     if (count <= 0)
                     {
-                        rf.id = a;
-                        rf.reason = "新增明细失败!";
+                        rf.ID = a;
+                        rf.Reason = "新增明细失败!";
                         rt.Add(rf);
                     }
                     else
@@ -2083,7 +2083,7 @@ namespace CoreData.CoreCore
             var logs = new List<LogInsert>();
             var log = new LogInsert();
             var res = new CancleAfterSaleReturn();
-            var fa = new List<InsertFailReason>();
+            var fa = new List<TransferNormalReturnFail>();
             var su = new List<CancleAfterSaleSuccess>();
             string sqlcommand = string.Empty;
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
@@ -2103,17 +2103,17 @@ namespace CoreData.CoreCore
                 {
                     if(a.Status != 0)
                     {
-                        var ff = new InsertFailReason();
-                        ff.id = a.ID;
-                        ff.reason = "只有待确认的单据才可以作废!";
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "只有待确认的单据才可以作废!";
                         fa.Add(ff);
                         continue;
                     }
                     if(a.GoodsStatus == "卖家已收到退货")
                     {
-                        var ff = new InsertFailReason();
-                        ff.id = a.ID;
-                        ff.reason = "已收到退货,若要作废单据,请先取消收到货物!";
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "已收到退货,若要作废单据,请先取消收到货物!";
                         fa.Add(ff);
                         continue;
                     }
@@ -2181,7 +2181,7 @@ namespace CoreData.CoreCore
             var logs = new List<LogInsert>();
             var log = new LogInsert();
             var res = new AgressReturn();
-            var fa = new List<InsertFailReason>();
+            var fa = new List<TransferNormalReturnFail>();
             var su = new List<AgressReturnSuccess>();
             string sqlcommand = string.Empty;
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
@@ -2201,17 +2201,17 @@ namespace CoreData.CoreCore
                 {
                     if(a.Status != 0)
                     {
-                        var ff = new InsertFailReason();
-                        ff.id = a.ID;
-                        ff.reason = "只有待确认的单据才可以操作!";
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "只有待确认的单据才可以操作!";
                         fa.Add(ff);
                         continue;
                     }
                     if(a.ShopStatus != "买家已经申请退款,等待卖家同意")
                     {
-                        var ff = new InsertFailReason();
-                        ff.id = a.ID;
-                        ff.reason = "只有[买家已经申请退款,等待卖家同意]的单据才可以操作!";
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "只有[买家已经申请退款,等待卖家同意]的单据才可以操作!";
                         fa.Add(ff);
                         continue;
                     }
@@ -2277,7 +2277,7 @@ namespace CoreData.CoreCore
             var logs = new List<LogInsert>();
             var log = new LogInsert();
             var res = new AgressReturn();
-            var fa = new List<InsertFailReason>();
+            var fa = new List<TransferNormalReturnFail>();
             var su = new List<AgressReturnSuccess>();
             string sqlcommand = string.Empty;
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
@@ -2297,17 +2297,17 @@ namespace CoreData.CoreCore
                 {
                     if(a.Status != 0)
                     {
-                        var ff = new InsertFailReason();
-                        ff.id = a.ID;
-                        ff.reason = "只有待确认的单据才可以操作!";
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "只有待确认的单据才可以操作!";
                         fa.Add(ff);
                         continue;
                     }
                     if(a.ShopStatus != "买家已经申请退款,等待卖家同意")
                     {
-                        var ff = new InsertFailReason();
-                        ff.id = a.ID;
-                        ff.reason = "只有[买家已经申请退款,等待卖家同意]的单据才可以操作!";
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "只有[买家已经申请退款,等待卖家同意]的单据才可以操作!";
                         fa.Add(ff);
                         continue;
                     }
@@ -2375,7 +2375,7 @@ namespace CoreData.CoreCore
             var logs = new List<LogInsert>();
             var log = new LogInsert();
             var res = new ConfirmAfterSaleReturn();
-            var fa = new List<InsertFailReason>();
+            var fa = new List<TransferNormalReturnFail>();
             var su = new List<ConfirmAfterSaleSuccess>();
             string sqlcommand = string.Empty;
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
@@ -2395,9 +2395,9 @@ namespace CoreData.CoreCore
                 {
                     if(a.Status != 0)
                     {
-                        var ff = new InsertFailReason();
-                        ff.id = a.ID;
-                        ff.reason = "只有待确认的单据才可以操作!";
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "只有待确认的单据才可以操作!";
                         fa.Add(ff);
                         continue;
                     }
@@ -2456,9 +2456,9 @@ namespace CoreData.CoreCore
                         }
                         if(x != y)
                         {
-                            var ff = new InsertFailReason();
-                            ff.id = a.ID;
-                            ff.reason = "退货的商品数量不等于换货的商品数量!";
+                            var ff = new TransferNormalReturnFail();
+                            ff.ID = a.ID;
+                            ff.Reason = "退货的商品数量不等于换货的商品数量!";
                             fa.Add(ff);
                             continue;
                         }
@@ -2943,7 +2943,7 @@ namespace CoreData.CoreCore
             var logs = new List<LogInsert>();
             var log = new LogInsert();
             var res = new ConfirmGoodsReturn();
-            var fa = new List<InsertFailReason>();
+            var fa = new List<TransferNormalReturnFail>();
             var su = new List<ConfirmGoodsSuccess>();
             string sqlcommand = string.Empty;
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
@@ -2963,17 +2963,17 @@ namespace CoreData.CoreCore
                 {
                     if(a.Type != 0 && a.Type != 1 && a.Type != 2)
                     {
-                        var ff = new InsertFailReason();
-                        ff.id = a.ID;
-                        ff.reason = "普通退货/拒收退货/换货的单据才可以执行此操作!";
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "普通退货/拒收退货/换货的单据才可以执行此操作!";
                         fa.Add(ff);
                         continue;
                     }
                     if(a.GoodsStatus == "卖家已收到退货")
                     {
-                        var ff = new InsertFailReason();
-                        ff.id = a.ID;
-                        ff.reason = "卖家未收到退货的单据才可以执行此操作!";
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "卖家未收到退货的单据才可以执行此操作!";
                         fa.Add(ff);
                         continue;
                     }
@@ -3141,7 +3141,7 @@ namespace CoreData.CoreCore
             var logs = new List<LogInsert>();
             var log = new LogInsert();
             var res = new ConfirmGoodsReturn();
-            var fa = new List<InsertFailReason>();
+            var fa = new List<TransferNormalReturnFail>();
             var su = new List<ConfirmGoodsSuccess>();
             string sqlcommand = string.Empty;
             var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
@@ -3161,17 +3161,17 @@ namespace CoreData.CoreCore
                 {
                     if(a.Type != 0 && a.Type != 1 && a.Type != 2)
                     {
-                        var ff = new InsertFailReason();
-                        ff.id = a.ID;
-                        ff.reason = "普通退货/拒收退货/换货的单据才可以执行此操作!";
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "普通退货/拒收退货/换货的单据才可以执行此操作!";
                         fa.Add(ff);
                         continue;
                     }
                     if(a.GoodsStatus != "卖家已收到退货")
                     {
-                        var ff = new InsertFailReason();
-                        ff.id = a.ID;
-                        ff.reason = "卖家已收到退货的单据才可以执行此操作!";
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "卖家已收到退货的单据才可以执行此操作!";
                         fa.Add(ff);
                         continue;
                     }
@@ -3442,6 +3442,168 @@ namespace CoreData.CoreCore
                     conn.Dispose();
                 }
             } 
+            return result;
+        }
+        ///<summary>
+        ///售后资料导入
+        ///</summary>
+        public static DataResult ImportInsertAfterSale(string DuType,int CoID,int Type,decimal SalerReturnAmt,decimal BuyerUpAmt,int WarehouseID,int IssueType,string Remark,
+                                                 string UserName,string Express,string ExCode,int OID)
+        {
+            var result = new DataResult(1,null);
+            int count = 0;
+            var log = new LogInsert();
+            var afterAsale = new AfterSale();
+            string WarehouseName = "";
+            string sqlcommand = string.Empty;
+            if(WarehouseID > 0)
+            {   
+                using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                    try{    
+                        string wheresql = "select WarehouseName from warehouse where ID =" + WarehouseID + " and enable = true and coid = " + CoID;
+                        var u = conn.Query<string>(wheresql).AsList();
+                        if(u.Count == 0)
+                        {
+                            result.s = -1;
+                            result.d = "仓库ID无效";
+                            return result;
+                        }
+                        else
+                        {
+                            WarehouseName = u[0];
+                        }          
+                    }catch(Exception ex){
+                        result.s = -1;
+                        result.d = ex.Message;
+                        conn.Dispose();
+                    }
+                }  
+            }
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                afterAsale.RegisterDate = DateTime.Now;
+                afterAsale.Type = Type;
+                afterAsale.SalerReturnAmt = SalerReturnAmt;
+                afterAsale.BuyerUpAmt = BuyerUpAmt;
+                afterAsale.RealReturnAmt = SalerReturnAmt - BuyerUpAmt;
+                if(WarehouseID > 0)
+                {
+                    afterAsale.WarehouseID = WarehouseID;
+                    afterAsale.RecWarehouse = WarehouseName;
+                }
+                afterAsale.IssueType = IssueType;
+                afterAsale.Remark = Remark;
+                afterAsale.Status = 0;
+                afterAsale.RefundStatus = "未申请状态";
+                afterAsale.IsSubmit = false;
+                afterAsale.IsSubmitDis = false;
+                afterAsale.IsInterfaceLoad = false;
+                afterAsale.CoID = CoID;
+                afterAsale.Creator = UserName;
+                afterAsale.Modifier = UserName;
+                afterAsale.Express = Express;
+                afterAsale.ExCode = ExCode;
+                afterAsale.OID = OID;
+                if(DuType == "A")
+                {
+                    sqlcommand = "select SoID,BuyerShopID,RecName,RecTel,RecPhone,ShopID,ShopName,Type,Distributor from `order` where id = " + OID + " and coid = " + CoID;
+                    var u = CoreDBconn.Query<Order>(sqlcommand).AsList();
+                    if(u.Count == 0)
+                    {
+                        result.s = -1;
+                        result.d = "订单ID无效";
+                        return result;
+                    }
+                    afterAsale.SoID = u[0].SoID;
+                    afterAsale.BuyerShopID = u[0].BuyerShopID;
+                    afterAsale.RecName = u[0].RecName;
+                    afterAsale.RecTel = u[0].RecTel;
+                    afterAsale.RecPhone = u[0].RecPhone;
+                    afterAsale.ShopID = u[0].ShopID;
+                    afterAsale.ShopName = u[0].ShopName;
+                    afterAsale.OrdType = u[0].Type;
+                    afterAsale.Distributor = u[0].Distributor;
+                }                
+                if(DuType == "A")
+                {
+                    sqlcommand = @"INSERT INTO aftersale(OID,SoID,RegisterDate,BuyerShopID,RecName,Type,RecTel,RecPhone,SalerReturnAmt,BuyerUpAmt,RealReturnAmt,ShopID,ShopName,
+                                                         WarehouseID,RecWarehouse,IssueType,OrdType,Remark,Status,RefundStatus,Express,ExCode,IsSubmit,IsSubmitDis,IsInterfaceLoad,
+                                                         Distributor,CoID,Creator,Modifier) 
+                                                  VALUES(@OID,@SoID,@RegisterDate,@BuyerShopID,@RecName,@Type,@RecTel,@RecPhone,@SalerReturnAmt,@BuyerUpAmt,@RealReturnAmt,@ShopID,@ShopName,
+                                                         @WarehouseID,@RecWarehouse,@IssueType,@OrdType,@Remark,@Status,@RefundStatus,@Express,@ExCode,@IsSubmit,@IsSubmitDis,@IsInterfaceLoad,
+                                                         @Distributor,@CoID,@Creator,@Modifier)";
+                }
+                if(DuType == "B")
+                {
+                    sqlcommand = @"INSERT INTO aftersale(OID,RegisterDate,Type,SalerReturnAmt,BuyerUpAmt,RealReturnAmt,WarehouseID,RecWarehouse,IssueType,Remark,Status,RefundStatus,
+                                                         Express,ExCode,IsSubmit,IsSubmitDis,IsInterfaceLoad,CoID,Creator,Modifier) 
+                                                  VALUES(@OID,@RegisterDate,@Type,@SalerReturnAmt,@BuyerUpAmt,@RealReturnAmt,@WarehouseID,@RecWarehouse,@IssueType,@Remark,@Status,@RefundStatus,
+                                                         @Express,@ExCode,@IsSubmit,@IsSubmitDis,@IsInterfaceLoad,@CoID,@Creator,@Modifier)";
+                }
+                count = CoreDBconn.Execute(sqlcommand,afterAsale,TransCore);
+                int rtn = 0;
+                if(count <= 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                else
+                {
+                    rtn = CoreDBconn.QueryFirst<int>("select LAST_INSERT_ID()");
+                    result.d = rtn;
+                }
+                if(afterAsale.Type == 1 && afterAsale.OID > 0)
+                {
+                    sqlcommand = "select * from orderitem where oid = " + afterAsale.OID + " and coid = " + CoID;
+                    var item = CoreDBconn.Query<OrderItem>(sqlcommand).AsList();
+                    foreach(var it in item)
+                    {
+                        sqlcommand = @"INSERT INTO aftersaleitem(RID,ReturnType,SkuAutoID,SkuID,SkuName,Norm,GoodsCode,RegisterQty,Price,Amount,Img,CoID,Creator,Modifier) 
+                                        VALUES(@RID,@ReturnType,@SkuAutoID,@SkuID,@SkuName,@Norm,@GoodsCode,@RegisterQty,@Price,@Amount,@Img,@CoID,@Creator,@Creator)";
+                        var args = new{RID = rtn,ReturnType = 0,SkuAutoID=it.SkuAutoID,SkuID = it.SkuID,SkuName=it.SkuName,Norm=it.Norm,GoodsCode=it.GoodsCode,RegisterQty=it.Qty,
+                                        Price=it.RealPrice,Amount=it.Amount,Img=it.img,CoID=CoID,Creator=UserName};
+                        count = CoreDBconn.Execute(sqlcommand,args,TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3002;
+                            return result;
+                        }
+                    }
+                }
+                log.OID = rtn;
+                log.Type = 1;
+                log.LogDate = DateTime.Now;
+                log.UserName = UserName;
+                log.Title = "售后时间";
+                log.Remark = "手工新增售后时间";
+                log.CoID = CoID;
+                string loginsert = @"INSERT INTO orderlog(OID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                   VALUES(@OID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                count =CoreDBconn.Execute(loginsert,log,TransCore);
+                if(count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            
+            
             return result;
         }
     }
