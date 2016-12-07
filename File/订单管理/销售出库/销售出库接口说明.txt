@@ -1,0 +1,33 @@
+接口名称:CoreWebApi/Controllers/Order/
+function说明
+1.GetSaleOutList() //查询table saleout资料
+  路由:http://localhost:5000/Core/SaleOut/GetSaleOutList
+input:      ID                  string          出库单号 
+            OID                 string          内部订单单号
+            SoID                string          外部订单单号
+            ExCode              string          快递单号 
+            DateStart           string          日期起 
+            Dateend             string          日期迄 
+            Status              string          状态
+            IsWeightYN          string          称重否
+            SkuID               string          商品编码
+            GoodsCode           string          款式编号
+            ExID                string          快递
+            IsExpPrint          string          快递单打印否
+            ShopID              string          店铺
+            RecName             string          收货人
+            BatchID             string          批次号
+            SortField           string          排序栏位名称 
+            SortDirection       string          排序方式
+            PageIndex           string          资料页数(ex.第一页就给1) default 1
+            NumPerPage          string          每页显示资料笔数 default 20
+OutPut:     Datacnt             int             资料总笔数
+            Pagecnt             decimal         总页数
+            SaleOut             List<SaleOut>   SaleOut 资料
+参考:output jason 文件:GetSaleOutList_output.json
+
+2.GetStatusInitData() //status List
+  路由:http://localhost:5000/Core/SaleOut/GetStatusInitData
+input:None
+OutPut:status List
+参考:output jason 文件:GetStatusInitData_output.json

@@ -1,0 +1,20 @@
+{
+    "AfterSale": {
+        "SoID": 63616702204,
+        "RegisterDate": "2016-12-7",
+        "Type": 0,
+        "ReturnAccount": "",
+        "IssueType": 3,
+        "Remark": "",
+        "ShopStatus": "等待买家退货",
+        "GoodsStatus": "卖家已退货",
+        "RefundStatus": "未申请状态",
+        "Result": 2,
+        "Express": "",
+        "ExCode": "",
+        "Item": [{
+            "SkuID": "test1234560004007",
+            "RegisterQty": 1
+        }]
+    }
+}

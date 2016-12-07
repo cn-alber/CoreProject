@@ -713,8 +713,21 @@ namespace CoreModels.XyCore
     }
     public class ImportAfterSaleItem
     {
-        public int ReturnType{get;set;}
         public string SkuID{get;set;}
         public int RegisterQty{get;set;}
+    }
+    public class ImportUpdateAfterSale
+    {
+        public long SoID{get;set;}
+        public int Type{get;set;}
+        public string ReturnAccount{get;set;}
+        public int IssueType{get;set;}
+        public string Remark{get;set;}
+        public string ShopStatus{get;set;}
+        public string GoodsStatus{get;set;}
+        public string RefundStatus{get;set;}
+        public int Result{get;set;}
+        public string Express{get;set;}
+        public string ExCode{get;set;}
     }
 }

@@ -339,3 +339,17 @@ input:OID   int  订单ID
 output:Type = A 表示有售后资料，返回售后List
        Type = B,表示没有售后资料，返回新增的售后ID
 参考:output jason 文件:OrdAddAfterSale_output.json
+
+32.ImportInsertAfterSale()接口售后新增
+路由:http://localhost:5000/Core/Order/ImportInsertAfterSale
+input:Module ImportInsertAfterSale
+output: s=1成功 else 错误代码
+参考:input jason 文件:ImportInsertAfterSale_input.json
+参考:output jason 文件:ImportInsertAfterSale_output.json
+
+23.ImportUpdateAfterSale()接口售后更新
+路由:http://localhost:5000/Core/Order/ImportUpdateAfterSale
+input:Module ImportUpdateAfterSale
+output: s=1成功 else 错误代码
+参考:input jason 文件:ImportUpdateAfterSale_input.json
+参考:output jason 文件:ImportUpdateAfterSale_output.json
