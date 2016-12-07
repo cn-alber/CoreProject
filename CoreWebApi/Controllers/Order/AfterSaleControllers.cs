@@ -1112,7 +1112,7 @@ namespace CoreWebApi
             if(data.s == 1)
             {
                 res.SuccessIDs = dr.SuccessIDs as List<AfterSaleItemQuery>;
-                res.FailIDs = data.d  as List<InsertFailReason>;
+                res.FailIDs = data.d  as List<TransferNormalReturnFail>;
                 res.Log = AfterSaleHaddle.GetOrderLog(RID,CoID).d as List<OrderLog>;
                 data.d = res;
             }
@@ -1463,7 +1463,7 @@ namespace CoreWebApi
             if(res.SuccessIDs.Count == 0 && res.FailIDs.Count > 0)
             {
                 data.s = -1;
-                data.d = res.FailIDs[0].reason;
+                data.d = res.FailIDs[0].Reason;
             }
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
@@ -1531,7 +1531,7 @@ namespace CoreWebApi
             if(res.SuccessIDs.Count == 0 && res.FailIDs.Count > 0)
             {
                 data.s = -1;
-                data.d = res.FailIDs[0].reason;
+                data.d = res.FailIDs[0].Reason;
             }
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }

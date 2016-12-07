@@ -533,7 +533,7 @@ namespace CoreModels.XyCore
     public class InsertASItemSkuReturn
     {
         public List<AfterSaleItemQuery> SuccessIDs{get;set;}
-        public List<InsertFailReason> FailIDs{get;set;}
+        public List<TransferNormalReturnFail> FailIDs{get;set;}
     }
     public class AfterSaleEdit
     {
@@ -586,13 +586,13 @@ namespace CoreModels.XyCore
     public class InsertASItemSkuEReturn
     {
         public List<AfterSaleItemQuery> SuccessIDs{get;set;}
-        public List<InsertFailReason> FailIDs{get;set;}
+        public List<TransferNormalReturnFail> FailIDs{get;set;}
         public List<OrderLog> Log{get;set;}
     }
     public class BindOrdReturn
     {
         public List<AfterSaleQuery> SuccessIDs{get;set;}
-        public List<InsertFailReason> FailIDs{get;set;}
+        public List<TransferNormalReturnFail> FailIDs{get;set;}
     }
     public class RefreshASReturn
     {
@@ -615,7 +615,7 @@ namespace CoreModels.XyCore
     public class CancleAfterSaleReturn
     {
         public List<CancleAfterSaleSuccess> SuccessIDs{get;set;}
-        public List<InsertFailReason> FailIDs{get;set;}
+        public List<TransferNormalReturnFail> FailIDs{get;set;}
     }
     public class AgressReturnSuccess
     {
@@ -625,7 +625,7 @@ namespace CoreModels.XyCore
     public class AgressReturn
     {
         public List<AgressReturnSuccess> SuccessIDs{get;set;}
-        public List<InsertFailReason> FailIDs{get;set;}
+        public List<TransferNormalReturnFail> FailIDs{get;set;}
     }
     public class ConfirmAfterSaleSuccess
     {
@@ -639,7 +639,7 @@ namespace CoreModels.XyCore
     public class ConfirmAfterSaleReturn
     {
         public List<ConfirmAfterSaleSuccess> SuccessIDs{get;set;}
-        public List<InsertFailReason> FailIDs{get;set;}
+        public List<TransferNormalReturnFail> FailIDs{get;set;}
     }
     public class ConfirmAfterSaleEEReturn
     {
@@ -656,7 +656,7 @@ namespace CoreModels.XyCore
     public class ConfirmGoodsReturn
     {
         public List<ConfirmGoodsSuccess> SuccessIDs{get;set;}
-        public List<InsertFailReason> FailIDs{get;set;}
+        public List<TransferNormalReturnFail> FailIDs{get;set;}
     }
     public class AfterSaleOrd
     {
@@ -695,5 +695,26 @@ namespace CoreModels.XyCore
         public List<AfterSaleItemQuery> AfterSaleItem{get;set;}
         public List<OrderLog> Log{get;set;}
     }
-    
+    public class ImportInsertAfterSale
+    {
+        public long SoID{get;set;}
+        public DateTime RegisterDate{get;set;}
+        public int Type{get;set;}
+        public string ReturnAccount{get;set;}
+        public int IssueType{get;set;}
+        public string Remark{get;set;}
+        public string ShopStatus{get;set;}
+        public string GoodsStatus{get;set;}
+        public string RefundStatus{get;set;}
+        public int Result{get;set;}
+        public string Express{get;set;}
+        public string ExCode{get;set;}
+        public List<ImportAfterSaleItem> Item{get;set;}
+    }
+    public class ImportAfterSaleItem
+    {
+        public int ReturnType{get;set;}
+        public string SkuID{get;set;}
+        public int RegisterQty{get;set;}
+    }
 }
