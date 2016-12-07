@@ -1,0 +1,15 @@
+{
+    "AfterSale": {
+        "SoID": 63616702204,
+        "Type": 0,
+        "ReturnAccount": "",
+        "IssueType": 4,
+        "Remark": "",
+        "ShopStatus": "等待买家退货1",
+        "GoodsStatus": "卖家已退货1",
+        "RefundStatus": "未申请状态1",
+        "Result": 5,
+        "Express": "",
+        "ExCode": ""
+    }
+}

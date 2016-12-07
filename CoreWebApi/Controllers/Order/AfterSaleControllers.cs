@@ -1611,5 +1611,33 @@ namespace CoreWebApi
             var data = AfterSaleHaddle.OrdAddAfterSale(rid,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/AfterSale/ImportInsertAfterSale")]
+        public ResponseResult ImportInsertAfterSale([FromBodyAttribute]JObject co)
+        {   
+            var sa = new ImportInsertAfterSale();
+            if(co["AfterSale"] != null)
+            {
+                sa = Newtonsoft.Json.JsonConvert.DeserializeObject<ImportInsertAfterSale>(co["AfterSale"].ToString());
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = AfterSaleHaddle.ImportInsertAfterSale(CoID,username,sa);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/AfterSale/ImportUpdateAfterSale")]
+        public ResponseResult ImportUpdateAfterSale([FromBodyAttribute]JObject co)
+        {   
+            var sa = new ImportUpdateAfterSale();
+            if(co["AfterSale"] != null)
+            {
+                sa = Newtonsoft.Json.JsonConvert.DeserializeObject<ImportUpdateAfterSale>(co["AfterSale"].ToString());
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = AfterSaleHaddle.ImportUpdateAfterSale(CoID,username,sa);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }

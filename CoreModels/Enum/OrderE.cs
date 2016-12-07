@@ -114,8 +114,13 @@ namespace CoreModels.Enum
         public enum SaleOutStatus
         {
             待出库 = 0,
-            已出库 = 1,
-            作废 = 2
+            已出库生效 = 1,
+            已出库待发货 = 2,
+            已出库并且已发货 = 3,
+            归档 = 4,
+            出库后作废 = 5,
+            出库前作废 = 6,
+            外部发货中 = 7
         }
         public enum ASStatus
         {
