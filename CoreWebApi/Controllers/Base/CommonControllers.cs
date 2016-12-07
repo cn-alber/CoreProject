@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using CoreData.CoreCore;
-// using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Authorization;
 // using CoreData.CoreCore;
 using CoreModels.XyCore;
@@ -8,7 +8,7 @@ using CoreModels.XyComm;
 using CoreData.CoreComm;
 using CoreData;
 using CoreModels;
-// using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace CoreWebApi
 {
@@ -28,14 +28,14 @@ namespace CoreWebApi
         public ResponseResult CommSkuLst(string Type, string GoodsCode, string SkuID, string SCoID, string Brand, string Filter, string Enable, string PageIndex, string PageSize, string SortField, string SortDirection)
         {
 
-            var cp = new CommSkuParam();            
+            var cp = new CommSkuParam();
             int x;
             if (!string.IsNullOrEmpty(Type))
             {
-                if(int.TryParse(Type, out x))
+                if (int.TryParse(Type, out x))
                 {
                     cp.Type = Type;
-                }                
+                }
             }
             cp.GoodsCode = GoodsCode;
             cp.SkuID = SkuID;
@@ -107,10 +107,10 @@ namespace CoreWebApi
                 res.s = -1;
                 res.d = "无效参数ParentId";
             }
-            if(res.s==1)
+            if (res.s == 1)
             {
                 res = CommHaddle.GetAreaLst(int.Parse(LevelType), int.Parse(ParentId));
-            }            
+            }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
@@ -118,8 +118,8 @@ namespace CoreWebApi
         #region //获取省市区所有列表 
         [HttpGetAttribute("/Core/Common/allArea")]
         public ResponseResult allArea()
-        {            
-            var res = CommHaddle.GetAllArea();            
+        {
+            var res = CommHaddle.GetAllArea();
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
@@ -136,31 +136,31 @@ namespace CoreWebApi
         #region 获取主仓库列表
         [HttpGetAttribute("/Core/Common/GetParentWarehouseList")]
         public ResponseResult GetParentWarehouseList()
-        {   
+        {
             int CoID = int.Parse(GetCoid());
             var data = WarehouseHaddle.GetParentWarehouseList(CoID);
-            return CoreResult.NewResponse(data.s, data.d, "General"); 
+            return CoreResult.NewResponse(data.s, data.d, "General");
         }
         #endregion
         #region 获取子仓库列表
         [HttpGetAttribute("/Core/Common/GetChildWarehouseList")]
         public ResponseResult GetChildWarehouseList()
-        { 
-            var data = new DataResult(1,null);  
+        {
+            var data = new DataResult(1, null);
             int CoID = int.Parse(GetCoid());
             data = WarehouseHaddle.GetChildWarehouseList(CoID);
-            return CoreResult.NewResponse(data.s, data.d, "General"); 
+            return CoreResult.NewResponse(data.s, data.d, "General");
         }
         #endregion
-         
+
         #region 获取子仓库列表 (value label 格式)
         [HttpGetAttribute("/Core/Common/GetChildWarehouseList2")]
         public ResponseResult GetChildWarehouseList2()
-        { 
-            var data = new DataResult(1,null);  
+        {
+            var data = new DataResult(1, null);
             int CoID = int.Parse(GetCoid());
             data = WarehouseHaddle.GetChildWarehouseList2(CoID);
-            return CoreResult.NewResponse(data.s, data.d, "General"); 
+            return CoreResult.NewResponse(data.s, data.d, "General");
         }
         #endregion
 
@@ -236,54 +236,76 @@ namespace CoreWebApi
         #region 获取店铺接口
         [HttpGetAttribute("/Core/Shop/getShopEnum")]
         public ResponseResult getShopEnum()
-        {          
-            var res = new DataResult(1,null);                            
-            string Coid = GetCoid();         
+        {
+            var res = new DataResult(1, null);
+            string Coid = GetCoid();
             var r = ShopHaddle.getShopEnum(Coid);
-            r.Add(new shopEnum{
+            r.Add(new shopEnum
+            {
                 value = 0,
                 label = "{线下}"
-            });  
+            });
             res.d = r;
-            return CoreResult.NewResponse(res.s,res.d,"Api");
+            return CoreResult.NewResponse(res.s, res.d, "Api");
         }
         #endregion
 
         #region 获取分销列表接口
         [HttpGetAttribute("/Core/Distributor/getDisEnum")]
         public ResponseResult getDisEnum()
-        {          
-            var res = new DataResult(1,null);                            
-            string Coid = GetCoid();         
+        {
+            var res = new DataResult(1, null);
+            string Coid = GetCoid();
             var r = DistributorHaddle.getDisEnum(Coid);
-            r.Add(new distributorEnum{
+            r.Add(new distributorEnum
+            {
                 value = 0,
                 label = "{自营}"
-            });  
+            });
             res.d = r;
-            return CoreResult.NewResponse(res.s,res.d,"Api");
+            return CoreResult.NewResponse(res.s, res.d, "Api");
         }
         #endregion
 
         #region 获取供销列表接口
         [HttpGetAttribute("/Core/Distributor/getSupEnum")]
         public ResponseResult getDEnum()
-        {          
-            var res = new DataResult(1,null);                            
-            string Coid = GetCoid();         
+        {
+            var res = new DataResult(1, null);
+            string Coid = GetCoid();
             var r = SupplierHaddle.getSupEnum(Coid);
             res.d = r;
-            return CoreResult.NewResponse(res.s,res.d,"Api");
+            return CoreResult.NewResponse(res.s, res.d, "Api");
         }
         #endregion
 
         #region 获取快递列表
         [HttpGetAttribute("/Core/Common/GetExpressList")]
         public ResponseResult GetExpressList()
-        {                                   
-            string Coid = GetCoid();         
+        {
+            string Coid = GetCoid();
             var r = CommHaddle.GetExpressList(Coid);
             return CoreResult.NewResponse(r.s, r.d, "General");
+        }
+        #endregion
+
+        #region 获取Sku库存数量
+        [HttpPostAttribute("Core/Common/SkuPCode")]
+        public ResponseResult SkuPCode([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            if (obj["IDLst"] == null)
+            {
+                res.s = -1;
+                res.d = "参数异常";
+            }
+            else
+            {
+                string CoID = GetCoid();
+                var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["IDLst"].ToString());
+                res = CommHaddle.GetSkuPileCode(CoID,IDLst);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
     }

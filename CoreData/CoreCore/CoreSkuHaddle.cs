@@ -488,21 +488,24 @@ namespace CoreData.CoreCore
             {
                 try
                 {
-                    StringBuilder querystr = new StringBuilder();
-                    querystr.Append("select SkuID from coresku where CoID = @CoID AND IsDelete=0 AND SkuID in @SkuIDLst ");
-                    var p = new DynamicParameters();
-                    p.Add("@CoID", CoID);
-                    p.Add("@SkuIDLst", SkuIDLst);
-                    if (ParentID > 0)
+                    if (SkuIDLst.Count > 0)
                     {
-                        querystr.Append(" and ParentID !=@ParentID");
-                        p.Add("@ParentID", ParentID);
-                    }
-                    var Lst = conn.Query<string>(querystr.ToString(), p).AsList();
-                    if (Lst.Count > 0)
-                    {
-                        res.s = -1;
-                        res.d = "商品编码已存在:" + string.Join(",", Lst.ToArray()); ;
+                        StringBuilder querystr = new StringBuilder();
+                        querystr.Append("select SkuID from coresku where CoID = @CoID AND IsDelete=0 AND SkuID in @SkuIDLst ");
+                        var p = new DynamicParameters();
+                        p.Add("@CoID", CoID);
+                        p.Add("@SkuIDLst", SkuIDLst);
+                        if (ParentID > 0)
+                        {
+                            querystr.Append(" and ParentID !=@ParentID");
+                            p.Add("@ParentID", ParentID);
+                        }
+                        var Lst = conn.Query<string>(querystr.ToString(), p).AsList();
+                        if (Lst.Count > 0)
+                        {
+                            res.s = -1;
+                            res.d = "商品编码已存在:" + string.Join(",", Lst.ToArray()); ;
+                        }
                     }
                 }
                 catch (Exception e)
@@ -1025,7 +1028,8 @@ namespace CoreData.CoreCore
                         }
                     }
 
-                    var DelIDLst = items_Old.Select(a => a.ID).Where(a => items.Select(b => b.ID).Contains(a)).AsList();
+                    var DelIDLst = items_Old.Select(a => a.ID).Where(a => !items.Select(b => b.ID).Contains(a)).AsList();//软删除明细
+                    var DelSkuPropsIDLst = skuprops_Old.Select(a=>a.ID).Where(a=>!skuprops.Select(b=>b.ID).Contains(a)).AsList();//停用sku属性
                     if (!string.IsNullOrEmpty(contents))
                     {
                         string UptMain = @"UPDATE coresku_main
@@ -1088,6 +1092,10 @@ namespace CoreData.CoreCore
                         conn.Execute(UptSql, UptSkuPropLst, Trans);
                         IsCommit = true;
                     }
+                    if(DelSkuPropsIDLst.Count>0)
+                    {
+                        conn.Execute(UnEnableCoreSkuPropSql(), new { CoID = CoID, IDLst = DelSkuPropsIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
+                    }
                     if (UptCoreSkuLst.Count > 0)
                     {
                         conn.Execute(UptCoreSkuSql(), UptCoreSkuLst, Trans);
@@ -1097,7 +1105,7 @@ namespace CoreData.CoreCore
                     {
                         conn.Execute(DelCoreSkuSql(), new { CoID = CoID, IDLst = DelIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
                         IsCommit = true;
-                    }
+                    }                    
                     if (NewCoreSkuLst.Count > 0)
                     {
                         conn.Execute(AddCoresku_sql(), NewCoreSkuLst, Trans);
@@ -2054,6 +2062,20 @@ namespace CoreData.CoreCore
             return UptSql;
         }
 
+        #endregion
+
+        #region 停用 - 商品sku属性SQL
+        public static string UnEnableCoreSkuPropSql()
+        {
+            string UptSql = @"UPDATE coresku_sku_props
+                                SET `Enable` = 0,
+                                Modifier =@Modifier,
+                                ModifyDate =@ModifyDate
+                                WHERE
+                                    CoID =@CoID
+                                AND ID IN @IDLst";
+            return UptSql;
+        }
         #endregion
 
 

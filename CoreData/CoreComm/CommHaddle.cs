@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using CoreModels.XyComm;
 using CoreModels.XyCore;
+using CoreModels.WmsApi;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 // using Newtonsoft.Json;
@@ -535,6 +536,29 @@ namespace CoreData.CoreComm
                 filter.Add(f);
             }
             result.d = filter;
+            return result;
+        }
+        #endregion
+
+
+        #region 
+        public static DataResult GetSkuPileCode(string CoID,List<int> IDLst)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                try
+                {
+                    string sql = "SELECT SkuID,PCode,Qty FROM wmspile WHERE CoID=@CoID AND Skuautoid IN @IDLst AND Type IN (1,2)";
+                    var PileLst = conn.Query<ASkuPileQty>(sql,new{CoID=CoID,IDLst = IDLst}).AsList();
+                    result.d = PileLst;
+                }
+                catch(Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
             return result;
         }
         #endregion

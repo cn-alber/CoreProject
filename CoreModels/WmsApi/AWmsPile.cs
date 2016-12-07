@@ -93,10 +93,10 @@ namespace CoreModels.WmsApi
         public string CreateDate { get; set; }
     }
 
-    public class APileQty
+    public class ASkuPileQty
     {
-        public int CoID { get; set; }
-        public int ID { get; set; }
+        public string SkuID { get; set; }
+        public string PCode { get; set; }
         public int Qty { get; set; }
     }
     public class ApiMoveParam
