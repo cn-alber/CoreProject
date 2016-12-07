@@ -1,0 +1,11 @@
+接口名称：AShelvesController.cs
+function说明
+############################################################
+1.移库下架 - 货位扫描 - 获取Sku信息
+    方法：GET
+    路由：http://192.168.30.211:5000/Core/AShelves/SkuByArea?PCode=
+    InPut:    
+        PCode       string      货位编码
+    OutPut：
+        AShelf       AShelfData 货架sku资料
+    参考:output json 文件:SkuByArea_output.json  

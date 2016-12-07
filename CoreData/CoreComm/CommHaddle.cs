@@ -185,14 +185,14 @@ namespace CoreData.CoreComm
             {
                 try
                 {
-                    Dictionary<string, object> DicWh = new Dictionary<string, object>();
-                    string Sql = @"SELECT ID,WarehouseName AS WhName FROM warehouse WHERE CoID=@CoID";
+                    // Dictionary<string, object> DicWh = new Dictionary<string, object>();
+                    string Sql = @"SELECT ID,WarehouseName AS WhName,Type FROM warehouse WHERE CoID=@CoID";
                     var WhLst = conn.Query<Warehouse_view>(Sql, new { CoID = CoID }).AsList();
-                    foreach (var wh in WhLst)
-                    {
-                        DicWh.Add(wh.ID, wh);
-                    }
-                    result.d = DicWh;
+                    // foreach (var wh in WhLst)
+                    // {
+                    //     DicWh.Add(wh.ID, wh);
+                    // }
+                    result.d = WhLst;
                 }
                 catch (Exception e)
                 {
