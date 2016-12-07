@@ -44,7 +44,7 @@ namespace CoreModels.XyCore
         public int _OrdType = -1;//订单类型
         public List<string> _ShopStatus = null;//淘宝状态
         public List<string> _RefundStatus = null;//退款状态
-        public int _Distributor = -1;//分销商
+        public string _Distributor = null;//分销商
         public string _IsSubmit = "A";//供销提交
         public int _IssueType = -1;//问题类型
         public int _Result = -1;//处理结果
@@ -189,7 +189,7 @@ namespace CoreModels.XyCore
             get { return _RefundStatus; }
             set { this._RefundStatus = value;}
         }
-        public int Distributor
+        public string Distributor
         {
             get { return _Distributor; }
             set { this._Distributor = value;}

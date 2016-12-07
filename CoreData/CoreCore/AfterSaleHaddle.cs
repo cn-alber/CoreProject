@@ -409,11 +409,11 @@ namespace CoreData.CoreCore
             {
                 wheresql = wheresql + " AND IsSubmitDis = '" + cp.IsSubmitDis.ToUpper() + "'" ;
             }
-            if(cp.ShopID > 0)
+            if(cp.ShopID >= 0)
             {
                 wheresql = wheresql + " AND ShopID = " + cp.ShopID ;
             }
-            if(cp.Status > 0)
+            if(cp.Status >= 0)
             {
                 wheresql = wheresql + " AND Status = " + cp.Status ;
             }
@@ -421,11 +421,11 @@ namespace CoreData.CoreCore
             {
                 wheresql = wheresql + " AND GoodsStatus = '" + cp.GoodsStatus + "'" ;
             }
-            if(cp.Type > 0)
+            if(cp.Type >= 0)
             {
                 wheresql = wheresql + " AND Type = " + cp.Type ;
             }
-            if(cp.OrdType > 0)
+            if(cp.OrdType >= 0)
             {
                 wheresql = wheresql + " AND OrdType = " + cp.OrdType ;
             }
@@ -449,19 +449,19 @@ namespace CoreData.CoreCore
                 shopstatus = shopstatus.Substring(0,shopstatus.Length - 1);
                 wheresql = wheresql + " AND RefundStatus in (" +  shopstatus + ")";
             }
-            if(cp.Distributor > 0)
+            if(!string.IsNullOrEmpty(cp.Distributor))
             {
-                wheresql = wheresql + " AND Distributor = " + cp.Distributor ;
+                wheresql = wheresql + " AND Distributor = '" + cp.Distributor + "'";
             }
             if(!string.IsNullOrEmpty(cp.IsSubmit) && (cp.IsSubmit.ToUpper() == "Y" || cp.IsSubmit.ToUpper() == "N"))
             {
                 wheresql = wheresql + " AND IsSubmit = '" + cp.IsSubmit.ToUpper() + "'" ;
             }
-            if(cp.IssueType > 0)
+            if(cp.IssueType >= 0)
             {
                 wheresql = wheresql + " AND IssueType = " + cp.IssueType ;
             }
-            if(cp.Result > 0)
+            if(cp.Result >= 0)
             {
                 wheresql = wheresql + " AND Result = " + cp.Result ;
             }

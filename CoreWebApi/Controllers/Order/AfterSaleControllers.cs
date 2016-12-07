@@ -128,13 +128,7 @@ namespace CoreWebApi
                 }
                 cp.RefundStatus = s;
             }
-            if(!string.IsNullOrEmpty(Distributor))
-            {
-                if (int.TryParse(Distributor, out x))
-                {
-                    cp.Distributor = int.Parse(Distributor);
-                }
-            }
+            cp.Distributor = Distributor;
             cp.IsSubmit = IsSubmit;
             if(!string.IsNullOrEmpty(IssueType))
             {
