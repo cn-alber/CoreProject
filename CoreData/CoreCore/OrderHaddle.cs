@@ -2401,6 +2401,7 @@ namespace CoreData.CoreCore
                 pay.CreateDate = DateTime.Now;
                 pay.Confirmer = UserName;
                 pay.ConfirmDate = DateTime.Now;
+                pay.BuyerShopID = ord.BuyerShopID;
                 var log = new LogInsert();
                 log.OID = pay.OID;
                 log.SoID = pay.SoID;
@@ -2460,8 +2461,8 @@ namespace CoreData.CoreCore
                 log.CoID = CoID;
                 logs.Add(log);
                 //新增支付单资料
-                string sqlCommandText = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SOID,Payment,PayAccount,PayDate,Title,Amount,PayAmount,DataSource,Status,CoID,Creator,CreateDate,Confirmer,ConfirmDate) 
-                                    VALUES(@PayNbr,@RecID,@RecName,@OID,@SOID,@Payment,@PayAccount,@PayDate,@Title,@Amount,@PayAmount,@DataSource,@Status,@CoID,@Creator,@CreateDate,@Confirmer,@ConfirmDate)";
+                string sqlCommandText = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SOID,Payment,PayAccount,PayDate,Title,Amount,PayAmount,DataSource,Status,CoID,Creator,CreateDate,Confirmer,ConfirmDate,BuyerShopID) 
+                                    VALUES(@PayNbr,@RecID,@RecName,@OID,@SOID,@Payment,@PayAccount,@PayDate,@Title,@Amount,@PayAmount,@DataSource,@Status,@CoID,@Creator,@CreateDate,@Confirmer,@ConfirmDate,@BuyerShopID)";
                 int count = CoreDBconn.Execute(sqlCommandText,pay,TransCore);
                 if(count < 0)
                 {
@@ -3296,6 +3297,7 @@ namespace CoreData.CoreCore
                 pay.CreateDate = DateTime.Now;
                 pay.Confirmer = UserName;
                 pay.ConfirmDate = DateTime.Now;
+                pay.BuyerShopID = ord.BuyerShopID;
                 var log = new LogInsert();
                 log.OID = pay.OID;
                 log.SoID = pay.SoID;
@@ -3342,8 +3344,8 @@ namespace CoreData.CoreCore
                 log.CoID = CoID;
                 logs.Add(log);
                 //新增支付单资料
-                string sqlCommandText = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SOID,Payment,PayAccount,PayDate,Title,Amount,PayAmount,DataSource,Status,CoID,Creator,CreateDate,Confirmer,ConfirmDate) 
-                                    VALUES(@PayNbr,@RecID,@RecName,@OID,@SOID,@Payment,@PayAccount,@PayDate,@Title,@Amount,@PayAmount,@DataSource,@Status,@CoID,@Creator,@CreateDate,@Confirmer,@ConfirmDate)";
+                string sqlCommandText = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SOID,Payment,PayAccount,PayDate,Title,Amount,PayAmount,DataSource,Status,CoID,Creator,CreateDate,Confirmer,ConfirmDate,BuyerShopID) 
+                                    VALUES(@PayNbr,@RecID,@RecName,@OID,@SOID,@Payment,@PayAccount,@PayDate,@Title,@Amount,@PayAmount,@DataSource,@Status,@CoID,@Creator,@CreateDate,@Confirmer,@ConfirmDate,@BuyerShopID)";
                 int count = CoreDBconn.Execute(sqlCommandText,pay,TransCore);
                 if(count < 0)
                 {
@@ -4362,9 +4364,9 @@ namespace CoreData.CoreCore
                     p.Amount = Math.Round(amtNew/(amt + amtNew) * Amount,2).ToString();
                     p.PayAmount = Math.Round(amtNew/(amt + amtNew) * PayAmount,2).ToString();
                     sqlcommand = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SOID,Payment,PayAccount,SellerAccount,Platform,PayDate,Bank,BankName,Title,Name,Amount,
-                                                    PayAmount,DiscountFree,DataSource,Status,Creator,Confirmer,ConfirmDate) 
+                                                    PayAmount,DiscountFree,DataSource,Status,Creator,Confirmer,ConfirmDate,BuyerShopID) 
                                 VALUES(@PayNbr,@RecID,@RecName,@OID,@SOID,@Payment,@PayAccount,@SellerAccount,@Platform,@PayDate,@Bank,@BankName,@Title,@Name,@Amount,
-                                       @PayAmount,@DiscountFree,@DataSource,@Status,@Creator,@Confirmer,@ConfirmDate)";
+                                       @PayAmount,@DiscountFree,@DataSource,@Status,@Creator,@Confirmer,@ConfirmDate,@BuyerShopID)";
                     count = CoreDBconn.Execute(sqlcommand,p,TransCore);
                     if (count < 0)
                     {
@@ -5140,6 +5142,7 @@ namespace CoreData.CoreCore
                     pay.CreateDate = DateTime.Now;
                     pay.Confirmer = UserName;
                     pay.ConfirmDate= DateTime.Now;
+                    pay.BuyerShopID = Order.BuyerShopID;
                     PayList.Add(pay);
                 }
                 //产生订单资料
@@ -5391,9 +5394,9 @@ namespace CoreData.CoreCore
                 }
                 //新增付款资料
                 sqlcommand = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SOID,Payment,PayAccount,SellerAccount,Platform,PayDate,Bank,BankName,Title,Name,Amount,
-                                                   PayAmount,DataSource,Status,CoID,Creator,CreateDate,Confirmer,ConfirmDate) 
+                                                   PayAmount,DataSource,Status,CoID,Creator,CreateDate,Confirmer,ConfirmDate,BuyerShopID) 
                                            VALUES(@PayNbr,@RecID,@RecName,@OID,@SOID,@Payment,@PayAccount,@SellerAccount,@Platform,@PayDate,@Bank,@BankName,@Title,@Name,@Amount,
-                                                  @PayAmount,@DataSource,@Status,@CoID,@Creator,@CreateDate,@Confirmer,@ConfirmDate)";
+                                                  @PayAmount,@DataSource,@Status,@CoID,@Creator,@CreateDate,@Confirmer,@ConfirmDate,@BuyerShopID)";
                 count = CoreDBconn.Execute(sqlcommand,PayList,TransCore);
                 if(count < 0)
                 {
@@ -5548,6 +5551,7 @@ namespace CoreData.CoreCore
                     pay.CreateDate = DateTime.Now;
                     pay.Confirmer = UserName;
                     pay.ConfirmDate= DateTime.Now;
+                    pay.BuyerShopID = ord[0].BuyerShopID;
                     PayList.Add(pay);
                     amount = amount + decimal.Parse(pay.PayAmount);
                 }
@@ -6815,7 +6819,7 @@ namespace CoreData.CoreCore
                             saleout.DocDate = DateTime.Now;
                             saleout.Status = 0;
                             saleout.ExpName = a.Express;
-                            // saleout.ExCode = ExCode;
+                            saleout.ExCode = ExCode;
                             saleout.RecMessage = a.RecMessage;
                             saleout.RecLogistics = a.RecLogistics;
                             saleout.RecDistrict = a.RecDistrict;
@@ -7744,7 +7748,7 @@ namespace CoreData.CoreCore
                         saleout.DocDate = DateTime.Now;
                         saleout.Status = 0;
                         saleout.ExpName = a.Express;
-                        // saleout.ExCode = ExCode;
+                        saleout.ExCode = ExCode;
                         saleout.RecMessage = a.RecMessage;
                         saleout.RecLogistics = a.RecLogistics;
                         saleout.RecDistrict = a.RecDistrict;
@@ -8380,6 +8384,7 @@ namespace CoreData.CoreCore
                     pay.CreateDate = DateTime.Now;
                     pay.Confirmer = UserName;
                     pay.ConfirmDate = DateTime.Now;
+                    pay.BuyerShopID = ord.BuyerShopID;
                     pays.Add(pay);
                     var log = new LogInsert();
                     log.OID = pay.OID;
@@ -8461,8 +8466,8 @@ namespace CoreData.CoreCore
                     su.Add(ss);
                 }
                 //新增支付单资料
-                string sqlCommandText = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SOID,Payment,PayAccount,PayDate,Title,Amount,PayAmount,DataSource,Status,CoID,Creator,CreateDate,Confirmer,ConfirmDate) 
-                                    VALUES(@PayNbr,@RecID,@RecName,@OID,@SOID,@Payment,@PayAccount,@PayDate,@Title,@Amount,@PayAmount,@DataSource,@Status,@CoID,@Creator,@CreateDate,@Confirmer,@ConfirmDate)";
+                string sqlCommandText = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SOID,Payment,PayAccount,PayDate,Title,Amount,PayAmount,DataSource,Status,CoID,Creator,CreateDate,Confirmer,ConfirmDate,BuyerShopID) 
+                                    VALUES(@PayNbr,@RecID,@RecName,@OID,@SOID,@Payment,@PayAccount,@PayDate,@Title,@Amount,@PayAmount,@DataSource,@Status,@CoID,@Creator,@CreateDate,@Confirmer,@ConfirmDate,@BuyerShopID)";
                 int count = CoreDBconn.Execute(sqlCommandText,pays,TransCore);
                 if(count < 0)
                 {
@@ -9466,8 +9471,8 @@ namespace CoreData.CoreCore
                     }
                 }
                 //投递资料处理
-                sqlCommand = @"update saleout set Status=0,ExCode=@ExCode,Modifier=@Modifier,ModifyDate=@ModifyDate where oid = @OID  and coid = @Coid and status in (1,2,3)";
-                count = CoreDBconn.Execute(sqlCommand,new{Modifier=UserName,ModifyDate=DateTime.Now,OID=oid,Coid=CoID,ExCode=""},TransCore);     
+                sqlCommand = @"update saleout set Status=0,Modifier=@Modifier,ModifyDate=@ModifyDate where oid = @OID  and coid = @Coid and status in (1,2,3)";
+                count = CoreDBconn.Execute(sqlCommand,new{Modifier=UserName,ModifyDate=DateTime.Now,OID=oid,Coid=CoID},TransCore);     
                 if(count < 0)
                 {
                     result.s = -3003;
