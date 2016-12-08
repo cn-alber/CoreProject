@@ -6815,7 +6815,7 @@ namespace CoreData.CoreCore
                             saleout.DocDate = DateTime.Now;
                             saleout.Status = 0;
                             saleout.ExpName = a.Express;
-                            // saleout.ExCode = ExCode;
+                            saleout.ExCode = ExCode;
                             saleout.RecMessage = a.RecMessage;
                             saleout.RecLogistics = a.RecLogistics;
                             saleout.RecDistrict = a.RecDistrict;
@@ -7744,7 +7744,7 @@ namespace CoreData.CoreCore
                         saleout.DocDate = DateTime.Now;
                         saleout.Status = 0;
                         saleout.ExpName = a.Express;
-                        // saleout.ExCode = ExCode;
+                        saleout.ExCode = ExCode;
                         saleout.RecMessage = a.RecMessage;
                         saleout.RecLogistics = a.RecLogistics;
                         saleout.RecDistrict = a.RecDistrict;
@@ -9466,8 +9466,8 @@ namespace CoreData.CoreCore
                     }
                 }
                 //投递资料处理
-                sqlCommand = @"update saleout set Status=0,ExCode=@ExCode,Modifier=@Modifier,ModifyDate=@ModifyDate where oid = @OID  and coid = @Coid and status in (1,2,3)";
-                count = CoreDBconn.Execute(sqlCommand,new{Modifier=UserName,ModifyDate=DateTime.Now,OID=oid,Coid=CoID,ExCode=""},TransCore);     
+                sqlCommand = @"update saleout set Status=0,Modifier=@Modifier,ModifyDate=@ModifyDate where oid = @OID  and coid = @Coid and status in (1,2,3)";
+                count = CoreDBconn.Execute(sqlCommand,new{Modifier=UserName,ModifyDate=DateTime.Now,OID=oid,Coid=CoID},TransCore);     
                 if(count < 0)
                 {
                     result.s = -3003;

@@ -118,5 +118,64 @@ namespace CoreWebApi
             var data = SaleOutHaddle.GetStatusInitData();
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/SaleOut/MarkExp")]
+        public ResponseResult MarkExp([FromBodyAttribute]JObject co)
+        {   
+            var id = new List<int>();
+            if(co["ID"] != null)
+            {
+                id = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["ID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "出库单号必填", "General");
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = SaleOutHaddle.MarkExp(id,username,CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/SaleOut/CancleMarkExp")]
+        public ResponseResult CancleMarkExp([FromBodyAttribute]JObject co)
+        {   
+            var id = new List<int>();
+            if(co["ID"] != null)
+            {
+                id = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["ID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "出库单号必填", "General");
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = SaleOutHaddle.CancleMarkExp(id,username,CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+        [HttpGetAttribute("/Core/SaleOut/GetSkuList")]
+        public ResponseResult GetSkuList(string ID)
+        {   
+            int x,id;
+            int CoID = int.Parse(GetCoid());
+            if(!string.IsNullOrEmpty(ID))
+            {
+                if (int.TryParse(ID, out x))
+                {
+                    id = int.Parse(ID);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "出库单号必填", "General");
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "出库单号必填", "General");
+            }
+            var data = SaleOutHaddle.GetSkuList(id,CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }
