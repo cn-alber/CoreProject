@@ -478,34 +478,6 @@ namespace CoreModels.XyCore
         public string Modifier{get;set;}
         public DateTime ModifyDate{get;set;}
     }
-    public class PayInfo
-    {
-        public int ID{get;set;}
-        public string PayNbr{get;set;}
-        public int RecID{get;set;}
-        public string RecName{get;set;}
-        public int OID{get;set;}
-        public long SoID{get;set;}
-        public string Payment{get;set;}
-        public string PayAccount{get;set;}
-        public string SellerAccount{get;set;}
-        public string Platform{get;set;}
-        public DateTime PayDate{get;set;}
-        public string Bank{get;set;}
-        public string BankName{get;set;}
-        public string Title{get;set;}
-        public string Name{get;set;}
-        public string Amount{get;set;}
-        public string PayAmount{get;set;}
-        public string DiscountFree{get;set;}
-        public int DataSource{get;set;}
-        public int Status{get;set;}
-        public int CoID{get;set;}
-        public string Creator{get;set;}
-        public DateTime CreateDate{get;set;}
-        public string Confirmer{get;set;}
-        public DateTime ConfirmDate{get;set;}
-    }
     public class AbnormalReason
     {
         public int ID{get;set;}
@@ -665,21 +637,6 @@ namespace CoreModels.XyCore
         public decimal Amount{get;set;}//必输
         public string Remark{get;set;}
         public string ShopSkuID{get;set;}
-    }
-    public class ImportPayinfo
-    {
-        public string PayNbr{get;set;}//必输
-        public string Payment{get;set;}//必输
-        public string PayAccount{get;set;}
-        public string SellerAccount{get;set;}
-        public string Platform{get;set;}
-        public DateTime PayDate{get;set;}//必输
-        public string Bank{get;set;}
-        public string BankName{get;set;}
-        public string Title{get;set;}
-        public string Name{get;set;}
-        public string Amount{get;set;}
-        public string PayAmount{get;set;}//必输
     }
     public class ImportOrderUpdate
     {

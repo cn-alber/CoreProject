@@ -2651,8 +2651,9 @@ namespace CoreData.CoreCore
                         pay.CoID = CoID;
                         pay.Creator = UserName;
                         pay.Confirmer = UserName;
-                        sqlcommand = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SoID,Payment,PayDate,Amount,PayAmount,DataSource,Status,CoID,Creator,Confirmer) 
-                                       VALUES(@PayNbr,@RecID,@RecName,@OID,@SoID,@Payment,@PayDate,@Amount,@PayAmount,@DataSource,@Status,@CoID,@Creator,@Confirmer)";
+                        pay.BuyerShopID = ordNew.BuyerShopID;
+                        sqlcommand = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SoID,Payment,PayDate,Amount,PayAmount,DataSource,Status,CoID,Creator,Confirmer,BuyerShopID) 
+                                       VALUES(@PayNbr,@RecID,@RecName,@OID,@SoID,@Payment,@PayDate,@Amount,@PayAmount,@DataSource,@Status,@CoID,@Creator,@Confirmer,@BuyerShopID)";
                         count = CoreDBconn.Execute(sqlcommand,pay,TransCore);
                         if(count < 0)
                         {
@@ -2860,8 +2861,9 @@ namespace CoreData.CoreCore
                             pay.CoID = CoID;
                             pay.Creator = UserName;
                             pay.Confirmer = UserName;
-                            sqlcommand = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SoID,Payment,PayDate,Amount,PayAmount,DataSource,Status,CoID,Creator,Confirmer) 
-                                        VALUES(@PayNbr,@RecID,@RecName,@OID,@SoID,@Payment,@PayDate,@Amount,@PayAmount,@DataSource,@Status,@CoID,@Creator,@Confirmer)";
+                            pay.BuyerShopID = ordNew.BuyerShopID;
+                            sqlcommand = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SoID,Payment,PayDate,Amount,PayAmount,DataSource,Status,CoID,Creator,Confirmer,BuyerShopID) 
+                                        VALUES(@PayNbr,@RecID,@RecName,@OID,@SoID,@Payment,@PayDate,@Amount,@PayAmount,@DataSource,@Status,@CoID,@Creator,@Confirmer,@BuyerShopID)";
                             count = CoreDBconn.Execute(sqlcommand,pay,TransCore);
                             if(count < 0)
                             {

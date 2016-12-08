@@ -546,6 +546,7 @@ namespace CoreWebApi
             string username = GetUname();
             int CoID = int.Parse(GetCoid());
             var data = AfterSaleHaddle.UpdateAfterSale(CoID,Type,SalerReturnAmt,BuyerUpAmt,ReturnAccount,WarehouseID,Remark,username,Express,ExCode,Result,RID);
+            data.d = AfterSaleHaddle.GetAfterSaleSingle(RID,CoID).d;
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
