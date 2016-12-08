@@ -7,7 +7,7 @@ using CoreData.CoreWmsApi;
 using System;
 namespace CoreWebApi
 {
-    // [AllowAnonymous]
+    [AllowAnonymous]
     public class APurController : ControllBase
     {
         #region 收货作业-根据箱码or件码_获取SKU

@@ -133,3 +133,12 @@ function说明
         ID              int                         商品主表coresku_main.ID
     OutPut:
         goods_skuprops  goods_print_skuprops        商品属性列表
+12.GetPrintSkuProps()//商品吊牌打印 - 根据货号&Sku属性,带出商品明细
+    方法：Get
+    路由：http://192.168.30.211:5000/Core/XyCore/CoreSku/PrintSkuItemQuery
+    参数：
+        ID              int                         商品主表coresku_main.ID
+        ValIDLst        List<int>                   商品Sku属性ID列表
+    OutPut：
+        cs              PrintCoreSku                商品打印明细
+    参考：output json 文件：PrintSkuItemQuery_output.json

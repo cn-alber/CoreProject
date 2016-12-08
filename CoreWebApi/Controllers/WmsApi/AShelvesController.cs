@@ -31,6 +31,9 @@ namespace CoreWebApi
                     cp.WarehouseID = int.Parse(WarehouseID);
                 }
                 cp.CoID = int.Parse(GetCoid());
+                cp.TypeLst = new List<int>();
+                cp.TypeLst.Add(1);
+                cp.TypeLst.Add(2);
                 res = AShelvesHaddles.GetUpBoxSku(cp);
             }
             return CoreResult.NewResponse(res.s, res.d, "WmsApi");
@@ -176,7 +179,7 @@ namespace CoreWebApi
         }
         #endregion
 
-        #region
+        #region 
         
         #endregion
 

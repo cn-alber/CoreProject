@@ -1029,7 +1029,7 @@ namespace CoreData.CoreCore
                     }
 
                     var DelIDLst = items_Old.Select(a => a.ID).Where(a => !items.Select(b => b.ID).Contains(a)).AsList();//软删除明细
-                    var DelSkuPropsIDLst = skuprops_Old.Select(a=>a.ID).Where(a=>!skuprops.Select(b=>b.ID).Contains(a)).AsList();//停用sku属性
+                    var DelSkuPropsIDLst = skuprops_Old.Select(a => a.ID).Where(a => !skuprops.Select(b => b.ID).Contains(a)).AsList();//停用sku属性
                     if (!string.IsNullOrEmpty(contents))
                     {
                         string UptMain = @"UPDATE coresku_main
@@ -1092,7 +1092,7 @@ namespace CoreData.CoreCore
                         conn.Execute(UptSql, UptSkuPropLst, Trans);
                         IsCommit = true;
                     }
-                    if(DelSkuPropsIDLst.Count>0)
+                    if (DelSkuPropsIDLst.Count > 0)
                     {
                         conn.Execute(UnEnableCoreSkuPropSql(), new { CoID = CoID, IDLst = DelSkuPropsIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
                     }
@@ -1105,7 +1105,7 @@ namespace CoreData.CoreCore
                     {
                         conn.Execute(DelCoreSkuSql(), new { CoID = CoID, IDLst = DelIDLst, Modifier = UserName, ModifyDate = DateTime.Now.ToString() }, Trans);
                         IsCommit = true;
-                    }                    
+                    }
                     if (NewCoreSkuLst.Count > 0)
                     {
                         conn.Execute(AddCoresku_sql(), NewCoreSkuLst, Trans);
@@ -1247,7 +1247,6 @@ namespace CoreData.CoreCore
             return res;
         }
         #endregion
-
 
         #region 根据条件抓取商品list(采购用)
         public static DataResult GetSkuAll(SkuParam cp, int CoID, int Type)
@@ -1519,6 +1518,111 @@ namespace CoreData.CoreCore
             {
                 CommConn.Close();
                 CoreConn.Close();
+            }
+            return result;
+        }
+        #endregion
+
+        #region 商品吊牌打印 - 根据货号&Sku属性,带出商品明细
+        public static DataResult PrintSkuItem(SkuPrintParam IParam)
+        {
+            var result = new DataResult(1, null);
+            var CoreConn = new MySqlConnection(DbBase.CoreConnectString);
+            var CommConn = new MySqlConnection(DbBase.CommConnectString);
+            try
+            {
+                var cs = new PrintCoreSku();
+                StringBuilder querysql = new StringBuilder();
+                string sql = @"SELECT
+                                        GoodsCode,
+                                        GoodsName,
+                                        MarketPrice,
+                                        SalePrice,
+                                        KindID,
+                                        SkuID,
+                                        SkuName,
+                                        SkuSimple,
+                                        pid1,
+                                        val_id1,
+                                        pid2,
+                                        val_id2,
+                                        pid3,
+                                        val_id3,
+                                        KindID
+                                    FROM coresku
+                                    WHERE CoID=@CoID
+                                    AND ParentID=@ID 
+                                    AND IsDelete=0";
+                querysql.Append(sql);
+                var p = new DynamicParameters();
+                p.Add("@CoID", IParam.CoID);
+                p.Add("@ID", IParam.ID);
+                if (IParam.ValIDLst != null & IParam.ValIDLst.Count > 0)
+                {
+                    if (IParam.ValIDLst.Count == 1)
+                    {
+                        querysql.Append(" AND val_id1 = @val_id1");
+                        p.Add("@val_id1", IParam.ValIDLst[0]);
+                    }
+                    else if (IParam.ValIDLst.Count == 2)
+                    {
+                        querysql.Append(" AND val_id1 in @ValIDLst AND val_id2 IN @ValIDLst");
+                        p.Add("@ValIDLst", IParam.ValIDLst);
+                    }
+                    else
+                    {
+                        querysql.Append(" AND val_id1 in @ValIDLst AND val_id2 IN @ValIDLst AND val_id3 IN @ValIDLst");
+                        p.Add("@ValIDLst", IParam.ValIDLst);
+                    }
+                    var SkuLst = CoreConn.Query<CoreSkuItemPrint>(querysql.ToString(), p).AsList();
+                    if (SkuLst.Count > 0)
+                    {
+
+                        string itempropsql = @"SELECT pid,val_id,val_name FROM coresku_item_props WHERE CoID = @CoID AND ParentID=@ID AND ISDelete = 0";
+                        string Pid_namesql = "SELECT pid,name FROM customkind_skuprops WHERE CoID=@CoID AND kindid=@KindID";
+                        var itemprops = CoreConn.Query<print_item_props>(itempropsql, p).AsList();
+                        var res = CustomKindPropsHaddle.GetItemPropsByKind(SkuLst[0].KindID.ToString(), IParam.CoID);
+                        if (res.s == 1)
+                        {
+                            var baseprops = res.d as List<itemprops>;
+                            itemprops = itemprops.Select(a => new print_item_props
+                            {
+                                pid = a.pid,
+                                pid_name = baseprops.Where(b => b.pid == a.pid).Select(b => b.name).First(),
+                                val_id = a.val_id,
+                                val_name = a.val_name
+                            }).AsList();
+                        }
+                        var Pid_nameLst = CommConn.Query<skuprops_data>(Pid_namesql, new{CoID=IParam.CoID,KindID=SkuLst[0].KindID}).AsList();
+                        foreach (var n in Pid_nameLst)
+                        {
+                            if (SkuLst[0].pid1 == n.pid.ToString())
+                            {
+                                SkuLst[0].pid1_name = n.name;
+                            }
+                            if (SkuLst[0].pid2 == n.pid.ToString())
+                            {
+                                SkuLst[0].pid2_name = n.name;
+                            }
+                            if (SkuLst[0].pid3 == n.pid.ToString())
+                            {
+                                SkuLst[0].pid3_name = n.name;
+                            }
+                        }
+                        cs.item = SkuLst[0];
+                        cs.itemprops = itemprops;
+                        result.d = cs;
+                    }
+                    else
+                    {
+                        result.s = -3001;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                result.s = -1;
+                result.d = e.Message;
             }
             return result;
         }

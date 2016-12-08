@@ -119,13 +119,13 @@ namespace CoreData.CoreWmsApi
                         PCodeSql2 = PCodeSql2 + " AND wmspile.Type=@Type";
                         p.Add("@Type", IParam.Type);
                     }
-                    if (IParam.TypeLst.Count > 0)
+                    if (IParam.TypeLst != null && IParam.TypeLst.Count > 0)
                     {
                         PCodeSql1 = PCodeSql1 + " AND wmspile.Type in @TypeLst";
                         PCodeSql2 = PCodeSql2 + " AND wmspile.Type in @TypeLst";
                         p.Add("@TypeLst", IParam.TypeLst);
                     }
-                    var PCodeSql = @"SELECT A.WarehouseID,A.SkuID,A.PCode,A.maxqty,A.Type,A.ID
+                    var PCodeSql = @"SELECT A.WarehouseID,A.SkuID,A.PCode,A.Qty,A.maxqty,A.Type,A.ID
                                     FROM
                                         ( " + PCodeSql1 + " UNION " + PCodeSql2 + " ) AS A ORDER BY A.Order";
                     var PCLst = conn.Query<AWmsPileAuto>(PCodeSql, p).AsList();
@@ -159,49 +159,62 @@ namespace CoreData.CoreWmsApi
             try
             {
                 var asku = IParam.SkuAuto;
-                result = IsExist(asku.BarCode, asku.SkuType, IParam.Type, IParam.CoID);
-                if (result.s == 1)
+                //更新WmsPile
+                string SubPileSql = "SELECT CoID,ID,Qty,WarehouseID,Type,PCode,Skuautoid,SkuID FROM wmspile WHERE CoID = @CoID AND Skuautoid = @Skuautoid AND Type=@Type";
+                string AddPileSql = "SELECT CoID,ID,Qty,WarehouseID,Type,PCode,Skuautoid,SkuID FROM wmspile WHERE CoID = @CoID AND ID=@ID";
+                var subpileLst = CoreConn.Query<AWmsPileAuto>(SubPileSql, new { CoID = IParam.CoID, Skuautoid = asku.Skuautoid, Type = IParam.Type }, CoreTrans).AsList();
+                var addpileLst = CoreConn.Query<AWmsPileAuto>(AddPileSql, new { CoID = IParam.CoID, ID = IParam.PileID }, CoreTrans).AsList();
+                if (subpileLst.Count <= 0 || addpileLst.Count <= 0)
                 {
-                    //更新WmsPile
-                    string SubPileSql = "SELECT CoID,ID,Qty,WarehouseID,Type,PCode FROM wmspile WHERE CoID = @CoID AND Skuautoid = @Skuautoid AND Type=@Type";
-                    string AddPileSql = "SELECT CoID,ID,Qty,WarehouseID,Type,PCode FROM wmspile WHERE CoID = @CoID AND ID=@ID";
-                    var subpileLst = CoreConn.Query<AWmsPileAuto>(SubPileSql, new { CoID = IParam.CoID, Skuautoid = asku.Skuautoid, Type = IParam.Type }, CoreTrans).AsList();
-                    var addpileLst = CoreConn.Query<AWmsPileAuto>(AddPileSql, new { CoID = IParam.CoID, ID = IParam.PileID }, CoreTrans).AsList();
-                    if (subpileLst.Count <= 0 || addpileLst.Count <= 0)
-                    {
-                        result.s = -6003;//无此SKU库存信息
-                    }
-                    else
+                    result.s = -6003;//无此SKU库存信息
+                }
+                else
+                {
+
+                    result = IsExist(asku.BarCode, asku.SkuType, addpileLst[0].Type, IParam.CoID);
+                    if (result.s == 1)
                     {
                         subpileLst[0].Qty = subpileLst[0].Qty - asku.Qty;
                         addpileLst[0].Qty = addpileLst[0].Qty + asku.Qty;
-                        var UptLst = new List<AWmsPileAuto>();
-                        UptLst.Add(subpileLst[0]);
-                        UptLst.Add(addpileLst[0]);
-                        CoreConn.Execute(UptPileQtySql(), UptLst, CoreTrans);
-                        //更新库存数量      
-                        var SkuIDLst = new List<int>();
-                        SkuIDLst.Add(asku.Skuautoid);
-                        CoreConn.Execute(UptInvWaitInQtySql(), new { CoID = IParam.CoID, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
-                        //更新总库存数量
-                        var res = CommHaddle.GetWareCoidList(IParam.CoID.ToString());
-                        var CoIDLst = res.d as List<string>;
-                        CoreConn.Execute(UptInvMainWaitInQtySql(), new { CoID = IParam.CoID, CoIDLst = CoIDLst, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
-                        //添加上架操作记录
-                        IParam.Type = addpileLst[0].Type;
-                        IParam.WarehouseID = addpileLst[0].WarehouseID;
-                        IParam.PCode = addpileLst[0].PCode;
-                        result = AddWmsLog(IParam);
-                        if (result.s == 1)
+                        if (addpileLst[0].Skuautoid > 0 && addpileLst[0].Skuautoid != asku.Skuautoid)
                         {
-                            var logLst = result.d as List<AWmslog>;
-                            CoreConn.Execute(APurHaddles.AddWmsLogSql(), logLst, CoreTrans);
-                            CoreTrans.Commit();
-                            result.d = null;
+                            result.s = -1;
+                            result.d = "库位Sku不符：" + addpileLst[0].SkuID;
+                        }
+                        else
+                        {
+                            if (addpileLst[0].Skuautoid == 0)
+                            {
+                                addpileLst[0].Skuautoid = asku.Skuautoid;
+                                addpileLst[0].SkuID = asku.SkuID;
+                            }
+                            var UptLst = new List<AWmsPileAuto>();
+                            UptLst.Add(subpileLst[0]);
+                            UptLst.Add(addpileLst[0]);
+                            CoreConn.Execute(UptPileSkuQtySql(), UptLst, CoreTrans);
+                            //更新库存数量      
+                            var SkuIDLst = new List<int>();
+                            SkuIDLst.Add(asku.Skuautoid);
+                            CoreConn.Execute(UptInvWaitInQtySql(), new { CoID = IParam.CoID, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
+                            //更新总库存数量
+                            var res = CommHaddle.GetWareCoidList(IParam.CoID.ToString());
+                            var CoIDLst = res.d as List<string>;
+                            CoreConn.Execute(UptInvMainWaitInQtySql(), new { CoID = IParam.CoID, CoIDLst = CoIDLst, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
+                            //添加上架操作记录
+                            IParam.Type = addpileLst[0].Type;
+                            IParam.WarehouseID = addpileLst[0].WarehouseID;
+                            IParam.PCode = addpileLst[0].PCode;
+                            result = AddWmsLog(IParam);
+                            if (result.s == 1)
+                            {
+                                var logLst = result.d as List<AWmslog>;
+                                CoreConn.Execute(APurHaddles.AddWmsLogSql(), logLst, CoreTrans);
+                                CoreTrans.Commit();
+                                result.d = null;
+                            }
                         }
                     }
                 }
-
             }
             catch (Exception e)
             {
@@ -424,6 +437,7 @@ namespace CoreData.CoreWmsApi
                                 SkuID = a.SkuID,
                                 BoxCode = a.BoxCode,
                                 WarehouseID = IParam.WarehouseID,
+                                PCode = IParam.PCode,
                                 Qty = a.Qty,
                                 Contents = IParam.Contents,
                                 Type = IParam.Type,
@@ -454,7 +468,7 @@ namespace CoreData.CoreWmsApi
                 {
                     if (SkuType != 1)
                     {
-                        string sql = "SELECT PCode,WarehouseID,Contents FROM wmslog WHERE CoID=@CoID ";
+                        string sql = "SELECT PCode,WarehouseID,Contents,Type FROM wmslog WHERE CoID=@CoID ";
                         if (SkuType == 0)//0.件码(唯一码)||1.普通Sku||2.箱码
                         {
                             sql = sql + " AND BarCode=@BarCode ORDER BY ID DESC LIMIT 1";
@@ -467,7 +481,7 @@ namespace CoreData.CoreWmsApi
                         p.Add("@CoID", CoID);
                         p.Add("@BarCode", BarCode);
                         var logLst = CoreConn.Query<AWmslog>(sql, p).AsList();
-                        if (logLst.Count > 0 && logLst[0].Type != Type)
+                        if (logLst.Count > 0 && logLst[0].Type != Type && logLst[0].Type != 4)
                         {
                             result.s = -1;
                             result.d = "条码已" + logLst[0].Contents;
