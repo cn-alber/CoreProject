@@ -1028,7 +1028,13 @@ namespace CoreData.CoreCore
                         }
                     }
 
-                    var DelIDLst = items_Old.Select(a => a.ID).Where(a => !items.Select(b => b.ID).Contains(a)).AsList();//软删除明细
+                    var DelIDLst = items_Old.Where(a => !items.Any(b => a.pid1 == b.pid1 &&
+                                                                    a.val_id1 == b.val_id1 &&
+                                                                    a.pid2 == b.pid2 &&
+                                                                    a.val_id2 == b.val_id2 &&
+                                                                    a.pid3 == b.pid3 &&
+                                                                    a.val_id3 == b.val_id3)).Select(a => a.ID).AsList();//软删除明细
+                    
                     var DelSkuPropsIDLst = skuprops_Old.Select(a => a.ID).Where(a => !skuprops.Select(b => b.ID).Contains(a)).AsList();//停用sku属性
                     if (!string.IsNullOrEmpty(contents))
                     {
