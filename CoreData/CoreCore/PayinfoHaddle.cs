@@ -227,6 +227,13 @@ namespace CoreData.CoreCore
                         return result;
                     }
                 }
+                sqlcommand = @"select ID,PayDate,OID,SoID,PayNbr,PayAmount,Status,Payment,PayAccount,BuyerShopID from payinfo where id = " + ID + " and coid = " + CoID;
+                var uu = CoreDBconn.Query<PayInfoQuery>(sqlcommand).AsList();
+                foreach(var a in uu)
+                {
+                    a.StatusString = Enum.GetName(typeof(PayStatus), a.Status);
+                }
+                result.d = uu[0];
                 TransCore.Commit();
             }catch (Exception e)
             {
