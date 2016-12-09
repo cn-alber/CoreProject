@@ -77,6 +77,8 @@ namespace CoreData.CoreCore
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;
                     res.Pay = u;
+                    var data = GetPayStatusInit().d as GetPayStatusInitReturn;
+                    res.Payment = data.Payment;
                     result.d = res;             
                 }catch(Exception ex){
                     result.s = -1;
