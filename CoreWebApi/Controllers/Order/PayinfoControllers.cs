@@ -6,8 +6,6 @@ using CoreData.CoreCore;
 using System;
 using CoreData.CoreComm;
 using CoreData;
-using System.Collections.Generic;
-using CoreModels;
 namespace CoreWebApi
 {
     [AllowAnonymous]
@@ -177,6 +175,58 @@ namespace CoreWebApi
             int CoID = int.Parse(GetCoid());
             string UserName = GetUname();
             var data = PayinfoHaddle.CanclePay(ID,CoID,UserName);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Pay/ComfirmPay")]
+        public ResponseResult ComfirmPay([FromBodyAttribute]JObject co)
+        {   
+            int ID = 0,j;
+            if(co["ID"] != null)
+            {
+                string Text = co["ID"].ToString();
+                if (int.TryParse(Text, out j))
+                {
+                    ID = int.Parse(Text);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "内部付款单号参数无效", "General");
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "内部付款单号必填", "General");
+            }
+            int CoID = int.Parse(GetCoid());
+            string UserName = GetUname();
+            var data = PayinfoHaddle.ComfirmPay(ID,CoID,UserName);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Pay/CancleComfirmPay")]
+        public ResponseResult CancleComfirmPay([FromBodyAttribute]JObject co)
+        {   
+            int ID = 0,j;
+            if(co["ID"] != null)
+            {
+                string Text = co["ID"].ToString();
+                if (int.TryParse(Text, out j))
+                {
+                    ID = int.Parse(Text);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "内部付款单号参数无效", "General");
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "内部付款单号必填", "General");
+            }
+            int CoID = int.Parse(GetCoid());
+            string UserName = GetUname();
+            var data = PayinfoHaddle.CancleComfirmPay(ID,CoID,UserName);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     }

@@ -44,3 +44,17 @@ input:ID            int         内部付款单号
 output: s=1成功 else 错误代码
 参考:input jason 文件:CanclePay_input.json
 参考:output jason 文件:CanclePay_output.json
+
+5.ComfirmPay()支付单审核
+路由:http://localhost:5000/Core/Pay/ComfirmPay
+input:ID            int         内部付款单号
+output: s=1成功 else 错误代码
+参考:input jason 文件:ComfirmPay_input.json
+参考:output jason 文件:ComfirmPay_output.json
+
+6.CancleComfirmPay()支付单取消审核
+路由:http://localhost:5000/Core/Pay/CancleComfirmPay
+input:ID            int         内部付款单号
+output: s=1成功 else 错误代码
+参考:input jason 文件:CancleComfirmPay_input.json
+参考:output jason 文件:CancleComfirmPay_output.json
