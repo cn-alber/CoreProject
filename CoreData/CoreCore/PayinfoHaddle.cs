@@ -4,10 +4,7 @@ using System;
 using CoreModels.XyCore;
 using Dapper;
 using System.Collections.Generic;
-using CoreModels.XyComm;
 using static CoreModels.Enum.OrderE;
-using CoreData.CoreUser;
-using CoreModels.XyUser;
 namespace CoreData.CoreCore
 {
     public static class PayinfoHaddle
@@ -258,7 +255,162 @@ namespace CoreData.CoreCore
             return result;
         }
         ///<summary>
-        ///支付作废
+        ///支付审核
         ///</summary>
+        public static DataResult ComfirmPay(int payid,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var logs = new List<LogInsert>();
+            bool isflag = false;
+            int OID = 0;
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string  wheresql = "select * from payinfo where id =" + payid + " and coid =" + CoID;
+                var payinfo = CoreDBconn.Query<PayInfo>(wheresql).AsList();
+                if(payinfo.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "内部支付单ID参数异常!";
+                    return result;
+                }
+                if(payinfo[0].Status != 0)
+                {
+                    result.s = -1;
+                    result.d = "该笔支付单不可审核!";
+                    return result;
+                }
+                if(payinfo[0].OID > 0)
+                {
+                    wheresql = "select status,soid from `order` where id =" + payinfo[0].OID + " and coid =" + CoID;
+                    var u = CoreDBconn.Query<Order>(wheresql).AsList();
+                    if(u.Count == 0)
+                    {
+                        result.s = -1;
+                        result.d = "订单ID无效!";
+                        return result;
+                    }
+                    if(u[0].Status != 0 && u[0].Status != 1 && u[0].Status != 7)
+                    {
+                        result.s = -1;
+                        result.d = "待付款/已付款待审核/异常的订单才可以审核支付单!";
+                        return result;
+                    }
+                    isflag = true;
+                    OID = payinfo[0].OID;
+                }    
+                else
+                {
+                    //更新支付单资料
+                    string sqlCommandText = @"update payinfo set Status = 1 where id = " + payid + " and coid = " + CoID;
+                    int count = CoreDBconn.Execute(sqlCommandText,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                }          
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            if(isflag == true)
+            {
+                result = OrderHaddle.ConfirmPay(OID,payid,CoID,UserName);
+            }
+            result.d = null;
+            return result;
+        }
+        ///<summary>
+        ///支付审核
+        ///</summary>
+        public static DataResult CancleComfirmPay(int payid,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var logs = new List<LogInsert>();
+            bool isflag = false;
+            int OID = 0;
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string  wheresql = "select * from payinfo where id =" + payid + " and coid =" + CoID;
+                var payinfo = CoreDBconn.Query<PayInfo>(wheresql).AsList();
+                if(payinfo.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "内部支付单ID参数异常!";
+                    return result;
+                }
+                if(payinfo[0].Status != 1)
+                {
+                    result.s = -1;
+                    result.d = "该笔支付单不可取消审核!";
+                    return result;
+                }
+                if(payinfo[0].OID > 0)
+                {
+                    wheresql = "select status,soid from `order` where id =" + payinfo[0].OID + " and coid =" + CoID;
+                    var u = CoreDBconn.Query<Order>(wheresql).AsList();
+                    if(u.Count == 0)
+                    {
+                        result.s = -1;
+                        result.d = "订单ID无效!";
+                        return result;
+                    }
+                    if(u[0].Status != 0 && u[0].Status != 1 && u[0].Status != 7)
+                    {
+                        result.s = -1;
+                        result.d = "待付款/已付款待审核/异常的订单才可以取消审核支付单!";
+                        return result;
+                    }
+                    isflag = true;
+                    OID = payinfo[0].OID;
+                }    
+                else
+                {
+                    //更新支付单资料
+                    string sqlCommandText = @"update payinfo set Status = 0 where id = " + payid + " and coid = " + CoID;
+                    int count = CoreDBconn.Execute(sqlCommandText,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                }          
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            if(isflag == true)
+            {
+                result = OrderHaddle.CancleConfirmPay(OID,payid,CoID,UserName);
+            }
+            result.d = null;
+            return result;
+        }
     }
 }
