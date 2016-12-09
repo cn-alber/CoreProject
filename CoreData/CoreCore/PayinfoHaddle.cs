@@ -92,6 +92,7 @@ namespace CoreData.CoreCore
         public static DataResult GetPayStatusInit()                
         {
             var result = new DataResult(1,null);
+            var res = new GetPayStatusInitReturn();
             var filter = new List<Filter>();
             foreach (int  myCode in Enum.GetValues(typeof(PayStatus)))
             {
@@ -99,8 +100,68 @@ namespace CoreData.CoreCore
                 s.value = myCode.ToString();
                 s.label = Enum.GetName(typeof(PayStatus), myCode);//获取名称
                 filter.Add(s);
+                res.Status = filter;
             }
-            result.d = filter;
+            filter = new List<Filter>();
+            var ff = new Filter();
+            ff.value = "支付宝";
+            ff.label = "支付宝";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "快钱";
+            ff.label = "快钱";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "招行直连";
+            ff.label = "招行直连";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "财付通";
+            ff.label = "财付通";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "现金支付";
+            ff.label = "现金支付";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "银行转账";
+            ff.label = "银行转账";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "其他";
+            ff.label = "其他";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "供销支付";
+            ff.label = "供销支付";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "快速支付";
+            ff.label = "快速支付";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "微信支付";
+            ff.label = "微信支付";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "授信";
+            ff.label = "授信";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "预支付";
+            ff.label = "预支付";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "内部流转";
+            ff.label = "内部流转";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "门店会员余额";
+            ff.label = "门店会员余额";
+            filter.Add(ff);
+            res.Payment = filter;
+
+            result.d = res;
             return result;
         }
         ///<summary>

@@ -153,4 +153,9 @@ namespace CoreModels.XyCore
         public decimal Pagecnt{get;set;}//总页数
         public List<PayInfoQuery> Pay {get;set;}
     }
+    public class GetPayStatusInitReturn
+    {
+        public List<Filter> Status{get;set;}
+        public List<Filter> Payment{get;set;}
+    }
 }
