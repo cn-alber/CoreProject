@@ -4,9 +4,9 @@ using System;
 using CoreModels.XyCore;
 using Dapper;
 using System.Collections.Generic;
-using CoreModels.XyComm;
+using CoreModels.WmsApi;
 using static CoreModels.Enum.OrderE;
-using CoreData.CoreUser;
+using CoreData.CoreComm;
 using CoreModels.XyUser;
 namespace CoreData.CoreCore
 {
@@ -170,6 +170,199 @@ namespace CoreData.CoreCore
                 filter.Add(s);
             }
             result.d = filter;
+            return result;
+        }
+        ///<summary>
+        ///标记快递已打
+        ///</summary>
+        public static DataResult MarkExp(List<int> ID,string UserName,int CoID)
+        {
+            var result = new DataResult(1,null);   
+            var res = new MarkExpReturn();
+            var fa = new List<TransferNormalReturnFail>();
+            var su = new List<MarkExpSuccess>();
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlCommand = string.Empty;
+                sqlCommand = "select ID,IsExpPrint,Status from saleout where id in @ID and coid = @Coid";
+                var u = CoreDBconn.Query<SaleOutQuery>(sqlCommand,new{ID = ID,Coid = CoID}).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "没有符合条件的资料!";
+                    return result;
+                }
+                int count =0;
+                foreach(var a in u)
+                {
+                    if(a.IsExpPrint == true)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "单据已经标记快递已打印!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    if(a.Status != 0)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "待出库的单据才可以设定";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    sqlCommand = "update saleout set IsExpPrint = true,Modifier = @Modifier,ModifyDate = @ModifyDate where id = @ID and coid = @Coid";
+                    count = CoreDBconn.Execute(sqlCommand,new{Modifier=UserName,ModifyDate=DateTime.Now,ID=a.ID,Coid = CoID},TransCore);
+                    if(count <= 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                    var ss = new MarkExpSuccess();
+                    ss.ID = a.ID;
+                    ss.IsExpPrint = true;
+                    su.Add(ss);
+                }
+                TransCore.Commit();
+            }catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            res.SuccessIDs = su;
+            res.FailIDs = fa;
+            result.d = res;
+            return  result;
+        }
+
+        ///<summary>
+        ///取消快递已打
+        ///</summary>
+        public static DataResult CancleMarkExp(List<int> ID,string UserName,int CoID)
+        {
+            var result = new DataResult(1,null);   
+            var res = new MarkExpReturn();
+            var fa = new List<TransferNormalReturnFail>();
+            var su = new List<MarkExpSuccess>();
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlCommand = string.Empty;
+                sqlCommand = "select ID,IsExpPrint,Status from saleout where id in @ID and coid = @Coid";
+                var u = CoreDBconn.Query<SaleOutQuery>(sqlCommand,new{ID = ID,Coid = CoID}).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "没有符合条件的资料!";
+                    return result;
+                }
+                int count =0;
+                foreach(var a in u)
+                {
+                    if(a.IsExpPrint == false)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "单据没有标记快递已打印!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    if(a.Status != 0)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "待出库的单据才可以设定";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    sqlCommand = "update saleout set IsExpPrint = false,Modifier = @Modifier,ModifyDate = @ModifyDate where id = @ID and coid = @Coid";
+                    count = CoreDBconn.Execute(sqlCommand,new{Modifier=UserName,ModifyDate=DateTime.Now,ID=a.ID,Coid = CoID},TransCore);
+                    if(count <= 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                    var ss = new MarkExpSuccess();
+                    ss.ID = a.ID;
+                    ss.IsExpPrint = false;
+                    su.Add(ss);
+                }
+                TransCore.Commit();
+            }catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            res.SuccessIDs = su;
+            res.FailIDs = fa;
+            result.d = res;
+            return  result;
+        }
+        ///<summary>
+        ///查看拣货货品情况
+        ///</summary>
+        public static DataResult GetSkuList(int ID,int CoID)                
+        {
+            var result = new DataResult(1,null);
+           using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{  
+                    string sqlcommand = "select distinct SkuAutoID,SkuID from saleoutitem where SID = " + ID + "  and coid = " + CoID;
+                    var u = conn.Query<CheckSkuInv>(sqlcommand).AsList();
+                    var IDLst = new List<int>();
+                    foreach(var a in u)
+                    {
+                        IDLst.Add(a.SkuAutoID);
+                    }
+                    var SKU = CommHaddle.GetSkuPileCode(CoID.ToString(),IDLst).d as List<ASkuPileQty>;
+                    var res = new List<CheckSkuInvRetrun>();
+                    foreach(var a in u)
+                    {
+                        var su = new CheckSkuInvRetrun();
+                        su.SkuID = a.SkuID;
+                        var ss = new List<string>();
+                        foreach(var s in SKU)
+                        {
+                            if(a.SkuID == s.SkuID)
+                            {
+                                string remark = s.PCode + " * " + s.Qty;
+                                ss.Add(remark);
+                            }
+                        }
+                        if(ss.Count == 0)
+                        {
+                            string remark = "缺货或未上架";
+                            ss.Add(remark);
+                        }
+                        su.InvLst = ss;
+                        res.Add(su);
+                    }
+                    
+                    result.d = res;             
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }  
             return result;
         }
     }

@@ -1,0 +1,26 @@
+{
+    "s": 1,
+    "d": {
+        "SuccessIDs": [
+            {
+                "ID": 14,
+                "IsExpPrint": true
+            },
+            {
+                "ID": 15,
+                "IsExpPrint": true
+            }
+        ],
+        "FailIDs": [
+            {
+                "ID": 10,
+                "Reason": "单据已经标记快递已打印!"
+            },
+            {
+                "ID": 11,
+                "Reason": "待出库的单据才可以设定"
+            }
+        ]
+    },
+    "m": ""
+}

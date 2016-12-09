@@ -31,3 +31,23 @@ OutPut:     Datacnt             int             资料总笔数
 input:None
 OutPut:status List
 参考:output jason 文件:GetStatusInitData_output.json
+
+3.MarkExp()订单修改
+路由:http://localhost:5000/Core/SaleOut/MarkExp
+input:ID  List<int> 出库单List 
+output: s=1成功 else 错误代码
+参考:input jason 文件:MarkExp_input.json
+参考:output jason 文件:MarkExp_output.json
+
+4.CancleMarkExp()订单修改
+路由:http://localhost:5000/Core/SaleOut/CancleMarkExp
+input:ID  List<int> 出库单List 
+output: s=1成功 else 错误代码
+参考:input jason 文件:CancleMarkExp_input.json
+参考:output jason 文件:CancleMarkExp_output.json
+
+5.GetSkuList() //查询table saleout资料//待出库的状态时，这个按钮才显示
+  路由:http://localhost:5000/Core/SaleOut/GetSkuList
+input:      ID                  string          出库单号 
+OutPut:     货品库存
+参考:output jason 文件:GetSkuList_output.json

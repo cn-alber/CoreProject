@@ -347,17 +347,40 @@ namespace CoreWebApi.XyCore
         [HttpGetAttribute("Core/XyCore/CoreSku/GetPrintSkuProps")]
         public ResponseResult GetPrintSkuProps(string ID)
         {
-            var res = new DataResult(1,null);
+            var res = new DataResult(1, null);
             int x;
-            if(string.IsNullOrEmpty(ID)||!string.IsNullOrEmpty(ID)&&!int.TryParse(ID,out x))
+            if (string.IsNullOrEmpty(ID) || !string.IsNullOrEmpty(ID) && !int.TryParse(ID, out x))
             {
                 res.s = -1;
-                res.d="无效参数";
+                res.d = "无效参数";
             }
             else
             {
                 string CoID = GetCoid();
-                res = CoreSkuHaddle.PrintSkuProps(ID,CoID);
+                res = CoreSkuHaddle.PrintSkuProps(ID, CoID);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 商品吊牌打印 - 根据货号&Sku属性,带出商品明细
+        [HttpPostAttribute("Core/XyCore/CoreSku/PrintSkuItemQuery")]
+        public ResponseResult PrintSkuItemQuery([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            int x;
+            if (!(obj["ID"] != null && int.TryParse(obj["ID"].ToString(), out x) && obj["ValIDLst"] != null))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var cp = new SkuPrintParam();
+                cp.CoID = GetCoid();
+                cp.ID = obj["ID"].ToString();
+                cp.ValIDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(obj["ValIDLst"].ToString());
+                res = CoreSkuHaddle.PrintSkuItem(cp);
             }
             return CoreResult.NewResponse(res.s, res.d, "General");
         }

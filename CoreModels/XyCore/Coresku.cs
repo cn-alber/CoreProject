@@ -289,6 +289,8 @@ namespace CoreModels.XyCore
         public string ScoGoodsCode { get; set; }
         public string SkuID { get; set; }
         public string CoID { get; set; }
+        public string ID { get; set; }
+        public List<int> ValIDLst { get; set; }
     }
     #endregion
 
@@ -300,10 +302,50 @@ namespace CoreModels.XyCore
     }
     #endregion
 
+    #region 商品吊牌打印-Sku属性查询
     public class goods_print_skuprops
     {
         public Dictionary<string, string> DicSkuProps { get; set; }
         public List<goods_sku_props> SkuProps { get; set; }
+    }
+    #endregion
+
+    #region 商品吊牌打印 - 商品打印明细
+    public class CoreSkuItemPrint
+    {
+        public string GoodsCode { get; set; }
+        public string GoodsName { get; set; }
+        public string SkuID { get; set; }
+        public string SkuName { get; set; }
+        public string SkuSimple { get; set; }
+        public string Norm { get; set; }
+        public string pid1 { get; set; }
+        public string pid1_name { get; set; }
+        public string val_id1 { get; set; }
+        public string pid2 { get; set; }
+        public string pid2_name { get; set; }
+        public string val_id2 { get; set; }
+        public string pid3 { get; set; }
+        public string pid3_name { get; set; }
+        public string val_id3 { get; set; }
+        public string MarketPrice { get; set; }
+        public string SalePrice { get; set; }
+        public int KindID { get; set; }
+
+    }
+    #endregion
+
+    public class PrintCoreSku
+    {
+        public CoreSkuItemPrint item { get; set; }        
+        public List<print_item_props> itemprops { get; set; }//货品item属性
+    }
+    public class print_item_props
+    {
+        public string pid { get; set; }
+        public string pid_name { get; set; }
+        public string val_id { get; set; }
+        public string val_name { get; set; }
     }
 
     #region ######### CoreMat

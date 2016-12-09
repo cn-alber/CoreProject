@@ -219,4 +219,24 @@ namespace CoreModels.XyCore
         public decimal Pagecnt{get;set;}//总页数
         public List<SaleOutQuery> SaleOut {get;set;}//订单资料List
     }
+    public class MarkExpSuccess
+    {
+        public int ID{get;set;}
+        public bool IsExpPrint{get;set;}
+    }
+    public class MarkExpReturn
+    {
+        public List<MarkExpSuccess> SuccessIDs{get;set;}
+        public List<TransferNormalReturnFail> FailIDs{get;set;}
+    }
+    public class CheckSkuInv
+    {
+        public int SkuAutoID{get;set;}
+        public string SkuID{get;set;}
+    }
+    public class CheckSkuInvRetrun
+    {
+        public string SkuID{get;set;}
+        public List<string> InvLst{get;set;}
+    }
 }

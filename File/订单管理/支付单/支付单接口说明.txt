@@ -1,0 +1,46 @@
+接口名称:CoreWebApi/Controllers/Order/PayinfoControllers
+function说明
+1.GetPayinfoList() //查询table payinfo 资料
+路由:http://localhost:5000/Core/Pay/GetPayinfoList
+input:      ID                  string          内部支付单号 default null
+            OID                 string          内部订单单号 default null
+            SoID                string          外部订单单号 default null
+            PayNbr              string          付款单号 default null
+            DateStart           string          日期起 default null
+            Dateend             string          日期迄 default null
+            Status              string          状态 default null
+            BuyerShopID         string          买家账号 default null
+            Payment             string          支付方式 default null
+            SortField           string          排序栏位名称 default null
+            SortDirection       string          排序方式 default null
+            PageIndex           string          资料页数(ex.第一页就给1) default 1
+            NumPerPage          string          每页显示资料笔数 default 20
+OutPut:     Datacnt             int             资料总笔数
+            Pagecnt             decimal         总页数
+            Pay                 List<Payinfo>   Payinfo 资料
+参考:output jason 文件:GetPayinfoList_output.json
+
+2.GetPayStatusInit() //status List
+路由:http://localhost:5000/Core/Pay/GetPayStatusInit
+input:None
+OutPut:status List
+参考:output jason 文件:GetPayStatusInit_output.json
+
+3.UpdatePay()支付单更新
+路由:http://localhost:5000/Core/Pay/UpdatePay
+input:ID            int         内部付款单号
+      Paydate       datetime    付款日期
+      PayAmount     decimal     金额
+      PayNbr        string      付款单号
+      Payment       string      支付方式
+      PayAccount    string      支付账号
+output: s=1成功 else 错误代码
+参考:input jason 文件:UpdatePay_input.json
+参考:output jason 文件:UpdatePay_output.json
+
+4.CanclePay()支付单作废
+路由:http://localhost:5000/Core/Pay/CanclePay
+input:ID            int         内部付款单号
+output: s=1成功 else 错误代码
+参考:input jason 文件:CanclePay_input.json
+参考:output jason 文件:CanclePay_output.json

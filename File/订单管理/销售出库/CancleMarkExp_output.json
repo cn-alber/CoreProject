@@ -1,0 +1,26 @@
+{
+    "s": 1,
+    "d": {
+        "SuccessIDs": [
+            {
+                "ID": 14,
+                "IsExpPrint": false
+            },
+            {
+                "ID": 15,
+                "IsExpPrint": false
+            }
+        ],
+        "FailIDs": [
+            {
+                "ID": 10,
+                "Reason": "单据没有标记快递已打印!"
+            },
+            {
+                "ID": 11,
+                "Reason": "单据没有标记快递已打印!"
+            }
+        ]
+    },
+    "m": ""
+}

@@ -1,0 +1,46 @@
+{
+    "s": 1,
+    "d": {
+        "item": {
+            "GoodsCode": "KLDE",
+            "GoodsName": "KLDE862",
+            "SkuID": "KLDE001001",
+            "SkuName": "KLDE862",
+            "SkuSimple": "KLDE862",
+            "Norm": null,
+            "pid1": "100016110194735",
+            "pid1_name": "颜色",
+            "val_id1": "98",
+            "pid2": "100016110114201",
+            "pid2_name": "尺码",
+            "val_id2": "99",
+            "pid3": null,
+            "pid3_name": null,
+            "val_id3": null,
+            "MarketPrice": null,
+            "SalePrice": "10.00",
+            "KindID": 365
+        },
+        "itemprops": [
+            {
+                "pid": "122216507",
+                "pid_name": "厚薄",
+                "val_id": "13062",
+                "val_name": "厚"
+            },
+            {
+                "pid": "42722636",
+                "pid_name": "基础风格",
+                "val_id": "0",
+                "val_name": ""
+            },
+            {
+                "pid": "100016110755910",
+                "pid_name": "属性测试",
+                "val_id": "0",
+                "val_name": ""
+            }
+        ]
+    },
+    "m": ""
+}

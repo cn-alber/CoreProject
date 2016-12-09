@@ -914,14 +914,14 @@ namespace CoreData.CoreCore
                 }
                 else
                 {
-                    if(u[0].Status != 0)
+                    if(u[0].Status != 0 && u[0].Status != 1)
                     {
                         result.s = -1;
                         result.d = "只有待确认的售后单才可以修改!";
                         return result;
                     }
                 }
-                int i = 0;
+                int i = 0,j = 0;
                 if(SalerReturnAmt >= 0 && u[0].SalerReturnAmt != SalerReturnAmt)
                 {
                     log = new LogInsert();
@@ -1021,6 +1021,7 @@ namespace CoreData.CoreCore
                     u[0].WarehouseID = WarehouseID;
                     u[0].RecWarehouse = WarehouseName;
                     i ++;
+                    j ++;
                 }
                 if(Remark != null  && u[0].Remark != Remark)
                 {
@@ -1035,6 +1036,7 @@ namespace CoreData.CoreCore
                     logs.Add(log);
                     u[0].Remark = Remark;
                     i ++;
+                    j ++;
                 }
                 if(Express != null  && u[0].Express != Express)
                 {
@@ -1049,6 +1051,7 @@ namespace CoreData.CoreCore
                     logs.Add(log);
                     u[0].Express = Express;
                     i ++;
+                    j ++;
                 }
                 if(ExCode != null  && u[0].ExCode != ExCode)
                 {
@@ -1063,6 +1066,7 @@ namespace CoreData.CoreCore
                     logs.Add(log);
                     u[0].ExCode = ExCode;
                     i ++;
+                    j ++;
                 }
                 if(Result >= 0  && u[0].Result != Result)
                 {
@@ -1078,12 +1082,33 @@ namespace CoreData.CoreCore
                     u[0].Result = Result;
                     i ++;
                 }
-                if(i > 0)
+                if(i > 0 && u[0].Status == 0)
                 {
                     u[0].Modifier = UserName;
                     u[0].ModifyDate = DateTime.Now;                
                     sqlcommand = @"update aftersale set SalerReturnAmt=@SalerReturnAmt,BuyerUpAmt=@BuyerUpAmt,RealReturnAmt=@RealReturnAmt,Type=@Type,ReturnAccount=@ReturnAccount,
                                    WarehouseID=@WarehouseID,RecWarehouse=@RecWarehouse,Remark=@Remark,Express=@Express,ExCode=@ExCode,Result=@Result,Modifier=@Modifier,
+                                   ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
+                    count = CoreDBconn.Execute(sqlcommand,u[0],TransCore);
+                    if(count <= 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                    string loginsert = @"INSERT INTO orderlog(OID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                    VALUES(@OID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                    count =CoreDBconn.Execute(loginsert,logs,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3002;
+                        return result;
+                    }
+                }
+                if(j > 0 && u[0].Status == 1)
+                {
+                    u[0].Modifier = UserName;
+                    u[0].ModifyDate = DateTime.Now;                
+                    sqlcommand = @"update aftersale set WarehouseID=@WarehouseID,RecWarehouse=@RecWarehouse,Remark=@Remark,Express=@Express,ExCode=@ExCode,Modifier=@Modifier,
                                    ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
                     count = CoreDBconn.Execute(sqlcommand,u[0],TransCore);
                     if(count <= 0)
@@ -2626,8 +2651,9 @@ namespace CoreData.CoreCore
                         pay.CoID = CoID;
                         pay.Creator = UserName;
                         pay.Confirmer = UserName;
-                        sqlcommand = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SoID,Payment,PayDate,Amount,PayAmount,DataSource,Status,CoID,Creator,Confirmer) 
-                                       VALUES(@PayNbr,@RecID,@RecName,@OID,@SoID,@Payment,@PayDate,@Amount,@PayAmount,@DataSource,@Status,@CoID,@Creator,@Confirmer)";
+                        pay.BuyerShopID = ordNew.BuyerShopID;
+                        sqlcommand = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SoID,Payment,PayDate,Amount,PayAmount,DataSource,Status,CoID,Creator,Confirmer,BuyerShopID) 
+                                       VALUES(@PayNbr,@RecID,@RecName,@OID,@SoID,@Payment,@PayDate,@Amount,@PayAmount,@DataSource,@Status,@CoID,@Creator,@Confirmer,@BuyerShopID)";
                         count = CoreDBconn.Execute(sqlcommand,pay,TransCore);
                         if(count < 0)
                         {
@@ -2835,8 +2861,9 @@ namespace CoreData.CoreCore
                             pay.CoID = CoID;
                             pay.Creator = UserName;
                             pay.Confirmer = UserName;
-                            sqlcommand = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SoID,Payment,PayDate,Amount,PayAmount,DataSource,Status,CoID,Creator,Confirmer) 
-                                        VALUES(@PayNbr,@RecID,@RecName,@OID,@SoID,@Payment,@PayDate,@Amount,@PayAmount,@DataSource,@Status,@CoID,@Creator,@Confirmer)";
+                            pay.BuyerShopID = ordNew.BuyerShopID;
+                            sqlcommand = @"INSERT INTO payinfo(PayNbr,RecID,RecName,OID,SoID,Payment,PayDate,Amount,PayAmount,DataSource,Status,CoID,Creator,Confirmer,BuyerShopID) 
+                                        VALUES(@PayNbr,@RecID,@RecName,@OID,@SoID,@Payment,@PayDate,@Amount,@PayAmount,@DataSource,@Status,@CoID,@Creator,@Confirmer,@BuyerShopID)";
                             count = CoreDBconn.Execute(sqlcommand,pay,TransCore);
                             if(count < 0)
                             {
