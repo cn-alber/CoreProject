@@ -858,7 +858,7 @@ namespace CoreData.CoreComm
         ///<summary>
         ///仓库启用停用设置
         ///</summary>
-        public static DataResult UpdateWarehouseEnable(int whid,string Company,string UserName,int CoID,bool Enable)
+        public static DataResult UpdateWarehouseEnable(int whid,string UserName,int CoID,bool Enable)
         {
             var result = new DataResult(1,null);   
             string contents = string.Empty;
@@ -875,7 +875,7 @@ namespace CoreData.CoreComm
                             return result;
                         }
                     }
-                    string uptsql = @"update warehouse set enable = @Enable where (id = @ID or parentid = @ID) and coid = @Coid";
+                    string uptsql = @"UPDATE warehouse SET warehouse.`Enable` = @Enable where (warehouse.ID = @ID or warehouse.ParentID = @ID) and warehouse.CoID = @Coid";
                     var args = new {ID = whid,Enable = Enable,Coid = CoID};          
                     int count = conn.Execute(uptsql,args);
                     if(count < 0)

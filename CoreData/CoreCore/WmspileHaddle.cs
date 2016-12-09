@@ -32,7 +32,9 @@ namespace CoreData.CoreCore
                     if(!string.IsNullOrEmpty(cell)){
                         whereSql += " AND Cell = '"+cell+"' ";
                     }                    
-                    var list = conn.Query<Pilelist>(sql+whereSql+" ORDER BY `Order` ").AsList();
+                    var relist =  conn.Query<Pilelist>(sql+whereSql+" ORDER BY `Order` ").AsList();
+                    var list = conn.Query<Pilelist>(sql+" ORDER BY `Order` ").AsList();
+                    
                     var subs = list.GroupBy(i=>i.Area).Select(g => new Sub{ parent = g.FirstOrDefault().Area , name="区域"}).ToList();
                     foreach(var rowsub in subs ){
                         if(!string.IsNullOrEmpty(rowsub.parent)){
@@ -58,7 +60,7 @@ namespace CoreData.CoreCore
                     }                    
                     res.d=new {
                         submenu = subs,
-                        list = list
+                        list = relist
                     };                                  
                 }
                 catch

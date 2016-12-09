@@ -31,22 +31,12 @@ namespace CoreWebApi
             
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
-        [HttpGetAttribute("/Core/Wmspile/InsertPile")]
+        [HttpPostAttribute("/Core/Wmspile/InsertPile")]
         public ResponseResult InsertPile([FromBodyAttribute]JObject co)
         {   
             var insertM = Newtonsoft.Json.JsonConvert.DeserializeObject<PileInsert>(co.ToString());
             string UserName = GetUname(); 
-            //string Company = co["Company"].ToString();
             string CoID = GetCoid();
-            // var insertM = new PileInsert();
-            // insertM.WarehouseID = 138;
-            // insertM.WarehouseName = "南极云商常熟次品1仓4";
-            // insertM.Type = 5;
-            // insertM.area = area;
-            // insertM.row = row.Split(',');
-            // insertM.col = col.Split(',');
-            // insertM.storey = null;
-            // insertM.cell = null;
             var data = WmspileHaddle.insertpile(insertM,UserName,CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
