@@ -249,6 +249,7 @@ namespace CoreModels.XyCore{
 	}
 	public class Sub{
 		public string parent{get;set;}
+		public string name{get;set;}
 		public List<Sub> children{get;set;}
 	}
 

@@ -807,6 +807,7 @@ namespace CoreData.CoreComm
                         var rr = new WarehouseResponse();
                         rr.area = new List<int>(){0,0,0};                        
                         rr.name0 = a.warehousename;
+                        rr.id0 = a.id;
                         rr.contract = a.contract;
                         rr.phone = a.phone;
                         rr.area[0] = a.logistics;
@@ -821,6 +822,7 @@ namespace CoreData.CoreComm
                             if(b.type == 1)
                             {
                                 rr.name1 = b.warehousename;
+                                rr.id1 = b.id;
                             }
                             if(b.type == 2)
                             {
@@ -829,14 +831,17 @@ namespace CoreData.CoreComm
                             if(b.type == 3)
                             {
                                 rr.name3 = b.warehousename;
+                                rr.id3 = b.id;
                             }
                             if(b.type == 4)
                             {
                                 rr.name4 = b.warehousename;
+                                rr.id4 = b.id;
                             }
                             if(b.type == 5)
                             {
                                 rr.name5 = b.warehousename;
+                                rr.id5 = b.id;
                             }
                         }
                         res.Add(rr);
