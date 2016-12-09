@@ -175,5 +175,11 @@ namespace CoreModels.Enum
             换货 = 1,
             补发 = 2
         }
+        public enum PayStatus
+        {
+            待审核 = 0,
+            已确认 = 1,
+            作废 = 2
+        }
     }
 }

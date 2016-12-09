@@ -1,0 +1,270 @@
+{
+    "s": 1,
+    "d": {
+        "Datacnt": 6179,
+        "Pagecnt": 309,
+        "Pay": [
+            {
+                "ID": 14853,//内部支付单号
+                "PayDate": "2016-12-07 10:14:04",//付款日期
+                "OID": 10884,//内部订单号
+                "SoID": 63616702204,//线上订单号
+                "PayNbr": "S636167024440",//付款单号
+                "PayAmount": "199.00",//金额
+                "Status": 1,//状态
+                "StatusString": "已确认",//状态说明
+                "Payment": "快速支付",//支付方式
+                "PayAccount": null,//支付账号
+                "BuyerShopID": null //买家账号
+            },
+            {
+                "ID": 14852,
+                "PayDate": "2016-12-07 10:10:39",
+                "OID": 10884,
+                "SoID": 63616702204,
+                "PayNbr": "S636167022386",
+                "PayAmount": "298.00",
+                "Status": 1,
+                "StatusString": "已确认",
+                "Payment": "快速支付",
+                "PayAccount": null,
+                "BuyerShopID": null
+            },
+            {
+                "ID": 14851,
+                "PayDate": "2016-12-06 14:11:28",
+                "OID": 10883,
+                "SoID": 63616622739,
+                "PayNbr": "rrrrrrr00005_In",
+                "PayAmount": "200.00",
+                "Status": 1,
+                "StatusString": "已确认",
+                "Payment": "内部流转",
+                "PayAccount": null,
+                "BuyerShopID": null
+            },
+            {
+                "ID": 14850,
+                "PayDate": "2016-12-06 12:06:27",
+                "OID": 10882,
+                "SoID": 63616622739,
+                "PayNbr": "rrrrrrr00005",
+                "PayAmount": "508.00",
+                "Status": 1,
+                "StatusString": "已确认",
+                "Payment": "支付宝",
+                "PayAccount": "",
+                "BuyerShopID": null
+            },
+            {
+                "ID": 14849,
+                "PayDate": "2016-12-05 16:05:57",
+                "OID": 10880,
+                "SoID": 63616182021,
+                "PayNbr": "www00002_In",
+                "PayAmount": "10.00",
+                "Status": 1,
+                "StatusString": "已确认",
+                "Payment": "内部流转",
+                "PayAccount": null,
+                "BuyerShopID": null
+            },
+            {
+                "ID": 14848,
+                "PayDate": "2016-12-01 09:40:51",
+                "OID": 10879,
+                "SoID": 63616182021,
+                "PayNbr": "www00002",
+                "PayAmount": "303.00",
+                "Status": 1,
+                "StatusString": "已确认",
+                "Payment": "支付宝",
+                "PayAccount": "",
+                "BuyerShopID": null
+            },
+            {
+                "ID": 14847,
+                "PayDate": "2016-11-25 16:36:24",
+                "OID": 10877,
+                "SoID": 63615688301,
+                "PayNbr": "S636156885837",
+                "PayAmount": "12.00",
+                "Status": 1,
+                "StatusString": "已确认",
+                "Payment": "快速支付",
+                "PayAccount": null,
+                "BuyerShopID": null
+            },
+            {
+                "ID": 14846,
+                "PayDate": "2016-11-25 16:36:18",
+                "OID": 10878,
+                "SoID": 63615688325,
+                "PayNbr": "S636156885775",
+                "PayAmount": "12.00",
+                "Status": 1,
+                "StatusString": "已确认",
+                "Payment": "快速支付",
+                "PayAccount": null,
+                "BuyerShopID": null
+            },
+            {
+                "ID": 14845,
+                "PayDate": "2016-11-25 16:18:19",
+                "OID": 10876,
+                "SoID": 63615687481,
+                "PayNbr": "S636156874990",
+                "PayAmount": "10.00",
+                "Status": 1,
+                "StatusString": "已确认",
+                "Payment": "快速支付",
+                "PayAccount": null,
+                "BuyerShopID": null
+            },
+            {
+                "ID": 14844,
+                "PayDate": "2016-11-25 15:09:50",
+                "OID": 10874,
+                "SoID": 63614997617,
+                "PayNbr": "S636156833899",
+                "PayAmount": "140.00",
+                "Status": 1,
+                "StatusString": "已确认",
+                "Payment": "快速支付",
+                "PayAccount": null,
+                "BuyerShopID": null
+            },
+            {
+                "ID": 14843,
+                "PayDate": "2016-11-24 13:53:48",
+                "OID": 10875,
+                "SoID": 63615344340,
+                "PayNbr": "S636155924276",
+                "PayAmount": "214.00",
+                "Status": 1,
+                "StatusString": "已确认",
+                "Payment": "快速支付",
+                "PayAccount": null,
+                "BuyerShopID": null
+            },
+            {
+                "ID": 14842,
+                "PayDate": "2016-11-23 16:57:43",
+                "OID": 10873,
+                "SoID": 201611151001,
+                "PayNbr": "S636155170627",
+                "PayAmount": "341.00",
+                "Status": 1,
+                "StatusString": "已确认",
+                "Payment": "快速支付",
+                "PayAccount": null,
+                "BuyerShopID": null
+            },
+            {
+                "ID": 14841,
+                "PayDate": "2016-11-23 16:53:49",
+                "OID": 10868,
+                "SoID": 63613180287,
+                "PayNbr": "S636155168288",
+                "PayAmount": "71.00",
+                "Status": 1,
+                "StatusString": "已确认",
+                "Payment": "快速支付",
+                "PayAccount": null,
+                "BuyerShopID": null
+            },
+            {
+                "ID": 14840,
+                "PayDate": "2016-11-23 16:51:58",
+                "OID": 10868,
+                "SoID": 63613180287,
+                "PayNbr": "44444",
+                "PayAmount": "20.00",
+                "Status": 1,
+                "StatusString": "已确认",
+                "Payment": "支付宝",
+                "PayAccount": "",
+                "BuyerShopID": null
+            },
+            {
+                "ID": 14839,
+                "PayDate": "2016-11-23 16:51:29",
+                "OID": 10868,
+                "SoID": 63613180287,
+                "PayNbr": "S636155166891",
+                "PayAmount": "1.00",
+                "Status": 2,
+                "StatusString": "作废",
+                "Payment": "快速支付",
+                "PayAccount": null,
+                "BuyerShopID": null
+            },
+            {
+                "ID": 14838,
+                "PayDate": "2016-11-23 16:49:44",
+                "OID": 10868,
+                "SoID": 63613180287,
+                "PayNbr": "11111",
+                "PayAmount": "5.00",
+                "Status": 2,
+                "StatusString": "作废",
+                "Payment": "支付宝",
+                "PayAccount": "",
+                "BuyerShopID": null
+            },
+            {
+                "ID": 14837,
+                "PayDate": "2016-11-23 15:42:29",
+                "OID": 10873,
+                "SoID": 201611151001,
+                "PayNbr": "S636155125486",
+                "PayAmount": "161.00",
+                "Status": 2,
+                "StatusString": "作废",
+                "Payment": "快速支付",
+                "PayAccount": null,
+                "BuyerShopID": null
+            },
+            {
+                "ID": 14836,
+                "PayDate": "2016-11-23 15:39:32",
+                "OID": 10873,
+                "SoID": 201611151001,
+                "PayNbr": "S636155123719",
+                "PayAmount": "107.00",
+                "Status": 2,
+                "StatusString": "作废",
+                "Payment": "快速支付",
+                "PayAccount": null,
+                "BuyerShopID": null
+            },
+            {
+                "ID": 14835,
+                "PayDate": "2016-11-23 14:57:59",
+                "OID": 10873,
+                "SoID": 201611151001,
+                "PayNbr": "S636155098785",
+                "PayAmount": "118.00",
+                "Status": 2,
+                "StatusString": "作废",
+                "Payment": "快速支付",
+                "PayAccount": null,
+                "BuyerShopID": null
+            },
+            {
+                "ID": 14834,
+                "PayDate": "2016-11-23 11:17:47",
+                "OID": 10873,
+                "SoID": 201611151001,
+                "PayNbr": "S636154966669",
+                "PayAmount": "6.00",
+                "Status": 2,
+                "StatusString": "作废",
+                "Payment": "快速支付",
+                "PayAccount": null,
+                "BuyerShopID": null
+            }
+        ]
+    },
+    "m": ""
+}
