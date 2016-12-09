@@ -49,11 +49,10 @@ namespace CoreWebApi
         public ResponseResult UpdateWarehouseEnable([FromBodyAttribute]JObject co)
         {   
             int id = int.Parse(co["ID"].ToString());
-            string Company = co["Company"].ToString();
             string UserName = GetUname(); 
             bool Enable = co["Enable"].ToString().ToUpper()=="TRUE"?true:false;
             int CoID = int.Parse(GetCoid());
-            var data = WarehouseHaddle.UpdateWarehouseEnable(id,Company,UserName,CoID,Enable);
+            var data = WarehouseHaddle.UpdateWarehouseEnable(id,UserName,CoID,Enable);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     
