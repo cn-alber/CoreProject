@@ -3,6 +3,7 @@ using System.Linq;
 using System.Data;
 using CoreModels;
 using CoreModels.XyUser;
+using CoreModels.Enum;
 using CoreModels.XyComm;
 using CoreModels.XyCore;
 using CoreModels.WmsApi;
@@ -482,10 +483,10 @@ namespace CoreData.CoreWmsApi
                             np.CoID = IParam.CoID;
                             np.PCType = 2;//0.暂存仓;1.固定货位;2.临时货位(托盘，可对应多个Sku)
                             int c1 = CoreConn.Execute(APurHaddles.AddWmsPile(), np, CoreTrans);
-                            if(c1<=0)
+                            if (c1 <= 0)
                             {
-                                result.s=-1;
-                                result.d="";
+                                result.s = -1;
+                                result.d = "";
                             }
                             IParam.WarehouseID = int.Parse(WhViewLst[0].ID);
                             re_qty = asku.Qty;
@@ -500,7 +501,7 @@ namespace CoreData.CoreWmsApi
                         var CoIDLst = res.d as List<string>;
                         CoreConn.Execute(UptInvMainWaitInQtySql(), new { CoID = IParam.CoID, CoIDLst = CoIDLst, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
                         //添加上架操作记录
-                        IParam.Type=1;
+                        IParam.Type = 1;
                         result = AddWmsLog(IParam);
                         if (result.s == 1)
                         {
@@ -526,7 +527,128 @@ namespace CoreData.CoreWmsApi
             return result;
         }
 
-
+        /// <summary>
+        /// 新增库存盘点交易
+        /// </summary>
+        public static DataResult SetAreaSkuQty(AShelfSet IParam)
+        {
+            var result = new DataResult(1, null);
+            var CoreConn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreConn.Open();
+            var CoreTrans = CoreConn.BeginTransaction();
+            try
+            {
+                string PileSql = "SELECT ID,Qty,MaxQty,WarehouseID,Type,PCode,Skuautoid,SkuID FROM wmspile WHERE CoID = @CoID AND ID = @ID AND Type in (1,2)";
+                string invsql = "SELECT ID,Skuautoid,StockQty FROM Inventory WHERE CoID=@CoID AND Skuautoid=@Skuautoid";
+                var pileLst = CoreConn.Query<AWmsPileAuto>(PileSql, new { CoID = IParam.CoID, ID = IParam.PileID }, CoreTrans).AsList();
+                if (IParam.Qty > pileLst[0].MaxQty)
+                {
+                    result.s = -1;
+                    result.d = "超出数量上限" + pileLst[0].MaxQty.ToString();
+                }
+                else
+                {
+                    var RecordID = "INV" + CommHaddle.GetRecordID(IParam.CoID);
+                    int Status = 1;//(0:待审核;1.审核通过;2.作废)     
+                    result = CommHaddle.GetWhViewByID(IParam.CoID, pileLst[0].WarehouseID);
+                    if (result.s > 0)
+                    {
+                        var inv_stock = CoreConn.Query<Sfc_InvStock>(invsql, new { CoID = IParam.CoID, Skuautoid = pileLst[0].Skuautoid }).AsList();
+                        var wh_view = result.d as Warehouse_view;
+                        var setqty = IParam.Qty - pileLst[0].Qty;//盘点交易数量
+                        CoreConn.Execute(UptPileQtySql(),new{CoID=IParam.CoID,ID=IParam.PileID,Qty=IParam.Qty});
+                        //新增操作记录
+                        var log = new AWmslog();
+                        log.BarCode = pileLst[0].SkuID;
+                        log.Skuautoid = pileLst[0].Skuautoid;
+                        log.SkuID = pileLst[0].SkuID;
+                        log.WarehouseID = pileLst[0].WarehouseID;
+                        log.PCode = pileLst[0].PCode;
+                        log.Qty = setqty;
+                        log.Contents = IParam.Contents;
+                        log.Type = pileLst[0].Type;
+                        log.CoID = IParam.CoID;
+                        log.Creator = IParam.Creator;
+                        log.CreateDate = IParam.CreateDate;
+                        CoreConn.Execute(APurHaddles.AddWmsLogSql(), log, CoreTrans);
+                        //盘点主表
+                        var main = new Sfc_main();
+                        main.CoID = IParam.CoID.ToString();
+                        main.Creator = IParam.Creator;
+                        main.CreateDate = IParam.CreateDate;
+                        main.Type = 2;//1.期初，2.盘点
+                        main.Status = Status;
+                        main.WhID = wh_view.ID;
+                        main.Parent_WhID = wh_view.ParentID;
+                        CoreConn.Execute(StockTakeHaddle.AddSfcMainSql(), main, CoreTrans);
+                        var MainID = CoreConn.QueryFirst<string>("select LAST_INSERT_ID()", CoreTrans);//获取新增id
+                        //盘点子表
+                        var item = new Sfc_item();
+                        item.ParentID = MainID;
+                        item.CoID = IParam.CoID.ToString(); ;
+                        item.Creator = IParam.Creator;
+                        item.CreateDate = IParam.CreateDate;
+                        item.Type = 2;
+                        item.WhID = wh_view.ID;
+                        item.Parent_WhID = wh_view.ParentID;
+                        item.Skuautoid = pileLst[0].Skuautoid;
+                        item.InvQty = inv_stock[0].StockQty + setqty;//盘点数量
+                        item.Qty = setqty;//交易数量   
+                        CoreConn.Execute(StockTakeHaddle.AddSfcItemSql(), item, CoreTrans);                       
+                         //交易主表
+                        var inv = new Invinout();
+                        inv.RefID = MainID;
+                        inv.RecordID = RecordID;
+                        inv.Type = 1401;
+                        inv.CusType =  Enum.GetName(typeof(InvE.InvType), 1401).ToString();//交易类型           ;
+                        inv.Status = Status;
+                        inv.WhID = wh_view.ParentID;
+                        inv.LinkWhID = wh_view.ID;
+                        inv.Creator = IParam.Creator;
+                        inv.CreateDate = IParam.CreateDate;
+                        inv.CoID = IParam.CoID.ToString();
+                        CoreConn.Execute(InventoryHaddle.AddInvinoutSql(), inv, CoreTrans);
+                        //交易子表
+                        var inv_item = new Invinoutitem();
+                        inv_item.RefID = MainID;
+                        inv_item.IoID = RecordID;
+                        inv_item.Type = 1401;
+                        inv_item.CusType = Enum.GetName(typeof(InvE.InvType), 1401).ToString();//交易类型     ;
+                        inv_item.Status = Status;
+                        inv_item.WhID = wh_view.ParentID;
+                        inv_item.LinkWhID = wh_view.ID;
+                        inv_item.Skuautoid = pileLst[0].Skuautoid;
+                        inv_item.Qty = setqty;//交易数量 
+                        inv_item.Creator = IParam.Creator;
+                        inv_item.CreateDate = IParam.CreateDate;
+                        inv_item.CoID = IParam.CoID.ToString();
+                        CoreConn.Execute(InventoryHaddle.AddInvinoutitemSql(), inv_item, CoreTrans);
+                         //更新库存数量                   
+                        var SkuIDLst = new List<int>();
+                        SkuIDLst.Add(inv_item.Skuautoid);
+                        CoreConn.Execute(InventoryHaddle.UptInvStockQtySql(), new { CoID = IParam.CoID, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
+                        //获取第三方仓公司ID
+                        var res = CommHaddle.GetWareCoidList(IParam.CoID.ToString());
+                        var CoIDLst = res.d as List<string>;
+                        CoreConn.Execute(InventoryHaddle.UptInvMainStockQtySql(), new { CoID = IParam.CoID, CoIDLst = CoIDLst, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);                      
+                        CoreTrans.Commit();
+                        CoreUser.LogComm.InsertUserLog("修改库存数量-盘点数量", "Inventory", "单据ID" + MainID, IParam.Creator, IParam.CoID, DateTime.Now);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                CoreTrans.Rollback();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                CoreTrans.Dispose();
+                CoreConn.Close();
+            }
+            return result;
+        }
 
         /// <summary>
         /// 新增操作记录

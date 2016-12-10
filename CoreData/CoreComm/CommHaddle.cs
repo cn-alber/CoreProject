@@ -226,7 +226,7 @@ namespace CoreData.CoreComm
             }
             return result;
         }
-        public static DataResult GetWhViewByID(string CoID, string WhID)
+        public static DataResult GetWhViewByID(int CoID, int WhID)
         {
             var result = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CommConnectString))
@@ -234,7 +234,7 @@ namespace CoreData.CoreComm
                 try
                 {
                     // Dictionary<string, object> DicWh = new Dictionary<string, object>();
-                    string Sql = @"SELECT ID,WarehouseName AS WhName FROM warehouse WHERE CoID=@CoID AND ID =@WhID";
+                    string Sql = @"SELECT ID,WarehouseName AS WhName,Type,ParentID FROM warehouse WHERE CoID=@CoID AND ID =@WhID";
                     var WhLst = conn.Query<Warehouse_view>(Sql, new { CoID = CoID, WhID = WhID }).AsList();
                     // foreach (var wh in WhLst)
                     // {

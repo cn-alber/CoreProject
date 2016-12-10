@@ -233,5 +233,31 @@ namespace CoreWebApi
         }
         #endregion
 
+        #region 库存盘点
+        [HttpPostAttribute("Core/AShelves/SetAreaQty")]
+        public ResponseResult SetAreaQty([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            int x;
+            if (!(obj["PileID"] != null && int.TryParse(obj["PileID"].ToString(), out x) && obj["Qty"] != null && int.TryParse(obj["Qty"].ToString(), out x) ))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var cp = new AShelfSet();
+                cp.PileID = int.Parse(obj["PileID"].ToString());
+                cp.Qty = int.Parse(obj["Qty"].ToString());
+                cp.Contents = "库存盘点";
+                cp.CoID = int.Parse(GetCoid());
+                cp.Creator = GetUname();
+                cp.CreateDate = DateTime.Now.ToString();
+                res = AShelvesHaddles.SetAreaSkuQty(cp);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "WmsApi");
+        }
+        #endregion
+
     }
 }
