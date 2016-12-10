@@ -9,7 +9,7 @@ function说明
     OutPut：
         ACore       ACoreSku    箱/件码Sku
     参考:output json 文件:GetBox_output.json  
-2.SetPurRec()//新增收料单
+2.SetPurRec()//采购收获 - 新增收料单
     方法：POST
     路由：http://192.168.30.211:5000/Core/APur/SetPurRec
     InPut:
@@ -17,3 +17,10 @@ function说明
         PurID       int             采购单编号Purchase.ID
         RecSkuLst   List<ARecSku>   收入条码信息
     参考：input json 文件：SetPurRec_input.json
+3.SetRec()//其他收获
+    方法：POST
+    路由：http://192.168.30.211:5000/Core/APur/SetOtherRec
+    InPut:
+        WhID        int             收入仓库编号Warehouse.ID
+        RecSkuLst   List<ARecSku>   收入条码信息
+    参考：input json 文件：SetOtherRec_input.json

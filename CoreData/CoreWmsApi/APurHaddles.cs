@@ -256,7 +256,7 @@ namespace CoreData.CoreWmsApi
                     inv.CreateDate = IParam.CreateDate;
                     inv.CoID = IParam.CoID.ToString();
                     // CoreConn.Execute(InventoryHaddle.AddInvinoutSql(), inv, CoreTrans);
-                    var inv_itemLst = IParam.RecSkuLst.Select(a => new Invinoutitem
+                    var inv_itemLst = RecSkuLst.Select(a => new Invinoutitem
                     {
                         RefID = ParentID,
                         IoID = RecordID,
@@ -506,7 +506,7 @@ namespace CoreData.CoreWmsApi
                 inv.CreateDate = IParam.CreateDate;
                 inv.CoID = IParam.CoID.ToString();
                 // CoreConn.Execute(InventoryHaddle.AddInvinoutSql(), inv, CoreTrans);
-                var inv_itemLst = IParam.RecSkuLst.Select(a => new Invinoutitem
+                var inv_itemLst = RecSkuLst.Select(a => new Invinoutitem
                 {
                     RefID = ParentID,
                     IoID = RecordID,

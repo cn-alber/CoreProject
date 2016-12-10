@@ -18,7 +18,7 @@ namespace CoreData.CoreWmsApi
     public static class AShelvesHaddles
     {
         /// <summary>
-        /// 扫条码获取Sku信息及默认货位
+        /// 货品上架 - 扫条码获取Sku信息及默认货位
         /// </summary>
         public static DataResult GetUpBoxSku(AShelfParam IParam)
         {
@@ -148,7 +148,7 @@ namespace CoreData.CoreWmsApi
         }
 
         /// <summary>
-        /// Sku上架
+        /// 货品下架 - 更新货位库存
         /// </summary>
         public static DataResult SetUpShelfPile(AShelfSet IParam)
         {
@@ -210,7 +210,7 @@ namespace CoreData.CoreWmsApi
                                 var logLst = result.d as List<AWmslog>;
                                 CoreConn.Execute(APurHaddles.AddWmsLogSql(), logLst, CoreTrans);
                                 CoreTrans.Commit();
-                                result.d = null;
+                                result.d = addpileLst[0].Qty;//返回现有库存数量
                             }
                         }
                     }
@@ -296,7 +296,7 @@ namespace CoreData.CoreWmsApi
         }
 
         /// <summary>
-        /// 货品下架
+        /// 货品下架 - 更新货位库存
         /// </summary>
         public static DataResult SetOffShelfPile(AShelfSet IParam)
         {
@@ -374,7 +374,7 @@ namespace CoreData.CoreWmsApi
                             var logLst = result.d as List<AWmslog>;
                             CoreConn.Execute(APurHaddles.AddWmsLogSql(), logLst, CoreTrans);
                             CoreTrans.Commit();
-                            result.d = null;
+                            result.d = subpileLst[0].Qty;//返回现有库存数量
                         }
                     }
                 }
@@ -393,7 +393,139 @@ namespace CoreData.CoreWmsApi
             return result;
         }
 
-        // public static DataResult GetPCode
+        /// <summary>
+        /// 托盘上架 - 扫描Sku
+        /// </summary>
+        public static DataResult TrayUpScanSku(AShelfParam IParam)
+        {
+            var result = new DataResult(1, null);
+            var cp = new ASkuScanParam();
+            cp.CoID = IParam.CoID;
+            cp.BarCode = IParam.BoxCode;
+            result = ASkuScanHaddles.GetType(cp);
+            if (result.s > 0)
+            {
+                var SkuAuto = result.d as ASkuScan;
+                using (var conn = new MySqlConnection(DbBase.CommConnectString))
+                {
+                    try
+                    {
+                        result = IsExist(SkuAuto.BarCode, SkuAuto.SkuType, 4, IParam.CoID);
+                        if (result.s > 0)
+                        {
+                            result.d = SkuAuto;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        result.s = -1;
+                        result.d = e.Message;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 托盘上架 - 扫描Sku
+        /// </summary>
+        public static DataResult TrayUp(AShelfSet IParam)
+        {
+            var result = new DataResult(1, null);
+            var CoreConn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreConn.Open();
+            var CoreTrans = CoreConn.BeginTransaction();
+            try
+            {
+                var asku = IParam.SkuAuto;
+                //更新WmsPile
+                string SubPileSql = "SELECT CoID,ID,Qty,WarehouseID,Type,PCode,Skuautoid,SkuID FROM wmspile WHERE CoID = @CoID AND Skuautoid = @Skuautoid AND Type=@Type";
+                string AddPileSql = "SELECT CoID,ID,Qty,WarehouseID,Type,PCode,Skuautoid,SkuID FROM wmspile WHERE CoID = @CoID AND PCode=@PCode AND Skuautoid = @Skuautoid";
+                var subpileLst = CoreConn.Query<AWmsPileAuto>(SubPileSql, new { CoID = IParam.CoID, Skuautoid = asku.Skuautoid, Type = IParam.Type }, CoreTrans).AsList();
+                var addpileLst = CoreConn.Query<AWmsPileAuto>(AddPileSql, new { CoID = IParam.CoID, PCode = IParam.PCode, Skuautoid = asku.Skuautoid }, CoreTrans).AsList();
+                if (subpileLst.Count <= 0)
+                {
+                    result.s = -6003;//无此SKU库存信息
+                }
+                else
+                {   //托盘上架 - 有资料Qty+,无资料新增wmspile                    
+                    result = IsExist(asku.BarCode, asku.SkuType, 2, IParam.CoID);
+                    if (result.s == 1)
+                    {
+                        int re_qty;
+                        var UptLst = new List<AWmsPileAuto>();
+                        subpileLst[0].Qty = subpileLst[0].Qty - asku.Qty;
+                        UptLst.Add(subpileLst[0]);
+                        if (addpileLst.Count > 0)
+                        {
+                            addpileLst[0].Qty = addpileLst[0].Qty + asku.Qty;
+                            UptLst.Add(addpileLst[0]);
+                            IParam.WarehouseID = addpileLst[0].WarehouseID;
+                            re_qty = addpileLst[0].Qty;
+                        }
+                        else
+                        {
+                            result = CommHaddle.GetWhViewAll(IParam.CoID.ToString());
+                            var WhViewLst = result.d as List<Warehouse_view>;
+                            WhViewLst = WhViewLst.Where(a => a.Type == "1").AsList();//存储藏 - 零数仓
+                            var np = new AWmsPile();
+                            np.Skuautoid = asku.Skuautoid;
+                            np.SkuID = asku.SkuID;
+                            np.PCode = IParam.PCode;
+                            np.WarehouseID = int.Parse(WhViewLst[0].ID);
+                            np.WarehouseName = WhViewLst[0].WhName;
+                            np.Type = 1;
+                            np.Qty = asku.Qty;
+                            np.Creator = IParam.Creator;
+                            np.CreateDate = IParam.CreateDate;
+                            np.CoID = IParam.CoID;
+                            np.PCType = 2;//0.暂存仓;1.固定货位;2.临时货位(托盘，可对应多个Sku)
+                            int c1 = CoreConn.Execute(APurHaddles.AddWmsPile(), np, CoreTrans);
+                            if(c1<=0)
+                            {
+                                result.s=-1;
+                                result.d="";
+                            }
+                            IParam.WarehouseID = int.Parse(WhViewLst[0].ID);
+                            re_qty = asku.Qty;
+                        }
+                        CoreConn.Execute(UptPileSkuQtySql(), UptLst, CoreTrans);
+                        //更新库存数量      
+                        var SkuIDLst = new List<int>();
+                        SkuIDLst.Add(asku.Skuautoid);
+                        CoreConn.Execute(UptInvWaitInQtySql(), new { CoID = IParam.CoID, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
+                        //更新总库存数量
+                        var res = CommHaddle.GetWareCoidList(IParam.CoID.ToString());
+                        var CoIDLst = res.d as List<string>;
+                        CoreConn.Execute(UptInvMainWaitInQtySql(), new { CoID = IParam.CoID, CoIDLst = CoIDLst, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
+                        //添加上架操作记录
+                        IParam.Type=1;
+                        result = AddWmsLog(IParam);
+                        if (result.s == 1)
+                        {
+                            var logLst = result.d as List<AWmslog>;
+                            int c2 = CoreConn.Execute(APurHaddles.AddWmsLogSql(), logLst, CoreTrans);
+                            CoreTrans.Commit();
+                            result.d = re_qty;//返回现有库存数量
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                CoreTrans.Rollback();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                CoreTrans.Dispose();
+                CoreConn.Close();
+            }
+            return result;
+        }
+
 
 
         /// <summary>
