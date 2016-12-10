@@ -1,0 +1,26 @@
+{
+    "s": 1,
+    "d": {
+        "ShopName": "京东南极人男装官方旗舰店",
+        "ID": 2,
+        "RefundDate": "2016-12-06 14:11:31",
+        "ConfirmDate": null,
+        "ModifyDate": "2016-12-10 08:51:53",
+        "OID": 10882,
+        "SoID": 63616622739,
+        "RefundNbr": "rrrrrrr00005_Out",
+        "Amount": "200.00",
+        "Status": 0,
+        "StatusString": "待审核",
+        "Refundment": "支付宝",
+        "PayAccount": "",
+        "BuyerShopID": "曹先生",
+        "RID": 271,
+        "RType": 2,
+        "RTypeString": "换货",
+        "IssueType": 7,
+        "IssueTypeString": "买错了",
+        "RRmark": ""
+    },
+    "m": ""
+}

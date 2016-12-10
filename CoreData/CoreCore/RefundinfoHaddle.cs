@@ -199,5 +199,292 @@ namespace CoreData.CoreCore
             result.d = res;
             return result;
         }
+        ///<summary>
+        ///更新退款单资料
+        ///</summary>
+        public static DataResult UpdateRefund(DateTime RefundDate,string RefundNbr,decimal Amount,string Refundment,string PayAccount,int ID,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);   
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlcommand = "select * from refundinfo where id = " + ID + " and coid = " + CoID;
+                var u = CoreDBconn.Query<RefundInfo>(sqlcommand).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "付款ID无效!";
+                    return result;
+                }
+                if(u[0].Status != 0)
+                {
+                    result.s = -1;
+                    result.d = "待审核的退款单才可以修改!";
+                    return result;
+                }
+                int i = 0;
+                if(RefundDate > DateTime.Parse("1900-01-01") && RefundDate != u[0].RefundDate)
+                {
+                    i ++;
+                    u[0].RefundDate = RefundDate;
+                }
+                if(Amount > 0 && Amount != u[0].Amount)
+                {
+                    i ++;
+                    u[0].Amount = Amount;
+                }
+                if(!string.IsNullOrEmpty(RefundNbr) && RefundNbr != u[0].RefundNbr)
+                {
+                    i ++;
+                    u[0].RefundNbr = RefundNbr;
+                }
+                if(!string.IsNullOrEmpty(Refundment) && Refundment != u[0].Refundment)
+                {
+                    i ++;
+                    u[0].Refundment = Refundment;
+                }
+                if(!string.IsNullOrEmpty(PayAccount) && PayAccount != u[0].PayAccount)
+                {
+                    i ++;
+                    u[0].PayAccount = PayAccount;
+                }
+                if(i > 0)
+                {
+                    u[0].Modifier = UserName;
+                    u[0].ModifyDate = DateTime.Now;
+                    sqlcommand = @"update refundinfo set RefundDate=@RefundDate,Amount=@Amount,RefundNbr=@RefundNbr,Refundment=@Refundment,PayAccount=@PayAccount,Modifier=@Modifier,
+                                   ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
+                    int count = CoreDBconn.Execute(sqlcommand,u[0],TransCore);
+                    if(count <= 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                }
+                sqlcommand = @"select ShopName,ID,RefundDate,ConfirmDate,ModifyDate,OID,SoID,RefundNbr,Amount,Status,Refundment,PayAccount,BuyerShopID,RID,RType,IssueType,RRmark 
+                               from refundinfo where id = " + ID + " and coid = " + CoID;
+                var uu = CoreDBconn.Query<RefundInfoQuery>(sqlcommand).AsList();
+                foreach(var a in uu)
+                {
+                    a.StatusString = Enum.GetName(typeof(RefundStatus), a.Status);
+                    a.RTypeString = Enum.GetName(typeof(ASType), a.RType);
+                    a.IssueTypeString = Enum.GetName(typeof(IssueType), a.IssueType);
+                }
+                result.d = uu[0];
+                TransCore.Commit();
+            }catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            return result;
+        }
+        ///<summary>
+        ///退款作废
+        ///</summary>
+        public static DataResult CancleRefund(int Refundid,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string  wheresql = "select * from refundinfo where id =" + Refundid + " and coid =" + CoID;
+                var payinfo = CoreDBconn.Query<RefundInfo>(wheresql).AsList();
+                if(payinfo.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "付款ID无效!";
+                    return result;
+                }
+                if(payinfo[0].Status != 0)
+                {
+                    result.s = -1;
+                    result.d = "待审核的退款单才可以作废!";
+                    return result;
+                }            
+                //更新支付单资料
+                string sqlCommandText = @"update refundinfo set Status = 2,Modifier=@Modifier,ModifyDate=@ModifyDate where id = " + Refundid + " and coid = " + CoID;
+                int count = CoreDBconn.Execute(sqlCommandText,new{Modifier=UserName,ModifyDate=DateTime.Now},TransCore);
+                if(count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            return result;
+        }
+        ///<summary>
+        ///退款审核
+        ///</summary>
+        public static DataResult ComfirmRefund(int payid,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string  wheresql = "select * from refundinfo where id =" + payid + " and coid =" + CoID;
+                var payinfo = CoreDBconn.Query<RefundInfo>(wheresql).AsList();
+                if(payinfo.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "内部支付单ID参数异常!";
+                    return result;
+                }
+                if(payinfo[0].Status != 0)
+                {
+                    result.s = -1;
+                    result.d = "该笔退款单不可审核!";
+                    return result;
+                }
+                //更新支付单资料
+                string sqlCommandText = @"update refundinfo set Status = 1,Modifier=@Modifier,ModifyDate=@ModifyDate,Confirmer=@Modifier,ConfirmDate=@ModifyDate
+                                           where id = " + payid + " and coid = " + CoID;
+                int count = CoreDBconn.Execute(sqlCommandText,new{Modifier=UserName,ModifyDate=DateTime.Now},TransCore);
+                if(count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }    
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            return result;
+        }
+        ///<summary>
+        ///退款审核取消
+        ///</summary>
+        public static DataResult CancleComfirmRefund(int payid,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string  wheresql = "select * from refundinfo where id =" + payid + " and coid =" + CoID;
+                var payinfo = CoreDBconn.Query<RefundInfo>(wheresql).AsList();
+                if(payinfo.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "内部支付单ID参数异常!";
+                    return result;
+                }
+                if(payinfo[0].Status != 1)
+                {
+                    result.s = -1;
+                    result.d = "该笔退款单不可取消!";
+                    return result;
+                }
+                //更新支付单资料
+                string sqlCommandText = @"update refundinfo set Status = 0,Modifier=@Modifier,ModifyDate=@ModifyDate,Confirmer=@Confirmer,ConfirmDate=@ConfirmDate
+                                           where id = " + payid + " and coid = " + CoID;
+                int count = CoreDBconn.Execute(sqlCommandText,new{Modifier=UserName,ModifyDate=DateTime.Now,Confirmer="",ConfirmDate=new DateTime()},TransCore);
+                if(count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }    
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            return result;
+        }
+        ///<summary>
+        ///退款审核取消
+        ///</summary>
+        public static DataResult CompleteRefund(int payid,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string  wheresql = "select * from refundinfo where id =" + payid + " and coid =" + CoID;
+                var payinfo = CoreDBconn.Query<RefundInfo>(wheresql).AsList();
+                if(payinfo.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "内部支付单ID参数异常!";
+                    return result;
+                }
+                if(payinfo[0].Status != 1)
+                {
+                    result.s = -1;
+                    result.d = "该笔退款单不可确认完成!";
+                    return result;
+                }
+                //更新支付单资料
+                string sqlCommandText = @"update refundinfo set Status = 3,Modifier=@Modifier,ModifyDate=@ModifyDate where id = " + payid + " and coid = " + CoID;
+                int count = CoreDBconn.Execute(sqlCommandText,new{Modifier=UserName,ModifyDate=DateTime.Now},TransCore);
+                if(count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }    
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            return result;
+        }
     }
 }

@@ -31,3 +31,43 @@ input:None
 OutPut:Status
        Payment
 参考:output jason 文件:GetRefundStatusInit_output.json
+
+3.UpdateRefund()退款单更新
+路由:http://localhost:5000/Core/Refund/UpdateRefund
+input:ID            int         内部退款单号
+      RefundDate    datetime    退款日期
+      Amount        decimal     金额
+      RefundNbr     string      退款单号
+      Refundment    string      退款方式
+      PayAccount    string      支付账号
+output: 修改后的退款资料
+参考:input jason 文件:UpdateRefund_input.json
+参考:output jason 文件:UpdateRefund_output.json
+
+4.CancleRefund()退款单作废
+路由:http://localhost:5000/Core/Refund/CancleRefund
+input:ID            int         内部付款单号
+output: s=1成功 else 错误代码
+参考:input jason 文件:CancleRefund_input.json
+参考:output jason 文件:CancleRefund_output.json
+
+5.ComfirmRefund()退款单审核
+路由:http://localhost:5000/Core/Refund/ComfirmRefund
+input:ID            int         内部付款单号
+output: s=1成功 else 错误代码
+参考:input jason 文件:ComfirmRefund_input.json
+参考:output jason 文件:ComfirmRefund_output.json
+
+6.CancleComfirmRefund()退款单取消审核
+路由:http://localhost:5000/Core/Pay/CancleComfirmRefund
+input:ID            int         内部付款单号
+output: s=1成功 else 错误代码
+参考:input jason 文件:CancleComfirmRefund_input.json
+参考:output jason 文件:CancleComfirmRefund_output.json
+
+7.CompleteRefund()退款单确认完成
+路由:http://localhost:5000/Core/Pay/CompleteRefund
+input:ID            int         内部付款单号
+output: s=1成功 else 错误代码
+参考:input jason 文件:CompleteRefund_input.json
+参考:output jason 文件:CompleteRefund_output.json

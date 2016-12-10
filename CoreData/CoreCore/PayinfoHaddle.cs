@@ -404,7 +404,7 @@ namespace CoreData.CoreCore
             return result;
         }
         ///<summary>
-        ///支付审核
+        ///支付取消审核
         ///</summary>
         public static DataResult CancleComfirmPay(int payid,int CoID,string UserName)
         {

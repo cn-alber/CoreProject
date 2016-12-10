@@ -100,5 +100,170 @@ namespace CoreWebApi
             var data = RefundinfoHaddle.GetRefundStatusInit();
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Refund/UpdateRefund")]
+        public ResponseResult UpdateRefund([FromBodyAttribute]JObject co)
+        {   
+            DateTime RefundDate = DateTime.Parse("1900-01-01"),x;
+            if(co["RefundDate"] != null)
+            {
+                string Text = co["RefundDate"].ToString();
+                if (DateTime.TryParse(Text, out x))
+                {
+                    RefundDate = DateTime.Parse(Text);
+                }
+            }
+            decimal Amount = -1,y;
+            if(co["Amount"] != null)
+            {
+                string Text = co["Amount"].ToString();
+                if (decimal.TryParse(Text, out y))
+                {
+                    Amount = decimal.Parse(Text);
+                    if(Amount <= 0)
+                    {
+                        return CoreResult.NewResponse(-1, "金额必须大于零", "General");
+                    }
+                }
+            }
+            string RefundNbr = null,Refundment=null,PayAccount=null;
+            if(co["RefundNbr"] != null)
+            {
+                RefundNbr = co["RefundNbr"].ToString();
+            }
+            if(co["Refundment"] != null)
+            {
+                Refundment = co["Refundment"].ToString();
+            }
+            if(co["PayAccount"] != null)
+            {
+                PayAccount = co["PayAccount"].ToString();
+            }
+            int ID = 0,j;
+            if(co["ID"] != null)
+            {
+                string Text = co["ID"].ToString();
+                if (int.TryParse(Text, out j))
+                {
+                    ID = int.Parse(Text);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "内部付款单号参数无效", "General");
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "内部付款单号必填", "General");
+            }
+            int CoID = int.Parse(GetCoid());
+            string UserName = GetUname();
+            var data = RefundinfoHaddle.UpdateRefund(RefundDate,RefundNbr,Amount,Refundment,PayAccount,ID,CoID,UserName);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Refund/CancleRefund")]
+        public ResponseResult CancleRefund([FromBodyAttribute]JObject co)
+        {   
+            int ID = 0,j;
+            if(co["ID"] != null)
+            {
+                string Text = co["ID"].ToString();
+                if (int.TryParse(Text, out j))
+                {
+                    ID = int.Parse(Text);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "内部付款单号参数无效", "General");
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "内部付款单号必填", "General");
+            }
+            int CoID = int.Parse(GetCoid());
+            string UserName = GetUname();
+            var data = RefundinfoHaddle.CancleRefund(ID,CoID,UserName);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Refund/ComfirmRefund")]
+        public ResponseResult ComfirmRefund([FromBodyAttribute]JObject co)
+        {   
+            int ID = 0,j;
+            if(co["ID"] != null)
+            {
+                string Text = co["ID"].ToString();
+                if (int.TryParse(Text, out j))
+                {
+                    ID = int.Parse(Text);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "内部付款单号参数无效", "General");
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "内部付款单号必填", "General");
+            }
+            int CoID = int.Parse(GetCoid());
+            string UserName = GetUname();
+            var data = RefundinfoHaddle.ComfirmRefund(ID,CoID,UserName);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Refund/CancleComfirmRefund")]
+        public ResponseResult CancleComfirmRefund([FromBodyAttribute]JObject co)
+        {   
+            int ID = 0,j;
+            if(co["ID"] != null)
+            {
+                string Text = co["ID"].ToString();
+                if (int.TryParse(Text, out j))
+                {
+                    ID = int.Parse(Text);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "内部付款单号参数无效", "General");
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "内部付款单号必填", "General");
+            }
+            int CoID = int.Parse(GetCoid());
+            string UserName = GetUname();
+            var data = RefundinfoHaddle.CancleComfirmRefund(ID,CoID,UserName);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Refund/CompleteRefund")]
+        public ResponseResult CompleteRefund([FromBodyAttribute]JObject co)
+        {   
+            int ID = 0,j;
+            if(co["ID"] != null)
+            {
+                string Text = co["ID"].ToString();
+                if (int.TryParse(Text, out j))
+                {
+                    ID = int.Parse(Text);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "内部付款单号参数无效", "General");
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "内部付款单号必填", "General");
+            }
+            int CoID = int.Parse(GetCoid());
+            string UserName = GetUname();
+            var data = RefundinfoHaddle.CompleteRefund(ID,CoID,UserName);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }
