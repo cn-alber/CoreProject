@@ -10,12 +10,12 @@ using MySql.Data.MySqlClient;
 namespace CoreData.CoreCore
 {
     public static class WmspileHaddle{
-        public static DataResult getPileList(string CoID,string area="",string row="",string col="",string storey="",string cell=""){
+        public static DataResult getPileList(string CoID,string wareid,string area="",string row="",string col="",string storey="",string cell=""){
             var res = new DataResult(1, null);
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try
                 {
-                    string sql = @"SELECT ID,SkuID,Skuautoid,PCode,`Enable`,Area,`Row`,Col,Storey,Cell, `Order` FROM wmspile WHERE CoID = 1 AND IsDelete = FALSE ";
+                    string sql = @"SELECT ID,SkuID,Skuautoid,PCode,`Enable`,Area,`Row`,Col,Storey,Cell, `Order` FROM wmspile WHERE CoID = "+CoID+" AND IsDelete = FALSE AND WarehouseID ="+wareid+" ";
                     string whereSql = "";
                     if(!string.IsNullOrEmpty(area)){
                         whereSql += " AND Area = '"+area+"' ";
@@ -32,20 +32,22 @@ namespace CoreData.CoreCore
                     if(!string.IsNullOrEmpty(cell)){
                         whereSql += " AND Cell = '"+cell+"' ";
                     }                    
-                    var list = conn.Query<Pilelist>(sql+whereSql+" ORDER BY `Order` ").AsList();
-                    var subs = list.GroupBy(i=>i.Area).Select(g => new Sub{ parent = g.FirstOrDefault().Area}).ToList();
+                    var relist =  conn.Query<Pilelist>(sql+whereSql+" ORDER BY `Order` ").AsList();
+                    var list = conn.Query<Pilelist>(sql+" ORDER BY `Order` ").AsList();
+                    
+                    var subs = list.GroupBy(i=>i.Area).Select(g => new Sub{ parent = g.FirstOrDefault().Area , name="区域"}).ToList();
                     foreach(var rowsub in subs ){
                         if(!string.IsNullOrEmpty(rowsub.parent)){
-                            rowsub.children = list.Where(i=>i.Area == rowsub.parent ).GroupBy(i=>i.Row).Select(g => new Sub{ parent = g.FirstOrDefault().Row}).ToList();
+                            rowsub.children = list.Where(i=>i.Area == rowsub.parent ).GroupBy(i=>i.Row).Select(g => new Sub{ parent = g.FirstOrDefault().Row, name="行"}).ToList();
                             foreach(var colsub in rowsub.children){
                                 if(!string.IsNullOrEmpty(colsub.parent)){
-                                    colsub.children = list.Where(i=>i.Row == colsub.parent ).GroupBy(i=>i.Col).Select(g => new Sub{ parent = g.FirstOrDefault().Col}).ToList();
+                                    colsub.children = list.Where(i=>i.Row == colsub.parent ).GroupBy(i=>i.Col).Select(g => new Sub{ parent = g.FirstOrDefault().Col, name="列"}).ToList();
                                     foreach(var storeysub in colsub.children){
                                         if(!string.IsNullOrEmpty(storeysub.parent)){
-                                            storeysub.children = list.Where(i=>i.Col == storeysub.parent ).GroupBy(i=>i.Storey).Select(g => new Sub{ parent = g.FirstOrDefault().Storey}).ToList();
+                                            storeysub.children = list.Where(i=>i.Col == storeysub.parent ).GroupBy(i=>i.Storey).Select(g => new Sub{ parent = g.FirstOrDefault().Storey, name="层"}).ToList();
                                             if(!string.IsNullOrEmpty(storeysub.children[0].parent.Replace(" ",""))){
                                                 foreach(var cellsub in storeysub.children){
-                                                    cellsub.children = list.Where(i=>i.Storey == cellsub.parent ).GroupBy(i=>i.Cell).Select(g => new Sub{ parent = g.FirstOrDefault().Cell}).ToList();
+                                                    cellsub.children = list.Where(i=>i.Storey == cellsub.parent ).GroupBy(i=>i.Cell).Select(g => new Sub{ parent = g.FirstOrDefault().Cell, name="格子"}).ToList();
                                                 }   
                                             } else {
                                                 storeysub.children =null;
@@ -58,7 +60,7 @@ namespace CoreData.CoreCore
                     }                    
                     res.d=new {
                         submenu = subs,
-                        list = list
+                        list = relist
                     };                                  
                 }
                 catch

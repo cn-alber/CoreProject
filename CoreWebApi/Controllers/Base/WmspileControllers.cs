@@ -16,32 +16,27 @@ namespace CoreWebApi
 
     public class WmspileControllers: ControllBase{
         [HttpGetAttribute("/Core/Wmspile/getPileList")]
-        public ResponseResult getPileList(string area="",string row="",string col="",string storey="",string cell="")
+        public ResponseResult getPileList(int wareid,string area="",string row="",string col="",string storey="",string cell="")
         {   
-            //
+            var data = new DataResult(1,null);
             string UserName = GetUname(); 
-            //string Company = co["Company"].ToString();
-            string CoID = GetCoid();
-            var insertM = new PileInsert();
-            var data = WmspileHaddle.getPileList(CoID ,area, row,col,storey,cell);
+            if(wareid == 0) {
+                data.s = -1;
+                data.d = "仓库ID参数错误";
+            } else {
+                string CoID = GetCoid();
+                var insertM = new PileInsert();
+                data = WmspileHaddle.getPileList(CoID,wareid.ToString() ,area, row,col,storey,cell);
+            }
+            
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
-        [HttpGetAttribute("/Core/Wmspile/InsertPile")]
+        [HttpPostAttribute("/Core/Wmspile/InsertPile")]
         public ResponseResult InsertPile([FromBodyAttribute]JObject co)
         {   
             var insertM = Newtonsoft.Json.JsonConvert.DeserializeObject<PileInsert>(co.ToString());
             string UserName = GetUname(); 
-            //string Company = co["Company"].ToString();
             string CoID = GetCoid();
-            // var insertM = new PileInsert();
-            // insertM.WarehouseID = 138;
-            // insertM.WarehouseName = "南极云商常熟次品1仓4";
-            // insertM.Type = 5;
-            // insertM.area = area;
-            // insertM.row = row.Split(',');
-            // insertM.col = col.Split(',');
-            // insertM.storey = null;
-            // insertM.cell = null;
             var data = WmspileHaddle.insertpile(insertM,UserName,CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }

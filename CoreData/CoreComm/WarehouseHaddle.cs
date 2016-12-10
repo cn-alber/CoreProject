@@ -807,6 +807,7 @@ namespace CoreData.CoreComm
                         var rr = new WarehouseResponse();
                         rr.area = new List<int>(){0,0,0};                        
                         rr.name0 = a.warehousename;
+                        rr.id0 = a.id;
                         rr.contract = a.contract;
                         rr.phone = a.phone;
                         rr.area[0] = a.logistics;
@@ -821,6 +822,7 @@ namespace CoreData.CoreComm
                             if(b.type == 1)
                             {
                                 rr.name1 = b.warehousename;
+                                rr.id1 = b.id;
                             }
                             if(b.type == 2)
                             {
@@ -829,14 +831,17 @@ namespace CoreData.CoreComm
                             if(b.type == 3)
                             {
                                 rr.name3 = b.warehousename;
+                                rr.id3 = b.id;
                             }
                             if(b.type == 4)
                             {
                                 rr.name4 = b.warehousename;
+                                rr.id4 = b.id;
                             }
                             if(b.type == 5)
                             {
                                 rr.name5 = b.warehousename;
+                                rr.id5 = b.id;
                             }
                         }
                         res.Add(rr);
@@ -853,7 +858,7 @@ namespace CoreData.CoreComm
         ///<summary>
         ///仓库启用停用设置
         ///</summary>
-        public static DataResult UpdateWarehouseEnable(int whid,string Company,string UserName,int CoID,bool Enable)
+        public static DataResult UpdateWarehouseEnable(int whid,string UserName,int CoID,bool Enable)
         {
             var result = new DataResult(1,null);   
             string contents = string.Empty;
@@ -870,7 +875,7 @@ namespace CoreData.CoreComm
                             return result;
                         }
                     }
-                    string uptsql = @"update warehouse set enable = @Enable where (id = @ID or parentid = @ID) and coid = @Coid";
+                    string uptsql = @"UPDATE warehouse SET warehouse.`Enable` = @Enable where (warehouse.ID = @ID or warehouse.ParentID = @ID) and warehouse.CoID = @Coid";
                     var args = new {ID = whid,Enable = Enable,Coid = CoID};          
                     int count = conn.Execute(uptsql,args);
                     if(count < 0)

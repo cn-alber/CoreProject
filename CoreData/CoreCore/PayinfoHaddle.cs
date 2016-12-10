@@ -4,10 +4,7 @@ using System;
 using CoreModels.XyCore;
 using Dapper;
 using System.Collections.Generic;
-using CoreModels.XyComm;
 using static CoreModels.Enum.OrderE;
-using CoreData.CoreUser;
-using CoreModels.XyUser;
 namespace CoreData.CoreCore
 {
     public static class PayinfoHaddle
@@ -15,354 +12,475 @@ namespace CoreData.CoreCore
         ///<summary>
         ///查询支付单List
         ///</summary>
-        // public static DataResult GetPayinfoList(PayInfoParm cp)
-        // {
-        //     var result = new DataResult(1,null);    
-        //     string sqlcount = "select count(id) from payinfo where 1=1";
-        //     string sqlcommand = @"select ID,PayDate,OID,SoID,PayNbr,PayAmount,Status,Payment,PayAccount,BuyerShopID from payinfo where 1=1";         
-        //     string wheresql = string.Empty;
-        //     if(cp.CoID != 1)//公司编号
-        //     {
-        //         wheresql = wheresql + " and coid = " + cp.CoID;
-        //     }
-        //     if(cp.ID > 0)//内部订单号
-        //     {
-        //         wheresql = wheresql + " and id = " + cp.ID;
-        //     }
-        //     if(cp.SoID > 0)//外部订单号
-        //     {
-        //         wheresql = wheresql + " and soid = " + cp.SoID;
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.PayNbr))//付款单号
-        //     {
-        //        wheresql = wheresql + " and paynbr = '" + cp.PayNbr + "'";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.BuyerShopID))//买家账号
-        //     {
-        //        wheresql = wheresql + " and buyershopid like '%" + cp.BuyerShopID + "%'";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.ExCode))//快递单号
-        //     {
-        //        wheresql = wheresql + " and excode like '%" + cp.ExCode + "%'";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.RecName))//收货人
-        //     {
-        //        wheresql = wheresql + " and recname like '%" + cp.RecName + "%'";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.RecPhone))//手机
-        //     {
-        //        wheresql = wheresql + " and recphone like '%" + cp.RecPhone + "%'";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.RecTel))//固定电话
-        //     {
-        //        wheresql = wheresql + " and rectel like '%" + cp.RecTel + "%'";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.RecLogistics))//收货人省
-        //     {
-        //        wheresql = wheresql + " and reclogistics like '%" + cp.RecLogistics + "%'";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.RecCity))//收货人城市
-        //     {
-        //        wheresql = wheresql + " and reccity like '%" + cp.RecCity + "%'";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.RecDistrict))//收货人县区
-        //     {
-        //        wheresql = wheresql + " and recdistrict like '%" + cp.RecDistrict + "%'";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.RecAddress))//详细地址
-        //     {
-        //        wheresql = wheresql + " and recaddress like '%" + cp.RecAddress + "%'";
-        //     }
-        //     if (cp.StatusList != null)//状态List
-        //     {
-        //         wheresql = wheresql + " AND status in ("+ string.Join(",", cp.StatusList) + ")" ;
-        //     }
-        //     if (cp.AbnormalStatusList != null)//异常状态List
-        //     {
-        //         string status = " AND abnormalstatus in (0,"+ string.Join(",", cp.AbnormalStatusList) + ")" ;
-        //         if(cp.StatusList != null)
-        //         {
-        //             if(cp.StatusList.Count == 1 && cp.StatusList[0] == 7)
-        //             {
-        //                 status = " AND abnormalstatus in ("+ string.Join(",", cp.AbnormalStatusList) + ")" ;
-        //             }
-        //         }
-        //         else
-        //         {
-        //             status = " AND abnormalstatus in ("+ string.Join(",", cp.AbnormalStatusList) + ")" ;
-        //         }
-        //         wheresql = wheresql + status ;
-        //     }
-        //     if(cp.IsRecMsgYN.ToUpper() == "Y")
-        //     {
-        //         if(cp.RecMessage == null)
-        //         {
-        //             wheresql = wheresql + " AND recmessage != '' and status in (0,1,2,7)" ;
-        //         }
-        //         else
-        //         {
-        //             wheresql = wheresql + " AND recmessage like '%" + cp.RecMessage + "%' and status in (0,1,2,7)" ;
-        //         }
-        //     }
-        //     if(cp.IsRecMsgYN.ToUpper() == "N")
-        //     {
-        //         wheresql = wheresql + " AND recmessage = '' and status in (0,1,2,7)" ;
-        //     }
-        //     if(cp.IsSendMsgYN.ToUpper() == "Y")
-        //     {
-        //         if(cp.SendMessage == null)
-        //         {
-        //             wheresql = wheresql + " AND sendmessage != '' and status in (0,1,2,7)" ;
-        //         }
-        //         else 
-        //         {
-        //             wheresql = wheresql + " AND sendmessage like '%" + cp.SendMessage + "%' and status in (0,1,2,7)" ;
-        //         }
-        //     }
-        //     if(cp.IsSendMsgYN.ToUpper() == "N")
-        //     {
-        //         wheresql = wheresql + " AND sendmessage = '' and status in (0,1,2,7)" ;
-        //     }
-        //     if(cp.Datetype.ToUpper() == "ODATE")
-        //     {
-        //         wheresql = wheresql + " AND odate between '" + cp.DateStart + "' and '" + cp.DateEnd + "'" ;
-        //     }
-        //     if(cp.Datetype.ToUpper() == "SENDDATE")
-        //     {
-        //         wheresql = wheresql + " AND senddate between '" + cp.DateStart + "' and '" + cp.DateEnd + "'" ;
-        //     }
-        //     if(cp.Datetype.ToUpper() == "PAYDATE")
-        //     {
-        //         wheresql = wheresql + " AND paydate between '" + cp.DateStart + "' and '" + cp.DateEnd + "'" ;
-        //     }
-        //     if(cp.Datetype.ToUpper() == "PLANDATE")
-        //     {
-        //         wheresql = wheresql + " AND plandate between '" + cp.DateStart + "' and '" + cp.DateEnd + "'" ;
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.Skuid))
-        //     {
-        //        wheresql = wheresql + " and exists(select id from orderitem where oid = order.id and skuid = '" + cp.Skuid + "')";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.GoodsCode))
-        //     {
-        //        wheresql = wheresql + " and exists(select id from orderitem where oid = order.id and GoodsCode = '" + cp.Skuid + "')";
-        //     }
-        //     if(cp.Ordqtystart > 0)
-        //     {
-        //         wheresql = wheresql + " AND ordqty >= " +  cp.Ordqtystart + " and status in (0,1,2,7)";
-        //     }
-        //     if(cp.Ordqtyend > 0)
-        //     {
-        //         wheresql = wheresql + " AND ordqty <= " +  cp.Ordqtyend + " and status in (0,1,2,7)";
-        //     }
-        //     if(cp.Ordamtstart > 0)
-        //     {
-        //         wheresql = wheresql + " AND amount >= " +  cp.Ordamtstart + " and status in (0,1,2,7)";
-        //     }
-        //     if(cp.Ordamtend > 0)
-        //     {
-        //         wheresql = wheresql + " AND amount <= " +  cp.Ordamtend + " and status in (0,1,2,7)";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.Skuname))
-        //     {
-        //        wheresql = wheresql + " and exists(select id from orderitem where oid = order.id and skuname like '%" + cp.Skuname + "%') and status in (0,1,2,7)";
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.Norm))
-        //     {
-        //        wheresql = wheresql + " and exists(select id from orderitem where oid = order.id and norm like '%" + cp.Norm + "%') and status in (0,1,2,7)";
-        //     }
-        //     if(cp.ShopStatus != null)
-        //     {
-        //         string shopstatus = string.Empty;
-        //         foreach(var x in cp.ShopStatus)
-        //         {
-        //             shopstatus = shopstatus + "'" + x + "',";
-        //         }
-        //         shopstatus = shopstatus.Substring(0,shopstatus.Length - 1);
-        //         wheresql = wheresql + " AND shopstatus in (" +  shopstatus + ")";
-        //     }
-        //     if(cp.OSource > -1)
-        //     {
-        //         wheresql = wheresql + " AND osource = " +  cp.OSource;
-        //     }
-        //     if (cp.Type != null)
-        //     {
-        //         wheresql = wheresql + " AND type in ("+ string.Join(",", cp.Type) + ")" ;
-        //     }
-        //     if(cp.IsCOD.ToUpper() == "Y")
-        //     {
-        //         wheresql = wheresql + " AND iscod = true" ;
-        //     }
-        //     if(cp.IsCOD.ToUpper() == "N")
-        //     {
-        //         wheresql = wheresql + " AND iscod = false" ;
-        //     }
-        //     if(cp.IsPaid.ToUpper() == "Y")
-        //     {
-        //         wheresql = wheresql + " AND IsPaid = true" ;
-        //     }
-        //     if(cp.IsPaid.ToUpper() == "N")
-        //     {
-        //         wheresql = wheresql + " AND IsPaid = false" ;
-        //     }
-        //     if (cp.IsShopSelectAll == false &&　cp.ShopID != null)
-        //     {
-        //         wheresql = wheresql + " AND shopid in ("+ string.Join(",", cp.ShopID) + ")" ;
-        //     }
-        //     if(cp.IsDisSelectAll == true)
-        //     {
-        //         wheresql = wheresql + " AND dealertype = 2" ;
-        //     }
-        //     else
-        //     {
-        //         if(cp.Distributor != null)
-        //         {
-        //             string distributor = string.Empty;
-        //             foreach(var x in cp.Distributor)
-        //             {
-        //                 distributor = distributor + "'" + x + "',";
-        //             }
-        //             distributor = distributor.Substring(0,distributor.Length - 1);
-        //             wheresql = wheresql + " AND dealertype = 2 AND distributor in (" +  distributor + ")";
-        //         }
-        //     }
-        //     if(cp.ExID != null)
-        //     {
-        //         wheresql = wheresql + " AND exid in ("+ string.Join(",", cp.ExID) + ")" ;
-        //     }
-        //     if(cp.SendWarehouse != null)
-        //     {
-        //         wheresql = wheresql + " AND WarehouseID in ("+ string.Join(",", cp.SendWarehouse) + ")" ;
-        //     }
-        //     if(cp.Others != null)
-        //     {
-        //         if(cp.Others.Contains(4))
-        //         {
-        //             wheresql = wheresql + " and IsInvoice = true";
-        //         }
-        //         if(cp.Others.Contains(0) == true &&　cp.Others.Contains(0) == false)
-        //         {
-        //             wheresql = wheresql + " and IsMerge = true";
-        //         }
-        //         if(cp.Others.Contains(0) == false &&　cp.Others.Contains(0) == true)
-        //         {
-        //             wheresql = wheresql + " and IsMerge = false";
-        //         }
-        //         if(cp.Others.Contains(1) == true &&　cp.Others.Contains(3) == false)
-        //         {
-        //             wheresql = wheresql + " and IsSplit = true";
-        //         }
-        //         if(cp.Others.Contains(1) == false &&　cp.Others.Contains(3) == true)
-        //         {
-        //             wheresql = wheresql + " and IsSplit = false";
-        //         }
-        //     }
-        //     if(!string.IsNullOrEmpty(cp.SortField) && !string.IsNullOrEmpty(cp.SortDirection))//排序
-        //     {
-        //         wheresql = wheresql + " ORDER BY "+cp.SortField +" "+ cp.SortDirection;
-        //     }
-        //     var res = new OrderData();
-        //     using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
-        //         try{    
-        //             int count = conn.QueryFirst<int>(sqlcount + wheresql);
-        //             decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
-        //             int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
-        //             wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
-        //             var u = conn.Query<OrderQuery>(sqlcommand + wheresql).AsList();
-        //             res.Datacnt = count;
-        //             res.Pagecnt = pagecnt;
-        //             res.Ord = u;
-        //             //订单资料
-        //             List<int> ItemID = new List<int>();
-        //             List<int> MID = new List<int>();
-        //             foreach(var a in res.Ord)
-        //             {
-        //                 a.TypeString = GetTypeName(a.Type);
-        //                 a.AbnormalStatusDec = a.StatusDec;
-        //                 a.StatusDec = Enum.GetName(typeof(OrdStatus), a.Status);
-        //                 if(!string.IsNullOrEmpty(a.ExID.ToString()))
-        //                 {
-        //                     a.ExpNamePinyin = GetExpNamePinyin(cp.CoID,a.ExID);
-        //                 }
-        //                 if(!string.IsNullOrEmpty(a.PaidAmount))
-        //                 {
-        //                     if(decimal.Parse(a.PaidAmount) == 0)
-        //                     {
-        //                         a.PayDate = null;
-        //                     }
-        //                 }
-        //                 if(a.OSource != 3)
-        //                 {
-        //                     a.Creator = "";
-        //                 }
-        //                 if(a.IsMerge == true)
-        //                 {
-        //                     MID.Add(a.ID);
-        //                 }
-        //                 ItemID.Add(a.ID);
-        //             }
-        //             //处理soid
-        //             var y = new List<Order>();
-        //             if(MID.Count > 0)
-        //             {
-        //                 sqlcommand = "select MergeOID,soid from `order` where coid = @Coid and MergeOID in @ID";
-        //                 y = conn.Query<Order>(sqlcommand,new{Coid = cp.CoID,ID = MID}).AsList();
-        //             }
-        //             sqlcommand = @"select id,oid,SkuAutoID,Img,Qty,GoodsCode,SkuID,SkuName,Norm,RealPrice,Amount,ShopSkuID,IsGift,Weight from orderitem 
-        //                                 where oid in @ID and coid = @Coid";
-        //             var item = conn.Query<SkuList>(sqlcommand,new{ID = ItemID,Coid = cp.CoID}).AsList();
-        //             List<int> skuid = new List<int>();
-        //             foreach(var i in item)
-        //             {
-        //                 skuid.Add(i.SkuAutoID);
-        //             }
-        //             sqlcommand = "select Skuautoid,(StockQty - LockQty + VirtualQty) as InvQty from inventory_sale where coid = @Coid and Skuautoid in @Skuid";
-        //             var inv = conn.Query<Inv>(sqlcommand,new{Coid=cp.CoID,Skuid = skuid}).AsList();
-        //             foreach(var i in item)
-        //             {
-        //                 i.InvQty = 0;
-        //                 foreach(var j in inv)
-        //                 {
-        //                     if(i.SkuAutoID == j.Skuautoid)
-        //                     {
-        //                         i.InvQty = j.InvQty;
-        //                         break;
-        //                     }
-        //                 }
-        //             }
-        //             foreach(var a in res.Ord)
-        //             {
-        //                 if(a.IsMerge == true)
-        //                 {
-        //                     var soid = new List<long>();
-        //                     soid.Add(a.SoID);
-        //                     foreach(var b in y)
-        //                     {
-        //                         if(a.ID == b.MergeOID)
-        //                         {
-        //                             soid.Add(b.SoID);
-        //                         }
-        //                     }
-        //                     a.SoIDList = soid;
-        //                 }
-        //                 var sd = new List<SkuList>();
-        //                 foreach(var i in item)
-        //                 {
-        //                     if(a.ID == i.OID)
-        //                     {
-        //                         sd.Add(i);
-        //                     }
-        //                 }
-        //                 a.SkuList = sd;
-        //             }
-        //             result.d = res;             
-        //         }catch(Exception ex){
-        //             result.s = -1;
-        //             result.d = ex.Message;
-        //             conn.Dispose();
-        //         }
-        //     }           
-        //     return result;
-        // }
+        public static DataResult GetPayinfoList(PayInfoParm cp)
+        {
+            var result = new DataResult(1,null);    
+            string sqlcount = "select count(id) from payinfo where 1=1";
+            string sqlcommand = @"select ID,PayDate,OID,SoID,PayNbr,PayAmount,Status,Payment,PayAccount,BuyerShopID from payinfo where 1=1";         
+            string wheresql = string.Empty;
+            if(cp.CoID != 1)//公司编号
+            {
+                wheresql = wheresql + " and coid = " + cp.CoID;
+            }
+            if(cp.ID > 0)//内部支付单号
+            {
+                wheresql = wheresql + " and id = " + cp.ID;
+            }
+            if(cp.OID > 0)//内部订单号
+            {
+                wheresql = wheresql + " and oid = " + cp.ID;
+            }
+            if(cp.SoID > 0)//外部订单号
+            {
+                wheresql = wheresql + " and soid = " + cp.SoID;
+            }
+            if(!string.IsNullOrEmpty(cp.PayNbr))//付款单号
+            {
+               wheresql = wheresql + " and paynbr = '" + cp.PayNbr + "'";
+            }
+            if(cp.DateStart > DateTime.Parse("1900-01-01"))
+            {
+                wheresql = wheresql + " AND paydate >= '" + cp.DateStart + "'" ;
+            }
+            if(cp.DateEnd > DateTime.Parse("1900-01-01"))
+            {
+                wheresql = wheresql + " AND paydate <= '" + cp.DateEnd + "'" ;
+            }
+            if(cp.Status >= 0)//状态
+            {
+                wheresql = wheresql + " and Status = " + cp.Status;
+            }
+            if(!string.IsNullOrEmpty(cp.BuyerShopID))//买家账号
+            {
+               wheresql = wheresql + " and buyershopid like '%" + cp.BuyerShopID + "%'";
+            }
+            if(!string.IsNullOrEmpty(cp.Payment))//支付方式
+            {
+               wheresql = wheresql + " and Payment like '%" + cp.Payment + "%'";
+            }
+            if(!string.IsNullOrEmpty(cp.SortField) && !string.IsNullOrEmpty(cp.SortDirection))//排序
+            {
+                wheresql = wheresql + " ORDER BY "+cp.SortField +" "+ cp.SortDirection;
+            }
+            var res = new PayInfoData();
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    int count = conn.QueryFirst<int>(sqlcount + wheresql);
+                    decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
+                    int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
+                    wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
+                    var u = conn.Query<PayInfoQuery>(sqlcommand + wheresql).AsList();
+                    foreach(var a in u)
+                    {
+                        a.StatusString = Enum.GetName(typeof(PayStatus), a.Status);
+                    }
+                    res.Datacnt = count;
+                    res.Pagecnt = pagecnt;
+                    res.Pay = u;
+                    var data = GetPayStatusInit().d as GetPayStatusInitReturn;
+                    res.Payment = data.Payment;
+                    result.d = res;             
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }           
+            return result;
+        }
+        ///<summary>
+        ///初始状态资料
+        ///</summary>
+        public static DataResult GetPayStatusInit()                
+        {
+            var result = new DataResult(1,null);
+            var res = new GetPayStatusInitReturn();
+            var filter = new List<Filter>();
+            foreach (int  myCode in Enum.GetValues(typeof(PayStatus)))
+            {
+                var s = new Filter();
+                s.value = myCode.ToString();
+                s.label = Enum.GetName(typeof(PayStatus), myCode);//获取名称
+                filter.Add(s);
+                res.Status = filter;
+            }
+            filter = new List<Filter>();
+            var ff = new Filter();
+            ff.value = "支付宝";
+            ff.label = "支付宝";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "快钱";
+            ff.label = "快钱";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "招行直连";
+            ff.label = "招行直连";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "财付通";
+            ff.label = "财付通";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "现金支付";
+            ff.label = "现金支付";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "银行转账";
+            ff.label = "银行转账";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "其他";
+            ff.label = "其他";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "供销支付";
+            ff.label = "供销支付";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "快速支付";
+            ff.label = "快速支付";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "微信支付";
+            ff.label = "微信支付";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "授信";
+            ff.label = "授信";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "预支付";
+            ff.label = "预支付";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "内部流转";
+            ff.label = "内部流转";
+            filter.Add(ff);
+            ff = new Filter();
+            ff.value = "门店会员余额";
+            ff.label = "门店会员余额";
+            filter.Add(ff);
+            res.Payment = filter;
+
+            result.d = res;
+            return result;
+        }
+        ///<summary>
+        ///更新付款资料
+        ///</summary>
+        public static DataResult UpdatePay(DateTime Paydate,string PayNbr,decimal PayAmount,string Payment,string PayAccount,int ID,int CoID)
+        {
+            var result = new DataResult(1,null);   
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlcommand = "select * from payinfo where id = " + ID + " and coid = " + CoID;
+                var u = CoreDBconn.Query<PayInfo>(sqlcommand).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "付款ID无效!";
+                    return result;
+                }
+                if(u[0].Status != 0)
+                {
+                    result.s = -1;
+                    result.d = "待审核的付款单才可以修改!";
+                    return result;
+                }
+                int i = 0;
+                if(Paydate > DateTime.Parse("1900-01-01") && Paydate != u[0].PayDate)
+                {
+                    i ++;
+                    u[0].PayDate = Paydate;
+                }
+                if(PayAmount > 0 && PayAmount != decimal.Parse(u[0].PayAmount))
+                {
+                    i ++;
+                    u[0].PayAmount = PayAmount.ToString();
+                }
+                if(!string.IsNullOrEmpty(PayNbr) && PayNbr != u[0].PayNbr)
+                {
+                    i ++;
+                    u[0].PayNbr = PayNbr;
+                }
+                if(!string.IsNullOrEmpty(Payment) && Payment != u[0].Payment)
+                {
+                    i ++;
+                    u[0].Payment = Payment;
+                }
+                if(!string.IsNullOrEmpty(PayAccount) && PayAccount != u[0].PayAccount)
+                {
+                    i ++;
+                    u[0].PayAccount = PayAccount;
+                }
+                if(i > 0)
+                {
+                    sqlcommand = "update payinfo set Paydate=@Paydate,PayAmount=@PayAmount,PayNbr=@PayNbr,Payment=@Payment,PayAccount=@PayAccount where id = @ID and coid = @Coid";
+                    int count = CoreDBconn.Execute(sqlcommand,u[0],TransCore);
+                    if(count <= 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                }
+                sqlcommand = @"select ID,PayDate,OID,SoID,PayNbr,PayAmount,Status,Payment,PayAccount,BuyerShopID from payinfo where id = " + ID + " and coid = " + CoID;
+                var uu = CoreDBconn.Query<PayInfoQuery>(sqlcommand).AsList();
+                foreach(var a in uu)
+                {
+                    a.StatusString = Enum.GetName(typeof(PayStatus), a.Status);
+                }
+                result.d = uu[0];
+                TransCore.Commit();
+            }catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            return result;
+        }
+        ///<summary>
+        ///支付作废
+        ///</summary>
+        public static DataResult CanclePay(int payid,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var logs = new List<LogInsert>();
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string  wheresql = "select * from payinfo where id =" + payid + " and coid =" + CoID;
+                var payinfo = CoreDBconn.Query<PayInfo>(wheresql).AsList();
+                if(payinfo.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "内部支付单ID参数异常!";
+                    return result;
+                }
+                if(payinfo[0].Status != 0)
+                {
+                    result.s = -1;
+                    result.d = "该笔支付单不可作废!";
+                    return result;
+                }
+                if(payinfo[0].OID > 0)
+                {
+                    wheresql = "select status,soid from `order` where id =" + payinfo[0].OID + " and coid =" + CoID;
+                    var u = CoreDBconn.Query<Order>(wheresql).AsList();
+                    if(u.Count > 0)
+                    {
+                        var log = new LogInsert();
+                        log.OID = payinfo[0].OID;
+                        log.SoID = u[0].SoID;
+                        log.Type = 0;
+                        log.LogDate = DateTime.Now;
+                        log.UserName = UserName;
+                        log.Title = "支付单作废";
+                        log.CoID = CoID;
+                        logs.Add(log);
+                    }
+                }              
+                //更新支付单资料
+                string sqlCommandText = @"update payinfo set Status = 2 where id = " + payid + " and coid = " + CoID;
+                int count = CoreDBconn.Execute(sqlCommandText,TransCore);
+                if(count < 0)
+                {
+                    result.s = -3003;
+                    return result;
+                }
+                string loginsert = @"INSERT INTO orderlog(OID,SoID,Type,LogDate,UserName,Title,Remark,CoID) 
+                                                VALUES(@OID,@SoID,@Type,@LogDate,@UserName,@Title,@Remark,@CoID)";
+                count = CoreDBconn.Execute(loginsert,logs, TransCore);
+                if (count < 0)
+                {
+                    result.s = -3002;
+                    return result;
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            return result;
+        }
+        ///<summary>
+        ///支付审核
+        ///</summary>
+        public static DataResult ComfirmPay(int payid,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var logs = new List<LogInsert>();
+            bool isflag = false;
+            int OID = 0;
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string  wheresql = "select * from payinfo where id =" + payid + " and coid =" + CoID;
+                var payinfo = CoreDBconn.Query<PayInfo>(wheresql).AsList();
+                if(payinfo.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "内部支付单ID参数异常!";
+                    return result;
+                }
+                if(payinfo[0].Status != 0)
+                {
+                    result.s = -1;
+                    result.d = "该笔支付单不可审核!";
+                    return result;
+                }
+                if(payinfo[0].OID > 0)
+                {
+                    wheresql = "select status,soid from `order` where id =" + payinfo[0].OID + " and coid =" + CoID;
+                    var u = CoreDBconn.Query<Order>(wheresql).AsList();
+                    if(u.Count == 0)
+                    {
+                        result.s = -1;
+                        result.d = "订单ID无效!";
+                        return result;
+                    }
+                    if(u[0].Status != 0 && u[0].Status != 1 && u[0].Status != 7)
+                    {
+                        result.s = -1;
+                        result.d = "待付款/已付款待审核/异常的订单才可以审核支付单!";
+                        return result;
+                    }
+                    isflag = true;
+                    OID = payinfo[0].OID;
+                }    
+                else
+                {
+                    //更新支付单资料
+                    string sqlCommandText = @"update payinfo set Status = 1 where id = " + payid + " and coid = " + CoID;
+                    int count = CoreDBconn.Execute(sqlCommandText,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                }          
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            if(isflag == true)
+            {
+                result = OrderHaddle.ConfirmPay(OID,payid,CoID,UserName);
+            }
+            result.d = null;
+            return result;
+        }
+        ///<summary>
+        ///支付审核
+        ///</summary>
+        public static DataResult CancleComfirmPay(int payid,int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var logs = new List<LogInsert>();
+            bool isflag = false;
+            int OID = 0;
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string  wheresql = "select * from payinfo where id =" + payid + " and coid =" + CoID;
+                var payinfo = CoreDBconn.Query<PayInfo>(wheresql).AsList();
+                if(payinfo.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "内部支付单ID参数异常!";
+                    return result;
+                }
+                if(payinfo[0].Status != 1)
+                {
+                    result.s = -1;
+                    result.d = "该笔支付单不可取消审核!";
+                    return result;
+                }
+                if(payinfo[0].OID > 0)
+                {
+                    wheresql = "select status,soid from `order` where id =" + payinfo[0].OID + " and coid =" + CoID;
+                    var u = CoreDBconn.Query<Order>(wheresql).AsList();
+                    if(u.Count == 0)
+                    {
+                        result.s = -1;
+                        result.d = "订单ID无效!";
+                        return result;
+                    }
+                    if(u[0].Status != 0 && u[0].Status != 1 && u[0].Status != 7)
+                    {
+                        result.s = -1;
+                        result.d = "待付款/已付款待审核/异常的订单才可以取消审核支付单!";
+                        return result;
+                    }
+                    isflag = true;
+                    OID = payinfo[0].OID;
+                }    
+                else
+                {
+                    //更新支付单资料
+                    string sqlCommandText = @"update payinfo set Status = 0 where id = " + payid + " and coid = " + CoID;
+                    int count = CoreDBconn.Execute(sqlCommandText,TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                }          
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            if(isflag == true)
+            {
+                result = OrderHaddle.CancleConfirmPay(OID,payid,CoID,UserName);
+            }
+            result.d = null;
+            return result;
+        }
     }
 }

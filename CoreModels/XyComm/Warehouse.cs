@@ -22,11 +22,17 @@ namespace CoreModels.XyComm
     public class WarehouseResponse
     {
         public string name0 { get; set; }
+        public int id0{get;set;}
         public string name1 { get; set; }
+        public int id1{get;set;}
         public string name2 { get; set; }
+        public int id2{get;set;}
         public string name3 { get; set; }
+        public int id3{get;set;}
         public string name4 { get; set; }
+        public int id4{get;set;}
         public string name5 { get; set; }
+        public int id5{get;set;}
         public string contract { get; set; }
         public string phone { get; set; }
         public List<int> area { get; set; }

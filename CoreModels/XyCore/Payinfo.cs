@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using CoreModels.XyComm;
 namespace CoreModels.XyCore
 {
     public class PayInfo
@@ -153,5 +152,11 @@ namespace CoreModels.XyCore
         public int Datacnt {get;set;}//总资料笔数
         public decimal Pagecnt{get;set;}//总页数
         public List<PayInfoQuery> Pay {get;set;}
+        public List<Filter> Payment{get;set;}
+    }
+    public class GetPayStatusInitReturn
+    {
+        public List<Filter> Status{get;set;}
+        public List<Filter> Payment{get;set;}
     }
 }
