@@ -270,6 +270,35 @@ namespace CoreModels.XyCore{
 		public int oIndex{get;set;}
 	}
 
+	public class plist1{
+		public int id{get;set;}
+		public int Skuautoid{get;set;}
+		public string PCode{get;set;}
+	}
+
+//ID, SkuID, SkuName, Img,GoodsCode
+	public class plist2{
+		public int id{get;set;}
+		public string SkuID{get;set;}
+		public string SkuName{get;set;}
+		public string Img{get;set;}
+		public string GoodsCode{get;set;}
+	}	
+
+	public class pileAndSku{
+		public int ID{get;set;}
+		public int Skuautoid{get;set;}
+		public string PCode{get;set;}
+		public string SkuID{get;set;}
+		public string SkuName{get;set;}
+		public string Img{get;set;}
+		public string GoodsCode{get;set;}
+	}
+
+	public class pileRetion{
+		public string PCode{get;set;}
+		public string SkuID{get;set;}
+	}
 
 
 }

@@ -94,7 +94,7 @@ namespace CoreData.CoreCore
                     if(!string.IsNullOrEmpty(cell)){
                         whereSql += " AND Cell = '"+cell+"' ";
                     }                    
-                    var list = conn.Query<Pilelist>(sql+whereSql+" ORDER BY `Order` ").AsList();
+                    var list = conn.Query<Pilelist>(sql+whereSql+" ORDER BY wmspile.`Order` ASC ").AsList();
                          
                     res.d=new {
                         list = list
@@ -208,6 +208,7 @@ namespace CoreData.CoreCore
                                         wmspile.Col='"+sp[2]+@"',
                                         wmspile.Storey='"+storeyparam+@"',
                                         wmspile.CreateDate=NOW(),
+                                        wmspile.PCType=1,
                                         wmspile.Type='"+pile.Type+@"',
                                         wmspile.Creator='"+uname+@"',
                                         wmspile.`Enable`=TRUE,
@@ -263,19 +264,106 @@ namespace CoreData.CoreCore
 
             return res;
         }
-        public static DataResult pileOrder(editOrder editOrder, string CoID)
+        
+        public static DataResult pileGetOrder(string CoID)
         {
             var res = new DataResult(1, null);
             using (var conn = new MySqlConnection(DbBase.CoreConnectString))
             {
                 try
                 {
-                    var sql = "UPDATE  wmspile SET `Order`=@oIndex WHERE ID =@id AND CoID = @CoID";
-                    var rnt = conn.Execute(sql,new {
-                        oIndex = editOrder.oIndex,
-                        ID = editOrder.id,
+                    var sql = "SELECT DISTINCT(wmspile.`Row`) FROM wmspile WHERE wmspile.`Row` <> '' AND CoID = @CoID ORDER BY wmspile.`Order` ASC";
+                    var list = conn.Query<string>(sql,new {
                         CoID = CoID
-                    });
+                    }).AsList();
+                    res.d = string.Join(",", list.ToArray());
+                }
+                catch (Exception ex)
+                {
+                    res.s = -1;
+                    res.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+
+            return res;
+        }
+
+        public static DataResult pileAndSku(string CoID,int page,int pageSize)
+        {
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                try
+                {
+                    var sql = "SELECT ID,Skuautoid,PCode from wmspile WHERE Skuautoid <>0 AND CoID="+CoID+ " limit "+(page-1)*0 +","+page*pageSize;
+                    var total = conn.Query<decimal>("SELECT COUNT(ID) from wmspile WHERE Skuautoid <>0 AND CoID= "+CoID).AsList()[0];
+                    var pageCount = Math.Ceiling(total/pageSize);
+
+                    var pList1 = conn.Query<plist1>(sql).AsList();
+                    var ids = from n in pList1
+                        select n.Skuautoid;                    
+                    sql = "SELECT ID, SkuID, SkuName, Img,GoodsCode from coresku WHERE ID in("+string.Join(",", ids.ToArray())+")";
+                    var pList2 = conn.Query<plist2>(sql).AsList();
+                    var plist = new List<pileAndSku>();
+                    foreach(var p in pList1){
+                        if(p.Skuautoid !=0) {
+                             var t = pList2.Where(i => i.id == p.Skuautoid).First();                            
+                            plist.Add(new pileAndSku(){
+                                ID = p.id,
+                                Skuautoid = p.Skuautoid,
+                                PCode = p.PCode,
+                                SkuID = t.SkuID,
+                                SkuName = t.SkuName,
+                                Img = t.Img,
+                                GoodsCode = t.GoodsCode
+                            });
+                        }                       
+                    }
+                    if(page ==1){
+                        res.d = new {
+                            list = plist,
+                            page = page,
+                            pageSize = pageSize,
+                            pageCount = pageCount,
+                            total = total
+                        };    
+                    }else{
+                        res.d = new {
+                            list = plist,
+                            page = page
+                        };    
+                    }
+                    
+
+                }
+                catch (Exception ex)
+                {
+                    res.s = -1;
+                    res.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+
+            return res;
+        }
+
+        public static DataResult pileOrder(string editOrder, string CoID)
+        {
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                try
+                {
+                    Console.WriteLine(editOrder);
+                    var areaArr = editOrder.Split(',');
+                    var sql = new StringBuilder();
+                    for(var i=0;i<areaArr.Length;i++){
+                        sql.Append("UPDATE  wmspile SET `Order`="+i+" WHERE Area='"+areaArr[i]+"' AND CoID = "+CoID+";");
+                    }
+                    Console.WriteLine(sql);
+                    // var sql = "UPDATE  wmspile SET `Order`=@oIndex WHERE ID =@id AND CoID = @CoID";
+                    var rnt = conn.Execute(sql.ToString());
                     if (rnt > 0)
                     {
                         res.s = 1;
@@ -294,6 +382,70 @@ namespace CoreData.CoreCore
             }
 
             return res;
+        }
+
+
+        public static DataResult delPileSKu(List<string> ids, string CoID)
+        {
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                try
+                {
+
+                    var sql = "UPDATE  wmspile SET Skuautoid=0 WHERE ID in("+string.Join(",", ids.ToArray())+") AND CoID = "+CoID+";";                 
+                    var rnt = conn.Execute(sql.ToString());
+                    if (rnt > 0)
+                    {
+                        res.s = 1;
+                    }
+                    else
+                    {
+                        res.s = -1;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    res.s = -1;
+                    res.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+
+            return res;
+        }
+
+        public static DataResult insertPileSKu(string PCode, string SkuID,string CoID){
+            var res = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                try
+                {
+                    var sql ="SELECT ID from coresku WHERE SkuID = @SkuID";
+                    var dataR = conn.Query<int>(sql, new {SkuID = SkuID}).AsList();
+                    if (dataR.Count == 0){
+                        res.s = -1;
+                        res.d = "商品编码不存在";
+                    } else {
+                        sql ="UPDATE wmspile SET Skuautoid = @Skuautoid,SkuID = @SkuID WHERE PCode=@PCode";
+                        Console.WriteLine(sql);
+                        var rnt = conn.Execute(sql, new {Skuautoid=dataR[0],PCode = PCode,SkuID = SkuID});
+                        if (rnt == 0) {
+                            res.s = -1;
+                            res.d = "仓位不存在";
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    res.s = -1;
+                    res.d = ex.Message;
+                    conn.Dispose();
+                }
+            }
+
+            return res;
+
         }
 
 

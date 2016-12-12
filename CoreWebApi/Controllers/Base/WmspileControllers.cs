@@ -52,14 +52,50 @@ namespace CoreWebApi
             var data = WmspileHaddle.deletepile(IDLst,CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+        
+        [HttpGetAttribute("/Core/Wmspile/pileGetOrder")]
+        public ResponseResult pileGetOrder()
+        {   
+            string CoID = GetCoid();
+            var data = WmspileHaddle.pileGetOrder(CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
 
         [HttpPostAttribute("/Core/Wmspile/pileOrder")]
         public ResponseResult pileOrder([FromBodyAttribute]JObject co)
         {   
-            var editorder = Newtonsoft.Json.JsonConvert.DeserializeObject<editOrder>(co.ToString());
+            var editorder = co["order"].ToString();
             string CoID = GetCoid();
             var insertM = new PileInsert();
             var data = WmspileHaddle.pileOrder(editorder,CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Wmspile/pileAndSku")]
+        public ResponseResult pileAndSku(int page=1, int pageSize = 20)
+        {   
+            string CoID = GetCoid();
+            var data = WmspileHaddle.pileAndSku(CoID,page,pageSize);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Wmspile/delPileSKu")]
+        public ResponseResult delPileSKu([FromBodyAttribute]JObject co)
+        {   
+            var IDLst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(co["IDLst"].ToString());
+            string UserName = GetUname(); 
+            //string Company = co["Company"].ToString();
+            string CoID = GetCoid();
+            var data = WmspileHaddle.delPileSKu(IDLst,CoID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Wmspile/insertPileSKu")]
+        public ResponseResult insertPileSKu([FromBodyAttribute]JObject co)
+        {   
+            var pilerelation = Newtonsoft.Json.JsonConvert.DeserializeObject<pileRetion>(co.ToString());
+            string CoID = GetCoid();
+            var data = WmspileHaddle.insertPileSKu(pilerelation.PCode,pilerelation.SkuID,CoID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
 
