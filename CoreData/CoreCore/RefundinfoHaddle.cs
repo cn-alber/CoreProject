@@ -321,6 +321,16 @@ namespace CoreData.CoreCore
                     result.s = -3003;
                     return result;
                 }
+                string sqlcommand = @"select ShopName,ID,RefundDate,ConfirmDate,ModifyDate,OID,SoID,RefundNbr,Amount,Status,Refundment,PayAccount,BuyerShopID,RID,RType,IssueType,RRmark 
+                               from refundinfo where id = " + Refundid + " and coid = " + CoID;
+                var uu = CoreDBconn.Query<RefundInfoQuery>(sqlcommand).AsList();
+                foreach(var a in uu)
+                {
+                    a.StatusString = Enum.GetName(typeof(RefundStatus), a.Status);
+                    a.RTypeString = Enum.GetName(typeof(ASType), a.RType);
+                    a.IssueTypeString = Enum.GetName(typeof(IssueType), a.IssueType);
+                }
+                result.d = uu[0];
                 TransCore.Commit();
             }
             catch (Exception e)
@@ -371,6 +381,16 @@ namespace CoreData.CoreCore
                     result.s = -3003;
                     return result;
                 }    
+                string sqlcommand = @"select ShopName,ID,RefundDate,ConfirmDate,ModifyDate,OID,SoID,RefundNbr,Amount,Status,Refundment,PayAccount,BuyerShopID,RID,RType,IssueType,RRmark 
+                               from refundinfo where id = " + payid + " and coid = " + CoID;
+                var uu = CoreDBconn.Query<RefundInfoQuery>(sqlcommand).AsList();
+                foreach(var a in uu)
+                {
+                    a.StatusString = Enum.GetName(typeof(RefundStatus), a.Status);
+                    a.RTypeString = Enum.GetName(typeof(ASType), a.RType);
+                    a.IssueTypeString = Enum.GetName(typeof(IssueType), a.IssueType);
+                }
+                result.d = uu[0];
                 TransCore.Commit();
             }
             catch (Exception e)
@@ -421,6 +441,16 @@ namespace CoreData.CoreCore
                     result.s = -3003;
                     return result;
                 }    
+                string sqlcommand = @"select ShopName,ID,RefundDate,ConfirmDate,ModifyDate,OID,SoID,RefundNbr,Amount,Status,Refundment,PayAccount,BuyerShopID,RID,RType,IssueType,RRmark 
+                               from refundinfo where id = " + payid + " and coid = " + CoID;
+                var uu = CoreDBconn.Query<RefundInfoQuery>(sqlcommand).AsList();
+                foreach(var a in uu)
+                {
+                    a.StatusString = Enum.GetName(typeof(RefundStatus), a.Status);
+                    a.RTypeString = Enum.GetName(typeof(ASType), a.RType);
+                    a.IssueTypeString = Enum.GetName(typeof(IssueType), a.IssueType);
+                }
+                result.d = uu[0];
                 TransCore.Commit();
             }
             catch (Exception e)
@@ -470,6 +500,16 @@ namespace CoreData.CoreCore
                     result.s = -3003;
                     return result;
                 }    
+                string sqlcommand = @"select ShopName,ID,RefundDate,ConfirmDate,ModifyDate,OID,SoID,RefundNbr,Amount,Status,Refundment,PayAccount,BuyerShopID,RID,RType,IssueType,RRmark 
+                               from refundinfo where id = " + payid + " and coid = " + CoID;
+                var uu = CoreDBconn.Query<RefundInfoQuery>(sqlcommand).AsList();
+                foreach(var a in uu)
+                {
+                    a.StatusString = Enum.GetName(typeof(RefundStatus), a.Status);
+                    a.RTypeString = Enum.GetName(typeof(ASType), a.RType);
+                    a.IssueTypeString = Enum.GetName(typeof(IssueType), a.IssueType);
+                }
+                result.d = uu[0];
                 TransCore.Commit();
             }
             catch (Exception e)
