@@ -3710,7 +3710,7 @@ namespace CoreData.CoreCore
                 sqlcommand = @"update aftersale set IssueType=@IssueType,Remark=@Remark,ShopStatus=@ShopStatus,GoodsStatus=@GoodsStatus,RefundStatus=@RefundStatus,Result=@Result,
                                Express=@Express,ExCode=@ExCode,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
                 count = CoreDBconn.Execute(sqlcommand,afterAsale,TransCore);
-                int rtn = 0;
+                // int rtn = 0;
                 if(count <= 0)
                 {
                     result.s = -3003;

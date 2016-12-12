@@ -125,33 +125,6 @@ namespace CoreWebApi
         }
         #endregion
 
-        #region 移库下架 - 产生下架资料
-        [HttpPostAttribute("Core/AShelves/OffShelfPile")]
-        public ResponseResult OffShelfPile([FromBodyAttribute]JObject obj)
-        {
-            var res = new DataResult(1, null);
-            int x;
-            if (!(obj["PileID"] != null && int.TryParse(obj["PileID"].ToString(), out x) && obj["SkuAuto"] != null))
-            {
-                res.s = -1;
-                res.d = "无效参数";
-            }
-            else
-            {
-                var cp = new AShelfSet();
-                cp.PileID = int.Parse(obj["PileID"].ToString());
-                cp.SkuAuto = Newtonsoft.Json.JsonConvert.DeserializeObject<ASkuScan>(obj["SkuAuto"].ToString());
-                cp.Type = 3;
-                cp.Contents = "移库下架";
-                cp.CoID = int.Parse(GetCoid());
-                cp.Creator = GetUname();
-                cp.CreateDate = DateTime.Now.ToString();
-                res = AShelvesHaddles.SetOffShelfPile(cp);
-            }
-            return CoreResult.NewResponse(res.s, res.d, "WmsApi");
-        }
-        #endregion
-
         #region 移库上架 - 产生上架资料
         [HttpPostAttribute("Core/AShelves/MovInPile")]
         public ResponseResult MovInPile([FromBodyAttribute]JObject obj)
@@ -179,8 +152,111 @@ namespace CoreWebApi
         }
         #endregion
 
-        #region 
-        
+        #region 移库下架 - 产生下架资料
+        [HttpPostAttribute("Core/AShelves/MoveOutShelfPile")]
+        public ResponseResult MoveOutShelfPile([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            int x;
+            if (!(obj["PileID"] != null && int.TryParse(obj["PileID"].ToString(), out x) && obj["SkuAuto"] != null))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var cp = new AShelfSet();
+                cp.PileID = int.Parse(obj["PileID"].ToString());
+                cp.SkuAuto = Newtonsoft.Json.JsonConvert.DeserializeObject<ASkuScan>(obj["SkuAuto"].ToString());
+                cp.Type = 3;
+                cp.Contents = "移库下架";
+                cp.CoID = int.Parse(GetCoid());
+                cp.Creator = GetUname();
+                cp.CreateDate = DateTime.Now.ToString();
+                res = AShelvesHaddles.SetOffShelfPile(cp);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "WmsApi");
+        }
+        #endregion
+
+        #region 强制下架 - 产生下架资料
+        [HttpPostAttribute("Core/AShelves/OffShelfPile")]
+        public ResponseResult OffShelfPile([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            int x;
+            if (!(obj["PileID"] != null && int.TryParse(obj["PileID"].ToString(), out x) && obj["SkuAuto"] != null))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var cp = new AShelfSet();
+                cp.PileID = int.Parse(obj["PileID"].ToString());
+                cp.SkuAuto = Newtonsoft.Json.JsonConvert.DeserializeObject<ASkuScan>(obj["SkuAuto"].ToString());
+                cp.Type = 3;
+                cp.Contents = "强制下架";
+                cp.CoID = int.Parse(GetCoid());
+                cp.Creator = GetUname();
+                cp.CreateDate = DateTime.Now.ToString();
+                res = AShelvesHaddles.SetOffShelfPile(cp);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "WmsApi");
+        }
+        #endregion
+
+        #region 托盘上架 - 产生上架资料
+        [HttpPostAttribute("Core/AShelves/TrayUp")]
+        public ResponseResult TrayUp([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            int x;
+            if (!(obj["PCode"] != null && obj["SkuAuto"] != null))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var cp = new AShelfSet();
+                cp.PCode = obj["PCode"].ToString();
+                cp.SkuAuto = Newtonsoft.Json.JsonConvert.DeserializeObject<ASkuScan>(obj["SkuAuto"].ToString());
+                cp.Type = 4;
+                cp.Contents = "托盘上架";
+                cp.CoID = int.Parse(GetCoid());
+                cp.Creator = GetUname();
+                cp.CreateDate = DateTime.Now.ToString();
+                res = AShelvesHaddles.TrayUp(cp);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "WmsApi");
+        }
+        #endregion
+
+        #region 库存盘点
+        [HttpPostAttribute("Core/AShelves/SetAreaQty")]
+        public ResponseResult SetAreaQty([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            int x;
+            if (!(obj["PileID"] != null && int.TryParse(obj["PileID"].ToString(), out x) && obj["Qty"] != null && int.TryParse(obj["Qty"].ToString(), out x) ))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var cp = new AShelfSet();
+                cp.PileID = int.Parse(obj["PileID"].ToString());
+                cp.Qty = int.Parse(obj["Qty"].ToString());
+                cp.Contents = "库存盘点";
+                cp.CoID = int.Parse(GetCoid());
+                cp.Creator = GetUname();
+                cp.CreateDate = DateTime.Now.ToString();
+                res = AShelvesHaddles.SetAreaSkuQty(cp);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "WmsApi");
+        }
         #endregion
 
     }

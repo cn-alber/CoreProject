@@ -1,0 +1,54 @@
+{
+    "s": 1,
+    "d": {
+        "Datacnt": 2,
+        "Pagecnt": 1,
+        "Refund": [
+            {
+                "ShopName": "京东南极人男装官方旗舰店",//店铺
+                "ID": 2,//内部退款单
+                "RefundDate": "2016-12-06 14:11:31",//退款日期
+                "ConfirmDate": null,//审核日期
+                "ModifyDate": "2016-12-06 14:12:55",//修改日期
+                "OID": 10882,//内部订单号
+                "SoID": 63616622739,//线上单号
+                "RefundNbr": "rrrrrrr00005_Out",//退款单号
+                "Amount": "200.00",//金额
+                "Status": 0,//状态
+                "StatusString": "待审核",//状态说明
+                "Refundment": "内部流转",//退款方式
+                "PayAccount": "",//支付账户
+                "BuyerShopID": "曹先生",//买家账号
+                "RID": 271,//售后单号
+                "RType": 2,//售后分类
+                "RTypeString": "换货",//售后分类说明
+                "IssueType": 7,//问题类型
+                "IssueTypeString": "买错了",//问题类型说明
+                "RRmark": ""//售后备注
+            },
+            {
+                "ShopName": "京东南极人男装官方旗舰店",
+                "ID": 1,
+                "RefundDate": "2016-12-06 14:08:03",
+                "ConfirmDate": null,
+                "ModifyDate": "2016-12-06 14:09:36",
+                "OID": 10882,
+                "SoID": 63616622739,
+                "RefundNbr": "rrrrrrr00005",
+                "Amount": "299.00",
+                "Status": 0,
+                "StatusString": "待审核",
+                "Refundment": "支付宝",
+                "PayAccount": "",
+                "BuyerShopID": "曹先生",
+                "RID": 270,
+                "RType": 0,
+                "RTypeString": "普通退货",
+                "IssueType": 3,
+                "IssueTypeString": "重复购买",
+                "RRmark": ""
+            }
+        ]
+    },
+    "m": ""
+}

@@ -1,0 +1,78 @@
+{
+    "WhID": 137,
+    "RecSkuLst": [
+        {
+            "BarCode": "BX100016120961793",
+            "Skuautoid": 3,
+            "SkuID": "test1234560004014",          
+            "Qty": 10,
+            "SkuType": 2
+        },
+        {
+            "BarCode": "BX100016120988243",
+            "Skuautoid": 3,
+            "SkuID": "test1234560004014",          
+            "Qty": 10,
+            "SkuType": 2
+        },
+        {
+            "BarCode": "BX100016120983106",
+            "Skuautoid": 3,
+            "SkuID": "test1234560004014",          
+            "Qty": 10,
+            "SkuType": 2
+        },
+        {
+            "BarCode": "BX100016120920732",
+            "Skuautoid": 3,
+            "SkuID": "test1234560004014",          
+            "Qty": 10,
+            "SkuType": 2
+        },
+        {
+            "BarCode": "BX100016120964254",
+            "Skuautoid": 3,
+            "SkuID": "test1234560004014",          
+            "Qty": 10,
+            "SkuType": 2
+        },
+        {
+            "BarCode": "BX100016120978404",
+            "Skuautoid": 3,
+            "SkuID": "test1234560004014",          
+            "Qty": 10,
+            "SkuType": 2
+        },
+        {
+            "BarCode": "BX100016120943418",
+            "Skuautoid": 3,
+            "SkuID": "test1234560004014",          
+            "Qty": 10,
+            "SkuType": 2
+        },
+        {
+            "BarCode": "BX100016120905707",
+            "Skuautoid": 3,
+            "SkuID": "test1234560004014",          
+            "Qty": 10,
+            "SkuType": 2
+        },
+        {
+            "BarCode": "BX100016120996021",
+            "Skuautoid": 3,
+            "SkuID": "test1234560004014",          
+            "Qty": 10,
+            "SkuType": 2
+        }
+    ]
+}
+
+
+
+
+
+
+
+
+
+

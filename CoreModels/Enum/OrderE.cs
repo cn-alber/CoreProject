@@ -181,5 +181,12 @@ namespace CoreModels.Enum
             已确认 = 1,
             作废 = 2
         }
+        public enum RefundStatus
+        {
+            待审核 = 0,
+            已确认 = 1,
+            作废 = 2,
+            完成 = 3
+        }
     }
 }

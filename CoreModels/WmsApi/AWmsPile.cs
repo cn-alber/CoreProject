@@ -87,6 +87,7 @@ namespace CoreModels.WmsApi
         public int WarehouseID { get; set; }
         public int Type { get; set; }
         public string PCode { get; set; }
+        public int Qty { get; set; }
         public string Contents { get; set; }
         public int CoID { get; set; }
         public string Creator { get; set; }
