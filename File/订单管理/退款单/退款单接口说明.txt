@@ -59,14 +59,14 @@ output: s=1成功 else 错误代码
 参考:output jason 文件:ComfirmRefund_output.json
 
 6.CancleComfirmRefund()退款单取消审核
-路由:http://localhost:5000/Core/Pay/CancleComfirmRefund
+路由:http://localhost:5000/Core/Refund/CancleComfirmRefund
 input:ID            int         内部付款单号
 output: s=1成功 else 错误代码
 参考:input jason 文件:CancleComfirmRefund_input.json
 参考:output jason 文件:CancleComfirmRefund_output.json
 
 7.CompleteRefund()退款单确认完成
-路由:http://localhost:5000/Core/Pay/CompleteRefund
+路由:http://localhost:5000/Core/Refund/CompleteRefund
 input:ID            int         内部付款单号
 output: s=1成功 else 错误代码
 参考:input jason 文件:CompleteRefund_input.json
