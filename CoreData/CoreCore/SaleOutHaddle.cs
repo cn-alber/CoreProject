@@ -98,7 +98,7 @@ namespace CoreData.CoreCore
             {
                 wheresql = wheresql + " and BatchID > 0";
             }
-            else if(cp.BatchID > 10)//店铺
+            else if(cp.BatchID > 1)
             {
                 wheresql = wheresql + " and BatchID = " + cp.BatchID;
             }
@@ -120,27 +120,30 @@ namespace CoreData.CoreCore
                         a.StatusString = Enum.GetName(typeof(SaleOutStatus), a.Status);
                         ItemID.Add(a.ID);
                     }
-                    sqlcommand = @"select * from saleoutitem  where sid in @ID and coid = @Coid";
-                    var item = conn.Query<SaleOutItemInsert>(sqlcommand,new{ID = ItemID,Coid = cp.CoID}).AsList();
-                    foreach(var a in u)
+                    if(ItemID.Count > 0)
                     {
-                        string remark = a.OrdQty + ".";
-                        foreach(var i in item)
+                        sqlcommand = @"select * from saleoutitem  where sid in @ID and coid = @Coid";
+                        var item = conn.Query<SaleOutItemInsert>(sqlcommand,new{ID = ItemID,Coid = cp.CoID}).AsList();
+                        foreach(var a in u)
                         {
-                            if(a.ID == i.SID)
+                            string remark = a.OrdQty + ".";
+                            foreach(var i in item)
                             {
-                                if(i.Qty == 1)
+                                if(a.ID == i.SID)
                                 {
-                                    remark = remark + i.SkuID + ",";
-                                }
-                                else
-                                {
-                                    remark = remark + i.SkuID + "*" + i.Qty + ",";
+                                    if(i.Qty == 1)
+                                    {
+                                        remark = remark + i.SkuID + ",";
+                                    }
+                                    else
+                                    {
+                                        remark = remark + i.SkuID + "*" + i.Qty + ",";
+                                    }
                                 }
                             }
+                            remark = remark.Substring(0,remark.Length - 1);
+                            a.Sku = remark;
                         }
-                        remark = remark.Substring(0,remark.Length - 1);
-                        a.Sku = remark;
                     }
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;

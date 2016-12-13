@@ -1,0 +1,130 @@
+{
+    "s": 1,
+    "d": {
+        "BatchStatus": [
+            {
+                "value": "0",
+                "label": "等待拣货"
+            },
+            {
+                "value": "1",
+                "label": "等待播种"
+            },
+            {
+                "value": "2",
+                "label": "等待出库验证"
+            },
+            {
+                "value": "3",
+                "label": "正在拣货"
+            },
+            {
+                "value": "4",
+                "label": "正在播种"
+            },
+            {
+                "value": "5",
+                "label": "正在出库验证"
+            },
+            {
+                "value": "6",
+                "label": "已完成"
+            },
+            {
+                "value": "7",
+                "label": "终止拣货"
+            }
+        ],
+        "Pickor": [
+            {
+                "value": "1",
+                "label": "admin"
+            },
+            {
+                "value": "33",
+                "label": "user002"
+            },
+            {
+                "value": "34",
+                "label": "user003"
+            },
+            {
+                "value": "35",
+                "label": "user004"
+            },
+            {
+                "value": "40",
+                "label": "user005"
+            },
+            {
+                "value": "41",
+                "label": "user006"
+            },
+            {
+                "value": "42",
+                "label": "user007"
+            },
+            {
+                "value": "43",
+                "label": "user008"
+            },
+            {
+                "value": "159",
+                "label": "user100019"
+            },
+            {
+                "value": "20181",
+                "label": "admintest1"
+            },
+            {
+                "value": "20182",
+                "label": "admintest2"
+            },
+            {
+                "value": "20183",
+                "label": "admintest3"
+            }
+        ],
+        "Task": [
+            {
+                "value": "N",
+                "label": "未安排任务"
+            },
+            {
+                "value": "N",
+                "label": "已安排任务"
+            }
+        ],
+        "BatchType": [
+            {
+                "value": "0",
+                "label": "一单一件"
+            },
+            {
+                "value": "1",
+                "label": "一单多件"
+            },
+            {
+                "value": "2",
+                "label": "现场大单"
+            },
+            {
+                "value": "3",
+                "label": "整箱"
+            },
+            {
+                "value": "4",
+                "label": "补货"
+            },
+            {
+                "value": "5",
+                "label": "组团"
+            },
+            {
+                "value": "6",
+                "label": "采购退货"
+            }
+        ]
+    },
+    "m": ""
+}

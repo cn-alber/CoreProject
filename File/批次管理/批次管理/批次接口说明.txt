@@ -1,0 +1,29 @@
+接口名称:CoreWebApi/Controllers/Batch/BatchControllers
+
+1.GetBatchInit() //status List
+路由:http://localhost:5000/Core/Batch/GetBatchInit
+input:None
+OutPut:BatchStatus  批次状态
+       Pickor       拣货人
+       Task         安排
+       BatchType    批次类型
+参考:output jason 文件:GetBatchInit_output.json
+
+2.GetBatchList() //查询table batch 资料
+路由:http://localhost:5000/Core/Batch/GetBatchList
+input:      ID                  string          批次号 default null
+            Remark              string          标志 default null
+            PickorID            string          拣货人 default null
+            Task                string          安排任务是否 default null
+            Type                string          类型
+            DateStart           string          日期起 default null
+            Dateend             string          日期迄 default null
+            Status              string          状态 default null
+            SortField           string          排序栏位名称 default null
+            SortDirection       string          排序方式 default null
+            PageIndex           string          资料页数(ex.第一页就给1) default 1
+            NumPerPage          string          每页显示资料笔数 default 20
+OutPut:     Datacnt             int             资料总笔数
+            Pagecnt             decimal         总页数
+            Batch               List<Batch>     Batch 资料
+参考:output jason 文件:GetBatchList_output.json
