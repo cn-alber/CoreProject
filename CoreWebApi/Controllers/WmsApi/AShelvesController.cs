@@ -231,7 +231,7 @@ namespace CoreWebApi
             }
             return CoreResult.NewResponse(res.s, res.d, "WmsApi");
         }
-        #endregion
+        #endregion 
 
         #region 库存盘点
         [HttpPostAttribute("Core/AShelves/SetAreaQty")]

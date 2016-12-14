@@ -11,7 +11,8 @@ namespace CoreModels.Enum
             正在播种 = 4,
             正在出库验证 = 5,
             已完成   = 6,
-            终止拣货 = 7
+            终止拣货 = 7,
+            等待发货=8
         }
 
         public enum BatchType

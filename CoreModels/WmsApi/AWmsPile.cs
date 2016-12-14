@@ -38,6 +38,7 @@ namespace CoreModels.WmsApi
         public int Skuautoid { get; set; }
         public string SkuID { get; set; }
         public int Qty { get; set; }
+        public int LockQty { get; set; }
         public int MaxQty { get; set; }
         public int Type { get; set; }
         public int PCType { get; set; }//实体货位 = 1,临时货位 = 2(托盘)
@@ -92,6 +93,10 @@ namespace CoreModels.WmsApi
         public int CoID { get; set; }
         public string Creator { get; set; }
         public string CreateDate { get; set; }
+        public string Picker { get; set; }
+        public int BatchID { get; set; }//拣货任务ID
+        public int BatchtaskID { get; set; }//拣货子任务ID
+        public int BatchType { get; set; }//拣货类型
     }
 
     public class ASkuPileQty
