@@ -99,5 +99,103 @@ namespace CoreWebApi
             var data = BatchHaddle.GetBatchList(cp);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpGetAttribute("/Core/Batch/GetConfigure")]
+        public ResponseResult GetConfigure(string Type)
+        {
+            if(!string.IsNullOrEmpty(Type))
+            {
+                Type = Type.ToUpper();
+                if(Type!= "A" && Type!= "B" && Type!= "C" && Type!= "D" && Type!= "E" && Type!= "F" && Type!= "G" && Type!= "H")
+                {
+                    return CoreResult.NewResponse(-1, "参数类型无效", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "参数类型必填", "General"); 
+            }
+            var data = BatchHaddle.GetConfigure(int.Parse(GetCoid()),Type);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Batch/SetConfigure")]
+        public ResponseResult SetConfigure([FromBodyAttribute]JObject co)
+        {   
+            string Type = "",TypeValue="";
+            if(co["Type"] != null)
+            {
+                Type = co["Type"].ToString();
+                if(!string.IsNullOrEmpty(Type))
+                {
+                    Type = Type.ToUpper();
+                    if(Type!= "A" && Type!= "B" && Type!= "C" && Type!= "D" && Type!= "E" && Type!= "F" && Type!= "G" && Type!= "H")
+                    {
+                        return CoreResult.NewResponse(-1, "参数类型无效", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "参数类型必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "参数类型必填", "General"); 
+            }
+            if(co["TypeValue"] != null)
+            {
+                TypeValue = co["TypeValue"].ToString();
+                if(!string.IsNullOrEmpty(TypeValue))
+                {
+                    if(Type == "A" || Type == "B" || Type == "C" || Type == "D" || Type == "E")
+                    {
+                        int x,y;
+                        if (int.TryParse(TypeValue, out x))
+                        {
+                            y = int.Parse(TypeValue);
+                            if((Type == "A" || Type == "B") && y <= 0)
+                            {
+                                return CoreResult.NewResponse(-1, "单件单批/多件单批订单数必须大于零", "General"); 
+                            }
+                            if((Type == "C" || Type == "D" || Type == "E") && y < 0)
+                            {
+                                return CoreResult.NewResponse(-1, "数量必须大于等于零", "General"); 
+                            }
+                        }
+                        else
+                        {
+                            return CoreResult.NewResponse(-1, "参数值无效", "General"); 
+                        }
+                    }
+                    if(Type == "F" || Type == "G")
+                    {
+                        if(TypeValue.Contains("A"))
+                        {
+                            TypeValue = "A";
+                        }
+                    }
+                    if(Type == "H")
+                    {
+                        if (TypeValue.ToUpper() != "TRUE" && TypeValue.ToUpper() != "FALSE")
+                        {
+                            return CoreResult.NewResponse(-1, "参数值无效", "General"); 
+                        }
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "参数值必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "参数值必填", "General"); 
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = BatchHaddle.SetConfigure(CoID,Type,TypeValue);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }

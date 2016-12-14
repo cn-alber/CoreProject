@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using CoreModels.WmsApi;
 using static CoreModels.Enum.OrderE;
 using CoreData.CoreComm;
-using CoreModels.XyUser;
 namespace CoreData.CoreCore
 {
     public static class SaleOutHaddle
@@ -122,7 +121,7 @@ namespace CoreData.CoreCore
                     }
                     if(ItemID.Count > 0)
                     {
-                        sqlcommand = @"select * from saleoutitem  where sid in @ID and coid = @Coid";
+                        sqlcommand = @"select * from saleoutitem  where sid in @ID and coid = @Coid and IsGift = false";
                         var item = conn.Query<SaleOutItemInsert>(sqlcommand,new{ID = ItemID,Coid = cp.CoID}).AsList();
                         foreach(var a in u)
                         {

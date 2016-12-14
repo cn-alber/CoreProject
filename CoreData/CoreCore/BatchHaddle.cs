@@ -4,9 +4,9 @@ using System;
 using CoreModels.XyCore;
 using Dapper;
 using System.Collections.Generic;
-using CoreModels.XyComm;
+// using CoreModels.XyComm;
 using static CoreModels.Enum.BatchE;
-using CoreModels.XyUser;
+// using CoreModels.XyUser;
 namespace CoreData.CoreCore
 {
     public static class BatchHaddle
@@ -45,7 +45,7 @@ namespace CoreData.CoreCore
             ff.label = "未安排任务";
             filter.Add(ff);
             ff = new Filter();
-            ff.value = "N";
+            ff.value = "Y";
             ff.label = "已安排任务";
             filter.Add(ff);
             res.Task = filter;
@@ -166,6 +166,111 @@ namespace CoreData.CoreCore
                     res.Pagecnt = pagecnt;
                     res.Batch = u;
                     result.d = res;             
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }           
+            return result;
+        }
+        ///<summary>
+        ///获取参数资料
+        ///</summary>
+        public static DataResult GetConfigure(int CoID,string Type)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    string wheresql = "select * from batch_configure where CoID = " + CoID;
+                    var u = conn.Query<BatchConfigure>(wheresql).AsList();
+                    if(Type == "A")
+                    {
+                        result.d = u[0].SingleOrdQty;
+                    }
+                    if(Type == "B")
+                    {
+                        result.d = u[0].MultiOrdQty;
+                    }
+                    if(Type == "C")
+                    {
+                        result.d = u[0].SingleSkuQty;
+                    }
+                    if(Type == "D")
+                    {
+                        result.d = u[0].MultiNotOrdQty;
+                    }
+                    if(Type == "E")
+                    {
+                        result.d = u[0].BigQty;
+                    }
+                    if(Type == "F")
+                    {
+                        result.d = u[0].Express;
+                    }
+                    if(Type == "G")
+                    {
+                        result.d = u[0].Shop;
+                    }
+                    if(Type == "H")
+                    {
+                        result.d = u[0].SpecialOrd;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }           
+            return result;
+        }
+        ///<summary>
+        ///更新参数资料
+        ///</summary>
+        public static DataResult SetConfigure(int CoID,string Type,string TypeValue)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    string wheresql = string.Empty;
+                    if(Type == "A")
+                    {
+                        wheresql = "update batch_configure set SingleOrdQty=@TypeValue where coid = @Coid";
+                    }
+                    if(Type == "B")
+                    {
+                        wheresql = "update batch_configure set MultiOrdQty=@TypeValue where coid = @Coid";
+                    }
+                    if(Type == "C")
+                    {
+                        wheresql = "update batch_configure set SingleSkuQty=@TypeValue where coid = @Coid";
+                    }
+                    if(Type == "D")
+                    {
+                        wheresql = "update batch_configure set MultiNotOrdQty=@TypeValue where coid = @Coid";
+                    }
+                    if(Type == "E")
+                    {
+                        wheresql = "update batch_configure set BigQty=@TypeValue where coid = @Coid";
+                    }
+                    if(Type == "F")
+                    {
+                        wheresql = "update batch_configure set Express=@TypeValue where coid = @Coid";
+                    }
+                    if(Type == "G")
+                    {
+                        wheresql = "update batch_configure set Shop=@TypeValue where coid = @Coid";
+                    }
+                    if(Type == "H")
+                    {
+                        wheresql = "update batch_configure set SpecialOrd=@TypeValue where coid = @Coid";
+                    }
+                    int count = conn.Execute(wheresql,new{TypeValue=TypeValue,Coid=CoID});
+                    if(count <= 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;

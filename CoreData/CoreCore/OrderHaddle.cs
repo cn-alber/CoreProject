@@ -1874,11 +1874,14 @@ namespace CoreData.CoreCore
                 }
                 ischeckPaid = u[0].IsPaid;
                 decimal amt = 0, weight = 0,qty = 0;
-                wheresql = @"select id,skuid,realprice,qty,amount,totalweight from orderitem where oid = " + oid + " and coid =" + CoID + " and id = " + id;
+                wheresql = @"select id,skuid,realprice,qty,amount,totalweight,isgift from orderitem where oid = " + oid + " and coid =" + CoID + " and id = " + id;
                 var x = CoreDBconn.Query<OrderItem>(wheresql).AsList();
                 if (x.Count > 0)
                 {
-                    qty += x[0].Qty;
+                    if(x[0].IsGift == false)
+                    {
+                        qty += x[0].Qty;
+                    }
                     amt += decimal.Parse(x[0].Amount);
                     weight += decimal.Parse(x[0].TotalWeight);
                     var log = new LogInsert();
@@ -2095,7 +2098,7 @@ namespace CoreData.CoreCore
                 string sqlCommandText = "update orderitem set ";
                 var p = new DynamicParameters();
                 decimal amt = 0, weight = 0,pricenew = 0,qtynew = 0;
-                wheresql = @"select id,skuid,realprice,qty,amount,totalweight,weight,saleprice,skuname from orderitem 
+                wheresql = @"select id,skuid,realprice,qty,amount,totalweight,weight,saleprice,skuname,isgift from orderitem 
                              where oid = " + oid + " and coid =" + CoID + " and id = " + id;
                 var x = CoreDBconn.Query<OrderItem>(wheresql).AsList();
                 if (x.Count > 0)
@@ -2271,11 +2274,16 @@ namespace CoreData.CoreCore
                             }
                         }
                     }
+                    decimal Ordqty = 0;
+                    if(x[0].IsGift == false)
+                    {
+                        Ordqty = qtynew - x[0].Qty;
+                    }
                     sqlCommandText = @"update `order` set SkuAmount = SkuAmount + @SkuAmount,Amount = SkuAmount + ExAmount,ExWeight = ExWeight + @ExWeight,
                                         ordqty = ordqty + @Ordqty ,Modifier=@Modifier,ModifyDate=@ModifyDate,IsPaid=@IsPaid,status=@Status,AbnormalStatus=@AbnormalStatus, 
                                         StatusDec =@StatusDec where ID = @ID and CoID = @CoID";
                     count = CoreDBconn.Execute(sqlCommandText, new { SkuAmount = pricenew * qtynew - amt, ExWeight = qtynew * decimal.Parse(x[0].Weight) - weight,
-                                                Ordqty = qtynew - x[0].Qty, Modifier = Username, ModifyDate = DateTime.Now,IsPaid=IsPaid,Status=status, ID = oid, CoID = CoID,
+                                                Ordqty = Ordqty, Modifier = Username, ModifyDate = DateTime.Now,IsPaid=IsPaid,Status=status, ID = oid, CoID = CoID,
                                                 AbnormalStatus=AbnormalStatus, StatusDec = StatusDec}, TransCore);
                     if (count < 0)
                     {
@@ -5232,7 +5240,7 @@ namespace CoreData.CoreCore
                 if(gi.s == 1)
                 {
                     var gire = gi.d as GiftInsertOrderReturn;
-                    ord.OrdQty = ord.OrdQty + gire.Qty;
+                    // ord.OrdQty = ord.OrdQty + gire.Qty;
                     ord.ExWeight = (decimal.Parse(ord.ExWeight) + gire.Exweight).ToString();
                     orderitem = gire.Item;
                     gifti = gire.Gift;
@@ -5794,7 +5802,7 @@ namespace CoreData.CoreCore
                     }
                     else
                     {
-                        sqlCommandText = @"update orderitem set qty = qty + 1,totalweight = weight * qty,modifier=@Modifier,modifydate = @ModifyDate 
+                        sqlCommandText = @"update orderitem set totalweight = weight * qty,modifier=@Modifier,modifydate = @ModifyDate 
                                         where oid = @ID and coid = @Coid and skuautoid = @Skuautoid and IsGift = true";
                         var args = new
                         {
@@ -8821,12 +8829,14 @@ namespace CoreData.CoreCore
                     if(j > 0)
                     {
                         ss.Add(i.ID);
-                        sqlcommand = "select sum(Qty) as QtyTot,sum(Amount) as AmtTot,sum(TotalWeight) as WeightTot from orderitem where oid = " + i.ID + " and coid = " + CoID;
+                        sqlcommand = "select sum(Qty) as QtyTot,sum(Amount) as AmtTot,sum(TotalWeight) as WeightTot from orderitem where oid = " + i.ID + " and coid = " + CoID + " and isgift = false";
                         var su = CoreDBconn.Query<OrdSum>(sqlcommand).AsList();
+                        sqlcommand = "select sum(Qty) as QtyTot,sum(Amount) as AmtTot,sum(TotalWeight) as WeightTot from orderitem where oid = " + i.ID + " and coid = " + CoID + " and isgift = true";
+                        var su2 = CoreDBconn.Query<OrdSum>(sqlcommand).AsList();
                         i.OrdQty = su[0].QtyTot;
-                        i.SkuAmount = su[0].AmtTot.ToString();
-                        i.Amount = (su[0].AmtTot + decimal.Parse(i.ExAmount)).ToString();
-                        i.ExWeight = su[0].WeightTot.ToString();
+                        i.SkuAmount = (su[0].AmtTot + su2[0].AmtTot).ToString();
+                        i.Amount = (decimal.Parse(i.SkuAmount) + decimal.Parse(i.ExAmount)).ToString();
+                        i.ExWeight = (su[0].WeightTot + su2[0].WeightTot).ToString();
                         if(business.isskulock == 0)
                         {
                             item = CoreDBconn.Query<OrderItem>("select * from orderitem where oid = " + i.ID + " and coid = " + CoID).AsList();
@@ -9662,8 +9672,8 @@ namespace CoreData.CoreCore
                         continue;
                     }
                     //更新订单的数量和重量
-                    sqlCommandText = @"update `order` set ExWeight = ExWeight + @ExWeight,OrdQty = OrdQty + @Qty,Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and CoID = @CoID";
-                    int count = CoreDBconn.Execute(sqlCommandText, new { ExWeight = weight,Qty = rr.Count,Modifier = Username, ModifyDate = DateTime.Now, ID = id, CoID = CoID }, TransCore);
+                    sqlCommandText = @"update `order` set ExWeight = ExWeight + @ExWeight,Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and CoID = @CoID";
+                    int count = CoreDBconn.Execute(sqlCommandText, new { ExWeight = weight,Modifier = Username, ModifyDate = DateTime.Now, ID = id, CoID = CoID }, TransCore);
                     if (count < 0)
                     {
                         result.s = -3003;
@@ -10626,11 +10636,13 @@ namespace CoreData.CoreCore
                         }
                     }
                     if(i == 0) continue;
-                    sqlCommandText = "select sum(Qty) as QtyTot,sum(Amount) as AmtTot,sum(TotalWeight) as WeightTot from orderitem where oid = " + a.ID + " and coid = " + CoID;
+                    sqlCommandText = "select sum(Qty) as QtyTot,sum(Amount) as AmtTot,sum(TotalWeight) as WeightTot from orderitem where oid = " + a.ID + " and coid = " + CoID + " and isgift = false";
                     var su = CoreDBconn.Query<OrdSum>(sqlCommandText).AsList();
+                    sqlCommandText = "select sum(Qty) as QtyTot,sum(Amount) as AmtTot,sum(TotalWeight) as WeightTot from orderitem where oid = " + a.ID + " and coid = " + CoID + " and isgift = true";
+                    var su2 = CoreDBconn.Query<OrdSum>(sqlCommandText).AsList();
                     //更新订单的数量和重量
                     sqlCommandText = @"update `order` set ExWeight = @ExWeight,OrdQty = @Qty,Modifier=@Modifier,ModifyDate=@ModifyDate where ID = @ID and CoID = @CoID";
-                    count = CoreDBconn.Execute(sqlCommandText, new { ExWeight = su[0].WeightTot,Qty = su[0].QtyTot,Modifier = UserName, ModifyDate = DateTime.Now, ID = a.ID, CoID = CoID }, TransCore);
+                    count = CoreDBconn.Execute(sqlCommandText, new { ExWeight = su[0].WeightTot + su2[0].WeightTot,Qty = su[0].QtyTot,Modifier = UserName, ModifyDate = DateTime.Now, ID = a.ID, CoID = CoID }, TransCore);
                     if (count < 0)
                     {
                         result.s = -3003;

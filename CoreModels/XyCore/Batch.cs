@@ -136,4 +136,16 @@ namespace CoreModels.XyCore
             set { this._PageIndex = value;}
         }
     }
+    public class BatchConfigure
+    {
+        public int ID{get;set;}
+        public int SingleOrdQty{get;set;}
+        public int MultiOrdQty{get;set;}
+        public int SingleSkuQty{get;set;}
+        public int MultiNotOrdQty{get;set;}
+        public int BigQty{get;set;}
+        public string Express{get;set;}
+        public string Shop{get;set;}
+        public bool SpecialOrd{get;set;}
+    }
 }

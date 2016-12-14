@@ -1,6 +1,6 @@
 接口名称:CoreWebApi/Controllers/Batch/BatchControllers
 
-1.GetBatchInit() //status List
+1.GetBatchInit() //初始资料
 路由:http://localhost:5000/Core/Batch/GetBatchInit
 input:None
 OutPut:BatchStatus  批次状态
@@ -27,3 +27,31 @@ OutPut:     Datacnt             int             资料总笔数
             Pagecnt             decimal         总页数
             Batch               List<Batch>     Batch 资料
 参考:output jason 文件:GetBatchList_output.json
+
+3.GetConfigure() //获取参数的值
+路由:http://localhost:5000/Core/Batch/GetConfigure
+input:Type  A   单件单批最大订单数
+            B   多件单批最大订单数
+            C   单件单批商品数
+            D   不参与多件生成商品订单数
+            E   大订单商品数
+            F   限定生成任务快递
+            G   限定生成任务店铺
+            H   是否排除特殊单
+OutPut:对应的值
+参考:output jason 文件:GetConfigure_output.json
+
+4.SetConfigure()参数值更新
+路由:http://localhost:5000/Core/Batch/SetConfigure
+input:Type  A   单件单批最大订单数
+            B   多件单批最大订单数
+            C   单件单批商品数
+            D   不参与多件生成商品订单数
+            E   大订单商品数
+            F   限定生成任务快递
+            G   限定生成任务店铺
+            H   是否排除特殊单
+       TypeValue   需更新的参数值
+output: 成功或失败
+参考:input jason 文件:SetConfigure_input.json
+参考:output jason 文件:SetConfigure_output.json
