@@ -148,4 +148,24 @@ namespace CoreModels.XyCore
         public string Shop{get;set;}
         public bool SpecialOrd{get;set;}
     }
+    public class ModifyRemarkSuccess
+    {
+        public int ID{get;set;}
+        public string Remark{get;set;}
+    }
+    public class ModifyRemarkReturn
+    {
+        public List<ModifyRemarkSuccess> SuccessIDs{get;set;}
+        public List<TransferNormalReturnFail> FailIDs{get;set;}
+    }
+    public class MarkPrintSuccess
+    {
+        public int ID{get;set;}
+        public bool PickingPrint{get;set;}
+    }
+    public class MarkPrintReturn
+    {
+        public List<MarkPrintSuccess> SuccessIDs{get;set;}
+        public List<TransferNormalReturnFail> FailIDs{get;set;}
+    }
 }

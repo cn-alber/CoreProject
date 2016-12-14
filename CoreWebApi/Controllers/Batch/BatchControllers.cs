@@ -197,5 +197,79 @@ namespace CoreWebApi
             var data = BatchHaddle.SetConfigure(CoID,Type,TypeValue);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Batch/ModifyRemark")]
+        public ResponseResult ModifyRemark([FromBodyAttribute]JObject co)
+        {   
+            string Remark = "";
+            var id = new List<int>();
+            if(co["Remark"] != null)
+            {
+                Remark = co["Remark"].ToString();
+            }
+            if(co["ID"] != null)
+            {
+                id = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["ID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "批次ID必填", "General");
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = BatchHaddle.ModifyRemark(CoID,id,username,Remark);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Batch/ModifyRemarkAll")]
+        public ResponseResult ModifyRemarkAll([FromBodyAttribute]JObject co)
+        {   
+            string Remark = "";
+            var id = new List<int>();
+            if(co["Remark"] != null)
+            {
+                Remark = co["Remark"].ToString();
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = BatchHaddle.ModifyRemarkAll(CoID,username,Remark);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Batch/MarkPrint")]
+        public ResponseResult MarkPrint([FromBodyAttribute]JObject co)
+        {   
+            var id = new List<int>();
+            if(co["ID"] != null)
+            {
+                id = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["ID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "批次ID必填", "General");
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = BatchHaddle.MarkPrint(CoID,id,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Batch/CancleMarkPrint")]
+        public ResponseResult CancleMarkPrint([FromBodyAttribute]JObject co)
+        {   
+            var id = new List<int>();
+            if(co["ID"] != null)
+            {
+                id = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["ID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "批次ID必填", "General");
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = BatchHaddle.CancleMarkPrint(CoID,id,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }
