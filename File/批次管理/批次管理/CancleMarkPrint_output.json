@@ -1,0 +1,26 @@
+{
+    "s": 1,
+    "d": {
+        "SuccessIDs": [
+            {
+                "ID": 1,
+                "PickingPrint": false
+            },
+            {
+                "ID": 2,
+                "PickingPrint": false
+            }
+        ],
+        "FailIDs": [
+            {
+                "ID": 3,
+                "Reason": "终止拣货&已完成的批次不可取消标记拣货单已打印!"
+            },
+            {
+                "ID": 6,
+                "Reason": "终止拣货&已完成的批次不可取消标记拣货单已打印!"
+            }
+        ]
+    },
+    "m": ""
+}

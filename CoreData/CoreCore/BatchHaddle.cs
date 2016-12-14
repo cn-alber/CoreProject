@@ -279,5 +279,248 @@ namespace CoreData.CoreCore
             }           
             return result;
         }
+        ///<summary>
+        ///修改标志
+        ///</summary>
+        public static DataResult ModifyRemark(int CoID,List<int> ID,string UserName,string Remark)
+        {
+            var result = new DataResult(1,null);
+            var res = new ModifyRemarkReturn();
+            var su = new List<ModifyRemarkSuccess>();
+            var fa = new List<TransferNormalReturnFail>();
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlcommand = "select ID,status from batch where id in @ID and coid = @Coid";
+                var u = CoreDBconn.Query<Batch>(sqlcommand,new{ID = ID,Coid = CoID}).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "参数异常";
+                    return result;
+                }
+                foreach(var a in u)
+                {
+                    if(a.Status != 0)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "等待拣货的批次才可以修改标志!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    sqlcommand = "update batch set mark=@Remark,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
+                    int count = CoreDBconn.Execute(sqlcommand,new{Remark=Remark,Modifier=UserName,ModifyDate=DateTime.Now,ID=a.ID,Coid=CoID},TransCore);
+                    if(count <= 0)
+                    {   
+                        result.s = -3003;
+                        return result;
+                    }
+                    var ss = new ModifyRemarkSuccess();
+                    ss.ID = a.ID;
+                    ss.Remark = Remark;
+                    su.Add(ss);
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            res.SuccessIDs = su;
+            res.FailIDs = fa;
+            result.d = res;
+            return result;
+        }
+        ///<summary>
+        ///设定批次标志
+        ///</summary>
+        public static DataResult ModifyRemarkAll(int CoID,string UserName,string Remark)
+        {
+            var result = new DataResult(1,null);
+            var ID = new List<int>();
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    string sqlcommand = "select ID from batch where status = 0 and coid = " + CoID;
+                    var u = conn.Query<Batch>(sqlcommand).AsList();
+                    if(u.Count == 0)
+                    {
+                        result.s = -1;
+                        result.d = "没有符合条件的资料需要设定标志";
+                        return result;
+                    }
+                    foreach(var a in u)
+                    {
+                        ID.Add(a.ID);
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }    
+            if(ID.Count > 0)
+            {
+                var data = ModifyRemark(CoID,ID,UserName,Remark);
+                if(data.s == -1)
+                {
+                    result.s = -1;
+                    result.d = data.d;
+                }
+            }       
+            return result;
+        }
+        ///<summary>
+        ///标记拣货单已打印
+        ///</summary>
+        public static DataResult MarkPrint(int CoID,List<int> ID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var res = new MarkPrintReturn();
+            var su = new List<MarkPrintSuccess>();
+            var fa = new List<TransferNormalReturnFail>();
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlcommand = "select ID,status,PickingPrint from batch where id in @ID and coid = @Coid";
+                var u = CoreDBconn.Query<Batch>(sqlcommand,new{ID = ID,Coid = CoID}).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "参数异常";
+                    return result;
+                }
+                foreach(var a in u)
+                {
+                    if(a.Status == 6 || a.Status == 7)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "终止拣货&已完成的批次不可标记拣货单已打印!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    if(a.PickingPrint == true)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "已标记拣货单已打印!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    sqlcommand = "update batch set PickingPrint=true,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
+                    int count = CoreDBconn.Execute(sqlcommand,new{Modifier=UserName,ModifyDate=DateTime.Now,ID=a.ID,Coid=CoID},TransCore);
+                    if(count <= 0)
+                    {   
+                        result.s = -3003;
+                        return result;
+                    }
+                    var ss = new MarkPrintSuccess();
+                    ss.ID = a.ID;
+                    ss.PickingPrint = true;
+                    su.Add(ss);
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            res.SuccessIDs = su;
+            res.FailIDs = fa;
+            result.d = res;
+            return result;
+        }
+        ///<summary>
+        ///取消标记拣货单已打印
+        ///</summary>
+        public static DataResult CancleMarkPrint(int CoID,List<int> ID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var res = new MarkPrintReturn();
+            var su = new List<MarkPrintSuccess>();
+            var fa = new List<TransferNormalReturnFail>();
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlcommand = "select ID,status,PickingPrint from batch where id in @ID and coid = @Coid";
+                var u = CoreDBconn.Query<Batch>(sqlcommand,new{ID = ID,Coid = CoID}).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "参数异常";
+                    return result;
+                }
+                foreach(var a in u)
+                {
+                    if(a.Status == 6 || a.Status == 7)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "终止拣货&已完成的批次不可取消标记拣货单已打印!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    if(a.PickingPrint == false)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "拣货单已打印未标记!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    sqlcommand = "update batch set PickingPrint=false,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
+                    int count = CoreDBconn.Execute(sqlcommand,new{Modifier=UserName,ModifyDate=DateTime.Now,ID=a.ID,Coid=CoID},TransCore);
+                    if(count <= 0)
+                    {   
+                        result.s = -3003;
+                        return result;
+                    }
+                    var ss = new MarkPrintSuccess();
+                    ss.ID = a.ID;
+                    ss.PickingPrint = false;
+                    su.Add(ss);
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            res.SuccessIDs = su;
+            res.FailIDs = fa;
+            result.d = res;
+            return result;
+        }
     }
 }

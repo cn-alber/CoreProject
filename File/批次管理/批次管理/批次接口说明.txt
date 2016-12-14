@@ -55,3 +55,32 @@ input:Type  A   单件单批最大订单数
 output: 成功或失败
 参考:input jason 文件:SetConfigure_input.json
 参考:output jason 文件:SetConfigure_output.json
+
+5.ModifyRemark()修改标志
+路由:http://localhost:5000/Core/Batch/ModifyRemark
+input:ID        List<int>   批次ID list
+      Remark    string      标志
+output: 成功或失败
+参考:input jason 文件:ModifyRemark_input.json
+参考:output jason 文件:ModifyRemark_output.json
+
+6.ModifyRemarkAll()设定批次标志
+路由:http://localhost:5000/Core/Batch/ModifyRemarkAll
+input:Remark    string      标志
+output: 成功或失败
+参考:input jason 文件:ModifyRemarkAll_input.json
+参考:output jason 文件:ModifyRemarkAll_output.json
+
+7.MarkPrint()标记拣货单已打印
+路由:http://localhost:5000/Core/Batch/MarkPrint
+input:ID        List<int>   批次ID list
+output: 成功或失败
+参考:input jason 文件:MarkPrint_input.json
+参考:output jason 文件:MarkPrint_output.json
+
+8.CancleMarkPrint()取消标记拣货单已打印
+路由:http://localhost:5000/Core/Batch/CancleMarkPrint
+input:ID        List<int>   批次ID list
+output: 成功或失败
+参考:input jason 文件:CancleMarkPrint_input.json
+参考:output jason 文件:CancleMarkPrint_output.json
