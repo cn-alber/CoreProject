@@ -271,5 +271,62 @@ namespace CoreWebApi
             var data = BatchHaddle.CancleMarkPrint(CoID,id,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpGetAttribute("/Core/Batch/GetPickorInit")]
+        public ResponseResult GetPickorInit()
+        {
+            var data = BatchHaddle.GetPickorInit(int.Parse(GetCoid()));
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Batch/GetPickorByRole")]
+        public ResponseResult GetPickorByRole(string RoleID)
+        {
+            int x,role;
+            if(!string.IsNullOrEmpty(RoleID))
+            {
+                if (int.TryParse(RoleID, out x))
+                {
+                    role = int.Parse(RoleID);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "角色ID无效", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "角色ID必填", "General"); 
+            }
+            var data = BatchHaddle.GetPickorByRole(int.Parse(GetCoid()),role);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Batch/SetPickor")]
+        public ResponseResult SetPickor([FromBodyAttribute]JObject co)
+        {   
+            var id = new List<int>();
+            if(co["ID"] != null)
+            {
+                id = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["ID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "批次ID必填", "General");
+            }
+            var Pickor = new List<int>();
+            if(co["Pickor"] != null)
+            {
+                Pickor = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["Pickor"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "拣货人员必填", "General");
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = BatchHaddle.SetPickor(CoID,id,Pickor,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }
