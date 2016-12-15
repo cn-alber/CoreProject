@@ -105,3 +105,19 @@ input:ID        List<int>   批次ID list
 output: 成功或失败
 参考:input jason 文件:SetPickor_input.json
 参考:output jason 文件:SetPickor_output.json
+
+12.ReSetPickor()重新安排拣货
+路由:http://localhost:5000/Core/Batch/ReSetPickor
+input:ID        List<int>   批次ID list
+      Pickor    List<int>   拣货人ID list
+output: 成功或失败
+参考:input jason 文件:ReSetPickor_input.json
+参考:output jason 文件:ReSetPickor_output.json
+
+13.GetOrdCount() //获取一单一件，一单多件，大单的订单数量
+路由:http://localhost:5000/Core/Batch/GetOrdCount
+input:None
+OutPut:SingleOrd  一单一件订单数
+       MultiOrd   一单多件订单数
+       BigOrd     现场大单订单数
+参考:output jason 文件:GetOrdCount_output.json

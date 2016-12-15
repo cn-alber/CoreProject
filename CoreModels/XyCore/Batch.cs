@@ -183,4 +183,10 @@ namespace CoreModels.XyCore
         public List<SetPickorSuccess> SuccessIDs{get;set;}
         public List<TransferNormalReturnFail> FailIDs{get;set;}
     }
+    public class GetOrdCountReturn
+    {
+        public int SingleOrd{get;set;}
+        public int MultiOrd{get;set;}
+        public int BigOrd{get;set;}
+    }
 }

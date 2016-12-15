@@ -328,5 +328,39 @@ namespace CoreWebApi
             var data = BatchHaddle.SetPickor(CoID,id,Pickor,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Batch/ReSetPickor")]
+        public ResponseResult ReSetPickor([FromBodyAttribute]JObject co)
+        {   
+            var id = new List<int>();
+            if(co["ID"] != null)
+            {
+                id = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["ID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "批次ID必填", "General");
+            }
+            var Pickor = new List<int>();
+            if(co["Pickor"] != null)
+            {
+                Pickor = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["Pickor"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "拣货人员必填", "General");
+            }
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = BatchHaddle.ReSetPickor(CoID,id,Pickor,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Batch/GetOrdCount")]
+        public ResponseResult GetOrdCount()
+        {
+            var data = BatchHaddle.GetOrdCount(int.Parse(GetCoid()));
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }
