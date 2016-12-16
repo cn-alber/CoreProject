@@ -822,5 +822,32 @@ namespace CoreData.CoreCore
             }           
             return result;
         }
+        ///<summary>
+        ///一单一件
+        ///</summary>
+        public static DataResult SingleOrd()
+        {
+            var result = new DataResult(1,null);  
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }            
+            return result;  
+        }
     }
 }
