@@ -5,7 +5,7 @@ using CoreModels;
 // using CoreModels.XyUser;
 // using CoreModels.Enum;
 // using CoreModels.XyComm;
-// using CoreModels.XyCore;
+using CoreModels.XyCore;
 using CoreModels.WmsApi;
 // using CoreData.CoreComm;
 // using CoreData.CoreCore;
@@ -39,7 +39,7 @@ namespace CoreData.CoreWmsApi
                             AND batchtask.Qty>(batchtask.PickQty+batchtask.NoQty)
                             AND batch.CoID = @CoID
                             AND batch.Type = @Type
-                            AND batchtask.PickorID = @Pickor
+                            AND batch.PickorID = @Pickor
                             ";
                     var p = new DynamicParameters();
                     p.Add("@CoID", IParam.CoID);
@@ -74,6 +74,7 @@ namespace CoreData.CoreWmsApi
                                         WHERE
                                             CoID =@CoID
                                         AND Type =@Type
+                                        AND PickorID = @Pickor
                                         AND (`Status` = 0 OR `Status` = 3)
                                         AND (
                                             batch.ID = @BID
@@ -81,7 +82,7 @@ namespace CoreData.CoreWmsApi
                                             OR @BID = 0
                                         )
                                     ";
-                    var batchLst = conn.Query<ABatch>(batchsql, new { CoID = IParam.CoID, Type = IParam.Type, BID = IParam.BatchID }).AsList();
+                    var batchLst = conn.Query<ABatch>(batchsql, new { CoID = IParam.CoID, Type = IParam.Type, Picker = IParam.Pickor, BID = IParam.BatchID }).AsList();
                     if (batchLst.Count > 0)
                     {
                         var BatchIDLst = batchLst.Select(a => a.ID).AsList();
@@ -99,10 +100,9 @@ namespace CoreData.CoreWmsApi
                                             CoID =@CoID
                                         AND Qty > (PickQty + NoQty)
                                         AND BatchID IN BatchIDLst
-                                        AND PickorID = @Pickor
                                         ORDER BY ID
                                         LIMIT 1";
-                        var taskLst = conn.Query<ABatchTask>(tasksql, new { CoID = IParam.CoID, Picker = IParam.Pickor, BatchIDLst = BatchIDLst }).AsList();
+                        var taskLst = conn.Query<ABatchTask>(tasksql, new { CoID = IParam.CoID, BatchIDLst = BatchIDLst }).AsList();
                         if (taskLst.Count > 0)
                         {
                             var task = taskLst[0];
@@ -160,23 +160,17 @@ namespace CoreData.CoreWmsApi
             {
                 try
                 {
-                    var batchsql = @"
-                            SELECT
-	                            batch.Type,
-	                            COUNT(DISTINCT batch.ID) AS Num
-                            FROM
-	                            batch,
-	                            batchtask
-                            WHERE
-	                            batch.CoID = batchtask.CoID
-                            AND batch.ID = batchtask.BatchID
-                            AND (batch.status=0 OR batch.status=3)
-                            AND batchtask.Qty>(batchtask.PickQty+batchtask.NoQty)
-                            AND batch.CoID = @CoID
-                            AND batchtask.PickorID = @Pickor
-                            GROUP BY
-	                            batch.Type
-                            ";
+                    var batchsql = @"SELECT batch.Type,
+                                            COUNT(DISTINCT batch.ID) AS Num
+                                        FROM
+                                            batch
+                                        WHERE batch.CoID = @CoID
+                                        AND (batch.status=0 OR batch.status=3)
+                                        AND batch.Qty>(batch.PickQty+batch.NoQty)
+                                        AND batch.PickorID = @Pickor
+                                        GROUP BY
+                                            batch.Type
+                                        ";
                     var TypeNumLst = conn.Query<TypeNum>(batchsql, new { CoID = IParam.CoID, Pickor = IParam.Pickor }).AsList();
                     if (TypeNumLst.Count > 0)
                     {
@@ -275,15 +269,16 @@ namespace CoreData.CoreWmsApi
         #endregion
 
         #region 新增拣货记录
-        public static DataResult AddBatchPinck(AShelfSet IParam, List<AWmslog> LogLst, IDbTransaction Trans, MySqlConnection conn)
+        public static DataResult AddBatchPicked(AShelfSet IParam, List<AWmslog> LogLst, IDbTransaction Trans, MySqlConnection conn)
         {
             var res = new DataResult(1, null);
-            var PinckLst = new List<ABatchPinck>();
+            var PinckLst = new List<ABatchPicked>();
             foreach (var log in LogLst)
             {
-                var p = new ABatchPinck();
+                var p = new ABatchPicked();
                 p.CoID = log.CoID;
                 p.BarCode = log.BarCode;
+                p.Skuautoid = log.Skuautoid;
                 p.Sku = log.SkuID;
                 p.BatchID = IParam.BatchID;
                 p.BatchtaskID = IParam.BatchtaskID;
@@ -291,7 +286,7 @@ namespace CoreData.CoreWmsApi
                 p.CreatDate = IParam.CreateDate;
                 PinckLst.Add(p);
             }
-            if (conn.Execute(AddBatchPinckSql(), PinckLst, Trans) <= 0)
+            if (conn.Execute(AddBatchPickSql(), PinckLst, Trans) <= 0)
             {
                 res.s = -6007;
             }
@@ -396,6 +391,138 @@ namespace CoreData.CoreWmsApi
         }
         #endregion
 
+        #region 订单分解-获取件信息&推荐格号
+        public static DataResult GetSortCode(ABatchParams IParam)
+        {
+            var result = new DataResult(1, null);
+            var data = new ABatchPickData();
+            using (var CoreConn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                string bsql = @"SELECT ID FROM batch WHERE CoID=@CoID AND Status=3 AND Type = 1";
+                var BatchIDLst = CoreConn.Query<int>(bsql).AsList();
+                if (BatchIDLst.Count <= 0)
+                {
+                    result.s = -6011;//无分拣任务
+                }
+                else
+                {
+                    string sql = @"SELECT ID,
+                                    BatchID,
+                                    OID,
+                                    SoID,
+                                    BarCode,
+                                    Skuautoid,
+                                    Qty,
+                                    `Status`,
+                                    OutID
+                                    BatchtaskID,
+                                    SortCode 
+                                WHERE CoID=@CoID 
+                                AND BarCode=@BarCode
+                                AND BatchID in @BatchIDLst";
+                    var PickLst = CoreConn.Query<ABatchPicked>(sql, new { CoID = IParam.CoID, BarCode = IParam.BarCode, BatchIDLst = BatchIDLst }).AsList();
+                    if (PickLst.Count <= 0)
+                    {
+                        result.s = -6000;//无效条码
+                    }
+                    else
+                    {
+                        var PLst = PickLst.Where(a => a.Status == 0).AsList();
+                        if (PLst.Count <= 0)
+                        {
+                            result.s = -6012;//已分配格号
+                        }
+                        else
+                        {
+                            IParam.BatchID = PLst[0].BatchID;//批次任务
+                            var cp = new ASkuScanParam();
+                            cp.CoID = IParam.CoID;
+                            cp.BarCode = IParam.BarCode;
+                            ASkuScanHaddles.GetType(cp);
+                            if (result.s > 0)
+                            {
+                                data.SkuAuto = result.d as ASkuScan; //扫描件码
+                                IParam.Skuautoid = data.SkuAuto.Skuautoid;
+                                result = GetPickedOrder(IParam);
+                                if (result.s > 0)
+                                {
+                                    data.OItemAuto = result.d as OrderItemBatch;//匹配订单分拣信息
+                                    data.ID = PLst[0].ID;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+        #endregion
+
+        #region 订单分解-更新分解格 
+        public static DataResult SetSortCode(ABatchParams IParam)
+        {
+            var result = new DataResult(1, null);
+            var CoreConn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreConn.Open();
+            var CoreTrans = CoreConn.BeginTransaction();
+            try
+            {
+                string sql = @"SELECT ID,
+                                    BatchID,
+                                    OID,
+                                    SoID,
+                                    `Status`,
+                                    SortCode,
+                                    CoID 
+                                FROM batchpicked
+                                WHERE CoID=@CoID 
+                                AND ID=@ID";
+                var PickLst = CoreConn.Query<ABatchPicked>(sql, new { CoID = IParam.CoID, ID = IParam.ID }, CoreTrans).AsList();
+                if (!string.IsNullOrEmpty(PickLst[0].SortCode))
+                {
+                    result.s = -6012;//已分配格号
+                }
+                else
+                {
+                    //出货主表绑定分拣格
+                    PickLst[0].OID = IParam.OID;
+                    PickLst[0].SoID = IParam.SoID;
+                    PickLst[0].SortCode = IParam.SortCode;
+                    PickLst[0].Status = 1;
+                    string psql = @"UPDATE batchpicked
+                                    SET OID =@OID,
+                                        SoID =@SoID,
+                                        SortCode =@SortCode
+                                    WHERE
+                                        CoID =@CoID
+                                    AND ID =@ID";
+                    int count = CoreConn.Execute(psql, PickLst[0], CoreTrans);
+                    if (count < 0)
+                    {
+                        result.s = -6013;
+                    }
+                    else
+                    {
+                        CoreTrans.Commit();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                CoreTrans.Rollback();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                CoreTrans.Dispose();
+                CoreConn.Close();
+            }
+            return result;
+        }
+        #endregion
+
+
         #region 获取绑定订单(for 订单分拣)
         public static DataResult GetPickedOrder(ABatchParams IParam)
         {
@@ -405,6 +532,7 @@ namespace CoreData.CoreWmsApi
                 try
                 {
                     string FSql = @"SELECT
+                                        saleout.BatchID,
                                         saleout.OID,
                                         saleout.SoID,
                                         saleout.SortCode,
@@ -412,12 +540,12 @@ namespace CoreData.CoreWmsApi
                                         SUM(saleoutitem.Qty) ItemQty,
                                         (
                                             SELECT
-                                                COUNT(batchpicked.Sku)
+                                                IFNULL(SUM(batchpicked.Qty), 0)
                                             FROM
                                                 batchpicked
                                             WHERE
                                                 batchpicked.BatchID = saleout.BatchID
-                                            AND batchpicked.Sku = @SkuID
+                                            AND batchpicked.Skuautoid = @SkuID
                                             AND batchpicked.CoID = @CoID
                                             AND batchpicked.OID = saleout.OID
                                         ) AS SortQty
@@ -431,10 +559,11 @@ namespace CoreData.CoreWmsApi
                                     AND saleout.BatchID = saleoutitem.BatchID
                                     AND saleout.BatchID = batch.ID
                                     AND batch.Type = 1
-                                    AND saleoutitem.SkuID = @SkuID
+                                    AND saleoutitem.Skuautoid = @SkuID
                                     AND saleout.CoID = @CoID
                                     AND saleout.BatchID = @BatchID
                                     GROUP BY
+                                        saleout.BatchID,
                                         saleout.OID,
                                         saleout.SoID,
                                         saleout.BatchID,
@@ -442,28 +571,28 @@ namespace CoreData.CoreWmsApi
                                     HAVING
                                         SUM(saleoutitem.Qty) > (
                                             SELECT
-                                                COUNT(batchpicked.Sku)
+                                                IFNULL(SUM(batchpicked.Qty), 0)
                                             FROM
                                                 batchpicked
                                             WHERE
                                                 batchpicked.BatchID = @BatchID
-                                            AND batchpicked.Sku = @SkuID
+                                            AND batchpicked.Skuautoid = @SkuID
                                             AND batchpicked.CoID = @CoID
                                             AND batchpicked.OID = saleout.OID
                                         )
                                     LIMIT 1";
                     var p = new DynamicParameters();
                     p.Add("@CoID", IParam.CoID);
-                    p.Add("@SkuID", IParam.SkuID);
+                    p.Add("@SkuID", IParam.Skuautoid);
                     p.Add("@BatchID", IParam.BatchID);
                     var itemLst = CoreConn.Query<OrderItemBatch>(FSql, p).AsList();
                     if (itemLst.Count > 0)
                     {
-                        result.d=itemLst;
+                        result.d = itemLst[0];
                     }
                     else
                     {
-                        result.s=-6011;//无分拣任务
+                        result.s = -6011;//无分拣任务
                     }
                 }
                 catch (Exception e)
@@ -476,17 +605,68 @@ namespace CoreData.CoreWmsApi
         }
         #endregion
 
+        #region 分拣格解绑
+        public static DataResult SetUnLock(ABatchParams IParam)
+        {
+            var result = new DataResult(1, null);
+            var CoreConn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreConn.Open();
+            var CoreTrans = CoreConn.BeginTransaction();
+            try
+            {
 
+                string psql = @"UPDATE batchpicked
+                            SET SoID = 0,
+                                OID = 0,
+                                SortCode = '',
+                                `Status` = 0
+                            WHERE
+                                CoID =@CoID
+                            AND SortCode =@SortCode";
+                string osql = @"UPDATE saleout
+                                SET SortCode = ''
+                                WHERE
+                                    CoID =@CoID
+                                AND SortCode =@SortCode";
+                var p = new DynamicParameters();
+                p.Add("@CoID", IParam.CoID);
+                p.Add("@SortCode", IParam.SortCode);
+                int c1 = CoreConn.Execute(psql, p, CoreTrans);
+                int c2 = CoreConn.Execute(osql, p, CoreTrans);
+                if (c1 <= 0 || c2 <= 0)
+                {
+                    result.s = 6014;
+                }
+                else
+                {
+                    CoreTrans.Commit();
+                }
+            }
+            catch (Exception e)
+            {
+                CoreTrans.Rollback();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                CoreTrans.Dispose();
+                CoreConn.Close();
+            }
+            return result;
+        }
+        #endregion
 
 
         #region 新增拣货记录Sql        
-        public static string AddBatchPinckSql()
+        public static string AddBatchPickSql()
         {
-            string sql = @"INSERT INTO batchpinck
+            string sql = @"INSERT INTO batchpicked
                             {
                                 BatchID,
                                 CoID,
                                 BarCode,
+                                Skuautoid,
                                 Sku,
                                 BatchtaskID,
                                 Creator,
@@ -497,6 +677,7 @@ namespace CoreData.CoreWmsApi
                                 @BatchID,
                                 @CoID,
                                 @BarCode,
+                                @Skuautoid,
                                 @Sku,
                                 @BatchtaskID,
                                 @Creator,

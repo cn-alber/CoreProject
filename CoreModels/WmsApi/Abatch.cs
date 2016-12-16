@@ -11,9 +11,11 @@ namespace CoreModels.WmsApi
         public int ID { get; set; }
         public int BatchID { get; set; }
         public string BarCode { get; set; }
+        public int Skuautoid { get; set; }
         public string SkuID { get; set; }
         public string SortCode { get; set; }
         public int OID { get; set; }
+        public long SoID { get; set; }
     }
     public class ABatch
     {
@@ -54,7 +56,7 @@ namespace CoreModels.WmsApi
         public int PCodeQty { get; set; }
         public string PCodeSku { get; set; }
     }
-    public class ABatchPinck
+    public class ABatchPicked
     {
         public int ID { get; set; }
         public int BatchID { get; set; }
@@ -62,8 +64,9 @@ namespace CoreModels.WmsApi
         public int OID { get; set; }
         public long SoID { get; set; }
         public string BarCode { get; set; }
+        public int Skuautoid { get; set; }
         public string Sku { get; set; }
-        public string Status { get; set; }
+        public int Status { get; set; }
         public int OutID { get; set; }
         public string Express { get; set; }
         public string ExCode { get; set; }
@@ -81,14 +84,23 @@ namespace CoreModels.WmsApi
         public int Type { get; set; }
         public int Num { get; set; }
     }
-    
+
     public class OrderItemBatch
     {
-        public int CoID { get; set; }
+        public int BatchID { get; set; }
         public int OID { get; set; }
         public long SoID { get; set; }
         public string SortCode { get; set; }
         public int ItemQty { get; set; }
         public int PickedQty { get; set; }
     }
+    public class ABatchPickData
+    {
+        public ASkuScan SkuAuto { get; set; }
+        public OrderItemBatch OItemAuto { get; set; }
+        public int ID { get; set; }//拣货记录ID
+
+    }
+
+
 }

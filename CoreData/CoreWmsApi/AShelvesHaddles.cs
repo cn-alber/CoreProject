@@ -398,7 +398,7 @@ namespace CoreData.CoreWmsApi
                                 CoreConn.Execute(APurHaddles.AddWmsLogSql(), logLst, CoreTrans);
                                 if (IParam.BatchID > 0)//添加拣货记录
                                 {
-                                    result = ABatchHaddles.AddBatchPinck(IParam, logLst, CoreTrans, CoreConn);//添加拣货记录
+                                    result = ABatchHaddles.AddBatchPicked(IParam, logLst, CoreTrans, CoreConn);//添加拣货记录
                                 }
                                 if (result.s > 0)
                                 {

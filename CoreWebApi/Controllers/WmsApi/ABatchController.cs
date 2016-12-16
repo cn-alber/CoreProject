@@ -69,7 +69,7 @@ namespace CoreWebApi
         public ResponseResult CallBatchNum()
         {
             var res = new DataResult(1, null);
-            int x;
+            // int x;
             // if (string.IsNullOrEmpty(Status) || !string.IsNullOrEmpty(Status) && int.TryParse(Status, out x))
             // {
             //     res.s = -1;
@@ -146,6 +146,18 @@ namespace CoreWebApi
         public ResponseResult GetBatchSortCode(string BarCode)
         {
             var res = new DataResult(1, null);
+            if (string.IsNullOrEmpty(BarCode))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var cp = new ABatchParams();
+                cp.BarCode = BarCode;
+                cp.CoID = int.Parse(GetCoid());
+                res = ABatchHaddles.GetSortCode(cp);
+            }
             return CoreResult.NewResponse(res.s, res.d, "WmsApi");
         }
 
@@ -153,7 +165,48 @@ namespace CoreWebApi
         public ResponseResult SetBatchSortCode([FromBodyAttribute]JObject obj)
         {
             var res = new DataResult(1, null);
+            int x;
+            long y;
+            if (!(obj["ID"] != null && int.TryParse(obj["ID"].ToString(), out x) &&
+               obj["OID"] != null && int.TryParse(obj["OID"].ToString(), out x)) &&
+               obj["SoID"] != null && long.TryParse(obj["SoID"].ToString(), out y)
+               || obj["ID"] == null || obj["OID"] == null || obj["SoID"] == null)
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var cp = new ABatchParams();
+                cp.ID = int.Parse(obj["ID"].ToString());
+                cp.OID = int.Parse(obj["OID"].ToString());
+                cp.SoID = long.Parse(obj["SoID"].ToString());
+                cp.CoID = int.Parse(GetCoid());                
+                cp.SortCode = obj["SortCode"].ToString();
+                res = ABatchHaddles.SetSortCode(cp);
+            }
             return CoreResult.NewResponse(res.s, res.d, "WmsApi");
+        }
+        #endregion
+
+        #region 分拣格解绑
+        [HttpPostAttribute("Core/ABatch/SetBatchUnLock")]
+        public DataResult SetBatchUnLock([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            if (string.IsNullOrEmpty(obj["SortCode"].ToString()))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var cp = new ABatchParams();
+                cp.CoID = int.Parse(GetCoid());                
+                cp.SortCode = obj["SortCode"].ToString();
+                res = ABatchHaddles.SetUnLock(cp);
+            }
+            return res;
         }
         #endregion
     }
