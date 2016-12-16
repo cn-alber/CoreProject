@@ -192,7 +192,9 @@ namespace CoreModels.XyCore
         public string DocDate{get;set;}
         public int Status{get;set;}
         public string StatusString{get;set;}
+        public string ExID{get;set;}
         public string ExpName{get;set;}
+        public string ExpNamePinyin{get;set;}
         public string ExCode{get;set;}
         public int BatchID{get;set;}
         public bool IsOrdPrint{get;set;}

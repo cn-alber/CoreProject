@@ -1,0 +1,26 @@
+{
+    "s": 1,
+    "d": {
+        "SuccessIDs": [
+            {
+                "ID": 6,
+                "Pickor": "user002"
+            },
+            {
+                "ID": 7,
+                "Pickor": "user003"
+            },
+            {
+                "ID": 23,
+                "Pickor": "user002"
+            }
+        ],
+        "FailIDs": [
+            {
+                "ID": 8,
+                "Reason": "等待拣货的批次才可以安排拣货员"
+            }
+        ]
+    },
+    "m": ""
+}

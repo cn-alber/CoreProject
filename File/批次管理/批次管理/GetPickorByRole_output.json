@@ -1,0 +1,54 @@
+{
+    "s": 1,
+    "d": [
+        {
+            "value": "1",
+            "label": "admin"
+        },
+        {
+            "value": "33",
+            "label": "user002"
+        },
+        {
+            "value": "34",
+            "label": "user003"
+        },
+        {
+            "value": "35",
+            "label": "user004"
+        },
+        {
+            "value": "40",
+            "label": "user005"
+        },
+        {
+            "value": "41",
+            "label": "user006"
+        },
+        {
+            "value": "42",
+            "label": "user007"
+        },
+        {
+            "value": "43",
+            "label": "user008"
+        },
+        {
+            "value": "159",
+            "label": "user100019"
+        },
+        {
+            "value": "20181",
+            "label": "admintest1"
+        },
+        {
+            "value": "20182",
+            "label": "admintest2"
+        },
+        {
+            "value": "20183",
+            "label": "admintest3"
+        }
+    ],
+    "m": ""
+}

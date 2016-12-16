@@ -18,7 +18,7 @@ namespace CoreData.CoreCore
         {
             var result = new DataResult(1,null);    
             string sqlcount = "select count(id) from saleout where 1=1";
-            string sqlcommand = @"select ID,OID,SoID,DocDate,Status,ExpName,ExCode,BatchID,IsOrdPrint,IsExpPrint,RecMessage,RecLogistics,RecDistrict,RecCity,RecAddress,
+            string sqlcommand = @"select ID,OID,SoID,DocDate,Status,ExID,ExpName,ExCode,BatchID,IsOrdPrint,IsExpPrint,RecMessage,RecLogistics,RecDistrict,RecCity,RecAddress,
                                   RecName,RecPhone,ExWeight,RealWeight,ShipType,ExCost,IsDeliver,Remark,OrdQty from saleout where 1=1"; 
             string wheresql = string.Empty;
             if(cp.CoID != 1)//公司编号
@@ -118,6 +118,10 @@ namespace CoreData.CoreCore
                     {
                         a.StatusString = Enum.GetName(typeof(SaleOutStatus), a.Status);
                         ItemID.Add(a.ID);
+                        if(!string.IsNullOrEmpty(a.ExID))
+                        {
+                            a.ExpNamePinyin = OrderHaddle.GetExpNamePinyin(cp.CoID,int.Parse(a.ExID));
+                        }
                     }
                     if(ItemID.Count > 0)
                     {

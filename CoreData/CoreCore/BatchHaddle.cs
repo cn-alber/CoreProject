@@ -522,5 +522,332 @@ namespace CoreData.CoreCore
             result.d = res;
             return result;
         }
+        ///<summary>
+        ///拣货人员安排初始资料
+        ///</summary>
+        public static DataResult GetPickorInit(int CoID)
+        {
+            var result = new DataResult(1,null);
+            var res = new GetPickorInit();
+            var Role = GetWmsRole(CoID);
+            if(Role.s == 1)
+            {
+                res.Role = Role.d as List<Filter>;
+                var RoleID = new List<int>();
+                foreach(var a in res.Role)
+                {
+                    RoleID.Add(int.Parse(a.value));
+                }
+                var User = GetWmsUser(CoID,RoleID).d as List<Filter>;
+                res.Pickor = User;
+            }
+            result.d = res;
+            return result;
+        }
+        ///<summary>
+        ///根据角色过滤拣货人员
+        ///</summary>
+        public static DataResult GetPickorByRole(int CoID,int RoleID)
+        {
+            var result = new DataResult(1,null);
+            var RoleIDLst = new List<int>();
+            if(RoleID == 0)
+            {
+                var Role = GetWmsRole(CoID).d as List<Filter>;
+                foreach(var a in Role)
+                {
+                    RoleIDLst.Add(int.Parse(a.value));
+                }
+            }
+            else
+            {
+                RoleIDLst.Add(RoleID);
+            }
+            var User = GetWmsUser(CoID,RoleIDLst).d as List<Filter>;
+            result.d = User;
+            return result;
+        }
+        ///<summary>
+        ///设定拣货人员
+        ///</summary>
+        public static DataResult SetPickor(int CoID,List<int> ID,List<int> Pickor,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var User = new List<Filter>();
+            using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
+                try{     
+                    foreach(var a in Pickor)
+                    {
+                        string wheresql = "select Account from user where Enable = true and CompanyID = " + CoID + " and ID =" + a;
+                        var u = conn.Query<string>(wheresql).AsList();
+                        if(u.Count > 0)
+                        {
+                            var ff = new Filter();
+                            ff.value = a.ToString();
+                            ff.label = u[0];
+                            User.Add(ff);
+                        }
+                    }           
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }      
+            if(User.Count == 0)
+            {
+                result.s = -1;
+                result.d = "没有符合条件的拣货员";
+                return result;
+            }   
+            var res = new SetPickorReturn();
+            var su = new List<SetPickorSuccess>();
+            var fa = new List<TransferNormalReturnFail>();
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlcommand = "select ID,status,PickorID,Pickor from batch where id in @ID and coid = @Coid";
+                var u = CoreDBconn.Query<Batch>(sqlcommand,new{ID = ID,Coid = CoID}).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "参数异常";
+                    return result;
+                }
+                int i = 0;
+                foreach(var a in u)
+                {
+                    if(a.Status != 0)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "等待拣货的批次才可以安排拣货员";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    if(!string.IsNullOrEmpty(a.Pickor))
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "未安排拣货员的批次才可以操作";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    string PickorID = User[i].value;
+                    string PickorName = User[i].label;
+                    sqlcommand = "update batch set PickorID=@PickorID,Pickor=@Pickor,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
+                    int count = CoreDBconn.Execute(sqlcommand,new{PickorID =PickorID, Pickor=PickorName,Modifier=UserName,ModifyDate=DateTime.Now,ID=a.ID,Coid=CoID},TransCore);
+                    if(count <= 0)
+                    {   
+                        result.s = -3003;
+                        return result;
+                    }
+                    var ss = new SetPickorSuccess();
+                    ss.ID = a.ID;
+                    ss.Pickor = PickorName;
+                    su.Add(ss);
+                    i ++;
+                    if(i == User.Count)
+                    {
+                        i = 0;
+                    }
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            res.SuccessIDs = su;
+            res.FailIDs = fa;
+            result.d = res;
+            return result;
+        }
+        ///<summary>
+        ///重新安排拣货人员
+        ///</summary>
+        public static DataResult ReSetPickor(int CoID,List<int> ID,List<int> Pickor,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var User = new List<Filter>();
+            using(var conn = new MySqlConnection(DbBase.UserConnectString) ){
+                try{     
+                    foreach(var a in Pickor)
+                    {
+                        string wheresql = "select Account from user where Enable = true and CompanyID = " + CoID + " and ID =" + a;
+                        var u = conn.Query<string>(wheresql).AsList();
+                        if(u.Count > 0)
+                        {
+                            var ff = new Filter();
+                            ff.value = a.ToString();
+                            ff.label = u[0];
+                            User.Add(ff);
+                        }
+                    }           
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }      
+            if(User.Count == 0)
+            {
+                result.s = -1;
+                result.d = "没有符合条件的拣货员";
+                return result;
+            }   
+            var res = new SetPickorReturn();
+            var su = new List<SetPickorSuccess>();
+            var fa = new List<TransferNormalReturnFail>();
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                string sqlcommand = "select ID,status,PickorID,Pickor from batch where id in @ID and coid = @Coid";
+                var u = CoreDBconn.Query<Batch>(sqlcommand,new{ID = ID,Coid = CoID}).AsList();
+                if(u.Count == 0)
+                {
+                    result.s = -1;
+                    result.d = "参数异常";
+                    return result;
+                }
+                int i = 0;
+                foreach(var a in u)
+                {
+                    if(a.Status == 6 || a.Status == 7)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "终止拣货/已完成的批次不可以重新安排拣货人";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    if(string.IsNullOrEmpty(a.Pickor))
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "未安排拣货员的批次不可以安排拣货人";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    string PickorID = User[i].value;
+                    string PickorName = User[i].label;
+                    sqlcommand = "update batch set PickorID=@PickorID,Pickor=@Pickor,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
+                    int count = CoreDBconn.Execute(sqlcommand,new{PickorID =PickorID, Pickor=PickorName,Modifier=UserName,ModifyDate=DateTime.Now,ID=a.ID,Coid=CoID},TransCore);
+                    if(count <= 0)
+                    {   
+                        result.s = -3003;
+                        return result;
+                    }
+                    var ss = new SetPickorSuccess();
+                    ss.ID = a.ID;
+                    ss.Pickor = PickorName;
+                    su.Add(ss);
+                    i ++;
+                    if(i == User.Count)
+                    {
+                        i = 0;
+                    }
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }
+            res.SuccessIDs = su;
+            res.FailIDs = fa;
+            result.d = res;
+            return result;
+        }
+        ///<summary>
+        ///获取一单一件，一单多件，大单的订单数量
+        ///</summary>
+        public static DataResult GetOrdCount(int CoID)
+        {
+            var result = new DataResult(1,null);    
+            var res = new GetOrdCountReturn();
+            int bigord = int.Parse(GetConfigure(CoID,"E").d.ToString());
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = @"select count(id) from saleout where status = 0 and BatchID = 0 and OrdQty = 1 and ExpName != '现场取货'";
+                    int count = conn.QueryFirst<int>(sqlcommand);
+                    res.SingleOrd = count;
+                    if(bigord == 0)
+                    {
+                        sqlcommand = @"select count(id) from saleout where status = 0 and BatchID = 0 and OrdQty > 1 and ExpName != '现场取货'";
+                    }
+                    else
+                    {
+                        sqlcommand = @"select count(id) from saleout where status = 0 and BatchID = 0 and OrdQty > 1 and OrdQty < " + bigord + " and ExpName != '现场取货'";
+                    }
+                    count = conn.QueryFirst<int>(sqlcommand);
+                    res.MultiOrd = count;
+                    if(bigord == 0)
+                    {
+                        sqlcommand = @"select count(id) from saleout where status = 0 and BatchID = 0 and ExpName = '现场取货'";
+                    }
+                    else
+                    {
+                        sqlcommand = @"select count(id) from saleout where status = 0 and BatchID = 0 and (ExpName = '现场取货' or OrdQty >= " + bigord + ")";
+                    }
+                    count = conn.QueryFirst<int>(sqlcommand);
+                    res.BigOrd = count;
+
+                    result.d = res;             
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }           
+            return result;
+        }
+        ///<summary>
+        ///一单一件
+        ///</summary>
+        public static DataResult SingleOrd()
+        {
+            var result = new DataResult(1,null);  
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }            
+            return result;  
+        }
     }
 }

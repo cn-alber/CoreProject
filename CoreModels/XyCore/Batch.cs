@@ -168,4 +168,25 @@ namespace CoreModels.XyCore
         public List<MarkPrintSuccess> SuccessIDs{get;set;}
         public List<TransferNormalReturnFail> FailIDs{get;set;}
     }
+    public class GetPickorInit
+    {
+        public List<Filter> Role{get;set;}
+        public List<Filter> Pickor{get;set;}
+    }
+    public class SetPickorSuccess
+    {
+        public int ID{get;set;}
+        public string Pickor{get;set;}
+    }
+    public class SetPickorReturn
+    {
+        public List<SetPickorSuccess> SuccessIDs{get;set;}
+        public List<TransferNormalReturnFail> FailIDs{get;set;}
+    }
+    public class GetOrdCountReturn
+    {
+        public int SingleOrd{get;set;}
+        public int MultiOrd{get;set;}
+        public int BigOrd{get;set;}
+    }
 }
