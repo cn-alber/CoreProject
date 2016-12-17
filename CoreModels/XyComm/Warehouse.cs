@@ -77,6 +77,21 @@ namespace CoreModels.XyComm
         public string label { get; set; }
     }
 
+    public class WareDetail{
+        public string warehousename { get; set; }
+        public string contract { get; set; }
+        public string phone { get; set; }
+        public int logistics { get; set; }
+        public string send_state{get;set;}
+        public int city { get; set; }
+        public string send_city{get;set;}
+
+        public int district { get; set; }
+        public string send_district{get;set;}
+        public string address { get; set; }
+    }
+
+
 
 
 }

@@ -952,4 +952,34 @@ namespace CoreModels.XyCore
         public List<SetSupDistributorSuccess> SuccessIDs {get;set;}
         public List<TransferNormalReturnFail> FailIDs {get;set;}
     }
+
+    public class OrderDetail
+    {
+        public int ID {get;set;}
+        public string ShopName{get;set;}
+        public string OSource{get;set;}
+        public string PayDate{get;set;}
+        public string BuyerShopID{get;set;}
+        public string ExAmount{get;set;}
+        public string Express{get;set;}
+        public string ExCode{get;set;}
+        public string RecTel{get;set;}
+        public int AbnormalStatus{get;set;}
+        public string AbnormalStatusDec{get;set;}
+        public int ExID{get;set;}
+        public string ExpNamePinyin{get;set;}
+        public string SkuAmount{get;set;}
+        public decimal Amount{get;set;}
+        public decimal PaidAmount{get;set;}
+        public int WarehouseID{get;set;}
+        public decimal ExWeight{get;set;}
+        public decimal ExCost{get;set;}
+        public bool IsInvoice{get;set;}
+        public string InvoiceTitle{get;set;}
+        public string InvoiceType{get;set;}
+        public string InvoiceDate{get;set;}
+        public int DealerType{get;set;}
+        public string ShopID{get;set;}
+    }
+
 }
