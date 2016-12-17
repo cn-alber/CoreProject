@@ -241,4 +241,90 @@ namespace CoreModels.XyCore
         public string SkuID{get;set;}
         public List<string> InvLst{get;set;}
     }
+
+        public class SaleOutItem
+    {
+        public int ID{get;set;}
+        public int OID{get;set;}
+        public long SoID{get;set;}
+        public string DocDate{get;set;}
+        public int Status{get;set;}
+        public string StatusString{get;set;}
+        public string ExID{get;set;}
+        public string ExpName{get;set;}
+        public string ExpNamePinyin{get;set;}
+        public string ExCode{get;set;}
+        public int BatchID{get;set;}
+        public bool IsOrdPrint{get;set;}
+        public bool IsExpPrint{get;set;}
+        public string RecMessage{get;set;}
+        public string RecLogistics{get;set;}
+        public string RecDistrict{get;set;}
+        public string RecCity{get;set;}
+        public string RecAddress{get;set;}
+        public string RecName{get;set;}
+        public string RecPhone{get;set;}
+        public string ExWeight{get;set;}
+        public string RealWeight{get;set;}
+        public string ShipType{get;set;}
+        public string ExCost{get;set;}
+        public bool IsDeliver{get;set;}
+        public string Remark{get;set;}
+        public string Sku{get;set;}
+        public int OrdQty{get;set;}
+        public string SendWarehouse{get;set;}
+        public string CreateDate{get;set;}
+        public string Creator{get;set;}
+        public string ModifyDate{get;set;}
+        public string Modifier{get;set;}
+        public string RecZip{get;set;}
+        public string sku_id{get;set;}
+        public string name{get;set;}
+        public string properties_value{get;set;}
+        public string name_properties_value{get;set;}
+        public decimal sale_price{get;set;}
+        public int qty{get;set;}
+        public string item_pattern{get;set;}
+        public List<SaleOutPrintItem> items{get;set;}
+    }
+
+    public class SaleOutPrintItem{
+        public int oi_id{get;set;}
+        public int o_id{get;set;}
+        public int co_id{get;set;}
+        public string sku_id{get;set;}
+        public int qty{get;set;}
+        public decimal base_price{get;set;}
+        public decimal price{get;set;}
+        public decimal amount{get;set;}
+        public string name{get;set;}
+        public decimal discount_rate{get;set;}
+        public string pic{get;set;}
+        public string shop_sku_id{get;set;}
+        public string weight{get;set;}
+        public string total_weight{get;set;}
+        public string created{get;set;}
+        public string creator{get;set;}
+        public string modified{get;set;}
+        public string modifier{get;set;}
+        public bool is_gift{get;set;}
+        public string bin{get;set;}
+        public string properties_value{get;set;}
+        public string remark{get;set;}
+        public string item_sign{get;set;}
+        public long outer_oi_id{get;set;}
+        public string sku_type{get;set;}
+        public string sku_tag{get;set;}
+        public string ioi_id{get;set;}
+        public decimal sale_price{get;set;}
+        public string name_properties_value{get;set;}
+        public decimal free_amount{get;set;}
+        public string pic60{get;set;}
+        public string pic100{get;set;}
+        public string pic160{get;set;}
+        public int index{get;set;}
+    }
+
+
+
 }
