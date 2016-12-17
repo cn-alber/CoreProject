@@ -22,7 +22,8 @@ namespace CoreModels.XyCore
         public string CoID { get; set; }
         // public bool IsUpdate { get; set; }
         public int Qty { get; set; }
-        public string RefID{get;set;}//相关单据编号(来源ID)
+        public string RefID { get; set; }//相关单据编号(来源ID)
+        public string OID { get; set; }
     }
 
     public class InvinoutData

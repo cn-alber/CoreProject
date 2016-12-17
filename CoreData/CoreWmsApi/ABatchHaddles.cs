@@ -458,7 +458,7 @@ namespace CoreData.CoreWmsApi
         }
         #endregion
 
-        #region 订单分解-更新分解格 
+        #region 订单分拣-更新分拣格 
         public static DataResult SetSortCode(ABatchParams IParam)
         {
             var result = new DataResult(1, null);

@@ -51,7 +51,7 @@ namespace CoreWebApi
                 var cp = new ABatchParams();
                 cp.CoID = int.Parse(GetCoid());
                 cp.BarCode = obj["BarCode"].ToString();
-                if(!string.IsNullOrEmpty(obj["BatchID"].ToString()))
+                if (!string.IsNullOrEmpty(obj["BatchID"].ToString()))
                 {
                     cp.BatchID = int.Parse(obj["BatchID"].ToString());
                 }
@@ -62,7 +62,108 @@ namespace CoreWebApi
         #endregion
 
         #region 单件发货-更新库存
-        
+        [HttpPostAttribute("Core/ASaleOut/SetSaleOutSingle")]
+        public ResponseResult SetSaleOutSingle([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            int x;
+            if (string.IsNullOrEmpty(obj["ID"].ToString()) ||
+               string.IsNullOrEmpty(obj["SkuAuto"].ToString()) ||
+               string.IsNullOrEmpty(obj["OItemAuto"].ToString()) ||
+             !string.IsNullOrEmpty(obj["ID"].ToString()) && !int.TryParse(obj["ID"].ToString(), out x))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var cp = new ASaleOutSet();
+                cp.CoID = int.Parse(GetCoid());
+                cp.Creator = GetUname();
+                cp.CreateDate = DateTime.Now.ToString();
+                cp.ID = int.Parse(obj["ID"].ToString());
+                cp.SkuAuto = Newtonsoft.Json.JsonConvert.DeserializeObject<ASkuScan>(obj["SkuAuto"].ToString());
+                cp.OItemAuto = Newtonsoft.Json.JsonConvert.DeserializeObject<OutItemBatch>(obj["OItemAuto"].ToString());
+                cp.Contents = "销售出货";
+                ASaleOutHaddles.SaleOutSingle(cp);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "WmsApi");
+        }
         #endregion
+
+        #region 多件发货 - 扫描格号
+        [HttpGetAttribute("Core/ASaleOut/ScanOutSortCode")]
+        public ResponseResult ScanOutSortCode(string SortCode)
+        {
+            var res = new DataResult(1, null);
+            if (string.IsNullOrEmpty(SortCode))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var cp = new ASaleParams();
+                cp.CoID = int.Parse(GetCoid());
+                cp.SortCode = SortCode;
+                res = ASaleOutHaddles.GetScanOutSortCode(cp);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "WmsApi");
+        }
+        #endregion
+
+        #region 多件发货 - 扫描件码
+        [HttpGetAttribute("Core/ASaleOut/ScanOutScanSkuMulti")]
+        public ResponseResult ScanOutScanSkuMulti(string SortCode,string BarCode)
+        {
+            var res = new DataResult(1, null);
+            if (string.IsNullOrEmpty(SortCode)||string.IsNullOrEmpty(BarCode))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var cp = new ASaleParams();
+                cp.CoID = int.Parse(GetCoid());
+                cp.SortCode = SortCode;
+                cp.BarCode = BarCode;
+                res = ASaleOutHaddles.GetScanOutSkuMulti(cp);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "WmsApi");
+        }
+        #endregion
+
+        #region 多件发货 - 更新库存
+        [HttpPostAttribute("Core/ASaleOut/SetSaleOutMulti")]
+        public ResponseResult SetSaleOutMulti([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            int x;
+            if (string.IsNullOrEmpty(obj["ID"].ToString()) ||
+               string.IsNullOrEmpty(obj["SkuAuto"].ToString()) ||
+               string.IsNullOrEmpty(obj["OItemAuto"].ToString()) ||
+             !string.IsNullOrEmpty(obj["ID"].ToString()) && !int.TryParse(obj["ID"].ToString(), out x))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var cp = new ASaleOutSet();
+                cp.CoID = int.Parse(GetCoid());
+                cp.Creator = GetUname();
+                cp.CreateDate = DateTime.Now.ToString();
+                cp.ID = int.Parse(obj["ID"].ToString());
+                cp.SkuAuto = Newtonsoft.Json.JsonConvert.DeserializeObject<ASkuScan>(obj["SkuAuto"].ToString());
+                cp.OItemAuto = Newtonsoft.Json.JsonConvert.DeserializeObject<OutItemBatch>(obj["OItemAuto"].ToString());
+                cp.Contents = "销售出货";
+                ASaleOutHaddles.SaleOutSingle(cp);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "WmsApi");
+        }
+        #endregion
+
+
     }
 }
