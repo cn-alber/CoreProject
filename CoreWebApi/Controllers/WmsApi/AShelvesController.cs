@@ -211,7 +211,7 @@ namespace CoreWebApi
         public ResponseResult TrayUp([FromBodyAttribute]JObject obj)
         {
             var res = new DataResult(1, null);
-            int x;
+            // int x;
             if (!(obj["PCode"] != null && obj["SkuAuto"] != null))
             {
                 res.s = -1;
