@@ -43,6 +43,8 @@ namespace CoreModels.WmsApi
         public int CoID { get; set; }
         public string Creator { get; set; }
         public string CreateDate { get; set; }
+        public string Contents { get; set; }
+        public string Code { get; set; }
         public List<BoxSku> BoxSkuLst { get; set; }
 
     }

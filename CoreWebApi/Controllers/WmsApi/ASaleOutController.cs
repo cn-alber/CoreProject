@@ -112,12 +112,12 @@ namespace CoreWebApi
         }
         #endregion
 
-        #region 多件发货 - 扫描件码
-        [HttpGetAttribute("Core/ASaleOut/ScanOutScanSkuMulti")]
-        public ResponseResult ScanOutScanSkuMulti(string SortCode,string BarCode)
+        #region 多件发货 - 扫描件码 原ScanOutScanSkuMulti
+        [HttpGetAttribute("Core/ASaleOut/SaleOutScanSkuMulti")]
+        public ResponseResult SaleOutScanSkuMulti(string SortCode, string BarCode)
         {
             var res = new DataResult(1, null);
-            if (string.IsNullOrEmpty(SortCode)||string.IsNullOrEmpty(BarCode))
+            if (string.IsNullOrEmpty(SortCode) || string.IsNullOrEmpty(BarCode))
             {
                 res.s = -1;
                 res.d = "无效参数";
@@ -128,7 +128,7 @@ namespace CoreWebApi
                 cp.CoID = int.Parse(GetCoid());
                 cp.SortCode = SortCode;
                 cp.BarCode = BarCode;
-                res = ASaleOutHaddles.GetScanOutSkuMulti(cp);
+                res = ASaleOutHaddles.GetSaleOutSkuMulti(cp);
             }
             return CoreResult.NewResponse(res.s, res.d, "WmsApi");
         }
@@ -162,6 +162,32 @@ namespace CoreWebApi
             }
             return CoreResult.NewResponse(res.s, res.d, "WmsApi");
         }
+        #endregion
+
+        #region 大单发货 - 扫描箱件码 原CallSaleOutBySku
+        [HttpGetAttribute("Core/ASaleOut/SaleOutScanSkuBig")]
+        public ResponseResult SaleOutScanSkuBig(string BarCode,string BatchID)
+        {
+            var res = new DataResult(1, null);
+            int x;
+            if (string.IsNullOrEmpty(BarCode)||string.IsNullOrEmpty(BatchID)||!string.IsNullOrEmpty(BatchID)&&!int.TryParse(BatchID,out x))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var cp = new ASaleParams();
+                cp.CoID = int.Parse(GetCoid());                
+                cp.BarCode = BarCode;
+                cp.BatchID = int.Parse(BatchID);
+                res = ASaleOutHaddles.GetSaleOutSkuBig(cp);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "WmsApi");
+        }
+        #endregion
+
+        #region 
         #endregion
 
 

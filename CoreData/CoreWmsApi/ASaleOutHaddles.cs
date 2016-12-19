@@ -62,8 +62,8 @@ namespace CoreData.CoreWmsApi
             using (var conn = new MySqlConnection(DbBase.CoreConnectString))
             {
                 try
-                {//8.等待发货，0.一单一件                    
-                    string bsql = @"SELECT ID FROM batch WHERE CoID=@CoID AND Status=8 AND Type = 0";
+                {//3.正在拣货，0.一单一件                    
+                    string bsql = @"SELECT ID FROM batch WHERE CoID=@CoID AND Status=3 AND Type = 0";
                     var p = new DynamicParameters();
                     p.Add("@CoID", IParam.CoID);
                     if (IParam.BatchID > 0)
@@ -368,7 +368,7 @@ namespace CoreData.CoreWmsApi
         #endregion
 
         #region 多件发货-扫描件码
-        public static DataResult GetScanOutSkuMulti(ASaleParams IParam)
+        public static DataResult GetSaleOutSkuMulti(ASaleParams IParam)
         {
             var result = new DataResult(1, null);
             var data = new ASaleOutData();
@@ -477,7 +477,7 @@ namespace CoreData.CoreWmsApi
                     inv.OID = aout.SoID.ToString();
                     inv.RecordID = RecordID;
                     inv.Type = Type;
-                    inv.CusType = Enum.GetName(typeof(InvE.InvType), Type).ToString();//交易类型           ;
+                    inv.CusType = Enum.GetName(typeof(InvE.InvType), Type).ToString();//交易类型
                     inv.Status = Status;
                     inv.WhID = WhViewLst[0].ParentID;
                     inv.LinkWhID = WhViewLst[0].ID;
@@ -504,7 +504,7 @@ namespace CoreData.CoreWmsApi
                     }).AsList();
                     CoreConn.Execute(InventoryHaddle.AddInvinoutitemSql(), inv_itemLst, CoreTrans);
                     //更新库存数量     
-                    var SkuIDLst = inv_itemLst.Select(a=>a.Skuautoid).AsList();
+                    var SkuIDLst = inv_itemLst.Select(a => a.Skuautoid).AsList();
                     CoreConn.Execute(UptInvSaleQtySql(), new { CoID = IParam.CoID, SkuIDLst = SkuIDLst, Modifier = IParam.Creator, ModifyDate = IParam.CreateDate }, CoreTrans);
                     //更新总库存数量
                     var res = CommHaddle.GetWareCoidList(IParam.CoID.ToString());
@@ -528,6 +528,7 @@ namespace CoreData.CoreWmsApi
         }
         #endregion
 
+        #region 多件发货 - 检查库存是否充足
         public static DataResult CheckMultiInvQty(ASaleOutSet IParam, IDbTransaction Trans, MySqlConnection conn)
         {
             var result = new DataResult(1, null);
@@ -546,6 +547,73 @@ namespace CoreData.CoreWmsApi
             }
             return result;
         }
+        #endregion
+
+
+        #region 大单发货 - 条码扫描获取条码信息
+        public static DataResult GetSaleOutSkuBig(ASaleParams IParam)
+        {
+            var result = new DataResult(1, null);
+            var data = new ASaleOutData();
+            using (var CoreConn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                try
+                {
+                    var cp = new ASkuScanParam();
+                    cp.CoID = IParam.CoID;
+                    cp.BarCode = IParam.BarCode;
+                    result = ASkuScanHaddles.GetType(cp);
+                    if (result.s > 0)
+                    {
+                        var asku = result.d as ASkuScan;
+                        if (asku.SkuType != 1)
+                        {
+                            string sql = @"SELECT IFNULL(SUM(Qty),0) FROM saleoutitemp WHERE CoID=@CoID";
+                            if (asku.SkuType == 0)
+                            {
+                                sql = sql + " AND BarCode=@BarCode";
+                            }
+                            else if (asku.SkuType == 2)
+                            {
+                                sql = sql + " AND BoxCode=@BarCode";
+                            }
+                            var p = new DynamicParameters();
+                            p.Add("@CoID", IParam.CoID);
+                            p.Add("@BarCode", IParam.BarCode);
+                            var temp = CoreConn.Query<int>(sql, p).First();
+                            if (temp > 0)
+                            {
+                                result.s = -6016;//重复扫描出货
+                            }
+                        }
+                        string psql = @"SELECT IFNULL(SUM(Qty),0)  
+                                FROM batchpicked                                
+                                WHERE CoID=@CoID 
+                                AND BarCode=@BarCode
+                                AND BatchID = @BatchID";
+                        var PickQty = CoreConn.Query<int>(psql, new { CoID = IParam.CoID, BarCode = IParam.BarCode, BatchID = IParam.BatchID }).First();
+                        if (PickQty <= 0)
+                        {
+                            result.s = -6020;//请先执行拣货任务
+                        }
+                        else
+                        {
+                            result.d = asku;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+        #endregion
+
+
+
 
         #region 更新销退仓库存
         public static string UptInvSaleQtySql()

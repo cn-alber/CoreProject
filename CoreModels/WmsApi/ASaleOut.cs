@@ -51,6 +51,28 @@ namespace CoreModels.WmsApi
         public int Qty { get; set; }
     }
 
+
+    public class ASaleOutTemp
+    {
+        public int ID { get; set; }
+        public int CoID { get; set; }
+        public string BoxCode { get; set; }
+        public string BarCode { get; set; }
+        public string SkuID { get; set; }
+        public int qty { get; set; }
+        public int OID { get; set; }
+        public string Express { get; set; }
+        public string ExCode { get; set; }
+        public int BatchID { get; set; }
+        public int Type { get; set; }
+        public int WarehouseID { get; set; }
+        public string Creator { get; set; }
+        public string CreateDate { get; set; }
+        public string Modifier { get; set; }
+        public string ModifyDate { get; set; }
+
+    }
+
     public class ASaleOutPrint
     {
         public int OID { get; set; }
