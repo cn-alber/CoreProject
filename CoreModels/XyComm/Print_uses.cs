@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace CoreModels.XyComm
 {
@@ -119,6 +120,31 @@ namespace CoreModels.XyComm
 		public bool defed { get; set; }
 	}
 
+	// tpl_id: 默认模板ID，不存在模块则为null
+	// tpls: 可选模板列表，<List>{id, name}，不存在则为null
+	// tpl_type: 模组类型，>0 则为内置类型，自定义的话 <0 (唯一)
+	// print_setting: {pageW, pageH}  print_use -> print_setting
+	// states: 模板数据 {doms, setting, tableColumns, tableHelp, tableStyle} print_use -> print_tpldata
+	// title: 打印标题
+	// rows: <List>{} print_sys_types->presets
+	public class printSetRequest{
+		public int tpl_id{get;set;}
+		public int tpl_type{get;set;}
+	}
+	public class printSetResponce{
+		public int tpl_id{get;set;}
+		public List<tpl> tpls{get;set;}
+		public int tpl_type{get;set;}
+		public string print_setting{get;set;}
+		public string states{get;set;}
+		public string title{get;set;}
+		public string rows{get;set;}
+	}
+
+	public class tpl{
+		public int id{get;set;}
+		public string name{get;set;}
+	}
 
 
 }

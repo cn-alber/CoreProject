@@ -362,8 +362,152 @@ namespace CoreDate.CoreComm
             return status;
         }
 
+        // 采购单 状态
+        public static string getPurStatus(int a){
+            string status = "";
+            switch (a)
+            {
+                case 0:
+                    status = "待审核";
+                    break;
+                case 1:
+                    status = "已确认";
+                    break;
+                case 2:
+                    status = "待发货";
+                    break;
+                case 3:
+                    status = "待收货";
+                    break;
+                case 4:
+                    status = "已作废";
+                    break;
+                case 5:
+                    status = "已完成";
+                    break;                                                                                                                                                    
+                default:
+                    status = "状态异常";
+                    break;
+            }
+            return status;
+        }
+        // 采购单 类别(0:成品;1:组合商品;2:原物料;3:非成品)
+        public static string getPurType(int a){
+            string status = "";
+            switch (a)
+            {
+                case 0:
+                    status = "成品";
+                    break;
+                case 1:
+                    status = "组合商品";
+                    break;
+                case 2:
+                    status = "原物料";
+                    break;
+                case 3:
+                    status = "非成品";
+                    break;                                                                                                                                               
+                default:
+                    status = "类别异常";
+                    break;
+            }
+            return status;
+        }
 
 
+         /// <summary>
+		/// 采购单
+		/// </summary>
+        public static DataResult getPurchaseForm(int id,string coid){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{                
+                    var purchase = new Purchase();
+                    var purDetailList = new PurchasePrint();
+                    
+                    purchase = PurchaseHaddle.GetPurchaseEdit(id,int.Parse(coid)).d as Purchase;
+                    purDetailList = getPurDetailist(purchase.id,coid).d as PurchasePrint;
+                
+
+                    result.d = new {
+                       rn__ = 1,
+                       po_id = purchase.id,
+                       po_date = purchase._purchasedate,
+                       print_date = "",
+                       seller = purchase.sconame,
+                       term = purchase.contract,
+                       send_address = purchase.shpaddress,
+                       total_qty = purDetailList.total_qty,
+                       total_amount=purDetailList.total_amount,
+                       total_amount_chinese = "",
+                       total_plan_arrive_qty= purDetailList.total_plan_arrive_qty,
+                       total_plan_arrive_amount = purDetailList.total_plan_arrive_amount,
+                       total_plan_arrive_amount_chinese="",
+                       purchaser_name = purchase.creator,
+                       contacts = "",
+                       mobile="",
+                       phone="",
+                       fax="",
+                       address="",
+                       supplier_code= purchase.scoid,
+                       remark=purchase.remark,
+                       items =  purDetailList.items
+                     };
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return result;
+        }
+
+        public static DataResult getPurDetailist(int id,string coid){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{                
+                    string sql = "select * from purchasedetail where purchaseid = " + id;
+                    var PurDetailist = conn.Query<PurchaseDetail>(sql).AsList();
+                    var print = new PurchasePrint();
+
+                    print.items = new List<PurchasePrintItem>();
+                    
+                    foreach(var item in PurDetailist) {
+                        print.items.Add(new PurchasePrintItem{
+                            index = item.id,
+                            pic60= item.img,
+                            pic100 = item.img,
+                            pic160 = item.img,
+                            sku_id =item.skuid,
+                            name = item.skuname,
+                            supplier_i_id = item.supplycode,
+                            properties_value = item.norm,
+                            qty = int.Parse(item.purqty.Split('.')[0]),
+                            price = decimal.Parse(item.price),
+                            amount = decimal.Parse(item.puramt),
+                            outer_i_id= item.goodscode,
+                            plan_arrive_qty = int.Parse(item.planqty.Split('.')[0]),
+                            plan_arrive_amount = decimal.Parse(item.planamt),
+                            remark = item.remark,
+                            brand = "",
+                            outer_pack_id = item.packingnum
+                        });
+                        print.total_qty += int.Parse(item.purqty.Split('.')[0]);
+                        print.total_amount += decimal.Parse(item.puramt);
+                        print.total_plan_arrive_qty = int.Parse(item.planqty.Split('.')[0]);
+                        print.total_plan_arrive_amount = decimal.Parse(item.planamt);
+                    }
+                    
+                    result.d = print;
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return result;
+        }
 
 
 

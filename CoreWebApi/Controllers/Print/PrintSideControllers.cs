@@ -15,9 +15,10 @@ namespace CoreWebApi.Print
         public ResponseResult sidesetdefed([FromBodyAttribute]JObject lo)
         {
             if(!checkInt(lo["my_tpl_id"].ToString())) return CoreResult.NewResponse(-4023, null, "Print");
+            if(!checkInt(lo["type"].ToString())) return CoreResult.NewResponse(-4009, null, "Print");
             var admin_id = GetUid();
             string coid = GetCoid();
-            var m = PrintHaddle.sideSetdefed(admin_id,lo["my_tpl_id"].ToString(),coid);
+            var m = PrintHaddle.sideSetdefed(admin_id,lo["my_tpl_id"].ToString(),lo["type"].ToString(),coid);
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion

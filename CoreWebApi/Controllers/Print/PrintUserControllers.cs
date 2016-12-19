@@ -112,8 +112,20 @@ namespace CoreWebApi.Print
 
         #endregion
 
+        #region 获取打印参数配置
+        [HttpGetAttribute("/core/print/tpl/getPrintSet")]    
+        public ResponseResult getPrintSet(int tpl_id=0,int tpl_type = 0){
+            
+            var admin_id = GetUid();
+            if(tpl_id == 0 && tpl_type==0){
+                return CoreResult.NewResponse(-1,"模板类型或ID必有其一","Print");
+            }
+            
+            var m = PrintHaddle.getPrintSet(admin_id,tpl_id,tpl_type);
+            return CoreResult.NewResponse(m.s,m.d,"Print");
+        }
 
-
+        #endregion
 
 
     }

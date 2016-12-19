@@ -48,7 +48,36 @@ namespace CoreWebApi.Print
         }
         #endregion
 
-        
+        #region 采购单
+        [HttpGetAttribute("/core/print/data/purchaseForm")]
+        public ResponseResult purchaseForm(string ID,string OID)
+        {
+            int x= 0; 
+            int oid=0;
+            int id=0;
+            var m = new DataResult(1,null);
+            if (int.TryParse(OID, out x))
+            {
+                oid = int.Parse(OID);
+            }
+            else
+            {
+                m.s = -1;
+                m.d = "参数无效!";              
+            }
+            if (int.TryParse(ID, out x))
+            {
+                id = int.Parse(ID);
+            }
+            else
+            {
+                m.s = -1;
+                m.d = "参数无效!";              
+            }
+            m = PrintDataHaddle.getPurchaseForm(id,GetCoid());
+            return CoreResult.NewResponse(m.s, m.d, "Print");
+        }
+        #endregion
         
 
 
