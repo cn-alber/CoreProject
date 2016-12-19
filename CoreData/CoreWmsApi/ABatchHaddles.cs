@@ -233,25 +233,24 @@ namespace CoreData.CoreWmsApi
                         if (autoLst.Count > 0)
                         {
                             var bth = autoLst[0];
-                            if (bth.Qty > bth.PickQty + bth.NoQty)
-                            {
-                                bth.Status = 3;//1.正在拣货
-                            }
-                            else
-                            {
-                                if (IParam.BatchType != 1)//1.一单多件
-                                {
-                                    bth.Status = 8;//等待发货
-                                }
-                                // if (IParam.BatchType == 1)//1.一单多件
-                                //     bth.Status = 1;//2:等待分拣
-                                // else
-                                //     bth.Status = 2;//4:等待发货
-                            }
+                            // if (bth.Qty > bth.PickQty + bth.NoQty)
+                            // {
+                            //     bth.Status = 3;//1.正在拣货
+                            // }
+                            // else
+                            // {
+                            //     if (IParam.BatchType != 1)//1.一单多件
+                            //     {
+                            //         bth.Status = 8;//等待发货
+                            //     }
+                            //     // if (IParam.BatchType == 1)//1.一单多件
+                            //     //     bth.Status = 1;//2:等待分拣
+                            //     // else
+                            //     //     bth.Status = 2;//4:等待发货
+                            // }
                             string uptsql2 = @"UPDATE batch
                                             SET PickedQty =@PickQty,
-                                                NoQty =@NoQty,
-                                                `Status` =@Status
+                                                NoQty =@NoQty
                                             WHERE
                                                 CoID =@CoID
                                             AND BatchID =@BatchID";
@@ -342,25 +341,24 @@ namespace CoreData.CoreWmsApi
                             if (autoLst.Count > 0)
                             {
                                 var bth = autoLst[0];
-                                if (bth.Qty > bth.PickQty + bth.NoQty)
-                                {
-                                    bth.Status = 3;//1.正在拣货
-                                }
-                                else
-                                {
-                                    if (IParam.Type != 1)//1.一单多件
-                                    {
-                                        bth.Status = 8;//等待发货
-                                    }
-                                    // if (IParam.Type == 1)//1.一单多件
-                                    //     bth.Status = 2;//2:等待分拣
-                                    // else
-                                    //     bth.Status = 4;//4:等待发货
-                                }
+                                // if (bth.Qty > bth.PickQty + bth.NoQty)
+                                // {
+                                //     bth.Status = 3;//1.正在拣货
+                                // }
+                                // else
+                                // {
+                                //     if (IParam.Type != 1)//1.一单多件
+                                //     {
+                                //         bth.Status = 8;//等待发货
+                                //     }
+                                //     // if (IParam.Type == 1)//1.一单多件
+                                //     //     bth.Status = 2;//2:等待分拣
+                                //     // else
+                                //     //     bth.Status = 4;//4:等待发货
+                                // }
                                 string uptsql2 = @"UPDATE batch
                                             SET PickedQty =@PickQty,
-                                                NoQty =@NoQty,
-                                                `Status` =@Status
+                                                NoQty =@NoQty
                                             WHERE
                                                 CoID =@CoID
                                             AND BatchID =@BatchID";
@@ -417,6 +415,7 @@ namespace CoreData.CoreWmsApi
                                     OutID
                                     BatchtaskID,
                                     SortCode 
+                                FROM batchpicked
                                 WHERE CoID=@CoID 
                                 AND BarCode=@BarCode
                                 AND BatchID in @BatchIDLst";

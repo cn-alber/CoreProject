@@ -27,10 +27,39 @@ namespace CoreWebApi
         [HttpPostAttribute("Core/ABox/SetBoxCode")]
         public ResponseResult SetBoxCode([FromBodyAttribute]JObject obj)
         {
-            var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiBoxParam>(obj.ToString());           
+            var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiBoxParam>(obj.ToString());
             cp.CoID = int.Parse(GetCoid());
             cp.Creator = GetUname();
             cp.CreateDate = DateTime.Now.ToString();
+            cp.Contents = "扫描装箱";
+            cp.Code = "BX";
+            var res = AWmsBoxHaddle.AddWmsBox(cp);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion    
+
+        #region 大单装箱-装箱条码检查
+        [HttpGetAttribute("Core/ABox/SkuByBarCodeBig")]
+        public ResponseResult SkuByBarCodeBig(string BarCode)
+        {
+            var cp = new WmsBoxParams();
+            cp.CoID = int.Parse(GetCoid());
+            cp.BarCode = BarCode;
+            var res = AWmsBoxHaddle.CheckBarCodeBig(cp);
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+        #region 大单装箱-产生装箱资料WmsBox
+        [HttpPostAttribute("Core/ABox/SetBoxCodeBig")]
+        public ResponseResult SetBoxCodeBig([FromBodyAttribute]JObject obj)
+        {
+            var cp = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiBoxParam>(obj.ToString());
+            cp.CoID = int.Parse(GetCoid());
+            cp.Creator = GetUname();
+            cp.CreateDate = DateTime.Now.ToString();
+            cp.Contents = "大单装箱";
+            cp.Code = "BG";
             var res = AWmsBoxHaddle.AddWmsBox(cp);
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
