@@ -288,6 +288,15 @@ namespace CoreModels.XyCore
         public List<SaleOutPrintItem> items{get;set;}
     }
 
+    public class SaleOutPrint{
+        public int index{get;set;}
+        public string shop_url{get;set;}
+        public string shop_short_name{get;set;}
+        public string shop_name{get;set;}
+        public string shop_phone{get;set;}
+        public string shop_address{get;set;}
+        public string packcode{get;set;}
+    }
     public class SaleOutPrintItem{
         public int oi_id{get;set;}
         public int o_id{get;set;}

@@ -17,6 +17,25 @@ namespace CoreWebApi.Print
 	/// </summary>    
     public class PrintDataController : ControllBase
     {
+        
+        [HttpGetAttribute("/core/print/data/withType")]
+        public ResponseResult withType(int withType,string ids)
+        {
+            int id=0;
+            var m = new DataResult(1,null);
+            switch (withType)
+            {
+                case 1: 
+                    //m = PrintDataHaddle.getSaleForm(ids.Split(','),GetCoid());
+                    break;
+                default:
+                    m.s = -1;
+                    m.d = "该类型暂无数据";
+                    break;
+            }
+            return CoreResult.NewResponse(m.s, m.d, "Print");
+        }
+        
         #region 销售单
         [HttpGetAttribute("/core/print/data/saleForm")]
         public ResponseResult saleOutForm(string ID,string OID)
@@ -43,7 +62,7 @@ namespace CoreWebApi.Print
                 m.s = -1;
                 m.d = "参数无效!";              
             }
-            m = PrintDataHaddle.getSaleForm(id,oid,GetCoid());
+            //m = PrintDataHaddle.getSaleForm(id,oid,GetCoid());
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion

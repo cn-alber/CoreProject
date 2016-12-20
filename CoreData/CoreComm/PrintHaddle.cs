@@ -1203,9 +1203,9 @@ namespace CoreDate.CoreComm
                             {
                                 result.d = new
                                 {
-                                    tpl_id = defed[0].defed_id,
+                                    tpl_id = defed[0].defed_id.ToString(),
                                     tpls = tpls,
-                                    tpl_type = tpl_type,
+                                    tpl_type = tpl_type.ToString(),
                                     print_setting = JsonConvert.DeserializeObject<dynamic>(print_uses[0].print_setting),
                                     states = JsonConvert.DeserializeObject<dynamic>(print_uses[0].states),
                                     title = print_uses[0].title,
@@ -1235,7 +1235,7 @@ namespace CoreDate.CoreComm
                             
                             result.d = new
                             {
-                                tpl_id = tpl_id,
+                                tpl_id = tpl_id.ToString(),
                                 print_setting = JsonConvert.DeserializeObject<dynamic>(print_uses[0].print_setting),
                                 states = JsonConvert.DeserializeObject<dynamic>(print_uses[0].states),
                                 title = print_uses[0].title,
