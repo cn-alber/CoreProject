@@ -1209,6 +1209,7 @@ namespace CoreDate.CoreComm
                                     print_setting = JsonConvert.DeserializeObject<dynamic>(print_uses[0].print_setting),
                                     states = JsonConvert.DeserializeObject<dynamic>(print_uses[0].states),
                                     title = print_uses[0].title,
+                                    lodop_target = defed[0].lodop_target,
                                     rows = JsonConvert.DeserializeObject<dynamic>(presets)
                                 };
                             }
@@ -1224,20 +1225,21 @@ namespace CoreDate.CoreComm
                         }
                         else
                         {
-                            var presets = "";
-                            var tasks = new Task[1];
-                            tasks[0] = Task.Factory.StartNew(() =>
-                            {
-                                presets = getPreset(print_uses[0].type);
-                            });
-                            Task.WaitAll(tasks);
+                            // var presets = "";
+                            // var tasks = new Task[1];
+                            // tasks[0] = Task.Factory.StartNew(() =>
+                            // {
+                            //     presets = getPreset(print_uses[0].type);
+                            // });
+                            // Task.WaitAll(tasks);
                             
                             result.d = new
                             {
+                                tpl_id = tpl_id,
                                 print_setting = JsonConvert.DeserializeObject<dynamic>(print_uses[0].print_setting),
                                 states = JsonConvert.DeserializeObject<dynamic>(print_uses[0].states),
                                 title = print_uses[0].title,
-                                rows = JsonConvert.DeserializeObject<dynamic>(presets)
+                                //rows = JsonConvert.DeserializeObject<dynamic>(presets)
                             };
                         }
                     }
