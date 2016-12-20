@@ -1210,7 +1210,7 @@ namespace CoreDate.CoreComm
                                     states = JsonConvert.DeserializeObject<dynamic>(print_uses[0].states),
                                     title = print_uses[0].title,
                                     lodop_target = defed[0].lodop_target,
-                                    rows = JsonConvert.DeserializeObject<dynamic>(presets)
+                                    //rows = JsonConvert.DeserializeObject<dynamic>(presets)
                                 };
                             }
                         }
