@@ -156,6 +156,7 @@ namespace CoreData.CoreCore
                     decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(cp.NumPerPage.ToString()));
                     int dataindex = (cp.PageIndex - 1)* cp.NumPerPage;
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + cp.NumPerPage.ToString();
+                    Console.WriteLine(sqlcommand + wheresql);
                     var u = conn.Query<BatchQuery>(sqlcommand + wheresql).AsList();
                     foreach(var a in u)
                     {
