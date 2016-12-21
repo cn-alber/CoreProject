@@ -20,7 +20,7 @@ namespace CoreDate.CoreComm
          /// <summary>
 		/// 销售出库单
 		/// </summary>
-        public static DataResult getSaleForm(int id,int oid,string coid){
+        public static DataResult getSaleForm(List<string> ids,string coid){
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{                
@@ -28,121 +28,133 @@ namespace CoreDate.CoreComm
                     var sale = new SaleOutItem();
                     var ware = new WareDetail();
                     var shop = new Shop();
-   
-                    var tasks = new Task[3];
-                    tasks[0] = Task.Factory.StartNew(() =>
-                    {
-                        var aa = getOrderDetail(oid,coid);
-                        if(aa.s == -1)
-                        {
-                            result.s = -1;
-                            result.d = aa.d;
-                        }else{
-                            order = aa.d as OrderDetail;
-                            shop = ShopHaddle.ShopQuery(coid,order.ShopID).d as Shop;
-                        }
-                    });
-                    tasks[1] = Task.Factory.StartNew(() =>
-                    {
-                        var bb = getSingleSaleOrder(id,coid);
-                        if(bb.s == -1)
-                        {
-                            result.s = -1;
-                            result.d =bb.d;
-                        }else{
-                            sale = bb.d as SaleOutItem;                        
-                        }
-                    });
-                    tasks[2] = Task.Factory.StartNew(() =>
-                    {
-                        var cc = getSendWare(coid);
-                        if(cc.s == -1)
-                        {
-                            result.s = -1;
-                            result.d =cc.d;
-                        }else{
-                            ware = cc.d as WareDetail;                        
-                        }
-                    });                    
-                    Task.WaitAll(tasks);
-                    if(result.s == -1){ return result;}
+                    var rs = new List<dynamic>();
 
-                    result.d = new {
-                        io_id =  sale.ID ,
-                        o_id = sale.OID,
-                        so_id = sale.SoID,
-                        io_date = sale.DocDate,
-                        io = -1,
-                        co_id = coid,
-                        wh_id = order.WarehouseID,
-                        warehouse = sale.SendWarehouse,
-                        quality_type = 1,
-                        type="销售出仓",
-                        status = getStatus(sale.Status),
-                        link_wh_id = "",
-                        link_warehouse = "",
-                        link_io_id = "",
-                        created = sale.CreateDate,
-                        creator =0,
-                        modified = sale.ModifyDate,
-                        modifier = 0,
-                        creator_name = sale.Creator,
-                        modifier_name = sale.Modifier,
-                        confirm_user = "",
-                        receiver_country = "",
-                        receiver_state = sale.RecLogistics,
-                        receiver_city = sale.RecCity,
-                        receiver_district =sale.RecDistrict,
-                        receiver_district_id = "",
-                        receiver_address = sale.RecAddress,
-                        receiver_name =sale.RecName,
-                        receiver_phone = order.RecTel,
-                        receiver_mobile = sale.RecPhone,
-                        buyer_message = sale.RecMessage,
-                        shipment = "",
-                        logistics_company = sale.ExpName,
-                        lc_id = order.ExpNamePinyin,
-                        l_id = sale.ExCode,
-                        freight = order.ExCost,
-                        weight = order.ExWeight,
-                        remark = sale.Remark,
-                        carry_id = "",
-                        is_invoice = order.IsInvoice,
-                        invoice_title = order.InvoiceTitle,
-                        invoice_type = order.InvoiceType,
-                        pay_date = order.InvoiceDate,
-                        shop_id = 0,
-                        is_delivery = sale.IsDeliver,
-                        as_id = 0,
-                        is_print = sale.IsOrdPrint,
-                        is_print_express = sale.IsExpPrint,
-                        sku_bin = "",
-                        bin_id = 0,
-                        pay_amount = order.Amount,
-                        paid_amount = order.PaidAmount,
-                        free_amount= order.Amount - order.PaidAmount,
-                        seller_flag = "",
-                        tag = "",
-                        send_state = ware.send_state,
-                        send_city = ware.send_city,
-                        send_district = ware.send_district,
-                        send_address = ware.address,
-                        print_date = "",
-                        send_full_address = ware.send_state+ware.send_city+ware.send_district,
-                        receiver_full_address = sale.RecLogistics+sale.RecCity+sale.RecDistrict,
-                        receiver_mobile_phone = sale.RecPhone,
-                        item_amount = 0,
-                        item_base_amount = 0,
-                        sku_id = sale.sku_id,
-                        name = sale.name,
-                        properties_value = sale.properties_value,
-                        name_properties_value = sale.name_properties_value,
-                        sale_price = sale.sale_price,
-                        item_pattern = sale.item_pattern,
-                        shop_url = shop.ShopUrl,
-                        shop_name = order.ShopName,
-                        items = sale.items
-                     };
+                    foreach(var id in ids){
+                        var tasks = new Task[3];
+                        tasks[0] = Task.Factory.StartNew(() =>
+                        {
+                            var aa = getOrderDetail(int.Parse(id),coid);
+                            if(aa.s == -1)
+                            {
+                                result.s = -1;
+                                result.d = aa.d;
+                            }else{
+                                order = aa.d as OrderDetail;
+                                shop = ShopHaddle.ShopQuery(coid,order.ShopID).d as Shop;
+                            }
+                        });
+                        tasks[1] = Task.Factory.StartNew(() =>
+                        {
+                            var bb = getSingleSaleOrder(int.Parse(id),coid);
+                            if(bb.s == -1)
+                            {
+                                result.s = -1;
+                                result.d =bb.d;
+                            }else{
+                                sale = bb.d as SaleOutItem;                        
+                            }
+                        });
+                        tasks[2] = Task.Factory.StartNew(() =>
+                        {
+                            var cc = getSendWare(coid);
+                            if(cc.s == -1)
+                            {
+                                result.s = -1;
+                                result.d =cc.d;
+                            }else{
+                                ware = cc.d as WareDetail;                        
+                            }
+                        });                    
+                        Task.WaitAll(tasks);
+                        if(result.s == -1){ return result;}
+
+                        // rs.add(new {
+                        //     index =  sale.ID ,
+                        //     shop_url = shop.ShopUrl,
+                        //     shop_short_name = order.ShopName,
+                        //     shop_name = order.ShopName,
+                        //     shop_phone = "",
+                        //     shop_address = ware.address,
+                        //     packcode = "", //码上淘
+
+
+
+
+                        //     o_id = sale.OID,
+                        //     so_id = sale.SoID,
+                        //     io_date = sale.DocDate,
+                        //     io = -1,
+                        //     co_id = coid,
+                        //     wh_id = order.WarehouseID,
+                        //     warehouse = sale.SendWarehouse,
+                        //     quality_type = 1,
+                        //     type="销售出仓",
+                        //     status = getStatus(sale.Status),
+                        //     link_wh_id = "",
+                        //     link_warehouse = "",
+                        //     link_io_id = "",
+                        //     created = sale.CreateDate,
+                        //     creator =0,
+                        //     modified = sale.ModifyDate,
+                        //     modifier = 0,
+                        //     creator_name = sale.Creator,
+                        //     modifier_name = sale.Modifier,
+                        //     confirm_user = "",
+                        //     receiver_country = "",
+                        //     receiver_state = sale.RecLogistics,
+                        //     receiver_city = sale.RecCity,
+                        //     receiver_district =sale.RecDistrict,
+                        //     receiver_district_id = "",
+                        //     receiver_address = sale.RecAddress,
+                        //     receiver_name =sale.RecName,
+                        //     receiver_phone = order.RecTel,
+                        //     receiver_mobile = sale.RecPhone,
+                        //     buyer_message = sale.RecMessage,
+                        //     shipment = "",
+                        //     logistics_company = sale.ExpName,
+                        //     lc_id = order.ExpNamePinyin,
+                        //     l_id = sale.ExCode,
+                        //     freight = order.ExCost,
+                        //     weight = order.ExWeight,
+                        //     remark = sale.Remark,
+                        //     carry_id = "",
+                        //     is_invoice = order.IsInvoice,
+                        //     invoice_title = order.InvoiceTitle,
+                        //     invoice_type = order.InvoiceType,
+                        //     pay_date = order.InvoiceDate,
+                        //     shop_id = 0,
+                        //     is_delivery = sale.IsDeliver,
+                        //     as_id = 0,
+                        //     is_print = sale.IsOrdPrint,
+                        //     is_print_express = sale.IsExpPrint,
+                        //     sku_bin = "",
+                        //     bin_id = 0,
+                        //     pay_amount = order.Amount,
+                        //     paid_amount = order.PaidAmount,
+                        //     free_amount= order.Amount - order.PaidAmount,
+                        //     seller_flag = "",
+                        //     tag = "",
+                        //     send_state = ware.send_state,
+                        //     send_city = ware.send_city,
+                        //     send_district = ware.send_district,
+                        //     send_address = ware.address,
+                        //     print_date = "",
+                        //     send_full_address = ware.send_state+ware.send_city+ware.send_district,
+                        //     receiver_full_address = sale.RecLogistics+sale.RecCity+sale.RecDistrict,
+                        //     receiver_mobile_phone = sale.RecPhone,
+                        //     item_amount = 0,
+                        //     item_base_amount = 0,
+                        //     sku_id = sale.sku_id,
+                        //     name = sale.name,
+                        //     properties_value = sale.properties_value,
+                        //     name_properties_value = sale.name_properties_value,
+                        //     sale_price = sale.sale_price,
+                        //     item_pattern = sale.item_pattern,
+                        //     items = sale.items
+                        // });
+                    }
+                    
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;
@@ -362,8 +374,152 @@ namespace CoreDate.CoreComm
             return status;
         }
 
+        // 采购单 状态
+        public static string getPurStatus(int a){
+            string status = "";
+            switch (a)
+            {
+                case 0:
+                    status = "待审核";
+                    break;
+                case 1:
+                    status = "已确认";
+                    break;
+                case 2:
+                    status = "待发货";
+                    break;
+                case 3:
+                    status = "待收货";
+                    break;
+                case 4:
+                    status = "已作废";
+                    break;
+                case 5:
+                    status = "已完成";
+                    break;                                                                                                                                                    
+                default:
+                    status = "状态异常";
+                    break;
+            }
+            return status;
+        }
+        // 采购单 类别(0:成品;1:组合商品;2:原物料;3:非成品)
+        public static string getPurType(int a){
+            string status = "";
+            switch (a)
+            {
+                case 0:
+                    status = "成品";
+                    break;
+                case 1:
+                    status = "组合商品";
+                    break;
+                case 2:
+                    status = "原物料";
+                    break;
+                case 3:
+                    status = "非成品";
+                    break;                                                                                                                                               
+                default:
+                    status = "类别异常";
+                    break;
+            }
+            return status;
+        }
 
 
+         /// <summary>
+		/// 采购单
+		/// </summary>
+        public static DataResult getPurchaseForm(int id,string coid){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{                
+                    var purchase = new Purchase();
+                    var purDetailList = new PurchasePrint();
+                    
+                    purchase = PurchaseHaddle.GetPurchaseEdit(id,int.Parse(coid)).d as Purchase;
+                    purDetailList = getPurDetailist(purchase.id,coid).d as PurchasePrint;
+                
+
+                    result.d = new {
+                       rn__ = 1,
+                       po_id = purchase.id,
+                       po_date = purchase._purchasedate,
+                       print_date = "",
+                       seller = purchase.sconame,
+                       term = purchase.contract,
+                       send_address = purchase.shpaddress,
+                       total_qty = purDetailList.total_qty,
+                       total_amount=purDetailList.total_amount,
+                       total_amount_chinese = "",
+                       total_plan_arrive_qty= purDetailList.total_plan_arrive_qty,
+                       total_plan_arrive_amount = purDetailList.total_plan_arrive_amount,
+                       total_plan_arrive_amount_chinese="",
+                       purchaser_name = purchase.creator,
+                       contacts = "",
+                       mobile="",
+                       phone="",
+                       fax="",
+                       address="",
+                       supplier_code= purchase.scoid,
+                       remark=purchase.remark,
+                       items =  purDetailList.items
+                     };
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return result;
+        }
+
+        public static DataResult getPurDetailist(int id,string coid){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{                
+                    string sql = "select * from purchasedetail where purchaseid = " + id;
+                    var PurDetailist = conn.Query<PurchaseDetail>(sql).AsList();
+                    var print = new PurchasePrint();
+
+                    print.items = new List<PurchasePrintItem>();
+                    
+                    foreach(var item in PurDetailist) {
+                        print.items.Add(new PurchasePrintItem{
+                            index = item.id,
+                            pic60= item.img,
+                            pic100 = item.img,
+                            pic160 = item.img,
+                            sku_id =item.skuid,
+                            name = item.skuname,
+                            supplier_i_id = item.supplycode,
+                            properties_value = item.norm,
+                            qty = int.Parse(item.purqty.Split('.')[0]),
+                            price = decimal.Parse(item.price),
+                            amount = decimal.Parse(item.puramt),
+                            outer_i_id= item.goodscode,
+                            plan_arrive_qty = int.Parse(item.planqty.Split('.')[0]),
+                            plan_arrive_amount = decimal.Parse(item.planamt),
+                            remark = item.remark,
+                            brand = "",
+                            outer_pack_id = item.packingnum
+                        });
+                        print.total_qty += int.Parse(item.purqty.Split('.')[0]);
+                        print.total_amount += decimal.Parse(item.puramt);
+                        print.total_plan_arrive_qty = int.Parse(item.planqty.Split('.')[0]);
+                        print.total_plan_arrive_amount = decimal.Parse(item.planamt);
+                    }
+                    
+                    result.d = print;
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return result;
+        }
 
 
 

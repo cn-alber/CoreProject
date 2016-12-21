@@ -288,6 +288,15 @@ namespace CoreModels.XyCore
         public List<SaleOutPrintItem> items{get;set;}
     }
 
+    public class SaleOutPrint{
+        public int index{get;set;}
+        public string shop_url{get;set;}
+        public string shop_short_name{get;set;}
+        public string shop_name{get;set;}
+        public string shop_phone{get;set;}
+        public string shop_address{get;set;}
+        public string packcode{get;set;}
+    }
     public class SaleOutPrintItem{
         public int oi_id{get;set;}
         public int o_id{get;set;}
@@ -324,6 +333,37 @@ namespace CoreModels.XyCore
         public string pic160{get;set;}
         public int index{get;set;}
     }
+
+    public class PurchasePrint{
+        public int total_qty{get;set;}
+        public decimal total_amount{get;set;}
+        public int total_plan_arrive_qty{get;set;}
+        public decimal total_plan_arrive_amount{get;set;}
+        public List<PurchasePrintItem> items{get;set;}
+    }
+
+    public class PurchasePrintItem{
+       public int index{get;set;}
+       public string pic60{get;set;}
+       public string pic100{get;set;}
+       public string pic160{get;set;}
+       public string sku_id{get;set;}
+       public string name{get;set;}
+       public string properties_value{get;set;}
+       public int qty{get;set;}
+       public decimal price{get;set;}
+       public decimal amount{get;set;}
+       public string supplier_i_id{get;set;}
+       public string outer_i_id{get;set;}
+       public int plan_arrive_qty{get;set;}
+       public decimal plan_arrive_amount{get;set;}
+       public string plan_arrive_date{get;set;}
+       public string remark{get;set;}
+       public string brand{get;set;}
+       public string outer_pack_id{get;set;}
+
+    }
+
 
 
 

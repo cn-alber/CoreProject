@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using CoreData.CoreComm;
+using System.Threading.Tasks;
 
 namespace CoreDate.CoreComm
 {
@@ -174,7 +175,7 @@ namespace CoreDate.CoreComm
          /// <summary>
 		/// 设定，更新默认模板
 		/// </summary>
-        public static DataResult sideSetdefed(string admin_id,string my_tpl_id,string coid){
+        public static DataResult sideSetdefed(string admin_id,string my_tpl_id,string type,string coid){
             var result = new DataResult(1,null); 
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try
@@ -182,16 +183,22 @@ namespace CoreDate.CoreComm
                     var oldmodel = conn.Query<print_use_setting>(@"SELECT * FROM 
                                                                     print_use_setting as a 
                                                                   WHERE 
-                                                                    a.admin_id = "+admin_id).AsList();
+                                                                    a.admin_id = "+admin_id + " AND a.type="+type).AsList();
                     int rnt = 0;
                     if (oldmodel.Count > 0){                   
                         rnt = conn.Execute(@"UPDATE print_use_setting SET 
                                                 print_use_setting.admin_id = @admin_id ,
-                                                print_use_setting.defed_id = @defed_id  
+                                                print_use_setting.defed_id = @defed_id,
+                                                print_use_setting.type = @type   
                                             WHERE 
                                                 print_use_setting.id = @id 
                                             AND 
-                                                print_use_setting.coid = @coid ;",new {admin_id=admin_id,defed_id =my_tpl_id,id = oldmodel[0].id,coid = coid});
+                                                print_use_setting.coid = @coid ;",new {
+                                                    admin_id=admin_id,
+                                                    defed_id =my_tpl_id,
+                                                    id = oldmodel[0].id,
+                                                    type = type,
+                                                    coid = coid});
                         if (rnt > 0){
                         result.s = 1;
                         }else{
@@ -202,8 +209,13 @@ namespace CoreDate.CoreComm
                                                 print_use_setting(
                                                     print_use_setting.admin_id,
                                                     print_use_setting.defed_id,
+                                                    print_use_setting.type = @type,
                                                     print_use_setting.coid) 
-                                            VALUES(@admin_id,@my_tpl_id,@coid)",new {admin_id = admin_id,my_tpl_id=my_tpl_id,coid = coid});
+                                            VALUES(@admin_id,@my_tpl_id,@coid)",new {
+                                                admin_id = admin_id,
+                                                my_tpl_id=my_tpl_id,
+                                                type = type,
+                                                coid = coid});
                         if (rnt > 0){
                             result.s = 1;
                         }else{
@@ -1142,6 +1154,141 @@ namespace CoreDate.CoreComm
             return result;
         }
 
+
+        /// <summary>
+		/// 获取用户打印配置
+		/// </summary>
+        public static DataResult getPrintSet(string uid, int tpl_id = 0, int tpl_type = 0)
+        {
+
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    string sql = "";
+                    if (tpl_id == 0)
+                    {
+                        sql = @"SELECT a.defed_id, a.lodop_target FROM 
+                                    print_use_setting as a 
+                                    WHERE 
+                                    a.admin_id = " + uid + " AND a.type=" + tpl_type;
+                        var defed = conn.Query<dynamic>(sql).AsList();
+                        var tpls = new List<tpl>();
+                        var presets = "";
+                        var tasks = new Task[2];
+                        tasks[0] = Task.Factory.StartNew(() =>
+                        {
+                            tpls = getTpls(tpl_type);
+                        });
+                        tasks[1] = Task.Factory.StartNew(() =>
+                        {
+                            presets = getPreset(tpl_type);
+                        });
+                        Task.WaitAll(tasks);
+                        if (defed.Count == 0)
+                        {
+                            result.s = -1;
+                            result.d = "用户未定义默认模板";
+                        }
+                        else
+                        {
+                            sql = @"SELECT name as title, print_setting ,tpl_data as states FROM print_uses WHERE type = " + tpl_type;
+                            var print_uses = conn.Query<dynamic>(sql).AsList();
+                            if (print_uses.Count == 0)
+                            {
+                                result.s = -4008;
+                            }
+                            else
+                            {
+                                result.d = new
+                                {
+                                    tpl_id = defed[0].defed_id.ToString(),
+                                    tpls = tpls,
+                                    tpl_type = tpl_type.ToString(),
+                                    print_setting = JsonConvert.DeserializeObject<dynamic>(print_uses[0].print_setting),
+                                    states = JsonConvert.DeserializeObject<dynamic>(print_uses[0].states),
+                                    title = print_uses[0].title,
+                                    lodop_target = defed[0].lodop_target,
+                                    //rows = JsonConvert.DeserializeObject<dynamic>(presets)
+                                };
+                            }
+                        }
+                    }
+                    else
+                    {
+                        sql = @"SELECT type, name as title, print_setting ,tpl_data as states FROM print_uses WHERE id = " + tpl_id;
+                        var print_uses = conn.Query<dynamic>(sql).AsList();
+                        if (print_uses.Count == 0)
+                        {
+                            result.s = -4023;
+                        }
+                        else
+                        {
+                            // var presets = "";
+                            // var tasks = new Task[1];
+                            // tasks[0] = Task.Factory.StartNew(() =>
+                            // {
+                            //     presets = getPreset(print_uses[0].type);
+                            // });
+                            // Task.WaitAll(tasks);
+                            
+                            result.d = new
+                            {
+                                tpl_id = tpl_id.ToString(),
+                                print_setting = JsonConvert.DeserializeObject<dynamic>(print_uses[0].print_setting),
+                                states = JsonConvert.DeserializeObject<dynamic>(print_uses[0].states),
+                                title = print_uses[0].title,
+                                //rows = JsonConvert.DeserializeObject<dynamic>(presets)
+                            };
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
+        public static List<tpl> getTpls(int type){
+
+            var result = new List<tpl>();
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    string sql = "SELECT id,`name` FROM print_uses WHERE type ="+type;
+                    result = conn.Query<tpl>(sql).AsList();
+                }
+                catch
+                {
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
+
+       public static string getPreset(int type){
+            var result = "";
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try
+                {
+                    string sql = "SELECT presets FROM print_sys_types WHERE type ="+type;
+                    var presets= conn.Query<string>(sql).AsList();
+                    if(presets.Count > 0){           
+                        result = presets[0];
+                    }
+                }
+                catch
+                {
+                    conn.Dispose();
+                }
+            }
+            return result;
+        }
 
 
         /// <summary>
