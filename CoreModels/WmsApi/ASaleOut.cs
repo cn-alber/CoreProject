@@ -22,6 +22,7 @@ namespace CoreModels.WmsApi
         public string ExpName { get; set; }
         public string IsExpPrint { get; set; }
         public int OrdQty { get; set; }
+        public int OutQty { get; set; }
         public string SortCode { get; set; }
     }
 
@@ -38,6 +39,8 @@ namespace CoreModels.WmsApi
         public OutItemBatch OItemAuto { get; set; }
         public int ID { get; set; }//拣货记录ID
         public string Contents { get; set; }
+        // public int BatchID { get; set; }
+        // public int OID { get; set; }
         public int CoID { get; set; }
         public string Creator { get; set; }
         public string CreateDate { get; set; }
