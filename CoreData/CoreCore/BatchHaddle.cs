@@ -1033,5 +1033,100 @@ namespace CoreData.CoreCore
             }
             return result;
         }
+        ///<summary>
+        ///批次策略查询List
+        ///</summary>
+        public static DataResult GetStrategySimple(int CoID,int Type)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = @"select ID,StrategyName from batchstrategy where Type = " + Type + " and coid = " + CoID;
+                    var s = conn.Query<StrategyList>(sqlcommand).AsList();
+                    result.d = s;             
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }   
+            return result;
+        }
+        ///<summary>
+        ///新增批次策略
+        ///</summary>
+        public static DataResult InsertStrategy(BatchStrategy strategy)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = @"INSERT INTO batchstrategy(Type,StrategyName,SkuIn,SkuNotIn,OrdGift,KindIDIn,PCodeIn,ExpPrint,ExpressIn,DistributorIn,ShopIn,AmtMin,AmtMax,
+                                                                    PayDateStart,PayDateEnd,RecMessage,SendMessage,CoID) 
+                                          VALUES(@Type,@StrategyName,@SkuIn,@SkuNotIn,@OrdGift,@KindIDIn,@PCodeIn,@ExpPrint,@ExpressIn,@DistributorIn,@ShopIn,@AmtMin,@AmtMax,
+                                                 @PayDateStart,@PayDateEnd,@RecMessage,@SendMessage,@CoID)";     
+                    int count = conn.Execute(sqlcommand,strategy);
+                    if(count <= 0)
+                    {
+                        result.s = -3002;
+                        return result;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }   
+            result = GetStrategySimple(strategy.CoID,strategy.Type);
+            return result;
+        }
+        ///<summary>
+        ///查询单笔策略资料
+        ///</summary>
+        public static DataResult GetStrategyEdit(int id,int CoID)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = @"select * from batchstrategy where id = " + id + " and coid = " + CoID;     
+                    var u = conn.Query<BatchStrategy>(sqlcommand).AsList();
+                    if(u.Count > 0)
+                    {
+                        result.d = u[0];
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }   
+            return result;
+        }
+         ///<summary>
+        ///修改策略资料
+        ///</summary>
+        public static DataResult UpdateStrategy(BatchStrategy strategy)
+        {
+            var result = new DataResult(1,null);
+            // using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+            //     try{
+            //         string sqlcommand = @"INSERT INTO batchstrategy(Type,StrategyName,SkuIn,SkuNotIn,OrdGift,KindIDIn,PCodeIn,ExpPrint,ExpressIn,DistributorIn,ShopIn,AmtMin,AmtMax,
+            //                                                         PayDateStart,PayDateEnd,RecMessage,SendMessage,CoID) 
+            //                               VALUES(@Type,@StrategyName,@SkuIn,@SkuNotIn,@OrdGift,@KindIDIn,@PCodeIn,@ExpPrint,@ExpressIn,@DistributorIn,@ShopIn,@AmtMin,@AmtMax,
+            //                                      @PayDateStart,@PayDateEnd,@RecMessage,@SendMessage,@CoID)";     
+            //         int count = conn.Execute(sqlcommand,strategy);
+            //         if(count <= 0)
+            //         {
+            //             result.s = -3002;
+            //             return result;
+            //         }
+            //     }catch(Exception ex){
+            //         result.s = -1;
+            //         result.d = ex.Message;
+            //         conn.Dispose();
+            //     }
+            // }   
+            // result = GetStrategySimple(strategy.CoID,strategy.Type);
+            return result;
+        }
     }
 }

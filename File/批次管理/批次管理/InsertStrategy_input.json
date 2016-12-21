@@ -1,0 +1,19 @@
+{
+    "Type":0,
+    "StrategyName":"测试1221",
+    "SkuIn":"11",
+    "SkuNotIn":"22",
+    "OrdGift":"1",
+    "KindIDIn":"33",
+    "PCodeIn":"44",
+    "ExpPrint":"2",
+    "ExpressIn":"A,1",
+    "DistributorIn":"1,2",
+    "ShopIn":"B,1",
+    "AmtMin":"100",
+    "AmtMax":"200",
+    "PayDateStart":"2016-12-01",
+    "PayDateEnd":"2016-12-31",
+    "RecMessage":"w",
+    "SendMessage":"c"
+}
