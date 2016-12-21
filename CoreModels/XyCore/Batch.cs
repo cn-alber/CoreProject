@@ -189,4 +189,17 @@ namespace CoreModels.XyCore
         public int MultiOrd{get;set;}
         public int BigOrd{get;set;}
     }
+    public class InvQty
+    {
+        public int ID{get;set;}
+        public int Qty{get;set;}
+        public string PCode{get;set;}
+        public string Order{get;set;}
+    }
+    public class Sku
+    {
+        public int SkuAutoID{get;set;}
+        public string SkuID{get;set;}
+        public string SkuName{get;set;}
+    }
 }

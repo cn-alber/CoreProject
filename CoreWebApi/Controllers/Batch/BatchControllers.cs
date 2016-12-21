@@ -362,5 +362,14 @@ namespace CoreWebApi
             var data = BatchHaddle.GetOrdCount(int.Parse(GetCoid()));
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Batch/SetSingleOrd")]
+        public ResponseResult SetSingleOrd([FromBodyAttribute]JObject co)
+        {   
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = BatchHaddle.SetSingleOrd(CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }
