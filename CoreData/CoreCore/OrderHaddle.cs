@@ -6848,10 +6848,10 @@ namespace CoreData.CoreCore
                             saleout.Modifier = UserName;
                             saleout.ExID = a.ExID;
                             saleout.ShopID = a.ShopID;
-
-                            sqlcommand = @"INSERT INTO saleout(OID,SoID,DocDate,Status,ExpName,ExCode,RecMessage,RecLogistics,RecDistrict,RecCity,RecAddress,RecZip,RecName,
+                            saleout.Distributor = a.Distributor;
+                            sqlcommand = @"INSERT INTO saleout(OID,SoID,DocDate,Status,ExpName,ExCode,RecMessage,RecLogistics,RecDistrict,RecCity,RecAddress,RecZip,RecName,Distributor,
                                                                     RecPhone,ExWeight,ExCost,Amount,OrdQty,SendWarehouse,PayDate,SendMessage,CoID,Creator,Modifier,ExID,ShopID) 
-                                                            VALUES(@OID,@SoID,@DocDate,@Status,@ExpName,@ExCode,@RecMessage,@RecLogistics,@RecDistrict,@RecCity,@RecAddress,@RecZip,@RecName,
+                                                            VALUES(@OID,@SoID,@DocDate,@Status,@ExpName,@ExCode,@RecMessage,@RecLogistics,@RecDistrict,@RecCity,@RecAddress,@RecZip,@RecName,@Distributor,
                                                                     @RecPhone,@ExWeight,@ExCost,@Amount,@OrdQty,@SendWarehouse,@PayDate,@SendMessage,@CoID,@Creator,@Modifier,@ExID,@ShopID)";
                             int y = CoreDBconn.Execute(sqlcommand,saleout,TransCore);
                             if(y < 0)
@@ -7777,10 +7777,10 @@ namespace CoreData.CoreCore
                         saleout.Modifier = UserName;
                         saleout.ExID = a.ExID;
                         saleout.ShopID = a.ShopID;
-
-                        sqlcommand = @"INSERT INTO saleout(OID,SoID,DocDate,Status,ExpName,ExCode,RecMessage,RecLogistics,RecDistrict,RecCity,RecAddress,RecZip,RecName,
+                        saleout.Distributor = a.Distributor;
+                        sqlcommand = @"INSERT INTO saleout(OID,SoID,DocDate,Status,ExpName,ExCode,RecMessage,RecLogistics,RecDistrict,RecCity,RecAddress,RecZip,RecName,Distributor,
                                                                 RecPhone,ExWeight,ExCost,Amount,OrdQty,SendWarehouse,PayDate,SendMessage,CoID,Creator,Modifier,ExID,ShopID) 
-                                                        VALUES(@OID,@SoID,@DocDate,@Status,@ExpName,@ExCode,@RecMessage,@RecLogistics,@RecDistrict,@RecCity,@RecAddress,@RecZip,@RecName,
+                                                        VALUES(@OID,@SoID,@DocDate,@Status,@ExpName,@ExCode,@RecMessage,@RecLogistics,@RecDistrict,@RecCity,@RecAddress,@RecZip,@RecName,@Distributor,
                                                                 @RecPhone,@ExWeight,@ExCost,@Amount,@OrdQty,@SendWarehouse,@PayDate,@SendMessage,@CoID,@Creator,@Modifier,@ExID,@ShopID)";
                         count = CoreDBconn.Execute(sqlcommand,saleout,TransCore);
                         if(count < 0)
@@ -9292,10 +9292,10 @@ namespace CoreData.CoreCore
                     saleout.Modifier = UserName;
                     saleout.ExID = u[0].ExID;
                     saleout.ShopID = u[0].ShopID;
-
-                    sqlCommand = @"INSERT INTO saleout(OID,SoID,DocDate,Status,ExpName,ExCode,RecMessage,RecLogistics,RecDistrict,RecCity,RecAddress,RecZip,RecName,
+                    saleout.Distributor = u[0].Distributor;
+                    sqlCommand = @"INSERT INTO saleout(OID,SoID,DocDate,Status,ExpName,ExCode,RecMessage,RecLogistics,RecDistrict,RecCity,RecAddress,RecZip,RecName,Distributor,
                                                             RecPhone,ExWeight,ExCost,Amount,OrdQty,SendWarehouse,PayDate,SendMessage,CoID,Creator,Modifier,ExID,ShopID) 
-                                                    VALUES(@OID,@SoID,@DocDate,@Status,@ExpName,@ExCode,@RecMessage,@RecLogistics,@RecDistrict,@RecCity,@RecAddress,@RecZip,@RecName,
+                                                    VALUES(@OID,@SoID,@DocDate,@Status,@ExpName,@ExCode,@RecMessage,@RecLogistics,@RecDistrict,@RecCity,@RecAddress,@RecZip,@RecName,@Distributor,
                                                             @RecPhone,@ExWeight,@ExCost,@Amount,@OrdQty,@SendWarehouse,@PayDate,@SendMessage,@CoID,@Creator,@Modifier,@ExID,@ShopID)";
                     count = CoreDBconn.Execute(sqlCommand,saleout,TransCore);
                     if(count < 0)
