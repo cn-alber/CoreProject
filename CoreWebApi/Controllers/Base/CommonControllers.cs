@@ -308,5 +308,21 @@ namespace CoreWebApi
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
         #endregion
+
+        #region 获取拣货策略基本配置参数（商品分类，店铺，快递，分销商）
+        [HttpPostAttribute("Core/Common/batchBase")]
+        public ResponseResult batchBase()
+        {
+            var res = new DataResult(1, null);
+            string CoID = GetCoid();
+
+            
+            //res = CommHaddle.GetSkuPileCode(CoID,IDLst);
+            
+            return CoreResult.NewResponse(res.s, res.d, "General");
+        }
+        #endregion
+
+
     }
 }

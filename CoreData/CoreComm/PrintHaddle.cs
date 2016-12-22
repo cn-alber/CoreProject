@@ -1161,7 +1161,7 @@ namespace CoreDate.CoreComm
         public static DataResult getPrintSet(string uid, int tpl_id = 0, int tpl_type = 0)
         {
 
-            var result = new DataResult(1, null);
+            var result = new DataResult(1, null, "");
             using (var conn = new MySqlConnection(DbBase.CommConnectString))
             {
                 try
@@ -1192,6 +1192,8 @@ namespace CoreDate.CoreComm
                             sql = @"SELECT id as defed_id  from print_syses WHERE type="+tpl_type+" LIMIT 0,1";
                             defed = conn.Query<dynamic>(sql).AsList();
                             result.s = 4010;
+                            var typeName = conn.Query<string>("SELECT name  from print_sys_types WHERE type="+tpl_type).AsList()[0];
+                            result.m = "您尚未设置该类型【"+typeName+"】打印模板，请前去【打印设置】，当前仅供预览";
                         }
                    
                         sql = @"SELECT name as title, print_setting ,tpl_data as states FROM print_uses WHERE type = " + tpl_type;
@@ -1225,15 +1227,7 @@ namespace CoreDate.CoreComm
                             result.s = -4023;
                         }
                         else
-                        {
-                            // var presets = "";
-                            // var tasks = new Task[1];
-                            // tasks[0] = Task.Factory.StartNew(() =>
-                            // {
-                            //     presets = getPreset(print_uses[0].type);
-                            // });
-                            // Task.WaitAll(tasks);
-                            
+                        {                            
                             result.d = new
                             {
                                 tpl_id = tpl_id.ToString(),

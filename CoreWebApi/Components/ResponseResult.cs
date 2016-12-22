@@ -15,7 +15,7 @@ namespace CoreWebApi
             return Newtonsoft.Json.JsonConvert.SerializeObject(new ResponseResult(s, d, JsonFile.GetMessage(s, Section)),Formatting.None, timeFormat);
         }
 
-        public static ResponseResult NewResponse(int s, object d, string Section)
+        public static ResponseResult NewResponse(int s, object d, string Section,string defaultM="")
         {
             // var configurationSection = Configuration.GetSection("AppSettings");
             // var m = JsonFile.GetJson<BasicCode>(_fileName,_section).Find(q=>q.Code == s).Message;
@@ -31,7 +31,7 @@ namespace CoreWebApi
             }
             else
             {
-                m = JsonFile.GetMessage(s, Section);
+                m = string.IsNullOrEmpty(defaultM) ?　JsonFile.GetMessage(s, Section) : defaultM;
             }
 
             return new ResponseResult(s, d, m);

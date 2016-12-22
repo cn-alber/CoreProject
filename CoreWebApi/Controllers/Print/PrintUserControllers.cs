@@ -122,7 +122,7 @@ namespace CoreWebApi.Print
             }
             
             var m = PrintHaddle.getPrintSet(admin_id,tpl_id,tpl_type);
-            return CoreResult.NewResponse(m.s,m.d,"Print");
+            return CoreResult.NewResponse(m.s,m.d,"Print",m.m);
         }
 
         #endregion

@@ -8,8 +8,15 @@ namespace CoreModels
             s = S;
             d = D;
         }
+        public DataResult(int S, object D, string m)
+        {
+            s = S;
+            d = D;
+        }
+                
 
         public int s { get; set; }
         public object d { get; set; }
+        public string m{get;set;}
     }
 }
