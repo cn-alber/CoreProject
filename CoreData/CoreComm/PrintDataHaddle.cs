@@ -395,37 +395,38 @@ namespace CoreDate.CoreComm
                 try{                
                     var purchase = new Purchase();
                     var purDetailList = new PurchasePrint();
+                    var rs = new List<PurchasePrintMain>();
+                    int i = 1;
                     foreach(var id in ids) {
                         purchase = PurchaseHaddle.GetPurchaseEdit(int.Parse(id),int.Parse(coid)).d as Purchase;
                         purDetailList = getPurDetailist(purchase.id,coid).d as PurchasePrint;
-                    }
-                   
-                
-
-                    result.d = new {
-                       rn__ = 1,
-                       po_id = purchase.id,
-                       po_date = purchase._purchasedate,
-                       print_date = "",
-                       seller = purchase.sconame,
-                       term = purchase.contract,
-                       send_address = purchase.shpaddress,
-                       total_qty = purDetailList.total_qty,
-                       total_amount=purDetailList.total_amount,
-                       total_amount_chinese = "",
-                       total_plan_arrive_qty= purDetailList.total_plan_arrive_qty,
-                       total_plan_arrive_amount = purDetailList.total_plan_arrive_amount,
-                       total_plan_arrive_amount_chinese="",
-                       purchaser_name = purchase.creator,
-                       contacts = "",
-                       mobile="",
-                       phone="",
-                       fax="",
-                       address="",
-                       supplier_code= purchase.scoid,
-                       remark=purchase.remark,
-                       items =  purDetailList.items
-                     };
+                        rs.Add(new PurchasePrintMain{
+                            rn__ = i,
+                            po_id = purchase.id,
+                            po_date = purchase._purchasedate,
+                            print_date = "",
+                            seller = purchase.sconame,
+                            term = purchase.contract,
+                            send_address = purchase.shpaddress,
+                            total_qty = purDetailList.total_qty,
+                            total_amount=purDetailList.total_amount,
+                            total_amount_chinese = "",
+                            total_plan_arrive_qty= purDetailList.total_plan_arrive_qty,
+                            total_plan_arrive_amount = purDetailList.total_plan_arrive_amount,
+                            total_plan_arrive_amount_chinese="",
+                            purchaser_name = purchase.creator,
+                            contacts = "",
+                            mobile="",
+                            phone="",
+                            fax="",
+                            address="",
+                            supplier_code= purchase.scoid,
+                            remark=purchase.remark,
+                            items =  purDetailList.items
+                        });
+                        i++;
+                    }                   
+                    result.d = rs;
                 }catch(Exception ex){
                     result.s = -1;
                     result.d = ex.Message;

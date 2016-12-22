@@ -367,6 +367,32 @@ namespace CoreModels.XyCore
         public int index{get;set;}
     }
 
+    public class PurchasePrintMain{
+        public int rn__{get;set;}
+        public int po_id{get;set;}
+        public string po_date{get;set;}
+        public string print_date{get;set;}
+        public string seller{get;set;}
+        public string term{get;set;}
+        public string send_address{get;set;}
+        public int total_qty{get;set;}
+        public decimal total_amount{get;set;}
+        public string total_amount_chinese{get;set;}
+        public int total_plan_arrive_qty{get;set;}
+        public decimal total_plan_arrive_amount{get;set;}
+        public string total_plan_arrive_amount_chinese{get;set;}
+        public string purchaser_name{get;set;}
+        public string contacts{get;set;}
+        public string mobile{get;set;}
+        public string phone{get;set;}
+        public string fax{get;set;}
+        public string address{get;set;}
+        public int supplier_code{get;set;}
+        public string remark{get;set;}
+        public List<PurchasePrintItem> items{get;set;}
+    }
+
+
     public class PurchasePrint{
         public int total_qty{get;set;}
         public decimal total_amount{get;set;}
