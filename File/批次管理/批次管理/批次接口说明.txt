@@ -121,3 +121,44 @@ OutPut:SingleOrd  一单一件订单数
        MultiOrd   一单多件订单数
        BigOrd     现场大单订单数
 参考:output jason 文件:GetOrdCount_output.json
+
+14.SetSingleOrd() //一单一件批次生成
+路由:http://localhost:5000/Core/Batch/SetSingleOrd
+input:None
+OutPut:成功或失败
+参考:output jason 文件:SetSingleOrd_output.json
+
+15.GetStrategySimple() //根据批次类型查询策略
+路由:http://localhost:5000/Core/Batch/GetStrategySimple
+input:      Type                string          类型
+OutPut:     策略List
+参考:output jason 文件:GetStrategySimple_output.json
+
+16.InsertStrategy()新增批次策略
+路由:http://localhost:5000/Core/Batch/InsertStrategy
+input:Type              int         批次类型
+      StrategyName      string      策略名称
+      SkuIn             string      包含商品
+      SkuNotIn          string      不包含商品
+      OrdGift           int         订单包含赠品
+      KindIDIn          string      限定商品分类
+      PCodeIn           string      限定仓位
+      ExpPrint          int         限定打印快递单
+      ExpressIn         string      限定快递公司
+      DistributorIn     string      分销商
+      ShopIn            string      限定店铺
+      AmtMin            decimal     最小金额
+      AmtMax            decimal     最大金额
+      PayDateStart      DateTime    最早付款日期
+      PayDateEnd        DateTime    最晚付款日期
+      RecMessage        string      买家留言
+      SendMessage       string      卖家备注
+output: 批次List
+参考:input jason 文件:InsertStrategy_input.json
+参考:output jason 文件:InsertStrategy_output.json
+
+17.GetStrategyEdit() //查询单笔批次资料
+路由:http://localhost:5000/Core/Batch/GetStrategyEdit
+input:      ID         int
+OutPut:     策略资料
+参考:output jason 文件:GetStrategyEdit_output.json

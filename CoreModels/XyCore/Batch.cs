@@ -189,4 +189,44 @@ namespace CoreModels.XyCore
         public int MultiOrd{get;set;}
         public int BigOrd{get;set;}
     }
+    public class InvQty
+    {
+        public int ID{get;set;}
+        public int Qty{get;set;}
+        public string PCode{get;set;}
+        public string Order{get;set;}
+    }
+    public class Sku
+    {
+        public int SkuAutoID{get;set;}
+        public string SkuID{get;set;}
+        public string SkuName{get;set;}
+    }
+    public class StrategyList
+    {
+        public int ID{get;set;}
+        public string StrategyName{get;set;}
+    }
+    public class BatchStrategy
+    {
+        public int ID{get;set;}
+        public int Type{get;set;}
+        public string StrategyName{get;set;}
+        public string SkuIn{get;set;}
+        public string SkuNotIn{get;set;}
+        public int OrdGift{get;set;}
+        public string KindIDIn{get;set;}
+        public string PCodeIn{get;set;}
+        public int ExpPrint{get;set;}
+        public string ExpressIn{get;set;}
+        public string DistributorIn{get;set;}
+        public string ShopIn{get;set;}
+        public string AmtMin{get;set;}
+        public string AmtMax{get;set;}
+        public string PayDateStart{get;set;}
+        public string PayDateEnd{get;set;}
+        public string RecMessage{get;set;}
+        public string SendMessage{get;set;}
+        public int CoID{get;set;}
+    }
 }

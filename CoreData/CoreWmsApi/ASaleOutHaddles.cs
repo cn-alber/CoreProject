@@ -435,6 +435,7 @@ namespace CoreData.CoreWmsApi
             try
             {
                 var aout = IParam.OItemAuto;
+                // IParam.OID = aout.OID;
                 //库存检查
                 result = CheckMultiInvQty(IParam, CoreTrans, CoreConn);
                 var itemLst = result.d as List<ASaleOutQty>;
@@ -532,10 +533,10 @@ namespace CoreData.CoreWmsApi
         public static DataResult CheckMultiInvQty(ASaleOutSet IParam, IDbTransaction Trans, MySqlConnection conn)
         {
             var result = new DataResult(1, null);
-            var aout = IParam.OItemAuto;
+            var item=IParam.OItemAuto;
             string itemsql = @"SELECT @CoID AS CoID,Skuautoid,Qty FROM saleoutitem WHERE CoID=@CoID AND OID=@OID";
             string invsql = @"SELECT IFNULL(Count(ID),0) FROM inventory WHERE CoID=@CoID AND Skuautoid =@Skuautoid AND StockQty<@Qty";
-            var itemLst = conn.Query<ASaleOutQty>(itemsql, new { CoID = IParam.CoID, OID = aout.OID }, Trans).AsList();
+            var itemLst = conn.Query<ASaleOutQty>(itemsql, new { CoID = IParam.CoID, OID = item.OID }, Trans).AsList();
             var count = conn.QueryFirst<int>(invsql, itemLst);
             if (count > 0)
             {
@@ -549,6 +550,57 @@ namespace CoreData.CoreWmsApi
         }
         #endregion
 
+        #region 大单发货 - 获取批次信息
+        public static DataResult GetSaleOutByBatch(ASaleParams IParam)
+        {
+            var result = new DataResult(1, null);
+            var data = new ASaleOutData();
+            using (var CoreConn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                try
+                {
+                    string sql = @"SELECT BatchID,
+                                        ID AS OutID,
+                                        OID,
+                                        ExpName,
+                                        ExCode,
+                                        OrdQty,
+                                        SortCode
+                                    FROM saleout
+                                    WHERE CoID=@CoID
+                                    AND BatchID=@BatchID
+                                    AND `Status` = 0";
+                    var p = new DynamicParameters();
+                    p.Add("@CoID", IParam.CoID);
+                    p.Add("@BatchID", IParam.BatchID);
+                    var aout = CoreConn.Query<OutItemBatch>(sql, p).AsList();
+                    if (aout.Count <= 0)
+                    {
+                        result.s = -6000;
+                    }
+                    else
+                    {
+                        string qSql = @"SELECT
+                                            IFNULL(SUM(Qty), 0)
+                                        FROM
+                                            saleoutitemp
+                                        WHERE
+                                            CoID =@CoID
+                                        AND BatchID =@BatchID";
+                        int OutQty = CoreConn.Query<int>(qSql, p).First();
+                        aout[0].OutQty = OutQty;
+                        result.d = aout[0];
+                    }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+        #endregion
 
         #region 大单发货 - 条码扫描获取条码信息
         public static DataResult GetSaleOutSkuBig(ASaleParams IParam)
@@ -612,7 +664,62 @@ namespace CoreData.CoreWmsApi
         }
         #endregion
 
+        #region 大单发货 - 更新库存资料
+        public static DataResult SaleOutBig(ASaleOutSet IParam)
+        {
+            var result = new DataResult(1, null);
+            var RecordID = "SL" + CommHaddle.GetRecordID(IParam.CoID);
+            var CoreConn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreConn.Open();
+            var CoreTrans = CoreConn.BeginTransaction();
+            try
+            {
+                string Osql = @"SELECT `Status`
+                                FROM saleout
+                                WHERE CoID=@CoID AND OID=@OID ";
+                var Olst = CoreConn.Query<int>(Osql, new { CoID = IParam.CoID, OID = IParam.OItemAuto.OID }).AsList();
+                if (Olst.Count <= 0)
+                {
+                    result.s = -6000;
+                }
+                else if (Olst[0] > 0)
+                {
+                    result.s = -6022;
+                }
+                else
+                {
+                    //检查库存是否充足
+                    result = CheckMultiInvQty(IParam, CoreTrans, CoreConn);
+                    var itemLst = result.d as List<ASaleOutQty>;
+                    if (result.s > 0)
+                    {
 
+                        //更新出货单状态
+                        string UptOsql = @"UPDATE saleout
+                                    SET `Status` = 1,
+                                        IsDeliver = 1
+                                    WHERE
+                                        CoID =@CoID
+                                    AND OID =@OID";
+                        CoreConn.Execute(UptOsql, new { CoID = IParam.CoID, OID = IParam.OItemAuto.OID }, CoreTrans);
+
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                CoreTrans.Rollback();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                CoreTrans.Dispose();
+                CoreConn.Close();
+            }
+            return result;
+        }
+        #endregion
 
 
         #region 更新销退仓库存
@@ -696,7 +803,8 @@ namespace CoreData.CoreWmsApi
         public static string SetSaleOutFnSql()
         {
             string sql = @"UPDATE saleout
-                            SET `Status` = 1
+                            SET `Status` = 1,
+                                IsDeliver = 1
                             WHERE
                                 CoID =@CoID
                             AND ID =@OutID";
