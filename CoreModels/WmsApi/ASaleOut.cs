@@ -76,6 +76,10 @@ namespace CoreModels.WmsApi
 
     }
 
+    public class ASaleOutItem
+    {
+        
+    }
     public class ASaleOutPrint
     {
         public int OID { get; set; }
