@@ -6,8 +6,10 @@ using MySql.Data.MySqlClient;
 
 namespace CoreData.CoreCore
 {
-    public static class DistributorHaddle{
-        public static List<distributorEnum> getDisEnum(string CoID){
+    public static class DistributorHaddle
+    {
+        public static List<distributorEnum> getDisEnum(string CoID)
+        {
             var res = new List<distributorEnum>();
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try
@@ -21,10 +23,23 @@ namespace CoreData.CoreCore
                     conn.Dispose();
                 }
             }
-
+            return res;
+        }
+        public static string getDisName(string CoID,string id)
+        {
+            string res = string.Empty;
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try
+                {
+                    string sql = @"SELECT DistributorName FROM distributor WHERE CoID="+CoID+" AND id = " + id;
+                    res  = conn.QueryFirst<string>(sql);                                  
+                }
+                catch
+                {
+                    conn.Dispose();
+                }
+            }
             return res;
         }
     }
-
-
 }

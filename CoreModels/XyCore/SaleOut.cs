@@ -29,6 +29,7 @@ namespace CoreModels.XyCore
         public string SendWarehouse{get;set;}
         public DateTime PayDate{get;set;}
         public string SendMessage{get;set;}
+        public string Distributor{get;set;}
         public int CoID{get;set;}
         public string Creator{get;set;}
         public string Modifier{get;set;}

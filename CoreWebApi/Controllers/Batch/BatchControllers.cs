@@ -672,5 +672,313 @@ namespace CoreWebApi
             var data = BatchHaddle.GetStrategyEdit(id,int.Parse(GetCoid()));
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Batch/UpdateStrategy")]
+        public ResponseResult UpdateStrategy([FromBodyAttribute]JObject co)
+        {   
+            int ID;
+            string StrategyName = null,SkuIn = null,SkuNotIn = null,OrdGift = null,KindIDIn = null,PCodeIn = null,ExpPrint = null,ExpressIn = null,DistributorIn = null,ShopIn = null,
+                   AmtMin = null,AmtMax = null,PayDateStart = null, PayDateEnd = null,RecMessage = null,SendMessage = null;
+            if(co["ID"] != null)
+            {
+                string Text = co["ID"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    int x;
+                    if (int.TryParse(Text, out x))
+                    {
+                        ID = int.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "策略ID参数异常", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "策略ID必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "策略ID必填", "General"); 
+            }
+            if(co["StrategyName"] != null)
+            {
+                StrategyName = co["StrategyName"].ToString();
+                if(string.IsNullOrEmpty(StrategyName))
+                {
+                    return CoreResult.NewResponse(-1, "策略名称必填", "General"); 
+                }
+            }
+            if(co["SkuIn"] != null)
+            {
+                SkuIn = co["SkuIn"].ToString();
+            }
+            if(co["SkuNotIn"] != null)
+            {
+                SkuNotIn = co["SkuNotIn"].ToString();
+            }
+            if(co["OrdGift"] != null)
+            {
+                OrdGift = co["OrdGift"].ToString();
+                if(!string.IsNullOrEmpty(OrdGift))
+                {
+                    int x,y;
+                    if (int.TryParse(OrdGift, out x))
+                    {
+                        y = int.Parse(OrdGift);
+                        if(y != 0 && y != 1 && y != 2)
+                        {
+                            return CoreResult.NewResponse(-1, "订单包含赠品参数异常", "General"); 
+                        }
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "订单包含赠品参数异常", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "订单包含赠品参数异常", "General"); 
+                }
+            }
+            if(co["KindIDIn"] != null)
+            {
+                KindIDIn = co["KindIDIn"].ToString();
+            }
+            if(co["PCodeIn"] != null)
+            {
+                PCodeIn = co["PCodeIn"].ToString();
+            }
+            if(co["ExpPrint"] != null)
+            {
+                ExpPrint = co["ExpPrint"].ToString();
+                if(!string.IsNullOrEmpty(ExpPrint))
+                {
+                    int x,y;
+                    if (int.TryParse(ExpPrint, out x))
+                    {
+                        y = int.Parse(ExpPrint);
+                        if(y != 0 && y != 1 && y != 2)
+                        {
+                            return CoreResult.NewResponse(-1, "限定打印快递单参数异常", "General"); 
+                        }
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "限定打印快递单参数异常", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "限定打印快递单参数异常", "General"); 
+                }
+            }
+            if(co["ExpressIn"] != null)
+            {
+                ExpressIn = co["ExpressIn"].ToString();
+                string[] a = ExpressIn.Split(',');
+                int i = 0,j = 0;
+                foreach(var aa in a)
+                {
+                    if(aa == "B")
+                    {
+                        i ++;
+                    }
+                    if(aa == "A")
+                    {
+                        j ++;
+                    }
+                }
+                if(i > 0)
+                {
+                    ExpressIn = "B";
+                }
+                else if(j > 0)
+                {
+                    ExpressIn = "A";
+                }
+            }
+            if(co["DistributorIn"] != null)
+            {
+                DistributorIn = co["DistributorIn"].ToString();
+            }
+            if(co["ShopIn"] != null)
+            {
+                ShopIn = co["ShopIn"].ToString();
+                string[] a = ShopIn.Split(',');
+                int i = 0,j = 0;
+                foreach(var aa in a)
+                {
+                    if(aa == "B")
+                    {
+                        i ++;
+                    }
+                    if(aa == "A")
+                    {
+                        j ++;
+                    }
+                }
+                if(i > 0)
+                {
+                    ShopIn = "B";
+                }
+                else if(j > 0)
+                {
+                    ShopIn = "A";
+                }
+            }
+            if(co["AmtMin"] != null)
+            {
+                string Text = co["AmtMin"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    decimal x;
+                    if (decimal.TryParse(Text, out x))
+                    {
+                        AmtMin = Text;
+                    }
+                }
+            }
+            if(co["AmtMax"] != null)
+            {
+                string Text = co["AmtMax"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    decimal x;
+                    if (decimal.TryParse(Text, out x))
+                    {
+                        AmtMax = Text;
+                    }
+                }
+            }
+            if(co["PayDateStart"] != null)
+            {
+                string Text = co["PayDateStart"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    DateTime x;
+                    if (DateTime.TryParse(Text, out x))
+                    {
+                        PayDateStart = Text;
+                    }
+                }
+            }
+            if(co["PayDateEnd"] != null)
+            {
+                string Text = co["PayDateEnd"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    DateTime x;
+                    if (DateTime.TryParse(Text, out x))
+                    {
+                        PayDateEnd = Text;
+                    }
+                }
+            }
+            if(co["RecMessage"] != null)
+            {
+                RecMessage = co["RecMessage"].ToString();
+            }
+            if(co["SendMessage"] != null)
+            {
+                SendMessage = co["SendMessage"].ToString();
+            }
+            var data = BatchHaddle.UpdateStrategy(ID,int.Parse(GetCoid()),StrategyName,SkuIn,SkuNotIn,OrdGift,KindIDIn,PCodeIn,ExpPrint,ExpressIn,DistributorIn,ShopIn,AmtMin,AmtMax,
+                                                  PayDateStart,PayDateEnd,RecMessage,SendMessage);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+        [HttpPostAttribute("/Core/Batch/DeleteStrategy")]
+        public ResponseResult DeleteStrategy([FromBodyAttribute]JObject co)
+        {   
+            int ID,Type;
+            if(co["Type"] != null)
+            {
+                string Text = co["Type"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    int x;
+                    if (int.TryParse(Text, out x))
+                    {
+                        Type = int.Parse(Text);
+                        if(Type != 0 && Type != 1)
+                        {
+                            return CoreResult.NewResponse(-1, "批次类型参数异常", "General"); 
+                        }
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "批次类型参数异常", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "批次类型必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "批次类型必填", "General"); 
+            }
+            if(co["ID"] != null)
+            {
+                string Text = co["ID"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    int x;
+                    if (int.TryParse(Text, out x))
+                    {
+                        ID = int.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "策略ID参数异常", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "策略ID必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "策略ID必填", "General"); 
+            }
+            var data = BatchHaddle.DeleteStrategy(ID,int.Parse(GetCoid()),Type);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Batch/SetSingleOrdStrategy")]
+        public ResponseResult SetSingleOrdStrategy([FromBodyAttribute]JObject co)
+        {   
+            int ID;
+            if(co["ID"] != null)
+            {
+                string Text = co["ID"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    int x;
+                    if (int.TryParse(Text, out x))
+                    {
+                        ID = int.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "策略ID参数异常", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "策略ID必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "策略ID必填", "General"); 
+            }
+            var data = BatchHaddle.SetSingleOrdStrategy(int.Parse(GetCoid()),GetUname(),ID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }
