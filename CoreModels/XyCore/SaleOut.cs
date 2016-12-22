@@ -296,6 +296,39 @@ namespace CoreModels.XyCore
         public string shop_phone{get;set;}
         public string shop_address{get;set;}
         public string packcode{get;set;}
+        public string buyer_message{get;set;}
+        public long so_id{get;set;}
+        public string shop_buyer_id{get;set;}
+        public int o_id{get;set;}
+        public int io_id{get;set;}
+        public string co_id_io_id{get;set;}
+        public string order_date{get;set;}
+        public string l_id{get;set;}
+        public string print_date{get;set;}
+        public string print_date_m{get;set;}
+        public string co_name{get;set;}
+        public string creator_name{get;set;}
+        public string remark{get;set;}
+        public decimal freight{get;set;}
+        public decimal item_amount{get;set;}
+        public decimal item_base_amount{get;set;}
+        public int total_qty{get;set;}
+        public decimal free_amount{get;set;}
+        public decimal pay_amount{get;set;}
+        public decimal paid_amount{get;set;}
+        public string invoice_title{get;set;}
+        public string receiver_state{get;set;}
+        public string receiver_city{get;set;}
+        public string receiver_district{get;set;}
+        public string receiver_address{get;set;}
+        public string receiver_zip{get;set;}
+        public string receiver_full_address{get;set;}
+        public string receiver_name{get;set;}
+        public string receiver_phone{get;set;}
+        public string receiver_mobile{get;set;}
+        public string receiver_mobile_phone{get;set;}
+        public List<SaleOutPrintItem> items{get;set;}
+
     }
     public class SaleOutPrintItem{
         public int oi_id{get;set;}
