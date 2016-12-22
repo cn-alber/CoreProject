@@ -193,6 +193,7 @@ namespace CoreWebApi.Print
             string ids =String.Join(",",lo["ids"]); 
             string coid = GetCoid();
             var m = PrintHaddle.DelSysesByID(ids,coid); 
+            
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion

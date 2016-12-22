@@ -1188,32 +1188,33 @@ namespace CoreDate.CoreComm
                         Task.WaitAll(tasks);
                         if (defed.Count == 0)
                         {
-                            result.s = -1;
-                            result.d = "用户未定义默认模板";
+                            
+                            sql = @"SELECT id as defed_id  from print_syses WHERE type="+tpl_type+" LIMIT 0,1";
+                            defed = conn.Query<dynamic>(sql).AsList();
+                            result.s = 4010;
+                        }
+                   
+                        sql = @"SELECT name as title, print_setting ,tpl_data as states FROM print_uses WHERE type = " + tpl_type;
+                        var print_uses = conn.Query<dynamic>(sql).AsList();
+                        if (print_uses.Count == 0)
+                        {
+                            result.s = -4008;
                         }
                         else
                         {
-                            sql = @"SELECT name as title, print_setting ,tpl_data as states FROM print_uses WHERE type = " + tpl_type;
-                            var print_uses = conn.Query<dynamic>(sql).AsList();
-                            if (print_uses.Count == 0)
+                            result.d = new
                             {
-                                result.s = -4008;
-                            }
-                            else
-                            {
-                                result.d = new
-                                {
-                                    tpl_id = defed[0].defed_id.ToString(),
-                                    tpls = tpls,
-                                    tpl_type = tpl_type.ToString(),
-                                    print_setting = JsonConvert.DeserializeObject<dynamic>(print_uses[0].print_setting),
-                                    states = JsonConvert.DeserializeObject<dynamic>(print_uses[0].states),
-                                    title = print_uses[0].title,
-                                    lodop_target = defed[0].lodop_target,
-                                    //rows = JsonConvert.DeserializeObject<dynamic>(presets)
-                                };
-                            }
+                                tpl_id = defed[0].defed_id.ToString(),
+                                tpls = tpls,
+                                tpl_type = tpl_type.ToString(),
+                                print_setting = JsonConvert.DeserializeObject<dynamic>(print_uses[0].print_setting),
+                                states = JsonConvert.DeserializeObject<dynamic>(print_uses[0].states),
+                                title = print_uses[0].title,
+                                lodop_target = defed[0].lodop_target,
+                                //rows = JsonConvert.DeserializeObject<dynamic>(presets)
+                            };
                         }
+                        
                     }
                     else
                     {

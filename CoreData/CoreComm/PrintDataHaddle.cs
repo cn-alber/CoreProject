@@ -389,98 +389,95 @@ namespace CoreDate.CoreComm
          /// <summary>
 		/// 采购单
 		/// </summary>
-        public static DataResult getPurchaseForm(int id,string coid){
+        public static DataResult getPurchaseForm(List<string> ids,string coid){
             var result = new DataResult(1,null);
-            // using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
-            //     try{                
-            //         var purchase = new Purchase();
-            //         var purDetailList = new PurchasePrint();
-                    
-            //         purchase = PurchaseHaddle.GetPurchaseEdit(id,int.Parse(coid)).d as Purchase;
-            //         purDetailList = getPurDetailist(purchase.id,coid).d as PurchasePrint;
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{                
+                    var purchase = new Purchase();
+                    var purDetailList = new PurchasePrint();
+                    foreach(var id in ids) {
+                        purchase = PurchaseHaddle.GetPurchaseEdit(int.Parse(id),int.Parse(coid)).d as Purchase;
+                        purDetailList = getPurDetailist(purchase.id,coid).d as PurchasePrint;
+                    }
+                   
                 
 
-            //         result.d = new {
-            //            rn__ = 1,
-            //            po_id = purchase.id,
-            //            po_date = purchase._purchasedate,
-            //            print_date = "",
-            //            seller = purchase.sconame,
-            //            term = purchase.contract,
-            //            send_address = purchase.shpaddress,
-            //            total_qty = purDetailList.total_qty,
-            //            total_amount=purDetailList.total_amount,
-            //            total_amount_chinese = "",
-            //            total_plan_arrive_qty= purDetailList.total_plan_arrive_qty,
-            //            total_plan_arrive_amount = purDetailList.total_plan_arrive_amount,
-            //            total_plan_arrive_amount_chinese="",
-            //            purchaser_name = purchase.creator,
-            //            contacts = "",
-            //            mobile="",
-            //            phone="",
-            //            fax="",
-            //            address="",
-            //            supplier_code= purchase.scoid,
-            //            remark=purchase.remark,
-            //            items =  purDetailList.items
-            //          };
-            //     }catch(Exception ex){
-            //         result.s = -1;
-            //         result.d = ex.Message;
-            //         conn.Dispose();
-            //     }
-            // } 
+                    result.d = new {
+                       rn__ = 1,
+                       po_id = purchase.id,
+                       po_date = purchase._purchasedate,
+                       print_date = "",
+                       seller = purchase.sconame,
+                       term = purchase.contract,
+                       send_address = purchase.shpaddress,
+                       total_qty = purDetailList.total_qty,
+                       total_amount=purDetailList.total_amount,
+                       total_amount_chinese = "",
+                       total_plan_arrive_qty= purDetailList.total_plan_arrive_qty,
+                       total_plan_arrive_amount = purDetailList.total_plan_arrive_amount,
+                       total_plan_arrive_amount_chinese="",
+                       purchaser_name = purchase.creator,
+                       contacts = "",
+                       mobile="",
+                       phone="",
+                       fax="",
+                       address="",
+                       supplier_code= purchase.scoid,
+                       remark=purchase.remark,
+                       items =  purDetailList.items
+                     };
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
             return result;
         }
 
-        public static DataResult getPurDetailist(List<string> ids,string coid){
+        public static DataResult getPurDetailist(int id,string coid){
             var result = new DataResult(1,null);
-            // using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
-            //     try{       
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{                
+                    string sql = "select * from purchasedetail where purchaseid = " + id;
+                    var PurDetailist = conn.Query<PurchaseDetail>(sql).AsList();
+                    var print = new PurchasePrint();
 
-            //         string sql = "";
-            //         var PurDetailist = new List<PurchaseDetail>();
-            //         var print = new PurchasePrint();
-            //         var rs = new List<PurchasePrint>();
-            //         print.items = new List<PurchasePrintItem>();
-            //         foreach(var id in ids) {
-            //             sql = "select * from purchasedetail where purchaseid = " + id;
-            //             PurDetailist = conn.Query<PurchaseDetail>(sql).AsList();
-            //             foreach(var item in PurDetailist) {
-            //             print.items.Add(new PurchasePrintItem{
-            //                 index = item.id,
-            //                 pic60= item.img,
-            //                 pic100 = item.img,
-            //                 pic160 = item.img,
-            //                 sku_id =item.skuid,
-            //                 name = item.skuname,
-            //                 supplier_i_id = item.supplycode,
-            //                 properties_value = item.norm,
-            //                 qty = int.Parse(item.purqty.Split('.')[0]),
-            //                 price = decimal.Parse(item.price),
-            //                 amount = decimal.Parse(item.puramt),
-            //                 outer_i_id= item.goodscode,
-            //                 plan_arrive_qty = int.Parse(item.planqty.Split('.')[0]),
-            //                 plan_arrive_amount = decimal.Parse(item.planamt),
-            //                 remark = item.remark,
-            //                 brand = "",
-            //                 outer_pack_id = item.packingnum
-            //             });
-            //             print.total_qty += int.Parse(item.purqty.Split('.')[0]);
-            //             print.total_amount += decimal.Parse(item.puramt);
-            //             print.total_plan_arrive_qty = int.Parse(item.planqty.Split('.')[0]);
-            //             print.total_plan_arrive_amount = decimal.Parse(item.planamt);
-            //         }
-            //     }
+                    print.items = new List<PurchasePrintItem>();
                     
+                    foreach(var item in PurDetailist) {
+                        print.items.Add(new PurchasePrintItem{
+                            index = item.id,
+                            pic60= item.img,
+                            pic100 = item.img,
+                            pic160 = item.img,
+                            sku_id =item.skuid,
+                            name = item.skuname,
+                            supplier_i_id = item.supplycode,
+                            properties_value = item.norm,
+                            qty = int.Parse(item.purqty.Split('.')[0]),
+                            price = decimal.Parse(item.price),
+                            amount = decimal.Parse(item.puramt),
+                            outer_i_id= item.goodscode,
+                            plan_arrive_qty = int.Parse(item.planqty.Split('.')[0]),
+                            plan_arrive_amount = decimal.Parse(item.planamt),
+                            remark = item.remark,
+                            brand = "",
+                            outer_pack_id = item.packingnum
+                        });
+                        print.total_qty += int.Parse(item.purqty.Split('.')[0]);
+                        print.total_amount += decimal.Parse(item.puramt);
+                        print.total_plan_arrive_qty = int.Parse(item.planqty.Split('.')[0]);
+                        print.total_plan_arrive_amount = decimal.Parse(item.planamt);
+                    }
                     
-            //         result.d = print;
-            //     }catch(Exception ex){
-            //         result.s = -1;
-            //         result.d = ex.Message;
-            //         conn.Dispose();
-            //     }
-            // } 
+                    result.d = print;
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
             return result;
         }
 
