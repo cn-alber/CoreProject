@@ -142,7 +142,7 @@ namespace CoreModels.XyComm
 	}
 
 	public class tpl{
-		public int id{get;set;}
+		public string id{get;set;}
 		public string name{get;set;}
 	}
 

@@ -93,7 +93,7 @@ namespace CoreWebApi.Print
                 m.s = -1;
                 m.d = "参数无效!";              
             }
-            m = PrintDataHaddle.getPurchaseForm(id,GetCoid());
+            //m = PrintDataHaddle.getPurchaseForm(id,GetCoid());
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
