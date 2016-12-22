@@ -25,7 +25,7 @@ namespace CoreWebApi.Print
             var m = new DataResult(1,null);
             switch (withType)
             {
-                case 1: 
+                case 3: 
                     m = PrintDataHaddle.getSaleForm(new List<string>(ids.Split(',')),GetCoid());
                     break;
                 default:
