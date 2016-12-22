@@ -29,6 +29,7 @@ namespace CoreModels.XyCore
         public string SendWarehouse{get;set;}
         public DateTime PayDate{get;set;}
         public string SendMessage{get;set;}
+        public string Distributor{get;set;}
         public int CoID{get;set;}
         public string Creator{get;set;}
         public string Modifier{get;set;}
@@ -296,6 +297,39 @@ namespace CoreModels.XyCore
         public string shop_phone{get;set;}
         public string shop_address{get;set;}
         public string packcode{get;set;}
+        public string buyer_message{get;set;}
+        public long so_id{get;set;}
+        public string shop_buyer_id{get;set;}
+        public int o_id{get;set;}
+        public int io_id{get;set;}
+        public string co_id_io_id{get;set;}
+        public string order_date{get;set;}
+        public string l_id{get;set;}
+        public string print_date{get;set;}
+        public string print_date_m{get;set;}
+        public string co_name{get;set;}
+        public string creator_name{get;set;}
+        public string remark{get;set;}
+        public decimal freight{get;set;}
+        public decimal item_amount{get;set;}
+        public decimal item_base_amount{get;set;}
+        public int total_qty{get;set;}
+        public decimal free_amount{get;set;}
+        public decimal pay_amount{get;set;}
+        public decimal paid_amount{get;set;}
+        public string invoice_title{get;set;}
+        public string receiver_state{get;set;}
+        public string receiver_city{get;set;}
+        public string receiver_district{get;set;}
+        public string receiver_address{get;set;}
+        public string receiver_zip{get;set;}
+        public string receiver_full_address{get;set;}
+        public string receiver_name{get;set;}
+        public string receiver_phone{get;set;}
+        public string receiver_mobile{get;set;}
+        public string receiver_mobile_phone{get;set;}
+        public List<SaleOutPrintItem> items{get;set;}
+
     }
     public class SaleOutPrintItem{
         public int oi_id{get;set;}
@@ -333,6 +367,32 @@ namespace CoreModels.XyCore
         public string pic160{get;set;}
         public int index{get;set;}
     }
+
+    public class PurchasePrintMain{
+        public int rn__{get;set;}
+        public int po_id{get;set;}
+        public string po_date{get;set;}
+        public string print_date{get;set;}
+        public string seller{get;set;}
+        public string term{get;set;}
+        public string send_address{get;set;}
+        public int total_qty{get;set;}
+        public decimal total_amount{get;set;}
+        public string total_amount_chinese{get;set;}
+        public int total_plan_arrive_qty{get;set;}
+        public decimal total_plan_arrive_amount{get;set;}
+        public string total_plan_arrive_amount_chinese{get;set;}
+        public string purchaser_name{get;set;}
+        public string contacts{get;set;}
+        public string mobile{get;set;}
+        public string phone{get;set;}
+        public string fax{get;set;}
+        public string address{get;set;}
+        public int supplier_code{get;set;}
+        public string remark{get;set;}
+        public List<PurchasePrintItem> items{get;set;}
+    }
+
 
     public class PurchasePrint{
         public int total_qty{get;set;}

@@ -1003,33 +1003,475 @@ namespace CoreData.CoreCore
         public static DataResult SetSingleOrd(int CoID,string UserName)
         {
             var result = new DataResult(1,null);
-            int SingleOrdQty = int.Parse(GetConfigure(CoID,"A").d.ToString());
-            for(int i = 0;i < 100;i++)  
-            {
-                var ID = new List<int>();
-                using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
-                    try{
-                        string sqlcommand = @"select saleout.ID from saleout where status = 0 and BatchID = 0 and OrdQty = 1 and ExpName != '现场取货' and 
-                                              coid = " + CoID + " limit 0," + SingleOrdQty;
-                        ID = conn.Query<int>(sqlcommand).AsList();         
-                    }catch(Exception ex){
-                        result.s = -1;
-                        result.d = ex.Message;
-                        conn.Dispose();
-                    }
-                }    
-                if(ID.Count > 0)
-                {
-                    result = SingleOrd(CoID,ID,UserName);
-                    if(result.s == -1)
-                    {
-                        break;
-                    }
-                }    
-                else
-                {
-                    break;
+            var ID = new List<int>();
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = @"select saleout.ID from saleout where status = 0 and BatchID = 0 and OrdQty = 1 and ExpName != '现场取货' and coid = " + CoID;
+                    ID = conn.Query<int>(sqlcommand).AsList();         
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
                 }
+            }    
+            if(ID.Count == 0)
+            {
+                result.s = -1;
+                result.d = "没有符合的条件资料生成批次!";
+                return result;
+            }
+            int SingleOrdQty = int.Parse(GetConfigure(CoID,"A").d.ToString());
+            var sinID = new List<int>();
+            foreach(var a in ID)
+            {
+                sinID.Add(a);
+                if(sinID.Count == SingleOrdQty)
+                {
+                    result = SingleOrd(CoID,sinID,UserName);
+                    sinID = new List<int>();
+                }
+            }
+            if(sinID.Count > 0)
+            {
+                result = SingleOrd(CoID,sinID,UserName);
+            }
+            return result;
+        }
+        ///<summary>
+        ///批次策略查询List
+        ///</summary>
+        public static DataResult GetStrategySimple(int CoID,int Type)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = @"select ID,StrategyName from batchstrategy where Type = " + Type + " and coid = " + CoID;
+                    var s = conn.Query<StrategyList>(sqlcommand).AsList();
+                    result.d = s;             
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }   
+            return result;
+        }
+        ///<summary>
+        ///新增批次策略
+        ///</summary>
+        public static DataResult InsertStrategy(BatchStrategy strategy)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = @"INSERT INTO batchstrategy(Type,StrategyName,SkuIn,SkuNotIn,OrdGift,KindIDIn,PCodeIn,ExpPrint,ExpressIn,DistributorIn,ShopIn,AmtMin,AmtMax,
+                                                                    PayDateStart,PayDateEnd,RecMessage,SendMessage,CoID) 
+                                          VALUES(@Type,@StrategyName,@SkuIn,@SkuNotIn,@OrdGift,@KindIDIn,@PCodeIn,@ExpPrint,@ExpressIn,@DistributorIn,@ShopIn,@AmtMin,@AmtMax,
+                                                 @PayDateStart,@PayDateEnd,@RecMessage,@SendMessage,@CoID)";     
+                    int count = conn.Execute(sqlcommand,strategy);
+                    if(count <= 0)
+                    {
+                        result.s = -3002;
+                        return result;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }   
+            result = GetStrategySimple(strategy.CoID,strategy.Type);
+            return result;
+        }
+        ///<summary>
+        ///查询单笔策略资料
+        ///</summary>
+        public static DataResult GetStrategyEdit(int id,int CoID)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = @"select * from batchstrategy where id = " + id + " and coid = " + CoID;     
+                    var u = conn.Query<BatchStrategy>(sqlcommand).AsList();
+                    if(u.Count > 0)
+                    {
+                        result.d = u[0];
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }   
+            return result;
+        }
+        ///<summary>
+        ///修改策略资料
+        ///</summary>
+        public static DataResult UpdateStrategy(int id,int CoID,string StrategyName,string SkuIn,string SkuNotIn,string OrdGift,string KindIDIn,string PCodeIn,string ExpPrint,
+                                                string ExpressIn,string DistributorIn,string ShopIn,string AmtMin,string AmtMax,string PayDateStart,string PayDateEnd,
+                                                string RecMessage,string SendMessage)
+        {
+            var result = new DataResult(1,null);
+            var strategy = GetStrategyEdit(id,CoID).d as BatchStrategy;
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = "update batchstrategy set ";
+                    int i = 0;
+                    if(StrategyName != null)
+                    {
+                        i ++;
+                        sqlcommand = sqlcommand + "StrategyName=@StrategyName,";
+                        strategy.StrategyName = StrategyName;
+                    }
+                    if(SkuIn != null)
+                    {
+                        i ++;
+                        sqlcommand = sqlcommand + "SkuIn=@SkuIn,";
+                        strategy.SkuIn = SkuIn;
+                    }
+                    if(SkuNotIn != null)
+                    {
+                        i ++;
+                        sqlcommand = sqlcommand + "SkuNotIn=@SkuNotIn,";
+                        strategy.SkuNotIn = SkuNotIn;
+                    }
+                    if(OrdGift != null)
+                    {
+                        i ++;
+                        sqlcommand = sqlcommand + "OrdGift=@OrdGift,";
+                        strategy.OrdGift = int.Parse(OrdGift);
+                    }
+                    if(KindIDIn != null)
+                    {
+                        i ++;
+                        sqlcommand = sqlcommand + "KindIDIn=@KindIDIn,";
+                        strategy.KindIDIn = KindIDIn;
+                    }
+                    if(PCodeIn != null)
+                    {
+                        i ++;
+                        sqlcommand = sqlcommand + "PCodeIn=@PCodeIn,";
+                        strategy.PCodeIn = PCodeIn;
+                    }
+                    if(ExpPrint != null)
+                    {
+                        i ++;
+                        sqlcommand = sqlcommand + "ExpPrint=@ExpPrint,";
+                        strategy.ExpPrint = int.Parse(ExpPrint);
+                    }
+                    if(ExpressIn != null)
+                    {
+                        i ++;
+                        sqlcommand = sqlcommand + "ExpressIn=@ExpressIn,";
+                        strategy.ExpressIn = ExpressIn;
+                    }
+                    if(DistributorIn != null)
+                    {
+                        i ++;
+                        sqlcommand = sqlcommand + "DistributorIn=@DistributorIn,";
+                        strategy.DistributorIn = DistributorIn;
+                    }
+                    if(ShopIn != null)
+                    {
+                        i ++;
+                        sqlcommand = sqlcommand + "ShopIn=@ShopIn,";
+                        strategy.ShopIn = ShopIn;
+                    }
+                    if(AmtMin != null)
+                    {
+                        i ++;
+                        sqlcommand = sqlcommand + "AmtMin=@AmtMin,";
+                        strategy.AmtMin = AmtMin;
+                    }
+                    if(AmtMax != null)
+                    {
+                        i ++;
+                        sqlcommand = sqlcommand + "AmtMax=@AmtMax,";
+                        strategy.AmtMax = AmtMax;
+                    }
+                    if(PayDateStart != null)
+                    {
+                        i ++;
+                        sqlcommand = sqlcommand + "PayDateStart=@PayDateStart,";
+                        strategy.PayDateStart = PayDateStart;
+                    }
+                    if(PayDateEnd != null)
+                    {
+                        i ++;
+                        sqlcommand = sqlcommand + "PayDateEnd=@PayDateEnd,";
+                        strategy.PayDateEnd = PayDateEnd;
+                    }
+                    if(RecMessage != null)
+                    {
+                        i ++;
+                        sqlcommand = sqlcommand + "RecMessage=@RecMessage,";
+                        strategy.RecMessage = RecMessage;
+                    }
+                    if(SendMessage != null)
+                    {
+                        i ++;
+                        sqlcommand = sqlcommand + "SendMessage=@SendMessage,";
+                        strategy.SendMessage = SendMessage;
+                    }
+                    if(i > 0)
+                    {
+                        sqlcommand = sqlcommand.Substring(0,sqlcommand.Length - 1);
+                        sqlcommand = sqlcommand + " where id = @ID and coid = @Coid";
+                        int count = conn.Execute(sqlcommand,strategy);
+                        if(count <= 0)
+                        {
+                            result.s = -3003;
+                            return result;
+                        }
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }   
+            result = GetStrategySimple(strategy.CoID,strategy.Type);
+            return result;
+        }
+        ///<summary>
+        ///删除批次策略
+        ///</summary>
+        public static DataResult DeleteStrategy(int id,int CoID,int Type)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = @"delete from batchstrategy where id = " + id + " and coid = " + CoID;     
+                    int count = conn.Execute(sqlcommand);
+                    if(count < 0)
+                    {
+                        result.s = -3004;
+                        return result;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }   
+            result = GetStrategySimple(CoID,Type);
+            return result;
+        }
+        ///<summary>
+        ///一单一件策略生成
+        ///</summary>
+        public static DataResult SetSingleOrdStrategy(int CoID,string UserName,int id)
+        {
+            var result = new DataResult(1,null);
+            var strategy = GetStrategyEdit(id,CoID).d as BatchStrategy;
+            var ID = new List<int>();
+            string shop = GetConfigure(CoID,"G").d.ToString();
+            string exp = GetConfigure(CoID,"F").d.ToString();
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = @"select saleout.ID from saleout where status = 0 and BatchID = 0 and OrdQty = 1 and ExpName != '现场取货' and coid = " + CoID;
+                    if(!string.IsNullOrEmpty(strategy.AmtMin))
+                    {
+                        sqlcommand = sqlcommand + " and Amount >= " + strategy.AmtMin;
+                    }
+                    if(!string.IsNullOrEmpty(strategy.AmtMax))
+                    {
+                        sqlcommand = sqlcommand + " and Amount <= " + strategy.AmtMax;
+                    }
+                    if(!string.IsNullOrEmpty(strategy.PayDateStart) && DateTime.Parse(strategy.PayDateStart) > DateTime.Parse("1900-01-01"))
+                    {
+                        sqlcommand = sqlcommand + " and PayDate <= '" + strategy.PayDateStart + "'";
+                    }
+                    if(!string.IsNullOrEmpty(strategy.PayDateEnd) && DateTime.Parse(strategy.PayDateEnd) > DateTime.Parse("1900-01-01"))
+                    {
+                        sqlcommand = sqlcommand + " and PayDate >= '" + strategy.PayDateEnd + "'";
+                    }
+                    if(!string.IsNullOrEmpty(strategy.RecMessage))
+                    {
+                        sqlcommand = sqlcommand + " and RecMessage like '%" + strategy.RecMessage + "%'";
+                    }
+                    if(!string.IsNullOrEmpty(strategy.SendMessage))
+                    {
+                        sqlcommand = sqlcommand + " and SendMessage like '%" + strategy.SendMessage + "%'";
+                    }
+                    if(!string.IsNullOrEmpty(strategy.ShopIn))
+                    {
+                        if(strategy.ShopIn == "B")
+                        {
+                            strategy.ShopIn = shop;
+                        }
+                        if(strategy.ShopIn != "A")
+                        {
+                            sqlcommand = sqlcommand + " and ShopID in (" + strategy.ShopIn + ")";
+                        }
+                    }
+                    if(!string.IsNullOrEmpty(strategy.ExpressIn))
+                    {
+                        if(strategy.ExpressIn == "B")
+                        {
+                            strategy.ExpressIn = exp;
+                        }
+                        if(strategy.ExpressIn != "A")
+                        {
+                            sqlcommand = sqlcommand + " and ExID in (" + strategy.ExpressIn + ")";
+                        }
+                    }
+                    if(strategy.ExpPrint == 1)
+                    {
+                        sqlcommand = sqlcommand + " and IsExpPrint == false";
+                    }
+                    if(strategy.ExpPrint == 2)
+                    {
+                        sqlcommand = sqlcommand + " and IsExpPrint == true";
+                    }
+                    if(!string.IsNullOrEmpty(strategy.DistributorIn))
+                    {
+                        string[] a = strategy.DistributorIn.Split(',');
+                        List<string> dis = new List<string>();
+                        bool isflag = false;
+                        foreach(var aa in a)
+                        {
+                            if(aa == "0")
+                            {
+                                isflag = true;
+                            }
+                            else
+                            {
+                                string name = DistributorHaddle.getDisName(CoID.ToString(),aa);
+                                dis.Add(name);
+                            }
+                        }
+                        if(isflag == true && dis.Count == 0)
+                        {
+                            sqlcommand = sqlcommand + " and Distributor == ''";
+                        }
+                        if(isflag == true && dis.Count > 0)
+                        {
+                            string distributor = string.Empty;
+                            foreach(var x in dis)
+                            {
+                                distributor = distributor + "'" + x + "',";
+                            }
+                            distributor = distributor.Substring(0,distributor.Length - 1);
+                            sqlcommand = sqlcommand + " and (Distributor == '' or Distributor in (" + distributor + "))";
+                        }
+                        if(isflag == false && dis.Count > 0)
+                        {
+                            string distributor = string.Empty;
+                            foreach(var x in dis)
+                            {
+                                distributor = distributor + "'" + x + "',";
+                            }
+                            distributor = distributor.Substring(0,distributor.Length - 1);
+                            sqlcommand = sqlcommand + " and Distributor in (" + distributor + ")";
+                        }
+                    }
+                    ID = conn.Query<int>(sqlcommand).AsList();    
+                    if(ID.Count == 0)
+                    {
+                        result.s = -1;
+                        result.d = "没有符合的条件资料生成批次!";
+                        return result;
+                    }   
+                    if(!string.IsNullOrEmpty(strategy.SkuIn) || !string.IsNullOrEmpty(strategy.SkuNotIn) || strategy.OrdGift != 0 || 
+                       !string.IsNullOrEmpty(strategy.KindIDIn) || !string.IsNullOrEmpty(strategy.PCodeIn))  
+                    {
+                        var NID = new List<int>();
+                        foreach(var a in ID)
+                        {
+                            sqlcommand = "select count(id) from saleoutitem where sid = " + a + " and coid = " + CoID + " and isgift = true";
+                            int count = conn.QueryFirst<int>(sqlcommand);    
+                            if(strategy.OrdGift == 1 && count == 0) continue;
+                            if(strategy.OrdGift == 2 && count > 0) continue;
+                            sqlcommand = "select SkuAutoID,SkuID from saleoutitem where sid = " + a + " and coid = " + CoID + " and isgift = false";
+                            var sku = conn.Query<SaleOutItemInsert>(sqlcommand).AsList();  
+                            if(!string.IsNullOrEmpty(strategy.SkuIn))
+                            {
+                                int i = 0;
+                                foreach(var s in sku)
+                                {
+                                    if(strategy.SkuIn.Contains(s.SkuID))
+                                    {
+                                        i ++;
+                                        break;
+                                    }
+                                }
+                                if(i == 0) continue;
+                            } 
+                            if(!string.IsNullOrEmpty(strategy.SkuNotIn))
+                            {
+                                int i = 0;
+                                foreach(var s in sku)
+                                {
+                                    if(strategy.SkuNotIn.Contains(s.SkuID))
+                                    {
+                                        i ++;
+                                        break;
+                                    }
+                                }
+                                if(i > 0) continue;
+                            } 
+                            if(!string.IsNullOrEmpty(strategy.KindIDIn))
+                            {
+                                var skuid = new List<int>();
+                                foreach(var s in sku)
+                                {
+                                    skuid.Add(s.SkuAutoID);
+                                }
+                                sqlcommand = @"select count(id) from coresku where id in (" + string.Join(",",skuid) + ") and KindID not in (" + strategy.KindIDIn + ")" + 
+                                              " and coid =" + CoID;
+                                count = conn.QueryFirst<int>(sqlcommand);  
+                                if(count > 0) continue;
+                            } 
+                            if(!string.IsNullOrEmpty(strategy.PCodeIn))
+                            {
+                                var skuid = new List<int>();
+                                foreach(var s in sku)
+                                {
+                                    skuid.Add(s.SkuAutoID);
+                                }
+                                string[] pcode = strategy.PCodeIn.Split(',');
+                                string wheresql = "";
+                                foreach(var p in pcode)
+                                {
+                                    wheresql = wheresql + "PCode like '%" + p + "%' or";
+                                }
+                                wheresql = "and (" + wheresql.Substring(0,wheresql.Length - 3) + ")";
+                                sqlcommand = @"select count(id) from wmspile where Skuautoid in (" + string.Join(",",skuid) + ") and coid =" + CoID + wheresql + " and Qty <= lockqty";
+                                count = conn.QueryFirst<int>(sqlcommand);  
+                                if(count > 0) continue;
+                            } 
+                            NID.Add(a);
+                        }
+                        ID = NID;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }    
+            if(ID.Count == 0)
+            {
+                result.s = -1;
+                result.d = "没有符合的条件资料生成批次!";
+                return result;
+            }
+            int SingleOrdQty = int.Parse(GetConfigure(CoID,"A").d.ToString());
+            var sinID = new List<int>();
+            foreach(var a in ID)
+            {
+                sinID.Add(a);
+                if(sinID.Count == SingleOrdQty)
+                {
+                    result = SingleOrd(CoID,sinID,UserName);
+                    sinID = new List<int>();
+                }
+            }
+            if(sinID.Count > 0)
+            {
+                result = SingleOrd(CoID,sinID,UserName);
             }
             return result;
         }

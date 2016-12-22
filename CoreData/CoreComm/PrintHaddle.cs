@@ -1161,7 +1161,7 @@ namespace CoreDate.CoreComm
         public static DataResult getPrintSet(string uid, int tpl_id = 0, int tpl_type = 0)
         {
 
-            var result = new DataResult(1, null);
+            var result = new DataResult(1, null, "");
             using (var conn = new MySqlConnection(DbBase.CommConnectString))
             {
                 try
@@ -1188,32 +1188,35 @@ namespace CoreDate.CoreComm
                         Task.WaitAll(tasks);
                         if (defed.Count == 0)
                         {
-                            result.s = -1;
-                            result.d = "用户未定义默认模板";
+                            
+                            sql = @"SELECT id as defed_id  from print_syses WHERE type="+tpl_type+" LIMIT 0,1";
+                            defed = conn.Query<dynamic>(sql).AsList();
+                            result.s = 4010;
+                            var typeName = conn.Query<string>("SELECT name  from print_sys_types WHERE type="+tpl_type).AsList()[0];
+                            result.m = "您尚未设置该类型【"+typeName+"】打印模板，请前去【打印设置】，当前仅供预览";
+                        }
+                   
+                        sql = @"SELECT name as title, print_setting ,tpl_data as states FROM print_uses WHERE type = " + tpl_type;
+                        var print_uses = conn.Query<dynamic>(sql).AsList();
+                        if (print_uses.Count == 0)
+                        {
+                            result.s = -4008;
                         }
                         else
                         {
-                            sql = @"SELECT name as title, print_setting ,tpl_data as states FROM print_uses WHERE type = " + tpl_type;
-                            var print_uses = conn.Query<dynamic>(sql).AsList();
-                            if (print_uses.Count == 0)
+                            result.d = new
                             {
-                                result.s = -4008;
-                            }
-                            else
-                            {
-                                result.d = new
-                                {
-                                    tpl_id = defed[0].defed_id.ToString(),
-                                    tpls = tpls,
-                                    tpl_type = tpl_type.ToString(),
-                                    print_setting = JsonConvert.DeserializeObject<dynamic>(print_uses[0].print_setting),
-                                    states = JsonConvert.DeserializeObject<dynamic>(print_uses[0].states),
-                                    title = print_uses[0].title,
-                                    lodop_target = defed[0].lodop_target,
-                                    //rows = JsonConvert.DeserializeObject<dynamic>(presets)
-                                };
-                            }
+                                tpl_id = defed[0].defed_id.ToString(),
+                                tpls = tpls,
+                                tpl_type = tpl_type.ToString(),
+                                print_setting = JsonConvert.DeserializeObject<dynamic>(print_uses[0].print_setting),
+                                states = JsonConvert.DeserializeObject<dynamic>(print_uses[0].states),
+                                title = print_uses[0].title,
+                                lodop_target = defed[0].lodop_target,
+                                //rows = JsonConvert.DeserializeObject<dynamic>(presets)
+                            };
                         }
+                        
                     }
                     else
                     {
@@ -1224,15 +1227,7 @@ namespace CoreDate.CoreComm
                             result.s = -4023;
                         }
                         else
-                        {
-                            // var presets = "";
-                            // var tasks = new Task[1];
-                            // tasks[0] = Task.Factory.StartNew(() =>
-                            // {
-                            //     presets = getPreset(print_uses[0].type);
-                            // });
-                            // Task.WaitAll(tasks);
-                            
+                        {                            
                             result.d = new
                             {
                                 tpl_id = tpl_id.ToString(),

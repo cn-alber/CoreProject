@@ -4,6 +4,7 @@ using CoreModels.XyComm;
 using System;
 using Newtonsoft.Json.Linq;
 using CoreModels;
+using System.Collections.Generic;
 
 
 //  print_sys_types   系统预设模板
@@ -21,12 +22,11 @@ namespace CoreWebApi.Print
         [HttpGetAttribute("/core/print/data/withType")]
         public ResponseResult withType(int withType,string ids)
         {
-            int id=0;
             var m = new DataResult(1,null);
             switch (withType)
             {
-                case 1: 
-                    //m = PrintDataHaddle.getSaleForm(ids.Split(','),GetCoid());
+                case 3: 
+                    m = PrintDataHaddle.getSaleForm(new List<string>(ids.Split(',')),GetCoid());
                     break;
                 default:
                     m.s = -1;
@@ -93,7 +93,7 @@ namespace CoreWebApi.Print
                 m.s = -1;
                 m.d = "参数无效!";              
             }
-            m = PrintDataHaddle.getPurchaseForm(id,GetCoid());
+            //m = PrintDataHaddle.getPurchaseForm(id,GetCoid());
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
         #endregion
