@@ -217,3 +217,24 @@ input:ID                int         策略ID
 output:成功或失败
 参考:input jason 文件:SetMultiOrdStrategy_input.json
 参考:output jason 文件:SetMultiOrdStrategy_output.json
+
+23.GetOrdTask()订单任务资料查询
+路由:http://localhost:5000/Core/Batch/GetOrdTask
+input:ID                int         策略ID
+      OrdQtyStart       int         订单数量起
+      OrdQtyEnd         int         订单数量迄
+output:成功或失败
+参考:output jason 文件:GetOrdTask_output.json
+
+24.OrdTaskBatch()选择订单生成任务
+路由:http://localhost:5000/Core/Batch/OrdTaskBatch
+input:ID    List<int>         出库单ID
+output:成功或失败
+参考:input jason 文件:OrdTaskBatch_input.json
+参考:output jason 文件:OrdTaskBatch_output.json
+
+25.SetBigOrd() //现场大单生成
+路由:http://localhost:5000/Core/Batch/SetBigOrd
+input:None
+OutPut:成功或失败
+参考:output jason 文件:SetBigOrd_output.json

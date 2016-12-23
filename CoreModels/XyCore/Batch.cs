@@ -231,4 +231,12 @@ namespace CoreModels.XyCore
         public string OrdQty{get;set;}
         public int CoID{get;set;}
     }
+    public class OrdTask
+    {
+        public int id{get;set;}
+        public int oid{get;set;}
+        public string Sku{get;set;}
+        public string ExpName{get;set;}
+        public int OrdQty{get;set;}
+    }
 }

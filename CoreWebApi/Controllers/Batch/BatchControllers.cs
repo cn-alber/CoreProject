@@ -1022,6 +1022,7 @@ namespace CoreWebApi
             var data = BatchHaddle.SetMultiOrd(CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
         [HttpPostAttribute("/Core/Batch/SetMultiOrdStrategy")]
         public ResponseResult SetMultiOrdStrategy([FromBodyAttribute]JObject co)
         {   
@@ -1051,6 +1052,58 @@ namespace CoreWebApi
                 return CoreResult.NewResponse(-1, "策略ID必填", "General"); 
             }
             var data = BatchHaddle.SetMultiOrdStrategy(int.Parse(GetCoid()),GetUname(),ID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Batch/GetOrdTask")]
+        public ResponseResult GetOrdTask(string ID,string OrdQtyStart,string OrdQtyEnd)
+        {
+            int x,id=0,ordqtys=0,ordqtye=0;
+            if(!string.IsNullOrEmpty(ID))
+            {
+                if (int.TryParse(ID, out x))
+                {
+                    id = int.Parse(ID);
+                }
+            }
+            if(!string.IsNullOrEmpty(OrdQtyStart))
+            {
+                if (int.TryParse(OrdQtyStart, out x))
+                {
+                    ordqtys = int.Parse(OrdQtyStart);
+                }
+            }
+            if(!string.IsNullOrEmpty(OrdQtyEnd))
+            {
+                if (int.TryParse(OrdQtyEnd, out x))
+                {
+                    ordqtye = int.Parse(OrdQtyEnd);
+                }
+            }
+            var data = BatchHaddle.GetOrdTask(int.Parse(GetCoid()),id,ordqtys,ordqtye);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Batch/OrdTaskBatch")]
+        public ResponseResult OrdTaskBatch([FromBodyAttribute]JObject co)
+        {   
+            var id = new List<int>();
+            if(co["ID"] != null)
+            {
+                id = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["ID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "出库单ID必填", "General");
+            }
+            var data = BatchHaddle.OrdTaskBatch(int.Parse(GetCoid()),GetUname(),id);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Batch/SetBigOrd")]
+        public ResponseResult SetBigOrd([FromBodyAttribute]JObject co)
+        {   
+            var data = BatchHaddle.SetBigOrd(int.Parse(GetCoid()),GetUname());
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     }
