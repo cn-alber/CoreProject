@@ -227,6 +227,8 @@ namespace CoreModels.XyCore
         public string PayDateEnd{get;set;}
         public string RecMessage{get;set;}
         public string SendMessage{get;set;}
+        public string PrioritySku{get;set;}
+        public string OrdQty{get;set;}
         public int CoID{get;set;}
     }
 }

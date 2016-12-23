@@ -645,6 +645,22 @@ namespace CoreWebApi
             {
                 strategy.SendMessage = co["SendMessage"].ToString();
             }
+            if(co["PrioritySku"] != null)
+            {
+                strategy.PrioritySku = co["PrioritySku"].ToString();
+            }
+            if(co["OrdQty"] != null)
+            {
+                string Text = co["OrdQty"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    int x;
+                    if (int.TryParse(Text, out x))
+                    {
+                        strategy.OrdQty = Text;
+                    }
+                }
+            }
             strategy.CoID = int.Parse(GetCoid());
             var data = BatchHaddle.InsertStrategy(strategy);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
@@ -678,7 +694,7 @@ namespace CoreWebApi
         {   
             int ID;
             string StrategyName = null,SkuIn = null,SkuNotIn = null,OrdGift = null,KindIDIn = null,PCodeIn = null,ExpPrint = null,ExpressIn = null,DistributorIn = null,ShopIn = null,
-                   AmtMin = null,AmtMax = null,PayDateStart = null, PayDateEnd = null,RecMessage = null,SendMessage = null;
+                   AmtMin = null,AmtMax = null,PayDateStart = null, PayDateEnd = null,RecMessage = null,SendMessage = null,PrioritySku=null,OrdQty=null;
             if(co["ID"] != null)
             {
                 string Text = co["ID"].ToString();
@@ -885,10 +901,27 @@ namespace CoreWebApi
             {
                 SendMessage = co["SendMessage"].ToString();
             }
+            if(co["PrioritySku"] != null)
+            {
+                PrioritySku = co["PrioritySku"].ToString();
+            }
+            if(co["OrdQty"] != null)
+            {
+                string Text = co["OrdQty"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    int x;
+                    if (int.TryParse(Text, out x))
+                    {
+                        OrdQty = Text;
+                    }
+                }
+            }
             var data = BatchHaddle.UpdateStrategy(ID,int.Parse(GetCoid()),StrategyName,SkuIn,SkuNotIn,OrdGift,KindIDIn,PCodeIn,ExpPrint,ExpressIn,DistributorIn,ShopIn,AmtMin,AmtMax,
-                                                  PayDateStart,PayDateEnd,RecMessage,SendMessage);
+                                                  PayDateStart,PayDateEnd,RecMessage,SendMessage,PrioritySku,OrdQty);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
         [HttpPostAttribute("/Core/Batch/DeleteStrategy")]
         public ResponseResult DeleteStrategy([FromBodyAttribute]JObject co)
         {   
@@ -978,6 +1011,46 @@ namespace CoreWebApi
                 return CoreResult.NewResponse(-1, "策略ID必填", "General"); 
             }
             var data = BatchHaddle.SetSingleOrdStrategy(int.Parse(GetCoid()),GetUname(),ID);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Batch/SetMultiOrd")]
+        public ResponseResult SetMultiOrd([FromBodyAttribute]JObject co)
+        {   
+            string username = GetUname();
+            int CoID = int.Parse(GetCoid());
+            var data = BatchHaddle.SetMultiOrd(CoID,username);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+        [HttpPostAttribute("/Core/Batch/SetMultiOrdStrategy")]
+        public ResponseResult SetMultiOrdStrategy([FromBodyAttribute]JObject co)
+        {   
+            int ID;
+            if(co["ID"] != null)
+            {
+                string Text = co["ID"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    int x;
+                    if (int.TryParse(Text, out x))
+                    {
+                        ID = int.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "策略ID参数异常", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "策略ID必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "策略ID必填", "General"); 
+            }
+            var data = BatchHaddle.SetMultiOrdStrategy(int.Parse(GetCoid()),GetUname(),ID);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
     }
