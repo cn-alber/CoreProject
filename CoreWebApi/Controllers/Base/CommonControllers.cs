@@ -310,14 +310,35 @@ namespace CoreWebApi
         #endregion
 
         #region 获取拣货策略基本配置参数（商品分类，店铺，快递，分销商）
-        [HttpPostAttribute("Core/Common/batchBase")]
+        [HttpGetAttribute("Core/Common/batchBase")]
         public ResponseResult batchBase()
         {
             var res = new DataResult(1, null);
-            string CoID = GetCoid();
+            string Coid = GetCoid();
+            var shops = ShopHaddle.getShopEnum(Coid);
+            shops.Add(new shopEnum
+            {
+                value = 0,
+                label = "{线下}"
+            });
+            var distributors = DistributorHaddle.getDisEnum(Coid);
+            distributors.Add(new distributorEnum
+            {
+                value = 0,
+                label = "{自营}"
+            });
+            var cp = new CusKindParam();
+            cp.CoID = int.Parse(Coid);
+            cp.Enable = "true";
+            cp.ParentID = 0;
+            var KindLst = CustomKindHaddle.GetKindLst(cp);
 
-            
-            //res = CommHaddle.GetSkuPileCode(CoID,IDLst);
+            res.d = new {
+                express = CommHaddle.GetExpressList(Coid).d,
+                distributor =  distributors,
+                shops = shops,
+                KindLst = KindLst.d
+            };
             
             return CoreResult.NewResponse(res.s, res.d, "General");
         }
