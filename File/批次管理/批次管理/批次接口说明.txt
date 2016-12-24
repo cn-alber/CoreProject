@@ -153,6 +153,8 @@ input:Type              int         批次类型
       PayDateEnd        DateTime    最晚付款日期
       RecMessage        string      买家留言
       SendMessage       string      卖家备注
+      PrioritySku       string      优先商品
+      OrdQty            string      每批拣货波次订单数
 output: 批次List
 参考:input jason 文件:InsertStrategy_input.json
 参考:output jason 文件:InsertStrategy_output.json
@@ -182,6 +184,8 @@ input:ID                int         策略ID
       PayDateEnd        DateTime    最晚付款日期
       RecMessage        string      买家留言
       SendMessage       string      卖家备注
+      PrioritySku       string      优先商品
+      OrdQty            string      每批拣货波次订单数
 output: 批次List
 参考:input jason 文件:UpdateStrategy_input.json
 参考:output jason 文件:UpdateStrategy_output.json
@@ -200,3 +204,37 @@ input:ID                int         策略ID
 output:成功或失败
 参考:input jason 文件:SetSingleOrdStrategy_input.json
 参考:output jason 文件:SetSingleOrdStrategy_output.json
+
+21.SetMultiOrd() //一单多件批次生成
+路由:http://localhost:5000/Core/Batch/SetMultiOrd
+input:None
+OutPut:成功或失败
+参考:output jason 文件:SetMultiOrd_output.json
+
+22.SetMultiOrdStrategy()一单多件策略生成
+路由:http://localhost:5000/Core/Batch/SetMultiOrdStrategy
+input:ID                int         策略ID
+output:成功或失败
+参考:input jason 文件:SetMultiOrdStrategy_input.json
+参考:output jason 文件:SetMultiOrdStrategy_output.json
+
+23.GetOrdTask()订单任务资料查询
+路由:http://localhost:5000/Core/Batch/GetOrdTask
+input:ID                int         策略ID
+      OrdQtyStart       int         订单数量起
+      OrdQtyEnd         int         订单数量迄
+output:成功或失败
+参考:output jason 文件:GetOrdTask_output.json
+
+24.OrdTaskBatch()选择订单生成任务
+路由:http://localhost:5000/Core/Batch/OrdTaskBatch
+input:ID    List<int>         出库单ID
+output:成功或失败
+参考:input jason 文件:OrdTaskBatch_input.json
+参考:output jason 文件:OrdTaskBatch_output.json
+
+25.SetBigOrd() //现场大单生成
+路由:http://localhost:5000/Core/Batch/SetBigOrd
+input:None
+OutPut:成功或失败
+参考:output jason 文件:SetBigOrd_output.json

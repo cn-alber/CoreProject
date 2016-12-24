@@ -130,15 +130,21 @@ namespace CoreData.CoreCore
                         foreach(var a in u)
                         {
                             string remark = a.OrdQty + ".";
-                            foreach(var i in item)
+                            if(a.OrdQty == 1)
                             {
-                                if(a.ID == i.SID)
+                                foreach(var i in item)
                                 {
-                                    if(i.Qty == 1)
+                                    if(a.ID == i.SID)
                                     {
                                         remark = remark + i.SkuID + ",";
                                     }
-                                    else
+                                }
+                            }
+                            else
+                            {
+                                foreach(var i in item)
+                                {
+                                    if(a.ID == i.SID)
                                     {
                                         remark = remark + i.SkuID + "*" + i.Qty + ",";
                                     }
