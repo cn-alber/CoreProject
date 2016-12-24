@@ -56,23 +56,80 @@ namespace CoreWebApi
                 cp.CoID = int.Parse(GetCoid());
                 cp.Creator = GetUname();
                 cp.CreateDate = DateTime.Now.ToString();
-                cp.Type  =3;//3.销退仓
+                cp.Type = 3;//3.销退仓
                 cp.SkuAuto = Newtonsoft.Json.JsonConvert.DeserializeObject<ASkuScan>(obj["SkuAuto"].ToString());
                 cp.ExCode = obj["ExCode"].ToString();
                 cp.issueName = obj["issueName"].ToString();
-                if(!string.IsNullOrEmpty(obj["OID"].ToString()))
+                if (!string.IsNullOrEmpty(obj["OID"].ToString()))
                 {
                     cp.OID = int.Parse(obj["OID"].ToString());
                 }
-                if(!string.IsNullOrEmpty(obj["ASID"].ToString()))
+                if (!string.IsNullOrEmpty(obj["ASID"].ToString()))
                 {
                     cp.OID = int.Parse(obj["ASID"].ToString());
                 }
-                if(!string.IsNullOrEmpty(obj["SoID"].ToString()))
+                if (!string.IsNullOrEmpty(obj["SoID"].ToString()))
                 {
                     cp.OID = int.Parse(obj["SoID"].ToString());
-                }            
+                }
                 res = ASaleAfterHaddles.SetSOAfter(cp);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "WmsApi");
+        }
+        #endregion
+
+        #region 退货上架 - 根据件码返回Sku&建议货位 原CallAfterUpSku
+        [HttpGetAttribute("Core/ASaleAfter/AfterUpScanSku")]
+        public ResponseResult AfterUpScanSku(string BarCode, string WarehouseID, string PCode)
+        {
+            var res = new DataResult(1, null);
+            int x;
+            if (string.IsNullOrEmpty(BarCode) ||
+            !string.IsNullOrEmpty(WarehouseID) && int.TryParse(WarehouseID, out x))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var cp = new ASaleAfterParam();
+                cp.CoID = int.Parse(GetCoid());
+                if(!string.IsNullOrEmpty(WarehouseID))
+                {
+                    cp.WhID = int.Parse(WarehouseID);
+                }
+                if(!string.IsNullOrEmpty(PCode))
+                {
+                    cp.PCode = PCode;
+                }
+                res=ASaleAfterHaddles.GetAfterUpSku(cp);
+            }
+            return CoreResult.NewResponse(res.s, res.d, "WmsApi");
+        }
+        #endregion
+
+        #region 退货上架 - 更新货位库存
+         [HttpPostAttribute("Core/ASaleAfter/SetAfterUp")]
+        public ResponseResult SetAfterUp([FromBodyAttribute]JObject obj)
+        {
+            var res = new DataResult(1, null);
+            int x;
+            if (!(obj["PileID"] != null && int.TryParse(obj["PileID"].ToString(), out x) && obj["SkuAuto"] != null))
+            {
+                res.s = -1;
+                res.d = "无效参数";
+            }
+            else
+            {
+                var cp = new AShelfSet();
+                cp.PileID = int.Parse(obj["PileID"].ToString());
+                cp.SkuAuto = Newtonsoft.Json.JsonConvert.DeserializeObject<ASkuScan>(obj["SkuAuto"].ToString());
+                cp.Type = 3;
+                cp.Contents = "退货上架";
+                cp.CoID = int.Parse(GetCoid());
+                cp.Creator = GetUname();
+                cp.CreateDate = DateTime.Now.ToString();
+                res = AShelvesHaddles.SetUpShelfPile(cp);
             }
             return CoreResult.NewResponse(res.s, res.d, "WmsApi");
         }

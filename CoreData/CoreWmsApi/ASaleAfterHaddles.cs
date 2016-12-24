@@ -41,15 +41,15 @@ namespace CoreData.CoreWmsApi
                                 WHERE CoID=@CoID ";
                         if (asku.SkuType == 0)
                         {
-                            sql = sql + " AND BarCode=@BarCode";
+                            sql = sql + " AND BarCode=@BarCode ORDER BY ID DESC LIMIT 1";
                         }
                         else if (asku.SkuType == 2)
                         {
-                            sql = sql + " AND BoxCode=@BarCode";
+                            sql = sql + " AND BoxCode=@BarCode ORDER BY ID DESC LIMIT 1";
                         }
                         else if (asku.SkuType == 1)
                         {
-                            sql = sql + " AND SkuID=@BarCode";
+                            sql = sql + " AND SkuID=@BarCode ORDER BY ID DESC LIMIT 1";
                         }
                         var p = new DynamicParameters();
                         p.Add("@CoID", IParam.CoID);
@@ -57,7 +57,7 @@ namespace CoreData.CoreWmsApi
                         var PickLst = CoreConn.Query<ABatchPicked>(sql, p).AsList();
                         if (PickLst.Count <= 0)
                         {
-                            result.s = -6023;
+                            result.s = -6023;//未获取出货信息
                         }
                         else
                         {
@@ -233,6 +233,151 @@ namespace CoreData.CoreWmsApi
             }
             return result;
         }
+        #endregion
+
+        #region 退货上架 - 根据件码返回Sku&建议货位
+        public static DataResult GetAfterUpSku(ASaleAfterParam IParam)
+        {
+            var result = new DataResult(1, null);
+            using (var CoreConn = new MySqlConnection(DbBase.CoreConnectString))
+            {
+                try
+                {
+                    var data = new AShelfData();
+                    var cp = new ASkuScanParam();
+                    cp.CoID = IParam.CoID;
+                    cp.BarCode = IParam.BarCode;
+                    result = ASkuScanHaddles.GetType(cp);
+                    if (result.s > 0)
+                    {
+                        var asku = result.d as ASkuScan;
+                        string sql = @"SELECT ID,
+                                    BatchID,
+                                    OID,
+                                    SoID
+                                FROM batchpicked
+                                WHERE CoID=@CoID ";
+                        if (asku.SkuType == 0)
+                        {
+                            sql = sql + " AND BarCode=@BarCode ORDER BY ID DESC LIMIT 1";
+                        }
+                        else if (asku.SkuType == 2)
+                        {
+                            sql = sql + " AND BoxCode=@BarCode ORDER BY ID DESC LIMIT 1";
+                        }
+                        else if (asku.SkuType == 1)
+                        {
+                            sql = sql + " AND SkuID=@BarCode ORDER BY ID DESC LIMIT 1";
+                        }
+                        var p = new DynamicParameters();
+                        p.Add("@CoID", IParam.CoID);
+                        p.Add("@BarCode", IParam.BarCode);
+                        var PickLst = CoreConn.Query<ABatchPicked>(sql, p).AsList();
+                        if (PickLst.Count <= 0)
+                        {
+                            result.s = -6023;//未获取出货信息
+                        }
+                        else if (PickLst[0].OutID == 0)
+                        {
+                            result.s = -6025;//已拣货等待出货
+                        }
+                        else
+                        {
+                            IParam.OID = PickLst[0].OID;
+                            IParam.SoID = PickLst[0].SoID;
+                            if (asku.SkuType == 0)
+                            {
+                                string iSql = @"SELECT
+                                                    ID
+                                                FROM
+                                                    aftersaleitem
+                                                WHERE
+                                                    CoID =@CoID
+                                                AND OID =@OID
+                                                AND BarCode =@BarCode";
+                                string logsql = @"SELECT
+                                                PCode,
+                                                WarehouseID,
+                                                Contents,
+                                                Type
+                                            FROM
+                                                wmslog
+                                            WHERE
+                                                CoID =@CoID
+                                            AND BarCode =@BarCode
+                                            ORDER BY
+                                                ID DESC
+                                            LIMIT 1";
+                                var itemLst = CoreConn.Query<int>(iSql, new { CoID = IParam.CoID, BarCode = IParam.BarCode, OID = IParam.OID }).AsList();
+                                var logLst = CoreConn.Query<AWmslog>(logsql, new { CoID = IParam.CoID, BarCode = IParam.BarCode }).AsList();
+                                if (itemLst.Count == 0)
+                                {
+                                    result.s = -6026;//已发货，不可上架
+                                }
+                                if (logLst.Count > 0 && !string.IsNullOrEmpty(logLst[0].PCode))
+                                {
+                                    result.s = -1;
+                                    result.d = "重复上架,货位:" + logLst[0].PCode;
+                                }
+                                else if (logLst.Count > 0 && logLst[0].Type != 3)
+                                {
+                                    result.s = -6027;
+                                }
+                            }
+                            if (result.s > 0)
+                            {
+                                var scp = new AShelfParam();
+                                scp.CoID = IParam.CoID;
+                                scp.BoxCode = IParam.BarCode;
+                                scp.WarehouseID = IParam.WhID;
+                                scp.Skuautoid = asku.Skuautoid;
+                                scp.PCode = IParam.PCode;
+                                result = AShelvesHaddles.GetUpPCode(scp);
+                                if (result.s > 0)
+                                {
+                                    data.SkuAuto = asku;
+                                    data.PileAuto = result.d as AWmsPileAuto;
+                                    result.d = data;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+            }
+            return result;
+        }
+        #endregion
+
+        #region 退货上架 - 更新货位库存
+        public static DataResult SetAfterUpSku(AShelfSet IParam)
+        {
+            var result = new DataResult(1, null);
+            var CoreConn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreConn.Open();
+            var CoreTrans = CoreConn.BeginTransaction();
+            try
+            {
+
+            }
+            catch (Exception e)
+            {
+                CoreTrans.Rollback();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                CoreTrans.Dispose();
+                CoreConn.Close();
+            }
+            return result;
+        }
+
         #endregion
 
         #region 更新售后单状态

@@ -20,6 +20,7 @@ namespace CoreModels.WmsApi
         public string Creator { get; set; }
         public string CreateDate { get; set; }
         public decimal Price { get; set; }
+        public string PCode { get; set; }
         // public SaleOutItemInsert SOItem { get; set; }
     }
     public class ASaleAfter
