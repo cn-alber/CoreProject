@@ -281,6 +281,7 @@ namespace CoreData.CoreWmsApi
                 p.Sku = log.SkuID;
                 p.BatchID = IParam.BatchID;
                 p.BatchtaskID = IParam.BatchtaskID;
+                p.PCode = log.PCode;
                 p.Creator = IParam.Creator;
                 p.CreatDate = IParam.CreateDate;
                 PinckLst.Add(p);

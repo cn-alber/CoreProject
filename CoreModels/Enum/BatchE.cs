@@ -10,9 +10,9 @@ namespace CoreModels.Enum
             正在拣货 = 3,
             正在播种 = 4,
             正在出库验证 = 5,
-            已完成   = 6,
+            已完成 = 6,
             终止拣货 = 7,
-            等待发货=8
+            等待发货 = 8
         }
 
         public enum BatchType
@@ -24,6 +24,13 @@ namespace CoreModels.Enum
             补货 = 4,
             组团 = 5,
             采购退货 = 6
+        }
+
+        public enum PickStatus
+        {
+            已拣货 = 0,
+            已分拣 = 1,
+            已出货 = 2
         }
     }
 }

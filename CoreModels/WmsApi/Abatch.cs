@@ -67,6 +67,7 @@ namespace CoreModels.WmsApi
         public int Skuautoid { get; set; }
         public string Sku { get; set; }
         public int Status { get; set; }
+        public string PCode { get; set; }
         public int OutID { get; set; }
         public string Express { get; set; }
         public string ExCode { get; set; }
