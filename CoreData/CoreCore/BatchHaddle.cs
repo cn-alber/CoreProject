@@ -2627,5 +2627,57 @@ namespace CoreData.CoreCore
             }  
             return result;
         }
+        ///<summary>
+        ///拣货明细信息
+        ///</summary>
+        public static DataResult GetBatchItem(int CoID,int id)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = @"select coresku.SkuID,coresku.SkuName,coresku.Norm,sum(batchtask.qty) as Qty,sum(batchtask.PickQty) as PickQty,
+                                          sum(batchtask.qty - batchtask.PickQty) as NoQty from batchtask,coresku where batchtask.Skuautoid = coresku.ID and 
+                                          batchtask.CoID = coresku.CoID and batchtask.BatchID=" + id + " and batchtask.CoID = " + CoID + 
+                                          " group by batchtask.Skuautoid,coresku.SkuName,coresku.Norm";
+                    var u = conn.Query<BatchItemList>(sqlcommand).AsList();
+                    result.d = u;               
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }  
+            return result;
+        }
+        ///<summary>
+        ///拣货批次唯一码
+        ///</summary>
+        public static DataResult GetBatchUnique(int CoID,int id)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = @"select BarCode,Sku,status,OutID,PCode,ModifyDate from batchpicked where BatchID = " + id + " and CoID = " + CoID + 
+                                         " order by Sku,BarCode,ModifyDate";
+                    var u = conn.Query<BatchUniqueList>(sqlcommand).AsList();
+                    foreach(var a in u)
+                    {
+                        a.StatusString = Enum.GetName(typeof(PickStatus), a.Status);
+                        sqlcommand = "select status from saleout where id = " + a.OutID + " and coid = " + CoID;
+                        var sa = conn.Query<SaleOutInsert>(sqlcommand).AsList();
+                        if(sa[0].Status == 1)
+                        {
+                            a.OutIDString = a.OutID + " - 已发货";
+                        }
+                    }
+                    result.d = u;               
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }  
+            return result;
+        }
     }
 }

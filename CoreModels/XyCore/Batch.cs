@@ -287,4 +287,24 @@ namespace CoreModels.XyCore
         public string Creator{get;set;}
         public string CreateDate{get;set;}
     }
+    public class BatchItemList
+    {
+        public string SkuID{get;set;}
+        public string SkuName{get;set;}
+        public string Norm{get;set;}
+        public int Qty{get;set;}
+        public int PickQty{get;set;}
+        public int NoQty{get;set;}
+    }
+    public class BatchUniqueList
+    {
+        public string BarCode{get;set;}
+        public string Sku{get;set;}
+        public int Status{get;set;}
+        public string StatusString{get;set;}
+        public int OutID{get;set;}
+        public string OutIDString{get;set;}
+        public string PCode{get;set;}
+        public string ModifyDate{get;set;}
+    }
 }

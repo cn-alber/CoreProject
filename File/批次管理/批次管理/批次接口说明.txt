@@ -254,6 +254,18 @@ OutPut:商品资料
 
 28.GetBatchLog() //批次日志查询
 路由:http://localhost:5000/Core/Batch/GetBatchLog
-input:None
+input:ID string 批次ID
 OutPut:商品资料
 参考:output jason 文件:GetBatchLog_output.json
+
+29.GetBatchItem() //拣货明细信息
+路由:http://localhost:5000/Core/Batch/GetBatchItem
+input:ID string 批次ID
+OutPut:商品资料
+参考:output jason 文件:GetBatchItem_output.json
+
+30.GetBatchUnique() //拣货批次唯一码
+路由:http://localhost:5000/Core/Batch/GetBatchUnique
+input:ID string 批次ID
+OutPut:商品资料
+参考:output jason 文件:GetBatchUnique_output.json

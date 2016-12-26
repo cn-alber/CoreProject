@@ -1152,5 +1152,51 @@ namespace CoreWebApi
             var data = BatchHaddle.GetBatchLog(id,int.Parse(GetCoid()));
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpGetAttribute("/Core/Batch/GetBatchItem")]
+        public ResponseResult GetBatchItem(string ID)
+        {
+            int x,id;
+            if(!string.IsNullOrEmpty(ID))
+            {
+                if (int.TryParse(ID, out x))
+                {
+                    id = int.Parse(ID);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "批次ID参数无效", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "批次ID必填", "General"); 
+            }
+            var data = BatchHaddle.GetBatchItem(int.Parse(GetCoid()),id);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Batch/GetBatchUnique")]
+        public ResponseResult GetBatchUnique(string ID)
+        {
+            int x,id;
+            if(!string.IsNullOrEmpty(ID))
+            {
+                if (int.TryParse(ID, out x))
+                {
+                    id = int.Parse(ID);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "批次ID参数无效", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "批次ID必填", "General"); 
+            }
+            var data = BatchHaddle.GetBatchUnique(int.Parse(GetCoid()),id);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }

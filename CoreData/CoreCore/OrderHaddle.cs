@@ -10713,5 +10713,347 @@ namespace CoreData.CoreCore
             }
             return result;
         }
+        ///<summary>
+        ///订单类型List
+        ///</summary>
+        public static DataResult GetOrdType()                
+        {
+            var result = new DataResult(1,null);
+            //订单类型
+            var oo = new List<Filter>();
+            var o = new Filter();
+            o.value = "0";
+            o.label = "普通订单";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "1";
+            o.label = "补发订单";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "2";
+            o.label = "换货订单";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "3";
+            o.label = "天猫分销";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "4";
+            o.label = "天猫供销";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "5";
+            o.label = "协同订单";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "6";
+            o.label = "普通订单,分销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "7";
+            o.label = "补发订单,分销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "8";
+            o.label = "换货订单,分销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "9";
+            o.label = "天猫供销,分销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "10";
+            o.label = "协同订单,分销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "11";
+            o.label = "普通订单,供销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "12";
+            o.label = "补发订单,供销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "13";
+            o.label = "换货订单,供销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "14";
+            o.label = "天猫供销,供销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "15";
+            o.label = "协同订单,供销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "16";
+            o.label = "普通订单,分销+,供销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "17";
+            o.label = "补发订单,分销+,供销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "18";
+            o.label = "换货订单,分销+,供销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "19";
+            o.label = "天猫供销,分销+,供销+";
+            oo.Add(o);
+            o = new Filter();
+            o.value = "20";
+            o.label = "协同订单,分销+,供销+";
+            oo.Add(o);
+            result.d = oo;
+            return result;
+        }
+        ///<summary>
+        ///新增自动审单规则
+        ///</summary>
+        public static DataResult InsertAutoConfirmRule(OrdAutoConfirmRule rule)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = @"INSERT INTO order_autoconfirm_rule(RuleName,StartDate,EndDate,PayStartDate,PayEndDate,AppointSku,ExcludeSku,MinAmt,MaxAmt,IgnoreRec,
+                                                                             RecMessage,IgnoreSend,SendMessage,DiscountRate,Shop,OrdType,DelayedMinute,CoID,Creator,Modifier) 
+                                                            VALUES(@RuleName,@StartDate,@EndDate,@PayStartDate,@PayEndDate,@AppointSku,@ExcludeSku,@MinAmt,@MaxAmt,@IgnoreRec,
+                                                                   @RecMessage,@IgnoreSend,@SendMessage,@DiscountRate,@Shop,@OrdType,@DelayedMinute,@CoID,@Creator,@Modifier)";     
+                    int count = conn.Execute(sqlcommand,rule);
+                    if(count <= 0)
+                    {
+                        result.s = -3002;
+                        return result;
+                    }
+                    int rtn = conn.QueryFirst<int>("select LAST_INSERT_ID()");
+                    result.d = rtn;
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }   
+            return result;
+        }
+        ///<summary>
+        ///查询单笔自动审单规则
+        ///</summary>
+        public static DataResult GetAutoConfirmRuleSingle(int CoID,int id)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = @"select ID,RuleName,StartDate,EndDate,PayStartDate,PayEndDate,AppointSku,ExcludeSku,MinAmt,MaxAmt,IgnoreRec,RecMessage,IgnoreSend,
+                                          SendMessage,DiscountRate,Shop,OrdType,DelayedMinute from order_autoconfirm_rule where id = " + id + " and coid = " + CoID;     
+                    var u = conn.Query<OrdAutoConfirmRuleSingle>(sqlcommand).AsList();
+                    if(u.Count > 0)
+                    {
+                        result.d = u[0];
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }   
+            return result;
+        }
+        ///<summary>
+        ///更新自动审单规则
+        ///</summary>
+        public static DataResult UpdateAutoConfirmRule(int CoID,int id,string RuleName,string StartDate,string EndDate,string PayStartDate,string PayEndDate,string AppointSku,
+                                                       string ExcludeSku,string MinAmt,string MaxAmt,string IgnoreRec,string RecMessage,string IgnoreSend,string SendMessage,
+                                                       string DiscountRate,string Shop,string OrdType,string DelayedMinute,string UserName)
+        {
+            var p = new DynamicParameters();
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = "update order_autoconfirm_rule set ";
+                    int i = 0;
+                    if(RuleName != null)
+                    {
+                        sqlcommand = sqlcommand + "RuleName = @RuleName,";
+                        p.Add("@RuleName",RuleName);
+                        i ++;
+                    }
+                    if(StartDate != null)
+                    {
+                        sqlcommand = sqlcommand + "StartDate = @StartDate,";
+                        p.Add("@StartDate",StartDate);
+                        i ++;
+                    }
+                    if(EndDate != null)
+                    {
+                        sqlcommand = sqlcommand + "EndDate = @EndDate,";
+                        p.Add("@EndDate",EndDate);
+                        i ++;
+                    }
+                    if(PayStartDate != null)
+                    {
+                        sqlcommand = sqlcommand + "PayStartDate = @PayStartDate,";
+                        p.Add("@PayStartDate",PayStartDate);
+                        i ++;
+                    }
+                    if(PayEndDate != null)
+                    {
+                        sqlcommand = sqlcommand + "PayEndDate = @PayEndDate,";
+                        p.Add("@PayEndDate",PayEndDate);
+                        i ++;
+                    }
+                    if(AppointSku != null)
+                    {
+                        sqlcommand = sqlcommand + "AppointSku = @AppointSku,";
+                        p.Add("@AppointSku",AppointSku);
+                        i ++;
+                    }
+                    if(ExcludeSku != null)
+                    {
+                        sqlcommand = sqlcommand + "ExcludeSku = @ExcludeSku,";
+                        p.Add("@ExcludeSku",ExcludeSku);
+                        i ++;
+                    }
+                    if(MinAmt != null)
+                    {
+                        sqlcommand = sqlcommand + "MinAmt = @MinAmt,";
+                        p.Add("@MinAmt",MinAmt);
+                        i ++;
+                    }
+                    if(MaxAmt != null)
+                    {
+                        sqlcommand = sqlcommand + "MaxAmt = @MaxAmt,";
+                        p.Add("@MaxAmt",MaxAmt);
+                        i ++;
+                    }
+                    if(IgnoreRec != null)
+                    {
+                        sqlcommand = sqlcommand + "IgnoreRec = @IgnoreRec,";
+                        p.Add("@IgnoreRec",IgnoreRec);
+                        i ++;
+                    }
+                    if(RecMessage != null)
+                    {
+                        sqlcommand = sqlcommand + "RecMessage = @RecMessage,";
+                        p.Add("@RecMessage",RecMessage);
+                        i ++;
+                    }
+                    if(IgnoreSend != null)
+                    {
+                        sqlcommand = sqlcommand + "IgnoreSend = @IgnoreSend,";
+                        p.Add("@IgnoreSend",IgnoreSend);
+                        i ++;
+                    }
+                    if(SendMessage != null)
+                    {
+                        sqlcommand = sqlcommand + "SendMessage = @SendMessage,";
+                        p.Add("@SendMessage",SendMessage);
+                        i ++;
+                    }
+                    if(DiscountRate != null)
+                    {
+                        sqlcommand = sqlcommand + "DiscountRate = @DiscountRate,";
+                        p.Add("@DiscountRate",DiscountRate);
+                        i ++;
+                    }
+                    if(Shop != null)
+                    {
+                        sqlcommand = sqlcommand + "Shop = @Shop,";
+                        p.Add("@Shop",Shop);
+                        i ++;
+                    }
+                    if(OrdType != null)
+                    {
+                        sqlcommand = sqlcommand + "OrdType = @OrdType,";
+                        p.Add("@OrdType",OrdType);
+                        i ++;
+                    }
+                    if(DelayedMinute != null)
+                    {
+                        sqlcommand = sqlcommand + "DelayedMinute = @DelayedMinute,";
+                        p.Add("@DelayedMinute",DelayedMinute);
+                        i ++;
+                    }
+                    if(i > 0)
+                    {
+                        sqlcommand = sqlcommand + "Modifier = @Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @CoID";
+                        p.Add("@Modifier",UserName);
+                        p.Add("@ModifyDate",DateTime.Now);
+                        p.Add("@ID",id);
+                        p.Add("@CoID",CoID);
+                        int count = conn.Execute(sqlcommand,p);
+                        if(count <= 0)
+                        {
+                            result.s = -3003;
+                            return result;
+                        }
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }   
+            return result;
+        }
+        ///<summary>
+        ///禁用或启用规则
+        ///</summary>
+        public static DataResult UpdateAutoConfirmRuleEnable(int CoID,int id,bool Enable,string UserName)
+        {
+            var p = new DynamicParameters();
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = "update order_autoconfirm_rule set enable = @Enable,Modifier = @Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @CoID";
+                    int count = conn.Execute(sqlcommand,new{Enable=Enable,Modifier=UserName,ModifyDate=DateTime.Now,ID =id,CoID=CoID});
+                    if(count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }   
+            return result;
+        }
+        ///<summary>
+        ///查询自动审单规则
+        ///</summary>
+        public static DataResult GetAutoConfirmRuleList(int CoID,string SortField,string SortDirection,int NumPerPage,int PageIndex)
+        {
+            var result = new DataResult(1,null);
+            string sqlcount = "select count(id) from order_autoconfirm_rule";
+            string sqlcommand = @"select ID,RuleName,AppointSku,ExcludeSku,MinAmt,MaxAmt,DiscountRate,IgnoreRec,StartDate,EndDate,DelayedMinute,Enable,CreateDate,ModifyDate 
+                                  from order_autoconfirm_rule";
+            string wheresql = string.Empty;
+            if(!string.IsNullOrEmpty(SortField) && !string.IsNullOrEmpty(SortDirection))//排序
+            {
+                wheresql = wheresql + " ORDER BY "+SortField +" "+ SortDirection;
+            }
+            var res = new OrdAutoConfirmRuleData();
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    int count = conn.QueryFirst<int>(sqlcount + wheresql);
+                    decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(NumPerPage.ToString()));
+                    int dataindex = (PageIndex - 1)* NumPerPage;
+                    wheresql = wheresql + " limit " + dataindex.ToString() + " ," + NumPerPage.ToString();
+                    Console.WriteLine(sqlcommand + wheresql);
+                    var u = conn.Query<OrdAutoConfirmRuleList>(sqlcommand + wheresql).AsList();
+                    res.Datacnt = count;
+                    res.Pagecnt = pagecnt;
+                    res.Rule = u;
+                    result.d = res;             
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }           
+            return result;
+        }
     }
 }

@@ -2074,5 +2074,541 @@ namespace CoreWebApi
             var data = OrderHaddle.CalGift(OidType,oid,DateType,IsSplit,IsDelGift,IsDelPrice0,ord,CoID,username);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpGetAttribute("/Core/Order/GetOrdType")]
+        public ResponseResult GetOrdType()
+        {   
+            var data = OrderHaddle.GetOrdType();
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/InsertAutoConfirmRule")]
+        public ResponseResult InsertAutoConfirmRule([FromBodyAttribute]JObject co)
+        {   
+            var rule = new OrdAutoConfirmRule();
+            if(co["RuleName"] != null)
+            {
+                string Text = co["RuleName"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    rule.RuleName = Text;
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "规格名称必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "规格名称必填", "General"); 
+            }
+            if(co["StartDate"] != null)
+            {
+                string Text = co["StartDate"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    DateTime x;
+                    if (DateTime.TryParse(Text, out x))
+                    {
+                        rule.StartDate = DateTime.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "开始日期参数异常", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "开始日期必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "开始日期必填", "General"); 
+            }
+            if(co["EndDate"] != null)
+            {
+                string Text = co["EndDate"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    DateTime x;
+                    if (DateTime.TryParse(Text, out x))
+                    {
+                        rule.EndDate = DateTime.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "结束日期参数异常", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "结束日期必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "结束日期必填", "General"); 
+            }
+            if(co["PayStartDate"] != null)
+            {
+                string Text = co["PayStartDate"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    DateTime x;
+                    if (DateTime.TryParse(Text, out x))
+                    {
+                        rule.PayStartDate = Text;
+                    }
+                }
+            }
+            if(co["PayEndDate"] != null)
+            {
+                string Text = co["PayEndDate"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    DateTime x;
+                    if (DateTime.TryParse(Text, out x))
+                    {
+                        rule.PayEndDate = Text;
+                    }
+                }
+            }
+            if(co["AppointSku"] != null)
+            {
+                rule.AppointSku = co["AppointSku"].ToString();
+            }
+            if(co["ExcludeSku"] != null)
+            {
+                rule.ExcludeSku = co["ExcludeSku"].ToString();
+            }
+            if(co["MinAmt"] != null)
+            {
+                string Text = co["MinAmt"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    decimal x;
+                    if (decimal.TryParse(Text, out x))
+                    {
+                        rule.MinAmt = Text;
+                    }
+                }
+            }
+            if(co["MaxAmt"] != null)
+            {
+                string Text = co["MaxAmt"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    decimal x;
+                    if (decimal.TryParse(Text, out x))
+                    {
+                        rule.MaxAmt = Text;
+                    }
+                }
+            }
+            if(co["IgnoreRec"] != null)
+            {
+                string Text = co["IgnoreRec"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    bool x;
+                    if (bool.TryParse(Text, out x))
+                    {
+                        rule.IgnoreRec = bool.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "忽略买家留言参数异常", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "忽略买家留言必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "忽略买家留言必填", "General"); 
+            }
+            if(co["RecMessage"] != null)
+            {
+                rule.RecMessage = co["RecMessage"].ToString();
+            }
+            if(co["IgnoreSend"] != null)
+            {
+                string Text = co["IgnoreSend"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    bool x;
+                    if (bool.TryParse(Text, out x))
+                    {
+                        rule.IgnoreSend = bool.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "忽略卖家备注参数异常", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "忽略卖家备注必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "忽略卖家备注必填", "General"); 
+            }
+            if(co["SendMessage"] != null)
+            {
+                rule.SendMessage = co["SendMessage"].ToString();
+            }
+            if(co["DiscountRate"] != null)
+            {
+                string Text = co["DiscountRate"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    decimal x;
+                    if (decimal.TryParse(Text, out x))
+                    {
+                        rule.DiscountRate = Text;
+                    }
+                }
+            }
+            if(co["Shop"] != null)
+            {
+                rule.Shop = co["Shop"].ToString();
+            }
+            if(co["OrdType"] != null)
+            {
+                rule.OrdType = co["OrdType"].ToString();
+            }
+            if(co["DelayedMinute"] != null)
+            {
+                string Text = co["DelayedMinute"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    int x;
+                    if (int.TryParse(Text, out x))
+                    {
+                        rule.DelayedMinute = int.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "支付后延迟审核参数异常", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "支付后延迟审核必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "支付后延迟审核必填", "General"); 
+            }
+            rule.CoID = int.Parse(GetCoid());
+            rule.Creator = GetUname();
+            rule.Modifier = GetUname();
+            var data = OrderHaddle.InsertAutoConfirmRule(rule);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Order/GetAutoConfirmRuleSingle")]
+        public ResponseResult GetAutoConfirmRuleSingle(string ID)
+        {   
+            int x,id;
+            if(!string.IsNullOrEmpty(ID))
+            {
+                if (int.TryParse(ID, out x))
+                {
+                    id = int.Parse(ID);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "规则ID参数无效", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "规则ID必填", "General"); 
+            }
+            var data = OrderHaddle.GetAutoConfirmRuleSingle(int.Parse(GetCoid()),id);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/UpdateAutoConfirmRule")]
+        public ResponseResult UpdateAutoConfirmRule([FromBodyAttribute]JObject co)
+        {   
+            int id = 0;
+            string RuleName = null,StartDate = null,EndDate = null,PayStartDate = null,PayEndDate = null,AppointSku = null,ExcludeSku = null,MinAmt = null,MaxAmt = null,
+                   IgnoreRec = null,RecMessage = null,IgnoreSend = null,SendMessage = null,DiscountRate = null,Shop = null,OrdType = null,DelayedMinute = null;
+            if(co["ID"] != null)
+            {
+                string Text = co["ID"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    int x;
+                    if (int.TryParse(Text, out x))
+                    {
+                        id = int.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "规则ID参数异常", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "规则ID必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "规则ID必填", "General"); 
+            }
+            if(co["RuleName"] != null)
+            {
+                string Text = co["RuleName"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    RuleName = Text;
+                }
+            }
+            if(co["StartDate"] != null)
+            {
+                string Text = co["StartDate"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    DateTime x;
+                    if (DateTime.TryParse(Text, out x))
+                    {
+                        StartDate = Text;
+                    }
+                }
+            }
+            if(co["EndDate"] != null)
+            {
+                string Text = co["EndDate"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    DateTime x;
+                    if (DateTime.TryParse(Text, out x))
+                    {
+                        EndDate = Text;
+                    }
+                }
+            }
+            if(co["PayStartDate"] != null)
+            {
+                string Text = co["PayStartDate"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    DateTime x;
+                    if (DateTime.TryParse(Text, out x))
+                    {
+                        PayStartDate = Text;
+                    }
+                }
+            }
+            if(co["PayEndDate"] != null)
+            {
+                string Text = co["PayEndDate"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    DateTime x;
+                    if (DateTime.TryParse(Text, out x))
+                    {
+                        PayEndDate = Text;
+                    }
+                }
+            }
+            if(co["AppointSku"] != null)
+            {
+                AppointSku = co["AppointSku"].ToString();
+            }
+            if(co["ExcludeSku"] != null)
+            {
+                ExcludeSku = co["ExcludeSku"].ToString();
+            }
+            if(co["MinAmt"] != null)
+            {
+                string Text = co["MinAmt"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    decimal x;
+                    if (decimal.TryParse(Text, out x))
+                    {
+                        MinAmt = Text;
+                    }
+                }
+            }
+            if(co["MaxAmt"] != null)
+            {
+                string Text = co["MaxAmt"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    decimal x;
+                    if (decimal.TryParse(Text, out x))
+                    {
+                        MaxAmt = Text;
+                    }
+                }
+            }
+            if(co["IgnoreRec"] != null)
+            {
+                string Text = co["IgnoreRec"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    bool x;
+                    if (bool.TryParse(Text, out x))
+                    {
+                        IgnoreRec = Text;
+                    }
+                }
+            }
+            if(co["RecMessage"] != null)
+            {
+                RecMessage = co["RecMessage"].ToString();
+            }
+            if(co["IgnoreSend"] != null)
+            {
+                string Text = co["IgnoreSend"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    bool x;
+                    if (bool.TryParse(Text, out x))
+                    {
+                        IgnoreSend = Text;
+                    }
+                }
+            }
+            if(co["SendMessage"] != null)
+            {
+                SendMessage = co["SendMessage"].ToString();
+            }
+            if(co["DiscountRate"] != null)
+            {
+                string Text = co["DiscountRate"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    decimal x;
+                    if (decimal.TryParse(Text, out x))
+                    {
+                        DiscountRate = Text;
+                    }
+                }
+            }
+            if(co["Shop"] != null)
+            {
+                Shop = co["Shop"].ToString();
+            }
+            if(co["OrdType"] != null)
+            {
+                OrdType = co["OrdType"].ToString();
+            }
+            if(co["DelayedMinute"] != null)
+            {
+                string Text = co["DelayedMinute"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    int x;
+                    if (int.TryParse(Text, out x))
+                    {
+                        DelayedMinute = Text;
+                    }
+                }
+            }
+            var data = OrderHaddle.UpdateAutoConfirmRule(int.Parse(GetCoid()),id,RuleName,StartDate,EndDate,PayStartDate,PayEndDate,AppointSku,ExcludeSku,MinAmt,MaxAmt,IgnoreRec,
+                                                          RecMessage,IgnoreSend,SendMessage,DiscountRate,Shop,OrdType,DelayedMinute,GetUname());
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/UpdateAutoConfirmRuleEnable")]
+        public ResponseResult UpdateAutoConfirmRuleEnable([FromBodyAttribute]JObject co)
+        {   
+            int id = 0;
+            bool Enable;
+            if(co["ID"] != null)
+            {
+                string Text = co["ID"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    int x;
+                    if (int.TryParse(Text, out x))
+                    {
+                        id = int.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "规则ID参数异常", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "规则ID必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "规则ID必填", "General"); 
+            }
+            if(co["Enable"] != null)
+            {
+                string Text = co["Enable"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    bool x;
+                    if (bool.TryParse(Text, out x))
+                    {
+                        Enable = bool.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "禁用/启用参数异常", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "禁用/启用必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "禁用/启用必填", "General"); 
+            }
+            var data = OrderHaddle.UpdateAutoConfirmRuleEnable(int.Parse(GetCoid()),id,Enable,GetUname());
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Order/GetAutoConfirmRuleList")]
+        public ResponseResult GetAutoConfirmRuleList(string SortField,string SortDirection,string PageIndex,string NumPerPage)
+        {   
+            int x,index=1,num=20;
+            string field = null,sort = null;
+            if(!string.IsNullOrEmpty(SortField))
+            {
+                if(CommHaddle.SysColumnExists(DbBase.CoreConnectString,"order_autoconfirm_rule",SortField).s == 1)
+                {
+                    field = SortField;
+                }
+            }
+            if(!string.IsNullOrEmpty(SortDirection))
+            {
+                 if(SortDirection.ToUpper() == "ASC" || SortDirection.ToUpper() == "DESC")
+                {
+                    sort = SortDirection;
+                }
+            }
+            if (int.TryParse(NumPerPage, out x))
+            {
+                num = int.Parse(NumPerPage);
+            }
+            if (int.TryParse(PageIndex, out x))
+            {
+                index = int.Parse(PageIndex);
+            }
+            var data = OrderHaddle.GetAutoConfirmRuleList(int.Parse(GetCoid()),field,sort,num,index);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }  
