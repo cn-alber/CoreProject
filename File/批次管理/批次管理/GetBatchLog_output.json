@@ -1,0 +1,116 @@
+{
+    "s": 1,
+    "d": [
+        {
+            "SaleID": null,
+            "Operate": "拣货批次:终止",
+            "UniqueCode": "",
+            "SkuID": "",
+            "Qty": 1,
+            "Remark": "",
+            "Remark2": "",
+            "Creator": "管理员",
+            "CreateDate": "2016-12-24 13:52:55"
+        },
+        {
+            "SaleID": "89",
+            "Operate": "绑定批次",
+            "UniqueCode": "订单:10886",
+            "SkuID": "",
+            "Qty": 0,
+            "Remark": "",
+            "Remark2": "",
+            "Creator": "管理员",
+            "CreateDate": "2016-12-24 13:48:12"
+        },
+        {
+            "SaleID": "90",
+            "Operate": "绑定批次",
+            "UniqueCode": "订单:10887",
+            "SkuID": "",
+            "Qty": 0,
+            "Remark": "",
+            "Remark2": "",
+            "Creator": "管理员",
+            "CreateDate": "2016-12-24 13:48:12"
+        },
+        {
+            "SaleID": "91",
+            "Operate": "绑定批次",
+            "UniqueCode": "订单:10888",
+            "SkuID": "",
+            "Qty": 0,
+            "Remark": "",
+            "Remark2": "",
+            "Creator": "管理员",
+            "CreateDate": "2016-12-24 13:48:12"
+        },
+        {
+            "SaleID": "92",
+            "Operate": "绑定批次",
+            "UniqueCode": "订单:10889",
+            "SkuID": "",
+            "Qty": 0,
+            "Remark": "",
+            "Remark2": "",
+            "Creator": "管理员",
+            "CreateDate": "2016-12-24 13:48:12"
+        },
+        {
+            "SaleID": "93",
+            "Operate": "绑定批次",
+            "UniqueCode": "订单:10890",
+            "SkuID": "",
+            "Qty": 0,
+            "Remark": "",
+            "Remark2": "",
+            "Creator": "管理员",
+            "CreateDate": "2016-12-24 13:48:12"
+        },
+        {
+            "SaleID": "94",
+            "Operate": "绑定批次",
+            "UniqueCode": "订单:10891",
+            "SkuID": "",
+            "Qty": 0,
+            "Remark": "",
+            "Remark2": "",
+            "Creator": "管理员",
+            "CreateDate": "2016-12-24 13:48:12"
+        },
+        {
+            "SaleID": "95",
+            "Operate": "绑定批次",
+            "UniqueCode": "订单:10892",
+            "SkuID": "",
+            "Qty": 0,
+            "Remark": "",
+            "Remark2": "",
+            "Creator": "管理员",
+            "CreateDate": "2016-12-24 13:48:12"
+        },
+        {
+            "SaleID": "96",
+            "Operate": "绑定批次",
+            "UniqueCode": "订单:10893",
+            "SkuID": "",
+            "Qty": 0,
+            "Remark": "",
+            "Remark2": "",
+            "Creator": "管理员",
+            "CreateDate": "2016-12-24 13:48:12"
+        },
+        {
+            "SaleID": "88",
+            "Operate": "绑定批次",
+            "UniqueCode": "订单:10885",
+            "SkuID": "",
+            "Qty": 0,
+            "Remark": "",
+            "Remark2": "",
+            "Creator": "管理员",
+            "CreateDate": "2016-12-24 13:48:11"
+        }
+    ],
+    "m": ""
+}
