@@ -49,8 +49,8 @@ namespace CoreDate.CoreComm
                     }
                     if (!string.IsNullOrEmpty(param.Enabled) && param.Enabled.ToUpper() != "ALL")//是否启用
                     {
-                        sql.Append(" AND Enabled = @Enable ");
-                        totalSql.Append(" AND Enabled = @Enable ");
+                        sql.Append(" AND Enabled = @Enabled ");
+                        totalSql.Append(" AND Enabled = @Enabled ");
                         p.Add("@Enabled", param.Enabled.ToUpper() == "TRUE" ? true : false);
                     }
                     if(!string.IsNullOrEmpty(param.Filter)){
