@@ -78,7 +78,7 @@ namespace CoreModels.WmsApi
 
     public class ASaleOutItem
     {
-        
+
     }
     public class ASaleOutPrint
     {
@@ -123,10 +123,9 @@ namespace CoreModels.WmsApi
     {
         public string GoodsCode { get; set; }
         public string GoodsName { get; set; }
-        public string ColorName { get; set; }
-        public string SizeName { get; set; }
+        public string Norm { get; set; }
         public int OutQty { get; set; }
-        public Boolean IsBox { get; set; }
         public string SkuID { get; set; }
+        public int Skuautoid { get; set; }
     }
 }

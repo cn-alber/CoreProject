@@ -1,0 +1,32 @@
+{
+    "s": 1,
+    "d": {
+        "SuccessIDs": [
+            {
+                "ID": 31,
+                "NotPickedQty": 4,
+                "NoQty": 0,
+                "Status": 7,
+                "StatusString": "终止拣货"
+            },
+            {
+                "ID": 32,
+                "NotPickedQty": 3,
+                "NoQty": 0,
+                "Status": 7,
+                "StatusString": "终止拣货"
+            },
+            {
+                "ID": 33,
+                "NotPickedQty": 2,
+                "NoQty": 0,
+                "Status": 7,
+                "StatusString": "终止拣货"
+            }
+        ],
+        "FailIDs": [
+            
+        ]
+    },
+    "m": ""
+}

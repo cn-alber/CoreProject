@@ -1,0 +1,20 @@
+{
+    "ID":1,
+    "RuleName":"测试011",
+    "StartDate":"2016-12-02",
+    "EndDate":"2016-12-30",
+    "PayStartDate":"2016-12-11",
+    "PayEndDate":"2016-12-19",
+    "AppointSku":"11",
+    "ExcludeSku":"22",
+    "MinAmt":"33",
+    "MaxAmt":"44",
+    "IgnoreRec":"true",
+    "RecMessage":"55",
+    "IgnoreSend":"false",
+    "SendMessage":"66",
+    "DiscountRate":"77",
+    "Shop":"88",
+    "OrdType":"99",
+    "DelayedMinute":"100"
+}

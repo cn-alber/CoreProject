@@ -1,0 +1,26 @@
+{
+    "s": 1,
+    "d": {
+        "Datacnt": 1,
+        "Pagecnt": 1,
+        "Rule": [
+            {
+                "ID": 1,
+                "RuleName": "测试011",
+                "AppointSku": "11",
+                "ExcludeSku": "22",
+                "MinAmt": "33.00",
+                "MaxAmt": "44.00",
+                "DiscountRate": "77.00",
+                "IgnoreRec": true,
+                "StartDate": "2016-12-02 00:00:00",
+                "EndDate": "2016-12-30 00:00:00",
+                "DelayedMinute": 100,
+                "Enable": false,
+                "CreateDate": "2016-12-26 15:36:57",
+                "ModifyDate": "2016-12-26 16:16:05"
+            }
+        ]
+    },
+    "m": ""
+}

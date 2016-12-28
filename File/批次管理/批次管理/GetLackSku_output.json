@@ -1,0 +1,14 @@
+{
+    "s": 1,
+    "d": [
+        {
+            "SkuAutoID": 2,
+            "SkuID": "test1234560004007",
+            "GoodsCode": "test123456",
+            "Norm": "红色1;43",
+            "OrdQty": 9,
+            "NoQty": 2
+        }
+    ],
+    "m": ""
+}

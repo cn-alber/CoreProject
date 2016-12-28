@@ -239,4 +239,72 @@ namespace CoreModels.XyCore
         public string ExpName{get;set;}
         public int OrdQty{get;set;}
     }
+    public class CancleBatchSuccess
+    {
+        public int ID{get;set;}
+        public int NotPickedQty{get;set;}
+        public int NoQty{get;set;}
+        public int Status{get;set;}
+        public string StatusString{get;set;}
+    }
+    public class CancleBatchReturn
+    {
+        public List<CancleBatchSuccess> SuccessIDs{get;set;}
+        public List<TransferNormalReturnFail> FailIDs{get;set;}
+    }
+    public class BatchTask
+    {
+        public int ID{get;set;}
+        public int BatchID{get;set;}
+        public int CoID{get;set;}
+        public int Skuautoid{get;set;}
+        public string SkuID{get;set;}
+        public string SkuName{get;set;}
+        public string PCode{get;set;}
+        public int Qty{get;set;}
+        public int Index{get;set;}
+        public int PickQty{get;set;}
+        public int NoQty{get;set;}
+    }
+    public class LackSkuList
+    {
+        public int SkuAutoID{get;set;}
+        public string SkuID{get;set;}
+        public string GoodsCode{get;set;}
+        public string Norm{get;set;}
+        public int OrdQty{get;set;}
+        public int NoQty{get;set;}
+    }
+    public class BatchLog
+    {
+        public string SaleID{get;set;}
+        public string Operate{get;set;}
+        public string UniqueCode{get;set;}
+        public string SkuID{get;set;}
+        public int Qty{get;set;}
+        public string Remark{get;set;}
+        public string Remark2{get;set;}
+        public string Creator{get;set;}
+        public string CreateDate{get;set;}
+    }
+    public class BatchItemList
+    {
+        public string SkuID{get;set;}
+        public string SkuName{get;set;}
+        public string Norm{get;set;}
+        public int Qty{get;set;}
+        public int PickQty{get;set;}
+        public int NoQty{get;set;}
+    }
+    public class BatchUniqueList
+    {
+        public string BarCode{get;set;}
+        public string Sku{get;set;}
+        public int Status{get;set;}
+        public string StatusString{get;set;}
+        public int OutID{get;set;}
+        public string OutIDString{get;set;}
+        public string PCode{get;set;}
+        public string ModifyDate{get;set;}
+    }
 }

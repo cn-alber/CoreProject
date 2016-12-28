@@ -980,6 +980,19 @@ namespace CoreData.CoreCore
                         result.s = -3003;
                         return result;
                     }
+                    sqlcommand = "select id,oid from saleout where id in @ID and coid = @Coid";
+                    var l = CoreDBconn.Query<SaleOutInsert>(sqlcommand,new{ID = sale,Coid = CoID}).AsList();
+                    foreach(var ll in l)
+                    {
+                        sqlcommand = @"INSERT INTO batch_log(BatchID,SaleID,Operate,UniqueCode,CoID,Creator) 
+                                                  VALUES(@BatchID,@SaleID,@Operate,@UniqueCode,@CoID,@Creator)";
+                        count = CoreDBconn.Execute(sqlcommand,new{BatchID=rtn,SaleID = ll.ID,Operate="绑定批次",UniqueCode="订单:" + ll.OID,CoID=CoID,Creator=UserName},TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3002;
+                            return result;
+                        }
+                    }
                     i ++;
                     j = j + sale.Count;
                     TransCore.Commit();
@@ -1645,6 +1658,19 @@ namespace CoreData.CoreCore
                     {
                         result.s = -3003;
                         return result;
+                    }
+                    sqlcommand = "select id,oid from saleout where id = @ID and coid = @Coid";
+                    var l = CoreDBconn.Query<SaleOutInsert>(sqlcommand,new{ID = a,Coid = CoID}).AsList();
+                    foreach(var ll in l)
+                    {
+                        sqlcommand = @"INSERT INTO batch_log(BatchID,SaleID,Operate,UniqueCode,CoID,Creator) 
+                                                  VALUES(@BatchID,@SaleID,@Operate,@UniqueCode,@CoID,@Creator)";
+                        count = CoreDBconn.Execute(sqlcommand,new{BatchID=rtn,SaleID = ll.ID,Operate="绑定批次",UniqueCode="订单:" + ll.OID,CoID=CoID,Creator=UserName},TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3002;
+                            return result;
+                        }
                     }
                     TransCore.Commit();
                 }
@@ -2387,6 +2413,19 @@ namespace CoreData.CoreCore
                         result.s = -3003;
                         return result;
                     }
+                    sqlcommand = "select id,oid from saleout where id = @ID and coid = @Coid";
+                    var l = CoreDBconn.Query<SaleOutInsert>(sqlcommand,new{ID = a,Coid = CoID}).AsList();
+                    foreach(var ll in l)
+                    {
+                        sqlcommand = @"INSERT INTO batch_log(BatchID,SaleID,Operate,UniqueCode,CoID,Creator) 
+                                                  VALUES(@BatchID,@SaleID,@Operate,@UniqueCode,@CoID,@Creator)";
+                        count = CoreDBconn.Execute(sqlcommand,new{BatchID=rtn,SaleID = ll.ID,Operate="绑定批次",UniqueCode="订单:" + ll.OID,CoID=CoID,Creator=UserName},TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3002;
+                            return result;
+                        }
+                    }
                     TransCore.Commit();
                 }
                 catch (Exception e)
@@ -2404,7 +2443,241 @@ namespace CoreData.CoreCore
             }    
             return result;  
         }
-        
-
+        ///<summary>
+        ///结束任务
+        ///</summary>
+        public static DataResult CancleBatch(int CoID,string UserName,List<int> ID)
+        {
+            var result = new DataResult(1,null);
+            string sqlcommand = string.Empty;
+            var batch = new List<Batch>();
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    sqlcommand = @"select * from batch where id in @ID and coid = @Coid";
+                    batch = conn.Query<Batch>(sqlcommand,new{ID = ID,Coid = CoID}).AsList();    
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }  
+            if(batch.Count == 0)
+            {
+                result.s = -1;
+                result.d = "没有符合条件的资料!";
+                return result;
+            }
+            int count = 0;
+            var res = new CancleBatchReturn();
+            var fa = new List<TransferNormalReturnFail>();
+            var su = new List<CancleBatchSuccess>();
+            var CoreDBconn = new MySqlConnection(DbBase.CoreConnectString);
+            CoreDBconn.Open();
+            var TransCore = CoreDBconn.BeginTransaction();
+            try
+            {
+                foreach(var a in batch)
+                {
+                    if(a.Status == 6 || a.Status == 7)
+                    {
+                        var ff = new TransferNormalReturnFail();
+                        ff.ID = a.ID;
+                        ff.Reason = "已完成或终止拣货的批次不可结束任务!";
+                        fa.Add(ff);
+                        continue;
+                    }
+                    //更新批次资料
+                    sqlcommand = "update batch set status = 7,Modifier=@Modifier,ModifyDate=@ModifyDate where id = @ID and coid = @Coid";
+                    count = CoreDBconn.Execute(sqlcommand,new{ModifyDate=DateTime.Now,CoID=CoID,Modifier=UserName,ID = a.ID},TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3003;
+                        return result;
+                    }
+                    //更新批次任务和库存
+                    sqlcommand = "select * from batchtask where BatchID = " + a.ID + " and coid = " + CoID;
+                    var task = CoreDBconn.Query<BatchTask>(sqlcommand).AsList();
+                    foreach(var t in task)
+                    {
+                        if(t.Qty != t.PickQty)
+                        {
+                            t.NoQty = t.Qty - t.PickQty;
+                            // //更新批次任务
+                            // sqlcommand = @"update batchtask set NoQty=@NoQty where id = @ID and coid = @Coid";
+                            // count = CoreDBconn.Execute(sqlcommand,t,TransCore);
+                            // if(count < 0)
+                            // {
+                            //     result.s = -3003;
+                            //     return result;
+                            // }
+                            //更新库存
+                            sqlcommand = @"update wmspile set lockqty=lockqty - @Qty where Skuautoid = @Skuautoid and Type in (1,2) and coid = @Coid and PCode = @PCode";
+                            count = CoreDBconn.Execute(sqlcommand,new{Qty = t.NoQty,Skuautoid = t.Skuautoid,Coid=CoID,PCode=t.PCode},TransCore);
+                            if(count < 0)
+                            {
+                                result.s = -3003;
+                                return result;
+                            }
+                        }
+                    }
+                    //更新出库单
+                    sqlcommand = "select ID from saleout where BatchID = " + a.ID + " and coid = " + CoID + " and status = 0";
+                    var saleID = CoreDBconn.Query<int>(sqlcommand).AsList();
+                    if(saleID.Count > 0)
+                    {
+                        sqlcommand = @"update saleout set BatchID=0,SortCode=null,Modifier=@Modifier,ModifyDate=@ModifyDate where ID in @ID and coid = @Coid";
+                        count = CoreDBconn.Execute(sqlcommand,new{ID = saleID,ModifyDate = DateTime.Now,Modifier=UserName,Coid = CoID},TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3003;
+                            return result;
+                        }
+                        sqlcommand = @"update saleoutitem set BatchID=0,Modifier=@Modifier,ModifyDate=@ModifyDate where sid in @ID and coid = @Coid";
+                        count = CoreDBconn.Execute(sqlcommand,new{ID = saleID,ModifyDate = DateTime.Now,Modifier=UserName,Coid = CoID},TransCore);
+                        if(count < 0)
+                        {
+                            result.s = -3003;
+                            return result;
+                        }
+                    }   
+                    sqlcommand = @"INSERT INTO batch_log(BatchID,Operate,Qty,CoID,Creator) 
+                                                    VALUES(@BatchID,@Operate,@Qty,@CoID,@Creator)";
+                    count = CoreDBconn.Execute(sqlcommand,new{BatchID=a.ID,Operate="拣货批次:终止",Qty=1,CoID=CoID,Creator=UserName},TransCore);
+                    if(count < 0)
+                    {
+                        result.s = -3002;
+                        return result;
+                    }
+                    var ss = new CancleBatchSuccess();
+                    ss.ID = a.ID;
+                    ss.NotPickedQty = a.Qty - a.PickedQty;
+                    ss.NoQty = 0;
+                    ss.Status = 7;
+                    ss.StatusString = Enum.GetName(typeof(BatchStatus), ss.Status);
+                    su.Add(ss);
+                }
+                TransCore.Commit();
+            }
+            catch (Exception e)
+            {
+                TransCore.Rollback();
+                TransCore.Dispose();
+                result.s = -1;
+                result.d = e.Message;
+            }
+            finally
+            {
+                TransCore.Dispose();
+                CoreDBconn.Dispose();
+            }  
+            res.SuccessIDs = su;
+            res.FailIDs = fa;
+            result.d = res;  
+            return result;
+        }
+        ///<summary>
+        ///查看待补货待上架商品
+        ///</summary>
+        public static DataResult GetLackSku(int CoID)
+        {
+            var result = new DataResult(1,null);
+            string sqlcommand = string.Empty;
+            var res = new List<LackSkuList>();
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    sqlcommand = @"select SkuAutoID,SkuID,GoodsCode,Norm,sum(Qty) as OrdQty from saleout,saleoutitem where saleout.ID = saleoutitem.SID and saleout.`Status`=0 
+                                   and saleout.coid = " +CoID + " and saleoutitem.IsGift = false and saleoutitem.BatchID = 0 group by SkuAutoID,SkuID,GoodsCode,Norm";
+                    var u = conn.Query<LackSkuList>(sqlcommand).AsList();
+                    foreach(var a in u)
+                    {
+                        sqlcommand = @"select sum(Qty - lockqty) from wmspile where Skuautoid = " + a.SkuAutoID + " and Type in (1,2) and Enable = true and CoID = " + CoID;
+                        int invqty = conn.QueryFirst<int>(sqlcommand);
+                        if(a.OrdQty > invqty)
+                        {
+                            a.NoQty = a.OrdQty - invqty;
+                            res.Add(a);
+                        }
+                    }      
+                    result.d = res;               
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }  
+            return result;
+        }
+        ///<summary>
+        ///批次日志查询
+        ///</summary>
+        public static DataResult GetBatchLog(int ID,int CoID)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = @"select SaleID,Operate,UniqueCode,SkuID,Qty,Remark,Remark2,Creator,CreateDate from batch_log where BatchID = " + ID + 
+                                         " and coid = " + CoID + " order by CreateDate desc";
+                    var u = conn.Query<BatchLog>(sqlcommand).AsList();
+                    result.d = u;               
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }  
+            return result;
+        }
+        ///<summary>
+        ///拣货明细信息
+        ///</summary>
+        public static DataResult GetBatchItem(int CoID,int id)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = @"select coresku.SkuID,coresku.SkuName,coresku.Norm,sum(batchtask.qty) as Qty,sum(batchtask.PickQty) as PickQty,
+                                          sum(batchtask.qty - batchtask.PickQty) as NoQty from batchtask,coresku where batchtask.Skuautoid = coresku.ID and 
+                                          batchtask.CoID = coresku.CoID and batchtask.BatchID=" + id + " and batchtask.CoID = " + CoID + 
+                                          " group by batchtask.Skuautoid,coresku.SkuName,coresku.Norm";
+                    var u = conn.Query<BatchItemList>(sqlcommand).AsList();
+                    result.d = u;               
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }  
+            return result;
+        }
+        ///<summary>
+        ///拣货批次唯一码
+        ///</summary>
+        public static DataResult GetBatchUnique(int CoID,int id)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = @"select BarCode,Sku,status,OutID,PCode,ModifyDate from batchpicked where BatchID = " + id + " and CoID = " + CoID + 
+                                         " order by Sku,BarCode,ModifyDate";
+                    var u = conn.Query<BatchUniqueList>(sqlcommand).AsList();
+                    foreach(var a in u)
+                    {
+                        a.StatusString = Enum.GetName(typeof(PickStatus), a.Status);
+                        sqlcommand = "select status from saleout where id = " + a.OutID + " and coid = " + CoID;
+                        var sa = conn.Query<SaleOutInsert>(sqlcommand).AsList();
+                        if(sa[0].Status == 1)
+                        {
+                            a.OutIDString = a.OutID + " - 已发货";
+                        }
+                    }
+                    result.d = u;               
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }  
+            return result;
+        }
     }
 }

@@ -952,7 +952,6 @@ namespace CoreModels.XyCore
         public List<SetSupDistributorSuccess> SuccessIDs {get;set;}
         public List<TransferNormalReturnFail> FailIDs {get;set;}
     }
-
     public class OrderDetail
     {
         public int ID {get;set;}
@@ -981,5 +980,75 @@ namespace CoreModels.XyCore
         public int DealerType{get;set;}
         public string ShopID{get;set;}
     }
-
+    public class OrdAutoConfirmRule
+    {
+        public int ID{get;set;}
+        public string RuleName{get;set;}
+        public DateTime StartDate{get;set;}
+        public DateTime EndDate{get;set;}
+        public string PayStartDate{get;set;}
+        public string PayEndDate{get;set;}
+        public string AppointSku{get;set;}
+        public string ExcludeSku{get;set;}
+        public string MinAmt{get;set;}
+        public string MaxAmt{get;set;}
+        public bool IgnoreRec{get;set;}
+        public string RecMessage{get;set;}
+        public bool IgnoreSend{get;set;}
+        public string SendMessage{get;set;}
+        public string DiscountRate{get;set;}
+        public string Shop{get;set;}
+        public string OrdType{get;set;}
+        public int DelayedMinute{get;set;}
+        public bool Enable{get;set;}
+        public int CoID{get;set;}
+        public string Creator{get;set;}
+        public DateTime CreateDate{get;set;}
+        public string Modifier{get;set;}
+        public DateTime ModifyDate{get;set;}
+    }
+    public class OrdAutoConfirmRuleSingle
+    {
+        public int ID{get;set;}
+        public string RuleName{get;set;}
+        public string StartDate{get;set;}
+        public string EndDate{get;set;}
+        public string PayStartDate{get;set;}
+        public string PayEndDate{get;set;}
+        public string AppointSku{get;set;}
+        public string ExcludeSku{get;set;}
+        public string MinAmt{get;set;}
+        public string MaxAmt{get;set;}
+        public bool IgnoreRec{get;set;}
+        public string RecMessage{get;set;}
+        public bool IgnoreSend{get;set;}
+        public string SendMessage{get;set;}
+        public string DiscountRate{get;set;}
+        public string Shop{get;set;}
+        public string OrdType{get;set;}
+        public string DelayedMinute{get;set;}
+    }
+    public class OrdAutoConfirmRuleList
+    {
+        public int ID{get;set;}
+        public string RuleName{get;set;}
+        public string AppointSku{get;set;}
+        public string ExcludeSku{get;set;}
+        public string MinAmt{get;set;}
+        public string MaxAmt{get;set;}
+        public string DiscountRate{get;set;}
+        public bool IgnoreRec{get;set;}
+        public string StartDate{get;set;}
+        public string EndDate{get;set;}
+        public int DelayedMinute{get;set;}
+        public bool Enable{get;set;}
+        public string CreateDate{get;set;}
+        public string ModifyDate{get;set;}
+    }
+    public class OrdAutoConfirmRuleData
+    {
+        public int Datacnt {get;set;}//总资料笔数
+        public decimal Pagecnt{get;set;}//总页数
+        public List<OrdAutoConfirmRuleList> Rule {get;set;}//订单资料List
+    }
 }

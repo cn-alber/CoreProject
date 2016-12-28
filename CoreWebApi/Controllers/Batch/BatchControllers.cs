@@ -1106,5 +1106,97 @@ namespace CoreWebApi
             var data = BatchHaddle.SetBigOrd(int.Parse(GetCoid()),GetUname());
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Batch/CancleBatch")]
+        public ResponseResult CancleBatch([FromBodyAttribute]JObject co)
+        {   
+            var id = new List<int>();
+            if(co["ID"] != null)
+            {
+                id = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(co["ID"].ToString());
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "出库单ID必填", "General");
+            }
+            var data = BatchHaddle.CancleBatch(int.Parse(GetCoid()),GetUname(),id);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Batch/GetLackSku")]
+        public ResponseResult GetLackSku()
+        {
+            var data = BatchHaddle.GetLackSku(int.Parse(GetCoid()));
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Batch/GetBatchLog")]
+        public ResponseResult GetBatchLog(string ID)
+        {
+            int x,id;
+            if(!string.IsNullOrEmpty(ID))
+            {
+                if (int.TryParse(ID, out x))
+                {
+                    id = int.Parse(ID);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "批次ID参数无效", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "批次ID必填", "General"); 
+            }
+            var data = BatchHaddle.GetBatchLog(id,int.Parse(GetCoid()));
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Batch/GetBatchItem")]
+        public ResponseResult GetBatchItem(string ID)
+        {
+            int x,id;
+            if(!string.IsNullOrEmpty(ID))
+            {
+                if (int.TryParse(ID, out x))
+                {
+                    id = int.Parse(ID);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "批次ID参数无效", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "批次ID必填", "General"); 
+            }
+            var data = BatchHaddle.GetBatchItem(int.Parse(GetCoid()),id);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Batch/GetBatchUnique")]
+        public ResponseResult GetBatchUnique(string ID)
+        {
+            int x,id;
+            if(!string.IsNullOrEmpty(ID))
+            {
+                if (int.TryParse(ID, out x))
+                {
+                    id = int.Parse(ID);
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "批次ID参数无效", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "批次ID必填", "General"); 
+            }
+            var data = BatchHaddle.GetBatchUnique(int.Parse(GetCoid()),id);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }

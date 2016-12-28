@@ -589,3 +589,81 @@ input:      OidType             string          订单范围选项 A:列表勾�
 output: s=1成功 else 错误代码
 参考:input jason 文件:CalGift_input.json
 参考:output jason 文件:CalGift_output.json
+
+53.GetOrdType()订单类型List
+路由:http://localhost:5000/Core/Order/GetOrdType
+input:
+output:订单类型List
+参考:output jason 文件:GetOrdType_output.json
+
+54.InsertAutoConfirmRule()新增自动审单规则
+路由:http://localhost:5000/Core/Order/InsertAutoConfirmRule
+input:RuleName          string      规则名称
+      StartDate         datetime    开始日期
+      EndDate           datetime    结束日期
+      PayStartDate      datetime    支付开始日期
+      PayEndDate        datetime    支付结束日期
+      AppointSku        string      指定商品
+      ExcludeSku        string      排除商品
+      MinAmt            decimal     最小金额
+      MaxAmt            decimal     最大金额
+      IgnoreRec         bool        忽略买家留言
+      RecMessage        string      买家留言
+      IgnoreSend        bool        忽略卖家备注
+      SendMessage       string      卖家备注
+      DiscountRate      decimal     折扣率
+      Shop              string      限定店铺
+      OrdType           string      限定订单类型
+      DelayedMinute     int         支付后延时审核
+output: s=1成功 else 错误代码
+参考:input jason 文件:InsertAutoConfirmRule_input.json
+参考:output jason 文件:InsertAutoConfirmRule_output.json
+
+55.GetAutoConfirmRuleSingle()查询单笔自动审单规则
+路由:http://localhost:5000/Core/Order/GetAutoConfirmRuleSingle
+input:ID          string      规则ID
+output: s=1成功 else 错误代码
+参考:output jason 文件:GetAutoConfirmRuleSingle_output.json
+
+56.UpdateAutoConfirmRule()更新自动审单规则
+路由:http://localhost:5000/Core/Order/UpdateAutoConfirmRule
+input:ID                string      规则ID
+      RuleName          string      规则名称
+      StartDate         datetime    开始日期
+      EndDate           datetime    结束日期
+      PayStartDate      datetime    支付开始日期
+      PayEndDate        datetime    支付结束日期
+      AppointSku        string      指定商品
+      ExcludeSku        string      排除商品
+      MinAmt            decimal     最小金额
+      MaxAmt            decimal     最大金额
+      IgnoreRec         bool        忽略买家留言
+      RecMessage        string      买家留言
+      IgnoreSend        bool        忽略卖家备注
+      SendMessage       string      卖家备注
+      DiscountRate      decimal     折扣率
+      Shop              string      限定店铺
+      OrdType           string      限定订单类型
+      DelayedMinute     int         支付后延时审核
+output: s=1成功 else 错误代码
+参考:input jason 文件:UpdateAutoConfirmRule_input.json
+参考:output jason 文件:UpdateAutoConfirmRule_output.json
+
+57.UpdateAutoConfirmRuleEnable()禁用启用规则
+路由:http://localhost:5000/Core/Order/UpdateAutoConfirmRuleEnable
+input:ID                string      规则ID
+      Enable            bool        禁用 false  启用 true
+output: s=1成功 else 错误代码
+参考:input jason 文件:UpdateAutoConfirmRuleEnable_input.json
+参考:output jason 文件:UpdateAutoConfirmRuleEnable_output.json
+
+58.GetAutoConfirmRuleList()查询规则资料List
+路由:http://localhost:5000/Core/Order/GetAutoConfirmRuleList
+input:      SortField           string          排序栏位名称 default null
+            SortDirection       string          排序方式 default null
+            PageIndex           string          资料页数(ex.第一页就给1) default 1
+            NumPerPage          string          每页显示资料笔数 default 20
+OutPut:     Datacnt             int             资料总笔数
+            Pagecnt             decimal         总页数
+            Rule                List<Rule>      Rule 资料
+参考:output jason 文件:GetAutoConfirmRuleList_output.json

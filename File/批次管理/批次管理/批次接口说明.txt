@@ -238,3 +238,34 @@ output:成功或失败
 input:None
 OutPut:成功或失败
 参考:output jason 文件:SetBigOrd_output.json
+
+26.CancleBatch()终止任务
+路由:http://localhost:5000/Core/Batch/CancleBatch
+input:ID    List<int>         批次ID
+output:成功或失败
+参考:input jason 文件:CancleBatch_input.json
+参考:output jason 文件:CancleBatch_output.json
+
+27.GetLackSku() //查看待补货待上架商品
+路由:http://localhost:5000/Core/Batch/GetLackSku
+input:None
+OutPut:商品资料
+参考:output jason 文件:GetLackSku_output.json
+
+28.GetBatchLog() //批次日志查询
+路由:http://localhost:5000/Core/Batch/GetBatchLog
+input:ID string 批次ID
+OutPut:商品资料
+参考:output jason 文件:GetBatchLog_output.json
+
+29.GetBatchItem() //拣货明细信息
+路由:http://localhost:5000/Core/Batch/GetBatchItem
+input:ID string 批次ID
+OutPut:商品资料
+参考:output jason 文件:GetBatchItem_output.json
+
+30.GetBatchUnique() //拣货批次唯一码
+路由:http://localhost:5000/Core/Batch/GetBatchUnique
+input:ID string 批次ID
+OutPut:商品资料
+参考:output jason 文件:GetBatchUnique_output.json
