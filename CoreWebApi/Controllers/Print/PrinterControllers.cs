@@ -17,13 +17,13 @@ namespace CoreWebApi.Print
     {
         
         [HttpGetAttribute("/core/printer/list")]
-        public ResponseResult list(int type=0,string filter="",string enable="All",int pageIndex=1,int pageSize=20)
+        public ResponseResult list(int type=0,string filter="",string enabled="All",int pageIndex=1,int pageSize=20)
         {           
             PrinterParam param = new PrinterParam();
             param.CoID = int.Parse(GetCoid());
             param.Type = type;
             param.Filter = filter;
-            param.Enabled = enable;
+            param.Enabled = enabled;
             param.PageIndex = pageIndex;
             param.PageSize = pageSize;
             var m = PrinterHaddle.getPrinterLst(param);          
@@ -41,6 +41,7 @@ namespace CoreWebApi.Print
         public ResponseResult createPrinter([FromBodyAttribute]JObject lo)
         {                       
             var printer = Newtonsoft.Json.JsonConvert.DeserializeObject<PrinterInsert>(lo.ToString());
+            printer.CoID = int.Parse(GetCoid());
             switch (printer.PrintType)
             {
                 case 1:
@@ -60,6 +61,37 @@ namespace CoreWebApi.Print
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
 
+        [HttpPostAttribute("/core/printer/modifyPrinter")]
+        public ResponseResult modifyPrinter([FromBodyAttribute]JObject lo)
+        {                       
+            var printer = Newtonsoft.Json.JsonConvert.DeserializeObject<PrinterInsert>(lo.ToString());
+            printer.CoID = int.Parse(GetCoid());
+            switch (printer.PrintType)
+            {
+                case 1:
+                    printer.PrintName = "箱码打印";
+                    break;
+                case 2:
+                    printer.PrintName = "快递单打印";
+                    break;
+                case 3:
+                    printer.PrintName = "件码打印";
+                    break;
+                default:
+                    printer.PrintName = "箱码打印";
+                    break;
+            }
+            var m = PrinterHaddle.modifyPrinter(printer);          
+            return CoreResult.NewResponse(m.s, m.d, "Print");
+        }
+
+        [HttpPostAttribute("/core/printer/delPrinter")]
+        public ResponseResult delPrinter([FromBodyAttribute]JObject lo)
+        {           
+            var ids = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(lo["IDLst"].ToString());
+            var m = PrinterHaddle.delPrinter(ids,GetCoid());          
+            return CoreResult.NewResponse(m.s, m.d, "Print");
+        }
 
 
     }

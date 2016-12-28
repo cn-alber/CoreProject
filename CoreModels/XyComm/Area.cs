@@ -18,6 +18,13 @@ namespace CoreModels.XyComm
 		public string Jianpin{get;set;}
 		public string FirstChar{get;set;}
      }
+	
+	 public class AreaQuery{
+		 public int ID{get;set;}
+		 public int ParentId{get;set;}
+		 public string Name{get;set;}
+		 public string LevelType{get;set;}
+	 }
 
 	 public class AreaAll{
 		 public int value{get;set;}

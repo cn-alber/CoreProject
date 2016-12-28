@@ -152,6 +152,98 @@ namespace CoreData.CoreComm
 
         #endregion
 
+        #region 获取单个省市区
+        public static DataResult GetArea(int id)
+        {
+            var result = new DataResult(1, null);
+            using (var conn = new MySqlConnection(DbBase.CommConnectString))
+            {
+                try
+                {
+                    if (id == 0 || id == 100000) {
+                        string sql = @"SELECT  area.ID as value,  area.ParentId ,  area.`Name` as label FROM area WHERE LevelType = 1 AND ParentId = 100000 ";
+                        string cSql = "";
+                        var province = conn.Query<AreaAll>(sql).AsList();
+                        foreach (AreaAll p in province)
+                        {
+                            cSql = @"SELECT  area.ID as value,  area.ParentId ,  area.`Name` as label FROM area WHERE LevelType = 2 AND ParentId =  " + p.value;
+                            p.children = new List<AreaAll>();
+                            var citys = conn.Query<AreaAll>(cSql).AsList();
+                            p.children = citys;
+                            cSql = "";
+                            string dSql = "";
+                            foreach (AreaAll c in citys)
+                            {
+                                dSql = @"SELECT  area.ID as value,  area.ParentId ,  area.`Name` as label FROM area WHERE LevelType = 3 AND ParentId =  " + c.value;
+                                c.children = new List<AreaAll>();
+                                var district = conn.Query<AreaAll>(dSql).AsList();
+                                c.children = district;
+                                dSql = "";
+                            }
+                        }
+
+                        result.d = JsonConvert.DeserializeObject<List<AreaCascader>>(JsonConvert.SerializeObject(province));
+                    } else {
+                        string sql = @"SELECT ID,ParentId, LevelType, Name FROM area WHERE ID = "+id;
+                        string cSql = "";
+                        var areaQuerys = conn.Query<AreaQuery>(sql).AsList();
+                        if (areaQuerys.Count>0){
+                            var areaQuery = areaQuerys[0];
+                            var p = new AreaAll();
+                            p.label = areaQuery.Name;
+                            p.ParentId = areaQuery.ParentId;
+                            p.value = areaQuery.ID;
+                            if(areaQuery.LevelType == "1") {
+                                cSql = @"SELECT  area.ID as value,  area.ParentId ,  area.`Name` as label FROM area WHERE LevelType = 2 AND ParentId =  " + p.value;
+                                p.children = new List<AreaAll>();
+                                var citys = conn.Query<AreaAll>(cSql).AsList();
+                                p.children = citys;
+                                cSql = "";
+                                string dSql = "";
+                                foreach (AreaAll c in citys)
+                                {
+                                    dSql = @"SELECT  area.ID as value,  area.ParentId ,  area.`Name` as label FROM area WHERE LevelType = 3 AND ParentId =  " + c.value;
+                                    c.children = new List<AreaAll>();
+                                    var district = conn.Query<AreaAll>(dSql).AsList();
+                                    c.children = district;
+                                    dSql = "";
+                                }
+                                result.d = JsonConvert.DeserializeObject<AreaCascader>(JsonConvert.SerializeObject(p));
+                            } else if(areaQuery.LevelType == "2") {
+                                string dSql = @"SELECT  area.ID as value,  area.ParentId ,  area.`Name` as label FROM area WHERE LevelType = 3 AND ParentId =  " + p.value;
+                                p.children = new List<AreaAll>();
+                                var district = conn.Query<AreaAll>(dSql).AsList();
+                                p.children = district;
+                                dSql = "";
+                                result.d = JsonConvert.DeserializeObject<AreaCascader2>(JsonConvert.SerializeObject(p));
+                            } else{
+                                result.d = JsonConvert.DeserializeObject<AreaCascader3>(JsonConvert.SerializeObject(p));
+                            }
+                   
+                        } else {
+                            result.s = -1;
+                            result.d = "不存在的ID";
+                        }
+
+                    }                   
+                }
+                catch (Exception e)
+                {
+                    result.s = -1;
+                    result.d = e.Message;
+                }
+                finally
+                {
+                    conn.Dispose();
+                }
+            }
+
+            return result;
+        }
+
+
+        #endregion
+
 
         #region 获取单据编号
         public static string GetRecordID(int CoID)

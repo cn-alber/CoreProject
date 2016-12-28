@@ -130,6 +130,7 @@ namespace CoreDate.CoreComm
                 try{
                     string sql = @"INSERT INTO printer SET 
                                     `NAME` = @NAME, 
+                                    `CoID` = @CoID,
                                     `PrintType` = @PrintType,
                                     `PrintName` = @PrintName,
                                     `IPAddress` = @IPAddress,
@@ -140,6 +141,58 @@ namespace CoreDate.CoreComm
                         result.d = 1;
                     } else {
                         result.d = -1;
+                    }
+
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return result;
+        }
+
+        public static DataResult modifyPrinter(PrinterInsert printer){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{
+                    string sql = @"UPDATE printer SET 
+                                    `NAME` = @NAME, 
+                                    `PrintType` = @PrintType,
+                                    `PrintName` = @PrintName,
+                                    `IPAddress` = @IPAddress,
+                                    `Enabled` = @Enabled,
+                                    `PrinterPort` = @PrinterPort
+                                    WHERE 
+                                     ID=@ID AND `CoID` = @CoID";
+                    var rnt = conn.Execute(sql,printer);
+                    if(rnt > 0){
+                        result.d = 1;
+                    } else {
+                        result.s = -1;
+                    }
+
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return result;
+        }
+        public static DataResult delPrinter(List<string> ids, string CoID){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{
+                    Console.WriteLine(string.Join(",", ids.ToArray()));
+                    string sql = @"UPDATE printer SET IsDelete=TRUE WHERE ID in ("+string.Join(",", ids.ToArray())+") AND CoID=@CoID";
+                    var rnt = conn.Execute(sql,new {
+                        CoID = CoID
+                    });
+                    if(rnt > 0){
+                        result.s = 1;
+                    } else {
+                        result.s = -1;
                     }
 
                 }catch(Exception ex){
