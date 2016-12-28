@@ -2610,5 +2610,19 @@ namespace CoreWebApi
             var data = OrderHaddle.GetAutoConfirmRuleList(int.Parse(GetCoid()),field,sort,num,index);
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Order/AutoConfirmOrd")]
+        public ResponseResult AutoConfirmOrd([FromBodyAttribute]JObject co)
+        {   
+            var data = OrderHaddle.AutoConfirmOrd(int.Parse(GetCoid()),GetUname());
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/AutoOutOfStock")]
+        public ResponseResult AutoOutOfStock([FromBodyAttribute]JObject co)
+        {   
+            var data = OrderHaddle.AutoOutOfStock(int.Parse(GetCoid()),GetUname());
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }  

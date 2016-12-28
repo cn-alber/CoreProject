@@ -667,3 +667,15 @@ OutPut:     Datacnt             int             资料总笔数
             Pagecnt             decimal         总页数
             Rule                List<Rule>      Rule 资料
 参考:output jason 文件:GetAutoConfirmRuleList_output.json
+
+59.AutoConfirmOrd()订单自动审核
+路由:http://localhost:5000/Core/Order/AutoConfirmOrd
+input:      None
+OutPut:     成功或失败
+参考:output jason 文件:AutoConfirmOrd_output.json
+
+60.AutoOutOfStock()缺货单智能分析提交
+路由:http://localhost:5000/Core/Order/AutoOutOfStock
+input:      None
+OutPut:     成功或失败
+参考:output jason 文件:AutoOutOfStock_output.json

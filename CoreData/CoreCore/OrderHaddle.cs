@@ -11041,7 +11041,6 @@ namespace CoreData.CoreCore
                     decimal pagecnt = Math.Ceiling(decimal.Parse(count.ToString())/decimal.Parse(NumPerPage.ToString()));
                     int dataindex = (PageIndex - 1)* NumPerPage;
                     wheresql = wheresql + " limit " + dataindex.ToString() + " ," + NumPerPage.ToString();
-                    Console.WriteLine(sqlcommand + wheresql);
                     var u = conn.Query<OrdAutoConfirmRuleList>(sqlcommand + wheresql).AsList();
                     res.Datacnt = count;
                     res.Pagecnt = pagecnt;
@@ -11053,6 +11052,158 @@ namespace CoreData.CoreCore
                     conn.Dispose();
                 }
             }           
+            return result;
+        }
+        ///<summary>
+        ///自动审核订单
+        ///</summary>
+        public static DataResult AutoConfirmOrd(int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var ID = new List<int>();
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    DateTime today = DateTime.Now;
+                    string sqlcommand = @"select * from order_autoconfirm_rule where enable = true and coid = " + CoID + " and '" + today + "' >= StartDate and '" + today + "' <= EndDate";
+                    var u = conn.Query<OrdAutoConfirmRule>(sqlcommand).AsList();
+                    foreach(var a in u)
+                    {
+                        sqlcommand = @"select ID from `order` where coid = " + CoID + " and status = 1";
+                        if(!string.IsNullOrEmpty(a.PayStartDate) && DateTime.Parse(a.PayStartDate) > DateTime.Parse("1900-01-01"))
+                        {
+                            sqlcommand = sqlcommand + " and paydate >= '" + a.PayStartDate + "'";
+                        }
+                        if(!string.IsNullOrEmpty(a.PayEndDate) && DateTime.Parse(a.PayEndDate) > DateTime.Parse("1900-01-01"))
+                        {
+                            sqlcommand = sqlcommand + " and paydate <= '" + a.PayEndDate + "'";
+                        }
+                        if(a.IgnoreRec == true && !string.IsNullOrEmpty(a.RecMessage))
+                        {
+                            sqlcommand = sqlcommand + " and RecMessage not like '%" + a.RecMessage + "%'";
+                        }
+                        if(a.IgnoreRec == false)
+                        {
+                            sqlcommand = sqlcommand + " and (RecMessage = null or RecMessage = '')";
+                        }
+                        if(a.IgnoreSend == true && !string.IsNullOrEmpty(a.SendMessage))
+                        {
+                            sqlcommand = sqlcommand + " and SendMessage not like '%" + a.SendMessage + "%'";
+                        }
+                        if(a.IgnoreSend == false)
+                        {
+                            sqlcommand = sqlcommand + " and (SendMessage = null or SendMessage = '')";
+                        }
+                        if(!string.IsNullOrEmpty(a.Shop))
+                        {
+                            sqlcommand = sqlcommand + " and shopid in (" + a.Shop + ")";
+                        }
+                        if(!string.IsNullOrEmpty(a.OrdType))
+                        {
+                            sqlcommand = sqlcommand + " and Type in (" + a.OrdType + ")";
+                        }
+                        if(a.DelayedMinute > 0)
+                        {
+                            DateTime x = DateTime.Now.AddMinutes(a.DelayedMinute);
+                            sqlcommand = sqlcommand + " and paydate >= '" + x + "'";
+                        }
+                        if(!string.IsNullOrEmpty(a.MinAmt))
+                        {
+                            sqlcommand = sqlcommand + " and Amount >= " + a.MinAmt;
+                        }
+                        if(!string.IsNullOrEmpty(a.MaxAmt))
+                        {
+                            sqlcommand = sqlcommand + " and Amount <= " + a.MaxAmt;
+                        }
+                        var ord = conn.Query<int>(sqlcommand).AsList();
+                        if(ord.Count == 0) continue;
+                        foreach(var o in ord)
+                        {
+                            sqlcommand = @"select * from orderitem where oid = " + o + " and coid = " + CoID;
+                            var item = conn.Query<OrderItem>(sqlcommand).AsList();
+                            if(!string.IsNullOrEmpty(a.AppointSku))
+                            {
+                                int j = 0;
+                                foreach(var i in item)
+                                {
+                                    if(a.AppointSku.Contains(i.SkuID))
+                                    {
+                                        j ++;
+                                        break;
+                                    }
+                                }
+                                if(j == 0) continue;
+                            }
+                            if(!string.IsNullOrEmpty(a.ExcludeSku))
+                            {
+                                int j = 0;
+                                foreach(var i in item)
+                                {
+                                    if(a.ExcludeSku.Contains(i.SkuID))
+                                    {
+                                        j ++;
+                                        break;
+                                    }
+                                }
+                                if(j > 0) continue;
+                            }
+                            if(!string.IsNullOrEmpty(a.DiscountRate))
+                            {
+                                decimal OAmt = 0,NAmt = 0;
+                                foreach(var i in item)
+                                {
+                                    OAmt = OAmt + i.Qty * decimal.Parse(i.SalePrice);
+                                    NAmt = NAmt + i.Qty * decimal.Parse(i.RealPrice);
+                                }
+                                if(NAmt/OAmt < decimal.Parse(a.DiscountRate)) continue;
+                            }
+                            ID.Add(o);
+                        }
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }    
+            if(ID.Count > 0)
+            {
+                result = ConfirmOrder(ID,CoID,UserName);
+            }       
+            return result;
+        }
+        ///<summary>
+        ///缺货单智能提交
+        ///</summary>
+        public static DataResult AutoOutOfStock(int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var ID = new List<int>();
+            int reasonid = GetReasonID("缺货",CoID,7).s;
+            if(reasonid <= 0)
+            {
+                result.s = -1;
+                result.d = "请先设定【缺货】的异常";
+                return result;
+            }
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    DateTime today = DateTime.Now;
+                    string sqlcommand = @"select ID from `order` where coid = " + CoID + " and status = 7 and AbnormalStatus = " + reasonid;
+                    ID = conn.Query<int>(sqlcommand).AsList();
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }    
+            if(ID.Count > 0)
+            {
+                result = TransferNormal(ID,CoID,UserName);
+                if(result.s == 1)
+                {
+                    result = ConfirmOrder(ID,CoID,UserName);
+                }
+            }       
             return result;
         }
     }
