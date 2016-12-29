@@ -38,6 +38,30 @@ namespace CoreDate.CoreComm
             } 
             return result;
         }
+                 /// <summary>
+		/// 获取print_sys_types 单条数据 
+		/// </summary>
+        public static DataResult GetSysesByType(string id){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{
+                    var list = conn.Query<print_sys_types>(@"SELECT * FROM
+                                                                print_sys_types as a 
+                                                            WHERE 
+                                                                 a.deleted = FALSE AND a.type = @id",new {id = id}).AsList();  
+                    if(list.Count>0){
+                        result.d = list[0];
+                    }else{
+                        result.s = -4023;
+                    }                                                         
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return result;
+        }
 
 
         public static DataResult GetSyses(string id){
@@ -756,7 +780,7 @@ namespace CoreDate.CoreComm
         public static DataResult saveSyses(int sys_id, string type,dynamic state, string name,string coid){
             
             var result = new DataResult(1,null);            
-            if(GetSysesType(type).d == null){ result.s=-4001;  return result;}            
+            if(GetSysesByType(type).d == null){ result.s=-4001;  return result;}            
             using(var conn = new MySqlConnection(DbBase.CommConnectString)){
                 try
                 {

@@ -184,7 +184,6 @@ namespace CoreDate.CoreComm
             var result = new DataResult(1,null);
             using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
                 try{
-                    Console.WriteLine(string.Join(",", ids.ToArray()));
                     string sql = @"UPDATE printer SET IsDelete=TRUE WHERE ID in ("+string.Join(",", ids.ToArray())+") AND CoID=@CoID";
                     var rnt = conn.Execute(sql,new {
                         CoID = CoID
@@ -204,7 +203,58 @@ namespace CoreDate.CoreComm
             return result;
         }
 
+        public static DataResult enabledPrinter(List<string> ids, string CoID,bool Enabled){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{
+                    string sql = @"UPDATE printer SET Enabled=@Enabled WHERE ID in ("+string.Join(",", ids.ToArray())+") AND CoID=@CoID";
+                    var rnt = conn.Execute(sql,new {
+                        Enabled = Enabled,
+                        CoID = CoID
+                    });
+                    if(rnt > 0){
+                        result.s = 1;
+                    } else {
+                        result.s = -1;
+                    }
 
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return result;
+        }
+        public static DataResult defPrinter(int id, string CoID){
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CommConnectString) ){
+                try{
+ 
+                    string sql = @"SELECT PrintType FROM printer WHERE id=@id AND CoID=@CoID";//@"UPDATE printer SET IsDefault=@IsDefault WHERE ID=@id AND CoID=@CoID";
+                    var res = conn.Query<int>(sql,new {
+                        id = id,             
+                        CoID = CoID
+                    }).AsList();
+                    if(res.Count>0) {
+                        var type = res[0];
+                        sql=@"UPDATE printer SET IsDefault=FALSE WHERE PrintType=@type AND CoID=@CoID;
+                              UPDATE printer SET IsDefault=TRUE WHERE ID=@id AND CoID=@CoID";
+                        var rnt = conn.Execute(sql,new {
+                            id = id,    
+                            type = type,         
+                            CoID = CoID
+                        });      
+                    }
+
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            } 
+            return result;
+        }
 
 
 

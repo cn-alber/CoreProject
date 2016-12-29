@@ -132,9 +132,12 @@ namespace CoreWebApi.Print
 
             int id =int.Parse(lo["id"].ToString());            
             string name = lo["name"].ToString();            
-            var presets = lo["presets"] !=null ? JsonEscape(lo["presets"].ToString()):"";
-            var emu_data = lo["emu_data"] !=null ? JsonEscape(lo["emu_data"].ToString()):"";
-            var setting = lo["setting"] !=null ? JsonEscape(lo["setting"].ToString()) :""; 
+            // var presets = lo["presets"] !=null ? JsonEscape(lo["presets"].ToString()):"";
+            // var emu_data = lo["emu_data"] !=null ? JsonEscape(lo["emu_data"].ToString()):"";
+            // var setting = lo["setting"] !=null ? JsonEscape(lo["setting"].ToString()) :""; 
+            var presets = lo["presets"] !=null ? lo["presets"].ToString():"";
+            var emu_data = lo["emu_data"] !=null ? lo["emu_data"].ToString():"";
+            var setting = lo["setting"] !=null ? lo["setting"].ToString() :""; 
             string coid = GetCoid();
             var m = PrintHaddle.saveSysesType(id,name,presets,emu_data,setting,coid); 
             return CoreResult.NewResponse(m.s, m.d, "Print");

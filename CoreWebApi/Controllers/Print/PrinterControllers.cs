@@ -92,6 +92,32 @@ namespace CoreWebApi.Print
             var m = PrinterHaddle.delPrinter(ids,GetCoid());          
             return CoreResult.NewResponse(m.s, m.d, "Print");
         }
+        
+        [HttpPostAttribute("/core/printer/enabledPrinter")]
+        public ResponseResult enabledPrinter([FromBodyAttribute]JObject lo)
+        {           
+            var ids = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(lo["IDLst"].ToString());
+            var m = new DataResult(1,null);
+            if(string.IsNullOrEmpty(lo["Enabled"].ToString())){
+                m.s = -1;
+            }else{
+                m = PrinterHaddle.enabledPrinter(ids,GetCoid(),bool.Parse(lo["Enabled"].ToString()));
+            }                      
+            return CoreResult.NewResponse(m.s, m.d, "Print");
+        }
+
+        [HttpPostAttribute("/core/printer/defPrinter")]
+        public ResponseResult defPrinter([FromBodyAttribute]JObject lo)
+        {           
+            var id = Newtonsoft.Json.JsonConvert.DeserializeObject<int>(lo["ID"].ToString());
+            var m = new DataResult(1,null);
+            if(id == 0){
+                m.s = -1;
+            }else{
+                m = PrinterHaddle.defPrinter(id,GetCoid());
+            }                      
+            return CoreResult.NewResponse(m.s, m.d, "Print");
+        }
 
 
     }
