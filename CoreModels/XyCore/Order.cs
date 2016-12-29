@@ -1051,4 +1051,30 @@ namespace CoreModels.XyCore
         public decimal Pagecnt{get;set;}//总页数
         public List<OrdAutoConfirmRuleList> Rule {get;set;}//订单资料List
     }
+    public class OrdSpecial
+    {
+        public int ID{get;set;}
+        public string Shop{get;set;}
+        public DateTime StartDate{get;set;}
+        public DateTime EndDate{get;set;}
+        public string RecMessage{get;set;}
+        public string SendMessage{get;set;}
+        public string RecAddress{get;set;}
+        public int CoID{get;set;}
+        public string Creator{get;set;}
+        public DateTime CreateDate{get;set;}
+        public string Modifier{get;set;}
+        public DateTime ModifyDate{get;set;}
+    }
+    public class OrdSpecialSingle
+    {
+        public int ID{get;set;}
+        public string Shop{get;set;}
+        public string StartDate{get;set;}
+        public string EndDate{get;set;}
+        public string RecMessage{get;set;}
+        public string SendMessage{get;set;}
+        public string RecAddress{get;set;}
+
+    }
 }

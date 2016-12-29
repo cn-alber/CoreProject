@@ -2624,5 +2624,519 @@ namespace CoreWebApi
             var data = OrderHaddle.AutoOutOfStock(int.Parse(GetCoid()),GetUname());
             return CoreResult.NewResponse(data.s, data.d, "General"); 
         }
+
+        [HttpPostAttribute("/Core/Order/AutoSetExpress")]
+        public ResponseResult AutoSetExpress([FromBodyAttribute]JObject co)
+        {   
+            var data = OrderHaddle.AutoSetExpress(int.Parse(GetCoid()),GetUname());
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/ConfirmOrdAll")]
+        public ResponseResult ConfirmOrdAll([FromBodyAttribute]JObject co)
+        {   
+            int x;
+            long l;
+            var cp = new OrderParm();
+            cp.CoID = int.Parse(GetCoid());
+            if(co["ID"] != null)
+            {
+                string Text = co["ID"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (int.TryParse(Text, out x))
+                    {
+                        cp.ID = int.Parse(Text);
+                    }
+                }
+            }
+            if(co["SoID"] != null)
+            {
+                string Text = co["SoID"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (long.TryParse(Text, out l))
+                    {
+                        cp.SoID = long.Parse(Text);
+                    }
+                }
+            }
+            if(co["PayNbr"] != null)
+            {
+                cp.PayNbr = co["PayNbr"].ToString();
+            }
+            if(co["BuyerShopID"] != null)
+            {
+                cp.BuyerShopID = co["BuyerShopID"].ToString();
+            }
+            if(co["ExCode"] != null)
+            {
+                cp.ExCode = co["ExCode"].ToString();
+            }
+            if(co["RecName"] != null)
+            {
+                cp.RecName = co["RecName"].ToString();
+            }
+            if(co["RecPhone"] != null)
+            {
+                cp.RecPhone = co["RecPhone"].ToString();
+            }
+            if(co["RecTel"] != null)
+            {
+                cp.RecTel = co["RecTel"].ToString();
+            }
+            if(co["RecLogistics"] != null)
+            {
+                cp.RecLogistics = co["RecLogistics"].ToString();
+            }
+            if(co["RecCity"] != null)
+            {
+                cp.RecCity = co["RecCity"].ToString();
+            }
+            if(co["RecDistrict"] != null)
+            {
+                cp.RecDistrict = co["RecDistrict"].ToString();
+            }
+            if(co["RecAddress"] != null)
+            {
+                cp.RecAddress = co["RecAddress"].ToString();
+            }
+            if(co["StatusList"] != null)
+            {
+                string Text = co["StatusList"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    string[] a = Text.Split(',');
+                    List<int> s = new List<int>();
+                    foreach(var i in a)
+                    {
+                        s.Add(int.Parse(i));
+                    }
+                    cp.StatusList = s;
+                }
+            }
+            if(co["AbnormalStatusList"] != null)
+            {
+                string Text = co["AbnormalStatusList"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    string[] a = Text.Split(',');
+                    List<int> s = new List<int>();
+                    foreach(var i in a)
+                    {
+                        s.Add(int.Parse(i));
+                    }
+                    cp.AbnormalStatusList = s;
+                }
+            }
+            if(co["IsRecMsgYN"] != null)
+            {
+                string Text = co["IsRecMsgYN"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if(Text.ToUpper() == "Y" || Text.ToUpper() == "N")
+                    {
+                        cp.IsRecMsgYN = Text;
+                    }
+                }
+            }
+            if(co["RecMessage"] != null)
+            {
+                cp.RecMessage = co["RecMessage"].ToString();
+            }
+            if(co["IsSendMsgYN"] != null)
+            {
+                string Text = co["IsSendMsgYN"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if(Text.ToUpper() == "Y" || Text.ToUpper() == "N")
+                    {
+                        cp.IsSendMsgYN = Text;
+                    }
+                }
+            }
+            if(co["SendMessage"] != null)
+            {
+                cp.SendMessage = co["SendMessage"].ToString();
+            }
+            if(co["Datetype"] != null)
+            {
+                string Text = co["Datetype"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if(Text.ToUpper() == "SENDDATE" || Text.ToUpper() == "PAYDATE" || Text.ToUpper() == "PLANDATE")
+                    {
+                        cp.Datetype = Text;
+                    }
+                }
+            }
+            DateTime date;
+            if(co["DateStart"] != null)
+            {
+                string Text = co["DateStart"].ToString();
+                if (DateTime.TryParse(Text, out date))
+                {
+                    cp.DateStart = DateTime.Parse(Text);
+                }
+            }
+            if(co["Dateend"] != null)
+            {
+                string Text = co["Dateend"].ToString();
+                if (DateTime.TryParse(Text, out date))
+                {
+                    cp.DateEnd = DateTime.Parse(Text);
+                }
+            }
+            if(co["Skuid"] != null)
+            {
+                cp.Skuid = co["Skuid"].ToString();
+            }
+            if(co["GoodsCode"] != null)
+            {
+                cp.GoodsCode = co["GoodsCode"].ToString();
+            }
+            if(co["Ordqtystart"] != null)
+            {
+                string Text = co["Ordqtystart"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (int.TryParse(Text, out x))
+                    {
+                        cp.Ordqtystart = int.Parse(Text);
+                    }
+                }
+            }
+            if(co["Ordqtyend"] != null)
+            {
+                string Text = co["Ordqtyend"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (int.TryParse(Text, out x))
+                    {
+                        cp.Ordqtyend = int.Parse(Text);
+                    }
+                }
+            }
+            decimal y;
+            if(co["Ordamtstart"] != null)
+            {
+                string Text = co["Ordamtstart"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (decimal.TryParse(Text, out y))
+                    {
+                        cp.Ordamtstart = decimal.Parse(Text);
+                    }
+                }
+            }
+            if(co["Ordamtend"] != null)
+            {
+                string Text = co["Ordamtend"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (decimal.TryParse(Text, out y))
+                    {
+                        cp.Ordamtend = decimal.Parse(Text);
+                    }
+                }
+            }
+            if(co["Skuname"] != null)
+            {
+                cp.Skuname = co["Skuname"].ToString();
+            }
+            if(co["Norm"] != null)
+            {
+                cp.Norm = co["Norm"].ToString();
+            }
+            if(co["ShopStatus"] != null)
+            {
+                string Text = co["ShopStatus"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    string[] a = Text.Split(',');
+                    List<string> s = new List<string>();
+                    foreach(var i in a)
+                    {
+                        s.Add(i);
+                    }
+                    cp.ShopStatus = s;
+                }
+            }
+            if(co["Osource"] != null)
+            {
+                string Text = co["Osource"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if (int.TryParse(Text, out x))
+                    {
+                        cp.OSource = int.Parse(Text);
+                    }
+                }
+            }
+            if(co["Type"] != null)
+            {
+                string Text = co["Type"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    string[] a = Text.Split(',');
+                    List<int> s = new List<int>();
+                    foreach(var i in a)
+                    {
+                        s.Add(int.Parse(i));
+                    }
+                    cp.Type = s;
+                }
+            }
+            if(co["IsCOD"] != null)
+            {
+                string Text = co["IsCOD"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if(Text.ToUpper() == "Y" || Text.ToUpper() == "N")
+                    {
+                        cp.IsCOD = Text;
+                    }
+                }
+            }
+            if(co["IsPaid"] != null)
+            {
+                string Text = co["IsPaid"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if(Text.ToUpper() == "Y" || Text.ToUpper() == "N")
+                    {
+                        cp.IsPaid = Text;
+                    }
+                }
+            }
+            if(co["IsShopSelectAll"] != null)
+            {
+                string Text = co["IsShopSelectAll"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if(Text.ToUpper() == "TRUE")
+                    {
+                        cp.IsShopSelectAll = true;
+                    }
+                }
+            }
+            if(co["ShopID"] != null)
+            {
+                string Text = co["ShopID"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    string[] a = Text.Split(',');
+                    List<int> s = new List<int>();
+                    foreach(var i in a)
+                    {
+                        s.Add(int.Parse(i));
+                    }
+                    cp.ShopID = s;
+                }
+            }
+            if(co["IsDisSelectAll"] != null)
+            {
+                string Text = co["IsDisSelectAll"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    if(Text.ToUpper() == "TRUE")
+                    {
+                        cp.IsDisSelectAll = true;
+                    }
+                }
+            }
+            if(co["Distributor"] != null)
+            {
+                string Text = co["Distributor"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    string[] a = Text.Split(',');
+                    List<string> s = new List<string>();
+                    foreach(var i in a)
+                    {
+                        s.Add(i);
+                    }
+                    cp.Distributor = s;
+                }
+            }
+            if(co["ExID"] != null)
+            {
+                string Text = co["ExID"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    string[] a = Text.Split(',');
+                    List<int> s = new List<int>();
+                    foreach(var i in a)
+                    {
+                        s.Add(int.Parse(i));
+                    }
+                    cp.ExID = s;
+                }
+            }
+            if(co["SendWarehouse"] != null)
+            {
+                string Text = co["SendWarehouse"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    string[] a = Text.Split(',');
+                    List<int> s = new List<int>();
+                    foreach(var i in a)
+                    {
+                        s.Add(int.Parse(i));
+                    }
+                    cp.SendWarehouse = s;
+                }
+            }
+            if(co["Others"] != null)
+            {
+                string Text = co["Others"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    string[] a = Text.Split(',');
+                    List<int> s = new List<int>();
+                    foreach(var i in a)
+                    {
+                        s.Add(int.Parse(i));
+                    }
+                    cp.Others = s;
+                }
+            }
+            cp.SortField = "ID";
+            cp.SortDirection = "DESC";
+            cp.NumPerPage = 1000000;
+            cp.PageIndex = 1;
+            var data = OrderHaddle.ConfirmOrdAll(cp,GetUname());
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/InsertOrderSpecial")]
+        public ResponseResult InsertOrderSpecial([FromBodyAttribute]JObject co)
+        {   
+            var rule = new OrdSpecial();
+            if(co["Shop"] != null)
+            {
+                rule.Shop = co["Shop"].ToString();
+            }
+            if(co["StartDate"] != null)
+            {
+                string Text = co["StartDate"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    DateTime x;
+                    if (DateTime.TryParse(Text, out x))
+                    {
+                        rule.StartDate = DateTime.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "开始日期参数异常", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "开始日期必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "开始日期必填", "General"); 
+            }
+            if(co["EndDate"] != null)
+            {
+                string Text = co["EndDate"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    DateTime x;
+                    if (DateTime.TryParse(Text, out x))
+                    {
+                        rule.EndDate = DateTime.Parse(Text);
+                    }
+                    else
+                    {
+                        return CoreResult.NewResponse(-1, "结束日期参数异常", "General"); 
+                    }
+                }
+                else
+                {
+                    return CoreResult.NewResponse(-1, "结束日期必填", "General"); 
+                }
+            }
+            else
+            {
+                return CoreResult.NewResponse(-1, "结束日期必填", "General"); 
+            }
+            if(co["RecMessage"] != null)
+            {
+                rule.RecMessage = co["RecMessage"].ToString();
+            }
+            if(co["SendMessage"] != null)
+            {
+                rule.SendMessage = co["SendMessage"].ToString();
+            }
+            if(co["RecAddress"] != null)
+            {
+                rule.RecAddress = co["RecAddress"].ToString();
+            }
+            rule.CoID = int.Parse(GetCoid());
+            rule.Creator = GetUname();
+            rule.Modifier = GetUname();
+            var data = OrderHaddle.InsertOrderSpecial(rule);
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpGetAttribute("/Core/Order/GetOrderSpecial")]
+        public ResponseResult GetOrderSpecial(string ID)
+        {   
+            var data = OrderHaddle.GetOrderSpecial(int.Parse(GetCoid()));
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
+
+        [HttpPostAttribute("/Core/Order/UpdateOrderSpecial")]
+        public ResponseResult UpdateOrderSpecial([FromBodyAttribute]JObject co)
+        {   
+            string RecAddress = null,StartDate = null,EndDate = null,RecMessage = null,SendMessage = null,Shop = null;
+            if(co["RecAddress"] != null)
+            {
+                RecAddress = co["RecAddress"].ToString();
+            }
+            if(co["StartDate"] != null)
+            {
+                string Text = co["StartDate"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    DateTime x;
+                    if (DateTime.TryParse(Text, out x))
+                    {
+                        StartDate = Text;
+                    }
+                }
+            }
+            if(co["EndDate"] != null)
+            {
+                string Text = co["EndDate"].ToString();
+                if(!string.IsNullOrEmpty(Text))
+                {
+                    DateTime x;
+                    if (DateTime.TryParse(Text, out x))
+                    {
+                        EndDate = Text;
+                    }
+                }
+            }
+            if(co["RecMessage"] != null)
+            {
+                RecMessage = co["RecMessage"].ToString();
+            }
+            if(co["SendMessage"] != null)
+            {
+                SendMessage = co["SendMessage"].ToString();
+            }
+            if(co["Shop"] != null)
+            {
+                Shop = co["Shop"].ToString();
+            }
+            var data = OrderHaddle.UpdateOrderSpecial(int.Parse(GetCoid()),Shop,StartDate,EndDate,RecMessage,SendMessage,RecAddress,GetUname());
+            return CoreResult.NewResponse(data.s, data.d, "General"); 
+        }
     }
 }  

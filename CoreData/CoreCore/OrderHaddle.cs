@@ -5036,6 +5036,7 @@ namespace CoreData.CoreCore
             var bu = GetConfig(CoID);
             var business = bu.d as Business;
             var gifti = new List<GiftRule>();
+            var spe = GetOrderSpecial(CoID).d as OrdSpecialSingle;
             //检查平台单号是否已经存在，若是，则不能新增
             using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
                 try{
@@ -5258,6 +5259,92 @@ namespace CoreData.CoreCore
                     ord.Status = 7;
                     ord.AbnormalStatus = reasonid;
                     ord.StatusDec = "商品编码缺失";
+                }
+                //检查是否标记特殊单
+                if(ord.Status != 7 && (!string.IsNullOrEmpty(spe.Shop) || !string.IsNullOrEmpty(spe.RecMessage) || !string.IsNullOrEmpty(spe.SendMessage) || !string.IsNullOrEmpty(spe.RecAddress)))
+                {
+                    bool speFlag = true;
+                    if(!string.IsNullOrEmpty(spe.Shop))
+                    {
+                        string[] sp = spe.Shop.Split(',');
+                        int i = 0;
+                        foreach(var pp in sp)
+                        {
+                            if (ord.ShopID.ToString() == pp)
+                            {
+                                i ++;
+                                break;
+                            }
+                        }
+                        if(i ==  0) 
+                        { 
+                            speFlag = false;
+                        }
+                    }
+                    if(!string.IsNullOrEmpty(spe.RecMessage))
+                    {
+                        string[] sp = spe.RecMessage.Split(',');
+                        int i = 0;
+                        foreach(var pp in sp)
+                        {
+                            if (ord.RecMessage.Contains(pp))
+                            {
+                                i ++;
+                                break;
+                            }
+                        }
+                        if(i ==  0) 
+                        { 
+                            speFlag = false;
+                        }
+                    }
+                    if(!string.IsNullOrEmpty(spe.SendMessage))
+                    {
+                        string[] sp = spe.SendMessage.Split(',');
+                        int i = 0;
+                        foreach(var pp in sp)
+                        {
+                            if (ord.SendMessage.Contains(pp))
+                            {
+                                i ++;
+                                break;
+                            }
+                        }
+                        if(i ==  0) 
+                        { 
+                            speFlag = false;
+                        }
+                    }
+                    if(!string.IsNullOrEmpty(spe.RecAddress))
+                    {
+                        string[] sp = spe.RecAddress.Split(',');
+                        int i = 0;
+                        foreach(var pp in sp)
+                        {
+                            if (ord.RecAddress.Contains(pp))
+                            {
+                                i ++;
+                                break;
+                            }
+                        }
+                        if(i ==  0) 
+                        { 
+                            speFlag = false;
+                        }
+                    }
+                    if( speFlag == true)
+                    {
+                        int reasonid = GetReasonID("特殊单",CoID,7).s;
+                        if(reasonid == -1)
+                        {
+                            result.s = -1;
+                            result.d = "请先设定【特殊单】的异常";
+                            return result;
+                        }
+                        ord.Status = 7;
+                        ord.AbnormalStatus = reasonid;
+                        ord.StatusDec = "特殊单";
+                    }
                 }
                 if(ord.Status != 7 && business.ismergeorder == true)
                 {
@@ -11204,6 +11291,176 @@ namespace CoreData.CoreCore
                     result = ConfirmOrder(ID,CoID,UserName);
                 }
             }       
+            return result;
+        }
+        ///<summary>
+        ///智能配快递
+        ///</summary>
+        public static DataResult AutoSetExpress(int CoID,string UserName)
+        {
+            var result = new DataResult(1,null);
+            var ID = new List<int>();
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{    
+                    DateTime today = DateTime.Now;
+                    string sqlcommand = @"select ID from `order` where coid = " + CoID + " and status in (0,1,2,7) and (ISNULL(ExID) or ExID = 0)";
+                    ID = conn.Query<int>(sqlcommand).AsList();
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }   
+            result =  SetExp(ID,CoID,"B","自动计算快递",UserName);
+            return result;
+        }
+        ///<summary>
+        ///批量审核所有符合条件的订单
+        ///</summary>
+        public static DataResult ConfirmOrdAll(OrderParm cp,string UserName)
+        {
+            var result = new DataResult(1,null);
+            result = GetOrderList(cp);
+            var res = result.d as OrderData;
+            var ord = res.Ord as List<OrderQuery>;
+            var ID = new List<int>();
+            var IDN = new List<int>();
+            foreach(var a in ord)
+            {
+                if(a.Status == 7 && a.AbnormalStatusDec == "缺货")
+                {
+                    ID.Add(a.ID);
+                    IDN.Add(a.ID);
+                }
+                if(a.Status == 1)
+                {
+                    ID.Add(a.ID);
+                }
+            }
+            if(IDN.Count > 0)
+            {
+                result = TransferNormal(IDN,cp.CoID,UserName);
+            }
+            if(ID.Count > 0)
+            {
+                result = ConfirmOrder(ID,cp.CoID,UserName);
+            }
+            return result;
+        }
+        ///<summary>
+        ///新增特殊单订单识别
+        ///</summary>
+        public static DataResult InsertOrderSpecial(OrdSpecial rule)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = @"INSERT INTO order_special(Shop,StartDate,EndDate,RecMessage,SendMessage,RecAddress,CoID,Creator,Modifier) 
+                                                            VALUES(@Shop,@StartDate,@EndDate,@RecMessage,@SendMessage,@RecAddress,@CoID,@Creator,@Modifier)";     
+                    int count = conn.Execute(sqlcommand,rule);
+                    if(count <= 0)
+                    {
+                        result.s = -3002;
+                        return result;
+                    }
+                    int rtn = conn.QueryFirst<int>("select LAST_INSERT_ID()");
+                    result.d = rtn;
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }   
+            return result;
+        }
+        ///<summary>
+        ///查询特殊单订单识别
+        ///</summary>
+        public static DataResult GetOrderSpecial(int CoID)
+        {
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = @"select ID,Shop,StartDate,EndDate,RecMessage,SendMessage,RecAddress from order_special where coid = " + CoID;     
+                    var u = conn.Query<OrdSpecialSingle>(sqlcommand).AsList();
+                    if(u.Count > 0)
+                    {
+                        result.d = u[0];
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }   
+            return result;
+        }
+        ///<summary>
+        ///更新特殊单订单识别
+        ///</summary>
+        public static DataResult UpdateOrderSpecial(int CoID,string Shop,string StartDate,string EndDate,string RecMessage,string SendMessage,string RecAddress,string UserName)
+        {
+            var p = new DynamicParameters();
+            var result = new DataResult(1,null);
+            using(var conn = new MySqlConnection(DbBase.CoreConnectString) ){
+                try{
+                    string sqlcommand = "update order_special set ";
+                    int i = 0;
+                    if(Shop != null)
+                    {
+                        sqlcommand = sqlcommand + "Shop = @Shop,";
+                        p.Add("@Shop",Shop);
+                        i ++;
+                    }
+                    if(StartDate != null)
+                    {
+                        sqlcommand = sqlcommand + "StartDate = @StartDate,";
+                        p.Add("@StartDate",StartDate);
+                        i ++;
+                    }
+                    if(EndDate != null)
+                    {
+                        sqlcommand = sqlcommand + "EndDate = @EndDate,";
+                        p.Add("@EndDate",EndDate);
+                        i ++;
+                    }
+                    if(RecMessage != null)
+                    {
+                        sqlcommand = sqlcommand + "RecMessage = @RecMessage,";
+                        p.Add("@RecMessage",RecMessage);
+                        i ++;
+                    }
+                    if(SendMessage != null)
+                    {
+                        sqlcommand = sqlcommand + "SendMessage = @SendMessage,";
+                        p.Add("@SendMessage",SendMessage);
+                        i ++;
+                    }
+                    if(RecAddress != null)
+                    {
+                        sqlcommand = sqlcommand + "RecAddress = @RecAddress,";
+                        p.Add("@RecAddress",RecAddress);
+                        i ++;
+                    }
+                    if(i > 0)
+                    {
+                        sqlcommand = sqlcommand + "Modifier = @Modifier,ModifyDate=@ModifyDate where coid = @CoID";
+                        p.Add("@Modifier",UserName);
+                        p.Add("@ModifyDate",DateTime.Now);
+                        p.Add("@CoID",CoID);
+                        int count = conn.Execute(sqlcommand,p);
+                        if(count <= 0)
+                        {
+                            result.s = -3003;
+                            return result;
+                        }
+                    }
+                }catch(Exception ex){
+                    result.s = -1;
+                    result.d = ex.Message;
+                    conn.Dispose();
+                }
+            }   
             return result;
         }
     }

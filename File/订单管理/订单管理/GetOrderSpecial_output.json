@@ -1,0 +1,13 @@
+{
+    "s": 1,
+    "d": {
+        "ID": 1,
+        "Shop": "1,2",
+        "StartDate": "2016-12-01 00:00:00",
+        "EndDate": "2016-12-31 00:00:00",
+        "RecMessage": "1",
+        "SendMessage": "2",
+        "RecAddress": "3"
+    },
+    "m": ""
+}
